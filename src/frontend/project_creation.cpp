@@ -1001,6 +1001,7 @@ CreationPlan plan_creation(const fs::path& requested,const CreationOptions& opti
     text+=app?"\n\n[application]\nid = ":"\n\n[package]\nid = ";
     text+=toml_string(app?generated(options.application_id,"local.a"):generated(options.package_id,"local.l"));
     if(!app)text+="\nname = "+toml_string(package);
+    if(!app && starter)text+="\nentry = "+toml_string(*starter);
     if(starter)text+="\n\n[sources]\nroots = ["+toml_string(starter_parent(*starter))+"]";
     text+='\n';
     auto parsed=parse_manifest(SourceFile(path_utf8(root/manifest_name),std::move(text)));

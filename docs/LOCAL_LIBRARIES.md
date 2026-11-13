@@ -1,39 +1,78 @@
 # Project-local VOID libraries
 
-Current add/tidy behavior and ownership rules are documented in
-[G26: installed source packages and maintenance](#g26-installed-source-packages-and-maintenance).
-The opening notes below retain the earlier implementation history.
+VOID supports project-owned `lib/...` source and declared, locked `pkg/...`
+packages. Both use the existing source graph, visibility and path checks.
+[G26 maintenance and ownership](#g26-installed-source-packages-and-maintenance)
+explains acquisition and publication; [G27 qualification](projects/G27_LIBRARY_AUTHORING.md)
+records the completed authoring integration. Earlier local-library delivery is
+retained in its [dated acceptance record](local-libraries/ACCEPTANCE.md).
 
-Slice 1 now validates application/library metadata and rejects nonempty reserved
-native/dependency declarations through the explicit compiler-library parser only.
-[Engineering evidence](projects/SLICE1.md) records the qualification. Source-library
-analysis, project admission, resolution and native linking/loading remain deferred;
-current import/provider behavior is unchanged.
+## Creating and composing libraries
 
-The [Phase 1 source/identity contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
-keeps `libs/` import-only for automatic application discovery; an imported library
-main does not become a candidate. A file independently included as an application
-seed remains eligible even if another seed imports it; exclusions/library placement
-make that role explicit. Library manifests initially support validation/metadata,
-not package artifacts or resolution. Schema 1 rejects nonempty reserved dependencies
-and native tables. These are proposals, with implementation HOLD.
+From an existing empty parent directory:
 
-## Later approved project/package direction, 8 November 2026
+```sh
+voidc new app
+voidc new geometry --kind library --package-name geometry
+voidc add geometry --project app --path ../geometry
+voidc tidy --check --project app
+```
 
-The [coordinated roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) extends the future
-Git-based package direction with native project manifests, separate package/app
-identities, SemVer and verified native dependencies. General typed C linking is
-dynamic by default, static optional; raylib is the first substantial integration
-target. Today's `lib/raylib` example is source layout, not a working C binding.
-New manifest/resolver/FFI details are proposed and unimplemented. Preserve local
-`libs/` identities/visibility; external packages need a separate boundary, and
-neither imports nor metadata grant native or installation authority.
+`new` writes `package.entry = "src/geometry.void"` under `[package]`, using the
+actual generated path. `--source api/geometry.void` records that custom path
+instead. `init --kind library` preserves existing source and does not guess an
+entry; set `[package].entry` explicitly before offering that project to `add`.
+Applications continue discovering a unique synchronous main without requiring
+`project.entry`. Libraries are checked/imported, not directly run or built as
+executables.
 
-## Recorded local-library delivery
+For a reusable library that depends on another library, start a separate graph
+in that same parent directory:
 
-21 October 2026. **Implemented and locally verified; Wrench review and native
-Windows/macOS verification pending.** [Acceptance evidence](local-libraries/ACCEPTANCE.md).
-This is the owner-authorized local-library sprint, not Stage 9 or hosted acceptance.
+```sh
+voidc new consumer --kind library --package-name consumer
+voidc add geometry --project consumer --path ../geometry
+voidc tidy --check --project consumer
+```
+
+Replace `consumer/src/consumer.void` with:
+
+```void
+use pkg/geometry as g
+public func answer() -> i32:
+    return g.answer() + 7
+```
+
+After saving the source, check and consume it from a fresh application:
+
+```sh
+voidc check --project consumer
+voidc new transitiveapp
+voidc add consumer --project transitiveapp --path ../consumer
+voidc tidy --check --project transitiveapp
+```
+
+Replace `transitiveapp/src/app.void` with:
+
+```void
+use pkg/consumer as c
+func main() -> i32:
+    print(c.answer())
+    return 0
+```
+
+`voidc run --project transitiveapp` prints `49`. The application declares
+`consumer`; only that library declares `geometry`. There is no implicit re-export
+of the transitive alias. External paths are editable copies: the first `app`'s
+`libs/geometry` and `transitiveapp`'s `libs/consumer/libs/geometry` are distinct
+origins. Adding another copied `geometry` directly to `transitiveapp` conflicts
+with VOID5007 even when IDs agree. Reuse a deliberately shared in-project origin
+when a graph needs shared editable identity.
+
+`add --git ORIGIN --rev FULL_SHA` also supports library consumers through the
+same D3 lock/snapshot checks. Transitive Git acquisition still requires explicit
+D3 authorization; add does not grant it implicitly. Native requirements, catalog
+selection and execution approval remain the application's separate D4 boundary.
 
 ## Source spelling and layout
 
@@ -64,11 +103,10 @@ qualifiers work; `using` remains struct composition.
 
 Unquoted segments retain the existing lowercase ASCII identifier grammar and `/`
 separators; omit `.void`. Quoted project paths retain their existing portable
-filename rules. The selected entry's parent is the VFS root, independent of cwd.
-`app.void` is an explicit entry, not a new automatic discovery filename. See
-[baseline project selection](STAGE8_DISCOVERY.md) for deterministic `main.void`
-discovery. The [approved replacement](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
-selects one main regardless of filename and diagnoses ambiguity; it is not implemented.
+filename rules. Explicit-file selection uses the selected entry's parent as VFS root; manifest
+selection uses the manifest root, independent of cwd. Manifest applications
+select a unique supported main across their source roots regardless of filename;
+manifestless directory selection retains exact `main.void`. See [CLI selection](CLI.md).
 
 ## Identity, ownership and safety
 
@@ -109,36 +147,15 @@ offers `raylib/`, plus `raylib` only if the exact repeated-name entry exists.
 refresh and same-server recovery apply. Empty folders offer traversal without an
 invented module. No adapter implements library discovery.
 
-## Native and future boundaries
+## Native and package boundaries
 
-`raylib` is illustrative. Importing VOID source grants no native C bindings,
-link libraries, handles, callbacks or additional host authority. Existing explicit
-provider admission, generation leases, Runtime/GC and linkage rules remain intact.
-Package installation, registries, manifests, versioning, external-project identity,
-automatic native linking and executable packaging require separate authorization.
-The separate CLI/build proposal and all Stage 9 work remain outside this sprint.
-
-## Future external package manager — Boss direction, 21 October 2026
-
-The future direction is a **Git-based package manager**: Git repositories as
-external VOID library sources, with explicit versions/revisions, reproducible
-dependency resolution, pinned identities/content hashes and a lockfile. Preserve
-compatibility with project-local `libs/` and `use lib/...`; today's project-owned
-imports are not already external packages and introduce no package trust boundary.
-
-Future design must account for target-aware native dependencies, platform and
-architecture compatibility, eventual C-library integration, package trust and
-integrity checks. Do not permit unrestricted automatic installation scripts.
-Package discovery and editor integration are future capabilities, using the
-compiler-owned source/identity model where appropriate.
-
-Exact manifest syntax, resolver design, version policy, trust rules, external
-identities and native-link contracts remain **proposed design details**, not
-implemented contracts. The 8 November record above approves manifest/SemVer and
-dynamic-default linkage direction without freezing those details. No project package
-manager is implemented by the local-library, Stage 9 or CI #90 repairs.
-Complete VOID language features before substantial
-standard-library implementation. This section records direction, not a new sprint.
+Importing ordinary VOID source grants no native C bindings, link libraries,
+handles, callbacks or additional host authority. Typed C imports and verified
+raylib packages are implemented through explicit provider admission, generation
+leases, Runtime/GC and linkage rules. See [G25 header import](projects/G25_NATIVE_HEADER_IMPORTER.md)
+and [G24 physical source](projects/G24_PHYSICAL_SOURCE_IMPLEMENTATION.md).
+No registry, automatic installation scripts or implicit native approval is added
+by library creation or maintenance.
 
 ## G26: installed source packages and maintenance
 
@@ -153,8 +170,9 @@ voidc tidy --project .
 voidc tidy --check --project .
 ```
 
-The project defaults to the current directory. Local source paths are relative to
-that selected project. There is no registry lookup. Git acquisition uses D3's
+Both application and library consumers use these commands. The project defaults
+to the current directory. Local source paths are relative to that selected
+project. There is no registry lookup. Git acquisition uses D3's
 existing HTTPS or `file:<project-relative-repository>` pins and its existing
 whole-repository limits.
 
@@ -192,7 +210,7 @@ materializes it. A present unowned or altered view is an error.
 
 `tidy` parses relevant source roots or the explicit entry using the compiler's
 source graph and follows referenced project/local imports. It validates package
-metadata and locks without executing or type-checking the application. Missing
+metadata and locks without executing or type-checking the selected project. Missing
 local entry files and undeclared `pkg/` imports are errors. Unused direct
 packages are advice and are retained. No developer `.void` source is changed.
 Legitimate editable-source or manifest changes refresh the lock. Immutable Git

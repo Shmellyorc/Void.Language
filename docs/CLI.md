@@ -22,8 +22,10 @@ the manifest path, IDs and next check command before publication.
 
 Init preserves existing sources and works before a unique main has been written.
 New uses `src/app.void` for applications or `src/<package-name>.void` for libraries
-by default. A custom source path sets the source root to its parent. Neither command
-writes an entry override. Publication refuses existing or wrong-case destinations,
+by default. A custom source path sets the source root to its parent. New libraries
+record that known path as `package.entry`; init does not infer an entry. Applications
+retain automatic main discovery without a generated `project.entry` override.
+Publication refuses existing or wrong-case destinations,
 and a child of a manifest project requires `--nested`. Completed creation returns
 0, validation or filesystem failures return 1, and malformed usage returns 2.
 Use `voidc resolve --project .` for available declared dependencies and
@@ -319,8 +321,8 @@ Both commands default to the current project. `--path` is relative to that
 project; a path already inside it remains editable in place, while an external
 source is installed as an editable copy under `libs/ALIAS`. Git pins must be
 complete lowercase immutable commits, acquired through D3's existing transport.
-There is no bare-name registry lookup. `add` selects an application manifest,
-validates the library's package ID/version/entry, appends its dependency table
+There is no bare-name registry lookup. `add` selects an application or library
+manifest, validates the source library's package ID/version/entry, appends its dependency table
 and maintains `void.lock`. Conflicts retain the previous project.
 
 `use lib/...` selects ordinary project-owned source. `use pkg/...` selects a
@@ -333,4 +335,7 @@ fetches or upgrades Git pins. `--check` performs read-only consistency checking
 and exits nonzero for required corrections; unused-package advice alone does
 not fail CI. Native execution still requires the existing separate D4 approval.
 See [local-library ownership and recovery](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance)
-and [G26 qualification](projects/G26_PACKAGE_MAINTENANCE.md).
+and [G26 qualification](projects/G26_PACKAGE_MAINTENANCE.md). Generated libraries
+include their known `package.entry`; `init` does not infer one. For complete
+application and library-consumer examples, see [creating and composing libraries](LOCAL_LIBRARIES.md#creating-and-composing-libraries)
+and [G27 qualification](projects/G27_LIBRARY_AUTHORING.md).

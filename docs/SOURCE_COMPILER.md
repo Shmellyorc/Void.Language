@@ -1,52 +1,45 @@
 # Source compiler and engineering build guide
 
-Slice 1 supplies the compiler-library [manifest parser](../include/void/project.hpp).
-Slice 2 adds `analyze_manifest_project(root, entry_override, sources, manifests)`
-in [frontend.hpp](../include/void/frontend.hpp), returning an owning immutable
-ProjectAnalysis with separate discovery/execution source snapshots and a selection
-key. Applications retain the existing ValidatedAnalysis/IR/LLVM pipeline. Libraries
-have no executable program or entry: their source union is checked with an explicit
-declarationless root scope. [Engineering/evidence](projects/SLICE2.md).
+The compiler-library [manifest parser](../include/void/project.hpp) and
+`analyze_manifest_project(root, entry_override, sources, manifests)` in
+[frontend.hpp](../include/void/frontend.hpp) provide owning immutable project
+analysis, discovery/execution snapshots and entry selection. Applications use the
+existing ValidatedAnalysis/IR/LLVM pipeline. Libraries check their source union
+with a declarationless root and have no executable application entry.
+`package.entry` selects a library's import surface; it does not fabricate main.
 
-SourceGraph now separates its ordinary Parser pass from import expansion. D Units
-are retained and moved into E as needed, so unimported helpers are not semantically
+SourceGraph separates its ordinary Parser pass from import expansion. Discovery
+units move into execution as needed, so unimported helpers are not semantically
 checked, emitted or initialized. The manifest fixes the physical VFS root; the
 selected entry fixes application declaration ownership. Disk membership, boundary
 observations and bytes are recaptured before successful acceptance. This detects
 changes and requests retry; it is not an OS filesystem transaction or sandbox.
+Legacy entry-only APIs remain supported adapters through the same frontend.
 
-Legacy `analyze_project(entry)` and existing ToolingSession/voidls entry-only modes
-remain adapters with their original semantics. Slice 3 will integrate project
-sessions/protocol; Runtime metadata, zero-ID OS calls and creation remain later
-slices. No second source parser, editor resolver or LLVM path is introduced.
+Project sessions/protocol, embedded metadata and OS conveniences, init/new,
+checked numeric enums, D3 dependency resolution, typed C ABI/native admission and
+D5 packaging are implemented. G23 adds trusted editor packaging; G24 supplies
+physical raylib source; G25 imports headers with pinned Clang; G26 supplies
+add/tidy and installed source views. G27 connects generated library entries and
+library consumers to that existing maintenance path. See the
+[current milestone register](roadmap/MILESTONE_REGISTER.md),
+[G27 qualification](projects/G27_LIBRARY_AUTHORING.md) and
+[project ownership contract](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow).
+No second parser, editor resolver, package mechanism or LLVM path is introduced.
 
-The [Phase 1 ownership contract](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow)
-requires explicit project root, source inventory, selected declaration owner and
-metadata inputs. Legacy `analyze_project(entry)`/ToolingSession remain entry-only;
-they do not supply the new records. S2's separate project API implements root,
-inventory and declaration-owner selection while keeping those legacy adapters.
-Parser capture is separate from recursive imports, with one semantic/IR/LLVM path
-and no fabricated library application entry. Project sessions/protocol, metadata
-and later slices await their architectural review boundaries in the roadmap.
-
-## Approved project/compiler roadmap, 8 November 2026
-
-The [project architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) plans native
-manifest parsing, bounded compiler-owned source-set/main discovery, immutable
-application metadata, checked numeric enums and general typed C ABI/link plans.
-Never require `main.void` or a mandatory entry field in the replacement design;
-select one valid main or report ambiguity. Reuse the current frontend, typed IR
-validation, Runtime context, LLVM JIT/AOT, explicit native admission, resource
-inventories and staged artifact publication. Dynamic linking is the approved
-default; static remains optional. S1/S2 deliver parsing/discovery locally; metadata,
-numeric enums and general C ABI remain future additions through this compiler.
-Legacy exact `main.void`
-automatic discovery and explicit-file compatibility still apply below.
+Manifest applications select one valid synchronous main regardless of filename,
+or report ambiguity. Manifestless directory selection retains exact `main.void`;
+explicit-file compatibility remains available. Ordinary run/build async roots
+still require an explicit host adapter; [async contracts](ASYNC.md) remain intact.
+Dynamic native linking is the default; supported static linking is optional.
+Library source acquisition grants no native-provider authority.
 
 For onboarding, start with [source installation](install/README.md),
-[your first program](FIRST_PROGRAM.md) and the [current CLI reference](CLI.md).
-The manual build commands and dated implementation records below remain useful
-for engineering; current feature guides supersede historical exclusions.
+[your first program](FIRST_PROGRAM.md), [creating and composing libraries](LOCAL_LIBRARIES.md#creating-and-composing-libraries)
+and the [CLI reference](CLI.md). The dated implementation records below retain
+their original qualification limits; current feature guides supersede historical
+exclusions. The [8 November roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) remains design
+history, not a list of unimplemented prerequisites.
 
 ## Stage 11 shared runtime globals
 

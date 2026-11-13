@@ -64,6 +64,13 @@ The historical `entry(i32) -> i32` adapter instead prints a numeric result and
 exits zero. See [CLI commands](CLI.md), [language examples](../examples/),
 [types](NUMERIC_TYPES.md) and [editor setup](EDITOR_INTEGRATION.md).
 
+## Add a reusable library
+
+Follow [creating and composing libraries](LOCAL_LIBRARIES.md#creating-and-composing-libraries)
+to generate a library, add dependencies to it, and consume it from an application.
+Generated library metadata is ready for `add`; dependencies remain explicit and
+native-provider approval remains separate.
+
 ## Step through a native Debug build
 
 On Linux x64 or Windows x64, append the following table to `void.project.toml`.

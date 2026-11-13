@@ -9,6 +9,9 @@ holds in historical records do not govern current work.
 - [Install from source](install/README.md), [first program](FIRST_PROGRAM.md),
   [CLI](CLI.md), [compiler/build architecture](SOURCE_COMPILER.md),
   [editor setup](EDITOR_INTEGRATION.md) and [troubleshooting](TROUBLESHOOTING.md).
+- [Creating and composing libraries](LOCAL_LIBRARIES.md#creating-and-composing-libraries),
+  [package add/tidy](CLI.md#source-packages-add-and-tidy) and
+  [G27 implementation and qualification](projects/G27_LIBRARY_AUTHORING.md).
 - [Language design](LANGUAGE_BIBLE.md), [numeric types](NUMERIC_TYPES.md),
   [modules](MODULE_SYSTEM.md), [strings](STRINGS.md), [value semantics](VALUE_SEMANTICS.md),
   [value structs](VALUE_STRUCTS.md), [reference/value structs](REFERENCE_VALUE_STRUCTS.md),

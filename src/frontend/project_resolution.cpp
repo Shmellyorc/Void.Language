@@ -778,7 +778,6 @@ MaintenanceReport add_dependency(const fs::path& requested,const AddOptions& opt
     const auto root=inspect_creation_root(requested);
     recover_package_edit(root);
     auto manifest=maintenance_manifest(root.path/manifest_name);
-    if(manifest->kind()!=Kind::application)throw std::runtime_error("add selects an application manifest.");
     const auto previous=read_dependency_lock(root.path);
     if(previous)require_lock_shape(*previous);
     // Existing dependencies must already be consistent; adding an unrelated

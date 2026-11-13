@@ -12,6 +12,43 @@ with tempfile.TemporaryDirectory(prefix='VOID editable raylib ') as temporary:
   assert text is None or text in output,(args,output)
   assert 'AddressSanitizer' not in output and 'UndefinedBehaviorSanitizer' not in output,output
   return output
+ # G27 library authors acquire source through the same add/publication path.
+ library=root/'engine';application=root/'nativeapp'
+ run(compiler,'new',library,'--kind','library','--package-name','engine')
+ run(compiler,'add','raylib','--path',repo/'verified-packages/raylib','--project',library,
+     text="source declares native provider 'org.voidlang.raylib'")
+ (library/'src/engine.void').write_text('''use pkg/raylib as rl
+public func answer() -> i32:
+    return rl.get_random_value(41, 41)
+''')
+ run(compiler,'tidy','--check','--project',library)
+ run(compiler,'new',application)
+ run(compiler,'add','engine','--path',library,'--project',application)
+ (application/'src/app.void').write_text('''use pkg/engine
+func main() -> i32:
+    print("LIBRARY:", engine.answer())
+    return 0
+''')
+ run(compiler,'check','--project',application,status=1,text='matching admitted descriptor')
+ with (application/'void.project.toml').open('a') as f:f.write('''
+[native-requirements.raylib]
+id="org.voidlang.raylib"
+version="=6.0.0"
+abi=3
+''')
+ run(compiler,'tidy','--project',application)
+ run(compiler,'tidy','--check','--project',application)
+ run(compiler,'check','--project',application)
+ run(compiler,'run','--project',application,status=2,text='--allow-native')
+ for profile in ['debug','release']:
+  run(compiler,'run','--no-cache','--project',application,'--allow-native','--profile',profile,text='LIBRARY: 41')
+ image=root/('library-native.exe' if windows else 'library-native')
+ run(compiler,'build','--project',application,'--allow-native','-o',image);run(image,text='LIBRARY: 41')
+ output=root/'library-package';moved=root/'library-relocated'
+ run(compiler,'package','--project',application,'--allow-native','-o',output)
+ run(compiler,'package','--verify',output);shutil.move(output,moved)
+ shutil.move(application,root/'parked-nativeapp');shutil.move(library,root/'parked-engine')
+ run(compiler,'package','--verify',moved);run(moved/('app.exe' if windows else 'app'),text='LIBRARY: 41')
  run(compiler,'new',project)
  package=project/'deps/raylib';shutil.copytree(repo/'verified-packages/raylib',package,ignore=shutil.ignore_patterns('__pycache__','.bind-*'))
  manifest=project/'void.project.toml'

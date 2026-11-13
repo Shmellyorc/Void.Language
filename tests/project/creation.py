@@ -9,6 +9,9 @@ import sys
 import tempfile
 import tomllib
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
+from lsp_client import Client
+
 compiler, server, evidence = map(lambda value: Path(value).resolve(), sys.argv[1:])
 calls = []
 manifest_name = "void.project.toml"
@@ -141,7 +144,7 @@ try:
         lib = base / "lib"
         run("new", lib, "--kind", "library", "--package-name", "toolkit", "--package-id", "org.test.toolkit")
         package = manifest(lib, "package")
-        assert package["package"] == {"id": "org.test.toolkit", "name": "toolkit"}
+        assert package["package"] == {"id": "org.test.toolkit", "name": "toolkit", "entry": "src/toolkit.void"}
         assert "main" not in (lib / "src/toolkit.void").read_text(encoding="utf-8")
         run("check", "--project", lib)
         run("run", "--project", lib, status=1)
@@ -149,6 +152,32 @@ try:
         run("new", library_default, "--kind", "library")
         library = manifest(library_default, "package")
         assert re.fullmatch(r"local\.l[0-9a-f]{32}", library["package"]["id"])
+        assert library["package"]["entry"] == "src/toolkit.void"
+        custom = base / "custom-library"
+        run("new", custom, "--kind", "library", "--package-name", "custom", "--source", "api/custom.void")
+        assert manifest(custom, "package")["package"]["entry"] == "api/custom.void"
+        run("check", "--project", custom)
+        initialized_library = directory("initialized_library")
+        (initialized_library / "existing.void").write_text("public func answer() -> i32:\n    return 42\n", encoding="utf-8")
+        run("init", initialized_library, "--kind", "library")
+        assert "entry" not in manifest(initialized_library, "package")["package"]
+
+        # The unedited new -> add -> tidy journey must compose across commands.
+        run("new", "app")
+        run("new", "geometry", "--kind", "library", "--package-name", "geometry")
+        run("add", "geometry", "--project", "app", "--path", "../geometry")
+        run("tidy", "--check", "--project", "app")
+        (base / "app/src/app.void").write_text(
+            "use pkg/geometry as g\nfunc main() -> i32:\n    return g.answer()\n", encoding="utf-8")
+        run("run", "--no-cache", "--project", "app", status=42)
+        with Client(server, base / "app", project=True) as client:
+            assert not any(n["diagnostics"] for n in client.initialize())
+            response, _ = client.request("textDocument/definition", {
+                "textDocument": {"uri": (base / "app/src/app.void").as_uri()},
+                "position": {"line": 0, "character": 10},
+            })
+            assert response["result"]["uri"] == (base / "app/libs/geometry/src/geometry.void").as_uri(), response
+            client.shutdown()
 
         child = root / "child"
         child.mkdir()

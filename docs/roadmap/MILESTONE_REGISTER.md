@@ -1,16 +1,18 @@
 # VOID developer experience milestone register
 
-Current authorized work is **G26: package add, project libraries and tidy**, starting
-at `49e419b7985c5e10234d158533d18146753d3308`. G23/G24/G25 are integrated
-in that baseline. G26 reuses local libraries and D3/D4/D5; implementation and
-qualification are recorded in the [G26 report](../projects/G26_PACKAGE_MAINTENANCE.md).
-Boss controls integration, publication and hosted CI.
+Current authorized work is **G27: complete library authoring integration**, at
+baseline `5aa51bdd1edbf1146fb64379497b2a1fb0b78561`. G23–G26 are integrated
+in that baseline. G27 records known generated library entries and admits library
+consumers to existing add/tidy publication. See [G27 implementation and qualification](../projects/G27_LIBRARY_AUTHORING.md).
+Boss controls integration, publication and hosted CI; no new integration commit
+or hosted campaign is part of G27.
 
 The preceding assignment was the Boss-authorized G23 editor packaging and G24 raylib
 verified source package integration. G22 is accepted at
 `ff3bbcd5a20fa2e81506d23e276a8a7837e9404f`. G23 is implemented; G24 has usable
 interfaces for all 600 declarations, with typed adaptations and native limits
-explicit. The G24 physical-source conversion is implemented locally; canonical
+explicit. The G24 physical-source conversion is integrated at
+`b61a32193fad616ae3863b01809533ab4a721cde`; canonical
 development stays in `verified-packages/raylib/`, with a standalone Git subtree
 publication proposal awaiting Boss authorization. Boss acceptance remains pending.
 Public post-push qualification at `6a7cb50b2d35023324053694275596c9a4a7b328` failed
@@ -52,10 +54,11 @@ Boss controls integration, hosted qualification and public release.
 | Milestone | Status and next evidence |
 | --- | --- |
 | 18 · G20 | **ACCEPTED**, as confirmed by the G21-R assignment. Integrated at `49d2e66243d80957e7dd1bbeecb9767a43a13964`. Physical-root recovery and established tabs formatting remain preserved. [Qualification](../compiler-health/G20_PROJECT_ROOT_RECOVERY.md) |
-| G23 | **IMPLEMENTED / LOCAL EDITOR QUALIFICATION.** Package reuses Check/Build/Run selection, trust, saved-buffer, profile and compiler execution checks. Real package verification passed in native VS Code 1.141.0 on PikaOS and Windows 10 Debug/Release. No integration commit created. [Implementation](../projects/G23_G24_IMPLEMENTATION.md) |
-| G24 | **IMPLEMENTED; PHYSICAL SOURCE LOCAL; STANDALONE PUBLICATION PENDING.** Baseline `6a7cb50b2d35023324053694275596c9a4a7b328` preserves all 600 usable interfaces: 236 direct, 352 ownership, ten G5 lifecycle and two typed equivalents. Real `.void` public/native modules replace raylib ghost source; editable behavior and root-repository Git consumers are locally qualified. The actual monorepo GitHub failure on all five builds remains recorded; D3 limits are unchanged. Reproducible subtree publication is proposed, with no repository creation/push authorized or performed. Strict external device leaks remain unsuppressed. [Physical-source report and publication commands](../projects/G24_PHYSICAL_SOURCE_IMPLEMENTATION.md) · [Public-origin qualification](../projects/G24_PUBLIC_GITHUB_QUALIFICATION.md) · [Integrated implementation](../projects/G23_G24_IMPLEMENTATION.md) |
-| G25 | **IMPLEMENTED LOCALLY / FIVE NATIVE PROFILES QUALIFIED.** Explicit `voidc native import` derives editable physical VOID, conventional descriptors, coverage and value adapters with pinned Clang. Pointer ownership/callbacks remain reviewed G3/G4/G5 contracts. Independent C/C++/SQLite and five-profile qualification are recorded in the [G25 report](../projects/G25_NATIVE_HEADER_IMPORTER.md). No new FFI, loader, registry or Runtime; no staging/commit/push/hosted CI. |
-| G26 | **IMPLEMENTED LOCALLY / FIVE NATIVE PROFILES QUALIFIED.** Explicit `voidc add`, `voidc tidy` and read-only `tidy --check`; editable path sources and verified Git views under `libs/`, existing package identities and D3 locks, recoverable serialized publication, separate D4 approval. See the [G26 report](../projects/G26_PACKAGE_MAINTENANCE.md). No registry, downloader, Runtime, compiler ABI or D3 limit change. |
+| G23 | **INTEGRATED / LOCAL EDITOR QUALIFICATION.** Package reuses Check/Build/Run selection, trust, saved-buffer, profile and compiler execution checks. Real package verification passed in native VS Code 1.141.0 on PikaOS and Windows 10 Debug/Release. Integrated at `6a7cb50b2d35023324053694275596c9a4a7b328`; the original report retains its local-work status. [Implementation](../projects/G23_G24_IMPLEMENTATION.md) |
+| G24 | **INTEGRATED; STANDALONE PUBLICATION PENDING.** Baseline `6a7cb50b2d35023324053694275596c9a4a7b328` preserves all 600 usable interfaces: 236 direct, 352 ownership, ten G5 lifecycle and two typed equivalents. Real `.void` public/native modules replace raylib ghost source; editable behavior and root-repository Git consumers are locally qualified. The actual monorepo GitHub failure on all five builds remains recorded; D3 limits are unchanged. Reproducible subtree publication is proposed, with no repository creation/push authorized or performed. Strict external device leaks remain unsuppressed. [Physical-source report and publication commands](../projects/G24_PHYSICAL_SOURCE_IMPLEMENTATION.md) · [Public-origin qualification](../projects/G24_PUBLIC_GITHUB_QUALIFICATION.md) · [Integrated implementation](../projects/G23_G24_IMPLEMENTATION.md) |
+| G25 | **INTEGRATED at `49e419b7985c5e10234d158533d18146753d3308` / FIVE NATIVE PROFILES QUALIFIED.** Explicit `voidc native import` derives editable physical VOID, conventional descriptors, coverage and value adapters with pinned Clang. Pointer ownership/callbacks remain reviewed G3/G4/G5 contracts. Independent C/C++/SQLite and five-profile qualification are recorded in the [G25 report](../projects/G25_NATIVE_HEADER_IMPORTER.md). No new FFI, loader, registry or Runtime; no staging/commit/push/hosted CI. |
+| G26 | **INTEGRATED at `5aa51bdd1edbf1146fb64379497b2a1fb0b78561` / FIVE NATIVE PROFILES QUALIFIED.** Explicit `voidc add`, `voidc tidy` and read-only `tidy --check`; editable path sources and verified Git views under `libs/`, existing package identities and D3 locks, recoverable serialized publication, separate D4 approval. See the [G26 report](../projects/G26_PACKAGE_MAINTENANCE.md). No registry, downloader, Runtime, compiler ABI or D3 limit change. |
+| G27 | **IMPLEMENTED LOCALLY / QUALIFICATION RECORDED.** Generated `package.entry` and library-consumer `add` reuse the existing creation plan, Resolver and publication journal. [Report and platform limits](../projects/G27_LIBRARY_AUTHORING.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
 

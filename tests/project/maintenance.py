@@ -63,11 +63,48 @@ def new(root, library=False):
         args += ['--app-id', 'org.example.' + root.name + '.app']
     run(compiler, 'new', root, *args)
     if library:
-        p = root / 'void.project.toml'
-        p.write_text(p.read_text().replace('[package]\n', '[package]\nentry = "src/' + root.name + '.void"\n'))
+        assert tomllib.loads((root / 'void.project.toml').read_text())['package']['entry'] == 'src/' + root.name + '.void'
 
 
 def qualification(base):
+    # G27: the generated manifests compose without entry/dependency repairs.
+    geometry, consumer, transitive = (base / name for name in ('geometry', 'consumer', 'transitive'))
+    new(geometry, True); new(consumer, True); new(transitive)
+    cli(consumer, 'add', 'geometry', '--path', '../geometry')
+    write(consumer, 'src/consumer.void', 'use pkg/geometry as g\npublic func answer() -> i32:\n    return g.answer() + 7\n')
+    cli(consumer, 'tidy', '--check'); cli(consumer, 'check')
+    before = state(consumer)
+    cli(consumer, 'add', 'geometry', '--path', '../geometry')
+    assert state(consumer) == before
+    cli(transitive, 'add', 'consumer', '--path', '../consumer')
+    write(transitive, 'src/app.void', 'use pkg/consumer as c\nfunc main() -> i32:\n    return c.answer() - 49\n')
+    cli(transitive, 'tidy', '--check'); cli(transitive, 'resolve', '--locked')
+    for flags in [('--no-opt',), ()]:
+        cli(transitive, 'run', '--no-cache', *flags)
+    binary = base / ('transitive-native.exe' if os.name == 'nt' else 'transitive-native')
+    cli(transitive, 'build', '-o', binary); run(binary)
+    output, relocated = base / 'transitive-package', base / 'transitive-relocated'
+    cli(transitive, 'package', '-o', output)
+    run(compiler, 'package', '--verify', output)
+    shutil.move(output, relocated)
+    # Execution after moving both source projects proves the D5 source boundary.
+    shutil.move(transitive, base / 'parked-transitive')
+    shutil.move(consumer, base / 'parked-consumer')
+    shutil.move(geometry, base / 'parked-geometry')
+    run(compiler, 'package', '--verify', relocated)
+    executables = list(relocated.glob('*.exe')) if os.name == 'nt' else [p for p in relocated.iterdir() if p.is_file() and os.access(p, os.X_OK)]
+    assert len(executables) == 1, executables
+    run(executables[0])
+    for root in (transitive, consumer, geometry):
+        shutil.move(base / ('parked-' + root.name), root)
+    # Equal IDs at independently copied editable origins must still conflict.
+    failure(transitive, 'add', 'geometry', '--path', '../geometry', contains='VOID5007')
+    write(transitive, 'src/app.void', 'use pkg/geometry as g\nfunc main() -> i32:\n    return g.answer()\n')
+    failure(transitive, 'tidy', '--check', contains='Undeclared direct package')
+    failure(transitive, 'check', contains='Undeclared direct package')
+    write(transitive, 'src/app.void', 'use pkg/consumer as c\nfunc main() -> i32:\n    return c.answer() - 49\n')
+    checks.append('generated library add/tidy/check; transitive application JIT/O2/AOT/D5 after source moves; copied-origin VOID5007; no undeclared re-export')
+
     app = base / 'app'
     new(app)
     assert not (app / 'libs').exists()
@@ -147,6 +184,24 @@ def qualification(base):
     cli(app, 'tidy'); cli(app, 'tidy')
     assert state(app) == before
     checks.append('immutable D3 Git view; explain/locked; normal/O2 JIT; native AOT; D5 verification/relocation; idempotence')
+    # Library consumers use the identical D3 pin and publication path. The app
+    # already declares this same immutable origin; no physical local IDs merge.
+    gitapp = base / 'gitapp'
+    new(gitapp)
+    shutil.copytree(repo, gitapp / 'vendor/repo')
+    cli(gitapp, 'add', 'source', '--git', 'file:vendor/repo', '--rev', revision)
+    gitconsumer = gitapp / 'vendor/gitconsumer'
+    new(gitconsumer, True)
+    shutil.copytree(repo, gitconsumer / 'vendor/repo')
+    cli(gitconsumer, 'add', 'source', '--git', 'file:vendor/repo', '--rev', revision)
+    write(gitconsumer, 'src/gitconsumer.void', 'use pkg/source as p\npublic func answer() -> i32:\n    return p.answer()\n')
+    cli(gitconsumer, 'tidy', '--check'); cli(gitconsumer, 'check')
+    cli(gitconsumer, 'resolve', '--locked')
+    cli(gitapp, 'add', 'gitconsumer', '--path', 'vendor/gitconsumer')
+    write(gitapp, 'src/app.void', 'use pkg/gitconsumer as p\nfunc main() -> i32:\n    return p.answer() - 42\n')
+    cli(gitapp, 'tidy', '--check'); cli(gitapp, 'run', '--no-cache')
+    # Leave the original fixture's later pin-update assertions independent.
+    checks.append('library adds full-pin Git dependency; locked/tidy/check; application consumes shared immutable transitive origin')
     installed = app / 'libs/source/src/repo.void'
     content = installed.read_bytes()
     installed.write_bytes(content + b'// tamper\n')
@@ -231,9 +286,10 @@ def qualification(base):
     checks.append('failed acquisition, invalid SHA, conflicting alias, owned collision, malformed source, missing transitive path and symlink rollback')
 
     if interrupt:
-        for phase in ['before', 'after', 'replace-displaced', 'replace-before', 'replace-after']:
-            recovery = base / ('recovery' + phase)
-            new(recovery)
+        for library, phase in [(library, phase) for library in (False, True)
+                               for phase in ['before', 'after', 'replace-displaced', 'replace-before', 'replace-after']]:
+            recovery = base / ('recovery' + ('library' if library else 'app') + phase.replace('-', ''))
+            new(recovery, library)
             if phase.startswith('replace'):
                 write(recovery, 'libs/interrupted/owned.txt', 'previous source')
             before = state(recovery)
@@ -246,7 +302,7 @@ def qualification(base):
             cli(recovery, 'tidy')
             assert state(recovery) == before
             cli(recovery, 'tidy', '--check')
-        checks.append('five process-interruption phases including displaced previous view and before/after manifest/lock publication; read-only gate and exact recovery')
+        checks.append('five process-interruption phases for applications and libraries including displaced previous view and before/after manifest/lock publication; read-only gate and exact recovery')
     editor = os.environ.get('VOID_G26_EDITOR_PROJECT')
     if editor:
         destination = Path(editor)
