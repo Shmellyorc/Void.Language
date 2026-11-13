@@ -76,6 +76,8 @@ class Qualification:
         bundle = {'Linux': 'linux-aws-lc-5.12.0', 'Windows': 'windows-schannel-x86_64',
                   'Darwin': 'macos-aws-lc-5.12.0-arm64'}[SYSTEM]
         self.http = ROOT / '.toolchains/http/prefix' / bundle / 'Release'
+        host_bundle = {'Linux': '', 'Windows': 'windows-x86_64', 'Darwin': 'macos-arm64'}[SYSTEM]
+        self.host_prefix = ROOT / '.toolchains/host/prefix' / host_bundle / 'Release'
         self.bin = self.prefix / 'bin'
         self.voidc = self.bin / ('voidc' + SUFFIX)
         self.voidls = self.bin / ('voidls' + SUFFIX)
@@ -155,7 +157,9 @@ class Qualification:
             'source_sha256': {name: digest(ROOT / name) for name in
                 ('.github/workflows/ci-install-qualification.yml', 'tools/ci/install_smoke.py',
                  'tools/ci/llvm_sdk.py', 'tools/setup_http_deps.py', 'tools/setup_http_deps_native.py',
-                 'third_party/http-versions.json')}})
+                 'third_party/http-versions.json', 'tools/setup_host_deps.py',
+                 'tools/setup_host_deps_native.py', 'tools/verify_host_deps.py',
+                 'third_party/host-versions.json')}})
         require(commit == os.environ['GITHUB_SHA'], 'Checkout differs from dispatch SHA')
         require(SYSTEM == os.environ['INSTALL_EXPECTED_SYSTEM'] and arch == os.environ['INSTALL_EXPECTED_ARCH']
                 and arch == os.environ['RUNNER_ARCH'], 'Actual host/runner architecture differs from required platform')
@@ -197,6 +201,7 @@ class Qualification:
 
     def dependencies(self):
         require(not self.http.exists(), 'HTTP Release prefix must be built afresh')
+        require(not self.host_prefix.exists(), 'Host Release prefix must be built afresh')
         command = [sys.executable, 'tools/setup_http_deps.py', '--profile', 'Release', '--jobs', '3']
         if SYSTEM == 'Darwin':
             command.append('--macos-install-only')
@@ -206,6 +211,11 @@ class Qualification:
             args.append('x86_64' if SYSTEM == 'Windows' else 'arm64')
         self.run('http-verify', args)
         shutil.copy2(self.http / 'VOID-HTTP-DEPENDENCIES.json', self.evidence / 'http-dependencies.json')
+        self.run('host-bootstrap', [sys.executable, 'tools/setup_host_deps.py', '--profile', 'Release', '--jobs', '3'])
+        self.run('host-verify', [sys.executable, 'tools/verify_host_deps.py', '--prefix', self.host_prefix,
+                               '--profile', 'Release', '--platform', SYSTEM,
+                               '--architecture', 'arm64' if SYSTEM == 'Darwin' else 'x86_64'])
+        shutil.copy2(self.host_prefix / 'VOID-HOST-DEPENDENCIES.json', self.evidence / 'host-dependencies.json')
 
     def configure(self):
         require(not self.build.exists() and not self.prefix.exists(), 'Build and install must start fresh')
@@ -213,6 +223,7 @@ class Qualification:
             '-DBUILD_TESTING=OFF', '-DVOID_SANITIZERS=OFF', '-DVOID_LLVM_RESEARCH=OFF',
             '-DLLVM_DIR=' + os.environ['LLVM_DIR'], '-DVOID_CLANG=' + os.environ['VOID_CLANG'],
             '-DVOID_LINKER=' + os.environ.get('VOID_LINKER', ''), '-DVOID_HTTP_DEPS_ROOT=' + str(self.http),
+            '-DVOID_HOST_DEPS_ROOT=' + str(self.host_prefix),
             '-DCMAKE_C_COMPILER=' + os.environ['CC'], '-DCMAKE_CXX_COMPILER=' + os.environ['CXX']]
         if SYSTEM == 'Linux':
             command.append('-DCMAKE_EXE_LINKER_FLAGS=--ld-path="' + os.environ['VOID_LINKER'] + '"')

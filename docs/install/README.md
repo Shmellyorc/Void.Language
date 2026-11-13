@@ -12,9 +12,12 @@ from the checkout (`python` on Windows). The helper reuses:
 2. `tools/setup_http_deps.py`: the existing native pinned dependency recipes;
    absent prefixes are built. Existing prefixes must pass
    `tools/verify_http_dependencies.py`, including source/archive and installed-file hashes.
-3. CMake: a separate Release build (or `--configuration Debug`), compiler/tooling
+3. `tools/setup_host_deps.py` and `tools/verify_host_deps.py`: missing host prefixes
+   are built after HTTP/zlib preparation; existing prefixes must pass the matching
+   profile/platform/architecture, source, recipe, toolchain and file-hash checks.
+4. CMake: a separate Release build (or `--configuration Debug`), compiler/tooling
    targets, then the existing `compiler` and `tooling` install components.
-4. `tools/verify_install.py`: an external temporary Hello World project, installed
+5. `tools/verify_install.py`: an external temporary Hello World project, installed
    stdlib, optimized and Debug JIT, native build/run, resource hashes and LSP handshake.
 
 Ninja is selected when available; Linux/macOS otherwise use Unix Makefiles.
@@ -30,7 +33,7 @@ The install prefix contains:
 bin/voidc, voidls                # .exe on Windows
 bin/void-native.txt              # host compiler/linker and link flags
 bin/void-native-resources.txt    # hashes of matching native libraries
-lib/void/                       # Runtime, native support and HTTP dependencies
+lib/void/                       # Runtime, native support, HTTP and host dependencies
 share/void/stdlib/               # matching .void sources
 share/void/licenses/             # VOID and dependency notices/source inputs
 share/void/vim/, neovim/         # editor adapters
@@ -43,7 +46,7 @@ Clang/LLD. Keep that SDK and the platform's development libraries in place.
 Native executables have their own platform/dependency requirements; successful
 source installation does not make either the tools or their output universally portable.
 
-Linux x86-64 GNU installations also provide `voidc package --project DIR`.
+Linux x86-64 GNU and Windows x64 installations also provide `voidc package --project DIR`.
 The compiler's `bin/void-package-notices.txt` verifies the existing installed
 license files used for an application distribution. Keep the installation
 together while building packages. See the [package command](../CLI.md#application-distributions).
@@ -67,6 +70,16 @@ and [Windows developer-host installation](../release/WINDOWS_X64_ISOLATED_INSTAL
 remain dated evidence for their own source revisions. Seven-job compiler CI is
 separate from native installation qualification. The new wrapper's Windows/macOS
 paths need native execution before being advertised as verified onboarding.
-No independent portable package, public binary release, package manager or stable
+No independent portable toolchain package, public binary channel or stable
 one-command installer is claimed. Preserve [license obligations](../release/REDISTRIBUTION_AUDIT.md)
 when copying or distributing installed material.
+
+For Linux binary candidates, build with the existing recipes on the declared
+support-floor userspace, then qualify the exact payload there. Pinning LLVM does
+not pin glibc/libstdc++ or CRT startup inputs. Current developer-host binaries fail
+on Ubuntu 24.04 with newer required symbols; do not bundle arbitrary system
+libraries to bypass that boundary. [G29 evidence](../release/G29_FIRST_RELEASE_READINESS.md#actual-ubuntu-userspace-probe-current-developer-artifacts-are-unsuitable)
+records the failures. macOS ARM64 retains historical native evidence but has no
+fresh G29 installation or later-scope qualification; a deployment flag alone is
+not minimum-OS execution evidence. Public VOIDUP trust and binary delivery remain
+outside source-install qualification.

@@ -17,7 +17,7 @@ with tempfile.TemporaryDirectory(prefix='void-tooling-package-') as temp:
     (stage/'NOTICES').mkdir();shutil.copy2(notice,stage/'NOTICES/LLVM-23.1.4.txt')
     shutil.copytree(repo/'editors/vim',stage/'share/void/vim');shutil.copytree(repo/'editors/neovim',stage/'share/void/neovim')
     (stage/'DEPENDENCIES.txt').write_text(audit)
-    (stage/'LOCAL-ACCEPTANCE.txt').write_text('Private local acceptance artifact. Repository UNLICENSED; no public redistribution authorized.\nDependencies listed separately are required from the host OS. This is not a self-contained portable bundle.\nLLVM/Clang/LLD 23.1.4 remains the build toolchain.\n')
+    (stage/'LOCAL-ACCEPTANCE.txt').write_text('Private local acceptance artifact. VOID-original code is MIT-licensed; public release is not authorized.\nDependencies listed separately are required from the host OS. This is not a self-contained portable bundle.\nLLVM/Clang/LLD 23.1.4 remains the build toolchain.\n')
     (stage/'manifest.json').write_text(json.dumps({'target':a.target,'sha256':hashlib.sha256(server.read_bytes()).hexdigest(),'dependencies':audit,'publicRedistribution':False},indent=2)+'\n')
     archive=out/(stage.name+('.zip' if os.name=='nt' else '.tar.gz'))
     if os.name=='nt':
@@ -38,11 +38,12 @@ with tempfile.TemporaryDirectory(prefix='void-tooling-package-') as temp:
     assert b'voidToolingProtocol' in child.stdout,child.stdout
     print(archive)
     if a.vsix:
-        extension=pathlib.Path(temp)/'extension';shutil.copytree(repo/'editors/vscode',extension,symlinks=True,ignore=shutil.ignore_patterns('server','out','dist','.vscode-test','node_modules'))
+        shutil.copy2(repo/'LICENSE',pathlib.Path(temp)/'LICENSE')
+        extension=pathlib.Path(temp)/'editors/vscode';shutil.copytree(repo/'editors/vscode',extension,symlinks=True,ignore=shutil.ignore_patterns('server','out','dist','.vscode-test','node_modules','LICENSE.txt'))
         shutil.copytree(repo/'editors/vscode/node_modules',extension/'node_modules',symlinks=True)
         (extension/'server').mkdir();shutil.copy2(server,extension/'server'/server.name)
         shutil.copytree(stage/'NOTICES',extension/'server/NOTICES')
         (extension/'server/DEPENDENCIES.txt').write_text(audit)
         (extension/'server/LOCAL-ACCEPTANCE.txt').write_text((stage/'LOCAL-ACCEPTANCE.txt').read_text())
         subprocess.run(['npm','run','build'],cwd=extension,check=True)
-        subprocess.run([str(extension/('node_modules/.bin/vsce.cmd' if os.name=='nt' else 'node_modules/.bin/vsce')),'package','--no-dependencies','--allow-missing-repository','--skip-license','--target',a.target,'--out',str(out/('void-language-'+a.target+'.vsix'))],cwd=extension,check=True)
+        subprocess.run([str(extension/('node_modules/.bin/vsce.cmd' if os.name=='nt' else 'node_modules/.bin/vsce')),'package','--no-dependencies','--allow-missing-repository','--target',a.target,'--out',str(out/('void-language-'+a.target+'.vsix'))],cwd=extension,check=True)

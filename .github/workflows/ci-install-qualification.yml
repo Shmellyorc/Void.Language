@@ -38,11 +38,11 @@ jobs:
           arch: x64
       - name: Prepare and record platform prerequisites
         run: python tools/ci/install_smoke.py host
-      # No compiled caches: download/hash the official SDK and build HTTP inputs
+      # No compiled caches: download/hash the official SDK and build HTTP/host inputs
       # afresh in this disposable checkout using the existing approved recipes.
       - name: Install and verify LLVM Clang LLD 23.1.4
         run: python tools/ci/install_smoke.py sdk
-      - name: Build and verify approved Release HTTP dependencies
+      - name: Build and verify approved Release HTTP and host dependencies
         run: python tools/ci/install_smoke.py dependencies
       - name: Configure production Release without tests
         run: python tools/ci/install_smoke.py configure

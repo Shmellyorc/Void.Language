@@ -71,9 +71,11 @@ terms reviewed. Windows `/MT` and DIA/SDK conditions, Apple SDK-derived material
 exact final platform closures, and crypto/jurisdiction questions remain open.
 VS Code/npm/VSIX and experimental installers are outside this distribution scope.
 
-Public release remains **HOLD**. In particular **LOG-PERF is OPEN**: file200
-20.091 ms fails the unchanged <10 ms requirement. Notice installation and MIT
-selection do not clear that gate or the unresolved compliance questions.
+Public release remains **HOLD** pending owner-controlled qualification and the
+unresolved compliance questions. The historical file200 measurement of 20.091 ms
+against the <10 ms target is retained; Boss's later directive makes that target
+advisory, not a release blocker. See [current preview policy](PREVIEW_BLOCKERS.md).
+Notice installation and MIT selection do not clear the remaining release holds.
 
 
 ## Runtime host primitive dependencies

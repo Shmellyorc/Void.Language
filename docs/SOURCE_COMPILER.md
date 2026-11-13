@@ -187,6 +187,9 @@ dependencies **before** configuring VOID:
 python3 tools/setup_http_deps.py --profile Release --jobs 3
 python3 tools/verify_http_dependencies.py \
   .toolchains/http/prefix/linux-aws-lc-5.12.0/Release Release
+python3 tools/setup_host_deps.py --profile Release --jobs 3
+python3 tools/verify_host_deps.py --prefix .toolchains/host/prefix/Release \
+  --profile Release --platform Linux --architecture x86_64
 ```
 
 [The pin set](../third_party/http-versions.json) covers nghttp2, c-ares, zlib,
@@ -199,6 +202,11 @@ archives in `.toolchains/http/downloads`: the verifier checks those archives too
 An ambient system curl/TLS installation is not a replacement. Setup writes local
 build receipts under `docs/net/http/evidence/`; retain them privately for a
 qualification rather than treating them as publication artifacts.
+
+Host providers use that verified HTTP zlib and require their matching receipt
+before CMake configuration. Keep `.toolchains/host` source archives, approved
+patch inputs and profile-specific prefixes. The same builders and verifiers are
+used by `tools/install.py`; do not substitute ambient sodium/archive libraries.
 
 The following production-only Release configuration matches the verified recipe,
 with source/build paths made checkout-relative. It builds the compiler, Runtime,
@@ -351,7 +359,9 @@ It tested `1afd881ecfa65c616261e7aeb76ecd2bf87770b6`, not the later observed rem
 
 Source builds require the native x64 Visual Studio developer environment, the full
 SDK with `clang-cl`, real zlib/static zstd/LibXml2 development targets, and the
-matching Windows Schannel HTTP dependency profile. The
+matching Windows Schannel HTTP dependency profile, then its matching host
+providers. `tools/setup_host_deps.py` delegates to the existing native builder;
+`tools/verify_host_deps.py` checks the Windows x64 receipt before CMake. The
 [SDK helper](../tools/ci/llvm_sdk.py),
 [native dependency recipe](../tools/setup_http_deps_native.py) and
 [ABI repair record](llvm23/CROSS_PLATFORM_REPAIR.md) describe those build inputs;
@@ -390,7 +400,9 @@ The hosted LLVM23 matrix includes macOS ARM64 Debug/Release. It is compiler
 regression evidence, not a clean source-install qualification. Use the complete
 official ARM64 SDK, Xcode 26+ vendor libc++ headers with Apple's system runtime,
 a physical selected Xcode SDK, explicit architecture/deployment target, and the
-matching macOS HTTP prefix. Configuration checks the actual C++20 stop-token and
+matching macOS HTTP prefix followed by the matching host-provider profile.
+The existing host setup/verifier requires the macOS ARM64 receipt before CMake.
+Configuration checks the actual C++20 stop-token and
 ORC link/run paths. The [cross-platform record](llvm23/CROSS_PLATFORM_REPAIR.md)
 describes the ABI setup; the later
 [HTTP acceptance](net/http/ACCEPTANCE.md) records the successful seven-job run.
@@ -399,8 +411,8 @@ Linux/Windows install results do not establish macOS installation or editor use.
 ### Tests, sanitizers and optional research
 
 The production-only install recipe above deliberately does not run CTest. For a
-separate developer regression build, prepare the corresponding HTTP profile
-(`Debug`, `Release`, or `strict`), then the
+separate developer regression build, prepare the corresponding HTTP and host
+profiles (`Debug`, `Release`, or `strict`), then the
 [HTTP test fixtures](../tools/setup_http_tests.py), and configure a separate build
 with `BUILD_TESTING=ON`. Build all targets and run its unfiltered CTest suite;
 building only `voidc`/`voidls` does not build every test executable. The fixture

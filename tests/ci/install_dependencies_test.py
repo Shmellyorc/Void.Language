@@ -123,7 +123,8 @@ class DependencyCommandTests(unittest.TestCase):
                         'RUNNER_TEMP': directory, 'INSTALL_QUALIFICATION_NAME': 'qualification'}):
                 q = smoke.Qualification()
                 q.http = Path(directory) / 'fresh-http-prefix'
-                with patch.object(q, 'run') as execute, patch.object(smoke.shutil, 'copy2'):
+                q.host_prefix = Path(directory) / 'fresh-host-prefix'
+                with patch.object(q, 'run') as execute, patch.object(smoke.shutil, 'copy2') as copy:
                     q.dependencies()
                 bootstrap = execute.call_args_list[0].args[1]
                 expected = [sys.executable, 'tools/setup_http_deps.py', '--profile', 'Release', '--jobs', '3']
@@ -131,6 +132,45 @@ class DependencyCommandTests(unittest.TestCase):
                     expected.append('--macos-install-only')
                 self.assertEqual(bootstrap, expected)
                 self.assertEqual(execute.call_args_list[1].args[0], 'http-verify')
+                self.assertEqual([call.args[0] for call in execute.call_args_list],
+                                 ['http-bootstrap', 'http-verify', 'host-bootstrap', 'host-verify'])
+                self.assertEqual(execute.call_args_list[2].args[1],
+                                 [sys.executable, 'tools/setup_host_deps.py', '--profile', 'Release', '--jobs', '3'])
+                self.assertEqual(execute.call_args_list[3].args[1],
+                                 [sys.executable, 'tools/verify_host_deps.py', '--prefix', q.host_prefix,
+                                  '--profile', 'Release', '--platform', system,
+                                  '--architecture', 'arm64' if system == 'Darwin' else 'x86_64'])
+                self.assertEqual([call.args for call in copy.call_args_list], [
+                    (q.http / 'VOID-HTTP-DEPENDENCIES.json', q.evidence / 'http-dependencies.json'),
+                    (q.host_prefix / 'VOID-HOST-DEPENDENCIES.json', q.evidence / 'host-dependencies.json')])
+
+    def test_install_smoke_rejects_existing_host_prefix_before_bootstrap(self):
+        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {
+                'RUNNER_TEMP': directory, 'INSTALL_QUALIFICATION_NAME': 'qualification'}):
+            q = smoke.Qualification()
+            q.http = Path(directory) / 'http'
+            q.host_prefix = Path(directory) / 'host'
+            q.host_prefix.mkdir()
+            with patch.object(q, 'run') as execute:
+                with self.assertRaisesRegex(RuntimeError, 'Host Release prefix must be built afresh'):
+                    q.dependencies()
+                execute.assert_not_called()
+
+    def test_install_smoke_stops_on_failed_provider_step(self):
+        for failed in ('http-bootstrap', 'http-verify', 'host-bootstrap', 'host-verify'):
+            with self.subTest(failed=failed), tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {
+                    'RUNNER_TEMP': directory, 'INSTALL_QUALIFICATION_NAME': 'qualification'}):
+                q = smoke.Qualification()
+                q.http = Path(directory) / 'http'
+                q.host_prefix = Path(directory) / 'host'
+                def run(label, argv):
+                    if label == failed:
+                        raise RuntimeError('provider refused')
+                with patch.object(q, 'run', side_effect=run) as execute, patch.object(smoke.shutil, 'copy2') as copy:
+                    with self.assertRaisesRegex(RuntimeError, 'provider refused'):
+                        q.dependencies()
+                    self.assertEqual(execute.call_args_list[-1].args[0], failed)
+                    self.assertFalse(any(call.args[1].name == 'host-dependencies.json' for call in copy.call_args_list))
 
     def test_required_macos_archive_and_header_contract(self):
         consumer = (ROOT / 'cmake/HttpNativeDependencies.cmake').read_text()

@@ -4,6 +4,8 @@ buildSync({entryPoints: ['src/extension.ts'], outfile: 'dist/extension.js', bund
 // Include full runtime dependency licenses in the distributable, not only headers.
 const fs = require('node:fs');
 const path = require('node:path');
+// Generate the distribution notice from the owner's authoritative root license.
+fs.copyFileSync(path.resolve(__dirname, '../../LICENSE'), path.join(__dirname, 'LICENSE.txt'));
 const lock = require('./package-lock.json');
 const notices = [];
 for (const [folder, metadata] of Object.entries(lock.packages)) {

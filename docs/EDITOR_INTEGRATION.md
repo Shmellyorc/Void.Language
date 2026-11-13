@@ -517,9 +517,10 @@ with esbuild and runs configuration/executable/path tests. Packaging repeats the
 build using the normal VS Code prepublish hook. The VSIX includes full runtime
 dependency license notices. It excludes tests, source maps, node_modules, lockfiles,
 native binaries and LLVM archives. Generated output and packages remain ignored;
-package.json/package-lock.json and source remain reviewable. The owner has not
-selected a repository license: package metadata remains UNLICENSED rather than
-inventing a redistribution policy. No marketplace/account/signing step is used.
+package.json/package-lock.json and source remain reviewable. VOID-original code
+is MIT-licensed. The build generates `LICENSE.txt` from the authoritative root
+`LICENSE`, and packaging includes its complete owner and permission notice beside
+the existing third-party notices. No marketplace/account/signing step is used.
 
 Launch a development host after building:
 

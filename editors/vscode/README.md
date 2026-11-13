@@ -108,7 +108,8 @@ Sprint 1 adds nested standard imports (`use io/files`) and importer-relative quo
 project imports (`use "app/player.void"`), with space/quote/slash completion triggers.
 Names here are illustrative fixture modules. Source `##` docs appear in hover,
 completion and signatures; `## @param name description` documents parameters.
-Set the absolute `VOID_STDLIB_ROOT` environment variable before launching the
-editor for relocated installations; otherwise the matching build's configured
-source root is used. Installed sources permit navigation without rename/format
+Installed tools discover `share/void/stdlib` relative to the actual executable,
+including after relocation. An explicit absolute `VOID_STDLIB_ROOT` override wins;
+otherwise the configured source root is only a fallback when no installed tree
+is present. Installed sources permit navigation without rename/format
 or project overlay authority. [Stage 8 discovery contract](https://github.com/Shmellyorc/Void.Language/blob/main/docs/STAGE8_DISCOVERY.md)

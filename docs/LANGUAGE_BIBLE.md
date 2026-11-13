@@ -1,10 +1,12 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
-**Current Slice 1:** Boss authorized the isolated project schema/identity/SemVer/
-diagnostic foundation; it is implemented in the compiler library. See
-[qualification and remaining limits](projects/SLICE1.md). No project-aware entry,
-Runtime/OS identity, CLI/editor or later language/native feature is delivered.
-The implementation HOLD below continues to apply to those later integrations.
+**Current project/package implementation:** manifest-selected entry, Runtime/OS
+identity, CLI/editor integration, application/library creation, local and immutable
+Git dependency maintenance, approved native providers and application packaging
+are delivered within their recorded host limits. See the [CLI](CLI.md),
+[library workflow](LOCAL_LIBRARIES.md), [current status](DEVELOPMENT_STRATEGY.md#current-implementation-status)
+and [G27 qualification](projects/G27_LIBRARY_AUTHORING.md). The Slice 1 and
+proposal-era HOLD below are historical; they do not override these later contracts.
 
 **Phase 1 proposal at `2f667ea3`, implementation HOLD:** the
 [initial project contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-manifest-and-identity-model)
@@ -516,12 +518,14 @@ At baseline `7a3e0200`, explicit entry selection wins; automatic discovery selec
 the nearest exact `main.void` within the selected workspace, with a standalone editor
 fallback. There is no recursive search for files containing `main()`. The entry's
 parent establishes the project root and its compile-time project constants.
-The [approved replacement](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
-removes filename priority and separates project root/source-set selection from
-entry selection. It is not implemented; `main.void` examples remain one valid filename.
+The now-implemented [manifest contract](CLI.md) supersedes that baseline for
+project mode: the manifest fixes root/source sets and discovery selects a unique
+supported synchronous main regardless of filename. Explicit-file and
+manifestless compatibility remain; `main.void` is one valid project filename.
 Application mode and selected-entry top-level execution follow the implemented
 Sprint 4 contract; imported executable top-level statements remain forbidden.
-External-package identities remain future work. Stage 11 implements runtime file
+External-package identities and locked source views follow [the dependency contract](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance).
+Stage 11 implements runtime file
 globals with selected-root visibility, ordinary imports and eager startup; see
 [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md).
 
@@ -549,7 +553,7 @@ use random                     # Official standard-library source
 use "/world/map.void" as world # Optional alias
 ```
 
-Multiple paths to the same physical/module source must resolve to one canonical module identity. Folders provide the compiler's internal qualification, but developers do not write a `namespace` declaration. Directory layout should **not** determine who is allowed to import what. Working project imports cannot escape the selected root. Exact component spelling, portable paths, collision rejection and symlink/redirect/hard-link alias checks apply on every OS. External imports require a separately approved future identity and permission contract.
+Multiple paths to the same physical/module source must resolve to one canonical module identity. Folders provide the compiler's internal qualification, but developers do not write a `namespace` declaration. Directory layout should **not** determine who is allowed to import what. Working project imports cannot escape the selected root. Exact component spelling, portable paths, collision rejection and symlink/redirect/hard-link alias checks apply on every OS. External sources use the implemented explicit dependency/lock contract through `use pkg/ALIAS`; they do not permit arbitrary root escapes or grant native authority.
 
 For example, inside `units/player.void`, both `use "/base_unit.void"` and `use "../base_unit.void"` reference the same module. Internally, `units/player.void` might contain `units.player`, but `Player`-style names are **not** the naming convention. A public `player` type can simply be used as `player` following an import. Conflicting imported simple names require qualification or an alias, never silent selection.
 
@@ -567,10 +571,17 @@ not external packages. Standard imports remain separate and cannot import local
 libraries. Compiler-owned completion uses actual directories/overlays and the
 same VFS checks. Imported `main()` declarations never control application entry.
 No import grants native binding/linking authority. See [the implementation
-contract](LOCAL_LIBRARIES.md); package management and external-package identities
-require future authorization. Hosted verification is not implied.
+contract](LOCAL_LIBRARIES.md); external packages use the separately implemented
+[dependency contract](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance). Hosted verification is not implied.
 
-### Future external packages [DIRECTION ONLY]
+### External packages: current contract and historical direction
+
+Local/immutable Git acquisition, explicit `add`/`tidy`, source identities, lock
+verification, library entries and native-provider approval are now implemented
+within [their documented scope](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance). The proposal below preserves
+the earlier direction; its unimplemented-status statements are superseded by
+that contract and [G26/G27](projects/G27_LIBRARY_AUTHORING.md). Public registry,
+production trust and binary delivery remain separate release boundaries.
 
 Boss's future direction is a Git-based package manager with explicit repository
 versions/revisions, reproducible resolution, pinned identities/hashes and a
@@ -2398,7 +2409,11 @@ Example discovery scenario:
 4. The package resolver registers the source/native metadata for the current target.
 5. LSP completion offers documented VOID wrappers, **not** raw C headers unless explicitly exploring a binding package.
 
-No actual registry or package manifest has been specified yet. Package distribution and trust/security verification are design work, not an assumed solved problem.
+The project/package manifests, local and immutable Git source maintenance,
+locks and native-provider verification are implemented; see [the CLI](CLI.md)
+and [library workflow](LOCAL_LIBRARIES.md). The searchable public catalog above
+remains a goal. Public registry/VOIDUP delivery and production trust are not
+established by the implemented source and application-package workflows.
 
 ## 48. Unified diagnostics [AGREED]
 
@@ -2619,7 +2634,11 @@ void build --release .
 void build --target windows-x64 .
 ```
 
-These command spellings are proposals, not finalized CLI syntax. Cross-compilation still requires supported target toolchains and compatible native libraries. Detect unsupported combinations early and report them in VOID-friendly diagnostics.
+These command spellings are historical proposals. Current commands use
+`voidc --version`, `voidc run --project DIR`, and
+`voidc build --project DIR --profile release`; see [the CLI reference](CLI.md).
+Live mode and cross-target syntax above are not current command promises.
+Cross-compilation still requires supported target toolchains and compatible native libraries. Detect unsupported combinations early and report them in VOID-friendly diagnostics.
 
 ## 52. Crosscutting correctness contracts
 
@@ -3150,7 +3169,7 @@ This section matters especially when an AI assistant inherits this file without 
 **Reconciled 16 October 2026:** The 33 historical topics below are retained in full. Items labeled **IMPLEMENTED CORE** have an owner-approved working compiler contract described elsewhere; only their stated extensions remain open. **RESOLVED** items should no longer be described as undecided. **OPEN EXTENSION** and **FUTURE DESIGN** do not authorize implementation. The per-item original design questions remain as historical context.
 
 1. **`const` and deep immutability:** [IMPLEMENTED CORE: P3/RV deep readonly access, not global freezing] P3/RV implement deep readonly reference **views**, not object-wide freezing: mutation through a `const` reference or any derived copy/view is rejected, while an independent mutable alias still works. Module `const` is pure compile-time, local `const` is runtime readonly. A separate globally-frozen-object feature and any broader borrowing optimization require distinct future approval.
-2. **File/module import identity:** [IMPLEMENTED CORE: local VFS identity and aliasing; external packages open] Local VFS identity and imports already normalize in-root `../`, repeated paths, import cycles and exact-case spellings; symlinks/redirected imported components and duplicate hard-link identities are rejected by current policy. External root-escaping imports, versioned packages, Unicode filenames and persistent cross-project identities still require separate design.
+2. **File/module import identity:** [IMPLEMENTED CORE: local VFS and explicit dependency identity] Local VFS identity and imports normalize in-root `../`, repeated paths, import cycles and exact-case spellings; symlinks/redirected imported components and duplicate hard-link identities are rejected by current policy. Explicit local/immutable Git package identities and locks follow [package maintenance](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance); arbitrary root-escaping imports and unclaimed identity extensions remain outside that contract.
 3. **Exact grammar for module scopes:** [IMPLEMENTED CORE: compile-time root constants/cycle rules; runtime globals open] Public/internal entry-file compile-time root constants, project-wide name collisions and structural constant dependency cycles have implemented deterministic rules. Runtime file-level mutable variables, their initialization order and runtime dependency cycles remain unimplemented and undecided.
 4. **Static syntax:** [FUTURE DESIGN: full static member grammar] The concept is accepted; `static func type.method()` grammar and visibility combinations need a parser contract.
 5. **Object-model boundary:** [IMPLEMENTED CORE: I1–I8 and IF1–IF8 bounded semantics; richer OOP open] Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, dynamic type tests and richer conversions remain deferred; Phase 24 adds compile-time constraints without value erasure; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
@@ -3177,7 +3196,7 @@ This section matters especially when an AI assistant inherits this file without 
 22. **Hot-reload implementation:** [IMPLEMENTED FOUNDATION: generation leases and native replacement; complete auto-reload open] Compatible-body-only behavior is agreed. The internal JIT generation leases, retained metadata and native replacement proofs already exist; complete automatic source watching, general code retirement, cross-thread publication across all future feature forms and full live product hot reload are still separate design and acceptance concerns.
 23. **GC details:** [IMPLEMENTED FOUNDATION: precise GC/roots; optimization and production acceptance open] The Phase 15 precise non-moving Heap, compiler-managed roots, explicit frame/slot contracts and cooperative collection/rendezvous have implemented proofs; later source phases use them. Production tuning, advanced/concurrent collector strategies, allocation thresholds, liveness optimization and comprehensive barrier/performance certification remain separate work; non-moving is not a permanent language restriction.
 24. **FFI details:** [IMPLEMENTED INTERNAL BRIDGE: source FFI design open] No user-facing pointers/C strings is agreed; trusted native binding grammar, ownership metadata, foreign threads, and callback trampoline semantics are not finished.
-25. **Tooling/packaging:** [IMPLEMENTED CORE: diagnostics/LSP/editor foundations; packages and CLI extensions open] A minimal language server, editor integration, source diagnostics and tooling sessions are implemented within their documented scope. Package registry/protocol, external-library discovery, trust verification, complete CLI spelling and later IntelliSense features remain future design.
+25. **Tooling/packaging:** [IMPLEMENTED CORE: diagnostics/LSP/editor, CLI and scoped packaging] Compiler-owned editor sessions, project commands, explicit package source maintenance/locks, native-provider verification and application packaging follow the current [CLI](CLI.md) and [editor](EDITOR_INTEGRATION.md) contracts. Public registry/discovery, production distribution trust and unclaimed IntelliSense extensions remain future work.
 26. **Module-as-scene adapter:** [UNAPPROVED IDEA: module-as-scene adapter] A module directly satisfying a scene interface and `func call()` at file level was explored, but the user corrected the discussion to favor **struct callback fields wired to private module functions**. Do not implement module-callable semantics as a locked feature without explicit reapproval.
 27. **Empty function bodies — resolved:** [RESOLVED AND IMPLEMENTED: pass] `pass` is the approved, implemented intentional no-op placeholder (Section 27.2). Empty ordinary statement bodies remain invalid; interface requirements remain bodyless.
 28. **Operator overloading:** [APPROVED DESIGN DIRECTION; NOT IMPLEMENTED] Boss approves C#-inspired operator overloading adapted to VOID's simpler design. Optional operator implementations belong **inside their owning struct**, for both `value struct` and managed `struct`, similar in spirit to optional `init` and `deinit`. A type need not implement every operator. Implementation requires a separately authorized future stage; this direction does not authorize Stage 8 implementation or alter its verification.

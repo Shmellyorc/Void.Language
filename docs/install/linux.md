@@ -37,7 +37,9 @@ interactive Bash configuration may use `~/.bashrc`. Reopen the shell and confirm
 `command -v` resolves the intended installation.
 
 The SDK is installed under `.toolchains/llvm-23.1.4`; HTTP source downloads and
-prefixes remain under `.toolchains/http`. Existing valid caches are verified and
+prefixes remain under `.toolchains/http`; host providers and their matching
+receipts remain under `.toolchains/host`. HTTP/zlib is prepared before host
+providers. Existing valid caches are verified and
 reused. A missing cache can require several GB of downloads/storage and a substantial
 source build. Keep the SDK for subsequent native builds.
 
