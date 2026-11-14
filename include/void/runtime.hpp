@@ -6,6 +6,7 @@
 #include "void/console.hpp"
 #include "void/application.hpp"
 #include <optional>
+#include <atomic>
 #include <array>
 #include <chrono>
 #include <condition_variable>
@@ -280,7 +281,7 @@ private:
     std::thread::id async_owner_ = {};
     std::size_t native_jobs_ = 0;
     bool closing_ = false;
-    bool requested_ = false;
+    std::atomic<bool> requested_{false};
     std::size_t callbacks_ = 0;
     std::size_t allocation_budget_ = 0, allocations_ = 0;
     std::uint64_t epoch_ = 0, completed_epoch_ = 0;

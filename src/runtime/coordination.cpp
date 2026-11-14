@@ -135,6 +135,7 @@ void Runtime::park(Thread& t, std::unique_lock<std::mutex>& lock) {
 }
 void Runtime::poll() {
     require_managed();
+    if (!requested_.load(std::memory_order_acquire)) return;
     std::unique_lock lock(mutex_);
     if (requested_) park(thread(), lock);
 }
@@ -325,7 +326,7 @@ Runtime::Snapshot Runtime::snapshot() const {
 bool Runtime::wait_for_request(std::chrono::milliseconds timeout) {
     if (current_runtime_ == this && thread().state == State::managed) throw std::logic_error("Managed thread cannot wait for a request");
     std::unique_lock lock(mutex_);
-    return changed_.wait_for(lock, timeout, [&] { return requested_; });
+    return changed_.wait_for(lock, timeout, [&] { return requested_.load(std::memory_order_relaxed); });
 }
 void Runtime::async_worker_limit(unsigned count) {
     if(!count || count>64)throw std::invalid_argument("worker limit must be 1..64");
