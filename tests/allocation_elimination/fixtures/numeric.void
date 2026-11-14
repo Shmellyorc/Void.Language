@@ -1,0 +1,27 @@
+struct packet:
+    small: u8
+    wide: i64
+    huge: u64
+    fraction: f32
+    zero: f64
+    noise: f64
+    enabled: bool
+func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for index in 0..<n:
+        var item = packet(small = 255 as u8, wide = -9223372036854775808, huge = 18446744073709551615, fraction = 0.5f, zero = -0.0d, noise = 0.0d / 0.0d, enabled = true)
+        item.small += (index % 2) as u8
+        item.wide -= 1
+        item.huge += 1
+        item.fraction *= 2.0f
+        var small = item.small as i32
+        var wide_ok = item.wide == 9223372036854775807
+        var huge_ok = item.huge == 0
+        var fraction_ok = item.fraction == 1.0f
+        var zero_ok = 1.0d / item.zero < 0.0d
+        var nan_ok = item.noise != item.noise
+        var enabled_ok = item.enabled
+        if not wide_ok or not huge_ok or not fraction_ok or not zero_ok or not nan_ok or not enabled_ok:
+            return -1
+        total += small + index % 97
+    return total

@@ -1,0 +1,13 @@
+var calls: i32 = 0
+func bump(value: i32) -> i32:
+    calls += 1
+    return value
+struct box:
+    value: i32
+func entry(n: i32) -> i32:
+    calls = 0
+    var total: i32 = 0
+    for index in 0..<n:
+        var item = box(value = bump(index % 97))
+        total += item.value
+    return total + calls

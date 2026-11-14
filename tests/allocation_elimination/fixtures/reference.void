@@ -1,0 +1,9 @@
+struct box:
+    value: i32
+    child: box?
+func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for index in 0..<n:
+        var item = box(value = index % 97)
+        total += item.value
+    return total

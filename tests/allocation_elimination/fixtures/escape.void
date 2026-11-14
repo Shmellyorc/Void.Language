@@ -1,0 +1,10 @@
+struct box:
+    value: i32
+func identity(value: box) -> box:
+    return value
+func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for index in 0..<n:
+        var item = identity(box(value = index % 97))
+        total += item.value
+    return total

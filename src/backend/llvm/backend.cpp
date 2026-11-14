@@ -189,6 +189,125 @@ std::string source_message(const SourceLocation& location, const std::string& ex
     return location.path + ":" + std::to_string(location.line) + ":" + std::to_string(location.column) +
         ": " + description + "\n" + excerpt;
 }
+// G33 Experiment A only. Values are block-local SSA indexes; local homes are
+// private slots. A successful proof permits only scalar field access and local
+// load/store aliases. No identity inspection, pointer publication, call argument,
+// receiver, capture, return or cross-edge local use can expose the staging address.
+// The whole-function local scan also excludes observable previous loop instances.
+// Keep these bounds and conservative fallbacks when adding new IR operations.
+struct BlockAllocationElision {
+    std::vector<std::set<unsigned>> values;
+    std::set<unsigned> locals;
+};
+BlockAllocationElision block_allocation_elision(const ir::Function &f,
+                                                const std::vector<std::vector<ir::Type>> &instruction_types,
+                                                const llvm::DataLayout &layout,
+                                                const std::function<llvm::Type *(ir::Type)> &type) {
+    BlockAllocationElision result{std::vector<std::set<unsigned>>(f.blocks.size()), {}};
+    auto &elided_values = result.values;
+    auto &elided_locals = result.locals;
+    unsigned elided_bytes = 0;
+    const bool elision_cleanup = std::any_of(f.blocks.begin(), f.blocks.end(), [](const auto &b) {
+        return std::any_of(b.instructions.begin(), b.instructions.end(), [](const auto &i) {
+            return i.op == ir::Op::local_cleanup || i.op == ir::Op::cleanup_call ||
+                   i.op == ir::Op::gc_release;
+        });
+    });
+    if (!f.asynchronous && !f.receiver && !f.initializer && !elision_cleanup) {
+        for (unsigned bn = 0; bn < f.blocks.size(); ++bn) {
+            const auto &block = f.blocks[bn];
+            for (unsigned origin = 0; origin < block.instructions.size(); ++origin) {
+                const auto &construct = block.instructions[origin];
+                auto t = instruction_types[bn][origin];
+                if (construct.op != ir::Op::gc_construct || t.kind != ir::Type::managed_ref ||
+                    !t.definition || t.construction || t.definition->native_resource ||
+                    t.definition->task_result || !t.definition->base.expired() || t.definition->callable ||
+                    t.definition->interface_type)
+                    continue;
+                bool scalar = true;
+                for (const auto &field : t.definition->fields) {
+                    ir::Type ft = field.type;
+                    if (!(numeric::integer(ft) || numeric::floating(ft) || ft == ir::Type::boolean))
+                        scalar = false;
+                }
+                auto bytes = layout.getTypeAllocSize(type(ir::Type(t.definition))).getFixedValue();
+                if (!scalar || !bytes || bytes > 256 || elided_bytes + bytes > 16384)
+                    continue;
+                std::set<unsigned> values{origin}, locals;
+                bool safe = true;
+                auto is_value = [&](unsigned id) { return values.contains(id); };
+                for (unsigned id = origin + 1; id < block.instructions.size() && safe; ++id) {
+                    const auto &use = block.instructions[id];
+                    if (use.receiver && locals.contains(use.receiver->slot)) {
+                        safe = false;
+                        break;
+                    }
+                    for (auto arg : use.arguments)
+                        if (is_value(arg))
+                            safe = false;
+                    if (!safe)
+                        break;
+                    using O = ir::Op;
+                    switch (use.op) {
+                    case O::store:
+                        if (is_value(use.b)) {
+                            if (f.locals[use.a] != t) {
+                                safe = false;
+                                break;
+                            }
+                            locals.insert(use.a);
+                        } else if (locals.contains(use.a))
+                            safe = false;
+                        break;
+                    case O::load:
+                        if (locals.contains(use.a))
+                            values.insert(id);
+                        break;
+                    case O::gc_read:
+                    case O::gc_write:
+                        if (use.op == O::gc_write && is_value(use.b))
+                            safe = false;
+                        break;
+                    case O::constant:
+                    case O::argument:
+                    case O::gc_poll:
+                    case O::gc_collect:
+                        break;
+                    case O::gc_construct: // scalar-only fields cannot retain this reference
+                        break;
+                    default:
+                        // Conservative fallback: unsupported use patterns stay on the heap.
+                        if (is_value(use.a) || is_value(use.b))
+                            safe = false;
+                        break;
+                    }
+                }
+                if ((block.end.kind == ir::Terminator::Kind::return_value ||
+                     block.end.kind == ir::Terminator::Kind::branch) &&
+                    values.contains(block.end.value))
+                    safe = false;
+                for (unsigned other = 0; other < f.blocks.size() && safe; ++other)
+                    for (unsigned id = 0; id < f.blocks[other].instructions.size() && safe; ++id) {
+                        const auto &use = f.blocks[other].instructions[id];
+                        if (use.receiver && locals.contains(use.receiver->slot))
+                            safe = false;
+                        if ((use.op == ir::Op::load || use.op == ir::Op::store) && locals.contains(use.a)) {
+                            if (other != bn || id <= origin)
+                                safe = false;
+                            else if (use.op == ir::Op::store && !values.contains(use.b))
+                                safe = false;
+                        }
+                    }
+                if (safe) {
+                    elided_values[bn].insert(values.begin(), values.end());
+                    elided_locals.insert(locals.begin(), locals.end());
+                    elided_bytes += bytes;
+                }
+            }
+        }
+    }
+    return result;
+}
 std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext& context,
                                   const std::string& suffix, const llvm::DataLayout& target_layout, const std::string& exported_entry,
                                   std::vector<NominalDescriptor>* host_catalog=nullptr,std::vector<InterfaceWitness>* host_witnesses=nullptr,
@@ -632,6 +751,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     std::size_t function_index = 0;
     for (const auto& f : input.functions) {
         const auto& instruction_types = checked_types.at(function_index++);
+        const auto elision=block_allocation_elision(f,instruction_types,layout,type);
+        const auto& elided_values=elision.values;
+        const auto& elided_locals=elision.locals;
         const auto* async=f.asynchronous?&async_plans.at(f.name):nullptr;
         auto* fn = async?async->resume:functions.at(f.name);
         llvm::BasicBlock* setup=async?llvm::BasicBlock::Create(context,"async.enter",fn):nullptr;
@@ -697,7 +819,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         std::vector<std::vector<std::uint64_t>> local_root_offsets(f.locals.size());
         if(!async)for(unsigned n=0;n<f.locals.size();++n) {
             if(f.receiver && n==0 && f.locals[n].kind==ir::Type::aggregate)continue;
-            reference_offsets(f.locals[n],0,local_root_offsets[n]);
+            if(!elided_locals.contains(n))reference_offsets(f.locals[n],0,local_root_offsets[n]);
             if(!local_root_offsets[n].empty() && type(f.locals[n])->isPointerTy()){local_root_indexes[n]=local_root_types.size();local_root_types.push_back(type(f.locals[n]));}
         }
         auto* local_roots_type=llvm::StructType::get(context,local_root_types);
@@ -812,6 +934,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             };
             std::vector<std::uint64_t> local_offsets;
             for (unsigned i = 0; i < slots.size(); ++i) {
+                if(elided_locals.contains(i))continue;
                 if(local_root_indexes[i]==~0u)add_root(f.locals[i],slots[i]);
                 else for(auto offset:local_root_offsets[i])local_offsets.push_back(layout.getStructLayout(local_roots_type)->getElementOffset(local_root_indexes[i])+offset);
             }
@@ -837,7 +960,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             // Compound values retain their independent layout descriptors.
             std::vector<llvm::Type*> root_types;
             std::vector<std::vector<std::uint64_t>> root_offsets;
-            if(!async)for(const auto& block:instruction_types)for(auto t:block) {
+            if(!async)for(unsigned bn=0;bn<instruction_types.size();++bn)for(unsigned id=0;id<instruction_types[bn].size();++id) {
+                if(elided_values[bn].contains(id))continue;
+                auto t=instruction_types[bn][id];
                 std::vector<std::uint64_t> offsets;reference_offsets(t,0,offsets);
                 if(!offsets.empty() && type(t)->isPointerTy()){root_types.push_back(type(t));root_offsets.push_back(std::move(offsets));}
             }
@@ -857,7 +982,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     auto t=instruction_types[block][position];
                     std::vector<std::uint64_t> offsets; reference_offsets(t,0,offsets);
                     llvm::Value* storage = nullptr;
-                    if (!offsets.empty()) {
+                    if (!offsets.empty() && !elided_values[block].contains(position)) {
                         if(async || !type(t)->isPointerTy()) {
                             storage=async?frame_home(async->values[block][position]):home(b.CreateAlloca(type(t)),StorageRole::instruction,llvm_backend::HomeKind::root);
                             if(!async)b.CreateStore(llvm::Constant::getNullValue(type(t)),storage);
@@ -1229,6 +1354,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         guard_complete(field_type,value);
                         b.CreateStore(value,field_address(object,payload,field));
                     }
+                    if(elided_values[n].contains(values.size())) { v=payload; break; }
                     std::vector<std::uint64_t> offsets; reference_offsets(object,0,offsets);
                     auto* storage=value_roots[n].at(values.size());
                     std::vector<llvm::Value*> arguments{storage,llvm::ConstantInt::get(size_type,bytes),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size()),payload};
