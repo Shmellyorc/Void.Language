@@ -6,6 +6,14 @@ accepts exactly that type on every topic. Independently constructed routers have
 independent state; assignments, fields and parameters share the managed instance.
 Use separate typed routers for unrelated messages.
 
+Choose this module for immediate owner-thread notifications: `emit` runs its
+subscriber snapshot synchronously before returning, and nested emits run
+depth-first. It supplies no async receive, worker queue or backpressure. For
+asynchronous completion, use the existing [Task/group/worker contracts](../ASYNC.md)
+under an [explicit async host](../ASYNC.md#explicit-root-adapter); router callbacks
+and callable-containing router graphs do not become worker-transferable.
+Start with the [local example](../../examples/channel/local.void).
+
 | Public declaration | Contract |
 |---|---|
 | `channel.router<t>()` | Empty reusable managed router; no default global registry. |

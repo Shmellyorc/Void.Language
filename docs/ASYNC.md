@@ -140,6 +140,14 @@ the returned ordinary `NativeCode`. `emit_async_object(module, path, optimize)`
 provides the corresponding native AOT adapter; the normal CLI does not select it
 implicitly. Calling an async function requires an active adapter.
 
+An `_async` stdlib function therefore does not make `voidc run` or `voidc build`
+an implicit async host. Use synchronous APIs from an ordinary CLI main, or the
+existing explicit adapter for async networking, timers, file work and
+[process capture](process/API.md). The [activation example](../examples/async/activation.void)
+is exercised through that adapter by the [maintained host](../tests/async/tests.cpp).
+For synchronous owner-thread pub/sub, use [channel](channel/API.md); its `emit`
+does not enqueue task communication.
+
 One owning thread executes activations in FIFO ready order. It suspends the
 current activation when a dependency is incomplete, resumes ready waiters in
 creation order, and never blocks an executor thread on a child. Concurrent roots

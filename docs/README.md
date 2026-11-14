@@ -25,11 +25,69 @@ holds in historical records do not govern current work.
   [GC Runtime](GC_RUNTIME.md), [runtime globals](RUNTIME_GLOBALS.md),
   [cache policy](compiler-health/stabilization/CACHE.md), [diagnostics](DIAGNOSTICS.md),
   [analysis compatibility](ANALYSIS_COMPATIBILITY.md), [language server](LANGUAGE_SERVER.md).
-- Standard library: [binary](binary/CONTRACT.md), [memory](memory/CONTRACT.md),
-  [I/O](io/API.md), [text/encoding](text-encoding/API.md), [random](random/API.md),
-  [math](math/API.md), [JSON](json/API.md), [channel](channel/API.md),
-  [OS](os/API.md), [collections](collections/API.md), [logging](log/API.md),
-  [HTTP](net/http/README.md).
+- [Standard-library modules](#standard-library-modules) and
+  [maintained examples](#standard-library-examples).
+
+## Standard-library modules
+
+These are the **29 implemented source modules** installed under `share/void/stdlib`.
+Use the module spelling shown below, for example `use collections as c` or
+`use net/tcp`. Each module link opens its authoritative declarations and source docs;
+the guides explain usage and limits without replacing those declarations.
+
+| Module / source | Use for | Existing guide |
+| --- | --- | --- |
+| [console](../stdlib/console.void) | Console input, output and terminal control | [Checked and convenience input](stage10/CONSOLE_IO.md#choosing-key-or-line-input) |
+| [convert](../stdlib/convert.void) | Typed parsing, display conversion and result unwrapping | [Conversion contract](combined/CONTRACT.md#convert) |
+| [error](../stdlib/error.void) | Common managed diagnostic base | [Typed error identity](combined/CONTRACT.md#installed-modules-and-error-identity) |
+| [text](../stdlib/text.void) | Literal search, split/join, trimming and Unicode scalar operations | [Text API and failures](text-encoding/API.md) |
+| [encoding/ascii](../stdlib/encoding/ascii.void) | Strict ASCII conversion and byte classification | [ASCII contract](text-encoding/CONTRACT.md#ascii) |
+| [encoding/hex](../stdlib/encoding/hex.void) | Hex encoding and strict decoding | [Codec contract](text-encoding/CONTRACT.md#hex-and-base64) |
+| [encoding/base64](../stdlib/encoding/base64.void) | Standard or URL-safe Base64 with explicit padding | [Codec contract](text-encoding/CONTRACT.md#hex-and-base64) |
+| [encoding/binary](../stdlib/encoding/binary.void) | Exact-width numeric bytes and byte order | [Binary contract](binary/CONTRACT.md) |
+| [math](../stdlib/math.void) | Typed numeric operations and constants | [Math API](math/API.md) |
+| [random](../stdlib/random.void) | Seeded gameplay PRNG, ranges, choice and shuffle | [Random API](random/API.md) |
+| [collections](../stdlib/collections.void) | Sorting, search, map/filter/fold and dictionary copies | [Collections API](collections/API.md) |
+| [io/memory](../stdlib/io/memory.void) | Owned seekable byte streams and wire values | [Memory contract](memory/CONTRACT.md) |
+| [io](../stdlib/io.void) | Checked files, directories and private atomic saves | [I/O API](io/API.md) |
+| [path](../stdlib/path.void) | Lexical host-path composition and components | [Paths and filesystem authority](io/API.md#paths-cleanup-and-publication) |
+| [os](../stdlib/os.void) | Application locations, arguments and host queries | [OS API](os/API.md) |
+| [time](../stdlib/time.void) | Dates, zones, clocks, durations and async sleep | [Temporal formatting](stage10/DISPLAY_FORMATTING.md), [timers](ASYNC.md#g10-monotonic-timers) |
+| [json](../stdlib/json.void) | Bounded JSON, typed conversion and field defaults | [JSON API](json/API.md) |
+| [log](../stdlib/log.void) | Checked console/file logging and rotation | [Logging API](log/API.md) |
+| [channel](../stdlib/channel.void) | Typed synchronous topic pub/sub | [Channel API](channel/API.md) |
+| [url](../stdlib/url.void) | HTTP(S) URLs, percent encoding and query construction | [URL/HTTP guide](net/http/README.md) |
+| [net/address](../stdlib/net/address.void) | Numeric addresses, endpoints and bounded DNS | [Address API](net/address/API.md) |
+| [net/error](../stdlib/net/error.void) | Typed socket/DNS failures and progress | [Network errors](net/error/API.md) |
+| [net/tcp](../stdlib/net/tcp.void) | TCP listeners and byte streams | [TCP API](net/tcp/API.md) |
+| [net/udp](../stdlib/net/udp.void) | Bounded unicast datagrams | [UDP API](net/udp/API.md) |
+| [net/http](../stdlib/net/http.void) | Verified HTTP/1.1 and HTTP/2 clients and transfers | [HTTP guide and platform limits](net/http/README.md) |
+| [system_error](../stdlib/system_error.void) | Shared host-operation errors | [Host scope](voidup/REPORT.md) |
+| [crypto](../stdlib/crypto.void) | SHA-256 and detached Ed25519 verification | [Implemented host scope](voidup/REPORT.md) |
+| [archive](../stdlib/archive.void) | Bounded ZIP reading and deterministic stored ZIP export | [ZIP contract](archive/ZIP_EXPORT.md) |
+| [process](../stdlib/process.void) | Explicit child launch, wait/close and bounded capture | [Process API](process/API.md) |
+
+Arrays/lists, dictionaries, strings and UTF-8 conversion, `print`/`format`, results,
+`with`/`defer`, events and Task/group/worker syntax are **language builtins**, not
+additional stdlib modules. See [array operations](ARRAY_OPERATIONS.md),
+[dictionaries](DICTIONARIES.md), [display](stage10/DISPLAY_FORMATTING.md),
+[recoverable builtins](STAGE8_TEXT_COLLECTIONS.md) and [explicit async hosting](ASYNC.md#explicit-root-adapter).
+
+## Standard-library examples
+
+Open the maintained source and its guide for inputs and execution requirements.
+The ordinary CLI entry is synchronous; async examples use the explicit host above.
+
+| Task | Existing example and guide |
+| --- | --- |
+| Configuration and defaults | [Configuration application](../examples/json/configuration.void), [JSON defaults](json/API.md#explicit-configuration-defaults) |
+| Text and codecs | [Small text example](../website/public/docs/snippets/text-encoding.void), [text cases](../tests/text_encoding/text.void), [codec/file composition](../tests/text_encoding/interop.void) |
+| Collections and generic callbacks | [Sorting, mapping, fixed slicing and dictionary copy](../examples/collections_stdlib/main.void), [collection guidance](collections/API.md#choosing-inputs-and-callbacks) |
+| Local sockets | [Addresses](../examples/net_sockets/addresses.void), [TCP server](../examples/net_sockets/tcp_echo_server.void)/[client](../examples/net_sockets/tcp_echo_client.void), [UDP loopback](../examples/net_sockets/udp_loopback.void) |
+| HTTP and JSON | [API client](../examples/net_http/api_json.void), [streaming async](../examples/net_http/streaming_async.void), [HTTP contract](net/http/DESIGN.md) |
+| Package composition | [Library creation and transitive consumer workflow](LOCAL_LIBRARIES.md#creating-and-composing-libraries), [maintained package composition fixture](../tests/project/packages.py) |
+| Files and publication | [Filesystem application](../examples/io/filesystem.void), [atomic save](../examples/atomic_save/test_game.void), [checked logger shutdown](../examples/log/checked_shutdown.void), [I/O contract](io/API.md#paths-cleanup-and-publication) |
+| Child output capture | [Capture application](../examples/process/capture.void), [launch authority and budgets](process/API.md#choosing-launch-and-capture) |
 
 ## Engineering documentation
 

@@ -1,5 +1,30 @@
 # Compiler-owned public API inventory
 
+## Choosing operations and handling failures
+
+Text positions are Unicode-scalar indexes; literal search returns `-1` when absent.
+Check each operation's result: `text.substring`, `text.split` and codec `decode`
+return typed module errors, while collection searches return their own typed `Err`.
+Built-in list `pop`, dictionary `get` and `string.from_utf8` instead use their
+documented `result<..., string>` errors. Match or propagate compatible results;
+sharing the managed `error.error` base does not implicitly widen result types.
+
+For hex/Base64, choose `try_encode` when an output-limit error must be recoverable;
+plain `encode` reports that limit through checked Runtime failure. Allocation
+failure remains a checked Runtime failure for either form. `convert.unwrap`
+also raises a checked failure on `Err`; `unwrap_or` evaluates its fallback eagerly.
+These failures and task cancellation are distinct from ordinary recoverable
+malformed-input results. See [codec contracts](CONTRACT.md#hex-and-base64),
+[conversion](../combined/CONTRACT.md#convert) and [recoverable builtins](../STAGE8_TEXT_COLLECTIONS.md).
+
+Start with the [small text example](../../website/public/docs/snippets/text-encoding.void),
+then [text cases](../../tests/text_encoding/text.void) or
+[memory, codecs and file composition](../../tests/text_encoding/interop.void).
+Strings use strict UTF-8/scalar semantics; grapheme segmentation, normalization
+and regular expressions remain outside this API.
+
+## Declaration inventory
+
 Generated from validated compiler declaration metadata, with zero public documentation
 warnings. Every explicit parameter and function return is documented. Non-function
 fields/types/cases have meaningful descriptions; their return column is n/a.

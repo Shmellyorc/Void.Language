@@ -14,6 +14,29 @@ documentation; the ownership test checks descriptions, every explicit parameter,
 meaningful returns and the managed error base. The persistent LSP test separately
 checks hover, definition, completion and parameter help against those declarations.
 
+## Paths, cleanup and publication
+
+Use `os` to discover a location and `path` to compose or normalize its spelling.
+Neither creates a directory nor proves containment, permissions or no-follow access;
+`path.normalize` is lexical and does not resolve links. Actual filesystem access
+and held private-directory authority belong to `io`. Follow the
+[path contract](CONTRACT.md#paths) and [OS location guarantees](../os/API.md).
+
+Use `with`/`defer` for deterministic cleanup, and inspect explicit `file.flush()`
+and `file.close()` results when successful synchronization or cleanup matters.
+A completed write or automatic cleanup alone is not a durability acknowledgement.
+GC does not invoke source destructors. The [filesystem example](../../examples/io/filesystem.void)
+shows scoped files; [checked logger shutdown](../../examples/log/checked_shutdown.void)
+shows observing delivery and cleanup separately.
+
+For application saves, use the existing admitted `private_directory` atomic-save
+operations and inspect `published`, `synchronized`, `code` and cleanup diagnostics.
+An error after publication can leave the new file installed; verify it before
+deciding to retry. Admission requires the existing private/no-follow/local-filesystem
+contract, so a plausible normalized path is insufficient. See the
+[atomic-save example](../../examples/atomic_save/test_game.void) and
+[publication/retry/platform rules](CONTRACT.md#atomic-application-saves).
+
 ## Capability coverage
 
 | Capability | Public surface | Principal tests |

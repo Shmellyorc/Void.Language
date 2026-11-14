@@ -9,6 +9,26 @@ Stdin is inherited. Each output stream can be captured or
 inherited independently. The capture call owns the direct child and the
 pipe readers through termination and cleanup.
 
+## Choosing launch and capture
+
+Use `start` when inherited stdio and explicit `child.wait()`/`child.close()` are
+appropriate; use `capture` to retain bounded output prefixes. Supply the absolute
+native image, literal arguments excluding `argv[0]`, complete `NAME=value`
+environment and absolute cwd deliberately. An empty environment list requests
+no caller environment inheritance; shell expansion, PATH lookup and script
+fallback are not supplied. Do not turn an untrusted command string into execution
+authority by silently choosing a shell or importing ambient environment entries.
+
+Set per-stream, total-output and time budgets, then inspect both the launched
+child's `outcome` and its observed exit status. `Ok` alone does not mean successful
+exit, complete output or valid UTF-8. Decode retained bytes explicitly when needed.
+For async capture, use the [explicit host](../ASYNC.md#explicit-root-adapter);
+ordinary CLI entry remains synchronous. The maintained
+[capture example](../../examples/process/capture.void) shows bounded capture and
+separate outcome/status checks. Direct-child cleanup does not supervise descendants.
+
+## Budgets and outcomes
+
 | Option | Meaning |
 | --- | --- |
 | `stdout_limit`, `stderr_limit` | Use `-1` to inherit the stream. A limit from 0 to 16 MiB enables capture. With a zero limit, the first byte exceeds the budget. |

@@ -5,6 +5,23 @@
 and error types are documented in the installed source, so compiler-owned hover,
 completion, signatures and navigation share the implementation metadata.
 
+## Choosing inputs and callbacks
+
+`[T, N]` is a fixed value array; `[T]` is a growable list with shared identity.
+These collection helpers accept growable lists. Pass a fixed array explicitly as
+`fixed[0..<fixed.count]`: slicing allocates an owned growable copy of the selected
+elements, rather than borrowing a view. The outer copy leaves the fixed input
+unchanged; referenced children still share identity and retain readonly authority.
+See [slice semantics](../ARRAY_OPERATIONS.md#slices).
+
+Specialize a generic comparator such as `c.numeric_less<i32>` and write lambda
+parameter types. For `map`, supply `<T,U>` or an already typed transform; annotating
+only the destination does not infer its output type. The maintained
+[collection example](../../examples/collections_stdlib/main.void) demonstrates
+both a typed transform and fixed slicing without another API or overload.
+
+## Declarations and behavior
+
 ```void
 func reversed<t>(const items: [t]) -> [t]
 func numeric_less<t>(const left: t, const right: t) -> bool
@@ -32,10 +49,7 @@ func values<k, v>(const items: {k: v}) -> [v]
 func copy_dictionary<k, v>(const items: {k: v}) -> {k: v}
 ```
 
-The only default is `descending = false`. Supply a strict weak ordering explicitly;
-generic callback references need concrete arguments (`c.numeric_less<i32>`), and
-lambda parameters need written types. Map needs explicit `<T,U>` or an already
-typed transform. A destination annotation alone does not infer U.
+The only default is `descending = false`. Supply a strict weak ordering explicitly.
 
 All returned outer lists/dictionaries are fresh. `sorted` is stable and snapshots
 the original outer list before invoking a comparator. Descending swaps comparison

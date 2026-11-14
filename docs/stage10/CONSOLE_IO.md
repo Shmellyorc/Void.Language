@@ -34,8 +34,13 @@ frames before waiting for input. Redirected output can use plain frames.
 For scripts or redirected input, select a line-input path explicitly.
 `stdin.read_line()` returns `Ok(text(...))`, `Ok(eof)` or a structured
 `Err`. The convenience `console.readline()` collapses empty text, EOF and
-recoverable failures to an empty string. Use the structured endpoint when
-those outcomes matter. `read_key()` refuses redirected stdin, and its
+recoverable failures to an empty string. `console.read(max_scalars)` also returns
+empty for EOF, negative counts and recoverable read failures. Use checked
+`stdin.read_line()` or `stdin.read_text(max_scalars)` when those distinctions matter;
+allocation/Runtime failures remain checked failures in either form.
+Prompting `readline(prompt)` flushes its prompt before reading, but a prompt
+write/flush failure returns empty without consuming input. `read_key()` refuses
+redirected stdin, and its
 terminal EOF is a checked `closed` error.
 [Executable Adventure](../../examples/ascii_adventure/README.md) · [Native terminal evidence](../developer-experience/G17_ASCII_ADVENTURE.md#terminal-behavior)
 
