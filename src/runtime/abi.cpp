@@ -105,6 +105,18 @@ void Runtime::collection_leave(void* identity) {
 }
 void Runtime::collection_append(void* text) {auto& t=thread();if(t.collection_displays.empty())throw std::logic_error("Invalid collection display scope");t.collection_displays.back().bytes.append(string_bytes(text));}
 void Runtime::collection_finish(void** out) {auto& t=thread();if(t.collection_displays.empty())throw std::logic_error("Invalid collection display scope");auto bytes=std::move(t.collection_displays.back().bytes).finish();string_into(out,bytes);}
+// Keep the generated-code poll with its TLS boundary so the native compiler
+// can inline the no-request path. Validation and the cold rendezvous are unchanged.
+void Runtime::poll() {
+    require_managed();
+    if (!requested_.load(std::memory_order_acquire)) return;
+    // G33-X D2: preserve validation/request/lock ordering; keep rare wait
+    // bookkeeping out of the common no-request function prologue.
+    [this]() __attribute__((noinline)) {
+        std::unique_lock lock(mutex_);
+        if (requested_) park(thread(), lock);
+    }();
+}
 Runtime& Runtime::current() {
     if (!current_runtime_) throw std::logic_error("generated code has no runtime attachment");
     return *current_runtime_;
@@ -119,7 +131,7 @@ VD_DISPLAY_ENCODING(f32);VD_DISPLAY_ENCODING(f64);
 static_assert(static_cast<unsigned>(vd::ScalarEncoding::boolean)==10);
 std::int32_t runtime_entry(vd::NativeCode::CheckedEntry entry,std::int32_t value,vd::RuntimeFailure* failure,const vd::RuntimeTypeRecord* records,std::size_t count,const vd::RuntimeWitnessRecord* witnesses=nullptr,std::size_t witness_count=0,int argc=0,const void* argv=nullptr,bool wide=false,vd::ApplicationMetadata::Owner application={},std::shared_ptr<const vd::DynamicBinding> dynamic={}) noexcept {
     try {
-        vd::Runtime runtime(256);
+        vd::Runtime runtime(256,vd::Runtime::AllocationPolicy::live);
         if (dynamic) runtime.bind_dynamic(std::move(dynamic));
         runtime.application_arguments(argc ? vd::capture_application_arguments(argc, argv, wide) : vd::checked_application_arguments({}));
         runtime.start_application(std::move(application));

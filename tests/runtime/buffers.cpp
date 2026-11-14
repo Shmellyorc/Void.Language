@@ -114,10 +114,12 @@ extern "C" void* __wrap___asan_memset(void* data,int value,std::size_t bytes) {r
 // Verified Linux x64 native C++ ABI symbol for Heap::collect(span<void* const>).
 // The first explicit argument is the method's existing this parameter. This is
 // only a test link wrapper; Runtime and the production library stay unmodified.
-extern "C" void __real__ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EE(vd::Heap*,std::span<void* const>);
-extern "C" void __wrap__ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EE(vd::Heap* heap,std::span<void* const> roots) {
+extern "C" std::size_t __real__ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EEPNS0_10ReuseCacheE(vd::Heap*,std::span<void* const>,void*);
+extern "C" std::size_t __wrap__ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EEPNS0_10ReuseCacheE(vd::Heap* heap,std::span<void* const> roots,void* cache) {
     if(redirect_slot) {*redirect_slot=redirect_value;redirect_slot=nullptr;}
-    __real__ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EE(heap,roots);
+    const auto bytes=__real__ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EEPNS0_10ReuseCacheE(heap,roots,cache);
+    if(bytes!=heap->memory_snapshot().payload_bytes)std::terminate();
+    return bytes;
 }
 #endif
 

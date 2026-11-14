@@ -116,6 +116,10 @@ public:
     std::optional<ReferenceEvent> at(std::size_t) const;
 private:
     friend class ReferenceCursor;
+    friend class Heap;
+    // GC cache retirement cannot construct an empty STL vector: Debug STL
+    // implementations may allocate its iterator proxy. Keep bounded capacity.
+    void clear_for_reuse() noexcept {bytes_=0;offsets_.clear();}
     LegacyReferenceMap(std::size_t bytes,std::vector<std::size_t> offsets) : bytes_(bytes),offsets_(std::move(offsets)) {}
     std::size_t bytes_;
     std::vector<std::size_t> offsets_;

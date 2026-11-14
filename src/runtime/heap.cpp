@@ -1,28 +1,96 @@
 #include "void/heap.hpp"
 #include "void/utf8.hpp"
 #include <algorithm>
+#include <array>
+#if defined(__has_feature)
+# if __has_feature(address_sanitizer)
+#  define VD_SMALL_ASAN 1
+#  include <sanitizer/asan_interface.h>
+# endif
+#endif
 #include <cstring>
 #include <new>
 #include <utility>
+#include <type_traits>
 #include <unordered_set>
 #include <stdexcept>
 namespace vd {
-Heap::MemorySnapshot Heap::memory_snapshot() const {
+static_assert(std::is_nothrow_move_assignable_v<LegacyReferenceMap>);
+namespace {
+void cache_poison(void* p,std::size_t bytes,bool dead) noexcept {
+#ifdef VD_SMALL_ASAN
+    if(dead)__asan_poison_memory_region(p,bytes);else __asan_unpoison_memory_region(p,bytes);
+#else
+    (void)p;(void)bytes;(void)dead;
+#endif
+}
+}
+struct Heap::ReuseCache::Data {
+    static constexpr unsigned capacity=256;
+    using Node=decltype(objects_)::node_type;
+    std::array<std::array<Node,capacity>,16> nodes;
+    std::array<unsigned,16> count{};
+    ~Data() {
+        for(unsigned i=0;i<16;++i)for(unsigned j=0;j<count[i];++j) {
+            void* p=nodes[i][j].key();cache_poison(p,(i+1)*16,false);::operator delete(p);
+        }
+    }
+};
+Heap::ReuseCache::ReuseCache() noexcept {
+    // Keep allocation/deletion paired under host replacements and sanitizers.
+    // Cache metadata is optional; every ordinary allocation remains fallible.
+    try {data_=std::make_unique<Data>();}catch(const std::bad_alloc&) {}
+}
+Heap::ReuseCache::~ReuseCache() = default;
+bool Heap::recycle(std::unordered_map<void*,Object>::iterator it,ReuseCache::Data* small_) noexcept {
+    const auto bytes=it->second.references.bytes();
+    if(!small_ || it->second.kind==TypeLayout::Kind::buffer || !bytes || bytes>256)return false;
+    const auto i=(bytes-1)/16;
+    if(small_->count[i]==ReuseCache::Data::capacity)return false;
+    auto node=objects_.extract(it);void* p=node.key();
+    // Release descriptor leases now. Empty reference-map capacity is bounded
+    // by the eligible 256-byte shape and reused without allocating in sweep.
+    node.mapped().references.clear_for_reuse();node.mapped().metadata.reset();
+    node.mapped().kind=TypeLayout::Kind::ordinary;node.mapped().marked=node.mapped().released=false;
+    small_->nodes[i][small_->count[i]++]=std::move(node);
+    cache_poison(p,(i+1)*16,true);return true;
+}
+Heap::MemorySnapshot Heap::memory_snapshot() const { return memory_snapshot(nullptr); }
+Heap::MemorySnapshot Heap::memory_snapshot(const ReuseCache* cache) const {
+    const auto* small_=cache?cache->data_.get():nullptr;
     std::size_t bytes=0;
     for(const auto& [address,object]:objects_) {(void)address;bytes+=object.references.bytes();}
-    return {objects_.size(),bytes,objects_.bucket_count(),roots_.capacity()};
+    std::size_t cached=0,blocks=0;
+    if(small_)for(unsigned i=0;i<16;++i){cached+=(i+1)*16*small_->count[i];blocks+=small_->count[i];}
+    return {objects_.size(),bytes,objects_.bucket_count(),roots_.capacity(),cached,blocks};
 }
 Heap::~Heap() { for (auto& [p, o] : objects_) { (void)o; destroy(p,o); } }
 void* Heap::allocate(const TypeLayout& layout) {
     return allocate_validated(layout,LegacyReferenceMap::validate(layout.size,layout.references));
 }
-void* Heap::allocate_validated(const TypeLayout& layout,LegacyReferenceMap shape) {
+void* Heap::allocate_validated(const TypeLayout& layout,LegacyReferenceMap shape,ReuseCache* cache) {
+    auto* small_=cache?cache->data_.get():nullptr;
     if (!layout.size || layout.size!=shape.bytes()) throw std::invalid_argument("empty or mismatched object layout");
     if (layout.kind!=TypeLayout::Kind::ordinary && layout.kind!=TypeLayout::Kind::string) throw std::invalid_argument("unknown object layout kind");
     if (layout.kind == TypeLayout::Kind::string &&
         (layout.size <= sizeof(std::uint64_t) || !layout.references.empty() || layout.descriptor))
         throw std::invalid_argument("invalid intrinsic string layout");
-    auto* p = ::operator new(layout.size);
+    if(small_ && layout.size<=256) {
+        const auto i=(layout.size-1)/16;
+        if(small_->count[i]) {
+            auto node=std::move(small_->nodes[i][--small_->count[i]]);void* p=node.key();
+            cache_poison(p,(i+1)*16,false);std::memset(p,0,layout.size);
+            node.mapped().references=std::move(shape);node.mapped().metadata=layout.descriptor;node.mapped().kind=layout.kind;node.mapped().marked=node.mapped().released=false;
+            try {auto inserted=objects_.insert(std::move(node));if(!inserted.inserted)std::terminate();}
+            catch(...) {
+                node.mapped().references.clear_for_reuse();node.mapped().metadata.reset();
+    node.mapped().kind=TypeLayout::Kind::ordinary;node.mapped().marked=node.mapped().released=false;
+                small_->nodes[i][small_->count[i]++]=std::move(node);cache_poison(p,(i+1)*16,true);throw;
+            }
+            return p;
+        }
+    }
+    auto* p = ::operator new(small_ && layout.size<=256 ? ((layout.size-1)/16+1)*16 : layout.size);
     std::memset(p, 0, layout.size);
     try { objects_.emplace(p, Object{std::move(shape),layout.descriptor,layout.kind}); }
     catch (...) { ::operator delete(p); throw; }
@@ -226,7 +294,9 @@ void Heap::store(void* object, std::size_t offset, void* value) {
     std::memcpy(static_cast<char*>(object) + offset, &value, sizeof(value));
 }
 void Heap::collect() { collect({}); }
-void Heap::collect(std::span<void* const> additional_roots) {
+void Heap::collect(std::span<void* const> additional_roots) { collect(additional_roots,nullptr); }
+std::size_t Heap::collect(std::span<void* const> additional_roots,ReuseCache* cache) {
+    auto* small_=cache?cache->data_.get():nullptr;
     std::vector<void*> pending;
     std::optional<std::unordered_set<void*>> buffer_queued; // do not construct even an empty set on legacy paths
     for (auto* root : additional_roots) if (root) pending.push_back(root);
@@ -274,10 +344,16 @@ void Heap::collect(std::span<void* const> additional_roots) {
         for (auto& [p, o] : objects_) { (void)p; o.marked = false; }
         throw;
     }
+    // Account surviving payload during the existing sweep, with no second walk.
+    std::size_t live_bytes=0;
     for (auto it = objects_.begin(); it != objects_.end();) {
-        if (!it->second.marked) { destroy(it->first,it->second); it = objects_.erase(it); }
-        else { it->second.marked = false; ++it; }
+        if (!it->second.marked) {
+            auto dead=it++;
+            if(!recycle(dead,small_)){destroy(dead->first,dead->second);objects_.erase(dead);}
+        }
+        else { live_bytes+=it->second.references.bytes(); it->second.marked = false; ++it; }
     }
+    return live_bytes;
 }
 Root::Root(Heap& heap, void* object) : heap_(heap), value_(object) { heap_.add_root(&value_); }
 Root::~Root() { heap_.remove_root(&value_); }

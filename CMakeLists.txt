@@ -817,7 +817,7 @@ if(BUILD_TESTING)
     # never to an allocator call that a different STL might make while waiting.
     if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
       target_compile_definitions(void_gc_buffers PRIVATE VD_BUFFER_WRAP_COLLECT=1)
-      target_link_options(void_gc_buffers PRIVATE "-Wl,--wrap=_ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EE")
+      target_link_options(void_gc_buffers PRIVATE "-Wl,--wrap=_ZN2vd4Heap7collectESt4spanIKPvLm18446744073709551615EEPNS0_10ReuseCacheE")
     endif()
     if(VOID_SANITIZERS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang")
       target_compile_definitions(void_gc_buffers PRIVATE VD_BUFFER_WRAP_ASAN_MEMSET=1)

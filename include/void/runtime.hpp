@@ -46,7 +46,8 @@ public:
     class BufferReadLease;
     class RegisteredRootWord;
     struct RootedInterfaceSource;
-    explicit Runtime(std::size_t allocation_budget = 0) : allocation_budget_(allocation_budget) {}
+    enum class AllocationPolicy { fixed, live }; // G33-X E: explicit host budgets remain fixed.
+    explicit Runtime(std::size_t allocation_budget = 0,AllocationPolicy policy=AllocationPolicy::fixed) : allocation_budget_(allocation_budget),allocation_policy_(policy) {}
     Runtime(std::size_t allocation_budget, std::shared_ptr<console::Streams>);
     std::shared_ptr<console::Context> console_context(); // Native state; lazy process defaults.
     ~Runtime();
@@ -218,8 +219,8 @@ private:
         std::uint64_t collecting_epoch = 0;
         Collection result = Collection::completed;
     };
-    static thread_local Runtime* current_runtime_;
-    static thread_local Thread* current_thread_;
+    static constinit thread_local Runtime* current_runtime_;
+    static constinit thread_local Thread* current_thread_;
     Thread& thread() const;
     void require_managed() const;
     struct RootLocation { Frame* frame; std::size_t slot, offset; };
@@ -286,6 +287,14 @@ private:
     std::size_t allocation_budget_ = 0, allocations_ = 0;
     std::uint64_t epoch_ = 0, completed_epoch_ = 0;
     std::uint64_t cooperative_parks_ = 0;
+    AllocationPolicy allocation_policy_ = AllocationPolicy::fixed;
+    std::size_t paced_budget_ = 0;
+    std::size_t allocated_bytes_ = 0, byte_budget_ = 64*1024;
+    // Shared by ordinary construction and private buffer preparation. The
+    // checkpoint may collect outside mutex_; committed accounting holds it.
+    void allocation_checkpoint(std::size_t bytes);
+    void allocation_committed(std::size_t bytes) noexcept;
+    Heap::ReuseCache reuse_;
 };
 
 class Runtime::Attachment {

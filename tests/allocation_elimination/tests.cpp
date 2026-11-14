@@ -20,7 +20,12 @@ void fixture(const char* name, const std::string& text, int expected, std::size_
     auto runtime=std::make_shared<vd::Runtime>(1);
     auto module=analysis->lower(vd::ir::Emission::entry);
     auto code=jit.compile(module,module.entry_symbol,optimized,{},runtime);
-    allocation_elimination::check(name,[&](int n){return code->invoke(n);},*runtime,expected,constructions);
+    // Warm reuse may satisfy a real allocation without any native request.
+    // Keep the OOM proof cold rather than forcing an unnecessary native request.
+    auto cold_runtime=std::make_shared<vd::Runtime>(1);
+    auto cold_code=jit.compile(module,module.entry_symbol,optimized,{},cold_runtime);
+    allocation_elimination::check(name,[&](int n){return code->invoke(n);},*runtime,expected,constructions,
+        [&](int n){return cold_code->invoke(n);});
 }
 // These are deliberately outside A's proof. Counts protect the conservative
 // fallback as well as values: equal results alone do not prove escape safety.

@@ -799,7 +799,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             if(collection_body)b.CreateCall(module->getOrInsertFunction("vd_collection_scope_leave",b.getVoidTy()));
             if(display_body)b.CreateCall(module->getOrInsertFunction("vd_display_leave",b.getVoidTy()));
             if(deinit_body)b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_leave",b.getVoidTy()));
-            if (input.coordinated) b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave", b.getVoidTy(), b.getPtrTy()), {root_frame});
+            if (root_frame) b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave", b.getVoidTy(), b.getPtrTy()), {root_frame});
         };
         unsigned active_block=0;
         auto return_failure = [&] {
@@ -960,11 +960,24 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             // Compound values retain their independent layout descriptors.
             std::vector<llvm::Type*> root_types;
             std::vector<std::vector<std::uint64_t>> root_offsets;
-            if(!async)for(unsigned bn=0;bn<instruction_types.size();++bn)for(unsigned id=0;id<instruction_types[bn].size();++id) {
-                if(elided_values[bn].contains(id))continue;
-                auto t=instruction_types[bn][id];
-                std::vector<std::uint64_t> offsets;reference_offsets(t,0,offsets);
-                if(!offsets.empty() && type(t)->isPointerTy()){root_types.push_back(type(t));root_offsets.push_back(std::move(offsets));}
+            // C2: validated instruction values are block-local. Locals carry
+            // every CFG edge, so synchronous blocks may share pointer homes.
+            // Keep ordinary function-duration root visibility until overwrite:
+            // stale words still name live rooted objects, as in the baseline.
+            // This reduces descriptor words without per-edge clear stores.
+            if(!async)for(unsigned bn=0;bn<instruction_types.size();++bn) {
+                unsigned block_roots=0;
+                for(unsigned id=0;id<instruction_types[bn].size();++id) {
+                    if(elided_values[bn].contains(id))continue;
+                    auto t=instruction_types[bn][id];
+                    std::vector<std::uint64_t> offsets;reference_offsets(t,0,offsets);
+                    if(!offsets.empty() && type(t)->isPointerTy()) {
+                        if(block_roots==root_types.size()) {
+                            root_types.push_back(type(t));root_offsets.push_back(std::move(offsets));
+                        }
+                        ++block_roots;
+                    }
+                }
             }
             auto* packed_type=llvm::StructType::get(context,root_types);
             llvm::Value* packed=nullptr;
@@ -976,8 +989,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 for(unsigned n=0;n<root_offsets.size();++n)for(auto offset:root_offsets[n])offsets.push_back(geometry->getElementOffset(n)+offset);
                 add_storage_root(geometry->getSizeInBytes(),packed,offsets);
             }
-            unsigned root_index=0;
-            for (unsigned block = 0; block < f.blocks.size(); ++block)
+            for (unsigned block = 0; block < f.blocks.size(); ++block) {
+                unsigned root_index=0;
                 for (unsigned position=0;position<instruction_types[block].size();++position) {
                     auto t=instruction_types[block][position];
                     std::vector<std::uint64_t> offsets; reference_offsets(t,0,offsets);
@@ -992,6 +1005,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     }
                     value_roots[block].push_back(storage);
                 }
+            }
             auto* root_array_type = llvm::ArrayType::get(slot_type,entries.size());
             auto* root_array = home(b.CreateAlloca(root_array_type),StorageRole::roots,llvm_backend::HomeKind::slots);
             // Sizes and exact reference maps are immutable. Bulk-initialize
@@ -1006,10 +1020,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 b.CreateMemCpy(root_array,alignment,initial,alignment,layout.getTypeAllocSize(root_array_type));
                 for(unsigned i=0;i<entries.size();++i){auto* entry=b.CreateInBoundsGEP(root_array_type,root_array,{b.getInt32(0),b.getInt32(i)});b.CreateStore(entries[i].address,b.CreateStructGEP(slot_type,entry,0));}
             }
+            if(!entries.empty() || async || display_body || collection_body || deinit_body) {
             auto* frame = home(b.CreateAlloca(b.getInt8Ty(), b.getInt64(sizeof(Runtime::Frame))),StorageRole::roots,llvm_backend::HomeKind::frame);
             frame->setAlignment(llvm::Align(alignof(Runtime::Frame))); root_frame = frame;
             b.CreateCall(module->getOrInsertFunction("vd_gc_frame_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type),
                 {root_frame,root_array,llvm::ConstantInt::get(size_type,entries.size())});
+            }
         }
         if(collection_body) {
             auto* entered=b.CreateCall(module->getOrInsertFunction("vd_collection_scope",b.getInt1Ty(),b.getPtrTy()),{failure});
@@ -2670,8 +2686,8 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     }
     if (input.coordinated && input.analysis && !runtime) {
         if (input.application_metadata || !input.globals.empty() ||
-            (input.c_primitives && input.c_primitives->dynamic())) runtime = std::make_shared<Runtime>(256);
-        else { if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256); runtime=impl_->source_runtime; }
+            (input.c_primitives && input.c_primitives->dynamic())) runtime = std::make_shared<Runtime>(256,Runtime::AllocationPolicy::live);
+        else { if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256,Runtime::AllocationPolicy::live); runtime=impl_->source_runtime; }
     }
     std::map<std::string,ir::ReferenceEffects> checked_effects;ir::validate(input,nullptr,&checked_effects);
     check_c_primitive_target(input, impl_->jit->getTargetTriple());
@@ -2805,8 +2821,8 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
             const bool globals = std::any_of(analysis.declarations().begin(), analysis.declarations().end(), [](const auto& d) { return d.kind == AnalyzedDeclaration::Kind::global_variable; });
             if (globals && !artifact->coordinated) throw std::runtime_error("global cache coordination mismatch");
             if (artifact->coordinated && !owner) {
-                if (analysis.application_metadata() || globals) owner = std::make_shared<Runtime>(256);
-                else { if (!impl_->source_runtime) impl_->source_runtime = std::make_shared<Runtime>(256); owner = impl_->source_runtime; }
+                if (analysis.application_metadata() || globals) owner = std::make_shared<Runtime>(256,Runtime::AllocationPolicy::live);
+                else { if (!impl_->source_runtime) impl_->source_runtime = std::make_shared<Runtime>(256,Runtime::AllocationPolicy::live); owner = impl_->source_runtime; }
             }
             if (owner) owner->start_application(analysis.application_metadata(),false);
             if (globals) owner->admit_globals(global_contract(analysis), impl_->replacing_globals, false);

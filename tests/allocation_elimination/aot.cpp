@@ -22,7 +22,16 @@ int main() {
         vd::RuntimeFailure failure; auto value=__vd_2f656c6973696f6e2e766f69643a3a656e747279_##name(n,&failure); \
         if(failure.message)throw std::runtime_error(failure.message); return value; \
     }; \
-    allocation_elimination::check(#name,invoke,runtime,expected,count); \
+    vd::Runtime cold(1); vd::RuntimeFailure cold_admission; \
+    vd_runtime_admit_metadata(&cold,__vd_types_##name,__vd_type_count_##name, \
+        __vd_witnesses_##name,__vd_witness_count_##name,&cold_admission); \
+    managed_test::require(!cold_admission.message,"cold elision metadata admission"); \
+    auto cold_invoke=[&](int n) { \
+        vd::Runtime::Attachment attachment(cold); vd::Runtime::Managed managed(cold); \
+        vd::RuntimeFailure failure; auto value=__vd_2f656c6973696f6e2e766f69643a3a656e747279_##name(n,&failure); \
+        if(failure.message)throw std::runtime_error(failure.message); return value; \
+    }; \
+    allocation_elimination::check(#name,invoke,runtime,expected,count,cold_invoke); \
 }
         VD_ELISION_CASES(CHECK)
 #undef CHECK

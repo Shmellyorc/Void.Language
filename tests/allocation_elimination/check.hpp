@@ -8,8 +8,8 @@ inline void force_collection() {
     if (++polls%31==0 && vd::Runtime::current().collect()!=vd::Runtime::Collection::completed)
         std::terminate();
 }
-template<class Invoke> void check(const char* name, Invoke invoke, vd::Runtime& runtime,
-                                  int expected, std::size_t constructions) {
+template<class Invoke,class ColdInvoke> void check(const char* name, Invoke invoke, vd::Runtime& runtime,
+                                  int expected, std::size_t constructions, ColdInvoke cold_invoke) {
     using namespace managed_test;
     require(invoke(1000)==expected,"allocation elimination warm oracle");
     std::size_t live_after_warm;
@@ -31,9 +31,13 @@ template<class Invoke> void check(const char* name, Invoke invoke, vd::Runtime& 
                 "allocation elimination final reclamation");
     };
     collect();
+    // Initialize only the eager global cells outside the per-object fault.
+    // Zero iterations construct no boxes and leave no dead payload cache.
+    if(std::string(name)=="effects" || std::string(name)=="init")
+        require(cold_invoke(0)==0,"cold global initialization");
     Probe fault; fault.inspect_roots=true; fault.frames.reserve(1024);
     fault.fail_construction=1; fault.fail_allocation=0; bool failed=false;
-    { Observe observe(fault); try { require(invoke(1000)==expected,"allocation elimination fault oracle"); }
+    { Observe observe(fault); try { require(cold_invoke(1000)==expected,"allocation elimination fault oracle"); }
       catch (const std::runtime_error& e) {
         require(std::string(e.what()).find("allocation failed")!=std::string::npos,
                 "allocation elimination wrong failure"); failed=true;
@@ -42,7 +46,8 @@ template<class Invoke> void check(const char* name, Invoke invoke, vd::Runtime& 
     require(fault.frames.empty() && fault.roots_valid && fault.commits_valid,
             "allocation elimination failure root/publication");
     require(failed==(constructions!=0),"remaining versus eliminated allocation OOM");
-    collect(); require(invoke(1000)==expected,"allocation elimination recovery"); collect();
+    collect(); require(invoke(1000)==expected,"allocation elimination recovery");
+    require(cold_invoke(1000)==expected,"cold allocation failure recovery"); collect();
     if(std::string(name)=="survives_allocation") {
         // Pre-attach so the injected native failure reaches source allocation.
         vd::Runtime::Attachment attachment(runtime); vd::Runtime::Managed managed(runtime);

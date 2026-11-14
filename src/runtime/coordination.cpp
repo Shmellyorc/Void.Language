@@ -14,8 +14,8 @@
 #include <stdexcept>
 
 namespace vd {
-thread_local Runtime* Runtime::current_runtime_ = nullptr;
-thread_local Runtime::Thread* Runtime::current_thread_ = nullptr;
+constinit thread_local Runtime* Runtime::current_runtime_ = nullptr;
+constinit thread_local Runtime::Thread* Runtime::current_thread_ = nullptr;
 std::int64_t Runtime::next_clock_identity() {
     static std::atomic<std::uint64_t> next{1};
     auto current=next.load(std::memory_order_relaxed);
@@ -133,12 +133,7 @@ void Runtime::park(Thread& t, std::unique_lock<std::mutex>& lock) {
     }
     t.state = State::managed;
 }
-void Runtime::poll() {
-    require_managed();
-    if (!requested_.load(std::memory_order_acquire)) return;
-    std::unique_lock lock(mutex_);
-    if (requested_) park(thread(), lock);
-}
+
 Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
     require_managed();
     if (timeout.count() < 0) throw std::invalid_argument("negative collection timeout");
@@ -163,6 +158,7 @@ Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
     if (timeout == std::chrono::milliseconds::max()) changed_.wait(lock, safe);
     else ready = changed_.wait_for(lock, timeout, safe);
     Collection result = ready ? Collection::completed : Collection::timed_out;
+    std::size_t live_bytes=0;
     if (ready) {
         try {
             std::vector<void*> roots;
@@ -184,11 +180,24 @@ Runtime::Collection Runtime::collect(std::chrono::milliseconds timeout) {
                     }
                 }
             for (auto* h : handles_) if (h->value_) roots.push_back(h->value_);
-            heap_.collect(roots);
+            live_bytes=heap_.collect(roots,&reuse_);
         } catch (const std::bad_alloc&) { result = Collection::allocation_failure; }
         catch (...) { std::terminate(); } // Invalid precise roots are a broken compiler/runtime invariant.
     }
-    if (result == Collection::completed) allocations_ = 0;
+    if (result == Collection::completed) {
+        allocations_ = 0;
+        allocated_bytes_ = 0;
+        if(allocation_budget_ && allocation_policy_==AllocationPolicy::live) {
+            constexpr auto maximum=std::numeric_limits<std::size_t>::max();
+            const auto cap=allocation_budget_>maximum/2?maximum:allocation_budget_*2;
+            paced_budget_=std::max(allocation_budget_,std::min(cap,heap_.size()));
+            // A bounded growth allowance, not a hard process-memory limit.
+            // Large single requests and concurrent NativeSafe preparation may
+            // exceed it; they retain their original allocation/failure contract.
+            byte_budget_=std::clamp(live_bytes/2,
+                                    std::size_t{64*1024},std::size_t{1024*1024});
+        }
+    }
     for (auto* t : threads_) if (t->collecting_epoch == epoch_) t->result = result;
     completed_epoch_ = epoch_;
     requested_ = false;
@@ -269,7 +278,26 @@ void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
     std::lock_guard lock(mutex_);
     validate_descriptor(layout);
     heap_.validate_output_address(slot);
-    *slot = heap_.allocate(layout);
+    *slot = heap_.allocate_validated(layout,LegacyReferenceMap::validate(layout.size,layout.references),&reuse_);
+}
+void Runtime::allocation_checkpoint(std::size_t bytes) {
+    bool due=false;
+    {
+        std::lock_guard lock(mutex_);
+        if(allocation_budget_) {
+            const auto count=paced_budget_?paced_budget_:allocation_budget_;
+            due=allocations_>=count;
+            if(allocation_policy_==AllocationPolicy::live && allocated_bytes_)
+                due=due || allocated_bytes_>=byte_budget_ || bytes>byte_budget_-allocated_bytes_;
+        }
+    }
+    if(due && collect()!=Collection::completed)throw std::bad_alloc();
+}
+void Runtime::allocation_committed(std::size_t bytes) noexcept {
+    constexpr auto maximum=std::numeric_limits<std::size_t>::max();
+    if(allocations_!=maximum)++allocations_;
+    if(allocation_policy_==AllocationPolicy::live)
+        allocated_bytes_=bytes>maximum-allocated_bytes_?maximum:allocated_bytes_+bytes;
 }
 void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* payload) {
     require_output(slot);
@@ -284,10 +312,7 @@ void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* 
     }
     auto references=LegacyReferenceMap::validate(layout.size,layout.references);
     ReferenceCursor cursor(references);
-    bool due;
-    { std::lock_guard lock(mutex_); due=allocation_budget_ && allocations_>=allocation_budget_; }
-    // Neither collection nor parking occurs with a collector-required lock held.
-    if (due && collect()!=Collection::completed) throw std::bad_alloc();
+    allocation_checkpoint(layout.size);
     poll();
     std::lock_guard lock(mutex_);
     while (auto offset=cursor.next_offset()) {
@@ -298,10 +323,10 @@ void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* 
     // copy and final root publication cannot throw or invoke user code/GC.
     validate_descriptor(layout);
     heap_.validate_output_address(slot);
-    void* object=heap_.allocate_validated(layout,std::move(references));
+    void* object=heap_.allocate_validated(layout,std::move(references),&reuse_);
     std::memcpy(object,payload,layout.size);
     *slot=object;
-    if (allocations_ != static_cast<std::size_t>(-1)) ++allocations_;
+    allocation_committed(layout.size);
 }
 void Runtime::store(void* object, std::size_t offset, void* value) {
     require_managed();
@@ -316,7 +341,7 @@ bool Runtime::begin_release(void* object) {
 bool Runtime::contains(void* p) const { std::lock_guard lock(mutex_); return heap_.contains(p); }
 Runtime::MemorySnapshot Runtime::memory_snapshot() const {
     std::lock_guard lock(mutex_);
-    return {heap_.memory_snapshot(),types_?types_->types.size():0,types_?types_->schemas.size():0,types_?types_->witnesses.size():0,
+    return {heap_.memory_snapshot(&reuse_),types_?types_->types.size():0,types_?types_->schemas.size():0,types_?types_->witnesses.size():0,
             handles_.size(),handles_.capacity(),threads_.size(),callbacks_};
 }
 Runtime::Snapshot Runtime::snapshot() const {

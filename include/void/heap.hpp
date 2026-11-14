@@ -51,7 +51,7 @@ public:
     std::string_view nominal_identity(void* object) const;
     std::string_view string_bytes(void* object) const;
     std::size_t size() const { return objects_.size(); }
-    struct MemorySnapshot {std::size_t objects,payload_bytes,buckets,root_capacity;};
+    struct MemorySnapshot {std::size_t objects,payload_bytes,buckets,root_capacity; std::size_t cached_bytes=0,cached_blocks=0;};
     MemorySnapshot memory_snapshot() const; // Host diagnostics; excludes allocator overhead.
 
     void add_root(void** slot);
@@ -60,7 +60,8 @@ public:
 private:
     friend class Runtime;
     void validate_output_address(void**) const;
-    void* allocate_validated(const TypeLayout&, LegacyReferenceMap);
+    class ReuseCache;
+    void* allocate_validated(const TypeLayout&, LegacyReferenceMap,ReuseCache* = nullptr);
     struct BufferState {
         BufferLayoutRef layout;
         mutable const void* owner;
@@ -104,6 +105,19 @@ private:
     };
     std::unordered_map<void*, Object> objects_;
     std::vector<void**> roots_;
+    // Dead nodes stay outside the live registry. Runtime places this opaque
+    // Heap resource at its tail, preserving all existing hot member offsets.
+    class ReuseCache {
+        friend class Heap;
+        struct Data;
+        std::unique_ptr<Data> data_;
+    public:
+        ReuseCache() noexcept;
+        ~ReuseCache();
+    };
+    bool recycle(std::unordered_map<void*,Object>::iterator,ReuseCache::Data*) noexcept;
+    MemorySnapshot memory_snapshot(const ReuseCache*) const;
+    std::size_t collect(std::span<void* const>,ReuseCache*);
     std::size_t private_buffers_=0,buffer_objects_=0;
     const BufferState* buffers_=nullptr;
     // Conservative inclusive address bounds, widened on adoption. Stale bounds

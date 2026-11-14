@@ -121,8 +121,7 @@ Runtime::BufferBuilder::BufferBuilder(Runtime& r,BufferLayoutRef layout,std::uin
     std::shared_ptr<const RuntimeMetadata> catalog;
     {std::lock_guard lock(r.mutex_);r.validate_buffer_layout(layout_);catalog=r.types_;}
     if(live>layout_->capacity() || !quota.bytes || !quota.node_events || !quota.reference_events) throw std::invalid_argument("invalid buffer live extent/work quota");
-    bool due;{std::lock_guard lock(r.mutex_);due=layout_->capacity() && r.allocation_budget_ && r.allocations_>=r.allocation_budget_;}
-    if(due && r.collect()!=Collection::completed) throw std::bad_alloc();
+    if(layout_->capacity())r.allocation_checkpoint(layout_->bytes());
     Heap::PendingBuffer pending;std::shared_ptr<const Heap::BufferState> state;
     {
         Native native(r);cursor_.prepare(layout_->schema());
@@ -134,7 +133,7 @@ Runtime::BufferBuilder::BufferBuilder(Runtime& r,BufferLayoutRef layout,std::uin
         // No poll/fallible step after successful adoption until the registered
         // Frame word contains the object. Counter saturation cannot fail here.
         root_.value_=r.heap_.adopt_buffer(pending,std::move(state));
-        if(r.allocations_!=std::numeric_limits<std::size_t>::max())++r.allocations_;
+        r.allocation_committed(layout_->bytes());
     }
 }
 void Runtime::BufferBuilder::require_active() {
