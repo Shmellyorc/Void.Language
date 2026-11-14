@@ -1,0 +1,14 @@
+struct box:
+    value: i32
+func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for index in 0..<n:
+        if index % 2 == 0:
+            var item = box(value = index % 97)
+            if index % 3 == 0:
+                item.value += 1
+            total += item.value
+        else:
+            var other = box(value = index % 97 + 1)
+            total += other.value
+    return total

@@ -32,7 +32,7 @@ void fixture(const char* name, const std::string& text, int expected, std::size_
 void boundaries(bool optimized) {
     const std::string box="struct box:\n    value: i32\n";
     fixture("identity",box+"func entry(n: i32) -> i32:\n    var a = box(value = 7)\n    var b = box(value = 7)\n    if a == b:\n        return 1\n    return 0\n",0,2,optimized);
-    fixture("published-field",box+"struct holder:\n    item: box\nfunc entry(n: i32) -> i32:\n    var a = box(value = 7)\n    var h = holder(item = a)\n    h.item.value = 9\n    return a.value\n",9,2,optimized);
+    fixture("published-field",box+"struct holder:\n    item: box\nfunc entry(n: i32) -> i32:\n    var a = box(value = 7)\n    var h = holder(item = a)\n    h.item.value = 9\n    return a.value\n",9,1,optimized);
     fixture("captured",box+"func entry(n: i32) -> i32:\n    var a = box(value = 7)\n    var get = func() -> i32:\n        return a.value\n    return get()\n",7,3,optimized);
     fixture("alias-rebind",box+"func entry(n: i32) -> i32:\n    var a = box(value = 7)\n    var b = a\n    a = box(value = 9)\n    return a.value + b.value\n",16,2,optimized);
     fixture("loop-instance",box+"func entry(n: i32) -> i32:\n    var previous = box(value = -1)\n    var total = 0\n    for index in 0..<n:\n        var current = box(value = index)\n        total += previous.value\n        previous = current\n    return total\n",498500,1001,optimized);

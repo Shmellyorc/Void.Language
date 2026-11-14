@@ -2,7 +2,17 @@
 
 Baseline `0407f83f9d6dd660b1503df1e68cdcee9b34b77b`. **G33-I: Experiment A integrated; production qualification complete on Linux and Windows 10 under explicit owner authorization.** See [managed allocation integration](G33_MANAGED_ALLOCATION_INTEGRATION.md). G32/G32-A findings remain authoritative. The G33-X campaign notes below are historical experimental evidence.
 
-## G34-I production-source integration
+## G35 candidate — broader managed escape analysis
+
+Archive and cleanup verified: 540 selected files plus manifest, 4,365,818 compressed bytes, SHA-256 `832123cd10ea1bc8ff96201eb1d73dcbe13b44e5f6d537856832fbe5d93f59af`. Task builds/transport are removed; active SDKs/providers and previous evidence are preserved. Exact receipts and final inventory accompany the archive.
+
+The worktree candidate extends the existing owned proof to synchronous CFG/local aliases, independent loop instances, bounded reference-bearing local owners with precise packed payload roots, and known same-module private/generic construction-view helpers. **Qualified candidate, pending Golden Wrench review and Boss-controlled Git**; G34 remains the accepted baseline. See [consolidated G35 handoff](G35_MANAGED_ESCAPE_ANALYSIS.md).
+
+Linux Release/fatal ASan/UBSan/LeakSanitizer 45/45, relevant fatal TSan including 26-pattern normal/O2 independent AOT, and native Windows 10 Debug/Release 45/45 pass. Exact counts/IR/AOT, forced-GC, ownership rejection, fault/recovery, reload/callback/cancellation and 1-MiB controls are retained. Runtime/public headers, B5/C2/D4/E3 and explicit budgets are unchanged; object/function payload caps stay 256 B/16 KiB. Root packing removes an added Slot without changing eligibility.
+
+The failed foreign-child proof, outlined-default correction, separate-Slot regression and all unfavorable final timings remain recoverable. Known G34 array/async/GC-tail tradeoffs remain active evidence. Whole representative G31 AOT/IR is byte-identical, so its small timing movements are not claimed as runtime improvements. Broader escape work remains active: direct reference temporary lifetimes, field-derived/incoming ownership, multiple-origin rebinding, multi-block/general interprocedural helpers, native/callback/async/cleanup escape and stack graphs are **NOT YET QUALIFIED**. No new allocator/collector/optimizer/root authority or hosted CI. Nothing is staged, committed or pushed.
+
+## Historical G34-I production-source integration
 
 Archive/cleanup verified: 255 selected files plus manifest, 3,032,603 ZIP bytes, SHA-256 `3688231f238ed57ae8bd3f62e501485f4c149a8a5ad193fac6368cbfb75e7ad1`. Disposable Linux and Windows task builds are removed; SDKs/providers and previous evidence are preserved. Final receipts accompany the archive.
 

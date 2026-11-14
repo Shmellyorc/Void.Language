@@ -1,0 +1,10 @@
+struct box:
+    value: i32
+func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for index in 0..<n:
+        var first = box(value = index)
+        var second = box(value = index)
+        if first != second:
+            total += 1
+    return total

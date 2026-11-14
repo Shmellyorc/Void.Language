@@ -134,11 +134,15 @@ void metadata() {
     vd::ir::Type next=retained.definition->fields.at(1).type;
     require(next.nullable && next.definition==retained.definition,"cyclic nominal query lifetime");
     vd::Jit jit;
-    auto a=analyze(node+"func entry(x: i32) -> i32:\n    return node(value = x).value\n");
+    // This control must retain a real heap object even when ordinary local
+    // reference-bearing objects are eligible for allocation elimination.
+    const std::string expose="func expose(value: node) -> i32:\n    return value.value\n";
+    auto a=analyze(node+expose+"func entry(x: i32) -> i32:\n    return expose(node(value = x))\n");
     vd::ReloadSlot slot(jit.compile(*a)); auto owner=slot.acquire()->runtime_owner();
     Probe live; live.capture=true;
     { Observe observe(live); require(slot.invoke(2)==2,"source object before reload"); }
-    auto b=analyze(node+"func entry(x: i32) -> i32:\n    return node(value = x + 1).value\n");
+    require(live.constructions==1 && live.retained,"reload control requires a real escaping object");
+    auto b=analyze(node+expose+"func entry(x: i32) -> i32:\n    return expose(node(value = x + 1))\n");
     require(jit.replace(slot,*b) && slot.invoke(2)==3 && slot.acquire()->runtime_owner()==owner,"managed source compatible reload/runtime owner");
     auto c=analyze(node+"struct extra:\n    x: i32\n\nfunc entry(x: i32) -> i32:\n    return x\n");
     require(!jit.replace(slot,*c),"managed layout change reloaded");

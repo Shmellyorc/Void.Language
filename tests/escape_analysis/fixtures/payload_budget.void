@@ -1,0 +1,168 @@
+struct child:
+    value: i32
+struct full:
+    child: child?
+    field0: i64
+    field1: i64
+    field2: i64
+    field3: i64
+    field4: i64
+    field5: i64
+    field6: i64
+    field7: i64
+    field8: i64
+    field9: i64
+    field10: i64
+    field11: i64
+    field12: i64
+    field13: i64
+    field14: i64
+    field15: i64
+    field16: i64
+    field17: i64
+    field18: i64
+    field19: i64
+    field20: i64
+    field21: i64
+    field22: i64
+    field23: i64
+    field24: i64
+    field25: i64
+    field26: i64
+    field27: i64
+    field28: i64
+    field29: i64
+    field30: i64
+func entry(n: i32) -> i32:
+    var total = 0
+    var item0 = full(field0 = 1)
+    total += item0.field0 as i32
+    var item1 = full(field0 = 1)
+    total += item1.field0 as i32
+    var item2 = full(field0 = 1)
+    total += item2.field0 as i32
+    var item3 = full(field0 = 1)
+    total += item3.field0 as i32
+    var item4 = full(field0 = 1)
+    total += item4.field0 as i32
+    var item5 = full(field0 = 1)
+    total += item5.field0 as i32
+    var item6 = full(field0 = 1)
+    total += item6.field0 as i32
+    var item7 = full(field0 = 1)
+    total += item7.field0 as i32
+    var item8 = full(field0 = 1)
+    total += item8.field0 as i32
+    var item9 = full(field0 = 1)
+    total += item9.field0 as i32
+    var item10 = full(field0 = 1)
+    total += item10.field0 as i32
+    var item11 = full(field0 = 1)
+    total += item11.field0 as i32
+    var item12 = full(field0 = 1)
+    total += item12.field0 as i32
+    var item13 = full(field0 = 1)
+    total += item13.field0 as i32
+    var item14 = full(field0 = 1)
+    total += item14.field0 as i32
+    var item15 = full(field0 = 1)
+    total += item15.field0 as i32
+    var item16 = full(field0 = 1)
+    total += item16.field0 as i32
+    var item17 = full(field0 = 1)
+    total += item17.field0 as i32
+    var item18 = full(field0 = 1)
+    total += item18.field0 as i32
+    var item19 = full(field0 = 1)
+    total += item19.field0 as i32
+    var item20 = full(field0 = 1)
+    total += item20.field0 as i32
+    var item21 = full(field0 = 1)
+    total += item21.field0 as i32
+    var item22 = full(field0 = 1)
+    total += item22.field0 as i32
+    var item23 = full(field0 = 1)
+    total += item23.field0 as i32
+    var item24 = full(field0 = 1)
+    total += item24.field0 as i32
+    var item25 = full(field0 = 1)
+    total += item25.field0 as i32
+    var item26 = full(field0 = 1)
+    total += item26.field0 as i32
+    var item27 = full(field0 = 1)
+    total += item27.field0 as i32
+    var item28 = full(field0 = 1)
+    total += item28.field0 as i32
+    var item29 = full(field0 = 1)
+    total += item29.field0 as i32
+    var item30 = full(field0 = 1)
+    total += item30.field0 as i32
+    var item31 = full(field0 = 1)
+    total += item31.field0 as i32
+    var item32 = full(field0 = 1)
+    total += item32.field0 as i32
+    var item33 = full(field0 = 1)
+    total += item33.field0 as i32
+    var item34 = full(field0 = 1)
+    total += item34.field0 as i32
+    var item35 = full(field0 = 1)
+    total += item35.field0 as i32
+    var item36 = full(field0 = 1)
+    total += item36.field0 as i32
+    var item37 = full(field0 = 1)
+    total += item37.field0 as i32
+    var item38 = full(field0 = 1)
+    total += item38.field0 as i32
+    var item39 = full(field0 = 1)
+    total += item39.field0 as i32
+    var item40 = full(field0 = 1)
+    total += item40.field0 as i32
+    var item41 = full(field0 = 1)
+    total += item41.field0 as i32
+    var item42 = full(field0 = 1)
+    total += item42.field0 as i32
+    var item43 = full(field0 = 1)
+    total += item43.field0 as i32
+    var item44 = full(field0 = 1)
+    total += item44.field0 as i32
+    var item45 = full(field0 = 1)
+    total += item45.field0 as i32
+    var item46 = full(field0 = 1)
+    total += item46.field0 as i32
+    var item47 = full(field0 = 1)
+    total += item47.field0 as i32
+    var item48 = full(field0 = 1)
+    total += item48.field0 as i32
+    var item49 = full(field0 = 1)
+    total += item49.field0 as i32
+    var item50 = full(field0 = 1)
+    total += item50.field0 as i32
+    var item51 = full(field0 = 1)
+    total += item51.field0 as i32
+    var item52 = full(field0 = 1)
+    total += item52.field0 as i32
+    var item53 = full(field0 = 1)
+    total += item53.field0 as i32
+    var item54 = full(field0 = 1)
+    total += item54.field0 as i32
+    var item55 = full(field0 = 1)
+    total += item55.field0 as i32
+    var item56 = full(field0 = 1)
+    total += item56.field0 as i32
+    var item57 = full(field0 = 1)
+    total += item57.field0 as i32
+    var item58 = full(field0 = 1)
+    total += item58.field0 as i32
+    var item59 = full(field0 = 1)
+    total += item59.field0 as i32
+    var item60 = full(field0 = 1)
+    total += item60.field0 as i32
+    var item61 = full(field0 = 1)
+    total += item61.field0 as i32
+    var item62 = full(field0 = 1)
+    total += item62.field0 as i32
+    var item63 = full(field0 = 1)
+    total += item63.field0 as i32
+    var item64 = full(field0 = 1)
+    total += item64.field0 as i32
+    return total

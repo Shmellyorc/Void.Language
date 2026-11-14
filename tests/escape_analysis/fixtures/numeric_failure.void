@@ -1,0 +1,11 @@
+struct holder:
+    value: i32
+    child: holder?
+func entry(n: i32) -> i32:
+    var item = holder(value = 7)
+    if n < 0:
+        return item.value / (n - n)
+    var total = 0
+    for index in 0..<n:
+        total += item.value
+    return total

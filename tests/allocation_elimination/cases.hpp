@@ -10,6 +10,6 @@
     X(numeric, 174495, 0) \
     X(init, 50995, 0) \
     X(escape, 46995, 1000) \
-    X(reference, 46995, 1000) \
-    X(across_edge, 47495, 1000) \
+    X(reference, 46995, 0) \
+    X(across_edge, 47495, 0) \
     X(survives_allocation, 46995, 0)

@@ -1,0 +1,10 @@
+struct box:
+    value: i32
+func entry(n: i32) -> i32:
+    var previous = box(value = -1)
+    var total = 0
+    for index in 0..<n:
+        var current = box(value = index)
+        total += previous.value
+        previous = current
+    return total

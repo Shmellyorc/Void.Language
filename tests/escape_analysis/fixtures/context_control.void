@@ -1,0 +1,13 @@
+struct box:
+    value: i32
+private func read(item: box) -> i32:
+    return item.value
+func (self box) init():
+    self.value = 7
+    self.value += read(self)
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        var item = box()
+        total += read(item)
+    return total

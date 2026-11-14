@@ -1,0 +1,11 @@
+struct box:
+    value: i32
+private func increment(item: box) -> i32:
+    item.value += 1
+    return item.value
+func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for index in 0..<n:
+        var item = box(value = index % 97)
+        total += increment(item)
+    return total

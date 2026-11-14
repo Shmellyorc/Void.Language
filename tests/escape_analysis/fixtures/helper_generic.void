@@ -1,0 +1,10 @@
+struct box<t>:
+    value: t
+private func read<t>(item: box<t>) -> t:
+    return item.value
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        var item = box<i32>(value = index % 97)
+        total += read(item)
+    return total

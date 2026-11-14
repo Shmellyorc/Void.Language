@@ -189,121 +189,316 @@ std::string source_message(const SourceLocation& location, const std::string& ex
     return location.path + ":" + std::to_string(location.line) + ":" + std::to_string(location.column) +
         ": " + description + "\n" + excerpt;
 }
-// G33 Experiment A only. Values are block-local SSA indexes; local homes are
-// private slots. A successful proof permits only scalar field access and local
-// load/store aliases. No identity inspection, pointer publication, call argument,
-// receiver, capture, return or cross-edge local use can expose the staging address.
-// The whole-function local scan also excludes observable previous loop instances.
-// Keep these bounds and conservative fallbacks when adding new IR operations.
+// Reuse the validated construction-view ABI for a bounded local helper, rather
+// than passing a stack address through an ordinary managed-reference root.
+// Original symbols/signatures remain intact for all other calls and reloads.
+struct ElisionHelper { unsigned parameter; std::string module; std::set<unsigned> aliases; };
+// A fresh result is current-heap storage on every successful return. This
+// bounded straight-line check reuses typed IR; parameter/field/unknown-call
+// results are deliberately not an ownership promise.
+std::map<std::string,std::string> allocation_heap_factories(const ir::Module& input,
+        const ir::InstructionTypes& types,const std::map<std::string,ir::ReferenceEffects>& effects) {
+    std::map<std::string,std::string> result;
+    for(unsigned fn=0;fn<input.functions.size();++fn) {
+        const auto& f=input.functions[fn];
+        if(f.visibility!="private" || f.module_identity.empty() || f.asynchronous || f.worker || f.receiver ||
+           f.initializer || f.closure || f.cleanup_entry || f.blocks.size()!=1 ||
+           f.blocks[0].instructions.size()>64 || f.result.kind!=ir::Type::managed_ref || f.result.construction)
+            continue;
+        const auto summary=effects.find(f.name);
+        // Outlined defaults are already typed but have no formal-effect
+        // summary here. They are not a fresh-result contract for callers.
+        if(summary==effects.end())continue;
+        bool formal=false;
+        for(const auto& [path,fact]:summary->second.returned)formal|=!fact.origins.empty();
+        if(formal || f.blocks[0].end.kind!=ir::Terminator::Kind::return_value)continue;
+        std::vector<bool> locals(f.locals.size()),values;
+        for(const auto& i:f.blocks[0].instructions) {
+            bool heap=i.op==ir::Op::gc_construct || i.op==ir::Op::gc_allocate || i.op==ir::Op::global_cell ||
+                (i.op==ir::Op::constant && types[fn][0][values.size()].kind==ir::Type::managed_ref && i.immediate==0);
+            if(i.op==ir::Op::load)heap=locals[i.a];
+            if(i.op==ir::Op::store)locals[i.a]=values[i.b];
+            values.push_back(heap);
+        }
+        if(values[f.blocks[0].end.value])result.emplace(f.name,f.module_identity);
+    }
+    return result;
+}
+std::map<std::string,ElisionHelper> allocation_elision_helpers(const ir::Module& input,
+        const ir::InstructionTypes& types,const std::map<std::string,ir::ReferenceEffects>& effects) {
+    std::map<std::string,ElisionHelper> result;
+    std::set<std::string> names;
+    for(const auto& f:input.functions)names.insert(f.name);
+    for(unsigned fn=0;fn<input.functions.size();++fn) {
+        const auto& f=input.functions[fn];
+        if(f.visibility!="private" || f.module_identity.empty() || f.asynchronous || f.worker ||
+           f.receiver || f.initializer || f.closure || f.cleanup_entry || !f.virtual_slot.empty() ||
+           !f.construction_origins.empty() || f.blocks.size()!=1 || f.blocks[0].instructions.size()>64)
+            continue;
+        if(!(numeric::number(f.result) || f.result==ir::Type::boolean || f.result==ir::Type::none))continue;
+        std::optional<unsigned> parameter;
+        bool safe=true;
+        for(unsigned n=0;n<f.parameters.size();++n) {
+            auto t=f.parameters[n];
+            if(t.kind==ir::Type::managed_ref && !t.nullable && !t.construction && t.definition &&
+               !t.definition->native_resource && !t.definition->task_result && !t.definition->callable &&
+               !t.definition->interface_type && t.definition->base.expired()) {
+                if(parameter)safe=false;else parameter=n;
+            } else if(!(numeric::number(t) || t==ir::Type::boolean))safe=false;
+        }
+        if(!safe || !parameter || *parameter>=f.locals.size() || f.locals[*parameter]!=f.parameters[*parameter])continue;
+        // A pre-existing construction context need not have the same body in
+        // hand-built validated IR. Do not redirect to an unproven namesake.
+        const auto specialized=ir::construction_name(f.name,{*parameter});
+        if(names.contains(specialized))continue;
+        for(auto t:f.locals)
+            if(!(numeric::number(t) || t==ir::Type::boolean || (t.kind==ir::Type::managed_ref && !t.construction)))safe=false;
+        const auto& summary=effects.at(f.name);
+        for(auto origin:summary.retained)if(origin.parameter==*parameter)safe=false;
+        for(const auto& [path,fact]:summary.returned)for(auto origin:fact.origins)
+            if(origin.parameter==*parameter)safe=false;
+        const auto& block=f.blocks[0];
+        std::set<unsigned> aliases{*parameter};
+        std::vector<bool> borrowed_values(block.instructions.size());
+        if(block.end.kind!=ir::Terminator::Kind::return_value && block.end.kind!=ir::Terminator::Kind::return_void)continue;
+        for(unsigned id=0;id<block.instructions.size();++id) {
+            const auto& i=block.instructions[id];
+            if(i.receiver || !i.arguments.empty()) {safe=false;break;}
+            using O=ir::Op;
+            if(i.op==O::argument && i.a==*parameter)borrowed_values[id]=true;
+            if(i.op==O::load && aliases.contains(i.a))borrowed_values[id]=true;
+            if(i.op==O::store) {
+                if(borrowed_values[i.b]) {
+                    if(f.locals[i.a]!=f.parameters[*parameter])safe=false;
+                    aliases.insert(i.a);
+                } else if(aliases.contains(i.a))safe=false;
+            }
+            switch(i.op) {
+            case O::argument: case O::constant: case O::load: case O::store:
+            case O::gc_read: case O::gc_poll: case O::gc_collect:
+            case O::add: case O::subtract: case O::multiply: case O::divide: case O::remainder:
+            case O::less: case O::less_equal: case O::greater: case O::greater_equal:
+            case O::equal: case O::not_equal: case O::logical_not: case O::negate: case O::convert:
+                break;
+            case O::gc_write:
+                if(!(numeric::number(types[fn][0][i.b]) || types[fn][0][i.b]==ir::Type::boolean))safe=false;
+                break;
+            default:safe=false;break;
+            }
+            // Identity/null/type inspection of the borrowed pointer is outside
+            // this initial helper proof, even when a summary reports no escape.
+            auto pointer=[&](unsigned value){return value<id && types[fn][0][value].kind==ir::Type::managed_ref;};
+            if(i.op!=O::gc_read && i.op!=O::gc_write && i.op!=O::store && i.op!=O::load &&
+               i.op!=O::argument && i.op!=O::constant && i.op!=O::gc_poll && i.op!=O::gc_collect &&
+               (pointer(i.a) || pointer(i.b)))safe=false;
+        }
+        for(unsigned id=0;id<block.instructions.size();++id) {
+            const auto& i=block.instructions[id];
+            if(i.op==ir::Op::store && aliases.contains(i.a) && !borrowed_values[i.b])safe=false;
+            if(i.op==ir::Op::load && aliases.contains(i.a) && !borrowed_values[id])safe=false;
+        }
+        if(safe)result.emplace(f.name,ElisionHelper{*parameter,f.module_identity,std::move(aliases)});
+    }
+    return result;
+}
+// The proof owns both heap-elision eligibility and omission of pointer homes.
+// A stack address may flow only through private, single-origin local aliases and
+// field receivers. Every load must belong to the current construction instance:
+// reaching a construction starts a new epoch, even on a loop backedge. Children
+// remain ordinary heap references, rooted separately in the stack payload.
 struct BlockAllocationElision {
     std::vector<std::set<unsigned>> values;
     std::set<unsigned> locals;
+    std::set<std::pair<unsigned,unsigned>> calls;
 };
 BlockAllocationElision block_allocation_elision(const ir::Function &f,
                                                 const std::vector<std::vector<ir::Type>> &instruction_types,
                                                 const llvm::DataLayout &layout,
-                                                const std::function<llvm::Type *(ir::Type)> &type) {
-    BlockAllocationElision result{std::vector<std::set<unsigned>>(f.blocks.size()), {}};
-    auto &elided_values = result.values;
-    auto &elided_locals = result.locals;
-    unsigned elided_bytes = 0;
-    const bool elision_cleanup = std::any_of(f.blocks.begin(), f.blocks.end(), [](const auto &b) {
-        return std::any_of(b.instructions.begin(), b.instructions.end(), [](const auto &i) {
-            return i.op == ir::Op::local_cleanup || i.op == ir::Op::cleanup_call ||
-                   i.op == ir::Op::gc_release;
-        });
-    });
-    if (!f.asynchronous && !f.receiver && !f.initializer && !elision_cleanup) {
-        for (unsigned bn = 0; bn < f.blocks.size(); ++bn) {
-            const auto &block = f.blocks[bn];
-            for (unsigned origin = 0; origin < block.instructions.size(); ++origin) {
-                const auto &construct = block.instructions[origin];
-                auto t = instruction_types[bn][origin];
-                if (construct.op != ir::Op::gc_construct || t.kind != ir::Type::managed_ref ||
-                    !t.definition || t.construction || t.definition->native_resource ||
-                    t.definition->task_result || !t.definition->base.expired() || t.definition->callable ||
-                    t.definition->interface_type)
-                    continue;
-                bool scalar = true;
-                for (const auto &field : t.definition->fields) {
-                    ir::Type ft = field.type;
-                    if (!(numeric::integer(ft) || numeric::floating(ft) || ft == ir::Type::boolean))
-                        scalar = false;
+                                                const std::function<llvm::Type *(ir::Type)> &type,
+                                                const std::map<std::string,ElisionHelper>& helpers,
+                                                const std::map<std::string,std::string>& factories) {
+    using O = ir::Op;
+    BlockAllocationElision result{std::vector<std::set<unsigned>>(f.blocks.size()), {}, {}};
+    if (f.asynchronous || f.receiver || f.initializer || f.cleanup_entry)
+        return result;
+    struct Use { unsigned block, index; enum Kind { field, store, call, escape } kind; };
+    using Position = std::pair<unsigned,unsigned>;
+    std::vector<std::vector<std::vector<Use>>> uses(f.blocks.size());
+    std::vector<std::vector<Position>> local_uses(f.locals.size());
+    std::vector<std::vector<unsigned>> predecessors(f.blocks.size());
+    // Index once. Candidate walks visit their alias uses, rather than rescanning
+    // every instruction in the function for each locally constructed object.
+    for (unsigned bn=0;bn<f.blocks.size();++bn) {
+        const auto& block=f.blocks[bn]; uses[bn].resize(block.instructions.size());
+        auto use=[&](unsigned value,unsigned index,Use::Kind kind) {
+            if(value<uses[bn].size() && instruction_types[bn][value].kind==ir::Type::managed_ref)
+                uses[bn][value].push_back({bn,index,kind});
+        };
+        for(unsigned id=0;id<block.instructions.size();++id) {
+            const auto& i=block.instructions[id];
+            if(i.op==O::local_cleanup || i.op==O::cleanup_call || i.op==O::gc_release)
+                return result;
+            if(i.receiver)local_uses[i.receiver->slot].push_back({bn,id});
+            const auto helper=helpers.find(i.callee);
+            const bool borrowed=i.op==O::call && !i.receiver && helper!=helpers.end() && helper->second.module==f.module_identity;
+            for(unsigned arg=0;arg<i.arguments.size();++arg)
+                use(i.arguments[arg],id,borrowed && arg==helper->second.parameter?Use::call:Use::escape);
+            switch(i.op) {
+            case O::load: local_uses[i.a].push_back({bn,id}); break;
+            case O::store: local_uses[i.a].push_back({bn,id}); use(i.b,id,Use::store); break;
+            case O::call:
+                if(i.arguments.empty())use(i.a,id,borrowed && helper->second.parameter==0?Use::call:Use::escape);
+                break;
+            case O::gc_read: use(i.a,id,Use::field); break;
+            case O::gc_write: use(i.a,id,Use::field); use(i.b,id,Use::escape); break;
+            case O::convert: case O::negate: case O::logical_not: case O::bitcast:
+                use(i.a,id,Use::escape); break;
+            case O::constant: case O::argument: case O::stage_begin:
+            case O::gc_construct: case O::gc_allocate: case O::global_cell:
+            case O::gc_poll: case O::gc_collect: case O::string_literal:
+            case O::function_null: case O::dict_new: break;
+            default:
+                // Unknown operand conventions can only reduce eligibility.
+                use(i.a,id,Use::escape); use(i.b,id,Use::escape); break;
+            }
+        }
+        const auto& end=block.end;
+        if(end.kind==ir::Terminator::Kind::return_value || end.kind==ir::Terminator::Kind::branch)
+            use(end.value,~0u,Use::escape);
+        if(end.kind==ir::Terminator::Kind::jump || end.kind==ir::Terminator::Kind::branch)
+            predecessors[end.yes].push_back(bn);
+        if(end.kind==ir::Terminator::Kind::branch)predecessors[end.no].push_back(bn);
+    }
+    // Propagate unproven heap affinity through the SAME indexed alias uses.
+    // No incoming pointer becomes trusted merely because its type is managed.
+    // Heap construction validates child ownership; elision may omit that check
+    // only when every initial/replacement child is already proved current-heap
+    // (or null). Any construction used as a child remains heap-backed because
+    // field publication is an escape in the alias proof below.
+    std::vector<std::vector<bool>> unproven(f.blocks.size());
+    std::vector<bool> unproven_locals(f.locals.size());
+    std::vector<Position> uncertain;
+    for(unsigned bn=0;bn<f.blocks.size();++bn) {
+        unproven[bn].resize(f.blocks[bn].instructions.size());
+        for(unsigned id=0;id<f.blocks[bn].instructions.size();++id) {
+            const auto& i=f.blocks[bn].instructions[id];
+            if(instruction_types[bn][id].kind!=ir::Type::managed_ref)continue;
+            const auto factory=factories.find(i.callee);
+            const bool heap=i.op==O::load || i.op==O::gc_construct || i.op==O::gc_allocate || i.op==O::global_cell ||
+                (i.op==O::constant && i.immediate==0) ||
+                (i.op==O::call && !i.receiver && factory!=factories.end() && factory->second==f.module_identity);
+            if(!heap){unproven[bn][id]=true;uncertain.push_back({bn,id});}
+        }
+    }
+    for(std::size_t next=0;next<uncertain.size();++next) {
+        auto [block,id]=uncertain[next];
+        for(const auto& use:uses[block][id])if(use.kind==Use::store) {
+            const auto slot=f.blocks[use.block].instructions[use.index].a;
+            if(unproven_locals[slot])continue;
+            unproven_locals[slot]=true;
+            for(auto [lb,li]:local_uses[slot])if(f.blocks[lb].instructions[li].op==O::load && !unproven[lb][li]) {
+                unproven[lb][li]=true;uncertain.push_back({lb,li});
+            }
+        }
+    }
+    unsigned elided_bytes=0;
+    for(unsigned bn=0;bn<f.blocks.size();++bn)for(unsigned origin=0;origin<f.blocks[bn].instructions.size();++origin) {
+        const auto& construct=f.blocks[bn].instructions[origin];
+        auto t=instruction_types[bn][origin];
+        if(construct.op!=O::gc_construct || t.kind!=ir::Type::managed_ref || !t.definition ||
+           t.construction || t.definition->native_resource || t.definition->task_result ||
+           !t.definition->base.expired() || t.definition->callable || t.definition->interface_type)
+            continue;
+        bool supported=true,has_references=false;
+        for(unsigned field=0;field<t.definition->fields.size();++field) {
+            ir::Type ft=t.definition->fields[field].type;
+            const bool child=ft.kind==ir::Type::managed_ref && !ft.construction && ft.definition &&
+                !ft.definition->native_resource && !ft.definition->task_result && !ft.definition->callable &&
+                !ft.definition->interface_type;
+            if(!(numeric::integer(ft) || numeric::floating(ft) || ft==ir::Type::boolean || child))supported=false;
+            has_references|=child;
+            if(child && unproven[bn][construct.arguments[field]])supported=false;
+        }
+        const auto bytes=layout.getTypeAllocSize(type(ir::Type(t.definition))).getFixedValue();
+        if(!supported || !bytes || bytes>256 || elided_bytes+bytes>16384)continue;
+        if(has_references) {
+            // Mirror an existing function-duration parent root. An immediate
+            // owning-local publication prevents extending child retention when
+            // C2 reuses an SSA root home in a later block. Direct temporaries
+            // require a separate, shorter payload-lifetime proof.
+            const auto& instructions=f.blocks[bn].instructions;
+            if(origin+1>=instructions.size() || instructions[origin+1].op!=O::store ||
+               instructions[origin+1].b!=origin)continue;
+        }
+        std::set<Position> values{{bn,origin}};
+        std::set<unsigned> locals;
+        std::set<Position> calls;
+        std::vector<Position> pending{{bn,origin}};
+        bool safe=true;
+        for(std::size_t next=0;next<pending.size() && safe;++next) {
+            auto [block,id]=pending[next];
+            for(const auto& use:uses[block][id]) {
+                if(use.kind==Use::escape){safe=false;break;}
+                if(use.kind==Use::field) {
+                    const auto& access=f.blocks[use.block].instructions[use.index];
+                    if(access.op==O::gc_write && instruction_types[use.block][access.b].kind==ir::Type::managed_ref &&
+                       unproven[use.block][access.b]){safe=false;break;}
                 }
-                auto bytes = layout.getTypeAllocSize(type(ir::Type(t.definition))).getFixedValue();
-                if (!scalar || !bytes || bytes > 256 || elided_bytes + bytes > 16384)
-                    continue;
-                std::set<unsigned> values{origin}, locals;
-                bool safe = true;
-                auto is_value = [&](unsigned id) { return values.contains(id); };
-                for (unsigned id = origin + 1; id < block.instructions.size() && safe; ++id) {
-                    const auto &use = block.instructions[id];
-                    if (use.receiver && locals.contains(use.receiver->slot)) {
-                        safe = false;
-                        break;
-                    }
-                    for (auto arg : use.arguments)
-                        if (is_value(arg))
-                            safe = false;
-                    if (!safe)
-                        break;
-                    using O = ir::Op;
-                    switch (use.op) {
-                    case O::store:
-                        if (is_value(use.b)) {
-                            if (f.locals[use.a] != t) {
-                                safe = false;
-                                break;
-                            }
-                            locals.insert(use.a);
-                        } else if (locals.contains(use.a))
-                            safe = false;
-                        break;
-                    case O::load:
-                        if (locals.contains(use.a))
-                            values.insert(id);
-                        break;
-                    case O::gc_read:
-                    case O::gc_write:
-                        if (use.op == O::gc_write && is_value(use.b))
-                            safe = false;
-                        break;
-                    case O::constant:
-                    case O::argument:
-                    case O::gc_poll:
-                    case O::gc_collect:
-                        break;
-                    case O::gc_construct: // scalar-only fields cannot retain this reference
-                        break;
-                    default:
-                        // Conservative fallback: unsupported use patterns stay on the heap.
-                        if (is_value(use.a) || is_value(use.b))
-                            safe = false;
-                        break;
-                    }
-                }
-                if ((block.end.kind == ir::Terminator::Kind::return_value ||
-                     block.end.kind == ir::Terminator::Kind::branch) &&
-                    values.contains(block.end.value))
-                    safe = false;
-                for (unsigned other = 0; other < f.blocks.size() && safe; ++other)
-                    for (unsigned id = 0; id < f.blocks[other].instructions.size() && safe; ++id) {
-                        const auto &use = f.blocks[other].instructions[id];
-                        if (use.receiver && locals.contains(use.receiver->slot))
-                            safe = false;
-                        if ((use.op == ir::Op::load || use.op == ir::Op::store) && locals.contains(use.a)) {
-                            if (other != bn || id <= origin)
-                                safe = false;
-                            else if (use.op == ir::Op::store && !values.contains(use.b))
-                                safe = false;
-                        }
-                    }
-                if (safe) {
-                    elided_values[bn].insert(values.begin(), values.end());
-                    elided_locals.insert(locals.begin(), locals.end());
-                    elided_bytes += bytes;
+                if(use.kind==Use::call){calls.insert({use.block,use.index});continue;}
+                if(use.kind!=Use::store)continue;
+                const auto slot=f.blocks[use.block].instructions[use.index].a;
+                if(f.locals[slot]!=t){safe=false;break;}
+                if(!locals.insert(slot).second)continue;
+                for(auto [lb,li]:local_uses[slot]) {
+                    const auto& i=f.blocks[lb].instructions[li];
+                    if(i.receiver){safe=false;break;}
+                    if(i.op==O::load && values.insert({lb,li}).second)pending.push_back({lb,li});
                 }
             }
+        }
+        if(!safe)continue;
+        // One origin per local. A rebound local could still expose an older
+        // loop instance or another object's identity; keep that case on heap.
+        std::vector<std::vector<Position>> events(f.blocks.size());
+        for(auto slot:locals)for(auto p:local_uses[slot]) {
+            const auto& i=f.blocks[p.first].instructions[p.second];
+            if(i.op==O::store && !values.contains({p.first,i.b}))safe=false;
+            events[p.first].push_back(p);
+        }
+        if(!safe)continue;
+        events[bn].push_back({bn,origin});
+        for(auto& block:events) {std::sort(block.begin(),block.end());block.erase(std::unique(block.begin(),block.end()),block.end());}
+        // Must-dataflow over the indexed alias events. Reset at every birth;
+        // loads before a rebinding store fail, including loop-carried aliases.
+        std::vector<std::set<unsigned>> incoming(f.blocks.size(),locals),outgoing(f.blocks.size(),locals);
+        bool changed;
+        do {
+            changed=false;
+            for(unsigned block=0;block<f.blocks.size();++block) {
+                auto state=(block==0 || predecessors[block].empty())?std::set<unsigned>{}:locals;
+                for(auto pred:predecessors[block])std::erase_if(state,[&](unsigned slot){return !outgoing[pred].contains(slot);});
+                if(incoming[block]!=state){incoming[block]=state;changed=true;}
+                for(auto [eb,id]:events[block]) {
+                    if(eb==bn && id==origin)state.clear();
+                    else if(f.blocks[eb].instructions[id].op==O::store)state.insert(f.blocks[eb].instructions[id].a);
+                }
+                if(outgoing[block]!=state){outgoing[block]=std::move(state);changed=true;}
+            }
+        }while(changed);
+        for(unsigned block=0;block<f.blocks.size() && safe;++block) {
+            auto state=incoming[block];
+            for(auto [eb,id]:events[block]) {
+                const auto& i=f.blocks[eb].instructions[id];
+                if(eb==bn && id==origin)state.clear();
+                else if(i.op==O::store)state.insert(i.a);
+                else if(i.op==O::load && !state.contains(i.a)){safe=false;break;}
+            }
+        }
+        if(safe) {
+            for(auto [block,id]:values)result.values[block].insert(id);
+            result.locals.insert(locals.begin(),locals.end());
+            result.calls.insert(calls.begin(),calls.end());
+            elided_bytes+=bytes;
         }
     }
     return result;
@@ -501,6 +696,39 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         if(auto found=dictionary_records.find(t);found!=dictionary_records.end())return found->second;auto entry=ir::array_element(t);
         auto* record=new llvm::GlobalVariable(*module,dictionary_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(dictionary_record_type,{element_record(entry),element_record(ir::dictionary_key(t)),llvm::ConstantInt::get(size_type,field_offset(entry,1)),llvm::ConstantInt::get(size_type,field_offset(entry,2))}),"dictionary.layout");dictionary_records.emplace(t,record);return record;
     };
+    const auto elision_helpers=allocation_elision_helpers(input,checked_types,verified_effects);
+    const auto heap_factories=allocation_heap_factories(input,checked_types,verified_effects);
+    std::vector<BlockAllocationElision> elisions;
+    std::set<std::string> borrowed_targets;
+    for(unsigned n=0;n<input.functions.size();++n) {
+        const auto& f=input.functions[n];
+        elisions.push_back(block_allocation_elision(f,checked_types[n],layout,type,elision_helpers,heap_factories));
+        for(auto [block,id]:elisions.back().calls)borrowed_targets.insert(f.blocks[block].instructions[id].callee);
+    }
+    std::map<std::string,std::string> borrowed_names;
+    const auto original_functions=input.functions.size();
+    for(unsigned n=0;n<original_functions;++n) {
+        const auto& original=input.functions[n];
+        if(!borrowed_targets.contains(original.name))continue;
+        const auto parameter=elision_helpers.at(original.name).parameter;
+        auto borrowed=original;
+        borrowed.name=ir::construction_name(original.name,{parameter});
+        borrowed_names.emplace(original.name,borrowed.name);
+        if(names.contains(borrowed.name))throw std::logic_error("allocation elision helper identity collision");
+        borrowed.parameters[parameter].construction=true;
+        for(auto slot:elision_helpers.at(original.name).aliases) {
+            borrowed.locals[slot].construction=true;
+            borrowed.construction_origins.emplace(slot,parameter);
+        }
+        if(auto instance=input.generic_instances.find(original.name);instance!=input.generic_instances.end())
+            input.generic_instances.emplace(borrowed.name,instance->second);
+        names.insert(borrowed.name);input.functions.push_back(std::move(borrowed));
+    }
+    if(input.functions.size()!=original_functions) {
+        ir::validate(input,&checked_types,&verified_effects);
+        for(unsigned n=original_functions;n<input.functions.size();++n)
+            elisions.push_back({std::vector<std::set<unsigned>>(input.functions[n].blocks.size()),{}, {}});
+    }
     auto* signature = llvm::FunctionType::get(b.getInt32Ty(), {b.getInt32Ty()}, false);
     std::set<std::string> source_entries{input.entry_symbol};
     for (const auto& entry : input.functions) if (entry.name == input.entry_symbol && entry.source_name == "$app_adapter")
@@ -750,8 +978,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     };
     std::size_t function_index = 0;
     for (const auto& f : input.functions) {
+        const auto& elision=elisions.at(function_index);
         const auto& instruction_types = checked_types.at(function_index++);
-        const auto elision=block_allocation_elision(f,instruction_types,layout,type);
         const auto& elided_values=elision.values;
         const auto& elided_locals=elision.locals;
         const auto* async=f.asynchronous?&async_plans.at(f.name):nullptr;
@@ -816,11 +1044,27 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         // and scalar locals separate for ordinary promotion.
         std::vector<unsigned> local_root_indexes(f.locals.size(),~0u);
         std::vector<llvm::Type*> local_root_types;
-        std::vector<std::vector<std::uint64_t>> local_root_offsets(f.locals.size());
+        std::vector<std::vector<std::uint64_t>> local_root_offsets;
         if(!async)for(unsigned n=0;n<f.locals.size();++n) {
             if(f.receiver && n==0 && f.locals[n].kind==ir::Type::aggregate)continue;
-            if(!elided_locals.contains(n))reference_offsets(f.locals[n],0,local_root_offsets[n]);
-            if(!local_root_offsets[n].empty() && type(f.locals[n])->isPointerTy()){local_root_indexes[n]=local_root_types.size();local_root_types.push_back(type(f.locals[n]));}
+            std::vector<std::uint64_t> offsets;
+            if(!elided_locals.contains(n))reference_offsets(f.locals[n],0,offsets);
+            if(!offsets.empty() && type(f.locals[n])->isPointerTy()) {
+                local_root_indexes[n]=local_root_types.size();local_root_types.push_back(type(f.locals[n]));
+                local_root_offsets.push_back(std::move(offsets));
+            }
+        }
+        // Proven payloads share the owning local's function-duration lifetime.
+        // Pack their exact reference fields into the existing local Slot, rather
+        // than adding a Slot to every remaining allocation's authority lookup.
+        std::map<std::pair<unsigned,unsigned>,unsigned> payload_root_indexes;
+        for(unsigned bn=0;bn<f.blocks.size();++bn)for(auto id:elided_values[bn]) {
+            if(f.blocks[bn].instructions[id].op!=ir::Op::gc_construct)continue;
+            const auto object=ir::Type(instruction_types[bn][id].definition);
+            std::vector<std::uint64_t> offsets;reference_offsets(object,0,offsets);
+            if(offsets.empty())continue;
+            payload_root_indexes.emplace(std::pair{bn,id},local_root_types.size());
+            local_root_types.push_back(type(object));local_root_offsets.push_back(std::move(offsets));
         }
         auto* local_roots_type=llvm::StructType::get(context,local_root_types);
         llvm::Value* local_roots=nullptr;
@@ -844,6 +1088,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             b.CreateMemSet(storage,b.getInt8(0),bytes,layout.getABITypeAlign(native));
             stage_storage.emplace(instruction.a,storage);
         }
+        std::map<std::pair<unsigned,unsigned>,llvm::Value*> elided_payloads;
+        for(const auto& [position,index]:payload_root_indexes)
+            elided_payloads.emplace(position,b.CreateStructGEP(local_roots_type,local_roots,index));
         std::map<ir::Type,llvm::Value*> copy_staging;
         auto plan_copy=[&](ir::Type t) {
             if(!contains_arrays(t) || copy_staging.contains(t)) return;
@@ -936,8 +1183,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             for (unsigned i = 0; i < slots.size(); ++i) {
                 if(elided_locals.contains(i))continue;
                 if(local_root_indexes[i]==~0u)add_root(f.locals[i],slots[i]);
-                else for(auto offset:local_root_offsets[i])local_offsets.push_back(layout.getStructLayout(local_roots_type)->getElementOffset(local_root_indexes[i])+offset);
             }
+            for(unsigned index=0;index<local_root_offsets.size();++index)
+                for(auto offset:local_root_offsets[index])
+                    local_offsets.push_back(layout.getStructLayout(local_roots_type)->getElementOffset(index)+offset);
             if(local_roots)add_storage_root(layout.getTypeAllocSize(local_roots_type),local_roots,local_offsets);
             for(auto [t,storage]:copy_staging) add_root(t,storage);
             for(auto [t,storage]:element_staging) add_root(t,storage);
@@ -1361,8 +1610,13 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     auto* native=type(object);
                     auto bytes=std::max<std::uint64_t>(1,layout.getTypeAllocSize(native));
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
-                    auto* payload=home(allocations.CreateAlloca(b.getInt8Ty(),b.getInt64(bytes)),StorageRole::staging,llvm_backend::HomeKind::staging);
-                    payload->setAlignment(layout.getABITypeAlign(native));
+                    const auto planned=elided_payloads.find({n,static_cast<unsigned>(values.size())});
+                    llvm::Value* payload;
+                    if(planned!=elided_payloads.end())payload=planned->second;
+                    else {
+                        auto* storage=home(allocations.CreateAlloca(b.getInt8Ty(),b.getInt64(bytes)),StorageRole::staging,llvm_backend::HomeKind::staging);
+                        storage->setAlignment(layout.getABITypeAlign(native));payload=storage;
+                    }
                     b.CreateMemSet(payload,b.getInt8(0),bytes,layout.getABITypeAlign(native));
                     for (unsigned field=0;field<instruction.arguments.size();++field) {
                         auto* value=values[instruction.arguments[field]];
@@ -2376,6 +2630,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         native_guard->setAlignment(llvm::Align(alignof(Runtime::Native)));
                         b.CreateCall(module->getOrInsertFunction("vd_gc_native_enter",b.getVoidTy(),b.getPtrTy()),{native_guard});
                     }
+                    if(elision.calls.contains({n,static_cast<unsigned>(values.size())}))
+                        callee=functions.at(borrowed_names.at(instruction.callee));
                     v = b.CreateCall(callee, arguments);
                     if (native_guard) b.CreateCall(module->getOrInsertFunction("vd_gc_native_leave",b.getVoidTy(),b.getPtrTy()),{native_guard});
                     if (checked) {
