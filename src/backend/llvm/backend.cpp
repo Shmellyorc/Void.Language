@@ -377,12 +377,18 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
     BlockAllocationElision result{std::vector<std::set<unsigned>>(f.blocks.size()), {}, {}, {}};
     if (f.asynchronous || f.receiver || f.initializer || f.cleanup_entry)
         return result;
-    struct Use { unsigned block, index; enum Kind { field, store, call, escape } kind; };
+    struct Use { unsigned block, index; enum Kind { field, store, call, alias, escape } kind; };
     using Position = std::pair<unsigned,unsigned>;
     std::vector<std::vector<std::vector<Use>>> uses(f.blocks.size());
     std::vector<std::vector<Position>> local_uses(f.locals.size());
     std::vector<std::vector<unsigned>> predecessors(f.blocks.size());
     bool retire_copies=!f.worker && !f.closure && f.virtual_slot.empty();
+    auto nullable_alias=[](ir::Type a,ir::Type b) {
+        if(a.kind!=ir::Type::managed_ref || b.kind!=ir::Type::managed_ref ||
+           a.construction || b.construction || a.readonly!=b.readonly ||
+           a.readonly_references!=b.readonly_references)return false;
+        a.nullable=b.nullable=false;return a==b;
+    };
     // Index once. Candidate walks visit their alias uses, rather than rescanning
     // every instruction in the function for each locally constructed object.
     for (unsigned bn=0;bn<f.blocks.size();++bn) {
@@ -420,7 +426,9 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
                 break;
             case O::gc_read: use(i.a,id,Use::field); break;
             case O::gc_write: use(i.a,id,Use::field); use(i.b,id,Use::escape); break;
-            case O::convert: case O::negate: case O::logical_not: case O::bitcast:
+            case O::convert:
+                use(i.a,id,nullable_alias(instruction_types[bn][i.a],instruction_types[bn][id])?Use::alias:Use::escape);break;
+            case O::negate: case O::logical_not: case O::bitcast:
                 use(i.a,id,Use::escape); break;
             case O::constant: case O::argument: case O::stage_begin:
             case O::gc_construct: case O::gc_allocate: case O::global_cell:
@@ -446,20 +454,37 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
     // field publication is an escape in the alias proof below.
     // Heap affinity alone is insufficient to trust fields (allocation and
     // initialization may be separate). Limit immutable-field provenance to a
-    // completed gc_construct, directly or through a local with only such stores.
+    // completed gc_construct, directly or through locals whose every stored
+    // origin is one of those constructions (including proved local aliases).
     // Build this fact once from the existing local index, never per candidate.
-    std::vector<bool> constructed_locals(f.locals.size());
+    std::vector<bool> constructed_locals(f.locals.size()),completed_candidate(f.locals.size());
+    std::vector<unsigned> dependencies(f.locals.size()),completed;
+    std::vector<std::vector<unsigned>> completed_users(f.locals.size());
     for(unsigned slot=0;slot<f.locals.size();++slot) {
-        bool stored=false,constructed=true;
+        bool stored=false,possible=slot>=f.parameters.size();
         for(auto [bn,id]:local_uses[slot]) {
             const auto& i=f.blocks[bn].instructions[id];
-            if(i.receiver)constructed=false;
-            if(i.op==O::store) {
-                stored=true;constructed &= f.blocks[bn].instructions[i.b].op==O::gc_construct;
-            }
+            if(i.receiver)possible=false;
+            if(i.op!=O::store)continue;
+            stored=true;const auto& value=f.blocks[bn].instructions[i.b];
+            if(value.op==O::gc_construct)continue;
+            if(value.op==O::load) {
+                ++dependencies[slot];completed_users[value.a].push_back(slot);
+            } else possible=false;
         }
-        constructed_locals[slot]=stored && constructed;
+        completed_candidate[slot]=stored && possible;
+        if(completed_candidate[slot] && !dependencies[slot]) {
+            constructed_locals[slot]=true;completed.push_back(slot);
+        }
     }
+    // Least fixed point rooted only in completed constructions. An incoming
+    // parameter, factory, uncertain merge or self-supporting alias cycle can
+    // never certify its own fields. Visit each indexed store dependency once.
+    for(unsigned cursor=0;cursor<completed.size();++cursor)
+        for(auto slot:completed_users[completed[cursor]])
+            if(!--dependencies[slot] && completed_candidate[slot]) {
+                constructed_locals[slot]=true;completed.push_back(slot);
+            }
     std::vector<std::vector<bool>> unproven(f.blocks.size());
     std::vector<bool> unproven_locals(f.locals.size());
     std::vector<Position> uncertain;
@@ -527,9 +552,11 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
         std::set<unsigned> locals;
         std::set<Position> calls;
         std::vector<Position> pending{{bn,origin}};
-        bool safe=true,block_lifetime=true;
+        bool safe=true,block_lifetime=true,nullable_flow=false;
+        std::vector<Position> lifetime_uses;
         unsigned final_use=origin;
         auto lifetime_use=[&](unsigned block,unsigned id) {
+            lifetime_uses.push_back({block,id});
             if(block!=bn || id<origin)block_lifetime=false;
             else final_use=std::max(final_use,id);
         };
@@ -539,6 +566,11 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
             for(const auto& use:uses[block][id]) {
                 lifetime_use(use.block,use.index);
                 if(use.kind==Use::escape){safe=false;break;}
+                if(use.kind==Use::alias) {
+                    nullable_flow=true;
+                    if(values.insert({use.block,use.index}).second)pending.push_back({use.block,use.index});
+                    continue;
+                }
                 if(use.kind==Use::field) {
                     const auto& access=f.blocks[use.block].instructions[use.index];
                     if(access.op==O::gc_write && instruction_types[use.block][access.b].kind==ir::Type::managed_ref &&
@@ -547,7 +579,10 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
                 if(use.kind==Use::call){calls.insert({use.block,use.index});continue;}
                 if(use.kind!=Use::store)continue;
                 const auto slot=f.blocks[use.block].instructions[use.index].a;
-                if(f.locals[slot]!=t){safe=false;break;}
+                if(f.locals[slot]!=t) {
+                    if(!nullable_alias(f.locals[slot],t)){safe=false;break;}
+                    nullable_flow=true;
+                }
                 if(!locals.insert(slot).second)continue;
                 for(auto [lb,li]:local_uses[slot]) {
                     const auto& i=f.blocks[lb].instructions[li];
@@ -567,6 +602,28 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
             events[p.first].push_back(p);
         }
         if(!safe)continue;
+        std::optional<Position> joined_retirement;
+        if(has_references && !block_lifetime && !f.worker && !f.closure && f.virtual_slot.empty()) {
+            const auto& fork=f.blocks[bn].end;
+            if(fork.kind==ir::Terminator::Kind::branch && fork.yes!=fork.no && fork.yes!=bn && fork.no!=bn) {
+                const auto& left=f.blocks[fork.yes].end;const auto& right=f.blocks[fork.no].end;
+                if(left.kind==ir::Terminator::Kind::jump && right.kind==ir::Terminator::Kind::jump &&
+                   left.yes==right.yes && left.yes!=bn && left.yes!=fork.yes && left.yes!=fork.no &&
+                   !f.blocks[left.yes].instructions.empty()) {
+                    const auto join=left.yes;unsigned last=0;bool bounded=true;
+                    for(auto [block,id]:lifetime_uses) {
+                        if(block==bn){if(id<origin)bounded=false;}
+                        else if(block!=fork.yes && block!=fork.no && block!=join)bounded=false;
+                        if(block==join)last=std::max(last,id);
+                    }
+                    if(bounded)joined_retirement=Position{join,last};
+                }
+            }
+        }
+        // The new nullable/cast flow is restricted to a reconverging diamond.
+        // Existing epoch/must-alias validation below still rejects old instances,
+        // rebinding, pre-birth loads and every escaping owner use.
+        if(nullable_flow && (!has_references || !joined_retirement))continue;
         if(has_references) {
             const auto& instructions=f.blocks[bn].instructions;
             const bool owning_local=origin+1<instructions.size() && instructions[origin+1].op==O::store &&
@@ -574,7 +631,7 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
             // Existing CFG owners retain their accepted lifetime. New direct
             // temporaries must have no local publication and an exact bounded
             // lifetime in their construction block; SSA cannot cross IR edges.
-            if(!owning_local && (!locals.empty() || !block_lifetime))continue;
+            if(!owning_local && (!locals.empty() || !block_lifetime) && !joined_retirement)continue;
         }
         events[bn].push_back({bn,origin});
         for(auto& block:events) {std::sort(block.begin(),block.end());block.erase(std::unique(block.begin(),block.end()),block.end());}
@@ -610,6 +667,8 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
             result.calls.insert(calls.begin(),calls.end());
             if(has_references && block_lifetime)
                 result.retirements[{bn,final_use}].payloads.push_back({bn,origin});
+            else if(has_references && joined_retirement)
+                result.retirements[*joined_retirement].payloads.push_back({bn,origin});
             elided_bytes+=bytes;
         }
     }
@@ -709,6 +768,58 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
             }
         }
         if(!instructions.empty())flush(instructions.size()-1);
+    }
+    if(retire_copies && !result.retirements.empty()) {
+        // Copy-home nullness only: payload fields retain their independent G39
+        // lifetime clear. A defining SSA store overwrites its block-shared home;
+        // locals require a must fact from every predecessor, including backedges.
+        auto reference=[](ir::Type t){return t.kind==ir::Type::managed_ref && !t.construction;};
+        std::set<unsigned> tracked,initial;
+        for(unsigned slot=0;slot<f.locals.size();++slot)
+            if(reference(f.locals[slot]) && !result.locals.contains(slot)) {
+                tracked.insert(slot);
+                if(slot>=f.parameters.size())initial.insert(slot);
+            }
+        const bool bounded=f.blocks.size()<=256 && tracked.size()<=256 &&
+            f.blocks.size()*tracked.size()<=16384;
+        std::vector<std::set<unsigned>> incoming,outgoing;
+        if(bounded){incoming.assign(f.blocks.size(),tracked);outgoing=incoming;}
+        auto transfer=[&](unsigned bn,std::set<unsigned> state,bool prune) {
+            const auto& instructions=f.blocks[bn].instructions;
+            std::vector<bool> null_values(instructions.size());
+            for(unsigned id=0;id<instructions.size();++id) {
+                const auto& i=instructions[id];
+                if(reference(instruction_types[bn][id]))
+                    null_values[id]=(i.op==O::constant && i.immediate==0) ||
+                        (i.op==O::load && state.contains(i.a));
+                if(i.op==O::store && tracked.contains(i.a)) {
+                    if(null_values[i.b])state.insert(i.a);else state.erase(i.a);
+                }
+                if(prune)if(auto event=result.retirements.find({bn,id});event!=result.retirements.end()) {
+                    std::erase_if(event->second.values,[&](unsigned value){return null_values[value];});
+                    std::erase_if(event->second.locals,[&](unsigned slot){return state.contains(slot);});
+                }
+            }
+            return state;
+        };
+        if(bounded) {
+            bool changed;
+            do {
+                changed=false;
+                for(unsigned bn=0;bn<f.blocks.size();++bn) {
+                    auto state=(bn==0 || predecessors[bn].empty())?initial:tracked;
+                    for(auto pred:predecessors[bn])
+                        std::erase_if(state,[&](unsigned slot){return !outgoing[pred].contains(slot);});
+                    auto next=transfer(bn,state,false);
+                    if(state!=incoming[bn] || next!=outgoing[bn])changed=true;
+                    incoming[bn]=std::move(state);outgoing[bn]=std::move(next);
+                }
+            }while(changed);
+        }
+        // Above the bounded CFG budget, retain only facts established by a
+        // write in this block; no loop/join initialization is assumed.
+        for(unsigned bn=0;bn<f.blocks.size();++bn)
+            transfer(bn,bounded?incoming[bn]:std::set<unsigned>{},true);
     }
     std::erase_if(result.retirements,[](const auto& event) {
         const auto& r=event.second;return r.payloads.empty() && r.values.empty() && r.locals.empty();
@@ -2874,6 +2985,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     // Adjacent existing pointer words share one zero fill.
                     // This changes stores, never Slot geometry or authority.
                     std::map<llvm::Value*,std::vector<std::pair<std::int64_t,llvm::Value*>>> words;
+                    // First-seen plan order is stable; LLVM allocation addresses
+                    // must not choose instruction order or stack layout.
+                    std::vector<llvm::Value*> bases;
                     auto clear_word=[&](llvm::Value* address) {
                         if(!address)return;
                         std::int64_t offset=0;
@@ -2881,12 +2995,15 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         if(!llvm::isa<llvm::AllocaInst>(base) || offset<0) {
                             b.CreateStore(llvm::Constant::getNullValue(b.getPtrTy()),address);return;
                         }
-                        words[base].push_back({offset,address});
+                        auto [group,fresh]=words.try_emplace(base);
+                        if(fresh)bases.push_back(base);
+                        group->second.push_back({offset,address});
                     };
                     for(auto id:retired->second.values)clear_word(value_roots[n][id]);
                     for(auto slot:retired->second.locals)clear_word(slots[slot]);
-                    for(auto& [base,group]:words) {
-                        (void)base;std::sort(group.begin(),group.end());
+                    for(auto* base:bases) {
+                        auto& group=words.at(base);
+                        std::sort(group.begin(),group.end(),[](auto a,auto b){return a.first<b.first;});
                         group.erase(std::unique(group.begin(),group.end(),[](auto a,auto b){return a.first==b.first;}),group.end());
                         for(unsigned begin=0;begin<group.size();) {
                             unsigned end=begin+1;

@@ -1,5 +1,6 @@
 #pragma once
-// Name, exact result at n=1000, G35 heap constructions, accepted G34 count.
+// Name, n=1000 oracle, candidate constructions, historical baseline count.
+// Original rows retain their historical baseline; G40 rows use accepted G39-F.
 #define VD_ESCAPE_CASES(X) \
     X(branch_alias, 48495, 0, 1000) \
     X(branch_birth, 47662, 0, 500) \
@@ -45,4 +46,16 @@
     X(factory_field, 46995, 3000, 3000) \
     X(helper_branch_rebind, 8000, 1500, 1500) \
     X(helper_block_limit, 46995, 1000, 1000) \
-    X(direct_null_failure, 7000, 0, 0)
+    X(direct_null_failure, 7000, 0, 0) \
+    X(root_null_straight, 46995, 1000, 1000) \
+    X(root_null_join, 46995, 1000, 1000) \
+    X(root_null_mixed, 49495, 1500, 1500) \
+    X(root_null_backedge, 46966, 1001, 1001) \
+    X(root_null_alias, 52995, 2000, 2000) \
+    X(cross_nullable, 48495, 1000, 2000) \
+    X(cross_child_survives, 140985, 1000, 2000) \
+    X(cross_mixed_origin, 27005, 3000, 3000) \
+    X(readonly_alias, 46995, 1000, 2000) \
+    X(readonly_alias_join, 47495, 3000, 4000) \
+    X(readonly_alias_incoming, 46995, 3000, 3000) \
+    X(readonly_alias_mutable, 46995, 2000, 2000)

@@ -1,0 +1,19 @@
+struct box:
+    value: i32
+struct holder:
+    child: box
+private func pause() -> i32:
+    return 0
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        var item: holder? = holder(child = box(value = index % 97))
+        var child: box? = null
+        if index % 2 == 0:
+            child = (item as holder).child
+        else:
+            child = (item as holder).child
+        total += 0
+        total += pause()
+        total += (child as box).value * 3
+    return total
