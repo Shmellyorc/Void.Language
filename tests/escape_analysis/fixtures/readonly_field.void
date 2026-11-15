@@ -1,0 +1,12 @@
+struct box:
+    value: i32
+struct owner:
+    const child: box
+struct holder:
+    const child: box
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        var local = owner(child = box(value = index % 97))
+        total += holder(child = local.child).child.value
+    return total

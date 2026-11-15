@@ -1,0 +1,13 @@
+struct box:
+    value: i32
+struct holder:
+    child: box
+private func read(item: holder, even: bool) -> i32:
+    if even:
+        return item.child.value
+    return item.child.value + 1
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        total += read(holder(child = box(value = index % 97)), index % 2 == 0)
+    return total

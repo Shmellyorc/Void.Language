@@ -24,9 +24,10 @@ void fixture(const char* name, const std::string& text, int expected, std::size_
     // Keep the OOM proof cold rather than forcing an unnecessary native request.
     auto cold_runtime=std::make_shared<vd::Runtime>(1);
     auto cold_code=jit.compile(module,module.entry_symbol,optimized,{},cold_runtime);
-    if(std::string(name)=="reference_effects")managed_test::require(cold_code->invoke(0)==0,"cold reference globals");
+    if(std::string(name)=="reference_effects" || std::string(name)=="direct_effects")managed_test::require(cold_code->invoke(0)==0,"cold reference globals");
     allocation_elimination::check(name,[&](int n){return code->invoke(n);},*runtime,expected,constructions,
         [&](int n){return cold_code->invoke(n);});
+    escape_analysis::retired_children(name,[&](int n){return code->invoke(n);});
     escape_analysis::remaining_failure(name,[&](int n){return code->invoke(n);},baseline);
 }
 

@@ -1,0 +1,11 @@
+struct box:
+    value: i32
+struct holder:
+    child: box
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        var child = box(value = index)
+        if holder(child = child) == holder(child = child):
+            total += 1
+    return total

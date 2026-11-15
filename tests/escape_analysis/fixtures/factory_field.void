@@ -1,0 +1,13 @@
+struct box:
+    value: i32
+struct owner:
+    const child: box
+struct holder:
+    const child: box
+private func make(value: i32) -> owner:
+    return owner(child = box(value = value))
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        total += holder(child = make(index % 97).child).child.value
+    return total

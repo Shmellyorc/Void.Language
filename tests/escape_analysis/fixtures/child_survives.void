@@ -1,0 +1,13 @@
+struct box:
+    value: i32
+struct holder:
+    child: box
+private func make(value: i32) -> box:
+    return box(value = value)
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        var child = holder(child = make(index % 97)).child
+        for spin in 0..<3:
+            total += child.value
+    return total

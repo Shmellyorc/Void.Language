@@ -32,6 +32,14 @@ int main(){
         vd::Runtime::Attachment attached(foreign);vd::Runtime::Managed managed(foreign);
         void* home=nullptr;const std::size_t offset=0;vd::Runtime::Slot slot{&home,sizeof(home),&offset,1};
         vd::Runtime::Frame roots(foreign,&slot,1);foreign.construct_into(&home,{sizeof(payload),{}},&payload);child.reset(home);foreign_pointer=home;
+#ifdef VD_FOREIGN_NESTED
+        // A valid foreign owner whose immutable child is also foreign. Reading
+        // that child must not establish affinity with the current Runtime.
+        void* owner=nullptr;vd::Runtime::Slot owner_slot{&owner,sizeof(owner),&offset,1};
+        vd::Runtime::Frame owner_roots(foreign,&owner_slot,1);
+        foreign.construct_into(&owner,{sizeof(home),{offset}},&home);
+        child.reset(owner);foreign_pointer=owner;
+#endif
     }
     vd::RuntimeFailure admission;
     vd_runtime_admit_metadata(&current,VD_NAME(__vd_types_),VD_NAME(__vd_type_count_),VD_NAME(__vd_witnesses_),VD_NAME(__vd_witness_count_),&admission);

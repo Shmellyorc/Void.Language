@@ -1,0 +1,12 @@
+struct box:
+    value: i32
+private func read(item: box, even: bool) -> i32:
+    var alias = item
+    if even:
+        alias = box(value = 7)
+    return alias.value
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        total += read(box(value = 9), index % 2 == 0)
+    return total

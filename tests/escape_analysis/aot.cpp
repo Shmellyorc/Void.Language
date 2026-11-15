@@ -32,8 +32,9 @@ int main(int argc,char**argv) {
         vd::RuntimeFailure failure; auto value=__vd_2f656c6973696f6e2e766f69643a3a656e747279_##name(n,&failure); \
         if(failure.message)throw std::runtime_error(failure.message); return value; \
     }; \
-    if(std::string(#name)=="reference_effects")managed_test::require(cold_invoke(0)==0,"cold reference globals"); \
+    if(std::string(#name)=="reference_effects" || std::string(#name)=="direct_effects")managed_test::require(cold_invoke(0)==0,"cold reference globals"); \
     allocation_elimination::check(#name,invoke,runtime,expected,baseline?old_count:count,cold_invoke); \
+    escape_analysis::retired_children(#name,invoke); \
     escape_analysis::remaining_failure(#name,invoke,baseline); \
 }
         VD_ESCAPE_CASES(CHECK)

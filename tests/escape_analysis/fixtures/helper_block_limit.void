@@ -1,0 +1,19 @@
+struct box:
+    value: i32
+private func read(item: box, n: i32) -> i32:
+    if n == 0:
+        return item.value
+    if n == 1:
+        return item.value
+    if n == 2:
+        return item.value
+    if n == 3:
+        return item.value
+    if n == 4:
+        return item.value
+    return item.value
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        total += read(box(value = index % 97), index)
+    return total

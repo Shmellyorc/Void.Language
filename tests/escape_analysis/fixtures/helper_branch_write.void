@@ -1,0 +1,14 @@
+struct box:
+    value: i32
+private func change(item: box, even: bool) -> i32:
+    if even:
+        item.value += 1
+    else:
+        item.value += 2
+    return item.value
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        var item = box(value = index % 97)
+        total += change(item, index % 2 == 0)
+    return total

@@ -1,0 +1,8 @@
+struct box:
+    value: i32
+struct holder:
+    child: box?
+func entry(n: i32) -> i32:
+    if n < 0:
+        return (holder(child = null).child as box).value
+    return n * 7

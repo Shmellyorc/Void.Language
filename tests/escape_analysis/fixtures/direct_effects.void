@@ -1,0 +1,17 @@
+var order: i32 = 0
+struct box:
+    value: i32
+struct pair:
+    first: box
+    second: box
+private func make(value: i32) -> box:
+    order = order * 10 + value
+    return box(value = value)
+private func read(item: pair) -> i32:
+    return item.first.value + item.second.value
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        order = 0
+        total += read(pair(first = make(1), second = make(2))) + order
+    return total
