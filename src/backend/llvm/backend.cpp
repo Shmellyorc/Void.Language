@@ -175,16 +175,6 @@ unsigned scalar_encoding(ir::Type t) {
     default:throw std::invalid_argument("Native fixed arrays require numeric or bool elements");
     }
 }
-const char* source_list_read_symbol(ir::Type t) {
-    switch(t.kind) {
-#define VD_SOURCE_READ(name) case ir::Type::name:return "vd_list_read_index_" #name;
-    VD_SOURCE_READ(i8) VD_SOURCE_READ(i16) VD_SOURCE_READ(i32) VD_SOURCE_READ(i64)
-    VD_SOURCE_READ(u8) VD_SOURCE_READ(u16) VD_SOURCE_READ(u32) VD_SOURCE_READ(u64)
-    VD_SOURCE_READ(f32) VD_SOURCE_READ(f64) VD_SOURCE_READ(boolean)
-#undef VD_SOURCE_READ
-    default:throw std::invalid_argument("unsupported source scalar list read");
-    }
-}
 std::string native_symbol(const ir::Function& function, const std::string& suffix) {
     if (function.module_identity.empty()) return function.name + suffix;
     // Injective ASCII encoding, independent of host paths, aliases and addresses.
@@ -1485,7 +1475,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     auto* encoding=b.getInt32(scalar_encoding(ir::array_element(t)));auto* count=b.getInt64(t.definition->extent.value_or(0));
                     if(instruction.op==Op::array_get) {
                         auto* value=t.kind==ir::Type::growable_array ?
-                            b.CreateCall(module->getOrInsertFunction(source_list_read_symbol(ir::array_element(t)),b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{source,index,b.getInt32(numeric::signed_integer(operand_type(instruction.b))),failure}) :
+                            b.CreateCall(module->getOrInsertFunction("vd_list_read_index",b.getInt64Ty(),b.getPtrTy(),b.getInt32Ty(),b.getInt64Ty(),b.getInt32Ty(),b.getPtrTy()),{source,encoding,index,b.getInt32(numeric::signed_integer(operand_type(instruction.b))),failure}) :
                             b.CreateCall(module->getOrInsertFunction("vd_array_read",b.getInt64Ty(),b.getPtrTy(),b.getInt64Ty(),b.getInt32Ty(),b.getInt64Ty(),b.getPtrTy()),{source,index,encoding,count,failure});
                         fail_if(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),"Array operation failed during index access");
                         auto element=ir::array_element(t);auto* narrow=b.CreateTruncOrBitCast(value,b.getIntNTy(numeric::width(element)));
@@ -2904,11 +2894,6 @@ Jit::Jit(DebugCache cache,ir::Emission emission) : impl_(std::make_shared<Impl>(
     bind("vd_list_new",vd_list_new);bind("vd_list_count",vd_list_count);bind("vd_list_version",vd_list_version);
     bind("vd_convert_parse", vd_convert_parse);
     bind("vd_list_write_bytes", vd_list_write_bytes);
-#define VD_SOURCE_READ(name) bind("vd_list_read_index_" #name,vd_list_read_index_##name);
-    VD_SOURCE_READ(i8) VD_SOURCE_READ(i16) VD_SOURCE_READ(i32) VD_SOURCE_READ(i64)
-    VD_SOURCE_READ(u8) VD_SOURCE_READ(u16) VD_SOURCE_READ(u32) VD_SOURCE_READ(u64)
-    VD_SOURCE_READ(f32) VD_SOURCE_READ(f64) VD_SOURCE_READ(boolean)
-#undef VD_SOURCE_READ
     bind("vd_list_read",vd_list_read);bind("vd_list_read_index",vd_list_read_index);bind("vd_list_write",vd_list_write);bind("vd_list_push",vd_list_push);bind("vd_list_remove",vd_list_remove);
     bind("vd_gc_construct",vd_gc_construct);
     bind("vd_gc_construct_typed",vd_gc_construct_typed);

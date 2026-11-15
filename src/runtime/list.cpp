@@ -4,7 +4,7 @@
 #include <limits>
 namespace vd {
 namespace {
-constexpr std::size_t scalar_width(ScalarEncoding e) {
+std::size_t scalar_width(ScalarEncoding e) {
     switch(e) {
     case ScalarEncoding::i8:case ScalarEncoding::u8:case ScalarEncoding::boolean:return 1;
     case ScalarEncoding::i16:case ScalarEncoding::u16:return 2;
@@ -45,30 +45,17 @@ std::uint64_t Runtime::list_read(RegisteredRootWord source,ScalarEncoding encodi
     return list_read_index(source,encoding,index,false);
 }
 std::uint64_t Runtime::list_read_index(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t index,bool signed_index) const {
-    return source_list_read_index<static_cast<ScalarEncoding>(~0u)>(source,index,signed_index,encoding);
-}
-template<ScalarEncoding Encoding>
-std::uint64_t Runtime::source_list_read_index(RegisteredRootWord source,std::uint64_t index,bool signed_index,ScalarEncoding encoding) const {
-    // The legacy entry supplies its dynamic encoding. Source entries bake only
-    // the encoding/load width; every dynamic header/root/index proof remains.
-    if constexpr(Encoding!=static_cast<ScalarEncoding>(~0u))encoding=Encoding;
     require_managed();std::lock_guard lock(mutex_);const auto& h=list_header(source,encoding);
-    // Unsigned magnitude handles INT64_MIN without signed overflow.
+    // Normalize a sign-extended source index against the same checked header
+    // used for the read. Unsigned subtraction handles INT64_MIN without UB.
     if(signed_index && (index&(std::uint64_t{1}<<63))) {
         const auto magnitude=~index+1;
         if(magnitude>h.count)throw std::out_of_range("list index outside extent");
         index=h.count-magnitude;
     }
     if(index>=h.count)throw std::out_of_range("list index outside extent");
-    const auto& state=heap_.buffer_state(h.backing);
-    return load_bits(static_cast<const char*>(h.backing)+state.layout->element_offset(index),scalar_width(encoding));
+    const auto& state=heap_.buffer_state(h.backing);return load_bits(static_cast<const char*>(h.backing)+state.layout->element_offset(index),scalar_width(encoding));
 }
-#define VD_SOURCE_READ(name) template std::uint64_t Runtime::source_list_read_index<ScalarEncoding::name>(RegisteredRootWord,std::uint64_t,bool,ScalarEncoding) const;
-VD_SOURCE_READ(i8) VD_SOURCE_READ(i16) VD_SOURCE_READ(i32) VD_SOURCE_READ(i64)
-VD_SOURCE_READ(u8) VD_SOURCE_READ(u16) VD_SOURCE_READ(u32) VD_SOURCE_READ(u64)
-VD_SOURCE_READ(f32) VD_SOURCE_READ(f64) VD_SOURCE_READ(boolean)
-#undef VD_SOURCE_READ
-template std::uint64_t Runtime::source_list_read_index<static_cast<ScalarEncoding>(~0u)>(RegisteredRootWord,std::uint64_t,bool,ScalarEncoding) const;
 void Runtime::list_write(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t index,std::uint64_t bits,std::optional<std::uint64_t> version) {
     valid_bits(encoding,bits);auto schema=fixed_scalar_schema(encoding);char data[8]{};store_bits(data,bits,scalar_width(encoding));array_write_value(source,schema,nullptr,index,data,false,version);
 }

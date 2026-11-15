@@ -150,10 +150,6 @@ public:
     std::uint64_t list_version(RegisteredRootWord,ScalarEncoding) const;
     std::uint64_t list_read(RegisteredRootWord,ScalarEncoding,std::uint64_t index) const;
     std::uint64_t list_read_index(RegisteredRootWord,ScalarEncoding,std::uint64_t bits,bool signed_index) const;
-    // Shared checked read: source instantiations fix Encoding; the legacy
-    // entry selects the internal dynamic mode and supplies its encoding.
-    template<ScalarEncoding Encoding>
-    std::uint64_t source_list_read_index(RegisteredRootWord,std::uint64_t,bool signed_index,ScalarEncoding encoding=Encoding) const;
     void list_write(RegisteredRootWord,ScalarEncoding,std::uint64_t index,std::uint64_t bits,std::optional<std::uint64_t> version={});
     void list_push(RegisteredRootWord,ScalarEncoding,std::uint64_t bits);
     // Transactional byte overwrite/append using the existing list backing allocator.
