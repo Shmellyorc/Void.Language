@@ -93,6 +93,36 @@ void numeric_tests(const std::filesystem::path& root) {
                     "target-aware dependent f32 rounding mismatch");
         }
     }
+    // Runtime-invariant branches may expose AOT SIMD, but all original source
+    // results, short trips, changing conditions and reached failures must agree.
+    for (const auto& fixture : {"invariant-division", "variable-divisor", "varying-condition", "range-edges", "late-failure"}) {
+        auto module = vd::compile_project(root / "tests/numeric/automatic_simd" / (std::string(fixture) + ".void")).module;
+        for (bool optimized : {false, true}) {
+            auto code = jit.compile(module, "entry", optimized);
+            for (int n : {-129, -17, -1, 0, 1, 2, 3, 4, 7, 8, 9, 17, 127, 128, 129, 1025}) {
+                const std::string name = fixture;
+                const bool fails = (name == "variable-divisor" && n == 0) || (name == "late-failure" && n >= 4);
+                if (fails) {
+                    bool observed = false;
+                    try { code->invoke(n); }
+                    catch (const std::runtime_error& error) { observed = std::string(error.what()).find("Division by zero") != std::string::npos; }
+                    require(observed, "Invariant-loop failure disappeared or changed"); continue;
+                }
+                std::uint32_t expected = 0;
+                if (name == "range-edges") expected = 1;
+                else if (name == "variable-divisor") {
+                    for (int i = 0; i < 1000000; ++i) expected += static_cast<std::uint32_t>(n > 0 ? i % 127 : i / n);
+                } else if (name == "invariant-division") {
+                    for (int i = 0; i < n; ++i) expected += static_cast<std::uint32_t>(n % 2 == 0 ? i % 127 : i / n);
+                } else if (name == "varying-condition") {
+                    for (int i = 0; i < n; ++i) expected += static_cast<std::uint32_t>(i % 2 == 0 ? i % 127 : -((i * 3) % 127));
+                } else {
+                    for (int i = 0; i != n; i += n > 0 ? 1 : -1) expected += static_cast<std::uint32_t>(i);
+                }
+                require(static_cast<std::uint32_t>(code->invoke(n)) == expected, "Invariant-loop oracle mismatch: " + name + "/" + std::to_string(n));
+            }
+        }
+    }
     unsigned executions = 0;
     for (const auto& item : std::filesystem::directory_iterator(root / "tests/numeric/programs")) {
         if (item.path().extension() != ".void") continue;

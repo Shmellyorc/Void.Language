@@ -1,0 +1,114 @@
+func bidirectional(n: i32) -> i32:
+    var total: i32 = 0
+    for i in 0..<n:
+        total += i % 127
+    return total
+
+func invariant_conditional(n: i32) -> i32:
+    if n <= 0:
+        return 0
+    var total: i32 = 0
+    for i in 0..<n:
+        if n % 2 == 0:
+            total += i % 127
+        else:
+            total += (i * 3) % 127
+    return total
+
+func invariant_division(n: i32) -> i32:
+    if n <= 0:
+        return 0
+    var total: i32 = 0
+    for i in 0..<n:
+        if n % 2 == 0:
+            total += i % 127
+        else:
+            total += i / n
+    return total
+
+func variable_divisor(n: i32) -> i32:
+    var total: i32 = 0
+    for i in 0..<1000000:
+        if n > 0:
+            total += i % 127
+        else:
+            total += i / n
+    return total
+
+func varying_condition(n: i32) -> i32:
+    if n <= 0:
+        return 0
+    var flag = true
+    var total: i32 = 0
+    for i in 0..<n:
+        if flag:
+            total += i % 127
+        else:
+            total -= (i * 3) % 127
+        flag = not flag
+    return total
+
+func range_edges(n: i32) -> i32:
+    var total: i64 = 0
+    for i in 2147483640..2147483647:
+        if i % 2 == 0:
+            continue
+        total += i as i64
+    if total != 8589934576:
+        return 2
+    var low: i64 = 0
+    for i in reverse -2147483648..<-2147483640:
+        low += i as i64
+    if low != -17179869156:
+        return 3
+    var visited: i32 = 0
+    for i in -2147483648..2147483647:
+        visited += 1
+        if visited == 9:
+            break
+    if visited != 9:
+        return 4
+    const first: i64 = 9223372036854775800
+    const last: i64 = 9223372036854775807
+    var count: i32 = 0
+    for i in first..last:
+        count += 1
+    if count != 8:
+        return 5
+    return 1
+
+func late_failure(n: i32) -> i32:
+    var total: i32 = 0
+    for i in 0..<n:
+        total += i
+        if n > 0 and i == 3:
+            total += 1 / (n - n)
+    return total
+
+func dependent(n: i32) -> i32:
+    var value: i32 = 7
+    for i in 0..<n:
+        value = (value * 3 + i) % 65521
+    return value
+func fp32(n: i32, x: f32) -> f32:
+    var value = x
+    if n <= 0:
+        return value
+    for i in 0..<n:
+        if n % 2 == 0:
+            value = value * 1.0000001 + 0.125
+        else:
+            value = value * 0.9999999 - 0.125
+    return value
+func fp64(n: i32, x: f64) -> f64:
+    var value = x
+    if n <= 0:
+        return value
+    for i in 0..<n:
+        if n % 2 == 0:
+            value = value * 1.0000000000001 + 0.125
+        else:
+            value = value * 0.9999999999999 - 0.125
+    return value
+func entry(n: i32) -> i32:
+    return bidirectional(n)

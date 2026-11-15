@@ -1,0 +1,7 @@
+func entry(n: i32) -> i32:
+    var total: i32 = 0
+    for i in 0..<n:
+        total += i
+        if n > 0 and i == 3:
+            total += 1 / (n - n)
+    return total

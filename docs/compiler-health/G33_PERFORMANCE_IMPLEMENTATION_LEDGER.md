@@ -1,5 +1,19 @@
 # G33 — Performance implementation ledger
 
+## G38 — automatic AOT SIMD, correctness qualified / performance held
+
+Archive/cleanup verified: 533 selected files plus manifest, 6,207,635 ZIP bytes, SHA-256 `9382e15d95d79fc88d62ea28d2e8109929378629ef497d57352405a47cce037e`. Task builds/transports and Windows private roots are removed; SDKs/providers, all previous archives and the original G37-F worktree are preserved. Observed host reclamation 10.03 GiB; Windows guest free space separately 10.47 GiB. Constant-path JIT controls still regress about2–10%; default acceptance remains held. Exact final diff/inventory and cleanup receipts accompany the archive.
+
+[Consolidated report](G38_AUTOMATIC_LOOP_OPTIMIZATION.md). Isolated accepted G36 baseline `1e606f8e5067a3113b1d4d4f850fd3a11e2e57a0`; hold default performance acceptance pending unresolved managed JIT host-context costs, alongside documented compilation/code-size costs. One existing LLVM nontrivial unswitch pass precedes the existing optimized AOT vectorizer, bounded by validated `!input.coordinated`; normal/O2 JIT, SLP policy, CPU features, Runtime and ABI stay accepted. Two scalar-to-SSE2 integer paths measure -60.45% and -59.52% region time. Full coordinated G36 optimized object/executable, normal AOT, Runtime/Core and exact-image controls are byte-identical.
+
+Linux Release77/77 and fatal ASan/UBSan/LSan77/77, relevant fatal TSan, native Windows10 Debug63/63 and Release63/63 pass with normal/O2 JIT and independent AOT, exact operation/poll/root/failure/cancellation assertions and 1MiB controls. The first all-module candidate's numeric/array regressions, exact source and all unfavorable timings remain archived; it is rejected, not silently accepted. Managed-escape JIT main cohort is about+6.5%; actual-host reruns remain worse despite identical driver objects/Runtime/Core/captured IR. Threaded-pressure same-image variation changes sign; text GC-tail costs remain explicit. Default acceptance is held pending native host/JIT-context investigation. General array/reference/mutable/worker/native/async SIMD and unguarded bidirectional loops remain open. No second optimizer, annotations, unchecked access, padding or alignment workaround. Compact archive verification and guarded cleanup receipts accompany exact diffs/inventories. No staging, commit, push or hosted CI.
+
+## G37 / G37-F — preserved, active, performance acceptance held
+
+The exact original nine-file worktree remains untouched at `/home/shmellyorc/Documents/Void.Language`; its [G37-F report](/home/shmellyorc/Documents/Void.Language/docs/compiler-health/G37F_NATIVE_CHECKED_READ_CORRECTION.md), ledger and verified archive `g37f-native-checked-read-correction-2026-11-14.zip` (SHA-256 `0cd0d21f695e2535033610a89aec54c4a402df6d9faa3b159d69831869781e9c`) remain authoritative. Eleven source-constant reads and 4096→0 dynamic-width work are correctness-qualified. Native integer/array/prepared-traversal and GC-tail tradeoffs keep default acceptance held. G38 imports none of those new ABI entries/templates/tests. Future encoding use remains a separate qualification, not a discarded capability.
+
+Broader escape analysis beyond G35, checked-array/descriptor work, dictionary/sorting, text/Unicode/JSON, historical GC-tail/worker/numeric costs and broader automatic SIMD remain active. No stage/commit/push/hosted CI.
+
 ## G36 candidate — checked collections and everyday workloads
 
 Archive and cleanup verified: 420 selected files plus manifest, 3,879,722 compressed bytes, SHA-256 `c0bdf49c6f34ea9f8c325677b84731630d5b5d9a827dabc88e65e683c23adeda`. Task builds/transport are removed; active SDKs/providers and previous evidence are preserved. Exact receipts and final inventory accompany the archive.

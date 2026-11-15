@@ -48,6 +48,8 @@
 #include <llvm/TargetParser/Host.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetMachine.h>
+#include <llvm/Transforms/Scalar/LoopPassManager.h>
+#include <llvm/Transforms/Scalar/SimpleLoopUnswitch.h>
 #include <llvm/Transforms/Utils/ModuleUtils.h>
 #include <atomic>
 #include <map>
@@ -83,7 +85,8 @@ template<class T> T unwrap(llvm::Expected<T> value) {
     if (!value) throw std::runtime_error(llvm::toString(value.takeError()));
     return std::move(*value);
 }
-void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_machine = nullptr) {
+void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_machine = nullptr,
+            bool version_loops = false) {
     std::string message;
     llvm::raw_string_ostream stream(message);
     if (llvm::verifyModule(module, &stream)) throw std::runtime_error("invalid LLVM lowering: " + message);
@@ -95,6 +98,16 @@ void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_m
         llvm::PipelineTuningOptions tuning;
         tuning.SLPVectorization = false;
         llvm::PassBuilder builder(analysis_machine, tuning);
+        if (analysis_machine && version_loops) {
+            // Runtime-free AOT: expose invariant control before vectorization.
+            // Coordinated modules keep their accepted checkpoint/call pipeline.
+            // LLVM owns legality/profitability; strict FP and failures remain.
+            builder.registerVectorizerStartEPCallback([](llvm::FunctionPassManager& pipeline,
+                                                        llvm::OptimizationLevel) {
+                pipeline.addPass(llvm::createFunctionToLoopPassAdaptor(
+                    llvm::SimpleLoopUnswitchPass(true), true));
+            });
+        }
         builder.registerModuleAnalyses(modules);
         builder.registerCGSCCAnalyses(cgscc);
         builder.registerFunctionAnalyses(functions);
@@ -3390,7 +3403,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     // and its CLI-home normalization are deliberately NOT activated here.
     // Analyze against the same generic deployment machine that emits the object.
     // JIT callers retain target-independent O2 and their existing ORC policy.
-    finish(*module, optimize, machine.get());
+    finish(*module, optimize, machine.get(), !input.coordinated);
     write_object(*module,*machine,output);
 }
 void emit_async_object(const ir::Module& source,const std::filesystem::path& output,bool optimize){auto module=source;module.async_root=true;emit_object(module,output,optimize,true);}
@@ -3410,7 +3423,7 @@ void emit_private_fixed_call_research(const ir::Module& input, const std::filesy
     llvm::LLVMContext context;
     auto module=lower(input,context,"",machine->createDataLayout(),input.entry_symbol,nullptr,nullptr,nullptr,true);
     module->setTargetTriple(machine->getTargetTriple());
-    finish(*module,optimize,machine.get());
+    finish(*module,optimize,machine.get(),!input.coordinated);
     write_object(*module,*machine,output);
 }
 void emit_aot_storage_proof(const ir::Module& input, const std::filesystem::path& output,

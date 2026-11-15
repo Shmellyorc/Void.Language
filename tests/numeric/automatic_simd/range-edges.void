@@ -1,0 +1,28 @@
+func entry(n: i32) -> i32:
+    var total: i64 = 0
+    for i in 2147483640..2147483647:
+        if i % 2 == 0:
+            continue
+        total += i as i64
+    if total != 8589934576:
+        return 2
+    var low: i64 = 0
+    for i in reverse -2147483648..<-2147483640:
+        low += i as i64
+    if low != -17179869156:
+        return 3
+    var visited: i32 = 0
+    for i in -2147483648..2147483647:
+        visited += 1
+        if visited == 9:
+            break
+    if visited != 9:
+        return 4
+    const first: i64 = 9223372036854775800
+    const last: i64 = 9223372036854775807
+    var count: i32 = 0
+    for i in first..last:
+        count += 1
+    if count != 8:
+        return 5
+    return 1

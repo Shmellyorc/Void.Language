@@ -1,0 +1,12 @@
+func entry(n: i32) -> i32:
+    if n <= 0:
+        return 0
+    var flag = true
+    var total: i32 = 0
+    for i in 0..<n:
+        if flag:
+            total += i % 127
+        else:
+            total -= (i * 3) % 127
+        flag = not flag
+    return total

@@ -1,0 +1,10 @@
+func entry(n: i32) -> i32:
+    if n <= 0:
+        return 0
+    var total: i32 = 0
+    for i in 0..<n:
+        if n % 2 == 0:
+            total += i % 127
+        else:
+            total += i / n
+    return total
