@@ -70,6 +70,13 @@ std::uint64_t vd_list_count(void**,unsigned,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_version(void**,unsigned,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_read(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;
 std::uint64_t vd_list_read_index(void**,unsigned,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
+// Source-constant scalar reads. Borrowed/dynamic descriptor entry points retain
+// their existing contracts. These use the same root/header/index proof.
+#define VD_SOURCE_READ(name) std::uint64_t vd_list_read_index_##name(void**,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
+VD_SOURCE_READ(i8) VD_SOURCE_READ(i16) VD_SOURCE_READ(i32) VD_SOURCE_READ(i64)
+VD_SOURCE_READ(u8) VD_SOURCE_READ(u16) VD_SOURCE_READ(u32) VD_SOURCE_READ(u64)
+VD_SOURCE_READ(f32) VD_SOURCE_READ(f64) VD_SOURCE_READ(boolean)
+#undef VD_SOURCE_READ
 void vd_list_write(void**,unsigned,std::uint64_t,std::uint64_t,std::uint64_t,unsigned,vd::RuntimeFailure*) noexcept;
 void vd_list_write_bytes(void**, void**, std::uint64_t, vd::RuntimeFailure*) noexcept;
 void vd_list_push(void**,unsigned,std::uint64_t,vd::RuntimeFailure*) noexcept;

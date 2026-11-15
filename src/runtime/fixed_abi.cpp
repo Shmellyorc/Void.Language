@@ -1,13 +1,10 @@
 #include "void/runtime_abi.hpp"
 #include <new>
 namespace {
-template<class Work> void checked(vd::RuntimeFailure* failure,Work work) noexcept {
-    // An absent failure context is a broken internal call contract.
-    if(!failure) std::terminate();
-    if(failure->message) return;
-    try {
-        work();
-    } catch(const vd::ListModified&) {failure->message="List structurally modified during selected operation";}
+// Called only from an active checked-boundary handler. Rethrowing the same
+// exception preserves its object and lifetime; no exception is copied or stored.
+void translate_failure(vd::RuntimeFailure* failure) noexcept {
+    try {throw;} catch(const vd::ListModified&) {failure->message="List structurally modified during selected operation";}
       catch(const std::bad_alloc&) {failure->message="Fixed value allocation failed";}
       catch(const vd::BufferBusy&) {failure->message="Fixed buffer is busy";}
       catch(const std::out_of_range&) {failure->message="Fixed index outside extent";}
@@ -15,6 +12,14 @@ template<class Work> void checked(vd::RuntimeFailure* failure,Work work) noexcep
       catch(const std::invalid_argument&) {failure->message="Invalid fixed value contract";}
       catch(const std::logic_error&) {failure->message="Invalid fixed root or runtime state";}
       catch(...) {std::terminate();}
+}
+template<class Work> void checked(vd::RuntimeFailure* failure,Work work) noexcept {
+    // An absent failure context is a broken internal call contract.
+    if(!failure) std::terminate();
+    if(failure->message) return;
+    try {
+        work();
+    } catch(...) {translate_failure(failure);}
 }
 template<class Work> void checked(vd::RuntimeFailure* failure,const vd::BufferLayoutRef* layout,Work work) noexcept {
     checked(failure,[&]{
@@ -36,6 +41,18 @@ template<class Work> void array_source_checked(void** source,unsigned encoding,s
         auto layout=runtime.fixed_scalar_layout(root,static_cast<vd::ScalarEncoding>(encoding),extent);
         work(runtime,root,layout);
     });
+}
+// Shared failure/authority boundary for dynamic and source-constant list reads.
+template<class Read>
+std::uint64_t list_index_checked(void** source,std::uint64_t index,unsigned signed_index,vd::RuntimeFailure* failure,Read read) noexcept {
+    std::uint64_t result=0;
+    checked(failure,[&]{
+        if(signed_index>1)throw std::invalid_argument("invalid list index signedness");
+        auto& r=vd::Runtime::current();
+        try {result=read(r,r.root_word(source),index,signed_index!=0);}
+        catch(const std::out_of_range&) {failure->message="List index outside extent";}
+    });
+    return result;
 }
 constexpr vd::BufferWorkQuota array_quota{16384,256,4096};
 
@@ -114,15 +131,15 @@ std::uint64_t vd_list_read(void** source,unsigned encoding,std::uint64_t index,v
     std::uint64_t result=0;checked(failure,[&]{auto& r=vd::Runtime::current();result=r.list_read(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index);});return result;
 }
 std::uint64_t vd_list_read_index(void** source,unsigned encoding,std::uint64_t index,unsigned signed_index,vd::RuntimeFailure* failure) noexcept {
-    std::uint64_t result=0;
-    checked(failure,[&]{
-        if(signed_index>1)throw std::invalid_argument("invalid list index signedness");
-        auto& r=vd::Runtime::current();
-        try {result=r.list_read_index(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index,signed_index!=0);}
-        catch(const std::out_of_range&) {failure->message="List index outside extent";}
-    });
-    return result;
+    return list_index_checked(source,index,signed_index,failure,[&](auto& r,auto root,auto i,bool sign){return r.list_read_index(root,static_cast<vd::ScalarEncoding>(encoding),i,sign);});
 }
+#define VD_SOURCE_READ(name) \
+std::uint64_t vd_list_read_index_##name(void** source,std::uint64_t index,unsigned signed_index,vd::RuntimeFailure* failure) noexcept { \
+    return list_index_checked(source,index,signed_index,failure,[](auto& r,auto root,auto i,bool sign){return r.template source_list_read_index<vd::ScalarEncoding::name>(root,i,sign);});}
+VD_SOURCE_READ(i8) VD_SOURCE_READ(i16) VD_SOURCE_READ(i32) VD_SOURCE_READ(i64)
+VD_SOURCE_READ(u8) VD_SOURCE_READ(u16) VD_SOURCE_READ(u32) VD_SOURCE_READ(u64)
+VD_SOURCE_READ(f32) VD_SOURCE_READ(f64) VD_SOURCE_READ(boolean)
+#undef VD_SOURCE_READ
 void vd_list_write(void** source,unsigned encoding,std::uint64_t index,std::uint64_t bits,std::uint64_t version,unsigned selected,vd::RuntimeFailure* failure) noexcept {
     checked(failure,[&]{auto& r=vd::Runtime::current();r.list_write(r.root_word(source),static_cast<vd::ScalarEncoding>(encoding),index,bits,selected ? std::optional(version) : std::nullopt);});
 }
