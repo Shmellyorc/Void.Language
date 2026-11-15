@@ -5,12 +5,15 @@ value struct marker:
         return left.number == right.number
 struct callback_frame:
     number: i32
+func observe_frame(value: callback_frame):
+    pass
 var calls = 0
 var items = [3, 1, 2]
 func make() -> func(const i32, const i32) -> bool:
     var step = 1
     return func(const left: i32, const right: i32) -> bool:
         var frame = callback_frame(number = 1)
+        observe_frame(frame)
         calls += step
         return left < right
 var saved: (func(const i32, const i32) -> bool)? = null

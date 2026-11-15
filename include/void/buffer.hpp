@@ -24,6 +24,14 @@ public:
     }
 private:
     friend class Runtime;
+    // Factory-validated immutable geometry. A hit is equivalent to constructing
+    // BufferLayout(schema, capacity, 0, 0); callers retain their checked fallback.
+    bool packed(const ElementSchemaRef& schema,std::uint64_t capacity) const noexcept {
+        if(schema_!=schema || capacity_!=capacity || base_)return false;
+        const auto bytes=std::max(std::size_t{1},schema_->bytes()),alignment=schema_->alignment();
+        if(bytes>std::size_t(-1)-(alignment-1))return false;
+        return stride_==((bytes+alignment-1)&~(alignment-1));
+    }
     BufferLayout(ElementSchemaRef,std::uint64_t,std::size_t base,std::size_t stride);
     ElementSchemaRef schema_;
     std::uint64_t capacity_;

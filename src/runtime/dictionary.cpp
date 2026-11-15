@@ -11,7 +11,9 @@ std::uint64_t read_word(const char* p) {std::uint64_t value;std::memcpy(&value,p
 void write_word(char* p,std::uint64_t value) {std::memcpy(p,&value,8);}
 }
 void Runtime::validate_dictionary_key_schema(const RuntimeMetadata& metadata,const ElementSchema& schema) const {
-    for(const auto& [identity,type]:metadata.types)if(type->dictionary_key_forbidden && (type->dictionary_key_schema==schema.identity() || type->dictionary_key_schema+"?"==schema.identity()))throw std::invalid_argument("custom equality type is not an eligible dictionary key");
+    const auto forbidden=[&](std::string_view key){auto found=metadata.dictionary_key_policies.find(key);return found!=metadata.dictionary_key_policies.end() && found->second;};
+    const std::string_view identity=schema.identity();
+    if(forbidden(identity) || (identity.ends_with('?') && forbidden(identity.substr(0,identity.size()-1))))throw std::invalid_argument("custom equality type is not an eligible dictionary key");
     for(const auto& node:schema.spec_.nodes) {
         if(auto field=std::get_if<SchemaManaged>(&node)) {
             auto target=metadata.types.find(field->target);
@@ -78,12 +80,15 @@ bool Runtime::dictionary_read(void* out,RegisteredRootWord source,const NativeDi
 }
 void Runtime::dictionary_entry(void* out,RegisteredRootWord source,const NativeDictionary& d,std::uint64_t index) {auto l=dictionary_layout(d);std::lock_guard lock(mutex_);auto& h=dictionary_header(source,l);if(index>=h.count)throw std::out_of_range("dictionary iterator outside extent");if(!out)throw std::invalid_argument("missing dictionary output");heap_.validate_output_address(reinterpret_cast<void**>(out));auto& state=heap_.buffer_state(h.entries);std::memcpy(out,static_cast<const char*>(h.entries)+state.layout->element_offset(index),d.entry->bytes);}
 void Runtime::dictionary_write(RegisteredRootWord source,const NativeDictionary& d,const void* value,std::uint64_t expected) {
-    auto l=dictionary_layout(d);DataCursor cursor;cursor.prepare(l.entries->schema());poll();void* old=nullptr;void* next=nullptr;void* buckets=nullptr;constexpr std::size_t zero=0;Slot slots[]={{&old,sizeof(old),&zero,1},{&next,sizeof(next),&zero,1},{&buckets,sizeof(buckets),&zero,1}};Frame roots(*this,slots,3);std::uint64_t count,capacity,hash;
+    auto l=dictionary_layout(d);DataCursor cursor;cursor.prepare(l.entries->schema());poll();void* old=nullptr;void* next=nullptr;void* buckets=nullptr;constexpr std::size_t zero=0;Slot slots[]={{&old,sizeof(old),&zero,1},{&next,sizeof(next),&zero,1},{&buckets,sizeof(buckets),&zero,1}};std::uint64_t count,capacity,hash;
     {std::lock_guard lock(mutex_);validate_native_element(value,cursor,l.entries->schema());auto& h=dictionary_header(source,l);if(h.version!=expected)throw ListModified("dictionary selected write invalidated");hash=dictionary_hash(value,*d.key);auto index=dictionary_find(h,d,value,hash);
         if(index!=absent){auto& state=heap_.buffer_state(h.entries);if(state.readers)throw BufferBusy("leased dictionary backing");auto* entry=static_cast<char*>(h.entries)+state.layout->element_offset(index);std::memcpy(entry+d.value_offset,static_cast<const char*>(value)+d.value_offset,d.hash_offset-d.value_offset);state.catalog=types_;return;}
         room(h.version);if(h.count<h.capacity){auto& state=heap_.buffer_state(h.entries);if(state.readers)throw BufferBusy("leased dictionary backing");auto* entry=static_cast<char*>(h.entries)+state.layout->element_offset(h.count);std::memcpy(entry,value,d.entry->bytes);write_word(entry+d.hash_offset,hash);state.catalog=types_;state.valid_prefix=++h.count;++h.version;auto& index_state=heap_.buffer_state(h.buckets);auto slot=hash&(h.capacity*2-1);auto* data=static_cast<char*>(h.buckets);while(read_word(data+index_state.layout->element_offset(slot)))slot=(slot+1)&(h.capacity*2-1);write_word(data+index_state.layout->element_offset(slot),h.count);return;}
         count=h.count;capacity=h.capacity;old=h.entries;
     }
+    // In-place updates never leave managed execution or reach a safepoint.
+    // Publish temporary roots before the first growth allocation/native scope.
+    Frame roots(*this,slots,3);
     if(capacity>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max())/4)throw std::length_error("dictionary capacity overflow");auto grown=capacity?capacity*2:4;auto target=buffer_layout(l.entries->schema(),grown);std::optional<BufferReadLease> lease;if(old){auto original=buffer_layout(l.entries->schema(),capacity);lease.emplace(*this,root_word(&old),original);}
     BufferBuilder builder(*this,target,count+1,quota);if(lease)builder.copy_elements(*lease,0,count);append_native(builder,target,value);builder.finish_into(&next);auto bucket_layout=fixed_scalar_layout(ScalarEncoding::u64,grown*2);BufferBuilder index_builder(*this,bucket_layout,grown*2,quota);index_builder.zero_elements(grown*2);index_builder.finish_into(&buckets);
     std::lock_guard lock(mutex_);auto& h=dictionary_header(source,l);if(h.version!=expected || h.entries!=old || h.count!=count)throw ListModified("dictionary modified during growth");auto& state=heap_.buffer_state(next);write_word(static_cast<char*>(next)+state.layout->element_offset(count)+d.hash_offset,hash);DictionaryHeader staged{next,buckets,count+1,grown,expected+1};dictionary_index(staged,d);h=staged;

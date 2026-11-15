@@ -37,6 +37,11 @@ struct RuntimeMetadata {
     std::map<std::string,std::shared_ptr<const NominalDescriptor>,std::less<>> types;
     std::map<std::string,ElementSchemaRef,std::less<>> schemas;
     std::map<std::string,std::shared_ptr<const InterfaceWitness>,std::less<>> witnesses;
+    // The canonical policy index is built/validated before catalog publication.
+    // It replaces the discarded admission set and per-operation nominal scan.
+    // Views borrow keys from the immutable descriptors retained in types.
+    // Catalog copies retain those same owners before copying this index.
+    std::map<std::string_view,bool,std::less<>> dictionary_key_policies;
 };
 class Heap {
 public:

@@ -26,8 +26,12 @@ Runtime::ListHeader& Runtime::list_header(void* object,const ElementSchemaRef& s
     if(h.count>h.capacity || h.capacity>maximum)throw std::invalid_argument("invalid list extent");
     if(!h.capacity) {if(h.count || h.backing)throw std::invalid_argument("invalid empty list");}
     else {
-        const auto& state=heap_.buffer_state(h.backing);BufferLayout expected(schema,h.capacity,0,0);
-        if(!state.complete || state.valid_prefix!=h.count || !state.layout->equivalent(expected))throw std::invalid_argument("invalid list backing");
+        const auto& state=heap_.buffer_state(h.backing);
+        if(!state.layout->packed(schema,h.capacity)) {
+            BufferLayout expected(schema,h.capacity,0,0);
+            if(!state.layout->equivalent(expected))throw std::invalid_argument("invalid list backing");
+        }
+        if(!state.complete || state.valid_prefix!=h.count)throw std::invalid_argument("invalid list backing");
     }
     return h;
 }
@@ -150,7 +154,7 @@ void Runtime::array_write_value(RegisteredRootWord source,const ElementSchemaRef
 void Runtime::array_push(RegisteredRootWord source,const ElementSchemaRef& schema,const void* value) {array_insert(source,schema,{},value);}
 void Runtime::array_insert(RegisteredRootWord source,const ElementSchemaRef& schema,std::optional<std::uint64_t> position,const void* value,std::optional<std::uint64_t> expected) {
     require_managed();if(!schema || !schema->mutable_data())throw std::invalid_argument("array profile does not permit mutation");DataCursor cursor;if(!std::holds_alternative<SchemaScalar>(schema->spec_.nodes[schema->spec_.root]))cursor.prepare(schema);poll();
-    void* old=nullptr;void* next=nullptr;constexpr std::size_t zero=0;Slot slots[]={{&old,sizeof(old),&zero,1},{&next,sizeof(next),&zero,1}};Frame roots(*this,slots,2);
+    void* old=nullptr;void* next=nullptr;constexpr std::size_t zero=0;Slot slots[]={{&old,sizeof(old),&zero,1},{&next,sizeof(next),&zero,1}};
     std::uint64_t count,capacity,version;BufferLayoutRef old_layout;
     {std::lock_guard lock(mutex_);validate_native_element(value,cursor,schema);auto& h=list_header(source,schema);if(expected && *expected!=h.version)throw ListModified("List structurally modified during selected insertion");
         if(!position)position=h.count;if(*position>h.count)throw std::out_of_range("list insertion index outside extent");structural_room(h.version);if(h.count==maximum)throw std::length_error("list count overflow");
@@ -160,6 +164,9 @@ void Runtime::array_insert(RegisteredRootWord source,const ElementSchemaRef& sch
             std::memcpy(to,value,schema->bytes());state.catalog=types_;state.valid_prefix=++h.count;++h.version;return;}
         count=h.count;capacity=h.capacity;version=h.version;old=h.backing;if(old)old_layout=heap_.buffer_state(old).layout;
     }
+    // Only growth crosses safepoints with these temporary references. The
+    // in-place branch above stays managed under mutex_ and needs no new roots.
+    Frame roots(*this,slots,2);
     const auto grown=capacity ? (capacity>maximum/2 ? maximum : capacity*2) : 4;auto next_layout=buffer_layout(schema,grown);
     std::optional<BufferReadLease> lease;if(old)lease.emplace(*this,root_word(&old),old_layout);
     BufferBuilder builder(*this,next_layout,count+1,quota);if(lease)builder.copy_elements(*lease,0,*position);append_native(builder,next_layout,value);if(lease)builder.copy_elements(*lease,*position,count-*position);builder.finish_into(&next);
@@ -321,21 +328,28 @@ void Runtime::array_slice(void** out,RegisteredRootWord source,const BufferLayou
 namespace vd {
 std::uint64_t Runtime::string_count(void* source,bool bytes) const {
     auto text=string_bytes(source);if(text.size()>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))throw std::length_error("string count is not representable");if(bytes)return text.size();
-    std::uint64_t count=0;for(std::size_t i=0;i<text.size();++count)i+=utf8_scalar_bytes(text,i);return count;
+    // Intrinsic strings are immutable and validated by string_parts_into /
+    // construct_into before publication. Each non-continuation byte starts
+    // exactly one scalar; counting needs no second UTF-8 decoder traversal.
+    std::uint64_t count=0;for(unsigned char byte:text)count+=(byte&0xc0)!=0x80;return count;
 }
 void Runtime::string_index_into(void** out,void* source,ScalarEncoding encoding,std::uint64_t bits) {
-    auto text=string_bytes(source);auto count=string_count(source,false);
+    auto text=string_bytes(source);
+    if(text.size()>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))throw std::length_error("string count is not representable");
     unsigned width;
     switch(encoding){case ScalarEncoding::i8:case ScalarEncoding::u8:width=8;break;case ScalarEncoding::i16:case ScalarEncoding::u16:width=16;break;case ScalarEncoding::i32:case ScalarEncoding::u32:width=32;break;case ScalarEncoding::i64:case ScalarEncoding::u64:width=64;break;default:throw std::invalid_argument("noninteger string index");}
     const bool sign=encoding==ScalarEncoding::i8 || encoding==ScalarEncoding::i16 || encoding==ScalarEncoding::i32 || encoding==ScalarEncoding::i64;
     if(width<64)bits&=(std::uint64_t{1}<<width)-1;
     std::uint64_t index=bits;
     if(sign && (bits&(std::uint64_t{1}<<(width-1)))) {
+        const auto count=string_count(source,false);
         auto magnitude=width==64 ? ~bits+1 : (std::uint64_t{1}<<width)-bits;
         if(magnitude>count)throw std::out_of_range("string index outside extent");index=count-magnitude;
     }
-    if(index>=count)throw std::out_of_range("string index outside extent");
-    std::size_t offset=0;for(std::uint64_t i=0;i<index;++i)offset+=utf8_scalar_bytes(text,offset);
+    // A nonnegative index needs only the prefix through its selected scalar.
+    // Negative indexing still uses the complete checked scalar count above.
+    std::size_t offset=0;for(std::uint64_t i=0;i<index && offset<text.size();++i)offset+=utf8_scalar_bytes(text,offset);
+    if(offset>=text.size())throw std::out_of_range("string index outside extent");
     // string_into stages the complete bytes before its first safepoint.
     string_into(out,text.substr(offset,utf8_scalar_bytes(text,offset)));
 }

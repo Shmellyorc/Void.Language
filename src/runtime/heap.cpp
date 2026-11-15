@@ -98,7 +98,8 @@ void* Heap::allocate_validated(const TypeLayout& layout,LegacyReferenceMap shape
 }
 std::size_t BufferLayout::element_offset(std::uint64_t index) const {
     if(index>=capacity_) throw std::out_of_range("buffer element outside capacity");
-    if(index && stride_>(std::numeric_limits<std::size_t>::max()-base_)/index) throw std::length_error("buffer offset overflow");
+    // The sole constructor checked base + stride * capacity and the rounded
+    // address extent. Immutable geometry and index < capacity prove this sum.
     return base_+stride_*static_cast<std::size_t>(index);
 }
 BufferReferenceCursor::BufferReferenceCursor(BufferLayoutRef layout)

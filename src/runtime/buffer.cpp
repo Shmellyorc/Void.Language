@@ -426,8 +426,11 @@ BufferLayoutRef Runtime::fixed_scalar_layout(RegisteredRootWord source,ScalarEnc
             // Reuse the immutable layout already owned by the buffer. Construct
             // the expected geometry on the stack; retain exact schema, packing
             // and complete fixed-extent checks without allocating metadata.
-            BufferLayout expected(schema,extent,0,0);
-            if(!state.complete || state.valid_prefix!=extent || !state.layout->equivalent(expected))
+            if(!state.layout->packed(schema,extent)) {
+                BufferLayout expected(schema,extent,0,0);
+                if(!state.layout->equivalent(expected))throw std::invalid_argument("invalid fixed scalar source");
+            }
+            if(!state.complete || state.valid_prefix!=extent)
                 throw std::invalid_argument("invalid fixed scalar source");
             layout=state.layout;
         }

@@ -525,7 +525,7 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
     for(;;) {
         std::shared_ptr<const TypeCatalog> snapshot;
         {std::lock_guard lock(mutex_); if(closing_ && !(current_runtime_==this && current_thread_->managed_depth)) throw std::logic_error("runtime is closing"); snapshot=types_;}
-        auto prepared=std::make_shared<TypeCatalog>(snapshot ? *snapshot : TypeCatalog{});
+        auto prepared=snapshot ? std::make_shared<TypeCatalog>(*snapshot) : std::make_shared<TypeCatalog>();
         for(const auto& [key,value]:candidates) {
             auto [found,added]=prepared->types.emplace(key,value);
             if(!added) {
@@ -546,8 +546,7 @@ void Runtime::admit_metadata(std::span<const NominalDescriptor> incoming,std::sp
                 current=parent;
             }
         }
-        std::set<std::string> key_policies;
-        for(const auto& [identity,type]:prepared->types)if(!type->dictionary_key_schema.empty() && !key_policies.insert(type->dictionary_key_schema).second)throw std::invalid_argument("conflicting canonical dictionary key policy");
+        for(const auto& [identity,type]:candidates)if(!type->dictionary_key_schema.empty() && (!snapshot || !snapshot->types.contains(identity)) && !prepared->dictionary_key_policies.emplace(type->dictionary_key_schema,type->dictionary_key_forbidden).second)throw std::invalid_argument("conflicting canonical dictionary key policy");
         for(const auto& [key,value]:witness_candidates) {
             if(!prepared->types.contains(value->view_identity)) throw std::invalid_argument("unadmitted witness static view");
             auto [found,added]=prepared->witnesses.emplace(key,value);

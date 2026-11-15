@@ -1,5 +1,17 @@
 # G33 — Performance implementation ledger
 
+## G36 candidate — checked collections and everyday workloads
+
+Archive and cleanup verified: 420 selected files plus manifest, 3,879,722 compressed bytes, SHA-256 `c0bdf49c6f34ea9f8c325677b84731630d5b5d9a827dabc88e65e683c23adeda`. Task builds/transport are removed; active SDKs/providers and previous evidence are preserved. Exact receipts and final inventory accompany the archive.
+
+Qualified Runtime candidate on accepted G35 `aa0f48e1998dc76397d238288f0b13669d0f3f2e`; Golden Wrench review/Boss-controlled Git remain pending. [Consolidated G36 report](G36_CHECKED_COLLECTIONS.md). Reuses immutable packed geometry, removes proved offset overflow work and unused in-place frames, indexes current dictionary policy in the existing catalog using descriptor-owned key views, removes an extra catalog copy, and simplifies immutable UTF-8 count/nonnegative indexing. G33/G35 eligibility and accepted G34 collector/reuse/roots/polling/host budgets remain unchanged.
+
+Final Linux Release/fatal sanitizer 74/74 each, relevant TSan and native Windows 10 Debug/Release 60/60 each; normal/O2 JIT and independent AOT/count/root/failure/collection/ABI controls pass. All consumers match headers/LLVM 23.1.4. Exact patch, first-candidate failures/tradeoffs, raw matched G35/Go measurements, code/count proofs and cleanup receipts accompany the compact verified archive. No staging/commit/push/hosted CI.
+
+AOT deltas: array/4096 -11.5%, dictionary/1024 -58.9%, sort/1024 -5.3%, text/1024 -6.5%, JSON/128 -2.9%; numeric controls and full unfavorable data remain explicit. The first owning-key candidate's float +6.2% and retained-string cost are preserved; final linked-context diagnostics do not claim arithmetic/SIMD gains on unchanged code.
+
+Open objectives remain: broader escape analysis beyond G35; checked-array/native-boundary efficiency; dictionary/sorting costs; text/Unicode/JSON construction and traversal; source-loop automatic SIMD; and historical G34 array/async/GC-tail plus G35 JIT-control tradeoffs. One improved workload does not close these objectives.
+
 Baseline `0407f83f9d6dd660b1503df1e68cdcee9b34b77b`. **G33-I: Experiment A integrated; production qualification complete on Linux and Windows 10 under explicit owner authorization.** See [managed allocation integration](G33_MANAGED_ALLOCATION_INTEGRATION.md). G32/G32-A findings remain authoritative. The G33-X campaign notes below are historical experimental evidence.
 
 ## G35 candidate — broader managed escape analysis
