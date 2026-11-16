@@ -17,6 +17,7 @@
 #include <map>
 #include <algorithm>
 #include <set>
+#include <span>
 #include <functional>
 #include <iterator>
 #include <bit>

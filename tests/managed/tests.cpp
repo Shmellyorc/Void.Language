@@ -3,7 +3,10 @@
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
 #include "void/tooling.hpp"
+#include <algorithm>
 #include <cstring>
+#include <fstream>
+#include <iterator>
 #include <future>
 #include <iostream>
 #include <set>
@@ -44,6 +47,63 @@ void diagnostics() {
     invalid(node+"func entry(x: i32) -> i32:\n    return node(value = true).value\n","Type mismatch");
     invalid(node+"func entry(x: i32) -> i32:\n    return node(value = 1, value = 2).value\n","Duplicate");
     invalid(node+"func entry(x: i32) -> i32:\n    var a = node()\n    a.init()\n    return 0\n","Lifecycle");
+}
+void validation_fixtures(const std::filesystem::path& root) {
+    const auto fixtures = root / "tests/managed/validation";
+    for (const auto& [name, reason] : {std::pair{"invalid_nullable.void", "nullable"},
+             std::pair{"invalid_readonly.void", "readonly"},
+             std::pair{"invalid_initialization.void", "non-nullable"}}) {
+        std::ifstream input(fixtures / name, std::ios::binary);
+        require(bool(input), "validation fixture available");
+        invalid(std::string(std::istreambuf_iterator<char>(input), {}), reason);
+    }
+    const auto source = vd::analyze_project(fixtures / "mixed.void");
+    require(source.succeeded(), "mixed generic/collection/managed source validation");
+    for (bool optimized : {false, true}) {
+        vd::Jit jit;
+        require(jit.compile(*source.program, optimized)->invoke(4) == 22,
+                "mixed generic/collection/managed source result");
+    }
+}
+void initialization_word_boundaries() {
+    using namespace vd::ir;
+    const auto source = analyze(node +
+        "func entry(x: i32) -> i32:\n"
+        "    var item = node(value = 1)\n"
+        "    if x != 0:\n"
+        "        item = node(value = 2)\n"
+        "    return item.value\n");
+    const auto original = source->lower();
+    for (unsigned target : {63u, 64u, 127u, 128u}) {
+        auto module = original;
+        auto entry = std::find_if(module.functions.begin(), module.functions.end(),
+            [&](const Function& f) { return f.name == module.entry_symbol; });
+        require(entry != module.functions.end(), "word boundary IR entry");
+        auto local = std::find_if(entry->locals.begin(), entry->locals.end(),
+            [](Type type) { return type.kind == Type::managed_ref; });
+        require(local != entry->locals.end() && entry->locals.size() <= target, "word boundary local");
+        const auto old = static_cast<unsigned>(local - entry->locals.begin());
+        entry->locals.resize(target + 1, Type::i32);
+        std::swap(entry->locals[old], entry->locals[target]);
+        Instruction* initialization = nullptr;
+        for (auto& block : entry->blocks) for (auto& instruction : block.instructions) {
+            if ((instruction.op == Op::load || instruction.op == Op::store) && instruction.a == old) {
+                instruction.a = target;
+                if (instruction.op == Op::store && !initialization) initialization = &instruction;
+            }
+        }
+        require(initialization != nullptr, "word boundary initialization present");
+        validate(module);
+        // Leave the same slot uninitialized on the path that skips the branch.
+        *initialization = Instruction{Op::gc_poll};
+        bool rejected = false;
+        try { validate(module); }
+        catch (const std::invalid_argument& e) {
+            rejected = e.what() == "VOID IR: non-nullable reference storage read before initialization in " + entry->name;
+        }
+        require(rejected, "branch-local store cannot initialize every path at a word boundary");
+        validate(original);
+    }
 }
 void roots(const std::filesystem::path& root,bool optimized) {
     auto analysis=vd::analyze_project(root/"examples/managed_structs/main.void");
@@ -164,7 +224,7 @@ int main(int argc,char** argv) {
         const bool storage_proof = argc==6 && std::string(argv[5])=="--storage-proof";
         if ((argc==5 || storage_proof) && std::string(argv[1])=="--emit-library") { auto p=vd::compile_project(argv[2]); storage_fixture::emit(p.module,argv[3],std::string(argv[4])=="optimized",storage_proof); return 0; }
         require(argc==2,"managed test root argument"); std::filesystem::path root=argv[1];
-        diagnostics(); metadata();
+        diagnostics(); metadata(); validation_fixtures(root); initialization_word_boundaries();
         for (bool optimized:{false,true}) {
             language_edges(optimized); roots(root,optimized); allocation_failures(optimized); source_polls(optimized); concurrent_source(root,optimized);
             for (const auto& name:{"handoffs","order","imports","numeric"}) {

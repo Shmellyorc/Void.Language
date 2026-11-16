@@ -1,9 +1,8 @@
 // Independent capability proof over nominally validated IR. Source summaries
 // are deliberately not inputs: malformed hand-built IR receives the same proof.
 std::set<unsigned> validate_reference_initialization(const Function& f) {
-    std::set<unsigned> required,entry,all;
+    std::set<unsigned> required;
     for (unsigned slot=0;slot<f.locals.size();++slot) {
-        all.insert(slot);
         if(f.locals[slot].definition && (f.locals[slot].definition->callable || !f.locals[slot].definition->cases.empty()) && !f.locals[slot].nullable)required.insert(slot);
         std::vector<Type> inline_types{f.locals[slot]};std::set<const ValueType*> endpoint_seen;
         while(!inline_types.empty()){auto type=inline_types.back();inline_types.pop_back();if(console::endpoint_type(type)){required.insert(slot);break;}if(!type.definition || !endpoint_seen.insert(type.definition.get()).second)continue;if(type.kind==Type::aggregate)for(const auto& field:type.definition->fields)inline_types.push_back(field.type);else if(type.kind==Type::fixed_array && *type.definition->extent)inline_types.push_back(array_element(type));}
@@ -17,7 +16,6 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
             if (!leaf.nullable) required.insert(slot);
         }
     }
-    if (f.receiver) entry.insert(0);
     std::vector<std::vector<unsigned>> predecessors(f.blocks.size());
     std::set<unsigned> reachable;
     std::vector<unsigned> order;
@@ -36,35 +34,70 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
     // postorder propagates straight-line facts in one pass, without changing
     // the fixed point or loop checks.
     std::reverse(order.begin(),order.end());
-    std::vector<std::set<unsigned>> incoming(f.blocks.size(),all),outgoing(f.blocks.size(),all);
+    // A bit per validated local slot represents the same must lattice.
+    // Only predecessor outputs participate in the fixed point. Recompute
+    // each final input when checking reads instead of storing a second table.
+    using Word = std::uint64_t;
+    constexpr auto bits = std::numeric_limits<Word>::digits;
+    const auto word_count = f.locals.size() / bits + (f.locals.size() % bits != 0);
+    std::vector<Word> outgoing;
+    if (word_count && f.blocks.size() > outgoing.max_size() / word_count)
+        throw std::length_error("VOID IR: reference initialization state too large");
+    std::vector<Word> all(word_count, ~Word{0}), state(word_count);
+    if (const auto tail = f.locals.size() % bits)
+        all.back() = (Word{1} << tail) - 1;
+    outgoing.resize(f.blocks.size() * word_count);
+    auto exit_state = [&](unsigned block) {
+        return std::span<Word>(outgoing).subspan(block * word_count, word_count);
+    };
+    for (auto block : order) std::ranges::copy(all, exit_state(block).begin());
+    auto mark = [&](unsigned slot) { state[slot / bits] |= Word{1} << (slot % bits); };
+    auto input_state = [&](unsigned block) {
+        if (block == 0) {
+            std::ranges::fill(state, Word{0});
+            if (f.receiver) mark(0);
+        } else {
+            std::ranges::copy(all, state.begin());
+        }
+        for (auto predecessor : predecessors[block]) {
+            const auto previous = exit_state(predecessor);
+            for (std::size_t word = 0; word < word_count; ++word) state[word] &= previous[word];
+        }
+    };
+    auto write = [&](const Instruction& i) {
+        if (i.op == Op::store) mark(i.a);
+        else if (i.op == Op::array_capture) mark(static_cast<unsigned>(i.immediate));
+    };
     bool changed;
     do {
-        changed=false;
-        for(auto block:order) {
-            auto state=block==0 ? entry : all;
-            for(auto predecessor:predecessors[block])
-                std::erase_if(state,[&](auto slot){return !outgoing[predecessor].contains(slot);});
-            if(incoming[block]!=state){incoming[block]=state;changed=true;}
-            for(const auto& i:f.blocks[block].instructions) if(i.op==Op::store) state.insert(i.a);else if(i.op==Op::array_capture)state.insert(static_cast<unsigned>(i.immediate));
-            if(outgoing[block]!=state){outgoing[block]=state;changed=true;}
+        changed = false;
+        for (auto block : order) {
+            input_state(block);
+            for (const auto& i : f.blocks[block].instructions) write(i);
+            auto previous = exit_state(block);
+            if (!std::ranges::equal(state, previous)) {
+                std::ranges::copy(state, previous.begin());
+                changed = true;
+            }
         }
-    }while(changed);
+    } while (changed);
     std::set<unsigned> observed_defaults;
-    for(auto block:order) {
-        auto state=incoming[block];
-        auto require=[&](unsigned slot) {
-            if(!state.contains(slot)) {
-                if(required.contains(slot)) throw std::invalid_argument("VOID IR: non-nullable reference storage read before initialization in "+f.name);
+    for (auto block : order) {
+        input_state(block);
+        auto require = [&](unsigned slot) {
+            if (slot >= f.locals.size()) throw std::invalid_argument("VOID IR: invalid slot in " + f.name);
+            if (!(state[slot / bits] & (Word{1} << (slot % bits)))) {
+                if (required.contains(slot)) throw std::invalid_argument("VOID IR: non-nullable reference storage read before initialization in " + f.name);
                 observed_defaults.insert(slot);
             }
         };
-        for(const auto& i:f.blocks[block].instructions) {
-            if(i.op==Op::load) require(i.a);
+        for (const auto& i : f.blocks[block].instructions) {
+            if (i.op == Op::load) require(i.a);
             // local_cleanup's receiver is read only when its dedicated flag is
             // active. local_cleanup.inc proves every activation follows the
             // binding store; ordinary loads/receivers keep definite-init checks.
-            if(i.receiver && i.op!=Op::local_cleanup) require(i.receiver->slot);
-            if(i.op==Op::store) state.insert(i.a);else if(i.op==Op::array_capture)state.insert(static_cast<unsigned>(i.immediate));
+            if (i.receiver && i.op != Op::local_cleanup) require(i.receiver->slot);
+            write(i);
         }
     }
     return observed_defaults;

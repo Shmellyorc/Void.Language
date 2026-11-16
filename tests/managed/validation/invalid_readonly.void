@@ -1,0 +1,11 @@
+struct box<t>:
+    value: t
+
+private func change(item: box<i32>):
+    item.value = 9
+
+func entry(n: i32) -> i32:
+    var item = box<i32>(value = n)
+    const view = item
+    change(view)
+    return item.value

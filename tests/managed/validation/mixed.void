@@ -1,0 +1,24 @@
+struct box<t>:
+    value: t
+
+private func unwrap<t>(item: box<t>) -> t:
+    return item.value
+
+private func score(value: i32) -> i32:
+    var selected: box<i32> = box<i32>(value = value)
+    if value % 2 == 0:
+        if value % 3 == 0:
+            selected = box<i32>(value = value + 4)
+        else:
+            selected = box<i32>(value = value + 2)
+    else:
+        selected = box<i32>(value = value - 1)
+    var numbers: [i32] = [unwrap(selected), value]
+    var row: {string: i32} = {"selected": numbers[0], "input": numbers[1]}
+    return row["selected"] + 2 * row["input"]
+
+func entry(n: i32) -> i32:
+    var result = 0
+    for index in 0..<n:
+        result += score(index)
+    return result

@@ -1,0 +1,8 @@
+struct box:
+    value: i32
+
+func entry(n: i32) -> i32:
+    var selected: box? = null
+    if n > 0:
+        selected = box(value = n)
+    return selected.value

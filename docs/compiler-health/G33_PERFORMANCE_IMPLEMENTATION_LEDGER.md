@@ -1,5 +1,29 @@
 # G33 — Performance implementation ledger
 
+## G43 — approved integration preparation
+
+Golden Wrench approved preparation of the qualified G43 implementation on `codex/g43-source-ir-validation-scaling`, based on accepted G42 `6022890670333cdd5e38a20c84b8c77d0108f8cd`. The approval entry is the only documentation delta from the nine qualified postimages. The complete G43 report and all prior ledger entries are preserved byte for byte. [Consolidated G43 report](G43_SOURCE_IR_VALIDATION_SCALING.md).
+
+The qualified validator SHA-256 is `27e38539120620956142fbdf4f3acf314455beb5cb7abbffe4f166b3fa2b5a86`. The packed exit-state solver recomputes block inputs for the original-order read checks. Source validation, JIT admission and LLVM lowering all retain their existing validation calls. The qualified compiler and test hashes match the archive, including the unchanged LLVM backend at `203900c25aaddf2fb0f2df5a8d15d42f551413eae1102fc4cffc188dfc7dc268`. G33–G42 ownership and escape decisions, Runtime, public ABI, precise roots and G38 SIMD remain intact. G37/G37-F remain separate and performance-held.
+
+Median nested compilation went from 14.053 to 6.396 seconds at 500 sites and from 37.289 to 15.740 seconds at 750 sites. Across the three validation calls at 500 sites, definite initialization fell from 7,905.929 ms (about 7,906 ms) to 9.242 ms. Proof allocation requests fell from 85,131,879 to 48,096. G43 compiled the exact 2,000-site nested fixture in 126.27 seconds at 1.26 GiB peak RSS. The paired G42 result is unavailable because available host memory was below its launch budget. Flat-500 and mixed-source compilation were 1.9% and 0.5% slower respectively. Byte-identical AOT executables showed elapsed-time variation with identical generated code.
+
+Archived qualification covers Linux Release and fatal ASan/UBSan/LSan at 86/86 each plus five diagnostic controls each, native Windows 10 Debug and Release at 71/71 each, fatal TSan on 66 fixtures across two independent AOT modes plus Runtime controls, and 216,000 forced-GC checks. All 132 LLVM IR/native object pairs and all 264 allocation and GC counter comparisons matched. The same evidence covers normal and O2 JIT, independently linked AOT, foreign-Heap rejection, allocation-failure recovery and 1 MiB stack controls. The compiler and test source identities were verified before reusing those results.
+
+The qualification archive `g43-source-ir-validation-scaling-2026-11-15.zip` has SHA-256 `044ccd597ac184e290e9392d71a2096fb31f342a33ff2bda905bb7d97cc1dbb3`. CRC, all 8,262 manifest entries and restoration of the nine qualified postimages passed. The qualified ledger SHA-256 is `d6d5df290bbb63863074d8d22d6bed7746f8210ed4572a9e02fb033c4031e62d`. The integration receipt records the committed ledger hash separately.
+
+The next objective is to profile LLVM O2 pass costs and JIT materialization on large nested source, starting with the exact 2,000-site fixture. The instrumented G43 compile recorded 86.96 seconds in LLVM O2 and 37.06 seconds in JIT materialization. Pass-level measurements will guide the next bounded change.
+
+## G43 — packed definite-initialization validation, qualified candidate
+
+The accepted integrated G42 and live remote `main` are `6022890670333cdd5e38a20c84b8c77d0108f8cd`. The qualified G43 validator hash is `27e38539120620956142fbdf4f3acf314455beb5cb7abbffe4f166b3fa2b5a86`. Replaces two set-valued state tables and per-block copies in the existing initialization proof with one packed exit-state table, a reusable scratch vector and final input recomputation. Preserves the proof's transfer, read ordering, reachability, required references, default observations, Runtime and public ABI, exact roots, G38 SIMD and G42 ownership eligibility. [G43 report](G43_SOURCE_IR_VALIDATION_SCALING.md).
+
+At 500 nested sites, median whole wall is 14.053 → 6.396 s and peak RSS is 700,872 → 317,948 KiB. Definite initialization across the three validation calls is 7905.929 → 9.242 ms. The separate work observation records 85,131,879 → 48,096 C++ allocation requests. The historical 2,000-site whole compile was G41 evidence retained in G42. The G43 exact 2,000-site status is candidate exact source verified, baseline deferred for host memory. LLVM optimization, JIT and remaining source validation are reported independently. The complete report retains every unfavorable wall, RSS, throughput and resource observation.
+
+Linux Release and fatal ASan/UBSan/LSan passed 86/86 each plus 5 diagnostic controls each. Native Windows 10 Debug/Release passed 71/71 each. Relevant fatal TSan, 1 MiB stacks, 216,000 raw forced-GC checks, 132 exact LLVM IR/native pairs and 264 exact allocation/GC comparisons pass. Invalid-source diagnostics and the branch-join IR negatives preserve failure behavior. G41 Priority B stays rejected, G37-F stays separate, and historical G34–G42 tradeoffs remain intact.
+
+Recommend INTEGRATE for review. Evidence is retained in `g43-source-ir-validation-scaling-2026-11-15.zip` with source restoration and integrity receipts. Next proposed implementation priority is to profile LLVM O2 pass costs and JIT materialization on the exact nested 2,000-site fixture. The remaining source-validation target is the duplicate checked type vectors in `ir::validate`. Broader ownership, checked collections, dictionary/sort, text/Unicode/JSON, SIMD, native/JIT, compiler/RSS, GC tails/startup and macOS/release work remain open.
+
 ## G42 — approved integration preparation
 
 Golden Wrench approved preparation of the qualified G42 implementation on `codex/g42-escape-analysis-scaling`, based on accepted G41 `f46d53746221ca58da428e5b73188314d3a5b11a`. The local commit is ready for Golden Wrench's final review and Boss's push. The approval entry is the sole change to the seven qualified postimages. The original report and all earlier ledger entries are preserved byte for byte. [Consolidated G42 report](G42_ESCAPE_ANALYSIS_SCALING.md).
