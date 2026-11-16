@@ -66,4 +66,6 @@
     X(cross_nested_child, 140985, 1000, 2000) \
     X(cross_nested_escape, 49328, 2000, 2000) \
     X(cross_deep_diamond, 50294, 2000, 2000) \
-    X(cross_nested_incoming, 49315, 3000, 3000)
+    X(cross_nested_incoming, 49315, 3000, 3000) \
+    X(proof_alias_64, 46995, 0, 0) \
+    X(proof_alias_65, 46995, 0, 0)

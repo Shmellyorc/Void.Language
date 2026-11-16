@@ -530,6 +530,11 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
             }
         }
     }
+    // Per-function scratch for the SAME must-alias proof. Small alias sets use
+    // one word per block; no candidate allocates a tree node for every state.
+    std::vector<std::uint64_t> must_in,must_out;
+    std::vector<unsigned> must_work,alias_bits;
+    std::vector<bool> must_queued;
     unsigned elided_bytes=0;
     for(unsigned bn=0;bn<f.blocks.size();++bn)for(unsigned origin=0;origin<f.blocks[bn].instructions.size();++origin) {
         const auto& construct=f.blocks[bn].instructions[origin];
@@ -664,28 +669,69 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
         for(auto& block:events) {std::sort(block.begin(),block.end());block.erase(std::unique(block.begin(),block.end()),block.end());}
         // Must-dataflow over the indexed alias events. Reset at every birth;
         // loads before a rebinding store fail, including loop-carried aliases.
-        std::vector<std::set<unsigned>> incoming(f.blocks.size(),locals),outgoing(f.blocks.size(),locals);
-        bool changed;
-        do {
-            changed=false;
-            for(unsigned block=0;block<f.blocks.size();++block) {
-                auto state=(block==0 || predecessors[block].empty())?std::set<unsigned>{}:locals;
-                for(auto pred:predecessors[block])std::erase_if(state,[&](unsigned slot){return !outgoing[pred].contains(slot);});
-                if(incoming[block]!=state){incoming[block]=state;changed=true;}
+        // With no local aliases the lattice is empty: birth is its only event,
+        // so the accepted proof is vacuous. Larger sets keep the original solver.
+        if(!locals.empty() && locals.size()<=64) {
+            alias_bits.resize(f.locals.size());unsigned bit=0;
+            for(auto slot:locals)alias_bits[slot]=bit++;
+            const auto all=locals.size()==64?~std::uint64_t{0}:(std::uint64_t{1}<<locals.size())-1;
+            must_in.resize(f.blocks.size());must_out.assign(f.blocks.size(),all);
+            must_queued.assign(f.blocks.size(),true);must_work.clear();must_work.reserve(f.blocks.size());
+            // Reverse insertion visits source order initially. Thereafter only
+            // a changed predecessor output schedules a successor, once at a time.
+            for(unsigned block=f.blocks.size();block-->0;)must_work.push_back(block);
+            auto enqueue=[&](unsigned block) {
+                if(!must_queued[block]){must_queued[block]=true;must_work.push_back(block);}
+            };
+            while(!must_work.empty()) {
+                const auto block=must_work.back();must_work.pop_back();must_queued[block]=false;
+                auto state=(block==0 || predecessors[block].empty())?std::uint64_t{0}:all;
+                for(auto pred:predecessors[block])state&=must_out[pred];
+                must_in[block]=state;
                 for(auto [eb,id]:events[block]) {
-                    if(eb==bn && id==origin)state.clear();
-                    else if(f.blocks[eb].instructions[id].op==O::store)state.insert(f.blocks[eb].instructions[id].a);
+                    if(eb==bn && id==origin)state=0;
+                    else if(f.blocks[eb].instructions[id].op==O::store)
+                        state|=std::uint64_t{1}<<alias_bits[f.blocks[eb].instructions[id].a];
                 }
-                if(outgoing[block]!=state){outgoing[block]=std::move(state);changed=true;}
+                if(must_out[block]!=state) {
+                    must_out[block]=state;const auto& end=f.blocks[block].end;
+                    if(end.kind==ir::Terminator::Kind::jump || end.kind==ir::Terminator::Kind::branch)enqueue(end.yes);
+                    if(end.kind==ir::Terminator::Kind::branch)enqueue(end.no);
+                }
             }
-        }while(changed);
-        for(unsigned block=0;block<f.blocks.size() && safe;++block) {
-            auto state=incoming[block];
-            for(auto [eb,id]:events[block]) {
-                const auto& i=f.blocks[eb].instructions[id];
-                if(eb==bn && id==origin)state.clear();
-                else if(i.op==O::store)state.insert(i.a);
-                else if(i.op==O::load && !state.contains(i.a)){safe=false;break;}
+            for(unsigned block=0;block<f.blocks.size() && safe;++block) {
+                auto state=must_in[block];
+                for(auto [eb,id]:events[block]) {
+                    const auto& i=f.blocks[eb].instructions[id];
+                    if(eb==bn && id==origin)state=0;
+                    else if(i.op==O::store)state|=std::uint64_t{1}<<alias_bits[i.a];
+                    else if(i.op==O::load && !(state&(std::uint64_t{1}<<alias_bits[i.a]))){safe=false;break;}
+                }
+            }
+        } else if(!locals.empty()) {
+            std::vector<std::set<unsigned>> incoming(f.blocks.size(),locals),outgoing(f.blocks.size(),locals);
+            bool changed;
+            do {
+                changed=false;
+                for(unsigned block=0;block<f.blocks.size();++block) {
+                    auto state=(block==0 || predecessors[block].empty())?std::set<unsigned>{}:locals;
+                    for(auto pred:predecessors[block])std::erase_if(state,[&](unsigned slot){return !outgoing[pred].contains(slot);});
+                    if(incoming[block]!=state){incoming[block]=state;changed=true;}
+                    for(auto [eb,id]:events[block]) {
+                        if(eb==bn && id==origin)state.clear();
+                        else if(f.blocks[eb].instructions[id].op==O::store)state.insert(f.blocks[eb].instructions[id].a);
+                    }
+                    if(outgoing[block]!=state){outgoing[block]=std::move(state);changed=true;}
+                }
+            }while(changed);
+            for(unsigned block=0;block<f.blocks.size() && safe;++block) {
+                auto state=incoming[block];
+                for(auto [eb,id]:events[block]) {
+                    const auto& i=f.blocks[eb].instructions[id];
+                    if(eb==bn && id==origin)state.clear();
+                    else if(i.op==O::store)state.insert(i.a);
+                    else if(i.op==O::load && !state.contains(i.a)){safe=false;break;}
+                }
             }
         }
         if(safe) {

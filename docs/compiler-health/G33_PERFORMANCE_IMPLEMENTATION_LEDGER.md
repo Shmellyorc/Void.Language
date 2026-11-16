@@ -1,5 +1,29 @@
 # G33 — Performance implementation ledger
 
+## G42 — approved integration preparation
+
+Golden Wrench approved preparation of the qualified G42 implementation on `codex/g42-escape-analysis-scaling`, based on accepted G41 `f46d53746221ca58da428e5b73188314d3a5b11a`. The local commit is ready for Golden Wrench's final review and Boss's push. The approval entry is the sole change to the seven qualified postimages. The original report and all earlier ledger entries are preserved byte for byte. [Consolidated G42 report](G42_ESCAPE_ANALYSIS_SCALING.md).
+
+The qualified backend SHA-256 is `203900c25aaddf2fb0f2df5a8d15d42f551413eae1102fc4cffc188dfc7dc268`. The 64-bit ownership worklist handles one through 64 aliases, skips the empty proof when there are no aliases, and uses the accepted G41 solver above the bound. G42 preserves the existing fixed point, allocation-elimination decisions, precise GC roots, Runtime and public ABI, and G38 SIMD. The held G37/G37-F experiments remain separate.
+
+At 500 nested sites, median ownership proof time fell from 73.38 to 3.20 ms and proof-phase C++ allocation requests fell from 1,690,000 to 5. Median full compiler process wall time went from 14.727 to 14.554 seconds, with identical median peak RSS of 696,578 KiB. Flat 2,000-site compilation was 2.7% slower. The exact nested 2,000-site G41 attempt exceeded the 8 GiB address-space cap before ownership analysis. The synthetic replay of the extracted solvers measured 1,106.8 to 41.1 ms. That replay measured solver work only. Source IR construction and validation remain dominant costs for large nested functions.
+
+The compiler and test hashes match the archived qualification. Linux Release and fatal ASan/UBSan/LeakSanitizer passed 86/86 each. Windows 10 Debug and Release passed 71/71 each. Evidence includes fatal TSan in both AOT modes, 216,000 forced-GC checks, 132 identical LLVM IR and native object pairs, 264 matching allocation and GC counter comparisons, normal and O2 JIT, independent AOT, foreign-Heap rejection, allocation-fault recovery, and 1 MiB stack controls.
+
+The qualification archive `g42-escape-analysis-scaling-2026-11-15.zip` has SHA-256 `6ba492f2cd99a922f568dfe1475422e163589c59eafe76c8dfffa97cc6275b6d`. CRC, all 8,164 manifest entries, and restoration of the seven qualified postimages passed. The archived ledger SHA-256 is `088c97a2b1a93ee985c32981e4d1ac1dc537f812129d8248de67bb2d92a92537`. The integration receipt records the committed ledger hash separately.
+
+The next proposed milestone is to identify and reduce the dominant source IR construction and validation work for large nested functions, independently of the optimized ownership solver.
+
+## G42 — bounded ownership proof scaling, qualified candidate
+
+[Consolidated G42 report](G42_ESCAPE_ANALYSIS_SCALING.md). Accepted integrated G41 and verified remote `main`: `f46d53746221ca58da428e5b73188314d3a5b11a`; prior status statements are historical records. Qualified backend `203900c25aaddf2fb0f2df5a8d15d42f551413eae1102fc4cffc188dfc7dc268`. Replaces small set-valued epoch solver states with reusable 64-bit masks and a successor worklist, skips vacuous zero-alias proofs, and keeps the accepted solver above 64 aliases. Same fixed point and load checks, alias/provenance/retirement eligibility, roots, payload bounds and outputs. No Runtime/public ABI, collector/allocator, root authority or G38 policy change. G37-F remains separate and performance-held; G41's rejected Priority B stays archived.
+
+At 500 nested sites, the epoch phase measures 73.383→3.197 ms; proof-phase C++ allocation requests 1,690,000→5; predecessor visits 1,000,000→562,250. All flat 100/500/2,000 and nested 100/500 measurements and actual process CPU/wall/RSS are recorded; the 2,000-site nested run is deferred under the recorded resource budget. Compilation remains dominated by source IR, validation and LLVM on bigger inputs. No linear scaling or universal wall-time gain is claimed.
+
+Final Linux Release/fatal ASan/UBSan/LSan 86/86 each; fatal TSan 66 patterns × two independent AOT modes plus Runtime controls; Windows 10 Debug/Release 71/71 each; 1 MiB stacks; 216,000 raw forced-GC checks; 132 equal G41/G42 native object and IR pairs; 264 equal ordinary/observer comparisons. Exact construction/oracle and observer-count identity, foreign-Heap/failure and child retention checks pass. G41's 50–53% nested gains, optimized retirement-only +7.1%, null-alias +5.8%, GC-tail and nested-CFG memory costs remain historical facts. No unchanged-code runtime timing is claimed as a speedup.
+
+Verified DEFLATE 9 archive `g42-escape-analysis-scaling-2026-11-15.zip` and sibling receipts retain source history, raw phases, work counts, regression controls, native/sanitizer evidence, and separate host/guest cleanup observations. Recommend INTEGRATE for Golden Wrench; no staging, commit, push or hosted CI. Next proposed implementation: isolate the dominant nested-CFG source-IR/validation work with a resource-bounded typed-IR replay. Broader ownership/retention, checked collections, dictionary/sort, text/Unicode/JSON, SIMD beyond G38, native/JIT, compile/RSS, GC-tail/startup and macOS/release objectives remain open.
+
 ## G41 — approved integration preparation
 
 Golden Wrench approves preparing the qualified G41 A+C implementation as one ordinary local integration commit on `codex/g41-root-store-precision`. Accepted baseline and verified remote `main`: G40 `9f00377236a1080ec4ebdc6252f3721843dd2f94`. The prepared commit awaits Golden Wrench's final commit review and Boss-controlled push; this entry does not claim remote integration. The qualification-time report and historical status statements below remain unchanged snapshots.
