@@ -1,5 +1,14 @@
 # G33 — Performance implementation ledger
 
+## G48 — reuse validated dictionary headers
+
+Qualified candidate on accepted G47 `1831364f0ca40fc48b7f706073904f764cecb0b3`. On a cache hit, the Runtime returns the existing immutable dictionary header after the current key-policy and input layout checks. It moves the two owned layout handles into the result and skips a redundant geometry check and publication lock. Storage, hash, equality, root, growth, error and ABI contracts are preserved. The 4,096-key replacement case removes 335,872 publication locks. The initial and corrected observer rounds each preserve every measured hash, key comparison, probe read, managed allocation, buffer adoption and dictionary-scope C++ native request against G47. [G48 report](G48_DICTIONARY_COLLECTION_PERFORMANCE.md).
+
+The first candidate is held. Its normal-AOT integer control repeated at +2.69% in the mixed program and +2.28% in isolated invocations. The bounded correction retained dictionary gains and measured −0.10% and −0.03% in the matching normal-AOT replay. Final 4,096-key O2 JIT lookup and replacement took 3.96% and 5.25% less time. Optimized AOT replacement-1,024 took 3.20% less time. Typed JSON dictionary build took 2.73% less time in O2 JIT. Its optimized-AOT recheck was +2.33%, and the typed parse recheck was +1.45%. The full optimized-AOT integer control recorded +2.24% and then −0.19% mixed and −0.02% isolated on the exact linked images. Preserve the individual adverse timing pairs and counter data. AOT application objects match byte for byte.
+
+The corrected source passed Linux Release and fatal ASan/UBSan/LeakSanitizer 40/40 each, three fatal TSan Runtime controls plus the shared-dictionary concurrent test and 120 independently linked AOT assertions, and native Windows Debug and Release 31/31 each with 480 additional native JIT/AOT output checks. The 1 MiB stack and pinned LLVM/Clang/LLD 23.1.4 controls passed. Recommend integration after independent review with the documented tradeoffs. Replaying the exact first candidate remains possible from `g48-dictionary-collection-performance-2026-11-16.zip`. The next bounded opportunity is reusing the vacant bucket found by a failed lookup on nongrowing insertion. G45/G46 experimental holds and all previous development objectives retain their existing status.
+
+
 ## G47 — measured AOT integer poll correction
 
 The separate `codex/g47-aot-poll` candidate preserves the exact G47 sorting source and removes an out-of-line call from the idle GC poll. The loop still reaches the same worker and GC check boundaries. Normal AOT integer-4M on the original host takes 98.589 ms G44, 108.541 ms G47 and 57.153 ms with the correction. G44 with the same poll takes 57.039 ms. Normal and optimized AOT sorting gains survive. The original G47 linked-image evidence remains historical, and the correction has its own qualification. [AOT integer poll report](G47_AOT_INTEGER_POLL.md).

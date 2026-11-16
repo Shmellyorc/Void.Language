@@ -35,13 +35,13 @@ Runtime::DictionaryLayout Runtime::dictionary_layout(const NativeDictionary& d) 
     {std::lock_guard lock(mutex_);
         if(types_)validate_dictionary_key_schema(*types_,*key->schema());
         auto found=collection_metadata_.find(entries->schema().get());
-        if(found!=collection_metadata_.end())header=found->second.dictionary_header;
+        // Only the checked miss path publishes this immutable descriptor.
+        if(found!=collection_metadata_.end() && found->second.dictionary_header)
+            return {std::move(entries),std::move(key),found->second.dictionary_header};
     }
-    if(!header) {
-        auto identity="void.dict.v1/"+std::string(d.entry->key);
-        {std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
-        if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
-    }
+    auto identity="void.dict.v1/"+std::string(d.entry->key);
+    {std::lock_guard lock(mutex_);if(types_){auto found=types_->types.find(identity);if(found!=types_->types.end())header=found->second;}}
+    if(!header){Native native(*this);NominalDescriptor spec{identity,"","dictionary-v1",{sizeof(DictionaryHeader),{offsetof(DictionaryHeader,entries),offsetof(DictionaryHeader,buckets)}}};admit_types({&spec,1});header=descriptor(identity);}
     const auto& references=header->layout.references;
     if(header->layout.size!=sizeof(DictionaryHeader) || references.size()!=2 || references[0]!=offsetof(DictionaryHeader,entries) || references[1]!=offsetof(DictionaryHeader,buckets))throw std::invalid_argument("invalid dictionary header descriptor");
     {std::lock_guard lock(mutex_);auto found=collection_metadata_.find(entries->schema().get());

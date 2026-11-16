@@ -87,5 +87,51 @@ void native(){
     }require(success && ((op!=0 && op!=1) || failures>0),"native dictionary required allocation sweep incomplete");std::cout<<"native dictionary "<<op<<": "<<failures<<" failures; rollback/version/collection passed\n";}
     Native f;f.put(0);auto version=f.r.dictionary_count(f.token(),f.metadata,true);f.r.dictionary_clear(f.token(),f.metadata);f.r.dictionary_clear(f.token(),f.metadata);require(f.r.dictionary_count(f.token(),f.metadata,true)==version+1,"empty clear changed dictionary version");f.item=nullptr;require(f.r.collect()==Runtime::Collection::completed && f.r.snapshot().objects==3,"dictionary clear retained removed references or lost capacity");f.finish();
 }
+void warm_dictionary(){
+    Native f;
+    constexpr std::uint64_t size=4096;
+    require(!f.r.dictionary_count(f.token(),f.metadata),"new dictionary is not empty");
+    for(std::uint64_t key=0;key<size;++key)f.put(key);
+    const auto version=f.r.dictionary_count(f.token(),f.metadata,true);
+    require(version==size,"dictionary growth lost structural versions");
+
+    auto type=f.r.descriptor("dict-node");
+    auto layout=type->layout;
+    layout.descriptor=type;
+    std::uint64_t replacement=99;
+    auto* original=f.item;
+    f.r.construct_into(&f.fresh,layout,&replacement);
+    f.item=f.fresh;
+    for(unsigned pass=0;pass<3;++pass)
+        for(std::uint64_t key=0;key<size;key+=2)f.put(key);
+    require(f.r.dictionary_count(f.token(),f.metadata)==size &&
+            f.r.dictionary_count(f.token(),f.metadata,true)==version,"dictionary replacement was structural");
+    require(f.r.collect()==Runtime::Collection::completed,"warm dictionary collection failed");
+    for(std::uint64_t key=0;key<size;++key){
+        Entry out{};
+        f.r.dictionary_read(&out,f.token(),f.metadata,&key);
+        require(out.key==key && out.value==(key%2?original:f.item),"warm dictionary replacement lost a managed value");
+    }
+
+    auto entry=f.entry;
+    NativeArrayField fields[3]={f.fields[0],f.fields[1],f.fields[2]};
+    fields[1].target="wrong-dictionary-value-type";
+    entry.fields=fields;
+    auto malformed=f.metadata;
+    malformed.entry=&entry;
+    RuntimeFailure error;
+    require(!vd_dict_count(&f.dict,&malformed,0,&error) && error.message &&
+            std::string_view(error.message)=="Invalid fixed value contract","warm dictionary accepted incompatible metadata");
+    require(f.r.dictionary_count(f.token(),f.metadata)==size,"rejected warm metadata changed dictionary");
+
+    std::uint64_t removed=size-1;
+    require(f.r.dictionary_remove(f.token(),f.metadata,&removed) &&
+            !f.r.dictionary_read(nullptr,f.token(),f.metadata,&removed,true),"warm dictionary removal failed");
+    f.r.dictionary_clear(f.token(),f.metadata);
+    require(!f.r.dictionary_count(f.token(),f.metadata),"clear retained populated dictionary");
+    f.put(removed);
+    require(f.r.dictionary_count(f.token(),f.metadata)==1,"dictionary reuse after clear failed");
+    f.finish();
 }
-int main(int argc,char** argv){try{require(argc==2,"expected repository root");diagnostics();native();for(bool optimized:{false,true}){source(argv[1],optimized);failures(argv[1],optimized);retirement(argv[1],optimized);}std::cout<<"Dictionaries: source/GC/order/readonly/rollback/reload passed\n";}catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
+}
+int main(int argc,char** argv){try{require(argc==2,"expected repository root");diagnostics();native();warm_dictionary();for(bool optimized:{false,true}){source(argv[1],optimized);failures(argv[1],optimized);retirement(argv[1],optimized);}std::cout<<"Dictionaries: source/GC/order/readonly/rollback/reload passed\n";}catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
