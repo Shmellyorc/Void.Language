@@ -8,6 +8,28 @@ previous instructions, owner decisions, CI links and test results. Those dated
 assignments and older toolchain pins are historical, including sections once
 labeled permanent; they must not override current Boss directions.
 
+## Mandatory Golden Wrench rule — ONLINE SOLUTION RESEARCH BEFORE INVESTIGATION
+
+Apply this rule to compiler, LLVM, linker, Runtime, dependency and performance
+problems before proposing new investigative work.
+
+1. Search online for existing reports, fixes, upstream commits and proven approaches.
+2. Check whether LLVM developers or another compiler project already solved the
+   same problem. Record whether each relevant change is merged, proposed or abandoned.
+3. Prefer applying or adapting an established solution when prior evidence already
+   establishes the problem.
+4. Verify that the solution applies to VOID's pinned version, architecture and
+   safety contracts before proposing adoption.
+5. Preserve known failures. Reopen them only with a new actionable hypothesis.
+6. Record correctness blockers and performance tradeoffs explicitly.
+7. Require an explicit Boss decision before accepting a substantial regression.
+8. Record unavailable hardware as a qualification limit and set completion
+   criteria that the authorized assignment can meet.
+9. If a bounded correction fails, preserve the work and continue developing
+   independent VOID capabilities.
+10. Give every research assignment a concrete implementation decision or
+    completion boundary.
+
 ## Workshop continuity
 
 Boss owns VOID and the final architecture/product decisions. Golden Wrench is the

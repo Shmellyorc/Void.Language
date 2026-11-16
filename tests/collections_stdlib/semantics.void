@@ -18,7 +18,24 @@ value struct tagged:
 func order(const left: tagged, const right: tagged) -> bool:
     return left.key < right.key
 
+func require_sort_sequence(descending: bool, const expected_calls: [i32], const expected_order: [i32]):
+    var items = [tagged(key = 2, serial = 0), tagged(key = 1, serial = 1), tagged(key = 2, serial = 2), tagged(key = 1, serial = 3), tagged(key = 0, serial = 4)]
+    var calls: [i32] = []
+    var compare = func(const left: tagged, const right: tagged) -> bool:
+        calls.push(left.serial * 10 + right.serial)
+        if calls.count == 1:
+            items.clear()
+        return left.key < right.key
+    var ordered = c.sorted(items, compare, descending)
+    require(items.count == 0 and calls.count == expected_calls.count and ordered.count == expected_order.count)
+    for call, index in expected_calls:
+        require(calls[index] == call)
+    for serial, index in expected_order:
+        require(ordered[index].serial == serial)
+
 func entry(input: i32) -> i32:
+    require_sort_sequence(false, [10, 32, 31, 30, 20, 41], [4, 1, 3, 0, 2])
+    require_sort_sequence(true, [1, 23, 2, 12, 13, 4, 24, 14, 34], [0, 2, 1, 3, 4])
     var items = [3, -1, 2, 3, 0]
     var alias = items
     var ordered = c.sorted(items, c.numeric_less<i32>)

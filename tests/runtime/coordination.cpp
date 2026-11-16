@@ -24,6 +24,8 @@ void states_and_roots() {
         rejected([&] { vd::Runtime::Attachment cross(other); });
         rejected([&] { r.poll(); });
         vd::Runtime::Managed managed(r);
+        r.poll();
+        rejected([&] { other.poll(); });
         struct Nested { int number; struct { void* reference; } child; } value{};
         const std::size_t offset = offsetof(Nested, child) + offsetof(decltype(Nested::child), reference);
         vd::Runtime::Slot slot{&value, sizeof(value), &offset, 1};

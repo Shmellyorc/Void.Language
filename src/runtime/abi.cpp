@@ -108,11 +108,14 @@ void Runtime::collection_finish(void** out) {auto& t=thread();if(t.collection_di
 // Keep the generated-code poll with its TLS boundary so the native compiler
 // can inline the no-request path. Validation and the cold rendezvous are unchanged.
 void Runtime::poll() {
-    require_managed();
-    if (!requested_.load(std::memory_order_acquire)) return;
-    // G33-X D2: preserve validation/request/lock ordering; keep rare wait
-    // bookkeeping out of the common no-request function prologue.
+    // Attachment installs its record in the owning thread's TLS. Validate the
+    // runtime and state here so an idle poll needs no call or lock.
+    if (current_runtime_ == this && current_thread_ &&
+        current_thread_->state == State::managed &&
+        !requested_.load(std::memory_order_acquire)) return;
+
     [this]() __attribute__((noinline)) {
+        require_managed();
         std::unique_lock lock(mutex_);
         if (requested_) park(thread(), lock);
     }();

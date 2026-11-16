@@ -85,11 +85,23 @@ func sorted<t>(const items: [t], less: func(const t, const t) -> bool, descendin
             var right = middle
             var destination = start
             for destination < finish:
-                if right < finish and (left == middle or _precedes(snapshot[order[right]], snapshot[order[left]], less, descending)):
-                    workspace[destination] = order[right]
+                var take_right = right < finish
+                var position: i64
+                if take_right:
+                    position = order[right]
+                    if left != middle:
+                        # The comparator receives snapshot elements. The checked
+                        # reads of our private index list can be reused after it.
+                        var left_position = order[left]
+                        take_right = _precedes(snapshot[position], snapshot[left_position], less, descending)
+                        if not take_right:
+                            position = left_position
+                else:
+                    position = order[left]
+                workspace[destination] = position
+                if take_right:
                     right += 1
                 else:
-                    workspace[destination] = order[left]
                     left += 1
                 destination += 1
             start = finish
