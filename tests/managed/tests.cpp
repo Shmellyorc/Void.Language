@@ -105,6 +105,34 @@ void initialization_word_boundaries() {
         validate(original);
     }
 }
+void scalar_defaults_across_large_cfg() {
+    using namespace vd::ir;
+    Function entry;
+    entry.name = "scalar_defaults";
+    entry.parameters = {Type::i32};
+    entry.result = Type::i32;
+    entry.locals = {Type::i32, Type::i32, Type::i32};
+    // slot 0 is only written on one edge. Capture slot 1's default before
+    // its later store, then carry that captured value through the entire CFG.
+    entry.blocks = {
+        {{{Op::load, 1}, {Op::constant, 0, 0, 7}, {Op::store, 1, 1}, {Op::store, 2, 0},
+          {Op::argument}, {Op::constant}, {Op::greater, 4, 5}},
+         {Terminator::Kind::branch, 6, 1, 2}},
+        {{{Op::constant, 0, 0, 13}, {Op::store, 0, 0}}, {Terminator::Kind::jump, 0, 2}},
+    };
+    for (unsigned block = 2; block < 130; ++block)
+        entry.blocks.push_back({{}, {Terminator::Kind::jump, 0, block + 1}});
+    entry.blocks.push_back({{{Op::load, 0}, {Op::load, 1}, {Op::load, 2},
+                             {Op::add, 0, 1}, {Op::add, 3, 2}},
+                            {Terminator::Kind::return_value, 4}});
+    const Module module{"/scalar_defaults", {}, {entry}};
+    for (bool optimized : {false, true}) {
+        vd::Jit jit;
+        auto code = jit.compile(module, entry.name, optimized);
+        require(code->invoke(0) == 7 && code->invoke(1) == 20,
+                "observed scalar defaults survive early loads and conditional writes");
+    }
+}
 void roots(const std::filesystem::path& root,bool optimized) {
     auto analysis=vd::analyze_project(root/"examples/managed_structs/main.void");
     require(analysis.succeeded(),"managed project analysis");
@@ -224,7 +252,7 @@ int main(int argc,char** argv) {
         const bool storage_proof = argc==6 && std::string(argv[5])=="--storage-proof";
         if ((argc==5 || storage_proof) && std::string(argv[1])=="--emit-library") { auto p=vd::compile_project(argv[2]); storage_fixture::emit(p.module,argv[3],std::string(argv[4])=="optimized",storage_proof); return 0; }
         require(argc==2,"managed test root argument"); std::filesystem::path root=argv[1];
-        diagnostics(); metadata(); validation_fixtures(root); initialization_word_boundaries();
+        diagnostics(); metadata(); validation_fixtures(root); initialization_word_boundaries(); scalar_defaults_across_large_cfg();
         for (bool optimized:{false,true}) {
             language_edges(optimized); roots(root,optimized); allocation_failures(optimized); source_polls(optimized); concurrent_source(root,optimized);
             for (const auto& name:{"handoffs","order","imports","numeric"}) {

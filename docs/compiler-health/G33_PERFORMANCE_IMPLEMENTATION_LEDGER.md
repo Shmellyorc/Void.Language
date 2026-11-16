@@ -1,5 +1,29 @@
 # G33 — Performance implementation ledger
 
+## G44 — approved integration preparation
+
+Golden Wrench approved preparation of G44 with the documented performance tradeoffs on `codex/g44-llvm-jit-scaling`, based on accepted G43 `895ae7b291935f2658fc40731ba89a2aed4ebb55`. The approval entry is the sole documentation delta from the four qualified postimages. The complete G44 report and all earlier ledger entries are preserved byte for byte. [Consolidated G44 report](G44_LLVM_JIT_SCALING.md).
+
+The qualified LLVM backend SHA-256 is `88a2e505bd1b70de3ce8fd48970a63ec02a3eb8f9a1edb92c7e14ac4741a43e9`. The backend removes an entry zero store from a private scalar slot only when the replacement store dominates every read. The existing LLVM O2 passes, ordering, verifiers and target policy are intact. G43 validation, GC and ownership behavior, Runtime and public ABI, and the G38 SIMD and no-SLP policies remain intact. G37/G37-F remain separate and performance-held, and the G41 zero-run bridge remains rejected.
+
+Median O2 JIT compilation fell from 6.768 to 4.516 seconds at 500 nested sites, 15.743 to 7.268 seconds at 750 sites, and 124.938 to 46.892 seconds on the exact 2,000-site fixture. The 2,000-site LLVM IR and native JIT object are byte-identical and native code generation still took about 35 seconds. Optimized AOT emission at 750 sites fell from 15.621 to 7.217 seconds with identical objects. Normal AOT at 750 sites was 4.5% slower across four pooled pairs, while the follow-up pairs reversed the initial slowdown. The optimized representative AOT image changed private scalar spill placement in `collections.sorted` and the order of two independent counter updates in `text.join`. Success and checked-failure oracles matched, and the measured sort-256 and text-256 times rose 4.2% and 2.2% respectively. The report retains the complete timing and disassembly evidence.
+
+Archived qualification covers Linux Release and fatal ASan/UBSan/LSan at 86/86 each plus five diagnostic controls each, Windows 10 Debug and Release at 71/71 each, fatal TSan on 66 fixtures in each AOT mode plus Runtime controls, and 216,000 forced-GC checks. All 132 escape LLVM IR/native object pairs, 264 ordinary/observer object pairs, and 264 allocation and GC comparisons matched. G38 SIMD objects, G43 diagnostics, foreign-Heap rejection, allocation-failure recovery and 1 MiB stack controls were verified against the qualified source identities.
+
+The qualification archive `g44-llvm-jit-scaling-2026-11-15.zip` has SHA-256 `82b57865ab53d9b4b24ff630cc9ef95218ce09bf6fdf8b7b541398a38d042f97`. CRC, all 8,890 manifest entries and restoration of all four postimages passed. The qualified ledger SHA-256 is `bc3b24c2d79a376deebcb435cfad1ca0b8d0224da908cdf046dc29a34ae1dbce`. The integration receipt records the committed ledger hash separately.
+
+The next objective is to time `MachineSinking` and count kill-flag walks and visited register uses per virtual register on the exact nested 2,000-site O2 JIT function.
+
+## G44 — dominated scalar defaults before LLVM O2, qualified candidate
+
+The accepted G43 baseline is `895ae7b291935f2658fc40731ba89a2aed4ebb55`. Backend SHA-256 `88a2e505bd1b70de3ce8fd48970a63ec02a3eb8f9a1edb92c7e14ac4741a43e9` proves exactly one removable entry zero store for a private scalar home when the other store dominates every read. The existing LLVM pipeline runs unchanged, including its verifiers, CPU feature policy, G38 runtime-free SIMD boundary and no-SLP setting. G43 packed initialization validation, precise GC, Runtime, public ABI and accepted escape decisions remain intact. [Consolidated G44 report](G44_LLVM_JIT_SCALING.md).
+
+Median nested-500 O2 JIT compilation went 6.768 → 4.516 seconds. The exact nested 2,000-site paired result is 124.938 → 46.892 seconds and 1,323,492 → 1,324,122 KiB RSS. The whole O2 pipeline on that source is 86431.148 → 8218.122 ms and native codegen is 35678.013 → 35323.296 ms with unchanged generated code. The normal-AOT 750-site recheck pooled four pairs at 10.368 → 10.831 seconds with identical output. The report retains small and flat tradeoffs, normal JIT, independent AOT, startup and runtime variation. Observer allocation counts are separate from throughput.
+
+Linux Release and fatal ASan/UBSan/LSan passed 86/86 each plus five diagnostic controls, Windows 10 Debug and Release 71/71 each, fatal TSan 66 cases across two independent AOT modes plus Runtime, and 216,000 forced-GC checks. All 132 LLVM IR/native object pairs, 264 ordinary/observer pairs and 264 allocation/GC comparisons matched. G38 SIMD objects and G43 CLI diagnostic outputs are byte-identical. Historical G31–G43 results, G37-F's held status and the G41 rejected zero-run bridge remain in this ledger.
+
+Recommend INTEGRATE for review. Evidence is retained in `g44-llvm-jit-scaling-2026-11-15.zip`. The next objective is to time MachineSinking on the exact nested 2,000-site O2 JIT function and count kill-flag walks per virtual register. The nested-750 normal JIT IP sample identified `clearKillFlags` and `MachineSinking::run` as the two largest self costs. Checked collections, dictionary and sort, text/Unicode/JSON, broader ownership, SIMD, GC tails, startup, native/JIT costs and macOS/release remain open.
+
 ## G43 — approved integration preparation
 
 Golden Wrench approved preparation of the qualified G43 implementation on `codex/g43-source-ir-validation-scaling`, based on accepted G42 `6022890670333cdd5e38a20c84b8c77d0108f8cd`. The approval entry is the only documentation delta from the nine qualified postimages. The complete G43 report and all prior ledger entries are preserved byte for byte. [Consolidated G43 report](G43_SOURCE_IR_VALIDATION_SCALING.md).

@@ -39,6 +39,7 @@
 #include <llvm/Config/llvm-config.h>
 #include <llvm/ExecutionEngine/Orc/LLJIT.h>
 #include <llvm/IR/DIBuilder.h>
+#include <llvm/IR/Dominators.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Intrinsics.h>
 #include <llvm/IR/LegacyPassManager.h>
@@ -86,6 +87,51 @@ template<class T> T unwrap(llvm::Expected<T> value) {
     if (!value) throw std::runtime_error(llvm::toString(value.takeError()));
     return std::move(*value);
 }
+void remove_dominated_scalar_defaults(llvm::Function& function, llvm::FunctionAnalysisManager& analyses) {
+    // Focus on large CFGs, where an extra definition can force expensive
+    // dominance-frontier searches during scalar promotion.
+    if (function.size() < 128) return;
+    auto& entry = function.getEntryBlock();
+    llvm::DominatorTree* dominators = nullptr;
+    for (auto& instruction : entry) {
+        auto* slot = llvm::dyn_cast<llvm::AllocaInst>(&instruction);
+        if (!slot || !slot->isStaticAlloca() || slot->isArrayAllocation() || slot->isUsedByMetadata()) continue;
+        auto* type = slot->getAllocatedType();
+        if (!type->isIntegerTy() && !type->isFloatingPointTy()) continue;
+
+        llvm::StoreInst* initial = nullptr;
+        llvm::StoreInst* replacement = nullptr;
+        bool private_scalar = true;
+        for (auto* user : slot->users()) {
+            if (auto* load = llvm::dyn_cast<llvm::LoadInst>(user)) {
+                if (load->isSimple() && load->getType() == type) continue;
+            }
+            auto* store = llvm::dyn_cast<llvm::StoreInst>(user);
+            if (!store || !store->isSimple() || store->getPointerOperand() != slot ||
+                store->getValueOperand()->getType() != type) {
+                private_scalar = false;
+                break;
+            }
+            auto* value = llvm::dyn_cast<llvm::Constant>(store->getValueOperand());
+            const bool entry_zero = store->getParent() == &entry && value && value->isNullValue();
+            auto*& definition = entry_zero ? initial : replacement;
+            if (definition) {
+                private_scalar = false;
+                break;
+            }
+            definition = store;
+        }
+        if (!private_scalar || !initial || !replacement ||
+            initial->getMetadata(llvm::LLVMContext::MD_DIAssignID)) continue;
+        if (replacement->getParent() == &entry && !initial->comesBefore(replacement)) continue;
+        if (!dominators) dominators = &analyses.getResult<llvm::DominatorTreeAnalysis>(function);
+        if (llvm::all_of(slot->users(), [&](const llvm::User* user) {
+                auto* load = llvm::dyn_cast<llvm::LoadInst>(user);
+                return !load || dominators->dominates(replacement, load);
+            }))
+            initial->eraseFromParent();
+    }
+}
 void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_machine = nullptr,
             bool version_loops = false) {
     std::string message;
@@ -114,6 +160,9 @@ void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_m
         builder.registerFunctionAnalyses(functions);
         builder.registerLoopAnalyses(loops);
         builder.crossRegisterProxies(loops, functions, cgscc, modules);
+        // The proof requests only the dominator tree. Removing stores leaves
+        // it valid for the existing pipeline.
+        for (auto& function : module) remove_dominated_scalar_defaults(function, functions);
         auto pipeline = builder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O2);
         pipeline.run(module, modules);
         if (llvm::verifyModule(module, &stream)) throw std::runtime_error("invalid optimized LLVM IR: " + message);
