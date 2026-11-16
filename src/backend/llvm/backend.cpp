@@ -366,6 +366,8 @@ struct BlockAllocationElision {
         std::vector<unsigned> values,locals;
     };
     std::map<std::pair<unsigned,unsigned>,Retirement> retirements;
+    std::vector<std::vector<unsigned>> predecessors;
+    bool precise_copies=false;
 };
 BlockAllocationElision block_allocation_elision(const ir::Function &f,
                                                 const std::vector<std::vector<ir::Type>> &instruction_types,
@@ -374,7 +376,7 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
                                                 const std::map<std::string,ElisionHelper>& helpers,
                                                 const std::map<std::string,ElisionFactory>& factories) {
     using O = ir::Op;
-    BlockAllocationElision result{std::vector<std::set<unsigned>>(f.blocks.size()), {}, {}, {}};
+    BlockAllocationElision result{std::vector<std::set<unsigned>>(f.blocks.size()), {}, {}, {}, {}, false};
     if (f.asynchronous || f.receiver || f.initializer || f.cleanup_entry)
         return result;
     struct Use { unsigned block, index; enum Kind { field, store, call, alias, escape } kind; };
@@ -606,21 +608,46 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
         if(has_references && !block_lifetime && !f.worker && !f.closure && f.virtual_slot.empty()) {
             const auto& fork=f.blocks[bn].end;
             if(fork.kind==ir::Terminator::Kind::branch && fork.yes!=fork.no && fork.yes!=bn && fork.no!=bn) {
-                const auto& left=f.blocks[fork.yes].end;const auto& right=f.blocks[fork.no].end;
-                if(left.kind==ir::Terminator::Kind::jump && right.kind==ir::Terminator::Kind::jump &&
-                   left.yes==right.yes && left.yes!=bn && left.yes!=fork.yes && left.yes!=fork.no &&
-                   !f.blocks[left.yes].instructions.empty()) {
-                    const auto join=left.yes;unsigned last=0;bool bounded=true;
+                std::set<unsigned> region{bn,fork.yes,fork.no};
+                // A direct arm, or ONE nested diamond with a direct exit.
+                // Vertices are distinct and internal edges acyclic. Existing
+                // must-alias validation still rejects unsafe incoming paths.
+                auto arm_exit=[&](unsigned arm)->std::optional<unsigned> {
+                    const auto& end=f.blocks[arm].end;
+                    if(end.kind==ir::Terminator::Kind::jump)return end.yes;
+                    if(end.kind!=ir::Terminator::Kind::branch || end.yes==end.no ||
+                       region.contains(end.yes) || region.contains(end.no))return {};
+                    const auto& left=f.blocks[end.yes].end;const auto& right=f.blocks[end.no].end;
+                    if(left.kind!=ir::Terminator::Kind::jump || right.kind!=ir::Terminator::Kind::jump ||
+                       left.yes!=right.yes || left.yes==end.yes || left.yes==end.no || region.contains(left.yes))return {};
+                    const auto& tail=f.blocks[left.yes].end;
+                    if(tail.kind!=ir::Terminator::Kind::jump)return {};
+                    region.insert(end.yes);region.insert(end.no);region.insert(left.yes);
+                    return tail.yes;
+                };
+                const auto left=arm_exit(fork.yes),right=arm_exit(fork.no);
+                if(left && right && *left==*right && !region.contains(*left) && region.size()<=6) {
+                    auto join=*left;region.insert(join);bool bounded=true;
+                    // One empty common join may forward directly to an existing
+                    // nonempty retirement block. Keep BOTH entry checkpoints;
+                    // clear after its first instruction, never across an edge.
+                    if(f.blocks[join].instructions.empty()) {
+                        const auto& end=f.blocks[join].end;
+                        if(end.kind!=ir::Terminator::Kind::jump || region.contains(end.yes) ||
+                           f.blocks[end.yes].instructions.empty())bounded=false;
+                        else {join=end.yes;region.insert(join);}
+                    }
+                    unsigned last=0;
                     for(auto [block,id]:lifetime_uses) {
                         if(block==bn){if(id<origin)bounded=false;}
-                        else if(block!=fork.yes && block!=fork.no && block!=join)bounded=false;
+                        else if(!region.contains(block))bounded=false;
                         if(block==join)last=std::max(last,id);
                     }
                     if(bounded)joined_retirement=Position{join,last};
                 }
             }
         }
-        // The new nullable/cast flow is restricted to a reconverging diamond.
+        // Nullable/cast flow stays within a bounded reconverging region (at most eight blocks).
         // Existing epoch/must-alias validation below still rejects old instances,
         // rebinding, pre-birth loads and every escaping owner use.
         if(nullable_flow && (!has_references || !joined_retirement))continue;
@@ -769,58 +796,8 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
         }
         if(!instructions.empty())flush(instructions.size()-1);
     }
-    if(retire_copies && !result.retirements.empty()) {
-        // Copy-home nullness only: payload fields retain their independent G39
-        // lifetime clear. A defining SSA store overwrites its block-shared home;
-        // locals require a must fact from every predecessor, including backedges.
-        auto reference=[](ir::Type t){return t.kind==ir::Type::managed_ref && !t.construction;};
-        std::set<unsigned> tracked,initial;
-        for(unsigned slot=0;slot<f.locals.size();++slot)
-            if(reference(f.locals[slot]) && !result.locals.contains(slot)) {
-                tracked.insert(slot);
-                if(slot>=f.parameters.size())initial.insert(slot);
-            }
-        const bool bounded=f.blocks.size()<=256 && tracked.size()<=256 &&
-            f.blocks.size()*tracked.size()<=16384;
-        std::vector<std::set<unsigned>> incoming,outgoing;
-        if(bounded){incoming.assign(f.blocks.size(),tracked);outgoing=incoming;}
-        auto transfer=[&](unsigned bn,std::set<unsigned> state,bool prune) {
-            const auto& instructions=f.blocks[bn].instructions;
-            std::vector<bool> null_values(instructions.size());
-            for(unsigned id=0;id<instructions.size();++id) {
-                const auto& i=instructions[id];
-                if(reference(instruction_types[bn][id]))
-                    null_values[id]=(i.op==O::constant && i.immediate==0) ||
-                        (i.op==O::load && state.contains(i.a));
-                if(i.op==O::store && tracked.contains(i.a)) {
-                    if(null_values[i.b])state.insert(i.a);else state.erase(i.a);
-                }
-                if(prune)if(auto event=result.retirements.find({bn,id});event!=result.retirements.end()) {
-                    std::erase_if(event->second.values,[&](unsigned value){return null_values[value];});
-                    std::erase_if(event->second.locals,[&](unsigned slot){return state.contains(slot);});
-                }
-            }
-            return state;
-        };
-        if(bounded) {
-            bool changed;
-            do {
-                changed=false;
-                for(unsigned bn=0;bn<f.blocks.size();++bn) {
-                    auto state=(bn==0 || predecessors[bn].empty())?initial:tracked;
-                    for(auto pred:predecessors[bn])
-                        std::erase_if(state,[&](unsigned slot){return !outgoing[pred].contains(slot);});
-                    auto next=transfer(bn,state,false);
-                    if(state!=incoming[bn] || next!=outgoing[bn])changed=true;
-                    incoming[bn]=std::move(state);outgoing[bn]=std::move(next);
-                }
-            }while(changed);
-        }
-        // Above the bounded CFG budget, retain only facts established by a
-        // write in this block; no loop/join initialization is assumed.
-        for(unsigned bn=0;bn<f.blocks.size();++bn)
-            transfer(bn,bounded?incoming[bn]:std::set<unsigned>{},true);
-    }
+    result.precise_copies=retire_copies;
+    result.predecessors=std::move(predecessors);
     std::erase_if(result.retirements,[](const auto& event) {
         const auto& r=event.second;return r.payloads.empty() && r.values.empty() && r.locals.empty();
     });
@@ -1050,7 +1027,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     if(input.functions.size()!=original_functions) {
         ir::validate(input,&checked_types,&verified_effects);
         for(unsigned n=original_functions;n<input.functions.size();++n)
-            elisions.push_back({std::vector<std::set<unsigned>>(input.functions[n].blocks.size()),{}, {}, {}});
+            elisions.push_back({std::vector<std::set<unsigned>>(input.functions[n].blocks.size()),{}, {}, {}, {}, false});
     }
     auto* signature = llvm::FunctionType::get(b.getInt32Ty(), {b.getInt32Ty()}, false);
     std::set<std::string> source_entries{input.entry_symbol};
@@ -1301,7 +1278,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     };
     std::size_t function_index = 0;
     for (const auto& f : input.functions) {
-        const auto& elision=elisions.at(function_index);
+        auto& elision=elisions.at(function_index);
         const auto& instruction_types = checked_types.at(function_index++);
         const auto& elided_values=elision.values;
         const auto& elided_locals=elision.locals;
@@ -1600,6 +1577,91 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             b.CreateCall(module->getOrInsertFunction("vd_gc_frame_enter",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),size_type),
                 {root_frame,root_array,llvm::ConstantInt::get(size_type,entries.size())});
             }
+        }
+        // Refine G40's null proof after assigning the EXISTING root homes.
+        // SSA homes are shared across blocks; source-nullness alone is not a
+        // physical-home fact. Source assignments and payload retirement stay
+        // untouched. Only synchronous, known root-transfer functions qualify.
+        std::set<std::pair<unsigned,unsigned>> redundant_root_definitions;
+        if(input.coordinated && elision.precise_copies) {
+            using Key=std::pair<llvm::Value*,std::int64_t>;
+            std::map<Key,unsigned> root_keys;
+            std::vector<std::vector<unsigned>> value_keys(f.blocks.size());
+            std::vector<unsigned> local_keys(f.locals.size(),~0u);
+            std::set<unsigned> all,initial;
+            auto key=[&](llvm::Value* address) {
+                if(!address)return ~0u;
+                std::int64_t offset=0;
+                auto* base=llvm::GetPointerBaseWithConstantOffset(address,offset,layout);
+                if(!llvm::isa<llvm::AllocaInst>(base) || offset<0)return ~0u;
+                auto [where,fresh]=root_keys.emplace(Key{base,offset},root_keys.size());
+                if(fresh)all.insert(where->second);
+                return where->second;
+            };
+            for(unsigned slot=0;slot<f.locals.size();++slot)
+                if(f.locals[slot].kind==ir::Type::managed_ref && !elided_locals.contains(slot)) {
+                    local_keys[slot]=key(slots[slot]);
+                    if(slot>=f.parameters.size() && local_keys[slot]!=~0u)initial.insert(local_keys[slot]);
+                }
+            for(unsigned bn=0;bn<f.blocks.size();++bn)
+                for(unsigned id=0;id<instruction_types[bn].size();++id) {
+                    // Other pointer-shaped values also overwrite shared homes.
+                    auto k=type(instruction_types[bn][id])->isPointerTy()?key(value_roots[bn][id]):~0u;
+                    value_keys[bn].push_back(k);
+                    if(k!=~0u)initial.insert(k); // Actual entry zero initialization.
+                }
+            const bool bounded=f.blocks.size()<=256 && all.size()<=256 &&
+                f.blocks.size()*all.size()<=16384;
+            std::vector<std::set<unsigned>> incoming,outgoing;
+            if(bounded){incoming.assign(f.blocks.size(),all);outgoing=incoming;}
+            auto transfer=[&](unsigned bn,std::set<unsigned> state,bool plan) {
+                const auto& instructions=f.blocks[bn].instructions;
+                std::vector<bool> null_values(instructions.size());
+                for(unsigned id=0;id<instructions.size();++id) {
+                    const auto& i=instructions[id];auto t=instruction_types[bn][id];
+                    if(t.kind==ir::Type::managed_ref && !t.construction)
+                        null_values[id]=(i.op==ir::Op::constant && i.immediate==0) ||
+                            (i.op==ir::Op::load && local_keys[i.a]!=~0u && state.contains(local_keys[i.a]));
+                    if(i.op==ir::Op::store && local_keys[i.a]!=~0u) {
+                        if(null_values[i.b])state.insert(local_keys[i.a]);else state.erase(local_keys[i.a]);
+                    }
+                    auto k=value_keys[bn][id];
+                    if(k!=~0u) {
+                        if(null_values[id]) {
+                            if(plan && state.contains(k))redundant_root_definitions.insert({bn,id});
+                            state.insert(k);
+                        } else state.erase(k);
+                    }
+                    if(auto event=elision.retirements.find({bn,id});event!=elision.retirements.end()) {
+                        auto& clear=event->second;
+                        if(plan) {
+                            std::erase_if(clear.values,[&](unsigned v){return state.contains(value_keys[bn][v]);});
+                            std::erase_if(clear.locals,[&](unsigned slot){return state.contains(local_keys[slot]);});
+                        }
+                        for(auto v:clear.values)if(value_keys[bn][v]!=~0u)state.insert(value_keys[bn][v]);
+                        for(auto slot:clear.locals)if(local_keys[slot]!=~0u)state.insert(local_keys[slot]);
+                        // Never infer payload-field state from a copy-home fact.
+                    }
+                }
+                return state;
+            };
+            if(bounded) {
+                bool changed;
+                do {
+                    changed=false;
+                    for(unsigned bn=0;bn<f.blocks.size();++bn) {
+                        auto state=(bn==0 || elision.predecessors[bn].empty())?initial:all;
+                        for(auto pred:elision.predecessors[bn])
+                            std::erase_if(state,[&](unsigned k){return !outgoing[pred].contains(k);});
+                        auto next=transfer(bn,state,false);
+                        if(state!=incoming[bn] || next!=outgoing[bn])changed=true;
+                        incoming[bn]=std::move(state);outgoing[bn]=std::move(next);
+                    }
+                }while(changed);
+            }
+            // Above the same bounded budget, only this block's writes count.
+            for(unsigned bn=0;bn<f.blocks.size();++bn)
+                transfer(bn,bounded?incoming[bn]:std::set<unsigned>{},true);
         }
         if(collection_body) {
             auto* entered=b.CreateCall(module->getOrInsertFunction("vd_collection_scope",b.getInt1Ty(),b.getPtrTy()),{failure});
@@ -2976,7 +3038,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 if(result_type.kind==ir::Type::numeric_enum && instruction.op!=Op::constant)
                     fail_if(b.CreateNot(enum_membership(result_type,v,false)),"Invalid numeric enum discriminant in storage");
                 if(async && result_type!=ir::Type::none)b.CreateStore(v,frame_home(async->values[n][values.size()]));
-                else if (input.coordinated && value_roots[n].at(values.size())) b.CreateStore(v,value_roots[n][values.size()]);
+                else if (input.coordinated && value_roots[n].at(values.size()) &&
+                    !redundant_root_definitions.contains({n,static_cast<unsigned>(values.size())}))
+                    b.CreateStore(v,value_roots[n][values.size()]);
                 // Root an extracted child/result before retiring its owner's
                 // fields. A borrowed helper has returned (including its error
                 // check) before this point. No safepoint splits these stores.

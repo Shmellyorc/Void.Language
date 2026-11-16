@@ -1091,7 +1091,7 @@ if(BUILD_TESTING)
   set_tests_properties(escape_analysis PROPERTIES TIMEOUT 180)
   foreach(mode normal optimized)
     set(escape_objects)
-    foreach(fixture branch_alias branch_birth nullable references nested field_rebind alias_rebind identity loop_carried helper_return helper_read helper_write helper_reference public_helper helper_generic reference_effects readonly_helper payload_budget context_control null_failure numeric_failure incoming_reference incoming_rebind unknown_factory outlined_array direct_reference direct_helper direct_factory direct_nested direct_identity direct_public direct_incoming direct_nullable root_retirement child_survives direct_effects helper_branch helper_branch_write readonly_field readonly_incoming mutable_field factory_field helper_branch_rebind helper_block_limit direct_null_failure root_null_straight root_null_join root_null_mixed root_null_backedge root_null_alias cross_nullable cross_child_survives cross_mixed_origin readonly_alias readonly_alias_join readonly_alias_incoming readonly_alias_mutable)
+    foreach(fixture branch_alias branch_birth nullable references nested field_rebind alias_rebind identity loop_carried helper_return helper_read helper_write helper_reference public_helper helper_generic reference_effects readonly_helper payload_budget context_control null_failure numeric_failure incoming_reference incoming_rebind unknown_factory outlined_array direct_reference direct_helper direct_factory direct_nested direct_identity direct_public direct_incoming direct_nullable root_retirement child_survives direct_effects helper_branch helper_branch_write readonly_field readonly_incoming mutable_field factory_field helper_branch_rebind helper_block_limit direct_null_failure root_null_straight root_null_join root_null_mixed root_null_backedge root_null_alias cross_nullable cross_child_survives cross_mixed_origin readonly_alias readonly_alias_join readonly_alias_incoming readonly_alias_mutable root_zero_bridge root_zero_live_gap cross_nested_diamond cross_nested_child cross_nested_escape cross_deep_diamond cross_nested_incoming)
       set(object "${CMAKE_CURRENT_BINARY_DIR}/escape-${fixture}-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
       add_custom_command(OUTPUT "${object}"
         COMMAND void_escape_analysis_tests --emit "${fixture}" "${escape_fixtures}/${fixture}.void" "${object}" "${mode}"
@@ -1108,11 +1108,11 @@ if(BUILD_TESTING)
     target_link_libraries(void_escape_analysis_foreign_${mode} PRIVATE void_runtime)
     add_test(NAME escape_analysis_foreign_${mode} COMMAND "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/escape_analysis/foreign.py" "$<TARGET_FILE:void_escape_analysis_foreign_${mode}>")
-    foreach(foreign_fixture direct_incoming readonly_incoming readonly_alias_incoming)
+    foreach(foreign_fixture direct_incoming readonly_incoming readonly_alias_incoming cross_nested_incoming)
       add_executable(void_escape_foreign_${foreign_fixture}_${mode} tests/escape_analysis/foreign.cpp
         "${CMAKE_CURRENT_BINARY_DIR}/escape-${foreign_fixture}-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
       target_compile_definitions(void_escape_foreign_${foreign_fixture}_${mode} PRIVATE VD_FOREIGN_SUFFIX=${foreign_fixture})
-      if(foreign_fixture STREQUAL "readonly_incoming" OR foreign_fixture STREQUAL "readonly_alias_incoming")
+      if(foreign_fixture STREQUAL "readonly_incoming" OR foreign_fixture STREQUAL "readonly_alias_incoming" OR foreign_fixture STREQUAL "cross_nested_incoming")
         target_compile_definitions(void_escape_foreign_${foreign_fixture}_${mode} PRIVATE VD_FOREIGN_NESTED=1)
       endif()
       target_link_libraries(void_escape_foreign_${foreign_fixture}_${mode} PRIVATE void_runtime)

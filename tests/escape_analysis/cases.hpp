@@ -1,6 +1,7 @@
 #pragma once
 // Name, n=1000 oracle, candidate constructions, historical baseline count.
 // Original rows retain their historical baseline; G40 rows use accepted G39-F.
+// G41 rows use accepted G40.
 #define VD_ESCAPE_CASES(X) \
     X(branch_alias, 48495, 0, 1000) \
     X(branch_birth, 47662, 0, 500) \
@@ -58,4 +59,11 @@
     X(readonly_alias, 46995, 1000, 2000) \
     X(readonly_alias_join, 47495, 3000, 4000) \
     X(readonly_alias_incoming, 46995, 3000, 3000) \
-    X(readonly_alias_mutable, 46995, 2000, 2000)
+    X(readonly_alias_mutable, 46995, 2000, 2000) \
+    X(root_zero_bridge, 193980, 4000, 4000) \
+    X(root_zero_live_gap, 193980, 4000, 4000) \
+    X(cross_nested_diamond, 49328, 1000, 2000) \
+    X(cross_nested_child, 140985, 1000, 2000) \
+    X(cross_nested_escape, 49328, 2000, 2000) \
+    X(cross_deep_diamond, 50294, 2000, 2000) \
+    X(cross_nested_incoming, 49315, 3000, 3000)

@@ -1,0 +1,20 @@
+struct box:
+    value: i32
+private func make(value: i32) -> box:
+    return box(value = value)
+func entry(n: i32) -> i32:
+    var total = 0
+    for index in 0..<n:
+        var a = make(index % 97)
+        var b = make(index % 97 + 1)
+        var c = make(index % 97 + 2)
+        var d = make(index % 97 + 3)
+        var one = a
+        var empty: box? = null
+        var two = b
+        var empty2: box? = null
+        var three = c
+        var empty3: box? = null
+        var four = d
+        total += one.value + two.value + three.value + four.value
+    return total
