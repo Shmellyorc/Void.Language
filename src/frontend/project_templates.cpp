@@ -237,39 +237,63 @@ std::string substitute(std::string_view text, std::string_view source, std::stri
     return output;
 }
 
-ProjectFiles instantiate(const Registration& registered, const CreationPlan& plan, const std::string& name) {
+std::string substitute_manifest(const Manifest& authored, const Manifest& generated,
+                                std::string_view placeholder, std::size_t limit) {
+    struct Edit { SourceSpan span; std::string_view value; };
+    std::vector<Edit> edits;
+    auto assign=[&](const std::string& key, std::string_view value) {
+        edits.push_back({authored.fields().at(key).value,value});
+    };
+    assign("project.id",generated.project().id);
+    assign("project.name",generated.project().name);
+    if(generated.application())assign("application.id",generated.application()->id);
+    else {
+        assign("package.id",generated.package()->id);
+        assign("package.name",generated.package()->name);
+    }
+
+    // Substitute only outside the generated identity fields so those values
+    // reach manifest validation in their canonical form.
+    std::ranges::sort(edits,{},[](const Edit& edit) { return edit.span.begin; });
+    const std::string_view text=authored.source().text();
+    const auto& name=generated.project().name;
+    std::string output;
+    std::size_t offset=0;
+    for(const auto& edit:edits) {
+        output+=substitute(text.substr(offset,edit.span.begin-offset),placeholder,name,limit-output.size());
+        if(edit.value.size()+2>limit-output.size())
+            throw std::runtime_error("Template substitution exceeds its output size limit.");
+        output+='"';
+        output+=edit.value;
+        output+='"';
+        offset=edit.span.end;
+    }
+    output+=substitute(text.substr(offset),placeholder,name,limit-output.size());
+    return output;
+}
+
+ProjectFiles instantiate(const Registration& registered, const Manifest& authored,
+                         const CreationPlan& plan, const std::string& name) {
     ProjectFiles result;
     std::set<std::string> paths;
     std::size_t bytes=0;
+    const auto& placeholder=registered.info.source_name;
     for(const auto& [path,data]:registered.files) {
         if(path==metadata_path || path==".void/")continue;
-        auto renamed=substitute(path,registered.info.source_name,name,4096);
+        auto renamed=substitute(path,placeholder,name,4096);
         require_template_path(renamed,false);
         const auto folded=fold_project_name(renamed.ends_with('/')?renamed.substr(0,renamed.size()-1):renamed);
         if(!paths.insert(folded).second)
             throw std::runtime_error("Template filename collision after substitution: "+renamed);
-        auto output=text_file(path)?substitute(data,registered.info.source_name,name,template_bytes-bytes):data;
+        std::string output;
+        if(path==manifest_path)output=substitute_manifest(authored,*plan.manifest,placeholder,template_bytes-bytes);
+        else if(text_file(path))output=substitute(data,placeholder,name,template_bytes-bytes);
+        else output=data;
         if(output.size()>template_bytes-bytes)throw std::runtime_error("Template output byte limit exceeded.");
         bytes+=output.size();
         result.emplace(std::move(renamed),std::move(output));
     }
 
-    const auto original=template_manifest(result);
-    auto& manifest=result.at(std::string(manifest_path));
-    struct Edit { SourceSpan span; std::string value; };
-    std::vector<Edit> edits;
-    auto assign=[&](const std::string& key, const std::string& value) {
-        edits.push_back({original->fields().at(key).value,'"'+value+'"'});
-    };
-    assign("project.id",plan.manifest->project().id);
-    assign("project.name",name);
-    if(plan.manifest->application())assign("application.id",plan.manifest->application()->id);
-    else {
-        assign("package.id",plan.manifest->package()->id);
-        assign("package.name",plan.manifest->package()->name);
-    }
-    std::ranges::sort(edits,[](const auto& first,const auto& second){return first.span.begin>second.span.begin;});
-    for(const auto& edit:edits)manifest.replace(edit.span.begin,edit.span.end-edit.span.begin,edit.value);
     (void)template_manifest(result);
     return result;
 }
@@ -362,7 +386,7 @@ std::optional<fs::path> create_from_project_template(std::string_view short_name
     options.kind=manifest->kind();
     if(options.kind==Kind::library)options.package_name=fold_project_name(*name);
     const auto plan=plan_creation(utf8_path(*name),options);
-    publish_new_project_files(plan,instantiate(*selected,plan,*name));
+    publish_new_project_files(plan,instantiate(*selected,*manifest,plan,*name));
     return plan.root;
 }
 }

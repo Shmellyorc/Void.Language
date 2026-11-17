@@ -124,6 +124,36 @@ with tempfile.TemporaryDirectory(prefix="VOID G62 templates ") as temporary:
     assert authored_hash == (root / "FirstGame" / manifest).read_bytes()
     editor(root / "FirstGame")
 
+    cli("new", "classlib", "--name", "templatemath")
+    library = root / "templatemath"
+    (library / template).parent.mkdir()
+    (library / template).write_text(
+        '''format = 1
+id = "org.example.templatemath"
+name = "Template Math"
+short-names = ["mathfixture"]
+description = "Starter for a reusable math library"
+tags = ["Math"]
+source-name = "templatemath"
+''',
+        encoding="utf-8",
+    )
+    authored = tomllib.loads((library / manifest).read_text())
+    assert authored["package"]["name"] == "templatemath"
+    cli("new", "install", "--dir", library)
+    cli("new", "mathfixture", "--name", "MyMath")
+    generated = root / "MyMath"
+    math = tomllib.loads((generated / manifest).read_text())
+    assert math["project"]["name"] == "MyMath"
+    assert math["package"]["name"] == "mymath"
+    assert len({project[section]["id"] for project in (authored, math)
+                for section in ("project", "package")}) == 4
+    entry = math["package"]["entry"]
+    assert entry == "src/MyMath.void"
+    assert (generated / entry).read_bytes() == (library / authored["package"]["entry"]).read_bytes()
+    cli("check", "--project", generated)
+    cli("new", "uninstall", "mathfixture")
+
     invalid = root / "invalid"
     shutil.copytree(fixture, invalid)
     metadata = (invalid / template).read_text()
