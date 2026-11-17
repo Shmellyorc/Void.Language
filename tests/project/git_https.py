@@ -497,11 +497,20 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl
         assert lock_row(subdir)["rev"] == nested_head and lock_row(subdir)["subdir"] == "packages/units"
         assert cli(subdir, "run", env=clean).stdout == b"87\n"
 
-        registered = base / "explicit package store"
+        registered = base / "registered package consumer"
         project(registered, "app", program)
-        run(compiler, "package", "install", "units", "--store", registered, "--git", origin,
-            "--subdir", "packages/units", cwd=base, env=trusted)
+        storage_key = "LOCALAPPDATA" if os.name == "nt" else "HOME" if sys.platform == "darwin" else "XDG_DATA_HOME"
+        store_env = dict(trusted, **{storage_key: str(base / "user data")})
+        run(compiler, "package", "install", "units", "--git", origin,
+            "--subdir", "packages/units", cwd=base, env=store_env)
+        before = len(server.requests)
+        run(compiler, "package", "install", "units", "--git", origin,
+            "--subdir", "packages/units", cwd=base, env=store_env)
+        cli(registered, "add", "units", env=store_env)
+        assert len(server.requests) == before
         assert lock_row(registered)["rev"] == nested_head
+        assert lock_row(registered)["git"] == origin and lock_row(registered)["subdir"] == "packages/units"
+        run(compiler, "package", "uninstall", "units", cwd=base, env=store_env)
         assert cli(registered, "run", env=clean).stdout == b"87\n"
 
         probe = base / "negative"

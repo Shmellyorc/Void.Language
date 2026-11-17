@@ -22,7 +22,7 @@
 namespace {
 struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
 bool known_command(const std::string& command) {
-    return command=="add" || command=="tidy" || command=="check" || command=="run" || command=="build" || command=="package" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind" || command=="native";
+    return command=="add" || command=="remove" || command=="tidy" || command=="check" || command=="run" || command=="build" || command=="package" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind" || command=="native";
 }
 void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
@@ -31,13 +31,17 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
       "       voidc package --verify DIR\n"
       "       voidc package list | voidc package search NAME\n"
-      "       voidc package install ALIAS --store DIR (--dir DIR | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n";
+      "       voidc package install ALIAS (--dir DIR | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n"
+      "       voidc package uninstall ALIAS\n";
     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
-    if(command.empty() || command=="new")out<<"Usage: voidc new PATH [project options] [--source PATH]\n";
-    if(command.empty() || command=="add")out<<"Usage: voidc add raylib [--project DIR]\n"
+    if(command.empty() || command=="new")out<<"Usage: voidc new [list]\n"
+      "       voidc new (app | lib) [PATH] [project options]\n"
+      "       voidc new PATH [project options] [--source PATH]\n";
+    if(command.empty() || command=="add")out<<"Usage: voidc add ALIAS [--project DIR]\n"
       "       voidc add ALIAS [--project DIR] (--dir DIR | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n";
     if(command.empty() || command=="tidy")out<<"Usage: voidc tidy [--project DIR] [--check]\n";
+    if(command.empty() || command=="remove")out<<"Usage: voidc remove ALIAS [--project DIR]\n";
     if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
     if(command.empty() || command=="deps")out<<"Usage: voidc deps explain --project DIR [--json]\n"
       "       voidc deps fetch --project DIR [--allow-git ORIGIN REV]...\n";
@@ -57,6 +61,7 @@ void help(const std::string& command={}) {
           "  init    Add a project manifest to an existing directory.\n"
           "  new     Create a project and starter source in a new directory.\n"
           "  add     Add a bundled, explicit local or immutable Git source package.\n"
+          "  remove  Remove a direct project dependency.\n"
           "  tidy    Validate imports, reconcile dependencies and maintain installed views.\n"
           "  resolve Resolve available library dependencies and verify or write void.lock.\n"
           "  deps explain Inspect the verified local dependency graph without changes.\n"
@@ -148,10 +153,17 @@ int discover_packages(const std::filesystem::path& executable, int argc, char** 
     const bool search=std::string_view(argv[2])=="search";
     if(argc!=(search?4:3) || (search && (!*argv[3] || argv[3][0]=='-')))
         throw UsageError("Expected package list or package search NAME.");
+    bool listed=false;
+    for(const auto& installed:vd::project::list_user_packages()) {
+        if(search && std::string_view(installed).substr(0,installed.find(' ')).find(argv[3])==std::string_view::npos)
+            continue;
+        std::cout<<"Installed: "<<installed<<'\n';
+        listed=true;
+    }
     const auto source=bundled_raylib_source(executable);
     if(source.empty() || !vd::native_source_debug_supported() ||
        (search && std::string_view("raylib").find(argv[3])==std::string_view::npos)) {
-        std::cout<<"No matching bundled packages available for this compiler and target.\n";
+        if(!listed)std::cout<<"No matching bundled packages available for this compiler and target.\n";
         return 0;
     }
     std::cout<<"raylib " VOID_RAYLIB_VERSION " | org.voidlang.raylib\n"
@@ -177,21 +189,33 @@ int maintain_project(const std::string& command,int argc,char** argv,const std::
         std::string option=argv[i];
         if(option=="--check" && command=="tidy") {
             if(check)throw UsageError("Repeated --check.");check=true;
-        } else if(option==(registration?"--store":"--project") ||
+        } else if((!registration && option=="--project") ||
                   (command=="add" && (option=="--path" || option=="--dir" || option=="--git" || option=="--rev" || option=="--subdir"))) {
             if(option=="--dir")option="--path";
             if(!seen.insert(option).second || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one value after "+option);
-            if(option=="--project" || option=="--store")root=vd::utf8_path(argv[i]);
+            if(option=="--project")root=vd::utf8_path(argv[i]);
             else if(option=="--path")options.path=vd::utf8_path(argv[i]);
             else if(option=="--git")origin=argv[i];
             else if(option=="--rev")rev=argv[i];
             else subdir=argv[i];
-        } else if(command=="add" && !option.starts_with('-') && options.alias.empty())options.alias=std::move(option);
+        } else if((command=="add" || command=="remove") && !option.starts_with('-') && options.alias.empty())options.alias=std::move(option);
         else throw UsageError("Unknown or repeated "+command+" option: "+option);
     }
-    if(registration && !seen.contains("--store"))
-        throw UsageError("package install requires --store DIR. Use voidc new DIR to create an explicit package store.");
+    auto print_report=[](const MaintenanceReport& report) {
+        std::cout<<(report.changed?"Updated source dependencies and installed views.":"Source dependencies unchanged.")<<'\n';
+        for(const auto& advice:report.advice)std::cout<<"Advice: "<<advice<<'\n';
+        return 0;
+    };
+    if(registration && command=="remove") {
+        if(options.alias.empty())throw UsageError("Expected one package alias.");
+        uninstall_user_package(options.alias);
+        std::cout<<"Uninstalled user package "<<options.alias<<".\n";
+        return 0;
+    }
     if(command=="add") {
+        if(!registration && !options.alias.empty() && !options.path && !origin && !rev && !subdir) {
+            if(const auto report=add_user_package(root,options.alias))return print_report(*report);
+        }
         if(options.alias=="raylib" && !options.path && !origin && !rev && !subdir) {
             const auto source=bundled_raylib_source(executable);
             if(source.empty() || !vd::native_source_debug_supported())
@@ -202,13 +226,20 @@ int maintain_project(const std::string& command,int argc,char** argv,const std::
             return 0;
         }
         if(options.alias.empty() || bool(options.path)==bool(origin) || (!origin && (rev || subdir)))
-            throw UsageError("add requires a bundled package name or ALIAS with --dir or --git; registry lookup is not supported.");
+            throw UsageError(registration?"Package install needs ALIAS with --dir or --git.":
+                "Add a registered or bundled package by alias, or supply --dir or --git.");
         if(origin)options.git=GitDependency{{*origin,rev.value_or("")},subdir.value_or("")};
+        if(registration) {
+            const auto report=install_user_package(options,[&]{return vd::native_clang_driver(argv[0]);},VOID_RAYLIB_SANITIZE);
+            std::cout<<(report.changed?"Installed user package ":"Verified existing user package ")<<options.alias<<".\n";
+            return 0;
+        }
     }
-    auto report=command=="add"?add_dependency(root,options):tidy_dependencies(root,check);
-    std::cout<<(report.changed?"Updated source dependencies and installed views.":"Source dependencies unchanged.")<<'\n';
-    for(const auto& advice:report.advice)std::cout<<"Advice: "<<advice<<'\n';
-    return 0;
+    if(command=="remove" && options.alias.empty())throw UsageError("Expected one dependency alias.");
+    auto report=command=="add"?add_dependency(root,options,[&]{return vd::native_clang_driver(argv[0]);},
+                                              VOID_RAYLIB_SANITIZE):
+        command=="remove"?remove_dependency(root,options.alias):tidy_dependencies(root,check);
+    return print_report(report);
 }
 int resolve_project(int argc,char** argv) {
     using namespace vd::project;
@@ -381,7 +412,16 @@ int create_project(const std::string& command,int argc,char** argv) {
     std::optional<std::filesystem::path> destination;
     std::set<std::string> seen;
     bool operands=false;
-    for(int i=2;i<argc;++i) {
+    int first=2;
+    std::string_view starter;
+    if(options.new_directory && argc>2 && (argc==3 || argv[3][0]!='-' || std::string_view(argv[3])=="--") &&
+       (std::string_view(argv[2])=="app" || std::string_view(argv[2])=="lib")) {
+        starter=argv[2];
+        options.kind=starter=="lib"?vd::project::Kind::library:vd::project::Kind::application;
+        seen.insert("--kind");
+        ++first;
+    }
+    for(int i=first;i<argc;++i) {
         std::string arg=argv[i];
         if(!operands && arg=="--"){operands=true;continue;}
         if(operands || !arg.starts_with('-')) {
@@ -407,11 +447,14 @@ int create_project(const std::string& command,int argc,char** argv) {
         else options.source=value;
     }
     const bool app=options.kind==vd::project::Kind::application;
+    if(!destination && !starter.empty())destination=vd::utf8_path(std::string(starter));
     if(!destination && options.new_directory)throw UsageError("new requires a destination PATH.");
     if(options.source && !options.new_directory)throw UsageError("--source is only available with new.");
     if((app && (options.package_name || options.package_id)) || (!app && options.application_id))
         throw UsageError("Identity options must match the selected project kind.");
-    const auto plan=vd::project::plan_creation(destination?*destination:std::filesystem::current_path(),options);
+    const auto root=destination?*destination:std::filesystem::current_path();
+    vd::project::require_outside_user_package_store(root);
+    const auto plan=vd::project::plan_creation(root,options);
     const auto manifest=plan.root/"void.project.toml";
     std::cout<<"Manifest: "<<vd::path_utf8(manifest)<<"\nProject ID: "<<plan.manifest->project().id<<'\n'
              <<(app?"Application ID: ":"Package ID: ")<<(app?plan.manifest->application()->id:plan.manifest->package()->id)
@@ -426,6 +469,7 @@ void generate_native_binding(int argc, char** argv) {
         throw UsageError("Expected native-bind <descriptor> <C-header> -o <adapter.c>.");
     const auto descriptor = vd::utf8_path(argv[2]);
     const auto output = vd::utf8_path(argv[5]);
+    vd::project::require_outside_user_package_store(output);
     if (output.extension() != ".c" && output.extension() != ".void")
         throw UsageError("Expected a new .c or .void output path.");
     if (!std::filesystem::is_regular_file(descriptor))
@@ -461,6 +505,13 @@ static int run_cli(int argc, char** argv) {
         if(argc>=2 && (std::string_view(argv[1])=="init" || std::string_view(argv[1])=="new")) {
             command=argv[1];
             if(argc==3 && (std::string_view(argv[2])=="--help" || std::string_view(argv[2])=="-h")){help(command);return 0;}
+            if(command=="new" && (argc==2 || (argc==3 && std::string_view(argv[2])=="list"))) {
+                std::cout<<"Template Name         Short Name  Tags\n"
+                    "Console Application   app         Common/Console\n"
+                    "VOID Library          lib         Common/Library\n"
+                    "Use voidc new app [PATH] or voidc new lib [PATH].\n";
+                return 0;
+            }
             return create_project(command,argc,argv);
         }
         // Preserve the established early removed-option diagnostic, but never
@@ -487,12 +538,13 @@ static int run_cli(int argc, char** argv) {
         }
         if(argc>=2 && std::string(argv[1])=="help") {
             if(argc==2) {help();return 0;}
-            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|add|tidy|resolve|deps|native-bind|native].");
+            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|add|remove|tidy|resolve|deps|native-bind|native].");
             help(argv[2]);return 0;
         }
         const auto executable=vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli)));
         vd::configure_standard_library_root(executable);
         if(argc==3 && std::string(argv[1])=="--emit-proof") {
+            vd::project::require_outside_user_package_store(vd::utf8_path(argv[2]));
             vd::emit_object(vd::ir::architecture_proof(),vd::utf8_path(argv[2]),true);
             std::cout<<"Wrote native architecture proof object\n";return 0;
         }
@@ -505,7 +557,7 @@ static int run_cli(int argc, char** argv) {
         if(!known_command(command))
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
-        if(command=="add" || command=="tidy")return maintain_project(command,argc,argv,executable);
+        if(command=="add" || command=="remove" || command=="tidy")return maintain_project(command,argc,argv,executable);
         if(command=="resolve")return resolve_project(argc,argv);
         if(command=="deps") {
             if(argc==4 && (std::string_view(argv[2])=="explain" || std::string_view(argv[2])=="fetch") &&
@@ -529,6 +581,7 @@ static int run_cli(int argc, char** argv) {
                 else throw UsageError("Unknown native import option: "+key);
             }
             if(options.provider.empty() || options.output.empty())throw UsageError("Native import requires --provider and --out.");
+            vd::project::require_outside_user_package_store(options.output);
             if(options.clang.empty())options.clang=vd::native_clang_driver(argv[0]);
             vd::import_native_header(options);return 0;
         }
@@ -536,8 +589,11 @@ static int run_cli(int argc, char** argv) {
         if(command=="package" && argc>=3 &&
            (std::string_view(argv[2])=="list" || std::string_view(argv[2])=="search"))
             return discover_packages(executable,argc,argv);
-        if(command=="package" && argc>=3 && std::string_view(argv[2])=="install")
-            return maintain_project("add",argc,argv,executable,true);
+        if(command=="package" && argc>=3 &&
+           (std::string_view(argv[2])=="install" || std::string_view(argv[2])=="uninstall")) {
+            if(argc==4 && std::string_view(argv[3])=="--help") {help(command);return 0;}
+            return maintain_project(std::string_view(argv[2])=="install"?"add":"remove",argc,argv,executable,true);
+        }
         if(command=="package" && argc>=3 && std::string_view(argv[2])=="--verify") {
             if(argc!=4 || !*argv[3] || argv[3][0]=='-')throw UsageError("Expected one directory after package --verify.");
             vd::verify_application_package(vd::utf8_path(argv[3]));
@@ -608,6 +664,8 @@ static int run_cli(int argc, char** argv) {
         // Parse legacy input syntax before analysis, but its admission follows classification.
         auto value=operands.size()==2?input(operands[1].c_str()):0;
         auto path=project_root?*project_root:operands.empty()?std::filesystem::current_path():vd::utf8_path(operands[0]);
+        vd::project::require_outside_user_package_store(path);
+        if(output)vd::project::require_outside_user_package_store(*output);
         const bool project_mode=project_root || (std::filesystem::is_directory(path) && vd::project_manifest_present(path));
         if(command=="package" && !project_mode)throw UsageError("Package requires a manifest-selected application project.");
         if(allow_native && (!project_mode || command=="check"))

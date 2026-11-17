@@ -447,6 +447,12 @@ if(BUILD_TESTING)
       "${PROJECT_SOURCE_DIR}/tests/project/git_https.py"
       "$<TARGET_FILE:voidc>" "${VOID_GIT_EXECUTABLE}")
     set_tests_properties(project_git_https PROPERTIES TIMEOUT 300)
+    if((WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Linux") AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$")
+      add_test(NAME project_simple_packages COMMAND "${Python3_EXECUTABLE}"
+        "${PROJECT_SOURCE_DIR}/tests/project/simple_packages.py"
+        "$<TARGET_FILE:voidc>" "${VOID_GIT_EXECUTABLE}" "${LLVM_TOOLS_BINARY_DIR}/llvm-readobj${CMAKE_EXECUTABLE_SUFFIX}")
+      set_tests_properties(project_simple_packages PROPERTIES TIMEOUT 300)
+    endif()
   endif()
   void_add_output_test(voidup_smoke "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/smoke.py"
     "${voidup_application}" "@VOID_TEST_OUTPUT@/voidup-smoke-evidence")

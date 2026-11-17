@@ -10,5 +10,5 @@ namespace vd::project {
 // and private working directory are visible to Git as configuration inputs.
 int run_git_fetch(const std::filesystem::path& work, const std::vector<std::string>& args,
                   const std::vector<std::string>& environment,
-                  std::chrono::steady_clock::time_point deadline);
+                  std::chrono::steady_clock::time_point deadline, bool capture_output = false);
 }

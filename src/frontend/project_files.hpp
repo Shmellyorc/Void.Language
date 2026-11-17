@@ -57,10 +57,16 @@ void require_no_package_edit(const std::filesystem::path&);
 // A pending edit is never compiler authority. Only an explicit maintenance
 // operation may roll it back, after checking its saved bytes and directories.
 void recover_package_edit(const CreationRoot&);
+void with_user_package_store(const std::filesystem::path&, bool create,
+                             const std::function<void(const CreationRoot&)>&);
+void publish_user_registration(const CreationRoot&, const std::string& alias,
+                               const std::function<void(const std::filesystem::path&)>& prepare);
+void remove_user_registration(const CreationRoot&, const std::string& alias);
 void publish_package_edit(const CreationRoot&, std::string_view previous_manifest,
                          const std::optional<std::string>& previous_lock,
                          const std::map<std::string, ProjectFiles>& additions,
                          const std::function<std::pair<std::string, std::optional<std::string>>()>& prepare,
                          CreationCheckpoint = nullptr,
-                         const std::map<std::string, ProjectFiles>& replacements = {});
+                         const std::map<std::string, ProjectFiles>& replacements = {},
+                         const std::map<std::string, ProjectFiles>& removals = {});
 }

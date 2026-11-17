@@ -149,7 +149,7 @@ public:
     ~GitObjects() { std::error_code ignored; fs::remove_all(work, ignored); }
     GitObjects(const GitObjects&) = delete;
 
-    void fetch(GitPin& pin) const {
+    void transport(const std::string& origin, const std::vector<std::string>& command, bool capture_output=false) const {
         auto settings = isolated_settings;
         const auto directory = path_utf8(work);
         const std::array<std::string, 10> transport_settings{
@@ -169,32 +169,20 @@ public:
         }
         // Only the named remote may connect directly. Standalone HTTP
         // helpers inherit a proxy URL that Git rejects before connecting.
-        const std::vector<std::string> args{
+        std::vector<std::string> args{
             git, "--git-dir=" + path_utf8(work / "repo.git"),
             "-c", "http.proxy=://", "-c", "remote.void-source.proxy=",
-            "-c", "remote.void-source.url=" + pin.origin,
+            "-c", "remote.void-source.url=" + origin,
             "-c", "credential.helper=", "-c", "credential.interactive=false",
             "-c", "http.sslVerify=true", "-c", "http.schannelUseSSLCAInfo=true",
             "-c", "http.followRedirects=false", "-c", "http.emptyAuth=false",
             "-c", "http.lowSpeedLimit=1", "-c", "http.lowSpeedTime=10",
             "-c", "fetch.fsckObjects=true", "-c", "fetch.unpackLimit=1",
-            "fetch", "--quiet", "--depth=1", "--no-tags", "--no-recurse-submodules",
-            pin.revision.empty() ? "--write-fetch-head" : "--no-write-fetch-head",
-            "--no-auto-gc", "--no-write-commit-graph", "--", "void-source",
-            pin.revision.empty() ? "HEAD" : pin.revision
         };
+        args.insert(args.end(), command.begin(), command.end());
         const int status = run_git_fetch(work, args, settings, std::min(deadline,
-            std::chrono::steady_clock::now() + std::chrono::seconds(30)));
-        if (status == 0) {
-            if (pin.revision.empty()) {
-                const auto head = read_project_input(work / "repo.git/FETCH_HEAD", 8192);
-                if (head.size() < 41 || head[40] != '\t' || !hex_id(std::string_view(head).substr(0, 40), 40) ||
-                    head.find('\n') != head.size() - 1)
-                    fail("HTTPS Git did not return a single valid HEAD commit.");
-                pin.revision = head.substr(0, 40);
-            }
-            return;
-        }
+            std::chrono::steady_clock::now() + std::chrono::seconds(30)), capture_output);
+        if (status == 0) return;
         std::string diagnostic(2048, '\0');
         std::ifstream errors(work / "fetch-error", std::ios::binary);
         errors.read(diagnostic.data(), static_cast<std::streamsize>(diagnostic.size()));
@@ -210,6 +198,30 @@ public:
         while (!diagnostic.empty() && diagnostic.back() == ' ') diagnostic.pop_back();
         fail("HTTPS Git fetch failed (exit " + std::to_string(status) + ")." +
              (diagnostic.empty() ? std::string{} : " " + diagnostic));
+    }
+
+    void fetch(GitPin& pin) const {
+        transport(pin.origin, {"fetch", "--quiet", "--depth=1", "--no-tags", "--no-recurse-submodules",
+            pin.revision.empty() ? "--write-fetch-head" : "--no-write-fetch-head",
+            "--no-auto-gc", "--no-write-commit-graph", "--", "void-source",
+            pin.revision.empty() ? "HEAD" : pin.revision});
+        if (pin.revision.empty()) {
+            const auto head = read_project_input(work / "repo.git/FETCH_HEAD", 8192);
+            if (head.size() < 41 || head[40] != '\t' || !hex_id(std::string_view(head).substr(0, 40), 40) ||
+                head.find('\n') != head.size() - 1)
+                fail("HTTPS Git did not return a single valid HEAD commit.");
+            pin.revision = head.substr(0, 40);
+        }
+    }
+
+    std::string refs(const std::string& origin, const std::map<std::string, std::string>& candidates) const {
+        std::vector<std::string> command{"ls-remote", "--quiet", "--", "void-source"};
+        for(const auto& [ref, path]:candidates) {
+            command.push_back(ref);
+            if(ref.starts_with("refs/tags/"))command.push_back(ref+"^{}");
+        }
+        transport(origin,command,true);
+        return read_project_input(work/"fetch-output",256*1024);
     }
 
     Objects read(const Ids& ids, std::string_view type, std::size_t limit) const {
@@ -396,6 +408,64 @@ static GitSnapshot acquire_git_snapshot_impl(const fs::path& root, GitPin& pin) 
     finish(result, pin);
     result.tree = git_snapshot_path(root, pin) / result.digest / "tree";
     return result;
+}
+
+GitDependency normalize_git_source(GitDependency selection) {
+    constexpr std::string_view github="https://github.com/";
+    if(!selection.pin.origin.starts_with(github))return selection;
+    if(!valid_git_origin(selection.pin.origin))fail("Invalid canonical GitHub URL.");
+    const auto address=std::string_view(selection.pin.origin).substr(github.size());
+    const auto owner=address.find('/');
+    if(owner==address.npos)fail("GitHub URL requires OWNER/REPOSITORY.");
+    const auto repository=address.find('/',owner+1);
+    std::string origin(github);
+    origin+=address.substr(0,repository);
+    if(!origin.ends_with(".git"))origin+=".git";
+    if(repository==address.npos) {
+        selection.pin.origin=std::move(origin);
+        return selection;
+    }
+    const auto locator=address.substr(repository);
+    if(!locator.starts_with("/tree/") || !selection.pin.revision.empty() || !selection.subdir.empty())
+        fail("Use a GitHub /tree/REF/DIRECTORY URL by itself, or a repository URL with explicit selectors.");
+    const auto suffix=locator.substr(6);
+    std::map<std::string,std::string> candidates;
+    std::optional<GitDependency> result;
+    for(auto split=suffix.find('/');split!=suffix.npos;split=suffix.find('/',split+1)) {
+        const auto ref=suffix.substr(0,split), directory=suffix.substr(split+1);
+        if(!valid_git_subdir(ref) || !valid_git_subdir(directory) || directory.empty())
+            fail("GitHub tree URL requires a portable ref and package directory.");
+        if(candidates.size()>=64)fail("GitHub tree URL has too many possible ref boundaries.");
+        if(hex_id(ref,40))result=GitDependency{{origin,std::string(ref)},std::string(directory)};
+        candidates.emplace("refs/heads/"+std::string(ref),directory);
+        candidates.emplace("refs/tags/"+std::string(ref),directory);
+    }
+    if(candidates.empty())fail("GitHub tree URL requires a package directory after its ref.");
+    const auto output=GitObjects(fs::path{}).refs(origin,candidates);
+    std::string_view rows(output);
+    std::map<std::string,std::string> refs, peeled;
+    while(!rows.empty()) {
+        const auto row=line(rows);
+        const auto tab=row.find('\t');
+        if(tab!=40 || !hex_id(row.substr(0,tab),40))fail("Malformed GitHub ref response.");
+        auto ref=row.substr(tab+1);
+        const bool tag_object=ref.ends_with("^{}");
+        if(tag_object)ref.remove_suffix(3);
+        if(!candidates.contains(std::string(ref)) || (tag_object && !ref.starts_with("refs/tags/")))
+            fail("Unexpected GitHub ref response.");
+        if(!(tag_object?peeled:refs).emplace(ref,row.substr(0,tab)).second)
+            fail("Duplicate GitHub ref response.");
+    }
+    for(const auto& [ref,id]:peeled) {
+        if(!refs.contains(ref))fail("Malformed peeled GitHub tag.");
+        refs.at(ref)=id;
+    }
+    for(const auto& [ref,id]:refs) {
+        if(result)fail("Ambiguous GitHub tree ref. Use its full commit ID and package directory.");
+        result=GitDependency{{origin,id},candidates.at(ref)};
+    }
+    if(!result)fail("GitHub tree ref not found.");
+    return std::move(*result);
 }
 
 GitSnapshot acquire_git_snapshot(const fs::path& root, const GitPin& pin) {

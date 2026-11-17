@@ -2,6 +2,7 @@
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "project_files.hpp"
+#include "project_native.hpp"
 #include "void/project_resolution.hpp"
 #include "void/c_dynamic.hpp"
 #include <algorithm>
@@ -236,6 +237,16 @@ std::optional<NativeCatalog> native_catalog(const toml::table& table) {
             return {};
     return plan;
 }
+}
+
+SemanticVersion parse_native_build_recipe(std::string_view bytes) {
+    if(bytes.size()>4096)throw std::runtime_error("Native build recipe exceeds its byte limit.");
+    const auto recipe=toml::parse(bytes);
+    if(recipe && recipe.table().size()==2 && recipe.table()["format"].value_exact<std::int64_t>()==1) {
+        const auto version=recipe.table()["version"].value_exact<std::string_view>();
+        if(version)if(auto parsed=parse_version(*version))return *parsed;
+    }
+    throw std::runtime_error("Native build recipe requires format = 1 and a provider version.");
 }
 
 NativeCatalog parse_native_catalog(std::string_view bytes) {

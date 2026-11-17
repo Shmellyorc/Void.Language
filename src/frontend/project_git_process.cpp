@@ -46,7 +46,8 @@ void check_storage(const fs::path& work) {
         if (error == std::errc::no_such_file_or_directory) continue;
         if (error) throw std::runtime_error("Cannot measure private HTTPS Git workspace.");
         if (size > storage_limit - bytes ||
-            (entry.path().filename() == "fetch-error" && size > diagnostic_limit)) storage_exceeded();
+            ((entry.path().filename() == "fetch-error" || entry.path().filename() == "fetch-output") &&
+             size > diagnostic_limit)) storage_exceeded();
         bytes += size;
     }
 }
@@ -88,7 +89,7 @@ class FetchProcess {
     Handle child{nullptr};
 public:
     FetchProcess(const fs::path& work, const std::vector<std::string>& args,
-                 const std::vector<std::string>& environment) {
+                 const std::vector<std::string>& environment, bool capture_output) {
         if (!job.value) process_error("Cannot create HTTPS Git job");
         JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};
         limits.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE |
@@ -116,7 +117,10 @@ public:
                                           &inherit, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr)};
         const Handle errors{CreateFileW((work / "fetch-error").c_str(), GENERIC_WRITE, FILE_SHARE_READ,
                                          &inherit, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr)};
-        if (discard.value == INVALID_HANDLE_VALUE || errors.value == INVALID_HANDLE_VALUE)
+        const Handle output{capture_output ? CreateFileW((work / "fetch-output").c_str(), GENERIC_WRITE, FILE_SHARE_READ,
+                                 &inherit, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr) : nullptr};
+        if (discard.value == INVALID_HANDLE_VALUE || errors.value == INVALID_HANDLE_VALUE ||
+            output.value == INVALID_HANDLE_VALUE)
             process_error("Cannot redirect HTTPS Git output");
 
         ProcessAttributes attributes;
@@ -127,15 +131,16 @@ public:
         if (!InitializeProcThreadAttributeList(list, 1, 0, &size))
             process_error("Cannot initialize HTTPS Git process attributes");
         attributes.list = list;
-        HANDLE inherited[]{discard.value, errors.value};
+        HANDLE inherited[]{discard.value, errors.value, output.value};
         if (!UpdateProcThreadAttribute(list, 0, PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
-                                       inherited, sizeof(inherited), nullptr, nullptr))
+                                       inherited, (capture_output ? 3 : 2)*sizeof(HANDLE), nullptr, nullptr))
             process_error("Cannot isolate HTTPS Git output handles");
 
         STARTUPINFOEXW startup{};
         startup.StartupInfo.cb = sizeof(startup);
         startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
-        startup.StartupInfo.hStdInput = startup.StartupInfo.hStdOutput = discard.value;
+        startup.StartupInfo.hStdInput = discard.value;
+        startup.StartupInfo.hStdOutput = capture_output ? output.value : discard.value;
         startup.StartupInfo.hStdError = errors.value;
         startup.lpAttributeList = list;
         PROCESS_INFORMATION info{};
@@ -180,7 +185,7 @@ class FetchProcess {
     pid_t child;
 public:
     FetchProcess(const fs::path& work, const std::vector<std::string>& args,
-                 const std::vector<std::string>& environment) {
+                 const std::vector<std::string>& environment, bool capture_output) {
         std::vector<char*> argv, env;
         for (const auto& arg : args) argv.push_back(const_cast<char*>(arg.c_str()));
         for (const auto& entry : environment) env.push_back(const_cast<char*>(entry.c_str()));
@@ -202,6 +207,11 @@ public:
             if (discard < 0 || dup2(discard, STDIN_FILENO) < 0 || dup2(discard, STDOUT_FILENO) < 0)
                 _exit(126);
             if (discard > STDERR_FILENO) close(discard);
+            if (capture_output) {
+                const int output = open("fetch-output", O_WRONLY | O_CREAT | O_EXCL, 0600);
+                if (output < 0 || dup2(output, STDOUT_FILENO) < 0) _exit(126);
+                if (output > STDERR_FILENO) close(output);
+            }
             const int errors = open("fetch-error", O_WRONLY | O_CREAT | O_EXCL, 0600);
             if (errors < 0 || dup2(errors, STDERR_FILENO) < 0) _exit(126);
             if (errors > STDERR_FILENO) close(errors);
@@ -232,8 +242,8 @@ public:
 
 int run_git_fetch(const fs::path& work, const std::vector<std::string>& args,
                   const std::vector<std::string>& environment,
-                  std::chrono::steady_clock::time_point deadline) {
-    FetchProcess process(work, args, environment);
+                  std::chrono::steady_clock::time_point deadline, bool capture_output) {
+    FetchProcess process(work, args, environment, capture_output);
     for (;;) {
         if (std::chrono::steady_clock::now() >= deadline)
             throw std::runtime_error("HTTPS Git transport time limit exceeded.");

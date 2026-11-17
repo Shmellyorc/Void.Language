@@ -69,6 +69,49 @@ Ordinary Git and local packages are source-only on addition. The shipped
 raylib definition is the current automatic native preparation route.
 
 
+## Declarative C packages
+
+This workflow supports an application that selects one native provider on
+x86-64 GNU/Linux or Windows x64. A library package supplies an explicit
+`package.entry`, a reviewed VOID wrapper and physical native declarations.
+Set the native descriptor's provider ID to the package ID and use ABI 3.
+
+Package the self-contained C11 provider as these files:
+
+```text
+native/void.build.toml
+native/provider.c
+native/provider.h
+native/provider-linux.descriptor
+native/provider-windows.descriptor
+native/NOTICE.txt
+```
+
+The recipe contains `format = 1` and a `version = "1.0.0"` provider
+version. Each target descriptor names the package's physical declarations
+using `source-file /src/ffi.void` and describes its actual calls, effects
+and ownership. Authors can start with the existing header importer and
+review and test both target descriptors before publishing. Use the matching
+descriptor to produce the initial editable declaration file:
+
+```sh
+voidc native-bind native/provider-linux.descriptor provider.h -o src/ffi.void
+```
+
+On `voidc add mylib --dir ../mylib` or the equivalent Git source command,
+VOID stages the captured inputs, generates the checked adapter and uses
+the configured Clang and LLD 23.1.4. The recipe has fixed input names and
+compiler options. It accepts no script, external build command, extra
+link input or flags from the package. VOID verifies and locks the
+project-local catalog. A repeated add of the same verified package
+reuses it.
+
+Run `voidc run . --allow-native` after reviewing the native provider.
+Source acquisition and native preparation carry no execution consent.
+The application manifest selects the exact provider and the lock binds
+the reviewed inputs and prepared artifact. A changed or tampered input
+fails verification against that lock. See the [G61 qualification and approval design](projects/G61_SIMPLE_PACKAGE_WORKFLOW.md).
+
 ## G25: import a C header explicitly
 
 `voidc native import` inspects a header with pinned Clang 23.1.4 and publishes

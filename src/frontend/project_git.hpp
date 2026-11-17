@@ -13,6 +13,7 @@ struct GitSnapshot {
 };
 
 bool valid_git_origin(std::string_view);
+GitDependency normalize_git_source(GitDependency);
 std::pair<GitPin, GitSnapshot> acquire_git_head(const std::filesystem::path&, std::string origin);
 std::string git_store_key(const GitPin&);
 std::filesystem::path git_snapshot_path(const std::filesystem::path&, const GitPin&);

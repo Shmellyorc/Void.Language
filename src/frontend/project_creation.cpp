@@ -869,10 +869,17 @@ void rollback_package_edit(const CreationRoot& root) {
         if(slash+1<tail.size())view.emplace(tail.substr(slash+1),bytes);
     }
     std::map<std::string,ProjectFiles> replacements;
+    std::set<std::string> removals;
     for(const auto& [path,bytes]:files)if(path.starts_with("previous/") && path!="previous/") {
         const auto tail=path.substr(9);const auto slash=tail.find('/');
-        if(slash==std::string::npos || !views.contains(tail.substr(0,slash)))throw std::runtime_error("Invalid package replacement recovery path.");
-        auto& previous=replacements[tail.substr(0,slash)];
+        if(slash==std::string::npos || !portable_path_component(tail.substr(0,slash)))
+            throw std::runtime_error("Invalid previous package recovery path.");
+        const auto alias=tail.substr(0,slash);
+        if(!views.contains(alias)) {
+            removals.insert(alias);
+            views.try_emplace(alias);
+        }
+        auto& previous=replacements[alias];
         if(slash+1<tail.size())previous.emplace(tail.substr(slash+1),bytes);
     }
     for(const auto& [alias,expected]:replacements) {
@@ -885,7 +892,8 @@ void rollback_package_edit(const CreationRoot& root) {
         auto path=root.path/"libs"/utf8_path(alias);
         if(fs::exists(path) || project_path_alias(path)) {
             auto actual=read_package_directory(path);
-            if(actual!=expected && (!replacements.contains(alias) || actual!=replacements.at(alias)))
+            if((removals.contains(alias) || actual!=expected) &&
+               (!replacements.contains(alias) || actual!=replacements.at(alias)))
                 throw std::runtime_error("Installed source changed after interrupted edit; retained "+path_utf8(path));
         }
     }
@@ -915,12 +923,66 @@ void recover_package_edit(const CreationRoot& root) {
     PackageWriter writer(root);
     rollback_package_edit(root);
 }
+
+void with_user_package_store(const fs::path& path,bool create,const std::function<void(const CreationRoot&)>& action) {
+    auto status=fs::symlink_status(path);
+    if(!fs::exists(status)) {
+        if(!create)return;
+        // Admit each existing ancestor before making the next directory.
+        std::vector<fs::path> missing;
+        for(auto cursor=path;!fs::exists(fs::symlink_status(cursor));cursor=cursor.parent_path())
+            missing.push_back(cursor);
+        for(auto dir=missing.rbegin();dir!=missing.rend();++dir) {
+            const auto parent=inspect_creation_root(dir->parent_path());
+            try {
+                publish_project_directory(parent,path_utf8(dir->filename()),{},[](const auto&,const auto&){});
+            } catch(const CreationCollision&) {
+                // Another installer created the directory first.
+            }
+            inspect_creation_root(*dir);
+        }
+    }
+    auto root=inspect_creation_root(path);
+    PackageWriter writer(root);
+    action(root);
+}
+
+void publish_user_registration(const CreationRoot& store,const std::string& alias,
+                               const std::function<void(const fs::path&)>& prepare) {
+    const auto workspace=store.path/".void";
+    const auto name="registration-"+random_hex();
+    const auto stage=workspace/utf8_path(name);
+    publish_edit_directory(workspace,name,{});
+    const auto staged=inspect_creation_root(stage);
+    try {
+        prepare(stage);
+        if(inspect_creation_root(stage).identity!=staged.identity ||
+           inspect_creation_root(store.path).identity!=store.identity)
+            throw std::runtime_error("Package registration staging changed before publication.");
+        rename_edit_directory(stage,store.path/utf8_path(alias));
+    } catch(...) {
+        std::error_code ignored;
+        fs::remove_all(stage,ignored);
+        throw;
+    }
+}
+
+void remove_user_registration(const CreationRoot& store,const std::string& alias) {
+    if(inspect_creation_root(store.path).identity!=store.identity)
+        throw std::runtime_error("User package store changed before removal.");
+    const auto removed=store.path/".void"/("uninstalled-"+random_hex());
+    rename_edit_directory(store.path/utf8_path(alias),removed);
+    std::error_code ignored;
+    fs::remove_all(removed,ignored);
+}
+
 void publish_package_edit(const CreationRoot& root,std::string_view previous_manifest,
                          const std::optional<std::string>& previous_lock,
                          const std::map<std::string,ProjectFiles>& additions,
                          const std::function<std::pair<std::string,std::optional<std::string>>()>& prepare,
                          CreationCheckpoint checkpoint,
-                         const std::map<std::string,ProjectFiles>& replacements) {
+                         const std::map<std::string,ProjectFiles>& replacements,
+                         const std::map<std::string,ProjectFiles>& removals) {
     PackageWriter writer(root);
     require_no_package_edit(root.path);
     if(vd::project::read_project_input(root.path/manifest_name,manifest_byte_limit)!=previous_manifest || read_dependency_lock(root.path)!=previous_lock)
@@ -944,6 +1006,14 @@ void publish_package_edit(const CreationRoot& root,std::string_view previous_man
         record.emplace("views/"+alias+"/","");
         for(const auto& [name,bytes]:files)record.emplace("views/"+alias+"/"+name,bytes);
     }
+    for(const auto& [alias,files]:removals) {
+        if(!portable_path_component(alias) || additions.contains(alias) ||
+           read_package_directory(root.path/"libs"/utf8_path(alias))!=files)
+            throw std::runtime_error("Installed package changed before removal.");
+        record.emplace("previous/","");
+        record.emplace("previous/"+alias+"/","");
+        for(const auto& [name,bytes]:files)record.emplace("previous/"+alias+"/"+name,bytes);
+    }
     publish_edit_directory(root.path/".void","package-edit",record);
     const auto journal=root.path/".void/package-edit";
     try {
@@ -955,6 +1025,13 @@ void publish_package_edit(const CreationRoot& root,std::string_view previous_man
                 if(checkpoint)checkpoint(journal/"displaced"/utf8_path(alias));
             }
             publish_edit_directory(root.path/"libs",alias,files);
+        }
+        for(const auto& [alias,files]:removals) {
+            const auto installed=root.path/"libs"/utf8_path(alias);
+            if(read_package_directory(installed)!=files)
+                throw std::runtime_error("Installed package changed during removal.");
+            rename_edit_directory(installed,journal/"displaced"/utf8_path(alias));
+            if(checkpoint)checkpoint(journal/"displaced"/utf8_path(alias));
         }
         auto [manifest,lock]=prepare();
         replace_edit_file(journal/"after-manifest",manifest);
@@ -970,6 +1047,12 @@ void publish_package_edit(const CreationRoot& root,std::string_view previous_man
         if(checkpoint)checkpoint(root.path); // Before commit, rollback still applies.
         for(const auto& [alias,files]:additions)if(read_package_directory(root.path/"libs"/utf8_path(alias))!=files)
             throw std::runtime_error("Installed source changed during publication.");
+        for(const auto& [alias,files]:removals) {
+            const auto installed=root.path/"libs"/utf8_path(alias);
+            if(fs::exists(fs::symlink_status(installed)) ||
+               read_package_directory(journal/"displaced"/utf8_path(alias))!=files)
+                throw std::runtime_error("Installed source changed during removal.");
+        }
         finish_package_edit(journal); // Readers can now admit the complete project.
     } catch(...) {rollback_package_edit(root);throw;}
 }

@@ -45,6 +45,8 @@ def workspace(args, root):
     project = root / "TestGame"
     compiler = args.compiler
     windows = sys.platform == "win32"
+    storage_key = "LOCALAPPDATA" if windows else "HOME" if sys.platform == "darwin" else "XDG_DATA_HOME"
+    env[storage_key] = str(root / "UserData")
 
     def run(label, *argv, cwd=project, status=0, contains="", environment=env):
         start = time.perf_counter()
@@ -62,15 +64,12 @@ def workspace(args, root):
 
     local = root / "local_library"
     cli("create local source package", "new", local, "--kind", "library", cwd=root)
-    local_store = root / "PackageStore"
-    cli("create explicit package store", "new", local_store, cwd=root)
-    cli("register local package", "package", "install", "local_lib", "--store", local_store,
-        "--dir", local, cwd=root)
-    assert (local_store / "void.lock").is_file()
+    cli("register local package", "package", "install", "local_lib", "--dir", local, cwd=root)
+    cli("list registered package", "package", "list", cwd=root, contains="Installed: local_lib")
     consumer = root / "LocalConsumer"
     cli("create local consumer", "new", consumer, cwd=root)
-    cli("copy registered package into consumer", "add", "local_lib", "--dir", local_store / "libs/local_lib",
-        cwd=consumer)
+    cli("copy registered package into consumer", "add", "local_lib", cwd=consumer)
+    cli("unregister local package", "package", "uninstall", "local_lib", cwd=root)
     cli("local consumer lock verifies", "resolve", "--project", ".", "--locked", cwd=consumer)
 
     cli("new", "new", project, cwd=root)
@@ -79,7 +78,7 @@ def workspace(args, root):
     cli("unlisted package", "package", "search", "unknown", contains="No matching bundled packages")
     manifest = project / "void.project.toml"
     original_manifest = manifest.read_bytes()
-    cli("unlisted name has no acquisition", "add", "unknown", status=2, contains="registry lookup is not supported")
+    cli("unlisted name has no acquisition", "add", "unknown", status=2, contains="registered or bundled")
     project_path = dict(env, PATH=".")
     cli("project PATH cannot select an interpreter", "add", "raylib", environment=project_path,
         status=1, contains="Python 3.12")

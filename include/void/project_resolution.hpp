@@ -1,6 +1,7 @@
 #pragma once
 #include "void/project.hpp"
 #include <filesystem>
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
@@ -73,7 +74,15 @@ struct MaintenanceReport {
     bool changed = false;
     std::vector<std::string> advice;
 };
-MaintenanceReport add_dependency(const std::filesystem::path&, const AddOptions&);
+MaintenanceReport add_dependency(const std::filesystem::path&, const AddOptions&,
+                                 const std::function<std::filesystem::path()>& clang = {}, bool sanitize = false);
+MaintenanceReport remove_dependency(const std::filesystem::path&, const std::string& alias);
+MaintenanceReport install_user_package(const AddOptions&, const std::function<std::filesystem::path()>& clang,
+                                       bool sanitize);
+std::optional<MaintenanceReport> add_user_package(const std::filesystem::path&, const std::string& alias);
+std::vector<std::string> list_user_packages();
+void uninstall_user_package(const std::string& alias);
+void require_outside_user_package_store(const std::filesystem::path&);
 MaintenanceReport add_verified_raylib(const std::filesystem::path& project,
     const std::filesystem::path& source, const std::filesystem::path& compiler,
     const std::filesystem::path& clang, bool sanitize);

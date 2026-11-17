@@ -4,6 +4,10 @@
 
 ```text
 voidc init [DIR]
+voidc new
+voidc new list
+voidc new app Orbit
+voidc new lib geometry
 voidc new PATH
 voidc init . --name Orbit --app-id org.example.orbit
 voidc new orbit --source src/game.void --app-id org.example.orbit
@@ -256,34 +260,54 @@ not promised to survive that rebuild.
 ```sh
 voidc package list
 voidc package search raylib
+voidc package install mylib --git https://github.com/OWNER/REPOSITORY.git
+voidc package install mylib --dir ../mylib
+voidc add mylib
 voidc add raylib
 voidc add mylib --git https://github.com/OWNER/REPOSITORY.git
+voidc add mylib --git https://github.com/OWNER/REPOSITORY/tree/main/packages/mylib
 voidc add mylib --dir ../mylib
 voidc tidy --check
+voidc remove mylib
 ```
 
-Discovery uses the version-controlled definitions shipped with the compiler.
-It needs no network or account. `--dir` accepts the same paths as `--path`.
+Discovery lists verified user registrations and the definitions shipped with
+the compiler. It needs no network or account. `--dir` accepts the same paths
+as `--path`. Give `package install` one source per alias.
 An explicit HTTPS URL authorizes source acquisition for that URL. Without
 `--rev`, the first addition pins the repository's HEAD in both
-`void.project.toml` and `void.lock`. A repeat preserves the existing pin.
-An advanced `--subdir packages/mylib` selects an exact manifest inside
-the immutable tree. `file:` Git origins still require an explicit `--rev`.
+`void.project.toml` and `void.lock`. A repeat of the repository URL
+preserves the existing pin. For a GitHub tree URL, VOID checks the
+matching branch and tag names, including slashes, or the full commit
+ID, then pins the selected commit and directory. An ambiguous tree
+URL must be rewritten with its full commit ID. An alias already
+locked to a different pin must be explicitly removed before adding
+the new one. The selected Git package view is installed at
+`libs/<alias>`. Advanced `--rev` and `--subdir` remain available
+with repository URLs. `file:` Git origins require an explicit `--rev`.
 
-To retain a package outside an application in an explicit, independently
-locked local store, create a project directory and select it with
-`package install`:
+The compiler creates the user package store on first installation:
 
-```sh
-voidc new PackageStore
-voidc package install mylib --store PackageStore --dir /absolute/path/to/mylib
-voidc package install otherlib --store PackageStore --git https://github.com/OWNER/REPOSITORY.git
-```
+- Windows uses `%LOCALAPPDATA%\VOID\packages`.
+- Linux uses `$XDG_DATA_HOME/void/packages`, with
+  `~/.local/share/void/packages` as the default.
+- macOS uses `~/Library/Application Support/VOID/packages`.
 
-A store keeps its own manifest, lock, installed views and any prepared
-bundled native catalog. A consuming project still acquires and locks its
-own dependency. For editable source reuse, pass the store's `libs/mylib`
-directory to the consumer's `voidc add mylib --dir …`.
+Repeat installation from the same specified source verifies the existing
+registration. To select different source bytes or a new Git pin, first
+run `voidc package uninstall ALIAS`. `voidc add ALIAS` copies the verified
+source and any prepared native catalog into the project. Git dependencies
+keep their original URL, commit and subtree in the project's own records.
+Projects continue to verify their own lock and require `--allow-native`
+for native execution.
+
+`voidc package uninstall ALIAS` removes the user registration.
+`voidc remove ALIAS` removes a project dependency and its verified
+managed view. Explicit editable local source is retained. Projects
+already using a registered package keep their own copies.
+Use `voidc new` to list starters or create a project. Use
+`voidc new -- lib` when `lib` is a literal destination and you want
+the legacy application starter.
 
 Use `voidc package --project list` if an application directory is named
 `list`, `search` or `install`. For the raylib program, prerequisites and
@@ -347,18 +371,20 @@ failure reports identify the driver and point to host development prerequisites.
 See [installation](install/README.md), [troubleshooting](TROUBLESHOOTING.md),
 [legacy source contract](SOURCE_COMPILER.md) and [native workflow](STAGE9_APPLICATION_WORKFLOW.md).
 
-## Source packages: add and tidy
+## Source packages: add, remove and tidy
 
 ```sh
-voidc add ALIAS [--project DIR] --path DIR
-voidc add ALIAS [--project DIR] --git ORIGIN --rev FULL_SHA [--subdir DIR]
+voidc add ALIAS [--project DIR] --dir DIR
+voidc add ALIAS [--project DIR] --git URL
+voidc remove ALIAS [--project DIR]
 voidc tidy [--project DIR] [--check]
 ```
 
-Both commands default to the current project. `--path` is relative to that
-project; a path already inside it remains editable in place, while an external
-source is installed as an editable copy under `libs/ALIAS`. Git pins must be
-complete lowercase immutable commits, acquired through D3's existing transport.
+These commands default to the current project. `--dir` and its compatible
+`--path` spelling are relative to that project. Ordinary local source already
+inside the project remains editable in place. External source and declarative
+native packages are installed under `libs/ALIAS`. The compiler records complete
+lowercase immutable Git pins using D3's existing transport.
 There is no bare-name registry lookup. `add` selects an application or library
 manifest, validates the source library's package ID/version/entry, appends its dependency table
 and maintains `void.lock`. Conflicts retain the previous project.

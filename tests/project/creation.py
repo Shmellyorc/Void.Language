@@ -194,7 +194,12 @@ try:
             run("init", collision, status=1)
             assert [p.name for p in collision.iterdir()] == [name]
             assert (collision / name).read_bytes() == b"[=roject]\n"
-        for args in (("new",), ("init", "--source", "game.void"), ("init", "--kind", "other"),
+        before_listing = set(base.iterdir())
+        starters = run("new")["stdout"]
+        assert starters == run("new", "list")["stdout"]
+        assert "Console Application" in starters and "VOID Library" in starters
+        assert set(base.iterdir()) == before_listing
+        for args in (("new", "--source", "game.void"), ("init", "--source", "game.void"), ("init", "--kind", "other"),
                      ("init", "--package-id", "a"), ("init", "--nested", "--nested"), ("init", "--unknown"),
                      ("init", "--name")):
             run(*args, status=2, cwd=base)
