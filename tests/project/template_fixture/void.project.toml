@@ -1,0 +1,15 @@
+schema = 1
+
+[project]
+id = "org.example.templategame"
+name = "TemplateGame"
+version = "1.0.0"
+kind = "application"
+entry = "src/TemplateGame.void"
+
+[application]
+id = "org.example.templategame.app"
+resources = ["assets/TemplateGame.bin"]
+
+[sources]
+roots = ["src"]

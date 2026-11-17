@@ -1,11 +1,11 @@
 #include "void/project_resolution.hpp"
 #include "project_files.hpp"
+#include "project_digest.hpp"
 #include "project_git.hpp"
 #include "project_native.hpp"
 #include "void/path.hpp"
 #include "void/frontend.hpp"
 #include <llvm/ADT/StringRef.h>
-#include <llvm/Support/SHA256.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Process.h>
 #include <llvm/Support/Program.h>
@@ -24,28 +24,6 @@ constexpr std::size_t depth_limit = 64, file_limit = 8192;
 constexpr std::size_t visit_limit = 131072, package_bytes = 64 * 1024 * 1024;
 constexpr std::size_t total_bytes = 256 * 1024 * 1024;
 
-class Digest {
-    llvm::SHA256 hash;
-public:
-    void bytes(std::string_view value) { hash.update(llvm::StringRef(value.data(), value.size())); }
-    void field(std::string_view value) {
-        const auto length = static_cast<std::uint64_t>(value.size());
-        char encoded[8];
-        for (unsigned i = 0; i < 8; ++i) encoded[i] = static_cast<char>((length >> (56 - i * 8)) & 255);
-        bytes({encoded, sizeof encoded});
-        bytes(value);
-    }
-    std::string finish() {
-        constexpr std::string_view hex = "0123456789abcdef";
-        std::string text;
-        for (auto byte : hash.final()) {
-            text += hex[byte >> 4];
-            text += hex[byte & 15];
-        }
-        return text;
-    }
-};
-
 std::string sha256(std::string_view bytes) {
     Digest digest;
     digest.bytes(bytes);
@@ -53,25 +31,8 @@ std::string sha256(std::string_view bytes) {
 }
 
 fs::path user_package_store() {
-    auto absolute_environment=[](const char* name) {
-        const auto path=utf8_path(llvm::sys::Process::GetEnv(name).value_or(""));
-        return path.is_absolute()?path.lexically_normal():fs::path{};
-    };
-#ifdef _WIN32
-    auto base=absolute_environment("LOCALAPPDATA");
-    return base.empty()?base:base/"VOID"/"packages";
-#elif defined(__APPLE__)
-    auto base=absolute_environment("HOME");
-    return base.empty()?base:base/"Library"/"Application Support"/"VOID"/"packages";
-#else
-    auto base=absolute_environment("XDG_DATA_HOME");
-    if(base.empty()) {
-        base=absolute_environment("HOME");
-        if(base.empty())return {};
-        base/=".local/share";
-    }
-    return base/"void"/"packages";
-#endif
+    const auto data=user_data_directory();
+    return data.empty()?data:data/"packages";
 }
 
 constexpr std::string_view registration_file=".void-registration";
@@ -772,16 +733,6 @@ std::shared_ptr<const Manifest> maintenance_manifest(const fs::path& path,const 
     if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
     return std::move(parsed.manifest);
 }
-fs::path add_source_path(const fs::path& root,const fs::path& requested) {
-    auto path=requested.is_absolute()?requested:root/requested;
-    auto current=path.root_path();
-    for(const auto& part:path.relative_path()) {
-        if(part==".")continue;
-        if(part=="..")current=current.parent_path();else current/=part;
-        inspect_creation_root(current); // Check before normalizing any parent step.
-    }
-    return inspect_creation_root(current).path;
-}
 ProjectFiles local_source_files(const fs::path& source) {
     // Source installation excludes only existing D3 administration, not user
     // sources. Nested manifests remain physical boundaries in the resolver.
@@ -902,7 +853,7 @@ static MaintenanceReport add_dependency_impl(const fs::path& requested, AddOptio
         selected=maintenance_manifest(snapshot->tree/utf8_path(options.git->subdir)/manifest_name,entry->second);
         publish_git_snapshot(root,options.git->pin,*snapshot);
     } else {
-        const auto source=add_source_path(root.path,*options.path);
+        const auto source=admit_source_directory(root.path,*options.path);
         selected=maintenance_manifest(source/manifest_name);
         auto relative=source.lexically_relative(root.path);
         if(relative.empty() || relative==".")throw std::runtime_error("A project cannot depend on itself.");
@@ -1163,7 +1114,7 @@ MaintenanceReport install_user_package(const AddOptions& requested,const std::fu
     std::string request;
     auto field=[&](std::string_view value) {request+=std::to_string(value.size())+":";request.append(value);};
     if(options.path) {
-        options.path=add_source_path(working,*options.path);
+        options.path=admit_source_directory(working,*options.path);
         require_outside_user_package_store(*options.path);
         field("local");
         field(path_utf8(*options.path));

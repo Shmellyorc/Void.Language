@@ -1,0 +1,8 @@
+format = 1
+id = "org.example.voidgame"
+name = "VOID 2D Game"
+short-names = ["voidgame", "game-starter"]
+description = "Starter project for a 2D VOID game"
+tags = ["Game", "2D"]
+source-name = "TemplateGame"
+version = "1.0.0"

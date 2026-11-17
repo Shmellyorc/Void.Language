@@ -1,0 +1,5 @@
+use "./parts.void" as parts
+
+func main():
+    print("TemplateGame")
+    print(parts.score())

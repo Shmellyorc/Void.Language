@@ -255,6 +255,59 @@ Rebuilding the changed driver
 changes the whole-compiler fingerprint normally; old compiled cache entries are
 not promised to survive that rebuild.
 
+## Built-in project starters
+
+```sh
+voidc new list
+voidc new app --name MyGame
+voidc new classlib --name MyMath
+voidc run --project MyGame
+voidc check --project MyMath
+```
+
+Both starters are built in. `lib` is a compatibility alias for
+`classlib`. `voidc new app MyGame` and `voidc new PATH` still create
+a fresh directory. A library starter has a public `answer()` function
+and a library manifest. It uses the lowercase directory name as the
+package name by default. Supply `--package-name` when the directory
+name is unsuitable as a VOID identifier.
+
+Use `voidc new app .` or `voidc new classlib .` from an empty current
+directory. Hidden files count toward emptiness. Use `voidc init` to add a
+manifest to existing sources.
+
+Open a generated application folder in VS Code and choose **VOID: Run
+Project**. Linux x64 application starters also include an LLDB DAP
+launch configuration. Build the Debug executable first, then use **F5**
+with the official LLVM extension and matching SDK configured. See the
+[starter editor workflow](EDITOR_INTEGRATION.md#running-a-built-in-application-starter).
+
+## Custom project templates
+
+```sh
+voidc new install --dir tests/project/template_fixture
+voidc new list
+voidc new voidgame --name MyAwesomeGame
+voidc run --project MyAwesomeGame
+voidc new uninstall voidgame
+```
+
+Install directly from an HTTPS Git repository or a GitHub tree URL with
+`voidc new install --git URL`. The compiler verifies and records the exact
+commit and selected directory in the user template store. Install and
+uninstall use a store separate from the library registrations under
+`voidc package`.
+
+Use a listed short name and `--name NAME` to generate a custom project.
+The name selects the destination directory in the current directory. Use
+`voidc new -- NAME` or `voidc new ./NAME` to create a built-in application
+in a literal directory that matches an installed short name or a command
+word.
+
+An authored template contains a regular source project and declarative
+metadata at `.void/template.toml`. See the author contract and a ready
+to run example in [Custom VOID project templates](projects/G62_CUSTOM_PROJECT_TEMPLATES.md).
+
 ## Source package discovery and installation
 
 ```sh

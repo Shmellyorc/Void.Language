@@ -1,8 +1,10 @@
 #include "void/project.hpp"
 #include "void/frontend.hpp"
 #include "void/path.hpp"
+#include "void/utf8.hpp"
 #include "project_files.hpp"
 #include "project_native.hpp"
+#include "project_templates.hpp"
 #include "void/project_resolution.hpp"
 #include "void/c_dynamic.hpp"
 #include <algorithm>
@@ -99,6 +101,51 @@ bool valid_git_origin(std::string_view origin) {
 bool valid_git_pin(const GitPin& pin) {
     return pin.revision.size() == 40 && pin.revision.find_first_not_of("0123456789abcdef") == pin.revision.npos &&
            valid_git_origin(pin.origin);
+}
+
+TemplateMetadata parse_template_metadata(std::string_view text) {
+    if(text.size()>16*1024 || !valid_utf8(text) || text.find('\0')!=text.npos)
+        throw std::runtime_error("Template metadata must be UTF-8 TOML within 16 KiB.");
+    auto parsed=toml::parse(text);
+    if(!parsed)throw std::runtime_error("Invalid template TOML: "+std::string(parsed.error().description()));
+    const auto& root=parsed.table();
+    for(const auto& [key,value]:root) {
+        (void)value;
+        const auto field=key.str();
+        if(field!="format" && field!="id" && field!="name" && field!="short-names" &&
+           field!="description" && field!="tags" && field!="source-name" && field!="version")
+            throw std::runtime_error("Unknown template field: "+std::string(field));
+    }
+    if(root["format"].value_exact<std::int64_t>()!=1)
+        throw std::runtime_error("Template format must be integer 1.");
+    auto string=[&](std::string_view key,std::size_t limit) {
+        const auto value=root[key].value_exact<std::string_view>().value_or("");
+        if(value.size()>limit || !valid_name(value))
+            throw std::runtime_error("Missing or invalid template field: "+std::string(key));
+        return std::string(value);
+    };
+    auto strings=[&](std::string_view key,std::size_t count,std::size_t limit,bool short_names) {
+        const auto* array=root[key].as_array();
+        if(!array || array->empty() || array->size()>count)
+            throw std::runtime_error("Missing or invalid template array: "+std::string(key));
+        std::vector<std::string> items;
+        std::set<std::string> seen;
+        for(const auto& item:*array) {
+            const auto value=item.value_exact<std::string_view>().value_or("");
+            if(value.size()>limit || !(short_names?valid_template_short_name(value):valid_name(value)) ||
+               !seen.insert(fold_project_name(value)).second)
+                throw std::runtime_error("Invalid, reserved or duplicate template "+std::string(key)+" value.");
+            items.emplace_back(value);
+        }
+        return items;
+    };
+    TemplateMetadata result{string("id",96),string("name",128),string("description",256),
+        string("source-name",64),strings("short-names",8,32,true),strings("tags",12,32,false)};
+    if(!valid_identity(result.id) || !valid_template_project_name(result.source_name))
+        throw std::runtime_error("Invalid template identity or source-name.");
+    if(root.contains("version") && !parse_version(string("version",128)))
+        throw std::runtime_error("Invalid template semantic version.");
+    return result;
 }
 
 bool VersionRequirement::accepts(const SemanticVersion& version) const {

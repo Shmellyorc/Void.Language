@@ -20,7 +20,8 @@ from dependency_explain import explain
 
 compiler, git = (Path(arg).resolve() for arg in sys.argv[1:3])
 replay = sys.argv[3:] == ["--reproduce-packfile-uris"]
-assert not sys.argv[3:] or replay, sys.argv[3:]
+github_fixture = sys.argv[4:] if sys.argv[3:4] == ["--github-template-fixture"] else []
+assert not sys.argv[3:] or replay or len(github_fixture) == 2, sys.argv[3:]
 manifest = "void.project.toml"
 store = ".void/git-deps"
 
@@ -512,6 +513,43 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl
         assert lock_row(registered)["git"] == origin and lock_row(registered)["subdir"] == "packages/units"
         run(compiler, "package", "uninstall", "units", cwd=base, env=store_env)
         assert cli(registered, "run", env=clean).stdout == b"87\n"
+
+        fixture = Path(__file__).resolve().with_name("template_fixture")
+        template_repo = repos / "templates.git"
+        shutil.copytree(fixture, template_repo)
+        run(git, "init", "--quiet", "--object-format=sha1", cwd=template_repo, env=git_env)
+        template_head = commit(template_repo)
+        template_origin = server.origin + "/templates.git"
+        template_store = base / "user data" / ("VOID" if os.name == "nt" else
+            "Library/Application Support/VOID" if sys.platform == "darwin" else "void") / "templates"
+        receipt = template_store / "org.example.voidgame/metadata/registration"
+        run(compiler, "new", "install", "--git", template_origin, cwd=base, env=store_env)
+        assert receipt.read_text().split("\n")[1:] == ["git", template_origin, template_head, ""]
+        before = len(server.requests)
+        run(compiler, "new", "voidgame", "--name", "HTTPSGame", cwd=base, env=store_env)
+        run(compiler, "new", "uninstall", "game-starter", cwd=base, env=store_env)
+        assert len(server.requests) == before and not receipt.exists()
+        assert cli(base / "HTTPSGame", "run", env=clean).stdout.replace(b"\r\n", b"\n") == b"HTTPSGame\n42\n"
+        print("Template HTTPS root installed pinned source and generated without fetching", flush=True)
+
+        if github_fixture:
+            test_compiler, route = map(Path, github_fixture)
+            nested_template = repos / "nested-templates.git"
+            shutil.copytree(fixture, nested_template / "starter")
+            write(nested_template / "outside.txt", "outside selected subtree")
+            run(git, "init", "--quiet", "--object-format=sha1", cwd=nested_template, env=git_env)
+            subtree_pin = commit(nested_template)
+            run(git, "branch", "topic/slash", cwd=nested_template, env=git_env)
+            github_origin = "https://github.com/g62-fixture/templates.git"
+            route.write_text(server.origin + "/nested-templates.git", encoding="utf-8")
+            run(test_compiler, "new", "install", "--git",
+                github_origin.removesuffix(".git") + "/tree/topic/slash/starter", cwd=base, env=store_env)
+            assert receipt.read_text().split("\n")[1:] == ["git", github_origin, subtree_pin, "starter"]
+            run(test_compiler, "new", "voidgame", "--name", "SubtreeGame", cwd=base, env=store_env)
+            assert not (base / "SubtreeGame/outside.txt").exists()
+            assert cli(base / "SubtreeGame", "run", env=clean).stdout == b"SubtreeGame\n42\n"
+            run(test_compiler, "new", "uninstall", "voidgame", cwd=base, env=store_env)
+            print("GitHub slash-ref subtree verified with real HTTPS fixture and exact pin", flush=True)
 
         probe = base / "negative"
         for target in (forbidden, server):

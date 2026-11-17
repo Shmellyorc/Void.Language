@@ -85,6 +85,27 @@ have their inferred component types in completion and hover, with ordinary
 Go to Definition. The language server derives all of these from the current
 compiler analysis, including supported unsaved edits.
 
+## Running a built-in application starter
+
+Create a project with `voidc new app --name MyGame`. Open **MyGame** as
+a trusted folder in VS Code with the VOID extension and matching
+`voidls` and `voidc`. Choose **VOID: Run Project** to run saved source
+in the task terminal. The equivalent CLI command inside the project is
+`voidc run .`.
+
+On Linux x64, the app starter includes the **VOID Debug project**
+launch configuration. Install [LLVM's LLDB DAP extension](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.lldb-dap)
+and set `lldb-dap.executable-path` to LLVM 23.1.4's `lldb-dap`.
+Select the Debug task profile, save the source and run **VOID: Build
+Project**. Then press **F5** with **VOID Debug project** selected. It
+launches the built executable. Rebuild after changing source. Use
+the settings in the next section to enable source breakpoints and
+stepping.
+
+On Windows, use **VOID: Run Project** or the CLI. The generated F5
+launch workflow is for Linux x64. `classlib` generates a library
+manifest and source with a public declaration.
+
 ## Native AOT source debugging
 
 Set `debug_info = "full"` under `[build.debug]` in `void.project.toml`.

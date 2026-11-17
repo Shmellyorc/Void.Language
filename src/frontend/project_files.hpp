@@ -18,6 +18,8 @@ bool dependency_admin_directory(std::string_view);
 bool valid_dependency_path(std::string_view);
 bool valid_git_subdir(std::string_view);
 bool project_path_alias(const std::filesystem::path&);
+std::filesystem::path user_data_directory();
+std::filesystem::path admit_source_directory(const std::filesystem::path& root, const std::filesystem::path&);
 std::string read_project_input(const std::filesystem::path&, std::size_t limit);
 
 // Keep borrowed stage authority within the synchronous publisher callback.
@@ -52,7 +54,10 @@ std::map<std::string, GitDependency> locked_direct_git_sources(std::string_view)
 
 using ProjectFiles = std::map<std::string, std::string>;
 // Bounded physical inventory, also used to verify staged/materialized source views.
-ProjectFiles read_package_directory(const std::filesystem::path&, const ProjectDirectoryReader& = {}, bool edit_record = false);
+enum class DirectoryInventory { complete, edit_record, template_source, template_registration };
+ProjectFiles read_package_directory(const std::filesystem::path&, const ProjectDirectoryReader& = {},
+                                    DirectoryInventory = DirectoryInventory::complete);
+void publish_new_project_files(const CreationPlan&, const ProjectFiles&);
 void require_no_package_edit(const std::filesystem::path&);
 // A pending edit is never compiler authority. Only an explicit maintenance
 // operation may roll it back, after checking its saved bytes and directories.

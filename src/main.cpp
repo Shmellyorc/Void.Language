@@ -6,6 +6,7 @@
 #include "void/native_import.hpp"
 #include "void/project_creation.hpp"
 #include "void/project_resolution.hpp"
+#include "frontend/project_templates.hpp"
 #include "void/runtime.hpp"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/JSON.h>
@@ -36,8 +37,11 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
     if(command.empty() || command=="new")out<<"Usage: voidc new [list]\n"
-      "       voidc new (app | lib) [PATH] [project options]\n"
-      "       voidc new PATH [project options] [--source PATH]\n";
+      "       voidc new (app | classlib | lib) [PATH | .] [--name NAME] [project options]\n"
+      "       voidc new PATH [project options] [--source PATH]\n"
+      "       voidc new SHORT-NAME --name NAME [--nested]\n"
+      "       voidc new install (--dir PATH | --git URL)\n"
+      "       voidc new uninstall SHORT-NAME\n";
     if(command.empty() || command=="add")out<<"Usage: voidc add ALIAS [--project DIR]\n"
       "       voidc add ALIAS [--project DIR] (--dir DIR | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n";
     if(command.empty() || command=="tidy")out<<"Usage: voidc tidy [--project DIR] [--check]\n";
@@ -117,6 +121,9 @@ void help(const std::string& command={}) {
       "  --project-id ID, --app-id ID or --package-id ID --package-name IDENTIFIER, --nested.\n"
       "Default: application, destination basename, version 0.1.0 and independent local IDs.\n"
       "--source is available with new. The destination and manifest are created exclusively.\n";
+    if(command=="new")std::cout<<"Use --name NAME with app or classlib to create NAME when PATH is omitted.\n"
+      "Use . for an empty current directory and ./PATH or -- PATH for a literal starter name.\n"
+      "lib is an alias for classlib. Built-in starters are available without installation.\n";
     if(command=="resolve")std::cout<<"\nVerify an existing local dependency lock or create one.\n"
       "  --locked   Require an existing lock when dependencies are declared.\n"
       "  --refresh  Replace a stale lock after recomputing the local graph.\n";
@@ -407,6 +414,69 @@ int fetch_project(int argc, char** argv) {
     std::cout << "Verified Git source snapshots: " << count << '\n';
     return 0;
 }
+int list_templates() {
+    std::cout<<"Template Name         Short Name  Tags\n"
+        "Console Application   app         Common/Console\n"
+        "VOID Library          classlib, lib  Common/Library\n";
+    auto display=[](const auto& values) {
+        for(std::size_t i=0;i<values.size();++i)std::cout<<(i?", ":"")<<values[i];
+    };
+    for(const auto& info:vd::project::list_project_templates()) {
+        std::cout<<info.name<<"   ";
+        display(info.short_names);
+        std::cout<<"   ";
+        display(info.tags);
+        std::cout<<'\n';
+    }
+    std::cout<<"Use voidc new app --name NAME, voidc new classlib --name NAME or voidc new SHORT-NAME --name NAME.\n";
+    return 0;
+}
+
+std::optional<int> custom_template_command(int argc,char** argv) {
+    using namespace vd::project;
+    const std::string_view command=argv[2];
+    if(command=="install" && argc>=4) {
+        const std::string_view source=argv[3];
+        if(argc==4 && (source=="--help" || source=="-h")) {help("new");return 0;}
+        if(source=="--dir" || source=="--git") {
+            if(argc!=5 || !*argv[4] || argv[4][0]=='-')
+                throw UsageError("Use voidc new install with exactly one --dir PATH or --git URL.");
+            auto template_info=source=="--dir"?install_project_template(vd::utf8_path(argv[4])):
+                install_project_template_git(argv[4]);
+            std::cout<<"Installed template "<<template_info.name<<" ("<<template_info.short_names.front()<<").\n";
+            return 0;
+        }
+    }
+    if(command=="uninstall" && argc==4) {
+        const std::string_view name=argv[3];
+        if(name=="--help" || name=="-h") {help("new");return 0;}
+        if(!name.empty() && !name.starts_with('-')) {
+            if(name=="app" || name=="classlib" || name=="lib")
+                throw UsageError("Built-in starters cannot be uninstalled.");
+            uninstall_project_template(name);
+            std::cout<<"Uninstalled template "<<name<<".\n";
+            return 0;
+        }
+    }
+
+    if(!valid_template_short_name(command))return {};
+    // Only the template grammar can select a short name. Explicit paths and
+    // the ordinary project's other options retain their existing meaning.
+    std::optional<std::string> name;
+    bool nested=false;
+    for(int i=3;i<argc;++i) {
+        const std::string_view option=argv[i];
+        if(option=="--name" && !name && i+1<argc && !std::string_view(argv[i+1]).starts_with("--"))
+            name=argv[++i];
+        else if(option=="--nested" && !nested)nested=true;
+        else return {};
+    }
+    auto project=create_from_project_template(command,name,nested);
+    if(!project)return {};
+    std::cout<<"Manifest: "<<vd::path_utf8(*project/"void.project.toml")<<'\n';
+    return 0;
+}
+
 int create_project(const std::string& command,int argc,char** argv) {
     vd::project::CreationOptions options;options.new_directory=command=="new";
     std::optional<std::filesystem::path> destination;
@@ -414,12 +484,15 @@ int create_project(const std::string& command,int argc,char** argv) {
     bool operands=false;
     int first=2;
     std::string_view starter;
-    if(options.new_directory && argc>2 && (argc==3 || argv[3][0]!='-' || std::string_view(argv[3])=="--") &&
-       (std::string_view(argv[2])=="app" || std::string_view(argv[2])=="lib")) {
-        starter=argv[2];
-        options.kind=starter=="lib"?vd::project::Kind::library:vd::project::Kind::application;
-        seen.insert("--kind");
-        ++first;
+    if(options.new_directory && argc>2) {
+        const std::string_view word=argv[2], next=argc>3?argv[3]:"";
+        if(word=="classlib" || ((word=="app" || word=="lib") &&
+           (next.empty() || !next.starts_with('-') || next=="--" || next=="--name"))) {
+            starter=word;
+            options.kind=starter=="app"?vd::project::Kind::application:vd::project::Kind::library;
+            seen.insert("--kind");
+            ++first;
+        }
     }
     for(int i=first;i<argc;++i) {
         std::string arg=argv[i];
@@ -447,8 +520,17 @@ int create_project(const std::string& command,int argc,char** argv) {
         else options.source=value;
     }
     const bool app=options.kind==vd::project::Kind::application;
-    if(!destination && !starter.empty())destination=vd::utf8_path(std::string(starter));
+    if(!destination && !starter.empty()) {
+        destination=vd::utf8_path(options.name.value_or(std::string(starter)));
+        if(destination->has_parent_path() || destination->has_root_path() ||
+           destination->empty() || *destination=="." || *destination=="..")
+            throw UsageError("Use a directory name with --name or supply a separate destination PATH.");
+    }
     if(!destination && options.new_directory)throw UsageError("new requires a destination PATH.");
+    options.in_place=options.new_directory && (*destination=="." || *destination=="./");
+#if defined(__linux__) && defined(__x86_64__)
+    options.app_launch=starter=="app";
+#endif
     if(options.source && !options.new_directory)throw UsageError("--source is only available with new.");
     if((app && (options.package_name || options.package_id)) || (!app && options.application_id))
         throw UsageError("Identity options must match the selected project kind.");
@@ -462,6 +544,11 @@ int create_project(const std::string& command,int argc,char** argv) {
     vd::project::publish_creation(plan);
     std::cout<<"Created project manifest.\n";
     if(app)std::cout<<"Automatic application selection requires one eligible main(). Use --entry for a deliberate override.\n";
+    if(starter=="app") {
+        std::cout<<"Run the starter from its directory with voidc run . or use VOID: Run Project in VS Code.\n";
+        if(options.app_launch)
+            std::cout<<"For F5 on Linux x64, build the Debug executable and configure the LLVM LLDB DAP extension.\n";
+    }
     return 0;
 }
 void generate_native_binding(int argc, char** argv) {
@@ -505,12 +592,9 @@ static int run_cli(int argc, char** argv) {
         if(argc>=2 && (std::string_view(argv[1])=="init" || std::string_view(argv[1])=="new")) {
             command=argv[1];
             if(argc==3 && (std::string_view(argv[2])=="--help" || std::string_view(argv[2])=="-h")){help(command);return 0;}
-            if(command=="new" && (argc==2 || (argc==3 && std::string_view(argv[2])=="list"))) {
-                std::cout<<"Template Name         Short Name  Tags\n"
-                    "Console Application   app         Common/Console\n"
-                    "VOID Library          lib         Common/Library\n"
-                    "Use voidc new app [PATH] or voidc new lib [PATH].\n";
-                return 0;
+            if(command=="new") {
+                if(argc==2 || (argc==3 && std::string_view(argv[2])=="list"))return list_templates();
+                if(const auto result=custom_template_command(argc,argv))return *result;
             }
             return create_project(command,argc,argv);
         }

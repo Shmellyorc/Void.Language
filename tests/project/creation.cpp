@@ -179,6 +179,25 @@ int main(int argc,char** argv) {
                 "Unexpected staging failure after tampering");
         }
         check(!fs::exists(target),"Changed staged bytes were published");
+
+        const auto here=fixture.root/"empty";
+        fs::create_directory(here);
+        auto in_place=fresh;
+        in_place.in_place=true;
+        in_place.app_launch=true;
+        auto into_current=plan_creation(here,in_place);
+        fails<CreationCollision>([&]{publish_creation(into_current,[](const fs::path& stage) {
+            std::ofstream(stage.parent_path()/"developer.txt")<<"keep";
+        });});
+        check(read(here/"developer.txt")=="keep","In-place publication changed an external file");
+        check(std::distance(fs::directory_iterator(here),fs::directory_iterator{})==1,
+              "In-place failure left staged project files");
+        fs::remove(here/"developer.txt");
+        publish_creation(into_current);
+        check(inspect_creation_root(here).identity==into_current.parent.identity,
+              "In-place publication replaced the original directory");
+        check(fs::is_regular_file(here/"void.project.toml") && fs::is_regular_file(here/"src/app.void") &&
+              fs::is_regular_file(here/".vscode/launch.json"),"In-place publication lost project files");
 #if defined(_WIN32) || defined(__linux__)
         const auto package_parent=fixture.root/"package parent";
         fs::create_directory(package_parent);

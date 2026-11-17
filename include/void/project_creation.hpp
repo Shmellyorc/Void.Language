@@ -14,17 +14,18 @@ struct CreationOptions {
     Kind kind = Kind::application;
     bool new_directory = false, nested = false;
     std::optional<std::string> name, version, project_id, application_id, package_id, package_name, source;
+    bool in_place = false, app_launch = false;
 };
 struct CreationRoot {
     std::filesystem::path path;
     std::string identity;
 };
 struct CreationPlan {
-    CreationRoot parent; // init root, or new's existing parent
+    CreationRoot parent; // existing root for init or in-place creation, parent for a fresh directory
     std::filesystem::path root;
     std::optional<std::string> starter;
     std::shared_ptr<const Manifest> manifest;
-    bool nested = false;
+    bool nested = false, in_place = false, app_launch = false;
 };
 class CreationCollision : public std::runtime_error {
 public:

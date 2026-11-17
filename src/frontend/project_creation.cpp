@@ -3,6 +3,7 @@
 #include "void/path.hpp"
 #include "void/utf8.hpp"
 #include "project_files.hpp"
+#include <llvm/Support/Process.h>
 #include <llvm/Support/RandomNumberGenerator.h>
 #include <algorithm>
 #include <array>
@@ -729,8 +730,12 @@ void publish_application_directory(const CreationRoot& directory, const std::str
 // Source-package publication uses the same pinned parents, exclusive staging,
 // atomic file rename and dependency writer as D3. The short-lived journal is a
 // rollback record, never a package index or source authority.
-ProjectFiles read_package_directory(const fs::path& root, const ProjectDirectoryReader& reader, bool edit_record) {
+ProjectFiles read_package_directory(const fs::path& root, const ProjectDirectoryReader& reader, DirectoryInventory inventory) {
     const auto admitted=reader.inspect(root);
+    const bool edit_record=inventory==DirectoryInventory::edit_record;
+    const bool template_source=inventory==DirectoryInventory::template_source;
+    const bool bounded_template=template_source || inventory==DirectoryInventory::template_registration;
+    const std::size_t limit=(bounded_template?64:256)*1024*1024;
     ProjectFiles files;
     std::size_t bytes=0, visited=0;
     std::function<void(const fs::path&,const std::string&,unsigned)> walk;
@@ -739,19 +744,21 @@ ProjectFiles read_package_directory(const fs::path& root, const ProjectDirectory
         reader.inspect(directory);
         std::set<std::string> names;
         for(const auto& child:fs::directory_iterator(directory)) {
-            if(++visited>32768)throw std::runtime_error("Package directory-entry limit exceeded.");
+            if(++visited>(bounded_template?8192u:32768u))throw std::runtime_error("Package directory-entry limit exceeded.");
             auto name=path_utf8(child.path().filename());
             if(!portable_path_component(name) || !names.insert(fold(name)).second || project_path_alias(child.path()))
                 throw std::runtime_error("Package path has a collision or alias: "+path_utf8(child.path()));
             auto relative=prefix+name;
             auto status=child.symlink_status();
+            if(template_source && prefix.empty() && name==".git" &&
+               (fs::is_regular_file(status) || fs::is_directory(status)))continue;
             if(fs::is_directory(status)) {
                 files.emplace(relative+"/","");
                 if(!edit_record || !prefix.empty() || (name!="displaced" && name!="discarded"))walk(child.path(),relative+"/",depth+1);
             } else if(fs::is_regular_file(status)) {
                 auto content=reader.read(child.path(),64*1024*1024);
                 bytes+=content.size();
-                if(bytes>256*1024*1024)throw std::runtime_error("Package source byte limit exceeded.");
+                if(bytes>limit)throw std::runtime_error("Package source byte limit exceeded.");
                 files.emplace(std::move(relative),std::move(content));
             } else throw std::runtime_error("Package source must contain regular files and directories.");
         }
@@ -852,7 +859,7 @@ void rollback_package_edit(const CreationRoot& root) {
     const auto journal=root.path/".void/package-edit";
     if(!named(root.path/".void","package-edit"))return;
     named(root.path/".void","package-edit",true);
-    auto files=read_package_directory(journal,{},true);
+    auto files=read_package_directory(journal,{},DirectoryInventory::edit_record);
     if(!files.contains("before-manifest") || !files.contains("views/"))throw std::runtime_error("Invalid package edit recovery record; retained for inspection.");
     const auto current=vd::project::read_project_input(root.path/manifest_name,manifest_byte_limit);
     if(current!=files.at("before-manifest") && (!files.contains("after-manifest") || current!=files.at("after-manifest")))
@@ -913,7 +920,7 @@ void rollback_package_edit(const CreationRoot& root) {
         }
     }
     if(files.contains("created-libs") && fs::exists(root.path/"libs") && fs::is_empty(root.path/"libs"))fs::remove(root.path/"libs");
-    if(read_package_directory(journal,{},true)!=files)throw std::runtime_error("Package recovery record changed; retained.");
+    if(read_package_directory(journal,{},DirectoryInventory::edit_record)!=files)throw std::runtime_error("Package recovery record changed; retained.");
     finish_package_edit(journal);
 }
 }
@@ -922,6 +929,39 @@ void recover_package_edit(const CreationRoot& root) {
     try {require_no_package_edit(root.path);return;}catch(const std::runtime_error&) {}
     PackageWriter writer(root);
     rollback_package_edit(root);
+}
+
+fs::path user_data_directory() {
+    auto absolute_environment=[](const char* name) {
+        const auto path=utf8_path(llvm::sys::Process::GetEnv(name).value_or(""));
+        return path.is_absolute()?path.lexically_normal():fs::path{};
+    };
+#ifdef _WIN32
+    auto base=absolute_environment("LOCALAPPDATA");
+    return base.empty()?base:base/"VOID";
+#elif defined(__APPLE__)
+    auto base=absolute_environment("HOME");
+    return base.empty()?base:base/"Library"/"Application Support"/"VOID";
+#else
+    auto base=absolute_environment("XDG_DATA_HOME");
+    if(base.empty()) {
+        base=absolute_environment("HOME");
+        if(base.empty())return {};
+        base/=".local/share";
+    }
+    return base/"void";
+#endif
+}
+
+fs::path admit_source_directory(const fs::path& root,const fs::path& requested) {
+    auto path=requested.is_absolute()?requested:root/requested;
+    auto current=path.root_path();
+    for(const auto& part:path.relative_path()) {
+        if(part==".")continue;
+        if(part=="..")current=current.parent_path();else current/=part;
+        inspect_creation_root(current); // Check before normalizing any parent step.
+    }
+    return inspect_creation_root(current).path;
 }
 
 void with_user_package_store(const fs::path& path,bool create,const std::function<void(const CreationRoot&)>& action) {
@@ -1057,6 +1097,29 @@ void publish_package_edit(const CreationRoot& root,std::string_view previous_man
     } catch(...) {rollback_package_edit(root);throw;}
 }
 
+namespace {
+void require_empty_creation(const fs::path& root, const fs::path& stage = {}) {
+    for(const auto& child:fs::directory_iterator(root))
+        if(child.path()!=stage)
+            throw CreationCollision("In-place project creation requires an empty directory: "+path_utf8(root));
+}
+
+constexpr std::string_view app_launch_json=R"json({
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "VOID Debug project",
+      "type": "lldb-dap",
+      "request": "launch",
+      "program": "${command:void.debugProjectProgram}",
+      "cwd": "${command:void.debugProjectRoot}",
+      "disableASLR": false
+    }
+  ]
+}
+)json";
+}
+
 CreationPlan plan_creation(const fs::path& requested,const CreationOptions& options,CreationEntropy entropy) {
     auto root=absolute_target(requested);
     auto leaf=path_utf8(root.filename());
@@ -1064,17 +1127,20 @@ CreationPlan plan_creation(const fs::path& requested,const CreationOptions& opti
     for(auto& c:portable)if(static_cast<unsigned char>(c)>=128)c='x';
     if(options.new_directory && (!root.has_relative_path() || !valid_utf8(leaf) || !portable_path_component(portable) || fold(leaf)==manifest_name))
         throw std::invalid_argument("New project destination requires a valid directory basename.");
-    auto parent=inspect_creation_root(options.new_directory?root.parent_path():root);
-    root=options.new_directory?parent.path/utf8_path(leaf):parent.path;
-    require_destination(root,options.new_directory,options.nested);
+    const bool fresh=options.new_directory && !options.in_place;
+    auto parent=inspect_creation_root(fresh?root.parent_path():root);
+    root=fresh?parent.path/utf8_path(leaf):parent.path;
+    require_destination(root,fresh,options.nested);
+    if(options.in_place)require_empty_creation(root);
     const auto basename=path_utf8(root.filename());
     auto generated=[&](const std::optional<std::string>& supplied,std::string_view prefix) {
         return supplied?*supplied:std::string(prefix)+random_hex(entropy);
     };
     const bool app=options.kind==Kind::application;
-    if((app && (options.package_id || options.package_name)) || (!app && options.application_id) || (!options.new_directory && options.source))
+    if((app && (options.package_id || options.package_name)) || (!app && (options.application_id || options.app_launch)) ||
+       (!options.new_directory && (options.source || options.in_place || options.app_launch)))
         throw std::invalid_argument("Creation options conflict with the project kind or command.");
-    auto package=options.package_name.value_or(basename);
+    auto package=options.package_name.value_or(options.new_directory?fold(basename):basename);
     std::optional<std::string> starter;
     if(options.new_directory)starter=options.source.value_or(app?"src/app.void":"src/"+package+".void");
     auto version=options.version.value_or("0.1.0");
@@ -1089,12 +1155,30 @@ CreationPlan plan_creation(const fs::path& requested,const CreationOptions& opti
     text+='\n';
     auto parsed=parse_manifest(SourceFile(path_utf8(root/manifest_name),std::move(text)));
     if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
-    return {std::move(parent),std::move(root),std::move(starter),std::move(parsed.manifest),options.nested};
+    return {std::move(parent),std::move(root),std::move(starter),std::move(parsed.manifest),options.nested,options.in_place,options.app_launch};
+}
+
+void publish_new_project_files(const CreationPlan& plan, const ProjectFiles& files) {
+    const auto& root=plan.root;
+    Parent parent(plan.parent.path);
+    if(!plan.starter || parent.identity_key()!=plan.parent.identity)
+        throw std::runtime_error("Project directory changed after review.");
+#ifndef _WIN32
+    if(flock(parent.handle.fd,LOCK_EX))system_failure("Cannot serialize project publication in its directory");
+#endif
+    require_destination(root,true,plan.nested);
+    const auto leaf=path_utf8(root.filename());
+    std::map<std::string,std::string_view> views(files.begin(),files.end());
+    publish_project_directory(plan.parent,leaf,views,[&](const auto& path,const auto& reader) {
+        if(path==root)throw CreationCollision("Project destination already exists: "+path_utf8(root));
+        if(read_package_directory(path,reader)!=files)
+            throw std::runtime_error("Project template staging changed before publication.");
+    },[&]{require_destination(root,true,plan.nested);});
 }
 
 void publish_creation(const CreationPlan& plan,CreationCheckpoint before_publish) {
     const auto& root=plan.root;
-    const bool fresh=plan.starter.has_value();
+    const bool fresh=plan.starter.has_value() && !plan.in_place;
     Parent parent(fresh?root.parent_path():root);
     if(parent.path!=plan.parent.path || parent.identity_key()!=plan.parent.identity)
         throw std::runtime_error("Project directory changed after review.");
@@ -1102,44 +1186,57 @@ void publish_creation(const CreationPlan& plan,CreationCheckpoint before_publish
     if(flock(parent.handle.fd,LOCK_EX))system_failure("Cannot serialize project publication in its directory");
 #endif
     require_destination(root,fresh,plan.nested);
+    if(plan.in_place)require_empty_creation(root);
     const auto temporary=".void-create-"+random_hex();
     const auto stage=parent.path/temporary;
-    std::map<fs::path,std::set<std::string>> layout{{stage,{std::string(manifest_name)}}};
-    if(fresh) {
-        auto directory=stage;
-        for(const auto& part:utf8_path(*plan.starter)) {layout[directory].insert(path_utf8(part));directory/=part;}
-    }
+    std::map<fs::path,std::set<std::string>> layout{{stage,{}}};
+    std::map<fs::path,std::size_t> entries{{stage,0}};
+    std::vector<std::pair<std::size_t,std::string_view>> files;
     std::vector<Node> objects;
-    objects.reserve(68);
+    objects.reserve(70);
     const auto& manifest_text=plan.manifest->source().text();
     const std::string_view starter_text=plan.manifest->kind()==Kind::application?
         "func main() -> i32:\n    return 0\n":"public func answer() -> i32:\n    return 42\n";
     bool published=false;
+    auto stage_file=[&](const fs::path& relative,std::string_view bytes) {
+        auto directory=stage;
+        for(const auto& part:relative.parent_path()) {
+            auto child=directory/part;
+            if(!entries.contains(child)) {
+                layout.at(directory).insert(path_utf8(part));
+                entries.emplace(child,objects.size());
+                layout.emplace(child,std::set<std::string>{});
+#ifdef _WIN32
+                objects.push_back(make_directory(child,false));
+#else
+                objects.push_back(make_directory(objects[entries.at(directory)].handle.fd,path_utf8(part)));
+#endif
+            }
+            directory=std::move(child);
+        }
+        const auto leaf=path_utf8(relative.filename());
+        layout.at(directory).insert(leaf);
+        entries.emplace(directory/relative.filename(),objects.size());
+        files.emplace_back(objects.size(),bytes);
+#ifdef _WIN32
+        objects.push_back(make_file(directory/relative.filename()));
+#else
+        objects.push_back(make_file(objects[entries.at(directory)].handle.fd,leaf));
+#endif
+        write_file(objects.back(),bytes);
+    };
     try {
 #ifdef _WIN32
-        objects.push_back(make_directory(parent.path/temporary,true));
-        objects.push_back(make_file(objects[0].path/manifest_name));
+        objects.push_back(make_directory(stage,true));
 #else
         objects.push_back(make_directory(parent.handle.fd,temporary));
-        objects.push_back(make_file(objects[0].handle.fd,std::string(manifest_name)));
 #endif
-        write_file(objects.back(),manifest_text);
-        if(fresh) {
+        stage_file(manifest_name,manifest_text);
+        if(plan.starter) {
             (void)starter_parent(*plan.starter);
-            auto path=utf8_path(*plan.starter);
-#ifdef _WIN32
-            auto directory=objects[0].path;
-            for(const auto& part:path.parent_path()) {directory/=part;objects.push_back(make_directory(directory,false));}
-            objects.push_back(make_file(directory/path.filename()));
-#else
-            int directory=objects[0].handle.fd;
-            for(const auto& part:path.parent_path()) {
-                objects.push_back(make_directory(directory,path_utf8(part)));directory=objects.back().handle.fd;
-            }
-            objects.push_back(make_file(directory,path_utf8(path.filename())));
-#endif
-            write_file(objects.back(),starter_text);
+            stage_file(utf8_path(*plan.starter),starter_text);
         }
+        if(plan.app_launch)stage_file(".vscode/launch.json",app_launch_json);
         if(before_publish)before_publish(stage);
         auto rechecked=inspect_creation_root(parent.path);
         if(rechecked.identity!=plan.parent.identity)throw std::runtime_error("Project directory changed before publication.");
@@ -1154,12 +1251,49 @@ void publish_creation(const CreationPlan& plan,CreationCheckpoint before_publish
             }
             if(actual!=expected)throw std::runtime_error("Unexpected project staging content.");
         }
-        if(!matches_file(objects[1],manifest_text) || (fresh && !matches_file(objects.back(),starter_text)))
-            throw std::runtime_error("Project staging contents changed before publication.");
+        for(const auto& [index,bytes]:files)
+            if(!matches_file(objects[index],bytes))
+                throw std::runtime_error("Project staging contents changed before publication.");
+        if(plan.in_place) {
+            // Keep the existing directory. Publish complete children
+            // exclusively, then make the project discoverable with its manifest.
+            require_empty_creation(root,stage);
+            for(const auto& leaf:layout.at(stage)) {
+                if(leaf==manifest_name)continue;
+                const auto child=stage/utf8_path(leaf);
+                auto& object=objects[entries.at(child)];
+#ifdef _WIN32
+                std::vector<std::pair<std::size_t,fs::path>> moved;
+                for(std::size_t i=1;i<objects.size();++i) {
+                    const auto& path=objects[i].path;
+                    if(path==child) {
+                        moved.emplace_back(i,root/utf8_path(leaf));
+                    } else {
+                        auto relative=path.lexically_relative(child);
+                        if(relative.empty() || *relative.begin()=="..")continue;
+                        moved.emplace_back(i,root/utf8_path(leaf)/relative);
+                        CloseHandle(std::exchange(objects[i].handle.value,INVALID_HANDLE_VALUE));
+                    }
+                }
+                publish_file(object,root/utf8_path(leaf));
+                for(auto& [index,path]:moved)objects[index].path.swap(path);
+#else
+                rename_exclusive(object,parent.handle.fd,leaf);
+                object.parent=parent.handle.fd;
+#endif
+            }
+            for(const auto& child:fs::directory_iterator(root)) {
+                const auto leaf=path_utf8(child.path().filename());
+                if(child.path()!=stage && (leaf==manifest_name || !layout.at(stage).contains(leaf)))
+                    throw CreationCollision("The destination changed during in-place project creation.");
+            }
+            for(const auto& object:objects)if(!owns(object))
+                throw std::runtime_error("Project staging ownership changed during publication.");
+        }
         const auto& selected=objects[fresh?0:1];
 #ifdef _WIN32
-        // NTFS will not rename a directory with open descendants. The root
-        // stays pinned; rollback must reopen descendants by their saved IDs.
+        // NTFS needs descendants closed before renaming a directory.
+        // Rollback reopens them against their saved identities when needed.
         if(fresh)for(auto it=objects.begin()+1;it!=objects.end();++it)
             CloseHandle(std::exchange(it->handle.value,INVALID_HANDLE_VALUE));
         publish_file(selected,fresh?root:root/manifest_name);

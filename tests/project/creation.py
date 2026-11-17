@@ -164,7 +164,7 @@ try:
 
         # The unedited new -> add -> tidy journey must compose across commands.
         run("new", "app")
-        run("new", "geometry", "--kind", "library", "--package-name", "geometry")
+        run("new", "classlib", "--name", "geometry")
         run("add", "geometry", "--project", "app", "--path", "../geometry")
         run("tidy", "--check", "--project", "app")
         (base / "app/src/app.void").write_text(
@@ -198,7 +198,55 @@ try:
         starters = run("new")["stdout"]
         assert starters == run("new", "list")["stdout"]
         assert "Console Application" in starters and "VOID Library" in starters
+        assert "classlib, lib" in starters
         assert set(base.iterdir()) == before_listing
+        for starter in ("app", "classlib", "lib"):
+            assert "Built-in starters cannot be uninstalled" in run("new", "uninstall", starter, status=2)["stderr"]
+
+        run("new", "app", "--name", "MyGame")
+        run("new", "app", "PositionalGame")
+        for project in ("MyGame", "PositionalGame"):
+            created = base / project
+            assert manifest(created)["project"]["name"] == project
+            run("run", "--project", created)
+            launch = created / ".vscode/launch.json"
+            if sys.platform.startswith("linux") and os.uname().machine == "x86_64":
+                actual = json.loads(launch.read_text())["configurations"]
+                assert actual == [{
+                    "name": "VOID Debug project", "type": "lldb-dap", "request": "launch",
+                    "program": "${command:void.debugProjectProgram}", "cwd": "${command:void.debugProjectRoot}",
+                    "disableASLR": False,
+                }]
+            else:
+                assert not launch.exists()
+
+        run("new", "classlib", "--name", "MyMath")
+        run("new", "lib", "--name", "LegacyMath")
+        for project in ("MyMath", "LegacyMath"):
+            created = base / project
+            data = manifest(created, "package")
+            package = project.lower()
+            assert data["project"]["name"] == project and "application" not in data
+            assert data["package"]["name"] == package and data["package"]["entry"] == f"src/{package}.void"
+            assert "public func answer()" in (created / data["package"]["entry"]).read_text()
+            assert not (created / ".vscode").exists()
+            run("check", "--project", created)
+
+        here_app, here_lib = directory("HereApp"), directory("HereMath")
+        run("new", "app", ".", "--source", "main.void", cwd=here_app)
+        assert (here_app / "main.void").is_file() and manifest(here_app)["project"]["name"] == "HereApp"
+        run("run", ".", cwd=here_app)
+        run("new", "classlib", ".", cwd=here_lib)
+        assert manifest(here_lib, "package")["package"]["name"] == "heremath"
+        run("check", ".", cwd=here_lib)
+        untouched = directory("NotEmpty")
+        notes = untouched / ".owned"
+        notes.write_bytes(b"developer content")
+        assert "requires an empty directory" in run("new", "app", ".", cwd=untouched, status=1)["stderr"]
+        assert list(untouched.iterdir()) == [notes] and notes.read_bytes() == b"developer content"
+        run("new", "app", "--name", "../Escape", status=2)
+        assert not (base / "Escape").exists()
+
         for args in (("new", "--source", "game.void"), ("init", "--source", "game.void"), ("init", "--kind", "other"),
                      ("init", "--package-id", "a"), ("init", "--nested", "--nested"), ("init", "--unknown"),
                      ("init", "--name")):

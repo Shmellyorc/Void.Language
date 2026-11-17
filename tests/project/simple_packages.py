@@ -53,7 +53,8 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     listing = cli('new', 'list', cwd=root, contains='Application')
     assert cli('new', cwd=root) == listing
     new_help = cli('new', '--help', cwd=root, contains='voidc new [list]')
-    assert 'voidc new install' not in new_help and 'voidc new uninstall' not in new_help
+    assert 'voidc new install (--dir PATH | --git URL)' in new_help
+    assert 'voidc new uninstall SHORT-NAME' in new_help
     package_help = cli('package', '--help', cwd=root, contains='voidc package install ALIAS')
     assert 'voidc package uninstall ALIAS' in package_help
     assert not list(root.iterdir())
@@ -114,7 +115,7 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     cli('package', 'install', 'invalid', '--dir', root/'existing', cwd=root,
         status=1, contains='Source must be a VOID library')
     assert not (store/'invalid').exists() and not list((store/'.void').glob('registration-*'))
-    cli('new', 'uninstall', 'local', cwd=root, status=2, contains='Expected one project destination.')
+    cli('new', 'uninstall', 'local', cwd=root, status=1, contains='No installed template named local.')
     assert registration.is_dir() and not (root/'uninstall').exists()
     cli('package', 'uninstall', 'local', cwd=root)
     assert not registration.exists()
