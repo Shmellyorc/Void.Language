@@ -1708,7 +1708,6 @@ class Semantics {
     const SourceFile& source;
     Unit& unit;
     const std::map<std::string, std::unique_ptr<Unit>>& units;
-    std::set<std::string> visible_names;
     Unit& root;
     std::function<void(Unit&, Constant&)> evaluate;
     std::function<void(Unit&, Structure&)> defaults;
@@ -1722,6 +1721,32 @@ class Semantics {
     bool inferring_default=false;
     unsigned loops = 0;
     bool suppress_zero = false,pattern_bindings=false,allow_event=false;
+    bool visible_name(const std::string& name) const {
+        if (unit.structure_names.contains(name) || unit.global_names.contains(name) ||
+            unit.constant_names.contains(name) || unit.declarations.contains(name) ||
+            unit.qualifiers.contains(name))
+            return true;
+        auto visible_in = [&](const auto& declarations, const Unit& owner) {
+            const auto found = declarations.find(name);
+            return found != declarations.end() &&
+                source_visible(found->second->visibility, owner.identity, unit.identity);
+        };
+        // An implicit project root exposes types, globals and non-file-private
+        // constants in the same library. Functions still need an import.
+        if (same_library(unit.identity, root.identity)) {
+            const auto constant = root.constant_names.find(name);
+            if ((constant != root.constant_names.end() && !constant->second->file_private) ||
+                visible_in(root.structure_names, root) || visible_in(root.global_names, root))
+                return true;
+        }
+        for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty()) {
+            const auto& owner = *units.at(import.target);
+            if (visible_in(owner.structure_names, owner) || visible_in(owner.global_names, owner) ||
+                visible_in(owner.constant_names, owner) || visible_in(owner.declarations, owner))
+                return true;
+        }
+        return false;
+    }
     Variable* lookup(const std::string& name,bool capture=true) {
         for (auto scope = scopes.rbegin(); scope != scopes.rend(); ++scope) {
             auto found = scope->find(name); if (found != scope->end()) return &found->second;
@@ -2484,7 +2509,7 @@ class Semantics {
             token.text == "seed" && !current->parameters.empty() &&
             token.offset == current->parameters[0].token.offset;
         auto* previous=lookup(token.text,poison_previous);
-        if (previous || (visible_names.contains(token.text) && !random_seed_parameter)) {
+        if (previous || (!random_seed_parameter && visible_name(token.text))) {
             std::vector<RelatedLocation> related;
             if (previous) {
                 related.push_back({span(source, previous->declaration), "Previously declared"});
@@ -4148,7 +4173,7 @@ class Semantics {
         case K::destructure: destructure_statement(s); break;
         case K::scoped:{
             auto& call=*s.expression;
-            if(call.kind==Expr::Kind::method_call && call.token.text=="group" && call.parts.size()==1 && call.parts[0]->kind==Expr::Kind::name && call.parts[0]->token.text=="tasks" && !lookup("tasks") && !visible_names.contains("tasks")){
+            if(call.kind==Expr::Kind::method_call && call.token.text=="group" && call.parts.size()==1 && call.parts[0]->kind==Expr::Kind::name && call.parts[0]->token.text=="tasks" && !lookup("tasks") && !visible_name("tasks")){
                 if(!current || !current->asynchronous || current->deferred || !call.type_arguments.empty())error(source,s.token,Code::unsupported_type,"tasks.group() requires an async scope.");
                 call.kind=Expr::Kind::literal;call.type=Type::u64;call.parts.clear();s.task_group=true;scopes.emplace_back();s.slot=declare(s.binder,Type::u64,true);lookup(s.binder.text)->task_group=true;
                 flow=sequence(s.body,false);scopes.pop_back();break;
@@ -4195,7 +4220,7 @@ class Semantics {
                     global_selection = true;
                 }
             }
-            if ((variable && variable->readonly) || (!variable && !global_selection && visible_names.contains(s.name)))
+            if ((variable && variable->readonly) || (!variable && !global_selection && visible_name(s.name)))
                 error(source, s.token, Code::readonly, "Cannot mutate readonly const or declaration '" + s.name + "'.", "Use var for a mutable local binding.");
             if (!variable && !global_selection) error(source, s.token, Code::unknown_identifier, "Unknown identifier '" + s.name + "'.", "Declare it with var before assignment.");
             auto t = variable ? variable->type : Type(Type::none); if (variable) s.slot = variable->slot;
@@ -4327,21 +4352,7 @@ public:
     }
     Semantics(Unit& u, const std::map<std::string, std::unique_ptr<Unit>>& graph, Unit& r,
         std::function<void(Unit&, Constant&)> eval, Diagnostics& d, std::function<void(Unit&,Structure&)> defs)
-        : source(u.source), unit(u), units(graph), root(r), evaluate(std::move(eval)), defaults(std::move(defs)), diagnostics(d) {
-        for (const auto& [id,owner] : units) for (const auto& [name,structure] : owner->structure_names)
-            if (owner.get() == &unit || (source_visible(structure->visibility,id,unit.identity) && ((owner.get() == &root && same_library(unit.identity,root.identity)) || std::any_of(unit.imports.begin(),unit.imports.end(),[&](const auto& i) { return !i.explicit_alias && i.target == id; })))) visible_names.insert(name);
-        for (const auto& [id, owner] : units) for (const auto& [name, value] : owner->global_names)
-            if (owner.get() == &unit || (source_visible(value->visibility, id, unit.identity) && ((owner.get() == &root && same_library(id, unit.identity)) || std::any_of(unit.imports.begin(), unit.imports.end(), [&](const auto& i) { return !i.explicit_alias && i.target == id; })))) visible_names.insert(name);
-        for (const auto& [name, c] : root.constant_names) if (same_library(unit.identity,root.identity) && (!c->file_private || &root == &unit)) visible_names.insert(name);
-        for (const auto& [name, c] : unit.constant_names) { (void)c; visible_names.insert(name); }
-        for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty())
-            for (const auto& [name, c] : units.at(import.target)->constant_names) if (source_visible(c->visibility,import.target,unit.identity)) visible_names.insert(name);
-        for (const auto& [name, f] : unit.declarations) { (void)f; visible_names.insert(name); }
-        for (const auto& [name, target] : unit.qualifiers) { (void)target; visible_names.insert(name); }
-        for (const auto& import : unit.imports) if (!import.explicit_alias && !import.target.empty())
-            for (const auto& [name, f] : units.at(import.target)->declarations)
-                if (source_visible(f->visibility,import.target,unit.identity)) visible_names.insert(name);
-    }
+        : source(u.source), unit(u), units(graph), root(r), evaluate(std::move(eval)), defaults(std::move(defs)), diagnostics(d) {}
     void validate_generic_receiver(Type receiver,const Token& token) {
         auto selected=ir::select_member(*root.member_catalog,receiver,token.text,unit.identity,nullptr,lexical_owner());
         if(selected.path.empty() && !selected.method.empty())

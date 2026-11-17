@@ -1,5 +1,17 @@
 # G33 — Performance implementation ledger
 
+## G60 — query existing name visibility during frontend validation
+
+Qualified candidate on accepted G59 `1c3cfc4e9bd0d8ca169d08fc470c9c214ece1649`. Semantic checks query the current unit, implicit root and unaliased imports through their existing indexes. This removes 3,737 temporary visibility sets and their graph-wide walks from one raylib launch. Source graph validation drops from 1,187 to 143 ms in the separate observer. Parsing, two project and lock captures, native verification, G43 definite initialization and LLVM work still execute. No semantic cache or Runtime change. [G60 implementation and qualification](G60_WARM_PROJECT_STARTUP.md)
+
+With the exact G59 raylib project and accepted compiler, isolated paired Linux first output moves from 1,690.91 to 633.68 ms in normal JIT and from 1,674.04 to 625.15 ms in O2. Median paired first-output latency improves 62.70% and 62.57%. Full launch moves from 1,722 to 664 ms and 1,704 to 655 ms. Raylib peak RSS is about 2.0–2.2 MiB higher. The ordinary app is slightly slower within overlapping ranges. Preserve the individual startup, acquisition, memory and phase results in the report and archive.
+
+Linux Release passes 24 distinct selected checks after replaying the package notice fixtures with exact physical directories. Fatal ASan/UBSan/LeakSanitizer passes 23 selected checks. Windows 10 x64 Debug and Release each pass 9/9 selected checks and the native raylib JIT/AOT workflow with 1 MiB stacks. Release includes the previously omitted interruption helper. The G59 historical Release result remains 7/8. Actual VS Code passes 14 recorded events, including source and package invalidation. The exact G59/G60 diagnostic comparisons, negative lock and native checks and the existing Debug cache replay pass. LLVM/Clang/LLD remain pinned at 23.1.4.
+
+**Recommend integration review.** G59 remains the accepted baseline and its [first-class package workflow](../projects/G59_FIRST_CLASS_PACKAGE_EXPERIENCE.md) and trust rules are preserved. Keep G55–G58 held and retain all earlier decisions. The next startup profile can examine program construction and JIT build costs once G60 is accepted. Source, raw timings, exact qualification and replay are retained in `g60-warm-project-startup-2026-11-17.zip`.
+
+**Integration approval.** Golden Wrench reviewed and approved the qualified G60 compiler patch for local integration on G59. The approval retains the measured 2.0-2.2 MiB rise in raylib peak RSS and all unfavorable observations in the qualification report and archive. G55-G58 remain held. G59's package workflow and native authorization are unchanged.
+
 ## G54 — reuse checked rule extents in File200 translation
 
 Candidate on accepted G52 `771fbfc56b5dcec16b01b84473351e05e417835b`. The existing short ASCII no-match proof reads rule pairs within the live prefix under exact read leases and one Runtime mutex. It reuses the proven immutable layout to remove 32,400 per-entry capacity checks across 16,200 rule pairs for File200. Both builds validate each replacement in order, dispatch the same fallbacks, make the same observed C++ allocation requests and produce 15,000 bytes in 200 writes with an actual `fsync`. [Proof and qualification](G54_FILE200_RUNTIME_REDUNDANCY.md).
