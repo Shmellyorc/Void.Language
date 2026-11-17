@@ -244,18 +244,18 @@ std::string_view Runtime::string_bytes(void* object) const {
     return heap_.string_bytes(object);
 }
 void Runtime::string_into(void** slot,std::string_view text) {
-    string_parts_into(slot,text,{});
+    string_parts_into(slot,text,{},true);
 }
 std::size_t Runtime::string_payload_size(std::size_t left,std::size_t right) {
     constexpr auto maximum=std::numeric_limits<std::size_t>::max()-sizeof(std::uint64_t);
     if (left>maximum || right>maximum-left) throw std::length_error("string extent overflow");
     return sizeof(std::uint64_t)+left+right;
 }
-void Runtime::string_parts_into(void** slot,std::string_view left,std::string_view right) {
+void Runtime::string_parts_into(void** slot,std::string_view left,std::string_view right,bool validate_parts) {
     require_output(slot);
     {std::lock_guard lock(mutex_);heap_.validate_output_address(slot);}
     auto bytes=string_payload_size(left.size(),right.size());
-    if (!valid_utf8(left) || !valid_utf8(right)) throw std::invalid_argument("invalid UTF-8 string");
+    if (validate_parts && (!valid_utf8(left) || !valid_utf8(right))) throw std::invalid_argument("invalid UTF-8 string");
     if (left.empty() && right.empty()) { std::lock_guard lock(mutex_);heap_.validate_output_address(slot);*slot=nullptr; return; }
     std::vector<char> payload(bytes);
     std::uint64_t size=left.size()+right.size(); std::memcpy(payload.data(),&size,sizeof(size));
@@ -266,7 +266,9 @@ void Runtime::string_parts_into(void** slot,std::string_view left,std::string_vi
 }
 void Runtime::concat_into(void** slot,void* left,void* right) {
     auto a=string_bytes(left),b=string_bytes(right);
-    string_parts_into(slot,a,b);
+    // These views borrow immutable strings already admitted by this Runtime.
+    // construct_into still validates the assembled payload before publication.
+    string_parts_into(slot,a,b,false);
 }
 void Runtime::allocate_into(void** slot, const TypeLayout& layout) {
     require_output(slot);

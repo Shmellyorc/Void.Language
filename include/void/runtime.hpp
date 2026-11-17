@@ -228,7 +228,7 @@ private:
     static bool registered_at(const Frame&,std::size_t,std::size_t,void**);
     void require_public_root(void**) const;
     Frame* require_output(void**) const;
-    void string_parts_into(void**,std::string_view,std::string_view);
+    void string_parts_into(void**,std::string_view,std::string_view,bool validate_parts);
     void validate_descriptor(const TypeLayout&) const; // Caller holds mutex_.
     void validate_buffer_layout(const BufferLayoutRef&) const; // mutex_ held
     ElementSchemaRef fixed_scalar_schema(ScalarEncoding);

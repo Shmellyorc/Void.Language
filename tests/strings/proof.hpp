@@ -42,6 +42,28 @@ inline void runtime_checks() {
     runtime.string_into(&slots[1],"\xc3\xa9");
     runtime.concat_into(&slots[2],slots[0],slots[1]);
     require(runtime.string_bytes(slots[2])==std::string_view("a\0b\xc3\xa9",5),"NUL/UTF-8 content lost");
+    unsigned concat_failures=0;
+    bool concat_succeeded=false;
+    for(int budget=0;budget<16 && !concat_succeeded;++budget) {
+        slots[2]=slots[0];
+        bool failed=false;
+        {
+            managed_test::AllocationFailure fail(budget);
+            try {runtime.concat_into(&slots[2],slots[2],slots[1]);}
+            catch(const std::bad_alloc&) {failed=true;}
+        }
+        if(failed) {
+            ++concat_failures;
+            require(slots[2]==slots[0],"failed concat replaced aliased output");
+        } else {
+            concat_succeeded=true;
+            require(runtime.string_bytes(slots[2])==std::string_view("a\0b\xc3\xa9",5),"concat retry changed output");
+        }
+        require(runtime.collect()==vd::Runtime::Collection::completed,"concat failure collection failed");
+        require(runtime.string_bytes(slots[0])==std::string_view("a\0b",3) &&
+                runtime.string_bytes(slots[1])=="\xc3\xa9","concat failure changed an operand");
+    }
+    require(concat_succeeded && concat_failures>0,"concat allocation sweep did not cover failure and success");
     for(int budget=0;budget<7;++budget) {
         void* previous=slots[2];bool failed=false;
         {managed_test::AllocationFailure fail(budget);try {runtime.string_into(&slots[2],std::string(80,'z'));}catch(const std::bad_alloc&) {failed=true;}}
@@ -67,6 +89,8 @@ inline void runtime_checks() {
     void* unrooted=nullptr;rejected=false;try {runtime.string_into(&unrooted,"text");}catch(const std::invalid_argument&) {rejected=true;}require(rejected,"unrooted string output accepted");
     auto ordinary=vd::TypeLayout{8,{}};runtime.allocate_into(&slots[2],ordinary);
     rejected=false;try {runtime.string_bytes(slots[2]);}catch(const std::invalid_argument&) {rejected=true;}require(rejected,"ordinary object accepted as string");
+    rejected=false;try {runtime.concat_into(&slots[0],nullptr,slots[2]);}catch(const std::invalid_argument&) {rejected=true;}
+    require(rejected && slots[0]==nullptr,"concat published an invalid operand");
     {vd::Runtime::Native native(runtime);rejected=false;try {runtime.string_bytes(slots[0]);}catch(const std::logic_error&) {rejected=true;}require(rejected,"NativeSafe string dereference accepted");}
 }
 }
