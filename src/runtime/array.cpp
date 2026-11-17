@@ -15,25 +15,27 @@ std::string Runtime::list_identity(const ElementSchemaRef& schema) {
 }
 Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,const ElementSchemaRef& schema) const {
     auto* object=reference_source(source);
-    return list_header(object,schema,list_identity(schema));
-}
-Runtime::ListHeader& Runtime::list_header(void* object,const ElementSchemaRef& schema,std::string_view key) const {
+    auto key=list_identity(schema);
     if(!types_)throw std::invalid_argument("missing list catalog");
     auto admitted=types_->schemas.find(schema->identity());if(admitted==types_->schemas.end() || admitted->second!=schema)throw std::invalid_argument("foreign list schema");
+    return checked_list(object,schema,key).header;
+}
+Runtime::CheckedList Runtime::checked_list(void* object,const ElementSchemaRef& schema,std::string_view key) const {
     auto type=types_->types.find(key);
     if(type==types_->types.end() || type->second->layout.size!=sizeof(ListHeader) || (type->second->layout.references.size()!=1 || type->second->layout.references[0]!=offsetof(ListHeader,backing)) || heap_.nominal_identity(object)!=key)throw std::invalid_argument("invalid list header");
     auto& h=*static_cast<ListHeader*>(object);
     if(h.count>h.capacity || h.capacity>maximum)throw std::invalid_argument("invalid list extent");
-    if(!h.capacity) {if(h.count || h.backing)throw std::invalid_argument("invalid empty list");}
-    else {
-        const auto& state=heap_.buffer_state(h.backing);
-        if(!state.layout->packed(schema,h.capacity)) {
-            BufferLayout expected(schema,h.capacity,0,0);
-            if(!state.layout->equivalent(expected))throw std::invalid_argument("invalid list backing");
-        }
-        if(!state.complete || state.valid_prefix!=h.count)throw std::invalid_argument("invalid list backing");
+    if(!h.capacity) {
+        if(h.count || h.backing)throw std::invalid_argument("invalid empty list");
+        return {h,nullptr};
     }
-    return h;
+    const auto& state=heap_.buffer_state(h.backing);
+    if(!state.layout->packed(schema,h.capacity)) {
+        BufferLayout expected(schema,h.capacity,0,0);
+        if(!state.layout->equivalent(expected))throw std::invalid_argument("invalid list backing");
+    }
+    if(!state.complete || state.valid_prefix!=h.count)throw std::invalid_argument("invalid list backing");
+    return {h,state.layout.get()};
 }
 BufferLayoutRef Runtime::native_array_layout(const NativeArrayElement& element,std::uint64_t capacity) {
     require_managed();if(!element.key || (element.count && !element.fields))throw std::invalid_argument("missing native element metadata");

@@ -1,5 +1,14 @@
 # G33 — Performance implementation ledger
 
+## G52 — reuse validated scalar list layout during indexed reads
+
+Qualified candidate on accepted G51 `a32a5ff3b7ce6c6ea7d56ad26aba578806fa1cac`. A checked read reuses the scalar schema admitted under the Runtime mutex, returns the validated backing layout from the existing header check, and reuses its proof of representability after the source index check. The private 4,096-element case eliminates 524,288 schema lookups, 524,288 backing lookups and 524,288 redundant capacity checks in the observer. Every observed read call, lock, logical bounds check, allocation, poll and root count matches. There is no change to compiler lowering, ABI or safepoint ownership. [G52 implementation and qualification](G52_PRIVATE_LIST_INDEXED_READS.md).
+
+All 96 matched private-list pairs improve, with 7.46–14.31% lower paired elapsed medians across normal/O2 JIT and independent normal/optimized AOT. Sorting takes 5.91–9.59% less time. The 4,096-element AOT counter runs retire 9.61–9.73% fewer instructions. The integer instruction counts match. Preserve mixed and isolated chained-concat results. The isolated normal JIT median is +7.51% in seven of eight slower pairs, and normal/optimized AOT register +2.01% and +2.14%. Their AOT instruction counts and observed allocation, poll and root counts match. The exact cause of the text cost remains unresolved. No source correction was justified.
+
+Linux Release and fatal ASan/UBSan/LeakSanitizer passed 32/32 each. Fatal TSan passed three Runtime controls, a standalone 32-collection concurrent resize/read proof and 36 independent AOT answers. Native Windows 10 Debug and Release each passed 30/30 plus 456 additional answers across normal/O2 JIT and independent AOT. Pinned LLVM/Clang/LLD 23.1.4 and 1 MiB stacks were verified. **Boss approved G52 for integration and explicitly accepted the measured performance tradeoffs above.** Replay and exact source restoration are retained in `g52-private-list-indexed-reads-2026-11-16.zip`. Preserve G45/G46/G49/G50 holds, the accepted G47/G48/G51 improvements, and the earlier performance record.
+
+
 ## G51 — avoid rescanning UTF-8 concatenation operands
 
 Qualified candidate on accepted G48 `4790a7a52ecf42732d12e3adc35cac3812246516`. The existing Runtime constructor skips two pre-staging UTF-8 scans only for already-admitted immutable current-Heap string operands. Raw input validation, assembled-output validation, allocation and failure ordering, copies and precise roots are preserved. Long concatenation removes 768 input scans over 25,165,824 bytes in the observed workload, with matching output validations and native requests. Its elapsed time drops 40.01–56.15% across normal/O2 JIT and independent normal/optimized AOT. The normal-AOT PMU replay shows 46.44% fewer retired instructions. [G51 proof and measurements](G51_TEXT_CONSTRUCTION_PERFORMANCE.md).

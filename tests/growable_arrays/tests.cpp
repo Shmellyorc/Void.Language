@@ -170,6 +170,40 @@ void cold_construction() {
     }
     require(success && failures>10,"cold allocation sweep incomplete");std::cout<<"cold list construction: "<<failures<<" failing allocation budgets passed\n";
 }
+void checked_reads_after_mutation() {
+    Runtime runtime(1);
+    Runtime::Attachment attachment(runtime);
+    Runtime::Managed managed(runtime);
+    void* list=nullptr;
+    void* alias=nullptr;
+    constexpr std::size_t zero=0;
+    Runtime::Slot slots[]={{&list,sizeof(list),&zero,1},{&alias,sizeof(alias),&zero,1}};
+    Runtime::Frame frame(runtime,slots,2);
+    constexpr auto encoding=ScalarEncoding::i32;
+    const auto root=runtime.root_word(&list);
+    const auto other=runtime.root_word(&alias);
+    auto failure=[&](unsigned format,std::uint64_t index,const char* expected) {
+        RuntimeFailure result;
+        vd_list_read_index(&list,format,index,0,&result);
+        require(result.message && std::string_view(result.message)==expected,"unexpected checked read failure");
+    };
+    runtime.list_into(&list,encoding);
+    failure(static_cast<unsigned>(encoding),0,"List index outside extent");
+    alias=list;
+    for(unsigned i=0;i<257;++i) runtime.list_push(other,encoding,i+1);
+    require(runtime.collect()==Runtime::Collection::completed,"list read collection failed");
+    require(runtime.list_read(root,encoding,0)==1 && runtime.list_read(root,encoding,256)==257,
+            "first or last scalar after growth is incorrect");
+    failure(static_cast<unsigned>(encoding),257,"List index outside extent");
+    runtime.list_write(other,encoding,0,400);
+    require(runtime.list_read(root,encoding,0)==400,"scalar read missed an alias write");
+    for(unsigned i=257;i>0;--i) runtime.list_remove(other,encoding,i-1);
+    failure(static_cast<unsigned>(encoding),0,"List index outside extent");
+    failure(static_cast<unsigned>(ScalarEncoding::u32),0,"Invalid fixed value contract");
+    runtime.list_push(other,encoding,27);
+    require(runtime.list_read_index(root,encoding,~std::uint64_t{0},true)==27,
+            "signed scalar read after regrowth is incorrect");
+}
 void concurrent_collection() {
     Runtime r(1);Runtime::Attachment a(r);Runtime::Managed m(r);void* list=nullptr;constexpr std::size_t zero=0;Runtime::Slot slot{&list,sizeof(list),&zero,1};Runtime::Frame frame(r,&slot,1);
     r.list_into(&list,ScalarEncoding::i32);auto token=r.root_word(&list);for(unsigned i=0;i<4;++i)r.list_push(token,ScalarEncoding::i32,i);
@@ -184,6 +218,6 @@ void concurrent_collection() {
 }
 }
 int main(int argc,char** argv) {
-    try {require(argc==2,"expected repository root");diagnostics_and_ir();runtime_transactions();cold_construction();concurrent_collection();for(bool optimized:{false,true}){sources(argv[1],optimized);extreme_indexes(optimized);scalar_read_effects(optimized);source_failures(argv[1],optimized);}std::cout<<"Growable lists: source, aliases, roots, transactions and failures passed\n";}
+    try {require(argc==2,"expected repository root");diagnostics_and_ir();runtime_transactions();cold_construction();checked_reads_after_mutation();concurrent_collection();for(bool optimized:{false,true}){sources(argv[1],optimized);extreme_indexes(optimized);scalar_read_effects(optimized);source_failures(argv[1],optimized);}std::cout<<"Growable lists: source, aliases, roots, transactions and failures passed\n";}
     catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}
 }

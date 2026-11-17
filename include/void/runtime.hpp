@@ -244,11 +244,13 @@ private:
     std::uint64_t dictionary_find(const DictionaryHeader&,const NativeDictionary&,const void*,std::uint64_t) const;
     void dictionary_index(DictionaryHeader&,const NativeDictionary&) const;
     struct ListHeader {void* backing;std::uint64_t count,capacity,version;};
+    struct CheckedList {ListHeader& header;const BufferLayout* backing_layout;};
     void array_write_value(RegisteredRootWord,const ElementSchemaRef&,const BufferLayout*,std::uint64_t,const void*,bool,std::optional<std::uint64_t>);
     static std::string list_identity(const ElementSchemaRef&);
     ListHeader& list_header(RegisteredRootWord,const ElementSchemaRef&) const;
-    ListHeader& list_header(void*,const ElementSchemaRef&,std::string_view) const;
-    ListHeader& list_header(RegisteredRootWord,ScalarEncoding) const; // mutex_ held
+    // Callers hold mutex_ and have resolved the schema in the current catalog.
+    CheckedList checked_list(void*,const ElementSchemaRef&,std::string_view) const;
+    CheckedList checked_list(RegisteredRootWord,ScalarEncoding) const; // mutex_ held
     void validate_native_element(const void*,DataCursor&,const ElementSchemaRef&) const;
     void append_native(BufferBuilder&,const BufferLayoutRef&,const void*);
     void validate_fixed_output(void**,const BufferLayoutRef&) const;

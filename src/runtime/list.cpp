@@ -28,7 +28,7 @@ void store_bits(void* p,std::uint64_t bits,std::size_t width) {
 }
 
 }
-Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,ScalarEncoding encoding) const {
+Runtime::CheckedList Runtime::checked_list(RegisteredRootWord source,ScalarEncoding encoding) const {
     // Invalid encodings retain the metadata/schema error ordering of this
     // checked-header boundary; scalar construction validates its own enum.
     if(!types_)throw std::invalid_argument("missing list metadata");
@@ -36,16 +36,17 @@ Runtime::ListHeader& Runtime::list_header(RegisteredRootWord source,ScalarEncodi
     auto key=scalar_identity(encoding);
     auto found=types_->schemas.find(key);if(found==types_->schemas.end())throw std::invalid_argument("missing list scalar schema");
     static constexpr std::string_view lists[]={"void.list.v1/0","void.list.v1/1","void.list.v1/2","void.list.v1/3","void.list.v1/4","void.list.v1/5","void.list.v1/6","void.list.v1/7","void.list.v1/8","void.list.v1/9","void.list.v1/10"};
-    return list_header(reference_source(source),found->second,lists[static_cast<unsigned>(encoding)]);
+    return checked_list(reference_source(source),found->second,lists[static_cast<unsigned>(encoding)]);
 }
 void Runtime::list_into(void** out,ScalarEncoding encoding,std::uint64_t count) {array_new(out,fixed_scalar_layout(encoding,count),true,true);}
-std::uint64_t Runtime::list_count(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return list_header(source,encoding).count;}
-std::uint64_t Runtime::list_version(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return list_header(source,encoding).version;}
+std::uint64_t Runtime::list_count(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return checked_list(source,encoding).header.count;}
+std::uint64_t Runtime::list_version(RegisteredRootWord source,ScalarEncoding encoding) const {require_managed();std::lock_guard lock(mutex_);return checked_list(source,encoding).header.version;}
 std::uint64_t Runtime::list_read(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t index) const {
     return list_read_index(source,encoding,index,false);
 }
 std::uint64_t Runtime::list_read_index(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t index,bool signed_index) const {
-    require_managed();std::lock_guard lock(mutex_);const auto& h=list_header(source,encoding);
+    require_managed();std::lock_guard lock(mutex_);
+    const auto [h,layout]=checked_list(source,encoding);
     // Normalize a sign-extended source index against the same checked header
     // used for the read. Unsigned subtraction handles INT64_MIN without UB.
     if(signed_index && (index&(std::uint64_t{1}<<63))) {
@@ -54,7 +55,10 @@ std::uint64_t Runtime::list_read_index(RegisteredRootWord source,ScalarEncoding 
         index=h.count-magnitude;
     }
     if(index>=h.count)throw std::out_of_range("list index outside extent");
-    const auto& state=heap_.buffer_state(h.backing);return load_bits(static_cast<const char*>(h.backing)+state.layout->element_offset(index),scalar_width(encoding));
+    // The checked header established count <= capacity == layout->capacity().
+    // The immutable layout proved representability when it was constructed.
+    const auto offset=layout->base()+layout->stride()*static_cast<std::size_t>(index);
+    return load_bits(static_cast<const char*>(h.backing)+offset,scalar_width(encoding));
 }
 void Runtime::list_write(RegisteredRootWord source,ScalarEncoding encoding,std::uint64_t index,std::uint64_t bits,std::optional<std::uint64_t> version) {
     valid_bits(encoding,bits);auto schema=fixed_scalar_schema(encoding);char data[8]{};store_bits(data,bits,scalar_width(encoding));array_write_value(source,schema,nullptr,index,data,false,version);
