@@ -201,13 +201,21 @@ int vd::Runtime::translate_scalars(void** output, RegisteredRootWord input, Regi
                 if (byte >= 128) return {};
                 present[byte / 64] |= std::uint64_t{1} << (byte % 64);
             }
+            if (count == 0) return source.size();
+            // Both exact read leases hold count live elements in complete,
+            // rooted backings. Layout construction proved the whole capacity
+            // addressable. The loop bound suffices while we hold this lock.
+            const auto* key_data = static_cast<const char*>(key_backing) + key_layout->base();
+            const auto* string_data = static_cast<const char*>(string_backing) + string_layout->base();
+            const auto key_stride = key_layout->stride();
+            const auto string_stride = string_layout->stride();
             auto remaining = byte_quota - source.size();
             std::int32_t previous = -1;
-            for (std::uint64_t i = 0; i < count; ++i) {
+            for (std::size_t i = 0; i < count; ++i) {
                 std::int32_t key;
-                std::memcpy(&key, static_cast<const char*>(key_backing) + key_layout->element_offset(i), sizeof(key));
+                std::memcpy(&key, key_data + key_stride * i, sizeof(key));
                 void* value = nullptr;
-                std::memcpy(&value, static_cast<const char*>(string_backing) + string_layout->element_offset(i), sizeof(value));
+                std::memcpy(&value, string_data + string_stride * i, sizeof(value));
                 // Stop at the first inconclusive entry; later rules cannot
                 // mask its failure in the original rule-processing path.
                 const auto bytes = runtime.heap_.string_bytes(value);

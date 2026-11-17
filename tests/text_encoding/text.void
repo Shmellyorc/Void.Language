@@ -123,4 +123,28 @@ func main() -> i32:
             return 37
     else:
         return 38
+
+    # The bounded proof may visit 256 rule pairs, with leases freezing the
+    # initialized prefixes even when the backing has room for more entries.
+    var ordered: [i32] = []
+    var values: [string] = []
+    for key in 256..<512:
+        ordered.push(key)
+        values.push("x")
+    if text.translate_scalars("b", ordered, values, 1) is Ok(var unchanged):
+        if unchanged != "b":
+            return 39
+    else:
+        return 40
+    ordered[255] = 510
+    if not rejected(text.translate_scalars("b", ordered, values, -1), text.error_kind.invalid_argument):
+        return 41
+    ordered[255] = 511
+    ordered.push(512)
+    values.push("y")
+    if text.translate_scalars("b", ordered, values, 1) is Ok(var fallback):
+        if fallback != "b":
+            return 42
+    else:
+        return 43
     return 0
