@@ -1,5 +1,74 @@
 # Trusted static native providers
 
+## Bundled raylib
+
+Use a G59-enabled `voidc` with Python 3.12 or newer on PATH and the
+configured Clang/LLD 23.1.4 SDK. On Windows use an x64 Visual Studio Native
+Tools shell. The first install needs access to the pinned raylib 6.0
+GitHub release. Supported targets are Linux x86-64 GNU and Windows x64 MSVC.
+
+```sh
+voidc new TestGame
+cd TestGame
+voidc package list
+voidc add raylib
+```
+
+Replace `src/app.void` with this image test, which works without a display.
+
+```void
+use pkg/raylib as rl
+
+func main() -> i32:
+    var image = rl.gen_image_color(16, 16, rl.orange()) as rl.image
+    defer rl.unload_image(image)
+    rl.image_draw_pixel(image, 2, 3, rl.blue())
+    var pixel = rl.get_image_color(image, 2, 3)
+    if pixel.b != 241:
+        return 19
+    print("raylib pixel: 241")
+    return 0
+```
+
+```sh
+voidc tidy --check
+voidc check .
+voidc run . --allow-native
+voidc run . --allow-native --profile debug
+voidc build . --allow-native --profile release
+```
+
+The compiler runs the shipped recipe to fetch and verify the release asset,
+generate the descriptor and adapter, and write the existing managed catalog.
+The existing package-edit transaction publishes the package and its catalog
+together. `void.lock` binds the source tree, target, descriptor, runtime and
+link artifacts and notices. Execution and AOT linking still require
+`--allow-native` each time. Review the project manifest and lock before
+authorizing a native provider in a project from another party.
+
+`voidc package list` and `libs/raylib/SOURCE_ORIGIN.txt` identify the
+GitHub origin and base revision separately from the shipped snapshot
+SHA-256. The snapshot includes the G59 preparation recipe and binding
+updates. The compiler build identity incorporates this digest, and
+`void.lock` covers the installed source bytes and receipt.
+
+The installed catalog lives at `libs/raylib/.void/native`. A successful
+unchanged run verifies and reuses it. If the entire installed `libs/raylib`
+tree is missing, `voidc add raylib` can restore it against the original
+manifest and lock using the same compiler and toolchain. It refuses a
+present altered tree or a rebuilt artifact that differs from the lock.
+The lock remains target-specific. Create or refresh a target's native lock
+only after reviewing the intentional change. For local development of
+the native adapter, use the existing explicit catalog workflow below.
+
+For another C library, keep the reviewed physical `.void` declarations and
+the C sources, headers, descriptor and notices in its ordinary source package.
+Use `voidc native import` and `voidc native-bind` for the existing import and
+adapter operations. Review callback and resource contracts before admission.
+Ordinary Git and local packages are source-only on addition. The shipped
+raylib definition is the current automatic native preparation route.
+
+
 ## G25: import a C header explicitly
 
 `voidc native import` inspects a header with pinned Clang 23.1.4 and publishes

@@ -157,6 +157,21 @@ and [G24 physical source](projects/G24_PHYSICAL_SOURCE_IMPLEMENTATION.md).
 No registry, automatic installation scripts or implicit native approval is added
 by library creation or maintenance.
 
+## G59 package entry points
+
+`voidc add mylib --dir DIR` is the friendly form of `--path`. The
+`--git URL` form records a verified immutable HEAD when the user omits
+`--rev`. Git acquisition still verifies the full snapshot before selecting
+`--subdir` and remains subject to the existing D3 limits. Repeated additions
+reuse the recorded pin. Only an explicit acquisition command or URL can
+contact Git. Discovery and explicit stores are described in the
+[CLI guide](CLI.md#source-package-discovery-and-installation).
+
+The bundled raylib route uses the same source installer, then publishes
+the reviewed native catalog with the package. All other local and Git
+source installation follows the existing source-only contract.
+See [Bundled raylib](NATIVE_LIBRARIES.md#bundled-raylib).
+
 ## G26: installed source packages and maintenance
 
 The implemented commands are:

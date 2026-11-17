@@ -1,5 +1,17 @@
 # VOID editor integration (Phase 11)
 
+## Bundled native package APIs
+
+In a trusted VS Code workspace with the matching `voidls`, run
+`voidc add raylib` in the project terminal and import `use pkg/raylib as rl`.
+The language server verifies the project lock and the package catalog from
+the project. Completions at `rl.`, typed hover, physical-source definitions,
+semantic tokens and diagnostics use the same declarations as the compiler.
+Parameter hints follow the existing documentation policy. Package refresh
+uses the existing watched-file pipeline. Run or build with explicit native
+authorization in the terminal. [Bundled raylib](NATIVE_LIBRARIES.md#bundled-raylib)
+
+
 ## VS Code project commands
 
 Open a trusted local folder with a selected VOID manifest. **VOID: Check

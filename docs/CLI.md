@@ -251,6 +251,44 @@ Rebuilding the changed driver
 changes the whole-compiler fingerprint normally; old compiled cache entries are
 not promised to survive that rebuild.
 
+## Source package discovery and installation
+
+```sh
+voidc package list
+voidc package search raylib
+voidc add raylib
+voidc add mylib --git https://github.com/OWNER/REPOSITORY.git
+voidc add mylib --dir ../mylib
+voidc tidy --check
+```
+
+Discovery uses the version-controlled definitions shipped with the compiler.
+It needs no network or account. `--dir` accepts the same paths as `--path`.
+An explicit HTTPS URL authorizes source acquisition for that URL. Without
+`--rev`, the first addition pins the repository's HEAD in both
+`void.project.toml` and `void.lock`. A repeat preserves the existing pin.
+An advanced `--subdir packages/mylib` selects an exact manifest inside
+the immutable tree. `file:` Git origins still require an explicit `--rev`.
+
+To retain a package outside an application in an explicit, independently
+locked local store, create a project directory and select it with
+`package install`:
+
+```sh
+voidc new PackageStore
+voidc package install mylib --store PackageStore --dir /absolute/path/to/mylib
+voidc package install otherlib --store PackageStore --git https://github.com/OWNER/REPOSITORY.git
+```
+
+A store keeps its own manifest, lock, installed views and any prepared
+bundled native catalog. A consuming project still acquires and locks its
+own dependency. For editable source reuse, pass the store's `libs/mylib`
+directory to the consumer's `voidc add mylib --dir …`.
+
+Use `voidc package --project list` if an application directory is named
+`list`, `search` or `install`. For the raylib program, prerequisites and
+authorization commands, see [Bundled raylib](NATIVE_LIBRARIES.md#bundled-raylib).
+
 ## Native output and installation
 
 ### Application distributions

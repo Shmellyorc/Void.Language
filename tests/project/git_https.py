@@ -474,6 +474,36 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl
         cli(fresh, "resolve")
         assert (fresh / "void.lock").read_bytes() == first_lock
 
+        # An explicitly supplied HTTPS URL resolves HEAD once. The existing
+        # snapshot verifier and lock carry the actual commit, including subdir.
+        head = base / "head consumer"
+        project(head, "app", program)
+        cli(head, "add", "units", "--git", origin, env=hostile)
+        assert lock_row(head)["rev"] == new
+        assert cli(head, "run", env=clean).stdout == b"58\n"
+        nested = units / "packages/units"
+        project(nested, "units", units_api.replace("41", "86"), library=True)
+        nested_head = commit(units)
+        before = len(server.requests)
+        cli(head, "add", "units", "--git", origin, env=clean)
+        assert len(server.requests) == before and lock_row(head)["rev"] == new
+
+        subdir = base / "nested consumer"
+        project(subdir, "app", program)
+        cli(subdir, "add", "units", "--git", origin, "--subdir", "absent", status=1, env=trusted)
+        cli(subdir, "add", "units", "--git", origin, "--subdir", "../packages", status=1, env=trusted)
+        assert not (subdir / "void.lock").exists()
+        cli(subdir, "add", "units", "--git", origin, "--subdir", "packages/units", env=trusted)
+        assert lock_row(subdir)["rev"] == nested_head and lock_row(subdir)["subdir"] == "packages/units"
+        assert cli(subdir, "run", env=clean).stdout == b"87\n"
+
+        registered = base / "explicit package store"
+        project(registered, "app", program)
+        run(compiler, "package", "install", "units", "--store", registered, "--git", origin,
+            "--subdir", "packages/units", cwd=base, env=trusted)
+        assert lock_row(registered)["rev"] == nested_head
+        assert cli(registered, "run", env=clean).stdout == b"87\n"
+
         probe = base / "negative"
         for target in (forbidden, server):
             server.pack_uri = target.origin + "/unsolicited.pack"

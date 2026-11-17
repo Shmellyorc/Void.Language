@@ -96,7 +96,7 @@ struct ProjectCapture {
             for (const auto& [id, package] : dependencies->packages()) package_roots.insert("/" + package.locator);
         }
         if(imports_only && manifest->native_requirement()) {
-            try {native=project::select_managed_native(*manifest->native_requirement()).admission;}
+            try {native=project::select_managed_native(*manifest, root).admission;}
             catch(const std::runtime_error& failure) {project_failure(anchor,Code::project_changed,failure.what());}
         }
         if (!manifest->native().empty()) {

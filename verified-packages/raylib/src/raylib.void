@@ -898,6 +898,9 @@ func color_is_equal(p0: native.color, p1: native.color) -> bool:
     _check()
     return value
 
+## Return a copy of a color with raylib's alpha adjustment.
+## @param p0 The input color whose red, green and blue channels are preserved.
+## @param p1 Alpha in the range 0.0 (transparent) to 1.0 (opaque).
 func fade(p0: native.color, p1: f32) -> native.color:
     var value = native.fade(p0, p1)
     _check()

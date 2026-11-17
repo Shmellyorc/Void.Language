@@ -6,6 +6,9 @@
 #include "void/frontend.hpp"
 #include <llvm/ADT/StringRef.h>
 #include <llvm/Support/SHA256.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Support/Process.h>
+#include <llvm/Support/Program.h>
 #include <algorithm>
 #include <cstdint>
 #include <iterator>
@@ -468,7 +471,7 @@ public:
         if (!fetch && manifest.native_requirement()) {
             const auto& requirement = *manifest.native_requirement();
             try {
-                native = select_managed_native(requirement);
+                native = select_managed_native(manifest, root);
             } catch (const std::invalid_argument& error) {
                 native_selection_failed(manifest, requirement, error.what());
             } catch (const std::runtime_error& error) {
@@ -770,19 +773,24 @@ void import_advice(const fs::path& root,const Manifest& manifest,MaintenanceRepo
     if(manifest.native_requirement())report.advice.push_back("Native requirement remains separate from source installation; existing D4 catalog selection and --allow-native are required for execution.");
 }
 }
-MaintenanceReport add_dependency(const fs::path& requested,const AddOptions& options) {
+static MaintenanceReport add_dependency_impl(const fs::path& requested, AddOptions options,
+    const std::function<ProjectFiles()>& prepare_raylib = {}) {
     if(!valid_editor_identifier(options.alias) || options.alias.size()>128 || bool(options.path)==bool(options.git))
         throw std::invalid_argument("add requires a valid alias and exactly one explicit --path or --git with --rev.");
-    if(options.git && (!valid_git_pin(options.git->pin) || !valid_git_subdir(options.git->subdir)))
-        throw std::invalid_argument("add requires a canonical Git origin, full lowercase commit SHA and portable subdir.");
+    if(options.git && (!valid_git_origin(options.git->pin.origin) || !valid_git_subdir(options.git->subdir) ||
+       (!options.git->pin.revision.empty() && !valid_git_pin(options.git->pin))))
+        throw std::invalid_argument("add requires a canonical Git origin, a full lowercase SHA when supplied and a portable subdir.");
     const auto root=inspect_creation_root(requested);
     recover_package_edit(root);
     auto manifest=maintenance_manifest(root.path/manifest_name);
     const auto previous=read_dependency_lock(root.path);
     if(previous)require_lock_shape(*previous);
+    auto prior=manifest->dependencies().find(options.alias);
+    const bool restore=prepare_raylib && previous && prior!=manifest->dependencies().end() &&
+                       !view_present(root.path,options.alias);
     // Existing dependencies must already be consistent; adding an unrelated
     // source never silently blesses a stale or forged lock.
-    if(!manifest->dependencies().empty() || manifest->native_requirement()) {
+    if(!restore && (!manifest->dependencies().empty() || manifest->native_requirement())) {
         Resolver existing(root.path,manifest.get());
         auto captured=existing.capture();
         if(!previous || *previous!=captured.lock)stale_lock();
@@ -793,7 +801,20 @@ MaintenanceReport add_dependency(const fs::path& requested,const AddOptions& opt
     std::string path;
     bool install_local=false;
     if(options.git) {
-        auto snapshot=read_git_snapshot(git_snapshot_path(root.path,options.git->pin),options.git->pin);
+        std::optional<GitSnapshot> snapshot;
+        if(options.git->pin.revision.empty()) {
+            if(prior!=manifest->dependencies().end()) {
+                if(!prior->second.git || prior->second.git->pin.origin!=options.git->pin.origin ||
+                   prior->second.git->subdir!=options.git->subdir)
+                    throw std::runtime_error("Conflicting dependency alias '"+options.alias+"'; existing project retained.");
+                options.git->pin=prior->second.git->pin;
+            } else {
+                auto [pin, acquired]=acquire_git_head(root.path,options.git->pin.origin);
+                options.git->pin=std::move(pin);
+                snapshot=std::move(acquired);
+            }
+        }
+        if(!snapshot)snapshot=read_git_snapshot(git_snapshot_path(root.path,options.git->pin),options.git->pin);
         if(!snapshot)snapshot=acquire_git_snapshot(root.path,options.git->pin);
         files=package_view(*snapshot,options.git->subdir);
         auto entry=files.find(std::string(manifest_name));
@@ -811,13 +832,30 @@ MaintenanceReport add_dependency(const fs::path& requested,const AddOptions& opt
     }
     if(!selected->package() || !selected->package_entry())throw std::runtime_error("Source must be a VOID library with an explicit package.entry.");
     const auto& identity=*selected->package();
-    report_native_sources(files,report,options.alias);
-    auto prior=manifest->dependencies().find(options.alias);
+    const auto& raylib=verified_raylib_requirement();
+    if(prepare_raylib && (!install_local || identity.id!=raylib.id || identity.version.text()!="0.1.0"))
+        throw std::runtime_error("Bundled raylib source does not match the supported package identity.");
+    if(!prepare_raylib)report_native_sources(files,report,options.alias);
     if(prior!=manifest->dependencies().end()) {
         const auto& declaration=prior->second;
         bool same=declaration.id==identity.id && declaration.version.accepts(identity.version) &&
             (options.git?declaration.git && declaration.git->pin==options.git->pin && declaration.git->subdir==options.git->subdir:!declaration.git && declaration.path==path);
+        if(prepare_raylib) {
+            const auto& requirement=manifest->native_requirement();
+            same=same && requirement && requirement->alias==raylib.alias && requirement->id==raylib.id &&
+                requirement->version==raylib.version && requirement->abi==raylib.abi;
+        }
         if(!same)throw std::runtime_error("Conflicting dependency alias '"+options.alias+"'; existing project retained.");
+        if(restore) {
+            files.merge(prepare_raylib());
+            publish_package_edit(root,manifest->source().text(),previous,{{options.alias,std::move(files)}},[&] {
+                Resolver fresh(root.path,manifest.get());
+                if(fresh.capture().lock!=*previous)stale_lock();
+                return std::pair{manifest->source().text(),previous};
+            });
+            report.changed=true;
+            return report;
+        }
         // Adopting an existing manual Git declaration also installs its optional
         // source view. Editable local contents remain the declared authority.
         if(options.git && !view_present(root.path,options.alias)) {
@@ -830,6 +868,8 @@ MaintenanceReport add_dependency(const fs::path& requested,const AddOptions& opt
         }
         return report;
     }
+    if(prepare_raylib && (manifest->kind()!=Kind::application || manifest->native_requirement() || !manifest->native().empty()))
+        throw std::runtime_error("Bundled raylib needs an application without another native provider.");
     auto text=manifest->source().text();
     const auto newline=text.find("\r\n")!=std::string::npos?"\r\n":"\n";
     std::string addition="\n[dependencies."+options.alias+"]\n";
@@ -839,12 +879,19 @@ MaintenanceReport add_dependency(const fs::path& requested,const AddOptions& opt
         if(!options.git->subdir.empty())string_field(addition,"subdir",options.git->subdir);
     } else string_field(addition,"path",path);
     string_field(addition,"version","="+identity.version.text());
+    if(prepare_raylib) {
+        addition+="\n[native-requirements."+raylib.alias+"]\n";
+        string_field(addition,"id",raylib.id);
+        string_field(addition,"version","="+raylib.version.text());
+        addition+="abi = "+std::to_string(raylib.abi)+"\n";
+    }
     if(!text.empty() && text.back()!='\n')text+=newline;
     for(char c:addition) {if(c=='\n')text+=newline;else text+=c;}
     auto future=maintenance_manifest(root.path/manifest_name,text);
     std::map<std::string,ProjectFiles> additions;
     if(options.git || install_local) {
         if(view_present(root.path,options.alias))throw CreationCollision("Developer-owned package destination already exists: libs/"+options.alias);
+        if(prepare_raylib)files.merge(prepare_raylib());
         additions.emplace(options.alias,std::move(files));
     }
     const std::vector<GitPin> direct_only;
@@ -867,6 +914,58 @@ MaintenanceReport add_dependency(const fs::path& requested,const AddOptions& opt
     if(!options.git && path=="libs/"+options.alias)report.advice.push_back("Editable local source installed at "+path+"; subsequent source edits belong there.");
     return report;
 }
+MaintenanceReport add_dependency(const fs::path& requested, const AddOptions& options) {
+    return add_dependency_impl(requested, options);
+}
+
+MaintenanceReport add_verified_raylib(const fs::path& requested, const fs::path& source,
+    const fs::path& compiler, const fs::path& clang, bool sanitize) {
+    return add_dependency_impl(requested, {"raylib", source, {}}, [&] {
+        // Find Python through absolute PATH entries only. Never run a program
+        // selected from the consumer or execute a script from installed sources.
+        llvm::SmallVector<llvm::StringRef> entries;
+        const auto search = llvm::sys::Process::GetEnv("PATH").value_or("");
+#ifdef _WIN32
+        llvm::StringRef(search).split(entries, ';');
+        constexpr auto name = "python.exe";
+#else
+        llvm::StringRef(search).split(entries, ':');
+        constexpr auto name = "python3";
+#endif
+        const auto cwd=fs::current_path();
+        entries.erase(std::remove_if(entries.begin(),entries.end(),[&](auto entry) {
+            const auto path=utf8_path(entry.str());
+            return !path.is_absolute() || path.lexically_normal()==cwd;
+        }),entries.end());
+        if(entries.empty())throw std::runtime_error("Bundled raylib preparation needs Python 3.12 or newer on PATH.");
+        const auto python=llvm::sys::findProgramByName(name,entries);
+        if(!python)throw std::runtime_error("Bundled raylib preparation needs Python 3.12 or newer on PATH.");
+
+        llvm::SmallString<128> temp;
+        if(auto error=llvm::sys::fs::createUniqueDirectory("void-raylib",temp))throw std::system_error(error);
+        const auto scratch=utf8_path(temp.str().str());
+        const auto catalog=scratch/"catalog";
+        try {
+            std::vector<std::string> args{*python,"-I","-B",path_utf8(source/"prepare.py"),"--bundled",
+                "--voidc",path_utf8(compiler),"--clang",path_utf8(clang),"--managed-catalog",path_utf8(catalog)};
+            if(sanitize)args.emplace_back("--sanitize");
+            const std::vector<llvm::StringRef> refs(args.begin(),args.end());
+            std::string error;
+            if(llvm::sys::ExecuteAndWait(args.front(),refs,std::nullopt,{},240,0,&error)!=0)
+                throw std::runtime_error("Bundled raylib preparation failed. "+error);
+            ProjectFiles files{{".void/",""},{std::string(verified_raylib_catalog)+"/",""}};
+            for(auto& [path,bytes]:read_package_directory(catalog))
+                files.emplace(std::string(verified_raylib_catalog)+"/"+path,std::move(bytes));
+            fs::remove_all(scratch);
+            return files;
+        } catch(...) {
+            std::error_code ignored;
+            fs::remove_all(scratch,ignored);
+            throw;
+        }
+    });
+}
+
 MaintenanceReport tidy_dependencies(const fs::path& requested,bool check) {
     const auto root=inspect_creation_root(requested);
     if(check)require_no_package_edit(root.path);else recover_package_edit(root);

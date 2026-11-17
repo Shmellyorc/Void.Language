@@ -149,7 +149,7 @@ public:
     ~GitObjects() { std::error_code ignored; fs::remove_all(work, ignored); }
     GitObjects(const GitObjects&) = delete;
 
-    void fetch(const GitPin& pin) const {
+    void fetch(GitPin& pin) const {
         auto settings = isolated_settings;
         const auto directory = path_utf8(work);
         const std::array<std::string, 10> transport_settings{
@@ -179,11 +179,22 @@ public:
             "-c", "http.lowSpeedLimit=1", "-c", "http.lowSpeedTime=10",
             "-c", "fetch.fsckObjects=true", "-c", "fetch.unpackLimit=1",
             "fetch", "--quiet", "--depth=1", "--no-tags", "--no-recurse-submodules",
-            "--no-write-fetch-head", "--no-auto-gc", "--no-write-commit-graph", "--", "void-source", pin.revision
+            pin.revision.empty() ? "--write-fetch-head" : "--no-write-fetch-head",
+            "--no-auto-gc", "--no-write-commit-graph", "--", "void-source",
+            pin.revision.empty() ? "HEAD" : pin.revision
         };
         const int status = run_git_fetch(work, args, settings, std::min(deadline,
             std::chrono::steady_clock::now() + std::chrono::seconds(30)));
-        if (status == 0) return;
+        if (status == 0) {
+            if (pin.revision.empty()) {
+                const auto head = read_project_input(work / "repo.git/FETCH_HEAD", 8192);
+                if (head.size() < 41 || head[40] != '\t' || !hex_id(std::string_view(head).substr(0, 40), 40) ||
+                    head.find('\n') != head.size() - 1)
+                    fail("HTTPS Git did not return a single valid HEAD commit.");
+                pin.revision = head.substr(0, 40);
+            }
+            return;
+        }
         std::string diagnostic(2048, '\0');
         std::ifstream errors(work / "fetch-error", std::ios::binary);
         errors.read(diagnostic.data(), static_cast<std::streamsize>(diagnostic.size()));
@@ -351,8 +362,7 @@ fs::path git_snapshot_path(const fs::path& root, const GitPin& pin) {
     return root / ".void" / git_store_name / git_store_key(pin);
 }
 
-GitSnapshot acquire_git_snapshot(const fs::path& root, const GitPin& pin) {
-    if (!valid_git_pin(pin)) fail("Invalid Git acquisition pin.");
+static GitSnapshot acquire_git_snapshot_impl(const fs::path& root, GitPin& pin) {
     const auto objects = pin.origin.starts_with("file:") ? std::optional(local_objects(root, pin)) : std::nullopt;
     GitObjects git(objects ? objects->path : fs::path{});
     if (!objects) git.fetch(pin);
@@ -386,6 +396,20 @@ GitSnapshot acquire_git_snapshot(const fs::path& root, const GitPin& pin) {
     finish(result, pin);
     result.tree = git_snapshot_path(root, pin) / result.digest / "tree";
     return result;
+}
+
+GitSnapshot acquire_git_snapshot(const fs::path& root, const GitPin& pin) {
+    if (!valid_git_pin(pin)) fail("Invalid Git acquisition pin.");
+    auto request = pin;
+    return acquire_git_snapshot_impl(root, request);
+}
+
+std::pair<GitPin, GitSnapshot> acquire_git_head(const fs::path& root, std::string origin) {
+    if (!origin.starts_with("https://") || !valid_git_origin(origin))
+        fail("Adding Git HEAD requires a canonical HTTPS origin; file: sources still need --rev.");
+    GitPin request{std::move(origin), {}};
+    auto snapshot = acquire_git_snapshot_impl(root, request);
+    return {std::move(request), std::move(snapshot)};
 }
 
 static std::optional<GitSnapshot> read_git_snapshot(const fs::path& directory, const GitPin& pin,

@@ -73,10 +73,7 @@ bool valid_git_subdir(std::string_view path) {
     return path.empty() || (relative_path(path, false) && valid_dependency_path(path));
 }
 
-bool valid_git_pin(const GitPin& pin) {
-    if (pin.revision.size() != 40 || pin.revision.find_first_not_of("0123456789abcdef") != pin.revision.npos)
-        return false;
-    std::string_view origin = pin.origin;
+bool valid_git_origin(std::string_view origin) {
     if (origin.starts_with("file:"))
         return origin.size() > 5 && valid_git_subdir(origin.substr(5));
     if (!origin.starts_with("https://") || origin.size() > 4096) return false;
@@ -96,6 +93,11 @@ bool valid_git_pin(const GitPin& pin) {
     return !host.empty() && host.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789.-") == host.npos &&
            path.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~/") == path.npos &&
            valid_git_subdir(path);
+}
+
+bool valid_git_pin(const GitPin& pin) {
+    return pin.revision.size() == 40 && pin.revision.find_first_not_of("0123456789abcdef") == pin.revision.npos &&
+           valid_git_origin(pin.origin);
 }
 
 bool VersionRequirement::accepts(const SemanticVersion& version) const {

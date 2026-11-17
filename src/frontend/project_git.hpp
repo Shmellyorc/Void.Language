@@ -12,6 +12,8 @@ struct GitSnapshot {
     std::size_t bytes = 0;
 };
 
+bool valid_git_origin(std::string_view);
+std::pair<GitPin, GitSnapshot> acquire_git_head(const std::filesystem::path&, std::string origin);
 std::string git_store_key(const GitPin&);
 std::filesystem::path git_snapshot_path(const std::filesystem::path&, const GitPin&);
 std::optional<GitSnapshot> read_git_snapshot(const std::filesystem::path& pin_directory, const GitPin&);

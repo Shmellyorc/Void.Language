@@ -74,5 +74,8 @@ struct MaintenanceReport {
     std::vector<std::string> advice;
 };
 MaintenanceReport add_dependency(const std::filesystem::path&, const AddOptions&);
+MaintenanceReport add_verified_raylib(const std::filesystem::path& project,
+    const std::filesystem::path& source, const std::filesystem::path& compiler,
+    const std::filesystem::path& clang, bool sanitize);
 MaintenanceReport tidy_dependencies(const std::filesystem::path&, bool check);
 }

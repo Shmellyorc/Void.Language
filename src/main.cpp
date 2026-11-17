@@ -29,11 +29,14 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
     if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
-      "       voidc package --verify DIR\n";
+      "       voidc package --verify DIR\n"
+      "       voidc package list | voidc package search NAME\n"
+      "       voidc package install ALIAS --store DIR (--dir DIR | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n";
     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
     if(command.empty() || command=="new")out<<"Usage: voidc new PATH [project options] [--source PATH]\n";
-    if(command.empty() || command=="add")out<<"Usage: voidc add ALIAS [--project DIR] (--path DIR | --git ORIGIN --rev FULL_SHA [--subdir DIR])\n";
+    if(command.empty() || command=="add")out<<"Usage: voidc add raylib [--project DIR]\n"
+      "       voidc add ALIAS [--project DIR] (--dir DIR | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n";
     if(command.empty() || command=="tidy")out<<"Usage: voidc tidy [--project DIR] [--check]\n";
     if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
     if(command.empty() || command=="deps")out<<"Usage: voidc deps explain --project DIR [--json]\n"
@@ -53,7 +56,7 @@ void help(const std::string& command={}) {
           "  emit    Write a native object for manual linking.\n"
           "  init    Add a project manifest to an existing directory.\n"
           "  new     Create a project and starter source in a new directory.\n"
-          "  add     Add an explicit local or immutable Git source package.\n"
+          "  add     Add a bundled, explicit local or immutable Git source package.\n"
           "  tidy    Validate imports, reconcile dependencies and maintain installed views.\n"
           "  resolve Resolve available library dependencies and verify or write void.lock.\n"
           "  deps explain Inspect the verified local dependency graph without changes.\n"
@@ -130,20 +133,55 @@ std::int32_t input(const char* text) {
         throw UsageError("Expected a decimal i32 input (-2147483648 through 2147483647).");
     return static_cast<std::int32_t>(value);
 }
-int maintain_project(const std::string& command,int argc,char** argv) {
+std::filesystem::path bundled_raylib_source(const std::filesystem::path& executable) {
+    const auto installed=(executable.parent_path()/"../share/void/verified-packages/raylib").lexically_normal();
+    if(std::filesystem::is_regular_file(installed/"prepare.py"))return installed;
+    const auto build=vd::utf8_path(VOID_RAYLIB_BUILD_ROOT);
+    // A build-tree compiler can use its CMake-staged resources. An installed
+    // compiler must use its own resources, even if a checkout still exists.
+    if(std::filesystem::is_regular_file(build/"prepare.py") &&
+       (executable.parent_path()==build.parent_path().parent_path() ||
+        executable.parent_path().parent_path()==build.parent_path().parent_path()))return build;
+    return {};
+}
+int discover_packages(const std::filesystem::path& executable, int argc, char** argv) {
+    const bool search=std::string_view(argv[2])=="search";
+    if(argc!=(search?4:3) || (search && (!*argv[3] || argv[3][0]=='-')))
+        throw UsageError("Expected package list or package search NAME.");
+    const auto source=bundled_raylib_source(executable);
+    if(source.empty() || !vd::native_source_debug_supported() ||
+       (search && std::string_view("raylib").find(argv[3])==std::string_view::npos)) {
+        std::cout<<"No matching bundled packages available for this compiler and target.\n";
+        return 0;
+    }
+    std::cout<<"raylib " VOID_RAYLIB_VERSION " | org.voidlang.raylib\n"
+              "  Source origin: " VOID_RAYLIB_ORIGIN " (" VOID_RAYLIB_SUBDIR ")\n"
+              "  Base revision: " VOID_RAYLIB_BASE_REVISION "\n"
+              "  Shipped snapshot SHA-256: " VOID_RAYLIB_SNAPSHOT_SHA256 "\n"
+              "  Native raylib 6.0.0 (ABI 3); GNU/Linux x86-64, Windows x64 MSVC\n";
+    const auto catalog=std::filesystem::current_path()/"libs/raylib/.void/native/void.native.toml";
+    if(std::filesystem::is_regular_file(catalog))
+        std::cout<<"  Local catalog present; run voidc resolve --project . --locked to verify it.\n";
+    else std::cout<<"  Install with voidc add raylib; authorize execution with voidc run . --allow-native.\n";
+    return 0;
+}
+int maintain_project(const std::string& command,int argc,char** argv,const std::filesystem::path& executable,
+                     bool registration=false) {
     using namespace vd::project;
     std::filesystem::path root=".";
     AddOptions options;
     std::optional<std::string> origin,rev,subdir;
     std::set<std::string> seen;
     bool check=false;
-    for(int i=2;i<argc;++i) {
+    for(int i=registration?3:2;i<argc;++i) {
         std::string option=argv[i];
         if(option=="--check" && command=="tidy") {
             if(check)throw UsageError("Repeated --check.");check=true;
-        } else if(option=="--project" || (command=="add" && (option=="--path" || option=="--git" || option=="--rev" || option=="--subdir"))) {
+        } else if(option==(registration?"--store":"--project") ||
+                  (command=="add" && (option=="--path" || option=="--dir" || option=="--git" || option=="--rev" || option=="--subdir"))) {
+            if(option=="--dir")option="--path";
             if(!seen.insert(option).second || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one value after "+option);
-            if(option=="--project")root=vd::utf8_path(argv[i]);
+            if(option=="--project" || option=="--store")root=vd::utf8_path(argv[i]);
             else if(option=="--path")options.path=vd::utf8_path(argv[i]);
             else if(option=="--git")origin=argv[i];
             else if(option=="--rev")rev=argv[i];
@@ -151,10 +189,21 @@ int maintain_project(const std::string& command,int argc,char** argv) {
         } else if(command=="add" && !option.starts_with('-') && options.alias.empty())options.alias=std::move(option);
         else throw UsageError("Unknown or repeated "+command+" option: "+option);
     }
+    if(registration && !seen.contains("--store"))
+        throw UsageError("package install requires --store DIR. Use voidc new DIR to create an explicit package store.");
     if(command=="add") {
-        if(options.alias.empty() || bool(options.path)==bool(origin) || (origin && !rev) || (!origin && (rev || subdir)))
-            throw UsageError("add requires ALIAS and exactly one --path or --git with --rev; registry lookup is not supported.");
-        if(origin)options.git=GitDependency{{*origin,*rev},subdir.value_or("")};
+        if(options.alias=="raylib" && !options.path && !origin && !rev && !subdir) {
+            const auto source=bundled_raylib_source(executable);
+            if(source.empty() || !vd::native_source_debug_supported())
+                throw std::runtime_error("Bundled raylib is unavailable for this compiler or target. Use an explicit --path or --git source.");
+            const auto report=add_verified_raylib(root,source,executable,vd::native_clang_driver(argv[0]),VOID_RAYLIB_SANITIZE);
+            std::cout<<(report.changed?"Installed and locked bundled raylib.":"Bundled raylib and native lock verified; reused the prepared catalog.")
+                     <<"\nNative execution still needs explicit consent: voidc run . --allow-native.\n";
+            return 0;
+        }
+        if(options.alias.empty() || bool(options.path)==bool(origin) || (!origin && (rev || subdir)))
+            throw UsageError("add requires a bundled package name or ALIAS with --dir or --git; registry lookup is not supported.");
+        if(origin)options.git=GitDependency{{*origin,rev.value_or("")},subdir.value_or("")};
     }
     auto report=command=="add"?add_dependency(root,options):tidy_dependencies(root,check);
     std::cout<<(report.changed?"Updated source dependencies and installed views.":"Source dependencies unchanged.")<<'\n';
@@ -441,7 +490,8 @@ static int run_cli(int argc, char** argv) {
             if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|add|tidy|resolve|deps|native-bind|native].");
             help(argv[2]);return 0;
         }
-        vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli))));
+        const auto executable=vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli)));
+        vd::configure_standard_library_root(executable);
         if(argc==3 && std::string(argv[1])=="--emit-proof") {
             vd::emit_object(vd::ir::architecture_proof(),vd::utf8_path(argv[2]),true);
             std::cout<<"Wrote native architecture proof object\n";return 0;
@@ -455,7 +505,7 @@ static int run_cli(int argc, char** argv) {
         if(!known_command(command))
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
-        if(command=="add" || command=="tidy")return maintain_project(command,argc,argv);
+        if(command=="add" || command=="tidy")return maintain_project(command,argc,argv,executable);
         if(command=="resolve")return resolve_project(argc,argv);
         if(command=="deps") {
             if(argc==4 && (std::string_view(argv[2])=="explain" || std::string_view(argv[2])=="fetch") &&
@@ -483,6 +533,11 @@ static int run_cli(int argc, char** argv) {
             vd::import_native_header(options);return 0;
         }
         if(command=="native-bind") {generate_native_binding(argc,argv);return 0;}
+        if(command=="package" && argc>=3 &&
+           (std::string_view(argv[2])=="list" || std::string_view(argv[2])=="search"))
+            return discover_packages(executable,argc,argv);
+        if(command=="package" && argc>=3 && std::string_view(argv[2])=="install")
+            return maintain_project("add",argc,argv,executable,true);
         if(command=="package" && argc>=3 && std::string_view(argv[2])=="--verify") {
             if(argc!=4 || !*argv[3] || argv[3][0]=='-')throw UsageError("Expected one directory after package --verify.");
             vd::verify_application_package(vd::utf8_path(argv[3]));

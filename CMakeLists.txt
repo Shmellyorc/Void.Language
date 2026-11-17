@@ -266,7 +266,44 @@ install(DIRECTORY editors/vim/ DESTINATION share/void/vim COMPONENT tooling)
 install(DIRECTORY editors/neovim/ DESTINATION share/void/neovim COMPONENT tooling)
 add_executable(void_native_example examples/native/host.cpp)
 target_link_libraries(void_native_example PRIVATE void_llvm void_cache_identity)
+# Bundle reviewed source and the preparation recipe. Upstream native binaries
+# remain pinned external inputs and are fetched only by explicit package add.
+include(verified-packages/raylib.package.cmake)
+set(verified_raylib_files
+  .gitattributes .gitignore
+  README.md OWNERSHIP.md inventory.json void.project.toml
+  prepare.py generate.py callback_bindings.py owned_bindings.py
+  src/raylib.void src/raylib_native.void upstream/raylib.h upstream/LICENSE
+  native/raylib_provider.c native/raylib_provider.h native/raylib.descriptor.in
+  native/raylib_api.c native/raylib_api.h native/raylib_api.descriptor.inc
+  native/raylib_callbacks.inc native/raylib_parity.h)
+set(verified_raylib_build_root "${CMAKE_CURRENT_BINARY_DIR}/verified-packages/raylib")
+list(SORT verified_raylib_files)
+set(verified_raylib_snapshot_manifest "")
+foreach(file IN LISTS verified_raylib_files)
+  configure_file("${verified_raylib_subdirectory}/${file}" "${verified_raylib_build_root}/${file}" COPYONLY)
+  file(SHA256 "${verified_raylib_build_root}/${file}" hash)
+  string(APPEND verified_raylib_snapshot_manifest "${hash}  ${file}\n")
+  get_filename_component(directory "${file}" DIRECTORY)
+  install(FILES "${verified_raylib_build_root}/${file}"
+    DESTINATION "share/void/verified-packages/raylib/${directory}" COMPONENT compiler)
+endforeach()
+# Exclude the generated receipt from its own digest. The project lock covers it.
+string(SHA256 verified_raylib_snapshot_sha256 "${verified_raylib_snapshot_manifest}")
+file(CONFIGURE OUTPUT "${verified_raylib_build_root}/SOURCE_ORIGIN.txt"
+  CONTENT "Source origin: ${verified_raylib_origin}
+Base revision: ${verified_raylib_base_revision}
+Source subdirectory: ${verified_raylib_subdirectory}
+Package version: ${verified_raylib_version}
+Shipped snapshot SHA-256: ${verified_raylib_snapshot_sha256}
+" NEWLINE_STYLE UNIX)
+install(FILES "${verified_raylib_build_root}/SOURCE_ORIGIN.txt" DESTINATION share/void/verified-packages/raylib COMPONENT compiler)
 add_library(voidc_objects OBJECT src/main.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
+target_compile_definitions(voidc_objects PRIVATE VOID_RAYLIB_BUILD_ROOT="${verified_raylib_build_root}"
+  VOID_RAYLIB_SANITIZE=$<BOOL:${VOID_SANITIZERS}>
+  VOID_RAYLIB_ORIGIN="${verified_raylib_origin}" VOID_RAYLIB_BASE_REVISION="${verified_raylib_base_revision}"
+  VOID_RAYLIB_SNAPSHOT_SHA256="${verified_raylib_snapshot_sha256}"
+  VOID_RAYLIB_SUBDIR="${verified_raylib_subdirectory}" VOID_RAYLIB_VERSION="${verified_raylib_version}")
 target_compile_definitions(voidc_objects PRIVATE VOID_COMPILER_VERSION="${PROJECT_VERSION}")
 target_include_directories(voidc_objects SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 target_link_libraries(voidc_objects PRIVATE void_llvm)

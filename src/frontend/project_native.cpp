@@ -112,7 +112,13 @@ bool compatible_link_input(llvm::MemoryBufferRef data, bool windows) {
 
 }
 
-SelectedNative select_managed_native(const NativeRequirement& requirement) {
+const NativeRequirement& verified_raylib_requirement() {
+    static const NativeRequirement requirement{"raylib", "org.voidlang.raylib", *parse_version("6.0.0"), 3};
+    return requirement;
+}
+
+SelectedNative select_managed_native(const Manifest& manifest, const fs::path& project_root) {
+    const auto& requirement = *manifest.native_requirement();
 #if defined(_WIN32) && (defined(_M_X64) || defined(__x86_64__))
     constexpr std::string_view target = "x86_64-pc-windows-msvc";
 #elif defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
@@ -121,10 +127,29 @@ SelectedNative select_managed_native(const NativeRequirement& requirement) {
     constexpr std::string_view target;
 #endif
     if (target.empty()) throw std::runtime_error("Managed native providers are unsupported on this host.");
-    const auto selected = llvm::sys::Process::GetEnv("VOID_NATIVE_CATALOG");
-    if (!selected || !utf8_path(*selected).is_absolute())
-        throw std::runtime_error("Select an approved absolute directory with VOID_NATIVE_CATALOG.");
-    const auto directory = inspect_creation_root(utf8_path(*selected)).path;
+    fs::path selected;
+    const auto& verified = verified_raylib_requirement();
+    const auto dependency = manifest.dependencies().find(requirement.alias);
+    if (requirement.alias == verified.alias && requirement.id == verified.id &&
+        requirement.version == verified.version && requirement.abi == verified.abi &&
+        dependency != manifest.dependencies().end() && !dependency->second.git &&
+        dependency->second.id == verified.id && dependency->second.path == "libs/raylib" &&
+        dependency->second.version.text() == "=0.1.0") {
+        const auto local = project_root / "libs/raylib" / verified_raylib_catalog;
+        // An installed catalog (including an invalid path) never falls back to
+        // a different provider. Missing local catalogs retain the manual D4 route.
+        if (fs::exists(fs::symlink_status(local)) || project_path_alias(local)) selected = local;
+    }
+    if (selected.empty()) {
+        const auto environment = llvm::sys::Process::GetEnv("VOID_NATIVE_CATALOG");
+        if (environment) selected = utf8_path(*environment);
+        if (!selected.is_absolute())
+            throw std::runtime_error("No native catalog selected for '" + requirement.id +
+                "' " + requirement.version.text() + " (ABI " + std::to_string(requirement.abi) +
+                "). Install the bundled raylib with 'voidc add raylib' or select an approved "
+                "manual catalog with the absolute VOID_NATIVE_CATALOG path.");
+    }
+    const auto directory = inspect_creation_root(selected).path;
     auto plan = parse_native_catalog(read_project_input(directory / "void.native.toml", native_catalog_byte_limit));
     if (plan.target != target)
         throw std::runtime_error("Managed native catalog target '" + plan.target +
