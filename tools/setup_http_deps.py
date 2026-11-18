@@ -99,23 +99,34 @@ cmake("zlib", ["-DZLIB_BUILD_TESTING=OFF", "-DZLIB_BUILD_SHARED=OFF", "-DZLIB_BU
 cmake("aws-lc", ["-DBUILD_SHARED_LIBS=OFF", "-DBUILD_TESTING=OFF", "-DBUILD_LIBSSL=ON",
                   "-DDISABLE_GO=ON", "-DENABLE_SOURCE_MODIFICATION=OFF"])
 
-def configure_make(name, options, extra_env=None, subtree=None):
+def configure_make(name, options, extra_env=None, subtree=None, make_args=()):
     build = build_root / name
     build.mkdir(exist_ok=True)
     run([sources[name] / "configure", f"--prefix={prefix}", f"--libdir={prefix / 'lib'}",
          "--disable-dependency-tracking", "--disable-rpath", *options], name + "-configure", build, extra_env)
     target = build / subtree if subtree else build
-    run(["make", f"-j{args.jobs}"], name + "-build", target, extra_env)
-    run(["make", "install"], name + "-install", target, extra_env)
+    run(["make", f"-j{args.jobs}", *make_args], name + "-build", target, extra_env)
+    run(["make", "install", *make_args], name + "-install", target, extra_env)
 
 configure_make("libunistring", ["--enable-shared", "--disable-static"], subtree="lib")
+# Libtool reads the .la file's absolute libdir even with --disable-rpath.
+# Keep the pinned shared library and link libidn2 against its sibling at runtime.
+(prefix / "lib/libunistring.la").unlink(missing_ok=True)
 # Shared GNU libraries remain replaceable, and their unmodified corresponding
 # source archives are installed alongside the license notices by VOID CMake.
 unicode_env = {"CPPFLAGS": f"-I{prefix / 'include'}",
                "LDFLAGS": f"-L{prefix / 'lib'} {ldflags}",
                "LD_LIBRARY_PATH": str(prefix / "lib")}
+# Make consumes one dollar and the shell consumes the backslash.
+idn2_ldflags = "LDFLAGS=" + unicode_env["LDFLAGS"] + r" -Wl,-rpath,\$$ORIGIN"
 configure_make("libidn2", ["--enable-shared", "--disable-static", "--disable-nls", "--disable-doc",
-                            f"--with-libunistring-prefix={prefix}"], unicode_env)
+                            f"--with-libunistring-prefix={prefix}"], unicode_env, make_args=(idn2_ldflags,))
+dynamic = subprocess.check_output(
+    [cc.with_name("llvm-readelf"), "-d", prefix / "lib/libidn2.so.0"], text=True)
+search_paths = [line.partition("[")[2].partition("]")[0] for line in dynamic.splitlines()
+                if "(RUNPATH)" in line or "(RPATH)" in line]
+if search_paths != ["$ORIGIN"]:
+    raise SystemExit(f"libidn2 must search beside itself: {search_paths}")
 psl_env = unicode_env | {"LIBIDN2_CFLAGS": f"-I{prefix / 'include'}",
                          "LIBIDN2_LIBS": f"-L{prefix / 'lib'} -lidn2 -lunistring"}
 configure_make("libpsl", ["--disable-shared", "--enable-static", "--disable-nls", "--disable-man",
