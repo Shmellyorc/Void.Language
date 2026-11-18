@@ -218,8 +218,19 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     terminal = dict(env)
     terminal.pop('CI', None)
     approve_run = lambda *args, **kw: interact(compiler, args, project, terminal, **kw)
+    reuse = '--reuse-native-approval'
+    approval_missing = 'No saved native approval matches this project and provider'
     cli('native', 'approvals', cwd=root, contains='No native approvals')
     assert not approvals.exists()  # Install, check and one-time flags confer no durable consent.
+    for command in ('run', 'build'):
+        denied = subprocess.run([str(compiler), command, '.', reuse], cwd=project, env=terminal,
+                                capture_output=True, input=b'approve\n', timeout=90)
+        assert denied.returncode==2 and not denied.stdout, denied
+        assert approval_missing.encode() in denied.stderr and b"run 'voidc run .'" in denied.stderr, denied
+        assert b'Type approve' not in denied.stderr
+    approve_run('run', '.', reuse, status=2, contains=approval_missing.encode())
+    assert not (project/'build/app.exe' if windows else project/'build/app').exists()
+    assert not approvals.exists()
     approve_run('run', '.', reply=b'no', status=2, contains=b'approval declined')
     assert not approvals.exists()
     catalog_file = catalog/'void.native.toml'
@@ -235,6 +246,8 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     listing = cli('native', 'approvals', cwd=root, contains='org.example.g61')
     approval_id = listing.split(' | ', 1)[0]
     assert len(approval_id) == 64
+    record = approvals/approval_id/'approval'
+    approved_record = record.read_bytes(), record.stat().st_mtime_ns
     for profile in ('debug', 'release'):
         output = approve_run('run', '.', '--profile', profile, contains=b'42')
         assert any(line.strip()==b'42' for line in output.splitlines()), output
@@ -243,6 +256,20 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
         run(executable, cwd=root, exact='42\n')
         if windows:
             run(readobj, '--file-headers', executable, cwd=root, contains='SizeOfStackReserve: 1048576')
+        cli('run', '.', reuse, '--profile', profile, cwd=project, exact='42\n')
+        reused = root/('reused-' + profile)/('app.exe' if windows else 'app')
+        cli('build', '.', reuse, '--profile', profile, '-o', reused, cwd=project)
+        run(reused, cwd=root, exact='42\n')
+    assert approved_record == (record.read_bytes(), record.stat().st_mtime_ns)
+    assert listing == cli('native', 'approvals', cwd=root)
+    for command in ('check', 'package'):
+        cli(command, '.', reuse, status=2, cwd=project,
+            contains='reuse-native-approval requires a manifest-selected run or build')
+    cli('emit', '.', reuse, '-o', root/'rejected.o', status=2, cwd=project,
+        contains='reuse-native-approval requires a manifest-selected run or build')
+    cli('run', '.', reuse, '--allow-native', status=2, cwd=project, contains='without --allow-native')
+    cli('run', '.', reuse, reuse, status=2, cwd=project, contains='Duplicate --reuse-native-approval')
+    cli('run', shell/'main.void', reuse, status=2, cwd=root, contains='manifest-selected run or build')
     cli('run', '.', cwd=project, status=2, contains='Pass --allow-native')
     cli('emit', '.', '-o', root/'unapproved.o', cwd=project, status=2, contains='Pass --allow-native')
     interact(compiler, ['run', '.'], project, dict(terminal, CI='true'),
@@ -250,13 +277,24 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     piped = subprocess.run([str(compiler), 'run', '.'], cwd=project, env=terminal,
                            capture_output=True, input=b'approve\n', timeout=90)
     assert piped.returncode==2 and piped.stdout==b'' and b'Pass --allow-native' in piped.stderr, piped
-    assert b"run 'voidc run .'" in piped.stderr and b'editor task using pipes cannot use one' in piped.stderr, piped
+    assert b"run 'voidc run .'" in piped.stderr, piped
+    for command in ('run', 'build'):
+        ci = subprocess.run([str(compiler), command, '.', reuse], cwd=project, env=dict(terminal, CI='true'),
+                            capture_output=True, input=b'approve\n', timeout=90)
+        assert ci.returncode==2 and not ci.stdout and b'CI requires explicit --allow-native' in ci.stderr, ci
     explicit = subprocess.run([str(compiler), 'run', '.', '--allow-native'], cwd=project, env=dict(terminal, CI='true'),
                               capture_output=True, stdin=subprocess.DEVNULL, check=True, timeout=90)
     assert explicit.stdout.replace(b'\r\n', b'\n')==b'42\n' and not explicit.stderr, explicit
     other_root = root/'same-manifest-other-project'
     shutil.copytree(project, other_root)
     interact(compiler, ['run', '.'], other_root, terminal, reply=b'no', status=2, contains=b'approval declined')
+    cli('run', '.', reuse, cwd=other_root, status=2, contains=approval_missing)
+    alternate = project/'src/alternate.void'
+    alternate.write_bytes((project/'src/app.void').read_bytes())
+    try:
+        cli('run', '.', reuse, '--entry', 'src/alternate.void', cwd=project, status=2, contains=approval_missing)
+    finally:
+        alternate.unlink()
     if not windows:
         with tempfile.TemporaryDirectory(prefix='void-unsafe-data-', dir='/tmp') as unsafe:
             Path(unsafe).chmod(0o777)
@@ -277,13 +315,16 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
         try:
             path.write_bytes(replacement)
             approve_run('run', '.', reply=reply, status=2 if reply else 1, contains=outcome)
+            cli('run', '.', reuse, cwd=project, status=2 if reply else 1,
+                contains=approval_missing if reply else outcome.decode())
         finally:
             path.write_bytes(original)
 
-    record = approvals/approval_id/'approval'
     original = record.read_bytes()
     record.write_bytes(original + b'malformed\n')
     approve_run('run', '.', status=1, contains=b'Malformed native approval record')
+    cli('run', '.', reuse, cwd=project, status=1, contains='Malformed native approval record')
+    assert record.read_bytes()==original+b'malformed\n'
     cli('native', 'approvals', cwd=root, status=1, contains='Malformed native approval record')
     record.write_bytes(original)
     alias = root/'approval-hard-link'
@@ -305,7 +346,10 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     cli('remove', 'newdep', cwd=project)
     approve_run('run', '.', contains=b'42')
     cli('native', 'revoke', approval_id, cwd=root)
+    for command in ('run', 'build'):
+        cli(command, '.', reuse, cwd=project, status=2, contains=approval_missing)
     approve_run('run', '.', reply=b'no', status=2, contains=b'approval declined')
+    print('G65 reuse: read-only exact JIT/AOT, redirected CLI and CI gates, tamper rejection and revocation passed', flush=True)
     print('G63 native approval lifecycle, lock renewal, terminal/CI gates, exact JIT/AOT, tampering and revocation passed', flush=True)
 
     cli('remove', 'cdemo', cwd=project)

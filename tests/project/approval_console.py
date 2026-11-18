@@ -7,6 +7,7 @@ import subprocess
 import sys
 import threading
 import time
+from pathlib import Path
 
 PROMPT = b"Type approve"
 VT = re.compile(rb'\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07\x1b]*(?:\x07|\x1b\\))')
@@ -221,3 +222,10 @@ def interact(compiler, args, cwd, env, *, reply=None, change_at_prompt=None, sta
     assert answered == (reply is not None) and contains in output, (argv, output)
     assert all(s not in output for s in (b'AddressSanitizer', b'LeakSanitizer', b'UndefinedBehaviorSanitizer', b'runtime error:')), output
     return bytes(output)
+
+
+if __name__ == '__main__':
+    compiler, project = (Path(arg).resolve() for arg in sys.argv[1:])
+    output = interact(compiler, ['run', '.'], project, dict(os.environ), reply=b'approve',
+                      status=17, contains=b'Saved native approval')
+    assert b'G65 native fixture: 241' in output, output

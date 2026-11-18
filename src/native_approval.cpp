@@ -27,10 +27,8 @@ namespace fs = std::filesystem;
 using namespace project;
 constexpr std::string_view record_header = "VOID native approval 1\n";
 constexpr std::size_t record_limit = 16 * 1024, approval_limit = 4096;
-constexpr auto missing_approval =
-    "This project declares native code. Pass --allow-native to explicitly authorize this invocation.\n"
-    "To review and save approval, open an ordinary interactive terminal in the project and run 'voidc run .'. "
-    "Saved approvals require a terminal; an editor task using pipes cannot use one.";
+constexpr auto terminal_review =
+    "To review and save approval, open an ordinary interactive terminal in the project and run 'voidc run .'.";
 
 bool valid_id(std::string_view id) {
     return id.size()==64 && std::ranges::all_of(id,[](char c) {
@@ -175,13 +173,14 @@ struct NativeApproval::Payload {
 #endif
 };
 
-NativeApproval::NativeApproval() = default;
+NativeApproval::NativeApproval(Mode mode):mode_(mode) {}
 NativeApproval::~NativeApproval() = default;
 
 fs::path NativeApproval::authorize(const ManagedNativeApprovalSubject& subject,bool jit) {
     if(llvm::sys::Process::GetEnv("CI"))
         throw NativeApprovalRequired("CI requires explicit --allow-native for this invocation.");
-    if(!interactive())throw NativeApprovalRequired(missing_approval);
+    if(mode_==Mode::terminal && !interactive())
+        throw NativeApprovalRequired(std::string("This project declares native code. Pass --allow-native to explicitly authorize this invocation.\n")+terminal_review);
     const auto store=store_path();
     const auto& dependencies=subject.dependencies;
     const auto& native=*dependencies.native();
@@ -210,13 +209,21 @@ fs::path NativeApproval::authorize(const ManagedNativeApprovalSubject& subject,b
     const auto expected=std::string(record_header)+id+'\n'+label+'\n';
     if(expected.size()>record_limit)throw NativeApprovalRequired("Native approval identity is too long. Pass --allow-native for this invocation.");
     bool found=false;
-    with_approval_store(store,false,[&](const CreationRoot& root){
-        if(auto record=read_record(root,id)) {
-            if(*record!=expected)throw std::runtime_error("Malformed native approval record.");
-            found=true;
-        }
-    });
+    try {
+        with_approval_store(store,false,[&](const CreationRoot& root){
+            if(auto record=read_record(root,id)) {
+                if(*record!=expected)throw std::runtime_error("Malformed native approval record.");
+                found=true;
+            }
+        });
+    } catch(const std::runtime_error& error) {
+        if(mode_==Mode::reuse_only)
+            throw std::runtime_error(std::string(error.what())+"\nResolve the approval store error first. "+terminal_review);
+        throw;
+    }
     if(!found) {
+        if(mode_==Mode::reuse_only)
+            throw NativeApprovalRequired(std::string("No saved native approval matches this project and provider.\n")+terminal_review);
         if(!confirm(label,id))throw NativeApprovalRequired("Native approval declined. No approval was saved.");
         pending_=expected;
     }
@@ -237,7 +244,7 @@ fs::path NativeApproval::authorize(const ManagedNativeApprovalSubject& subject,b
 }
 
 void NativeApproval::remember() {
-    if(pending_.empty())return;
+    if(mode_==Mode::reuse_only || pending_.empty())return;
     with_approval_store(store_path(),true,[&](const CreationRoot& root){
         if(const auto old=read_record(root,id_)) {
             if(*old!=pending_)throw std::runtime_error("Malformed native approval record.");

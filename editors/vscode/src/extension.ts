@@ -90,6 +90,7 @@ class ServerManager {
         if (!['debug', 'release'].includes(profile)) throw new Error('Choose debug or release in void.tasks.profile.');
         const args = [command, '--project', project.requestedRoot ?? project.root, '--profile', profile];
         if (project.entryOverride) args.push('--entry', project.entryOverride);
+        if (command === 'run' || command === 'build') args.push('--reuse-native-approval');
         if (command === 'run') {
             const runArguments = settings.get<unknown>('tasks.runArguments', []);
             if (!Array.isArray(runArguments) || runArguments.some(argument => typeof argument !== 'string' || argument.includes('\0')))

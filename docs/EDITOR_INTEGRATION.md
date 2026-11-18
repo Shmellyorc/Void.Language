@@ -29,10 +29,14 @@ arguments as separate strings in `void.tasks.runArguments`. Set
 `void.compiler.path` if the matching `voidc` is installed separately from
 `voidls`. Save dirty VOID sources and manifests in the selected root before
 launch. The task terminal shows output and the exit status, and compiler
-diagnostics appear in Problems. These tasks use pipes. They do not prompt
-for native approval, use a saved approval, or add `--allow-native`. Use a
-regular interactive terminal for G63 approval or TTY applications. For
-automation, supply `--allow-native` deliberately on the CLI.
+diagnostics appear in Problems. These tasks use pipes. Run Project, Build
+Project and the F5 Debug build can use an existing approval for the exact
+verified native provider and application. To grant approval or review an
+intentional provider change, open an ordinary interactive terminal in the
+project and run `voidc run .`. Inspect approvals with `voidc native approvals`
+and revoke one with `voidc native revoke APPROVAL_ID`. Use an interactive
+terminal for TTY applications. For CI, supply `--allow-native` deliberately
+on the CLI.
 
 Open VOID sources within the project get compiler-owned semantic highlighting,
 completion, hover, signatures, definitions, formatting and diagnostics from
@@ -113,7 +117,8 @@ locals. The general `void.tasks.profile` setting still controls the
 ordinary project commands; F5 always chooses Debug.
 
 The starter sets `debug.onTaskErrors` to `abort` so a failed build
-cannot launch an old executable. Keep `abort` or `showErrors` for this
+cannot launch an old executable, including when native approval is missing,
+changed or revoked. Keep `abort` or `showErrors` for this
 launch. If you switch the selected project or entry during a debug
 session, stop it and start F5 again. The JIT may report that the
 profile's native debug information is unavailable during **Run

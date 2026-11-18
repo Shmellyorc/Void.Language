@@ -704,7 +704,7 @@ static int run_cli(int argc, char** argv) {
             return 0;
         }
         bool optimize=true,cache=false,no_cache=false,no_opt=false;
-        bool allow_native=false;
+        bool allow_native=false,reuse_native_approval=false;
         bool replace_package=false;
         bool positional_only=false;
         bool forwarded=false;
@@ -730,6 +730,10 @@ static int run_cli(int argc, char** argv) {
             else if(arg=="--cache") {if(cache)throw UsageError("Duplicate --cache.");cache=true;optimize=false;}
             else if(arg=="--no-cache") {if(no_cache)throw UsageError("Duplicate --no-cache.");no_cache=true;}
             else if(arg=="--allow-native") {if(allow_native)throw UsageError("Duplicate --allow-native.");allow_native=true;}
+            else if(arg=="--reuse-native-approval") {
+                if(reuse_native_approval)throw UsageError("Duplicate --reuse-native-approval.");
+                reuse_native_approval=true;
+            }
             else if(arg=="--replace" && command=="package") {
                 if(replace_package)throw UsageError("Duplicate --replace.");
                 replace_package=true;
@@ -776,12 +780,14 @@ static int run_cli(int argc, char** argv) {
         if(command=="package" && !project_mode)throw UsageError("Package requires a manifest-selected application project.");
         if(allow_native && (!project_mode || command=="check"))
             throw UsageError("--allow-native requires a manifest-selected run, build or emit.");
+        if(reuse_native_approval && (allow_native || !project_mode || (command!="run" && command!="build")))
+            throw UsageError("--reuse-native-approval requires a manifest-selected run or build without --allow-native.");
         if(profile && !project_mode)throw UsageError("--profile requires a manifest-selected project context.");
         if(project_entry && !project_mode)throw UsageError("--entry requires a manifest-selected project context.");
         std::shared_ptr<const vd::ProjectAnalysis> project;
         std::filesystem::path selected;
         vd::AnalysisResult analysis;
-        vd::NativeApproval approval;
+        vd::NativeApproval approval(reuse_native_approval?vd::NativeApproval::Mode::reuse_only:vd::NativeApproval::Mode::terminal);
         if(project_mode) {
             const bool durable=!allow_native && (command=="run" || command=="build");
             auto result=durable?vd::analyze_manifest_project_with_native_approval(path,project_entry,
@@ -799,7 +805,14 @@ static int run_cli(int argc, char** argv) {
                 if(supports_debug && command!="check")source_debug=selected_profile.debug_info;
                 for(const auto& warning:selected_profile.diagnostics)std::cerr<<vd::render_diagnostic(warning)<<'\n';
             }
-            if(!result.succeeded())throw vd::CompilationError(std::move(result.diagnostics));
+            if(!result.succeeded()) {
+                if(reuse_native_approval)for(auto& diagnostic:result.diagnostics) {
+                    if(diagnostic.code!=vd::DiagnosticCode::project_changed)continue;
+                    if(!diagnostic.hint.empty())diagnostic.hint+=' ';
+                    diagnostic.hint+="After verifying an intentional native provider change, run 'voidc run .' in an ordinary interactive terminal to review approval.";
+                }
+                throw vd::CompilationError(std::move(result.diagnostics));
+            }
             if((!result.manifest->native().empty() || result.manifest->native_requirement()) &&
                 command!="check" && !allow_native && !approval.authorized())
                 throw UsageError("This project declares native code. Pass --allow-native to authorize its execution.");
