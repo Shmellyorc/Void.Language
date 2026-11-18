@@ -91,6 +91,34 @@ have their inferred component types in completion and hover, with ordinary
 Go to Definition. The language server derives all of these from the current
 compiler analysis, including supported unsaved edits.
 
+## Creating a project from a template
+
+Open one trusted local folder in VS Code with the VOID extension and matching
+`voidc`. Run **VOID: New Project** from the Command Palette. Pick a template
+by its name, short name or tags, and enter a project name such as `MyGame`.
+Choose **Create a named project folder** and select the parent folder. When
+creation succeeds, **Open Project** opens the result in a new window.
+
+- **Console Application** (`app`) creates a runnable starter. Its generated
+  F5 configuration follows the platform instructions below.
+- **VOID Library** (`classlib`, alias `lib`) creates a reusable library with
+  no application launch configuration.
+- Installed templates appear in the same picker. Register one from a
+  terminal with `voidc new install --dir PATH` or `voidc new install --git URL`.
+  Its authored files and assets use the compiler's normal template rules.
+
+The built-in choices can also populate a folder you explicitly select with
+**Use an existing empty folder**. For an in-place library, use a folder base
+name that can serve as its package name, as in the CLI starter. The compiler
+rejects a nonempty destination and keeps the existing files. Select a parent
+outside another VOID project for normal named creation. Project names in
+this picker use portable identifiers such as `MyGame` and `My_Library2`.
+Cancellation before creation leaves the filesystem alone.
+
+Use **VOID: Create Project** or `voidc init` to adopt existing sources.
+Standalone `.void` execution remains available. Template creation grants no
+native approval.
+
 ## Running a built-in application starter
 
 Create a project with `voidc new app --name MyGame`. Open **MyGame** as

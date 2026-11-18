@@ -58,5 +58,6 @@ export async function workbench(port: string) {
             return true;
         })()`), Boolean, label);
     };
-    return {evaluate, visible, click, key, close: () => socket.close()};
+    const type = (value: string) => send('Input.insertText', {text: value});
+    return {evaluate, visible, click, key, type, close: () => socket.close()};
 }

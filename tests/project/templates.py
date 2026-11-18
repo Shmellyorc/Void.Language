@@ -1,5 +1,6 @@
 """Exercise installed custom templates through the CLI, JIT, AOT and voidls."""
 from concurrent.futures import ThreadPoolExecutor
+import json
 import os
 from pathlib import Path
 import shutil
@@ -77,6 +78,11 @@ with tempfile.TemporaryDirectory(prefix="VOID G62 templates ") as temporary:
     work = root / "work"
     work.mkdir()
     assert b"voidgame" not in cli("new", "list") and not store.exists()
+    builtins = json.loads(cli("new", "list", "--json"))
+    assert builtins == {"schema": 1, "templates": [
+        {"name": "Console Application", "shortNames": ["app"], "tags": ["Common/Console"], "inPlace": True},
+        {"name": "VOID Library", "shortNames": ["classlib", "lib"], "tags": ["Common/Library"], "inPlace": True},
+    ]}
     # Registration copies data, including scripts, without executing it.
     script = source / "make.sh"
     script.write_text("#!/bin/sh\ntouch G62-unexpected-script\n", encoding="utf-8")
@@ -90,6 +96,26 @@ with tempfile.TemporaryDirectory(prefix="VOID G62 templates ") as temporary:
     listing = cli("new", "list")
     assert b"VOID 2D Game" in listing and b"voidgame, game-starter" in listing and b"Game, 2D" in listing
     assert cli("new") == listing
+    assert json.loads(cli("new", "list", "--json"))["templates"][-1] == {
+        "name": "VOID 2D Game", "shortNames": ["voidgame", "game-starter"], "tags": ["Game", "2D"], "inPlace": False,
+    }
+    assert json.loads(cli("new", "--template", "app", "--name", "EditorApp")) == {
+        "schema": 1, "root": str(root / "EditorApp").replace(os.sep, "/"),
+    }
+    placed = root / "placed"
+    placed.mkdir()
+    created = json.loads(cli("new", "--template", "classlib", "--name", "EditorLibrary", "--in-place", cwd=placed))
+    assert Path(created["root"]) == placed
+    placed_manifest = (placed / manifest).read_bytes()
+    assert tomllib.loads(placed_manifest.decode())["project"]["name"] == "EditorLibrary"
+    assert not (placed / ".vscode").exists()
+    cli("new", "--template", "classlib", "--name", "Replacement", "--in-place", cwd=placed, status=1)
+    assert (placed / manifest).read_bytes() == placed_manifest
+    cli("new", "--template", "app", "--name", "../Outside", status=2, message="portable identifier")
+    cli("new", "--template", "voidgame", "--name", "EditorGame", "--in-place", status=2, message="new project directory")
+    created = json.loads(cli("new", "--template", "game-starter", "--name", "EditorGame", cwd=work))
+    assert Path(created["root"]) == work / "EditorGame"
+    assert (work / "EditorGame/assets/EditorGame.bin").read_bytes() == (fixture / "assets/TemplateGame.bin").read_bytes()
     cli("new", "voidgame", status=1, message="Use --name NAME")
     cli("new", "voidgame", "--name", "../Outside", status=1, message="portable identifier")
     cli("new", "voidgame", "--name", "CON", status=1, message="portable identifier")
@@ -182,11 +208,15 @@ source-name = "templatemath"
     original = stored.read_bytes()
     stored.write_bytes(original + b"\n# changed\n")
     cli("new", "list", status=1, message="Template registration changed")
+    assert cli("new", "list", "--json", status=1, message="Template registration changed") == b""
+    cli("new", "--template", "voidgame", "--name", "Tampered", status=1, message="Template registration changed")
     cli("new", "voidgame", "--name", "Tampered", status=1, message="Template registration changed")
     cli("new", "uninstall", "voidgame", status=1, message="Template registration changed")
     assert not (root / "Tampered").exists() and registration.exists()
     stored.write_bytes(original)
     cli("new", "uninstall", "game-starter")
+    cli("new", "--template", "voidgame", "--name", "Vanished", status=2, message="No installed template named")
+    assert not (root / "Vanished").exists()
     assert not registration.exists() and b"voidgame" not in cli("new", "list")
     assert cli("run", ".", cwd=root / "FirstGame") == b"FirstGame\n42\n"
 

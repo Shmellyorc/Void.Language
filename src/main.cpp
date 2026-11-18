@@ -14,6 +14,7 @@
 #include <llvm/Support/JSON.h>
 #include <llvm/Config/llvm-config.h>
 #include <llvm/Support/raw_ostream.h>
+#include <array>
 #include <cerrno>
 #include <cstdlib>
 #include <fstream>
@@ -39,9 +40,11 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
     if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
     if(command.empty() || command=="new")out<<"Usage: voidc new [list]\n"
+      "       voidc new list --json\n"
       "       voidc new (app | classlib | lib) [PATH | .] [--name NAME] [project options]\n"
       "       voidc new PATH [project options] [--source PATH]\n"
       "       voidc new SHORT-NAME --name NAME [--nested]\n"
+      "       voidc new --template SHORT-NAME --name NAME [--in-place]\n"
       "       voidc new install (--dir PATH | --git URL)\n"
       "       voidc new uninstall SHORT-NAME\n";
     if(command.empty() || command=="add")out<<"Usage: voidc add ALIAS [--project DIR]\n"
@@ -420,14 +423,38 @@ int fetch_project(int argc, char** argv) {
     std::cout << "Verified Git source snapshots: " << count << '\n';
     return 0;
 }
-int list_templates() {
+int list_templates(bool machine = false) {
+    const auto installed=vd::project::list_project_templates();
+    if(machine) {
+        std::string text;
+        llvm::raw_string_ostream out(text);
+        llvm::json::OStream json(out);
+        auto entry=[&](llvm::StringRef name,const auto& short_names,const auto& tags,bool builtin) {
+            json.object([&] {
+                json.attribute("name",name);
+                json.attributeArray("shortNames",[&]{for(const auto& value:short_names)json.value(value);});
+                json.attributeArray("tags",[&]{for(const auto& value:tags)json.value(value);});
+                json.attribute("inPlace",builtin);
+            });
+        };
+        json.object([&] {
+            json.attribute("schema",1);
+            json.attributeArray("templates",[&] {
+                entry("Console Application",std::array{"app"},std::array{"Common/Console"},true);
+                entry("VOID Library",std::array{"classlib","lib"},std::array{"Common/Library"},true);
+                for(const auto& info:installed)entry(info.name,info.short_names,info.tags,false);
+            });
+        });
+        std::cout<<text<<'\n';
+        return 0;
+    }
     std::cout<<"Template Name         Short Name  Tags\n"
         "Console Application   app         Common/Console\n"
         "VOID Library          classlib, lib  Common/Library\n";
     auto display=[](const auto& values) {
         for(std::size_t i=0;i<values.size();++i)std::cout<<(i?", ":"")<<values[i];
     };
-    for(const auto& info:vd::project::list_project_templates()) {
+    for(const auto& info:installed) {
         std::cout<<info.name<<"   ";
         display(info.short_names);
         std::cout<<"   ";
@@ -435,6 +462,57 @@ int list_templates() {
         std::cout<<'\n';
     }
     std::cout<<"Use voidc new app --name NAME, voidc new classlib --name NAME or voidc new SHORT-NAME --name NAME.\n";
+    return 0;
+}
+
+vd::project::CreationOptions starter_options(std::string_view starter) {
+    vd::project::CreationOptions options;
+    options.new_directory=true;
+    options.kind=starter=="app"?vd::project::Kind::application:vd::project::Kind::library;
+#if (defined(__linux__) && defined(__x86_64__)) || (defined(_WIN32) && (defined(_M_X64) || defined(__x86_64__)))
+    options.app_launch=starter=="app";
+#endif
+    return options;
+}
+
+vd::project::CreationPlan checked_creation_plan(const std::filesystem::path& root,const vd::project::CreationOptions& options) {
+    vd::project::require_outside_user_package_store(root);
+    vd::project::require_outside_native_approval_store(root,true);
+    return vd::project::plan_creation(root,options);
+}
+
+int create_selected_template(int argc,char** argv) {
+    if((argc!=6 && argc!=7) || std::string_view(argv[4])!="--name" ||
+       (argc==7 && std::string_view(argv[6])!="--in-place"))
+        throw UsageError("Use voidc new --template SHORT-NAME --name NAME [--in-place].");
+    const std::string_view starter=argv[3];
+    const std::string name=argv[5];
+    const bool in_place=argc==7;
+    if(!vd::project::valid_template_project_name(name))
+        throw UsageError("Template project name must be a portable identifier beginning with a letter.");
+    std::filesystem::path root;
+    if(starter=="app" || starter=="classlib" || starter=="lib") {
+        auto options=starter_options(starter);
+        options.name=name;
+        options.in_place=in_place;
+        const auto plan=checked_creation_plan(in_place?vd::utf8_path("."):vd::utf8_path(name),options);
+        vd::project::publish_creation(plan);
+        root=plan.root;
+    } else {
+        if(!vd::project::valid_template_short_name(starter))throw UsageError("Invalid template short name.");
+        if(in_place)throw UsageError("Installed templates require a new project directory.");
+        const auto generated=vd::project::create_from_project_template(starter,name,false);
+        if(!generated)throw UsageError("No installed template named "+std::string(starter)+". Run voidc new list and select again.");
+        root=*generated;
+    }
+    std::string text;
+    llvm::raw_string_ostream out(text);
+    llvm::json::OStream json(out);
+    json.object([&] {
+        json.attribute("schema",1);
+        json.attribute("root",vd::path_utf8(root));
+    });
+    std::cout<<text<<'\n';
     return 0;
 }
 
@@ -495,7 +573,7 @@ int create_project(const std::string& command,int argc,char** argv) {
         if(word=="classlib" || ((word=="app" || word=="lib") &&
            (next.empty() || !next.starts_with('-') || next=="--" || next=="--name"))) {
             starter=word;
-            options.kind=starter=="app"?vd::project::Kind::application:vd::project::Kind::library;
+            options=starter_options(starter);
             seen.insert("--kind");
             ++first;
         }
@@ -534,16 +612,11 @@ int create_project(const std::string& command,int argc,char** argv) {
     }
     if(!destination && options.new_directory)throw UsageError("new requires a destination PATH.");
     options.in_place=options.new_directory && (*destination=="." || *destination=="./");
-#if (defined(__linux__) && defined(__x86_64__)) || (defined(_WIN32) && (defined(_M_X64) || defined(__x86_64__)))
-    options.app_launch=starter=="app";
-#endif
     if(options.source && !options.new_directory)throw UsageError("--source is only available with new.");
     if((app && (options.package_name || options.package_id)) || (!app && options.application_id))
         throw UsageError("Identity options must match the selected project kind.");
     const auto root=destination?*destination:std::filesystem::current_path();
-    vd::project::require_outside_user_package_store(root);
-    vd::project::require_outside_native_approval_store(root,true);
-    const auto plan=vd::project::plan_creation(root,options);
+    const auto plan=checked_creation_plan(root,options);
     const auto manifest=plan.root/"void.project.toml";
     std::cout<<"Manifest: "<<vd::path_utf8(manifest)<<"\nProject ID: "<<plan.manifest->project().id<<'\n'
              <<(app?"Application ID: ":"Package ID: ")<<(app?plan.manifest->application()->id:plan.manifest->package()->id)
@@ -606,6 +679,9 @@ static int run_cli(int argc, char** argv) {
             if(argc==3 && (std::string_view(argv[2])=="--help" || std::string_view(argv[2])=="-h")){help(command);return 0;}
             if(command=="new") {
                 if(argc==2 || (argc==3 && std::string_view(argv[2])=="list"))return list_templates();
+                if(std::string_view(argv[2])=="list" && argc==4 && std::string_view(argv[3])=="--json")
+                    return list_templates(true);
+                if(std::string_view(argv[2])=="--template")return create_selected_template(argc,argv);
                 if(const auto result=custom_template_command(argc,argv))return *result;
             }
             return create_project(command,argc,argv);

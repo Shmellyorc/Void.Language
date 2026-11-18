@@ -5,6 +5,7 @@ import {LanguageClient, CloseAction, ErrorAction, Trace, State, RevealOutputChan
 import type {TextEdit as ProtocolTextEdit} from 'vscode-languageclient/node';
 import {inside, Project, resolveCompiler, resolveProject, Settings} from './config';
 import {CreationWorkflow} from './creationWorkflow';
+import {newProjectCommand} from './newProject';
 import {compilerExecution} from './projectTask';
 
 let manager: ServerManager | undefined;
@@ -361,6 +362,7 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
     const workflow = creation = new CreationWorkflow(context.workspaceState, bundled, root => current.selectCreatedRoot(root),
         message => current.report(`VOID project creation: ${message}`));
     context.subscriptions.push(output, statusBar, workflow,
+        vscode.commands.registerCommand('void.newProject', newProjectCommand(bundled)),
         vscode.commands.registerCommand('void.createProject', () => workflow.create()),
         vscode.commands.registerCommand('void.resetCreationPrompt', () => workflow.reset()),
         vscode.commands.registerCommand('void.selectEntry', () => current.selectEntry()),
