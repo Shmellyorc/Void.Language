@@ -5,6 +5,19 @@ It exposes all 600 supported interfaces in snake case. The API includes 236
 direct C ABI mappings, 352 ownership and value adapters, 10 callback
 interfaces and two typed alternatives to C variadic functions.
 
+Public wrappers document their parameters and return values in source. Parameter
+names follow the pinned C declaration in snake_case. VOID rejects shadowing,
+so names already used by a public type or constructor receive `_value`.
+For example, the circle signature is
+`draw_circle(center_x: i32, center_y: i32, radius: f32, color_value: native.color)`.
+The `color()` constructor keeps its established name.
+
+Calls using the former anonymous labels must adopt the descriptive names.
+For example, replace `get_random_value(p0 = 1, p1 = 6)` with
+`get_random_value(min = 1, max = 6)`. Positional argument ordering and types
+are preserved. Adapted APIs document VOID-owned buffers, nullable results,
+callback lifetimes and the matching cleanup operation.
+
 ## Add raylib to an application
 
 The bundled library supports x86-64 GNU/Linux and Windows x64 with the MSVC

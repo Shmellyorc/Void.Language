@@ -2245,9 +2245,11 @@ class Semantics {
     VOID_SEMANTIC_HANDLER void editor_call(const Expr& e,const Function& target,std::size_t first,const Documentation* selected_docs=nullptr) {
         std::optional<std::size_t> active;
         for(std::size_t n=first;n<e.parts.size() && !active;++n) {
+            if(editor_cursor(e.names[n-first])) {active=n;break;}
             std::vector<const Expr*> work{e.parts[n].get()};
             while(!work.empty()) {
                 auto* part=work.back();work.pop_back();
+                if(part->kind==Expr::Kind::call || part->kind==Expr::Kind::method_call)continue;
                 if(editor_cursor(*part)){active=n;break;}
                 for(const auto& child:part->parts)work.push_back(child.get());
             }
@@ -2287,8 +2289,31 @@ class Semantics {
                 out.signature=random_public_name(target)+"(";for(const auto& p:out.parameters){if(out.signature.back()!='(')out.signature+=", ";out.signature+=p;}out.signature+=") -> "+ir::type_name(target.result);
             }
         }
+        const auto& label=e.names[*active-first];
+        const bool editing_label=editor_cursor(label);
+        const bool bare_cursor=label.text.empty() && e.parts[*active]->kind==Expr::Kind::name && editor_cursor(*e.parts[*active]);
+        if((editing_label || bare_cursor) && !invalid_function && !unit.failed_import &&
+           !(current && current->parse_failed) && (!selected_docs || !target.generics.empty()) &&
+           !target.symbol.starts_with("$result::") && !target.symbol.starts_with("$nullable::")) {
+            // Bind every other written argument through the ordinary mapper.
+            // The cursor occupies its positional slot but supplies no value.
+            const auto mapping=argument_mapping(e,target,first,false,*active);
+            std::vector<bool> bound(target.parameters.size());
+            for(auto index:mapping)bound[index]=true;
+            for(std::size_t index=0;index<target.parameters.size();++index) {
+                const auto& parameter=target.parameters[index];
+                const auto& name=parameter.token.text;
+                if(bound[index] || !valid_editor_identifier(name) || out.candidates.size()>=256)continue;
+                out.candidates.push_back({name+" =",ir::type_name(target.generics.empty()?parameter.type:editor_pattern_type(parameter.type)),6,
+                    editing_label?name:name+" = ",docs.parameter(name)});
+            }
+            const bool named_before=std::any_of(e.names.begin(),e.names.begin()+(*active-first),
+                [](const auto& argument){return !argument.text.empty();});
+            if(editing_label || named_before)throw EditorProbeFound{};
+        }
     }
-    std::vector<unsigned> argument_mapping(const Expr& e, const Function& target, std::size_t first, bool constructor) {
+    std::vector<unsigned> argument_mapping(const Expr& e, const Function& target, std::size_t first, bool constructor,
+                                         std::optional<std::size_t> cursor = {}) {
         std::vector<bool> bound(target.parameters.size());
         std::vector<unsigned> mapping;
         bool named = false;
@@ -2296,6 +2321,7 @@ class Semantics {
         for (std::size_t n = first; n < e.parts.size(); ++n) {
             auto index = positional++;
             const auto& label = e.names[n-first];
+            if(cursor==n) {named|=!label.text.empty();continue;}
             if (!label.text.empty()) {
                 named = true;
                 auto found = std::find_if(target.parameters.begin(),target.parameters.end(),[&](const auto& p) { return p.token.text == label.text; });

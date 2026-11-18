@@ -1,0 +1,212 @@
+"""Physical raylib names/docs, named calls and compiler-owned editor results.
+
+Usage: raylib_documentation.py voidc voidls approved-native-catalog
+       raylib_documentation.py --docs-only
+The native catalog is prepared separately. All project edits are isolated.
+"""
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'tools'))
+from lsp_client import Client
+
+sys.path.insert(0, str(ROOT / 'tools/raylib'))
+from public_docs import public_functions, verify_documentation_meanings
+
+
+def documentation_checks():
+    functions = {function['name']: function for function in public_functions(
+        (ROOT / 'verified-packages/raylib/src/raylib.void').read_text())}
+    for function in functions.values():
+        verify_documentation_meanings(function)
+    # Reintroduce independent historical template errors in memory. These
+    # guards must reject the mistakes rather than merely count present tags.
+    mistakes = [
+        ('window_should_close', '@return ', 'The resource-ledger close status. This operation consumes the supplied owner.'),
+        ('gallery_should_close', '@return ', 'The resource-ledger close status.'),
+        ('set_texture_filter', '@param filter ', 'File-extension filter.'),
+        ('load_font_from_image', '@param key ', 'Keyboard key code.'),
+        ('load_font_from_image', '@param first_char ', 'Starting array index.'),
+        ('draw_grid', '@param spacing ', 'Character spacing in pixels.'),
+        ('set_text_line_spacing', '@param spacing ', 'Character spacing.'),
+        ('gen_image_gradient_linear', '@param direction ', 'Direction vector.'),
+        ('seek_music_stream', '@param position ', 'Position in pixels.'),
+        ('draw_cube', '@param length ', 'Number of elements to read.'),
+        ('get_monitor_count', '@return ', 'Number of elements in the array.'),
+        ('get_random_value', '@return ', 'The a random integer.'),
+        ('get_time', '@return ', 'The numeric result described above.'),
+        ('get_directory_path', 'Copy the directory', 'Get a path (uses static string).'),
+        ('compute_md5', 'Compute an MD5', 'Compute MD5, returns static int[4].'),
+        ('load_model_from_mesh', 'Create a model', 'This mutation invalidates earlier views.'),
+        ('image_draw_triangle_ex', '@param c2 ', 'Second control point.'),
+        ('image_color_replace', '@param replace ', 'Text to replace.'),
+        ('load_font_from_memory', '@param file_type ', 'File format such as ".png".'),
+        ('get_file_extension', '@param file_name ', 'Relative paths use the process working directory.'),
+    ]
+    for name, prefix, replacement in mistakes:
+        function = dict(functions[name])
+        docs = list(function['docs'])
+        indices = [i for i, line in enumerate(docs) if line.startswith(prefix)]
+        assert len(indices) == 1, (name, prefix, indices)
+        # Preserve tag/label spelling so each case exercises meaning checks.
+        docs[indices[0]] = (prefix if prefix.startswith('@') else '') + replacement
+        function['docs'] = docs
+        try:
+            verify_documentation_meanings(function)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError((name, 'accepted inaccurate documentation', replacement))
+    print(f'Raylib documentation checks: {len(functions)} public functions and {len(mistakes)} rejected template errors passed')
+
+
+documentation_checks()
+if sys.argv[1:] == ['--docs-only']:
+    raise SystemExit(0)
+
+compiler, server, catalog = (Path(arg).resolve() for arg in sys.argv[1:4])
+SOURCE = '''use pkg/raylib as rl
+func main() -> i32:
+    var ink = rl.color(10, 20, 30, 255)
+    var faded = rl.fade(color_value = ink, alpha = 0.5)
+    if faded.a != 127:
+        return 1
+    var codepoint = rl.get_codepoint(text = "A")
+    if codepoint.value != 65 or codepoint.size != 1:
+        return 2
+    var previous = rl.get_codepoint_previous(text = "AB", position = 2)
+    if previous.value != 66 or previous.size != 1:
+        return 3
+    var image = rl.gen_image_color(width = 2, height = 2, color_value = ink) as rl.image
+    if rl.unload_image(image_value = image) != 0:
+        return 4
+    if rl.get_random_value(min = 41, max = 41) != 41:
+        return 5
+    if false:
+        rl.draw_circle(center_x = 10, center_y = 20, radius = 5, color_value = ink)
+    print("raylib descriptive named arguments passed")
+    return 0
+'''
+
+
+def point(text, needle, delta=0):
+    prefix = text[:text.index(needle) + delta]
+    return {'line': prefix.count('\n'),
+            'character': len(prefix.rsplit('\n', 1)[-1].encode('utf-16-le')) // 2}
+
+
+with tempfile.TemporaryDirectory(prefix='VOID raylib documentation ') as scratch:
+    root = Path(scratch)
+    env = dict(os.environ, VOID_NATIVE_CATALOG=str(catalog))
+
+    def run(*arguments, status=0):
+        result = subprocess.run(list(map(str, arguments)), cwd=root, env=env,
+                                capture_output=True, timeout=240)
+        output = (result.stdout + result.stderr).decode(errors='replace')
+        assert result.returncode == status, (arguments, result.returncode, output)
+        assert not any(word in output for word in ('AddressSanitizer', 'LeakSanitizer', 'runtime error:')), output
+        return output
+
+    project = root / 'consumer'
+    run(compiler, 'new', project)
+    run(compiler, 'add', 'raylib', '--project', project, '--dir', ROOT / 'verified-packages/raylib')
+    manifest = project / 'void.project.toml'
+    with manifest.open('a') as file:
+        file.write('\n[native-requirements.raylib]\nid="org.voidlang.raylib"\nversion="=6.0.0"\nabi=3\n')
+    entry = next((project / 'src').glob('*.void'))
+    entry.write_text(SOURCE)
+    run(compiler, 'tidy', '--project', project)
+    run(compiler, 'check', '--project', project)
+    for profile in ('debug', 'release'):
+        assert 'descriptive named arguments passed' in run(
+            compiler, 'run', '--project', project, '--allow-native', '--profile', profile)
+        image = root / profile / ('app.exe' if os.name == 'nt' else 'app')
+        run(compiler, 'build', '--project', project, '--allow-native', '--profile', profile, '-o', image)
+        assert 'descriptive named arguments passed' in run(image)
+    entry.write_text(SOURCE.replace('center_x = 10', 'p0 = 10'))
+    assert 'p0' in run(compiler, 'check', '--project', project, status=1)
+    entry.write_text(SOURCE)
+    run(compiler, 'check', '--project', project)
+
+    # Client has no environment override. Only this test process inherits the
+    # isolated, explicitly supplied catalog for its server subprocess.
+    os.environ['VOID_NATIVE_CATALOG'] = str(catalog)
+    with Client(server, project, project=True) as client:
+        client.request('initialize', {'capabilities': {'textDocument': {
+            'publishDiagnostics': {'versionSupport': True},
+            'signatureHelp': {'signatureInformation': {'documentationFormat': ['plaintext']}},
+            'semanticTokens': {'requests': {'full': True}, 'formats': ['relative'],
+                               'tokenTypes': ['namespace', 'function', 'variable'], 'tokenModifiers': []},
+        }}})
+        client.notify('initialized', {})
+        notes = client.sync()
+        assert not [d for note in notes for d in note['diagnostics']], notes
+        uri, version, text = entry.as_uri(), 0, SOURCE
+
+        def update(new):
+            global text, version
+            text = new
+            version += 1
+            client.notify('textDocument/didOpen' if version == 1 else 'textDocument/didChange',
+                          {'textDocument': {'uri': uri, 'version': version, 'languageId': 'void', 'text': text}}
+                          if version == 1 else
+                          {'textDocument': {'uri': uri, 'version': version}, 'contentChanges': [{'text': text}]})
+            return client.sync()
+
+        def query(method, needle, delta=0):
+            response, _ = client.request('textDocument/' + method,
+                                         {'textDocument': {'uri': uri}, 'position': point(text, needle, delta)})
+            assert 'result' in response, response
+            return response['result']
+
+        update(SOURCE)
+        hover = query('hover', 'rl.draw_circle', len('rl.'))['contents']['value']
+        assert 'center_x: i32' in hover and 'center_y: i32' in hover, hover
+        assert 'color_value' in hover and 'Draw a color-filled circle.' in hover, hover
+        returns = query('hover', 'rl.get_codepoint(', len('rl.'))['contents']['value']
+        assert 'size' in returns and 'consumed UTF-8 bytes' in returns, returns
+        base = 'use pkg/raylib as rl\nfunc main():\n    '
+        for call, active, description in [
+            ('rl.draw_circle(', 0, 'Horizontal coordinate of the circle center in pixels.'),
+            ('rl.draw_circle(10, ', 1, 'Vertical coordinate of the circle center in pixels.'),
+            ('rl.draw_circle(radius = ', 2, 'Circle radius in pixels.'),
+            ('rl.load_image(', 0, 'Path to the file. Relative paths use the process working directory.'),
+            ('rl.get_codepoint_previous(position = ', 1,
+             'UTF-8 byte position immediately after the codepoint. A negative value selects the end of the text.'),
+            ('rl.set_texture_filter(filter = ', 1,
+             'Texture scaling filter selected from the texture_filter_* constants.'),
+            ('rl.load_font_from_image(key = ', 1,
+             'Image background and transparency color key used to locate glyphs.'),
+            ('rl.draw_grid(spacing = ', 1, 'Distance between adjacent grid lines in world units.'),
+            ('rl.set_text_line_spacing(', 0, 'Vertical spacing in pixels between successive lines of text.'),
+            ('rl.image_draw_triangle_ex(c2 = ', 5, 'Color at vertex v2 for interpolation across the triangle.'),
+        ]:
+            update(base + call)
+            help = query('signatureHelp', call, len(call))
+            assert help and help['activeParameter'] == active, (call, help)
+            signature = help['signatures'][0]
+            assert signature['parameters'][active]['documentation']['value'] == description, help
+
+        update(base + 'var closing = rl.window_should_close()')
+        closing = query('hover', 'rl.window_should_close', len('rl.'))['contents']['value']
+        assert 'True when the application should close its window.' in closing, closing
+        assert not any(term in closing for term in ('resource-ledger', 'consumes')), closing
+
+        update(base + 'rl.draw_circle(cen')
+        result = query('completion', 'rl.draw_circle(cen', len('rl.draw_circle(cen'))
+        items = result['items'] if isinstance(result, dict) else result
+        labels = {item['label'].removesuffix(' =') for item in items}
+        assert {'center_x', 'center_y'} <= labels, labels
+        assert not {'p0', 'p1'} & labels, labels
+
+        notes = update(SOURCE)
+        assert notes and all(not note['diagnostics'] for note in notes), notes
+        semantic, _ = client.request('textDocument/semanticTokens/full', {'textDocument': {'uri': uri}})
+        assert semantic['result']['data']
+        client.shutdown()
+
+print('Raylib docs: debug/release named calls, JIT/AOT, hover, active parameter docs, named completion and repair passed')

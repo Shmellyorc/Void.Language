@@ -12,6 +12,7 @@ import re
 import subprocess
 from owned_bindings import OWNERS, extend
 from callback_bindings import extend as callback_extensions
+from public_docs import verify_public_api
 
 TOOLS = Path(__file__).resolve().parent
 ROOT = TOOLS.parents[1] / "verified-packages/raylib"
@@ -260,6 +261,7 @@ def generate(clang):
     inventory['complete_binding_semantics']='Legacy exact-C-signature completeness; arbitrary C variadics are not exposed. complete_usable_api includes explicitly identified typed equivalents and lifecycle adapters.'
     inventory['complete_direct_c_abi']=False
     inventory['arbitrary_c_varargs_supported']=False
+    verify_public_api((ROOT / 'src/raylib.void').read_text(), nodes, inventory, snake)
     return {'inventory.json': json.dumps(inventory, indent=2) + '\n',
             'native/raylib_api.h': '\n'.join(declarations) + '\n', 'native/raylib_api.c': '\n'.join(c) + '\n',
             'native/raylib_parity.h': '\n'.join(checks) + '\n', 'native/raylib_api.descriptor.inc': '\n'.join(descriptor) + '\n'}
