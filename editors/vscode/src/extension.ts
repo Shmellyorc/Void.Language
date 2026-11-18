@@ -7,6 +7,7 @@ import {inside, Project, resolveCompiler, resolveProject, Settings} from './conf
 import {CreationWorkflow} from './creationWorkflow';
 import {newProjectCommand} from './newProject';
 import {compilerExecution} from './projectTask';
+import {libraryCommands} from './libraryManagement';
 
 let manager: ServerManager | undefined;
 let creation: CreationWorkflow | undefined;
@@ -78,6 +79,50 @@ class ServerManager {
         await this.serial;
         // An explicit task or launch may be the first action in a new folder.
         if (!this.project && vscode.workspace.workspaceFolders?.length === 1) await this.refresh(true);
+    }
+    async librarySelection() {
+        if (!vscode.workspace.isTrusted) throw new Error('Trust this workspace before changing VOID libraries.');
+        await this.ensureProject();
+        const folder = vscode.workspace.workspaceFolders?.length === 1 ? vscode.workspace.workspaceFolders[0] : undefined;
+        const project = this.project, client = this.client, selection = this.requestSerial;
+        if (!folder || folder.uri.scheme !== 'file' || !project?.manifestMode || !client?.isRunning())
+            throw new Error('Open one trusted local folder and select a VOID manifest project first.');
+        const compilerSetting = () => vscode.workspace.getConfiguration('void', folder.uri).get('compiler.path', '');
+        const setting = compilerSetting();
+        const verify = () => {
+            if (!vscode.workspace.isTrusted || this.disposed || this.project !== project || this.client !== client ||
+                this.requestSerial !== selection || !client.isRunning() || compilerSetting() !== setting ||
+                vscode.workspace.workspaceFolders?.length !== 1 ||
+                vscode.workspace.workspaceFolders[0].uri.toString() !== folder.uri.toString())
+                throw new Error('The editor or selected project changed. Invoke the command again.');
+            const dirty = vscode.workspace.textDocuments.find(document => document.isDirty &&
+                document.uri.scheme === 'file' && inside(project.root, document.uri.fsPath));
+            if (dirty) throw new Error(`Save ${basename(dirty.uri.fsPath)} before changing VOID libraries. The compiler uses saved files.`);
+        };
+        const compiler = await resolveCompiler(project.server, setting, folder.uri.fsPath);
+        if (!inside(await fs.realpath(folder.uri.fsPath), project.root))
+            throw new Error('Select a VOID project inside the trusted workspace folder.');
+        verify();
+        const verifySelection = async () => {
+            verify();
+            const state = await client.sendRequest<{root: string; rootAvailable: boolean}>('void/projectState', {});
+            verify();
+            // Import errors can be resolved by adding a library. Directory
+            // replacement, however, always requires a fresh project selection.
+            if (typeof state.rootAvailable !== 'boolean')
+                throw new Error('Use the matching voidls with support for editor library management.');
+            if (!state.rootAvailable || !samePath(state.root, project.root))
+                throw new Error('The saved project directory changed. Restart the VOID language server and try again.');
+        };
+        const refresh = async () => {
+            await this.serial;
+            if (!vscode.workspace.isTrusted || this.project !== project || this.client !== client) return;
+            // A lock change intentionally changes the compiler's context key.
+            // Accept that context in the same session, preserving its entry override.
+            this.changed();
+            await client.sendRequest('void/reselectProject', {entry: project.entryOverride ?? null});
+        };
+        return {compiler, root: project.root, requestedRoot: project.requestedRoot ?? project.root, verify, verifySelection, refresh};
     }
     private async projectInvocation(command: ProjectCommand, debugBuild = false) {
         await this.ensureProject();
@@ -361,7 +406,10 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
     const current = manager = new ServerManager(output, bundled, statusBar);
     const workflow = creation = new CreationWorkflow(context.workspaceState, bundled, root => current.selectCreatedRoot(root),
         message => current.report(`VOID project creation: ${message}`));
+    const libraries = libraryCommands(() => current.librarySelection(), output);
     context.subscriptions.push(output, statusBar, workflow,
+        vscode.commands.registerCommand('void.addLibrary', () => libraries('add')),
+        vscode.commands.registerCommand('void.removeLibrary', () => libraries('remove')),
         vscode.commands.registerCommand('void.newProject', newProjectCommand(bundled)),
         vscode.commands.registerCommand('void.createProject', () => workflow.create()),
         vscode.commands.registerCommand('void.resetCreationPrompt', () => workflow.reset()),

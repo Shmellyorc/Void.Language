@@ -35,6 +35,7 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
       "       voidc package --verify DIR\n"
       "       voidc package list | voidc package search NAME\n"
+      "       voidc package list --json\n"
       "       voidc package install ALIAS (--dir DIR | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n"
       "       voidc package uninstall ALIAS\n";
     if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
@@ -48,7 +49,8 @@ void usage(std::ostream& out, const std::string& command={}) {
       "       voidc new install (--dir PATH | --git URL)\n"
       "       voidc new uninstall SHORT-NAME\n";
     if(command.empty() || command=="add")out<<"Usage: voidc add ALIAS [--project DIR]\n"
-      "       voidc add ALIAS [--project DIR] (--dir DIR | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n";
+      "       voidc add ALIAS [--project DIR] (--dir DIR [--copy] | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n"
+      "       voidc add --suggest-alias --dir DIR [--project DIR]\n";
     if(command.empty() || command=="tidy")out<<"Usage: voidc tidy [--project DIR] [--check]\n";
     if(command.empty() || command=="remove")out<<"Usage: voidc remove ALIAS [--project DIR]\n";
     if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
@@ -167,17 +169,29 @@ std::filesystem::path bundled_raylib_source(const std::filesystem::path& executa
 }
 int discover_packages(const std::filesystem::path& executable, int argc, char** argv) {
     const bool search=std::string_view(argv[2])=="search";
-    if(argc!=(search?4:3) || (search && (!*argv[3] || argv[3][0]=='-')))
-        throw UsageError("Expected package list or package search NAME.");
+    const bool json=!search && argc==4 && std::string_view(argv[3])=="--json";
+    if(argc!=(search||json?4:3) || (search && (!*argv[3] || argv[3][0]=='-')))
+        throw UsageError("Expected package list [--json] or package search NAME.");
+    const auto registrations=vd::project::list_user_packages();
+    const bool raylib=!bundled_raylib_source(executable).empty() && vd::native_source_debug_supported();
+    if(json) {
+        llvm::json::Array packages;
+        if(raylib)packages.emplace_back(llvm::json::Object{{"kind","bundled"},{"alias","raylib"},
+            {"version",VOID_RAYLIB_VERSION},{"id","org.voidlang.raylib"}});
+        for(const auto& package:registrations)packages.emplace_back(llvm::json::Object{{"kind","registered"},
+            {"alias",package.alias},{"version",package.version},{"id",package.id},{"identity",package.identity}});
+        llvm::outs()<<llvm::json::Value(llvm::json::Object{{"schema",1},{"packages",std::move(packages)}})<<'\n';
+        return 0;
+    }
     bool listed=false;
-    for(const auto& installed:vd::project::list_user_packages()) {
-        if(search && std::string_view(installed).substr(0,installed.find(' ')).find(argv[3])==std::string_view::npos)
-            continue;
-        std::cout<<"Installed: "<<installed<<'\n';
+    for(const auto& package:registrations) {
+        if(search && package.alias.find(argv[3])==std::string::npos)continue;
+        std::cout<<"Installed: "<<package.alias<<' '<<package.version<<" | "<<package.id;
+        if(package.git)std::cout<<" | "<<package.git->pin.origin<<" @ "<<package.git->pin.revision;
+        std::cout<<'\n';
         listed=true;
     }
-    const auto source=bundled_raylib_source(executable);
-    if(source.empty() || !vd::native_source_debug_supported() ||
+    if(!raylib ||
        (search && std::string_view("raylib").find(argv[3])==std::string_view::npos)) {
         if(!listed)std::cout<<"No matching bundled packages available for this compiler and target.\n";
         return 0;
@@ -198,14 +212,20 @@ int maintain_project(const std::string& command,int argc,char** argv,const std::
     using namespace vd::project;
     std::filesystem::path root=".";
     AddOptions options;
-    std::optional<std::string> origin,rev,subdir;
+    std::optional<std::string> origin,rev,subdir,registered;
     std::set<std::string> seen;
-    bool check=false;
+    bool check=false,bundled=false,suggest_alias=false;
     for(int i=registration?3:2;i<argc;++i) {
         std::string option=argv[i];
         if(option=="--check" && command=="tidy") {
             if(check)throw UsageError("Repeated --check.");check=true;
-        } else if((!registration && option=="--project") ||
+        } else if(!registration && command=="add" && (option=="--copy" || option=="--bundled" || option=="--suggest-alias")) {
+            if(!seen.insert(option).second)throw UsageError("Repeated "+option+".");
+            if(option=="--copy")options.copy=true;
+            else if(option=="--bundled")bundled=true;
+            else suggest_alias=true;
+        } else if((!registration && (option=="--project" || (command!="tidy" && option=="--edit-token") ||
+                                      (command=="add" && option=="--registered"))) ||
                   (command=="add" && (option=="--path" || option=="--dir" || option=="--git" || option=="--rev" || option=="--subdir"))) {
             if(option=="--dir")option="--path";
             if(!seen.insert(option).second || ++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one value after "+option);
@@ -213,6 +233,8 @@ int maintain_project(const std::string& command,int argc,char** argv,const std::
             else if(option=="--path")options.path=vd::utf8_path(argv[i]);
             else if(option=="--git")origin=argv[i];
             else if(option=="--rev")rev=argv[i];
+            else if(option=="--edit-token")options.edit_token=argv[i];
+            else if(option=="--registered")registered=argv[i];
             else subdir=argv[i];
         } else if((command=="add" || command=="remove") && !option.starts_with('-') && options.alias.empty())options.alias=std::move(option);
         else throw UsageError("Unknown or repeated "+command+" option: "+option);
@@ -229,14 +251,28 @@ int maintain_project(const std::string& command,int argc,char** argv,const std::
         return 0;
     }
     if(command=="add") {
-        if(!registration && !options.alias.empty() && !options.path && !origin && !rev && !subdir) {
-            if(const auto report=add_user_package(root,options.alias))return print_report(*report);
+        const bool explicit_source=options.path || origin || rev || subdir;
+        if(suggest_alias) {
+            if(!options.alias.empty() || !options.path || origin || rev || subdir || bundled || registered ||
+               options.copy || options.edit_token)
+                throw UsageError("Expected add --suggest-alias --dir DIR [--project DIR].");
+            const auto alias=suggest_local_package_alias(root,*options.path);
+            llvm::outs()<<llvm::json::Value(llvm::json::Object{{"schema",1},
+                {"alias",alias?llvm::json::Value(*alias):llvm::json::Value(nullptr)}})<<'\n';
+            return 0;
         }
-        if(options.alias=="raylib" && !options.path && !origin && !rev && !subdir) {
+        if((options.copy && !options.path) || ((bundled || registered) && explicit_source) || (bundled && registered))
+            throw UsageError("Select one source; --copy requires a local --dir.");
+        if(!registration && !bundled && !options.alias.empty() && !explicit_source) {
+            if(const auto report=add_user_package(root,options.alias,options.edit_token,registered))return print_report(*report);
+        }
+        if(registered)throw std::runtime_error("No selected user package registration for '"+options.alias+"'.");
+        if(bundled && options.alias!="raylib")throw UsageError("No bundled library named '"+options.alias+"'.");
+        if(options.alias=="raylib" && !explicit_source) {
             const auto source=bundled_raylib_source(executable);
             if(source.empty() || !vd::native_source_debug_supported())
                 throw std::runtime_error("Bundled raylib is unavailable for this compiler or target. Use an explicit --path or --git source.");
-            const auto report=add_verified_raylib(root,source,executable,vd::native_clang_driver(argv[0]),VOID_RAYLIB_SANITIZE);
+            const auto report=add_verified_raylib(root,source,executable,vd::native_clang_driver(argv[0]),VOID_RAYLIB_SANITIZE,options.edit_token);
             std::cout<<(report.changed?"Installed and locked bundled raylib.":"Bundled raylib and native lock verified; reused the prepared catalog.")
                      <<"\nNative execution still needs explicit consent: review with voidc run .\n";
             return 0;
@@ -254,7 +290,7 @@ int maintain_project(const std::string& command,int argc,char** argv,const std::
     if(command=="remove" && options.alias.empty())throw UsageError("Expected one dependency alias.");
     auto report=command=="add"?add_dependency(root,options,[&]{return vd::native_clang_driver(argv[0]);},
                                               VOID_RAYLIB_SANITIZE):
-        command=="remove"?remove_dependency(root,options.alias):tidy_dependencies(root,check);
+        command=="remove"?remove_dependency(root,options.alias,options.edit_token):tidy_dependencies(root,check);
     return print_report(report);
 }
 int resolve_project(int argc,char** argv) {
@@ -308,6 +344,7 @@ std::string dependency_json(const vd::project::DependencyExplanation* report, st
             return;
         }
         json.attribute("project_id", report->project_id);
+        if(report->edit_token)json.attribute("edit_token", *report->edit_token);
         json.attributeObject("lock", [&] {
             json.attribute("status", report->lock_sha256 ? "verified" : "not_required");
             if (report->lock_sha256) json.attribute("sha256", *report->lock_sha256);
@@ -367,7 +404,7 @@ std::string dependency_text(const vd::project::DependencyExplanation& report) {
 
 int explain_project(int argc, char** argv) {
     std::optional<std::filesystem::path> root;
-    bool json = false;
+    bool json = false, for_edit = false;
     for (int i = 3; i < argc; ++i) {
         const std::string_view option = argv[i];
         if (option == "--project") {
@@ -375,11 +412,12 @@ int explain_project(int argc, char** argv) {
                 throw UsageError("Expected one directory after --project.");
             root = vd::utf8_path(argv[i]);
         } else if (option == "--json" && !json) json = true;
+        else if (option == "--for-edit" && !for_edit) for_edit = true;
         else throw UsageError("Unknown or repeated deps explain option: " + std::string(option));
     }
-    if (!root) throw UsageError("deps explain requires --project DIR.");
+    if (!root || (for_edit && !json)) throw UsageError("deps explain requires --project DIR; --for-edit requires --json.");
     try {
-        const auto report = vd::project::explain_dependencies(*root);
+        const auto report = vd::project::explain_dependencies(*root,for_edit);
         const auto text = json ? dependency_json(&report) : dependency_text(report);
         if (text.size() > dependency_output_limit) throw std::runtime_error("Dependency explanation exceeds the output byte limit.");
         std::cout << text;

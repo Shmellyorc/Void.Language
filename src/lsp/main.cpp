@@ -901,8 +901,14 @@ public:
                     const auto& params=object(o->get("params"));std::optional<std::string> entry;
                     if(auto value=params.get("entry");value && !value->getAsNull())entry=string(params,"entry");
                     session.reselect(entry);analyze();
-                } else (void)observe_project_root();
-                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",summary()}});return {};
+                    send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",summary()}});return {};
+                }
+                const bool available=observe_project_root();
+                auto result=summary();
+                // Availability of the pinned directory is independent of
+                // entry selection and source errors such as an unresolved import.
+                result["rootAvailable"]=available;
+                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
             }
             if(name=="void/refreshProject") {
                 session.refresh();analyze();if(id)send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",nullptr}});return {};

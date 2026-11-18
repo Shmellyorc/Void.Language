@@ -103,6 +103,7 @@ def state(client):
 def error_state(client, code):
     current = state(client)
     assert current['status'] == 'error' and current['requiresReselection'], current
+    assert current['rootAvailable'] is False, current
     assert current['entry'] is None and current['executionCount'] == 0, current
     assert current['discoveryCount'] == 0 and current['snapshotKey'] == '', current
     assert [item['code'] for item in current['diagnostics']] == [code], current
@@ -170,7 +171,7 @@ with TemporaryDirectory(prefix='VOID LSP root recovery ') as directory:
         notes = client.sync()
         assert all(not n['diagnostics'] for n in notes), notes
         initial = state(client)
-        assert initial['status'] == 'ready', initial
+        assert initial['status'] == 'ready' and initial['rootAvailable'] is True, initial
         before, _ = completion(client, entry, dirty)
         assert [item['label'] for item in before] == ['count'], before
         assert before[0]['textEdit']['range']['start'] == position(dirty, 'p.count', 2)
@@ -261,7 +262,8 @@ with TemporaryDirectory(prefix='VOID LSP root recovery ') as directory:
         _, notes = request(client, 'void/refreshProject', {})
         assert any(n['uri'] == manifest.as_uri() and
                    [d['code'] for d in n['diagnostics']] == ['VOID5011'] for n in notes), notes
-        assert state(client)['status'] == 'error'
+        available = state(client)
+        assert available['status'] == 'error' and available['rootAvailable'] is True, available
         assert cli(root, 'check').returncode != 0
         lock.write_bytes(valid_lock)
         original_package = package_source.read_bytes()

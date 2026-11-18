@@ -21,7 +21,8 @@ from dependency_explain import explain
 compiler, git = (Path(arg).resolve() for arg in sys.argv[1:3])
 replay = sys.argv[3:] == ["--reproduce-packfile-uris"]
 github_fixture = sys.argv[4:] if sys.argv[3:4] == ["--github-template-fixture"] else []
-assert not sys.argv[3:] or replay or len(github_fixture) == 2, sys.argv[3:]
+library_fixture = sys.argv[4:] if sys.argv[3:4] == ["--github-library-fixture"] else []
+assert not sys.argv[3:] or replay or len(github_fixture) == 2 or len(library_fixture) == 3, sys.argv[3:]
 manifest = "void.project.toml"
 store = ".void/git-deps"
 
@@ -550,6 +551,23 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl
             assert cli(base / "SubtreeGame", "run", env=clean).stdout == b"SubtreeGame\n42\n"
             run(test_compiler, "new", "uninstall", "voidgame", cwd=base, env=store_env)
             print("GitHub slash-ref subtree verified with real HTTPS fixture and exact pin", flush=True)
+
+        if library_fixture:
+            test_compiler, route, editor_driver = map(Path, library_fixture)
+            run(git, "branch", "topic/slash", cwd=units, env=git_env)
+            route.write_text(origin, encoding="utf-8")
+            url = "https://github.com/g67-fixture/libraries/tree/topic/slash/packages/units"
+            before = len(server.requests)
+            # Keep Electron and debugger temporaries out of the transport
+            # cleanup assertions that follow.
+            editor_temp = base / "editor temp"
+            editor_temp.mkdir()
+            editor_env = dict(trusted, TMPDIR=str(editor_temp), TEMP=str(editor_temp), TMP=str(editor_temp))
+            subprocess.run([sys.executable, "-B", editor_driver, test_compiler, url, nested_head],
+                           cwd=base, env=editor_env, timeout=480, check=True)
+            assert len(server.requests) > before
+            assert {(repo, protocol) for repo, _, _, protocol in server.requests[before:]} == {("units.git", "version=2")}
+            print("VS Code GitHub library acquisition used the verified HTTPS fixture and exact subtree pin", flush=True)
 
         probe = base / "negative"
         for target in (forbidden, server):

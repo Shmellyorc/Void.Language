@@ -610,6 +610,26 @@ void require_lock_shape(std::string_view bytes) {
     throw std::runtime_error("Stale or tampered void.lock. Review the inputs and run voidc resolve --project <directory> --refresh.");
 }
 
+// Bind an editor's review to the exact filesystem root and saved inputs,
+// including the distinction between an absent lock and an empty one.
+std::string package_edit_token(const CreationRoot& root, std::string_view manifest,
+                               const std::optional<std::string>& lock) {
+    Digest hash;
+    hash.field("void-package-edit-v1");
+    hash.field(path_utf8(root.path));
+    hash.field(root.identity);
+    hash.field(manifest);
+    hash.field(lock ? "locked" : "unlocked");
+    if(lock)hash.field(*lock);
+    return hash.finish();
+}
+
+void check_package_edit_token(const CreationRoot& root, const std::optional<std::string>& token,
+                              std::string_view manifest, const std::optional<std::string>& lock) {
+    if(token && *token != package_edit_token(root,manifest,lock))
+        throw std::runtime_error("The selected project's saved manifest, lock or directory changed. Select the library again.");
+}
+
 void recheck_capture(const CreationRoot& root, const Snapshot& captured) {
     if (inspect_creation_root(root.path).identity != root.identity)
         throw std::runtime_error("Project root changed during dependency resolution; retry.");
@@ -730,14 +750,17 @@ ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) 
     return previous ? ResolveResult::refreshed : ResolveResult::created;
 }
 
-DependencyExplanation explain_dependencies(const fs::path& requested) {
+DependencyExplanation explain_dependencies(const fs::path& requested, bool for_edit) {
+    if(for_edit)require_outside_user_package_store(requested);
     const auto root = inspect_creation_root(requested);
     require_no_package_edit(root.path);
     Resolver resolver(root.path);
     (void)resolver.has_dependencies(); // Admit the exact manifest before examining its lock.
     const auto previous = read_dependency_lock(root.path);
     const auto captured = capture_locked_project(root, resolver, previous);
-    return resolver.explanation(captured, previous);
+    auto report=resolver.explanation(captured, previous);
+    if(for_edit)report.edit_token=package_edit_token(root,captured.manifest,previous);
+    return report;
 }
 
 std::size_t fetch_dependencies(const fs::path& requested, const std::vector<GitPin>& allowed) {
@@ -832,16 +855,14 @@ static MaintenanceReport add_dependency_impl(const fs::path& requested, AddOptio
     const std::function<ProjectFiles()>& prepare_raylib = {},
     const std::function<fs::path()>& clang = {}, bool sanitize=false,
     const ProjectFiles* registered=nullptr, const fs::path& acquisition_root={}) {
-    if(!valid_editor_identifier(options.alias) || options.alias.size()>128 || bool(options.path)==bool(options.git))
+    if(!valid_editor_identifier(options.alias) || options.alias.size()>128 || bool(options.path)==bool(options.git) ||
+       ((options.copy || options.edit_token) && !portable_path_component(options.alias)))
         throw std::invalid_argument("add requires a valid alias and exactly one explicit --path or --git with --rev.");
-    if(options.git)options.git=normalize_git_source(std::move(*options.git));
-    if(options.git && (!valid_git_origin(options.git->pin.origin) || !valid_git_subdir(options.git->subdir) ||
-       (!options.git->pin.revision.empty() && !valid_git_pin(options.git->pin))))
-        throw std::invalid_argument("add requires a canonical Git origin, a full lowercase SHA when supplied and a portable subdir.");
     const auto root=inspect_creation_root(requested);
-    recover_package_edit(root);
+    if(options.edit_token)require_no_package_edit(root.path);else recover_package_edit(root);
     auto manifest=maintenance_manifest(root.path/manifest_name);
     const auto previous=read_dependency_lock(root.path);
+    check_package_edit_token(root,options.edit_token,manifest->source().text(),previous);
     if(previous)require_lock_shape(*previous);
     auto prior=manifest->dependencies().find(options.alias);
     const bool restore=prepare_raylib && previous && prior!=manifest->dependencies().end() &&
@@ -853,6 +874,10 @@ static MaintenanceReport add_dependency_impl(const fs::path& requested, AddOptio
         auto captured=existing.capture();
         if(!previous || *previous!=captured.lock)stale_lock();
     }
+    if(options.git)options.git=normalize_git_source(std::move(*options.git));
+    if(options.git && (!valid_git_origin(options.git->pin.origin) || !valid_git_subdir(options.git->subdir) ||
+       (!options.git->pin.revision.empty() && !valid_git_pin(options.git->pin))))
+        throw std::invalid_argument("add requires a canonical Git origin, a full lowercase SHA when supplied and a portable subdir.");
     MaintenanceReport report;
     ProjectFiles files;
     std::shared_ptr<const Manifest> selected;
@@ -884,7 +909,7 @@ static MaintenanceReport add_dependency_impl(const fs::path& requested, AddOptio
         selected=maintenance_manifest(source/manifest_name);
         auto relative=source.lexically_relative(root.path);
         if(relative.empty() || relative==".")throw std::runtime_error("A project cannot depend on itself.");
-        if(!registered && *relative.begin()!="..")path=path_utf8(relative);
+        if(!registered && !options.copy && *relative.begin()!="..")path=path_utf8(relative);
         else {path="libs/"+options.alias;install_local=true;}
         files=local_source_files(source);
     }
@@ -1004,17 +1029,32 @@ MaintenanceReport add_dependency(const fs::path& requested, const AddOptions& op
     return add_dependency_impl(requested,options,{},clang,sanitize);
 }
 
-MaintenanceReport remove_dependency(const fs::path& requested, const std::string& alias) {
+std::optional<std::string> suggest_local_package_alias(const fs::path& requested, const fs::path& source) {
+    const auto root=inspect_creation_root(requested);
+    const auto path=admit_source_directory(root.path,source);
+    require_outside_user_package_store(path);
+    if(path==root.path)throw std::runtime_error("A project cannot depend on itself.");
+    const auto selected=maintenance_manifest(path/manifest_name);
+    if(!selected->package() || !selected->package_entry())
+        throw std::runtime_error("Source must be a VOID library with an explicit package.entry.");
+    const auto& name=selected->package()->name;
+    if(name.size()<=128 && portable_path_component(name))return name;
+    return {};
+}
+
+MaintenanceReport remove_dependency(const fs::path& requested, const std::string& alias,
+                                    const std::optional<std::string>& edit_token) {
     require_outside_user_package_store(requested);
     if(!valid_editor_identifier(alias) || alias.size()>128)
         throw std::invalid_argument("remove requires one valid dependency alias.");
     const auto root=inspect_creation_root(requested);
-    recover_package_edit(root);
+    if(edit_token)require_no_package_edit(root.path);else recover_package_edit(root);
     const auto manifest=maintenance_manifest(root.path/manifest_name);
+    const auto previous=read_dependency_lock(root.path);
+    check_package_edit_token(root,edit_token,manifest->source().text(),previous);
     const auto found=manifest->dependencies().find(alias);
     if(found==manifest->dependencies().end())
         throw std::runtime_error("No direct dependency named '"+alias+"'.");
-    const auto previous=read_dependency_lock(root.path);
     Resolver existing(root.path,manifest.get());
     capture_locked_project(root,existing,previous);
 
@@ -1091,7 +1131,7 @@ struct Registration {
     std::shared_ptr<const Manifest> manifest;
     ProjectFiles files;
     DependencyExplanation graph;
-    std::string request;
+    std::string request, identity;
 };
 
 std::string registration_digest(const Snapshot& snapshot, const ProjectFiles& files,std::string_view request) {
@@ -1114,15 +1154,16 @@ Registration read_registration(const fs::path& path,const std::string& alias,boo
     const auto lock=read_dependency_lock(root.path);
     const auto captured=capture_locked_project(root,resolver,lock);
     auto files=read_package_directory(root.path/"libs"/utf8_path(alias));
-    std::string request;
+    std::string request, identity;
     if(!creating) {
         const auto receipt=read_project_input(root.path/registration_file,65536);
         if(receipt.size()<66 || receipt[64]!='\n')throw std::runtime_error("Invalid user package registration receipt.");
         request=receipt.substr(65);
-        if(receipt.substr(0,64)!=registration_digest(captured,files,request))
+        identity=receipt.substr(0,64);
+        if(identity!=registration_digest(captured,files,request))
             throw std::runtime_error("User package registration identity mismatch: "+alias);
     }
-    return {std::move(manifest),std::move(files),resolver.explanation(captured,lock),std::move(request)};
+    return {std::move(manifest),std::move(files),resolver.explanation(captured,lock),std::move(request),std::move(identity)};
 }
 
 fs::path require_user_package_store() {
@@ -1184,7 +1225,8 @@ MaintenanceReport install_user_package(const AddOptions& requested,const std::fu
     return report;
 }
 
-std::optional<MaintenanceReport> add_user_package(const fs::path& requested,const std::string& alias) {
+std::optional<MaintenanceReport> add_user_package(const fs::path& requested,const std::string& alias,
+    const std::optional<std::string>& edit_token,const std::optional<std::string>& registration_identity) {
     require_registration_alias(alias);
     require_outside_user_package_store(requested);
     const auto store=user_package_store();
@@ -1194,7 +1236,14 @@ std::optional<MaintenanceReport> add_user_package(const fs::path& requested,cons
         const auto path=user.path/utf8_path(alias);
         if(!fs::exists(fs::symlink_status(path)))return;
         const auto registration=read_registration(path,alias);
+        if(registration_identity && *registration_identity!=registration.identity)
+            throw std::runtime_error("The user package registration changed. Select the library again.");
         const auto root=inspect_creation_root(requested);
+        if(edit_token) {
+            require_no_package_edit(root.path);
+            check_package_edit_token(root,edit_token,read_project_input(root.path/manifest_name,manifest_byte_limit),
+                                     read_dependency_lock(root.path));
+        }
         const auto& dependency=registration.manifest->dependencies().at(alias);
         for(const auto& package:registration.graph.packages)if(package.git) {
             const auto& pin=package.git->pin;
@@ -1202,16 +1251,16 @@ std::optional<MaintenanceReport> add_user_package(const fs::path& requested,cons
             if(!snapshot)throw std::runtime_error("Missing verified user package snapshot.");
             publish_git_snapshot(root,pin,*snapshot);
         }
-        AddOptions options{alias,{},dependency.git};
+        AddOptions options{alias,{},dependency.git,false,edit_token};
         if(!options.git)options.path=path/"libs"/utf8_path(alias);
         report=add_dependency_impl(root.path,options,{},{},false,&registration.files);
     });
     return report;
 }
 
-std::vector<std::string> list_user_packages() {
+std::vector<RegisteredPackage> list_user_packages() {
     const auto store=user_package_store();
-    std::vector<std::string> items;
+    std::vector<RegisteredPackage> items;
     if(store.empty())return items;
     with_user_package_store(store,false,[&](const CreationRoot& root) {
         for(const auto& entry:fs::directory_iterator(root.path)) {
@@ -1220,12 +1269,10 @@ std::vector<std::string> list_user_packages() {
             require_registration_alias(alias);
             const auto registration=read_registration(entry.path(),alias);
             const auto& dependency=registration.manifest->dependencies().at(alias);
-            auto label=alias+" "+dependency.version.text()+" | "+dependency.id;
-            if(dependency.git)label+=" | "+dependency.git->pin.origin+" @ "+dependency.git->pin.revision;
-            items.push_back(std::move(label));
+            items.push_back({alias,dependency.version.text(),dependency.id,registration.identity,dependency.git});
         }
     });
-    std::sort(items.begin(),items.end());
+    std::sort(items.begin(),items.end(),[](const auto& left,const auto& right) {return left.alias<right.alias;});
     return items;
 }
 
@@ -1243,9 +1290,9 @@ void uninstall_user_package(const std::string& alias) {
 }
 
 MaintenanceReport add_verified_raylib(const fs::path& requested, const fs::path& source,
-    const fs::path& compiler, const fs::path& clang, bool sanitize) {
+    const fs::path& compiler, const fs::path& clang, bool sanitize, const std::optional<std::string>& edit_token) {
     require_outside_user_package_store(requested);
-    return add_dependency_impl(requested, {"raylib", source, {}}, [&] {
+    return add_dependency_impl(requested, {"raylib", source, {}, false, edit_token}, [&] {
         // Find Python through absolute PATH entries only. Never run a program
         // selected from the consumer or execute a script from installed sources.
         llvm::SmallVector<llvm::StringRef> entries;

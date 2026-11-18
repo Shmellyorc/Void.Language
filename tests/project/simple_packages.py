@@ -1,5 +1,6 @@
 """G61 starter, source package and declarative native workflow with independent results."""
 from hashlib import sha256
+import json
 import os
 from pathlib import Path
 import shutil
@@ -77,6 +78,49 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     assert not store.exists()
     entry = tomllib.loads((source/'void.project.toml').read_text())['package']['entry']
     put(source/entry, 'public func answer() -> i32:\n    return 17\n')
+    # Editor protocol: discovery is read-only and guards subsequent mutations.
+    def review(path=project):
+        rec = json.loads(cli('deps', 'explain', '--json', '--for-edit', '--project', path, cwd=root))
+        assert rec['schema'] == 1 and rec['status'] == 'ok'
+        assert len(rec['edit_token']) == 64
+        return rec
+
+    catalog = json.loads(cli('package', 'list', '--json', cwd=root))
+    assert catalog['schema'] == 1 and all(p['kind'] == 'bundled' for p in catalog['packages'])
+    nested = project/'draft-library'
+    shutil.copytree(source, nested)
+    assert json.loads(cli('add', '--suggest-alias', '--dir', nested, cwd=project)) == {
+        'schema': 1, 'alias': 'arithmetic',
+    }
+    before = {p.relative_to(project):p.read_bytes() for p in project.rglob('*') if p.is_file()}
+    token = review()['edit_token']
+    assert not store.exists()
+    manifest = project/'void.project.toml'
+    manifest.write_bytes(before[Path(manifest.name)]+b'\n# changed after picker\n')
+    cli('add', 'arithmetic', '--dir', nested, '--copy', '--edit-token', token, cwd=project,
+        status=1, contains='saved manifest, lock or directory changed')
+    assert not (project/'void.lock').exists() and not (project/'libs').exists()
+    manifest.write_bytes(before[Path(manifest.name)])
+    other = root/'same-saved-files'
+    shutil.copytree(project, other)
+    cli('add', 'arithmetic', '--dir', nested, '--copy', '--edit-token', token, cwd=other,
+        status=1, contains='saved manifest, lock or directory changed')
+    cli('add', 'bad/alias', '--dir', nested, '--copy', '--edit-token', token, cwd=project,
+        status=1, contains='valid alias')
+    assert before == {p.relative_to(project):p.read_bytes() for p in project.rglob('*') if p.is_file()}
+    cli('add', 'arithmetic', '--dir', nested, '--copy', '--edit-token', token, cwd=project)
+    assert (project/'libs/arithmetic'/entry).read_bytes() == (nested/entry).read_bytes()
+    added = review()
+    assert [(edge['alias'], edge['source']['path']) for edge in added['relationships'] if edge['direct']] == [
+        ('arithmetic', 'libs/arithmetic'),
+    ]
+    cli('remove', 'arithmetic', '--edit-token', token, cwd=project, status=1, contains='saved manifest, lock or directory changed')
+    cli('tidy', '--check', cwd=project)
+    cli('remove', 'arithmetic', '--edit-token', added['edit_token'], cwd=project, contains='Editable source retained')
+    assert not (project/'void.lock').exists() and (project/'libs/arithmetic'/entry).is_file()
+    assert not review()['relationships']
+    shutil.rmtree(nested)
+    shutil.rmtree(project/'libs')
     cli('new', 'install', 'local', '--dir', source, cwd=root,
         status=2, contains='Expected one project destination.')
     assert not store.exists() and not (root/'install').exists()
@@ -91,6 +135,13 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     cached = registration/'libs/local'
     assert (cached/'void.project.toml').is_file() and (registration/'void.lock').is_file()
     cli('package', 'list', cwd=root, contains='Installed: local')
+    catalog = json.loads(cli('package', 'list', '--json', cwd=root))
+    package, = (item for item in catalog['packages'] if item['kind'] == 'registered')
+    assert package['alias'] == 'local' and package['id'] == 'org.example.g61' and package['version'] == '=0.1.0'
+    assert package['identity'] == (registration/'.void-registration').read_text()[:64]
+    cli('add', 'local', '--registered', '0'*64, '--edit-token', review()['edit_token'], cwd=project,
+        status=1, contains='registration changed')
+    assert not (project/'libs/local').exists()
     cli('package', 'install', 'local', '--dir', source, cwd=root, contains='Verified existing')
     cli('package', 'install', 'local', '--dir', root/'lib', cwd=root,
         status=1, contains='different origin or pin')
@@ -100,13 +151,14 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     cli('build', '.', '-o', cached/'unauthorized', cwd=project, status=1, contains='user package store')
     assert not (cached/'unauthorized').exists()
     put(project/'src/app.void', 'use pkg/local\nfunc main():\n    print(local.answer())\n')
-    cli('add', 'local', cwd=project)
+    cli('add', 'local', '--registered', package['identity'], '--edit-token', review()['edit_token'], cwd=project)
     cli('run', '.', cwd=project, exact='17\n')
     project_lock = (project/'void.lock').read_bytes()
     saved = (cached/entry).read_bytes()
     put(cached/entry, 'public func answer() -> i32:\n    return 99\n')
     cli('add', 'local', cwd=project, status=1, contains='Stale or tampered void.lock')
     cli('package', 'list', cwd=root, status=1, contains='Stale or tampered void.lock')
+    assert cli('package', 'list', '--json', cwd=root, status=1, contains='Stale or tampered void.lock') == ''
     (cached/entry).write_bytes(saved)
     receipt = registration/'.void-registration'
     saved_receipt = receipt.read_bytes()

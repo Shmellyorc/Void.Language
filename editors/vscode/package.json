@@ -100,6 +100,16 @@
         "enablement": "isWorkspaceTrusted"
       },
       {
+        "command": "void.addLibrary",
+        "title": "VOID: Add Library",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
+        "command": "void.removeLibrary",
+        "title": "VOID: Remove Library",
+        "enablement": "isWorkspaceTrusted"
+      },
+      {
         "command": "void.newProject",
         "title": "VOID: New Project",
         "enablement": "isWorkspaceTrusted"

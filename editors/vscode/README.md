@@ -49,6 +49,16 @@ Language Server** to select a different physical directory at the same path or
 to recover after a configuration or process failure.
 Output → VOID reports startup/lifecycle failures; verbose trace can include source.
 
+### Add and remove libraries
+
+In a trusted local VOID project, save your changes and run **VOID: Add Library**.
+Pick a bundled or registered library, a local VOID library folder, or a GitHub
+repository or subtree URL. Write `use pkg/ALIAS` to import the installed library.
+Use **VOID: Remove Library** to select and confirm a direct dependency.
+Installation grants no native execution approval. See the
+[library management guide](https://github.com/Shmellyorc/Void.Language/blob/main/docs/EDITOR_INTEGRATION.md#adding-and-removing-libraries)
+for the full workflow.
+
 ### Check, build, run and package
 
 In a trusted folder with a selected manifest, run **VOID: Check Project**,

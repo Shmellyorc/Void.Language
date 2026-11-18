@@ -119,6 +119,38 @@ Use **VOID: Create Project** or `voidc init` to adopt existing sources.
 Standalone `.void` execution remains available. Template creation grants no
 native approval.
 
+## Adding and removing libraries
+
+After **VOID: New Project**, open the new project in a trusted VS Code
+window. Save your changes, then run **VOID: Add Library** from the Command
+Palette. Use the matching `voidc` and `voidls`. The picker targets the selected
+manifest project inside the open folder.
+
+- Pick a bundled library such as **raylib** when your compiler supplies it.
+- Pick a **Registered** library to add it to this project. To register a library
+  for reuse across projects, run `voidc package install ALIAS --dir PATH` or
+  `voidc package install ALIAS --git URL` in a terminal first.
+- Pick **From local folder** and select the folder with the library's
+  `void.project.toml`. VOID uses its package name when it is a valid
+  directory alias and asks for an alias otherwise.
+- Pick **From GitHub** and paste an HTTPS repository URL or a
+  `https://github.com/OWNER/REPO/tree/REF/DIRECTORY` URL. Enter the alias
+  you want to use in imports. The compiler resolves and verifies the commit.
+
+The compiler installs the library under `libs/ALIAS` and updates the manifest
+and lock. Write `use pkg/ALIAS` where you need it. The editor refreshes
+diagnostics and navigation after the change. **VOID: Remove Library** lists
+direct dependencies and asks for confirmation before removing one. Editable
+local copies remain on disk after removal so you can keep any changes to them.
+The user registration is independent of the project dependency.
+
+If the project changed while the picker was open, run the command again.
+For lock or installed view reconciliation, review `voidc tidy --check` and
+run `voidc tidy` explicitly if needed. Adding a native library grants no
+execution approval. Review the provider and approve it with `voidc run .`
+in an ordinary interactive terminal before using the editor's Run, Build or
+F5 commands with that provider.
+
 ## Running a built-in application starter
 
 Create a project with `voidc new app --name MyGame`. Open **MyGame** as

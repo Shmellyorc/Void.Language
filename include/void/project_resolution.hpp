@@ -59,10 +59,11 @@ struct DependencyExplanation {
     std::optional<std::string> lock_sha256;
     std::vector<ExplainedPackage> packages;
     std::vector<ExplainedDependency> relationships;
+    std::optional<std::string> edit_token;
 };
 // The selected manifest and exact local lock are verified before returning any
 // package claims. The compiler's acquisition and publication paths are absent.
-DependencyExplanation explain_dependencies(const std::filesystem::path&);
+DependencyExplanation explain_dependencies(const std::filesystem::path&, bool for_edit = false);
 
 // Only this operation may consult the explicitly authorized Git repositories.
 std::size_t fetch_dependencies(const std::filesystem::path&, const std::vector<GitPin>&);
@@ -72,6 +73,8 @@ struct AddOptions {
     std::string alias;
     std::optional<std::filesystem::path> path;
     std::optional<GitDependency> git;
+    bool copy = false;
+    std::optional<std::string> edit_token;
 };
 struct MaintenanceReport {
     bool changed = false;
@@ -79,15 +82,24 @@ struct MaintenanceReport {
 };
 MaintenanceReport add_dependency(const std::filesystem::path&, const AddOptions&,
                                  const std::function<std::filesystem::path()>& clang = {}, bool sanitize = false);
-MaintenanceReport remove_dependency(const std::filesystem::path&, const std::string& alias);
+MaintenanceReport remove_dependency(const std::filesystem::path&, const std::string& alias,
+                                    const std::optional<std::string>& edit_token = {});
+std::optional<std::string> suggest_local_package_alias(const std::filesystem::path& root,
+                                                       const std::filesystem::path& source);
 MaintenanceReport install_user_package(const AddOptions&, const std::function<std::filesystem::path()>& clang,
                                        bool sanitize);
-std::optional<MaintenanceReport> add_user_package(const std::filesystem::path&, const std::string& alias);
-std::vector<std::string> list_user_packages();
+struct RegisteredPackage {
+    std::string alias, version, id, identity;
+    std::optional<GitDependency> git;
+};
+std::optional<MaintenanceReport> add_user_package(const std::filesystem::path&, const std::string& alias,
+    const std::optional<std::string>& edit_token = {}, const std::optional<std::string>& registration_identity = {});
+std::vector<RegisteredPackage> list_user_packages();
 void uninstall_user_package(const std::string& alias);
 void require_outside_user_package_store(const std::filesystem::path&);
 MaintenanceReport add_verified_raylib(const std::filesystem::path& project,
     const std::filesystem::path& source, const std::filesystem::path& compiler,
-    const std::filesystem::path& clang, bool sanitize);
+    const std::filesystem::path& clang, bool sanitize,
+    const std::optional<std::string>& edit_token = {});
 MaintenanceReport tidy_dependencies(const std::filesystem::path&, bool check);
 }
