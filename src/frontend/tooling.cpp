@@ -20,7 +20,7 @@ ToolingIndex::ToolingIndex(std::shared_ptr<const ValidatedAnalysis> analysis) : 
     const auto references = this->references();
     for (std::size_t i=0; i<references.size(); ++i) {
         if (!references[i].implicit) {
-            incoming_[references[i].to].push_back(i);
+            if(!references[i].semantic_only)incoming_[references[i].to].push_back(i);
             positions_[references[i].source.module_identity].push_back(i);
         }
     }
@@ -49,7 +49,7 @@ std::vector<AnalyzedDeclaration> ToolingIndex::definitions_at(const std::string&
     std::set<std::string> seen;
     while(next!=indices.begin()) {
         const auto& ref=references()[*--next];if(ref.source.begin!=begin)break;
-        if(offset>=ref.source.end || !seen.insert(ref.to).second)continue;
+        if(ref.semantic_only || offset>=ref.source.end || !seen.insert(ref.to).second)continue;
         if(auto d=declaration(ref.to)){if(!ref.signature.empty())d->signature=ref.signature;result.push_back(std::move(*d));}
     }
     // Selected user hooks are the source definition of a compiler conversion.
@@ -364,7 +364,7 @@ void ToolingSession::close(const std::string& id, DocumentRevision revision) {
     if (!overridden(id)) throw std::invalid_argument("No override to close");
     change(id,revision,{},true);
 }
-std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot snapshot) {
+std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot snapshot,bool presentation) {
     if (!snapshot.identity_) throw std::invalid_argument("Select a project snapshot before analysis");
     auto result = std::make_shared<SessionAnalysis>();
     result->snapshot_ = std::move(snapshot);
@@ -379,6 +379,7 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
         result->index_.reset();
         result->editor_documents_.clear();
         result->recovery_.clear();
+        result->presentation_.clear();
         result->project_root_available_=false;
         return true;
     };
@@ -406,22 +407,35 @@ std::shared_ptr<const SessionAnalysis> ToolingSession::analyze(ProjectSnapshot s
         });
     auto recover=[&](const std::vector<Diagnostic>& diagnostics,const std::string* document) {
         std::string module;
+        bool ordinary_recovery=true;
         for(const auto& d:diagnostics) {
             if(d.severity!=Severity::error)continue;
-            if(d.code!=DiagnosticCode::syntax && d.code!=DiagnosticCode::identifier && !d.editor_enum_recovery)return;
+            if(d.code!=DiagnosticCode::syntax && d.code!=DiagnosticCode::identifier &&
+               d.code!=DiagnosticCode::indentation && !d.editor_enum_recovery && !d.editor_member_recovery)
+                ordinary_recovery=false;
+            if(d.code==DiagnosticCode::project_boundary || d.code==DiagnosticCode::project_changed ||
+               d.code==DiagnosticCode::import_path || d.code==DiagnosticCode::import_read)return;
             if(module.empty())module=d.primary.module_identity;
             if(module.empty() || module!=d.primary.module_identity || (document && module!=*document))return;
         }
         auto open=selected.overrides_.find(module);
         if(open==selected.overrides_.end() || !open->second)return;
-        auto program=recover_editor_analysis(state?*selected.project_request_:selected.entry_,selected.entry_override_,
-            selected.overrides_,state?&selected.manifests_:nullptr,selected.discovery_,module,document!=nullptr);
-        if(program)result->recovery_.emplace(module,EditorRecoveryAnalysis{program,ToolingIndex(program)});
+        auto recover_graph=[&](bool colors_only) {
+            auto program=recover_editor_analysis(state?*selected.project_request_:selected.entry_,selected.entry_override_,
+                selected.overrides_,state?&selected.manifests_:nullptr,selected.discovery_,module,document!=nullptr,colors_only);
+            if(program) {
+                auto& target=colors_only?result->presentation_:result->recovery_;
+                target.emplace(module,EditorRecoveryAnalysis{program,ToolingIndex(program)});
+            }
+            return bool(program);
+        };
+        if(ordinary_recovery && recover_graph(false))return;
+        if(presentation)recover_graph(true);
     };
     if(!result->semantic_ && (!state || state->manifest))recover(result->result_.diagnostics,nullptr);
     if(!state || state->manifest)for(const auto& [id,source]:selected.overrides_) {
         if(!source)continue;
-        if(result->recovery_.contains(id))continue;
+        if(result->presentation_for(id))continue;
         if(state && (state->execution.contains(id) ||
             (state->entry && state->root/utf8_path(id).relative_path()==*state->entry)))continue;
         if(!state && id=="/"+path_utf8(selected.entry_.filename()))continue;
@@ -445,7 +459,8 @@ bool ToolingSession::accept(std::shared_ptr<const SessionAnalysis> result) {
         auto present=[&](const std::string& id){for(const auto* analysis:{last_success_->semantic_analysis().get(),result->semantic_analysis().get()})for(const auto& module:analysis->modules())if(module.identity==id)return true;return false;};
         std::erase_if(hints,[&](const auto& id){return !present(id);});
     }
-    accepted_plan_ = last_success_ ? plan_invalidation(*last_success_->semantic_analysis(), hints, result->semantic_analysis().get()) : InvalidationPlan{};
+    comparison_base_ = last_success_ ? last_success_->semantic_analysis() : nullptr;
+    comparison_changes_ = std::move(hints);
     latest_ = std::move(result);
     if (latest_->succeeded()) {
         if(latest_->project() && selected_context_.empty())selected_context_=latest_->project()->project->context_key();
@@ -461,7 +476,9 @@ std::shared_ptr<const ToolingIndex> ToolingSession::current_index() const {
 }
 InvalidationPlan ToolingSession::invalidation() const {
     auto fresh = current_analysis();
-    if (fresh) return accepted_plan_;
+    if (fresh) return comparison_base_
+        ? plan_invalidation(*comparison_base_,comparison_changes_,fresh->semantic_analysis().get())
+        : InvalidationPlan{};
     if (!last_success_) return {};
     return plan_invalidation(*last_success_->semantic_analysis(), changed_);
 }

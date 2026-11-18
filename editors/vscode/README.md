@@ -91,7 +91,7 @@ from a terminal. Automatic native reload remains outside this workflow.
 Build and install from this directory with Node 24.19.0 and the locked dependencies.
 
 ```sh
-if npm ci && npm run package && code --install-extension dist/void-language-0.1.0.vsix; then
+if npm ci && npm run package && code --install-extension dist/void-language-0.1.2.vsix; then
   printf '%s\n' 'VOID extension installed.'
 else
   printf 'VOID setup stopped with exit status %s. See the failing command above.\n' "$?" >&2

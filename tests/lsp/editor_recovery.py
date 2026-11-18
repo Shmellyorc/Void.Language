@@ -5,7 +5,7 @@ import sys
 from tempfile import TemporaryDirectory
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
-from lsp_client import Client
+from lsp_client import Client, frame
 
 FIXTURES = Path(__file__).parent / 'fixtures' / 'editor_recovery'
 BROKEN = (FIXTURES / 'main.void').read_text(encoding='utf-8')
@@ -160,5 +160,174 @@ def run(server, compiler):
         print('editor recovery: nested members, visibility, UTF-16, tokens, diagnostics, revision, switch and strict CLI passed')
 
 
+def run_members(server, compiler):
+    with TemporaryDirectory(prefix='VOID member edits é😀 ') as temp:
+        parent = Path(temp)
+        root, package = parent / 'app', parent / 'maths'
+
+        def cli(*args):
+            subprocess.run([compiler, *args], check=True, capture_output=True, timeout=30)
+
+        cli('new', root)
+        cli('new', package, '--kind', 'library', '--package-name', 'maths')
+        large = ''.join(f'public func api_{n:03}() -> i32:\n    return {n}\n' for n in range(270))
+        (package / 'src/maths.void').write_text(large + 'public func z_final() -> i32:\n    return 42\n', encoding='utf-8')
+        cli('add', 'maths', '--path', package, '--project', root)
+        path = root / 'src/app.void'
+        (root / 'src/shapes.void').write_text(
+            'public value struct point:\n    public x: i32\n    private hidden: i32\n'
+            'public func (p point) shift() -> i32:\n    return p.x\n'
+            'public func create() -> point:\n    return point()\n', encoding='utf-8')
+        good = '''use "./shapes.void" as shapes
+use pkg/maths as library
+
+value struct local_point:
+    x: i32
+
+func main() -> i32:
+    var local = local_point()
+    var imported = shapes.point()
+    print("é😀", local.x, imported.shift())
+    return library.z_final()
+'''
+        path.write_text(good, encoding='utf-8')
+        with Client(server, root, project=True) as client:
+            capabilities = {'textDocument': {'semanticTokens': {'requests': {'full': True},
+                'formats': ['relative'], 'tokenTypes': ['variable'], 'tokenModifiers': []}}}
+            legend = request(client, 'initialize', {'capabilities': capabilities})[
+                'capabilities']['semanticTokensProvider']['legend']['tokenTypes']
+            client.notify('initialized', {})
+            client.sync()
+            assert not update(client, path, good, 1)
+            stable = roles(client, path, good, legend)
+            expected = {(4, 'x', 'property'), (7, 'local_point', 'struct'), (8, 'shapes', 'namespace'),
+                        (8, 'point', 'struct'), (9, 'x', 'property'), (9, 'shift', 'method')}
+            assert expected <= stable, stable
+            completion = query(client, 'completion', path, good, 'library.z_', after=True)
+            final = next(item for item in completion if item['label'] == 'z_final')
+            assert final['textEdit'] == {'newText': 'z_final', 'range': {
+                'start': {'line': 10, 'character': 19}, 'end': {'line': 10, 'character': 26}}}, final
+            version = 1
+            for base, name, full in [('local', 'x', 'x'), ('imported', 'shift', 'shift()'),
+                                     ('shapes', 'create', 'create()'), ('library', 'z_final', 'z_final()')]:
+                for selector in ('.', '.' + (name[:2] if len(name) > 2 else ''), '.' + full):
+                    # Use the same UTF-16 line before and after the edit and
+                    # check that the compiler retains unrelated bindings.
+                    current = good.replace('    return', f'    {base}{selector}\n    return')
+                    version += 1
+                    diagnostics = update(client, path, current, version)
+                    assert bool(diagnostics) == (selector != '.' + full or full == 'x'), (base, selector, diagnostics)
+                    tokens = roles(client, path, current, legend)
+                    assert expected <= tokens and (11, 'z_final', 'function') in tokens, tokens
+                    cursor = selector[:-2] if selector.endswith('()') else selector
+                    when = f'    {base}{cursor}'
+                    if selector != '.' + full:
+                        for _ in range(3):
+                            candidates = labels(client, path, current, when)
+                            assert name in candidates and 'hidden' not in candidates, candidates
+            mixed = good.replace('    return', '\tlibrary.\n    return')
+            version += 1
+            assert any(d['code'] == 'VOID1002' for d in update(client, path, mixed, version))
+            tokens = roles(client, path, mixed, legend)
+            assert expected <= tokens and (10, 'library', 'namespace') in tokens
+            assert 'z_final' in labels(client, path, mixed, '\tlibrary.')
+            version += 1
+            assert not update(client, path, good, version)
+            assert roles(client, path, good, legend) == stable
+            client.shutdown()
+        run_interactive(server, root, path, good)
+        path.write_text(mixed, encoding='utf-8')
+        result = subprocess.run([compiler, 'check', '--project', root], capture_output=True, timeout=30)
+        assert result.returncode and b'VOID1002' in result.stderr, result.stderr
+        print('member editing: local values, imported types and methods, large installed package, tabs, UTF-16 and strict compiler checks passed')
+
+
+class InteractiveClient(Client):
+    def receive(self):
+        while True:
+            message = super().receive()
+            if message.get('method') != 'workspace/semanticTokens/refresh':
+                return message
+            self.write(frame({'jsonrpc': '2.0', 'id': message['id'], 'result': None}))
+
+
+def run_interactive(server, root, path, original):
+    valid = original.replace('    return library.z_final()', '    local.x -= 1\n    return library.z_final()')
+    cases = [
+        ('VOID2001', '    local.x -= 1', '    local.x -= 1.0'),
+        ('VOID2002', '    local.x -= 1', '    missing.x -= 1'),
+        ('VOID1101', '    local.x -= 1', '    local.x -='),
+        ('VOID1002', '    local.x -= 1', '\tlocal.x -= 1'),
+    ]
+    important = {(7, 'local_point', 'struct'), (8, 'shapes', 'namespace'), (8, 'point', 'struct'),
+                 (9, 'shift', 'method'), (11, 'z_final', 'function')}
+
+    def initialize(client):
+        caps = {'textDocument': {'semanticTokens': {'requests': {'full': True}, 'formats': ['relative'],
+                  'tokenTypes': ['variable'], 'tokenModifiers': []}},
+                'workspace': {'semanticTokens': {'refreshSupport': True}}}
+        legend = request(client, 'initialize', {'capabilities': caps,
+                    'initializationOptions': {'voidInteractivePresentation': True, 'voidGuardedFixes': True}})[
+                        'capabilities']['semanticTokensProvider']['legend']['tokenTypes']
+        client.notify('initialized', {})
+        client.sync()
+        return legend
+
+    path.write_text(valid, encoding='utf-8')
+    # Cold-open each invalid document. Coloring must come from checked current
+    # source even when there is no earlier token response to project forward.
+    for code, before, after in cases:
+        broken = valid.replace(before, after)
+        path.write_text(broken, encoding='utf-8')
+        with InteractiveClient(server, root, project=True) as client:
+            legend = initialize(client)
+            assert any(d['code'] == code for d in update(client, path, broken, 1)), code
+            color = roles(client, path, broken, legend)
+            assert important <= color, (code, color)
+            assert not update(client, path, valid, 2)
+            assert important <= roles(client, path, valid, legend)
+            client.shutdown()
+
+    path.write_text(valid, encoding='utf-8')
+    with InteractiveClient(server, root, project=True) as client:
+        legend = initialize(client)
+        assert not update(client, path, valid, 1)
+        assert important <= roles(client, path, valid, legend)
+        version = 1
+        for prefix in ('.', '.z', '.z_', '.', '.api_', '.z_f'):
+            text = valid.replace('    local.x -= 1', f'    library{prefix}')
+            version += 1
+            client.notify('textDocument/didChange', {'textDocument': {'uri': path.as_uri(), 'version': version},
+                          'contentChanges': [{'text': text}]})
+            request(client, 'textDocument/codeAction', {'textDocument': {'uri': path.as_uri()},
+                    'context': {'diagnostics': [], 'triggerKind': 2},
+                    'range': {'start': {'line': 10, 'character': 4}, 'end': {'line': 10, 'character': 4}}})
+            color = roles(client, path, text, legend)
+            assert important <= color, color
+            found = labels(client, path, text, f'    library{prefix}')
+            assert ('api_269' if prefix=='.api_' else 'z_final') in found, found
+        assert not update(client, path, valid, version + 1)
+        assert important <= roles(client, path, valid, legend)
+        # Package disk changes must invalidate the previous completion catalog.
+        installed = root / 'libs/maths/src/maths.void'
+        original = installed.read_bytes()
+        try:
+            installed.write_bytes(original + b'\n# invalidates the recorded tree\n')
+            client.notify('workspace/didChangeWatchedFiles', {'changes': [{'uri': installed.as_uri(), 'type': 2}]})
+            text = valid.replace('    local.x -= 1', '    library.')
+            client.notify('textDocument/didChange', {'textDocument': {'uri': path.as_uri(), 'version': version + 2},
+                          'contentChanges': [{'text': text}]})
+            assert not labels(client, path, text, '    library.')
+        finally:
+            installed.write_bytes(original)
+        client.notify('workspace/didChangeWatchedFiles', {'changes': [{'uri': installed.as_uri(), 'type': 2}]})
+        assert not update(client, path, valid, version + 3)
+        assert important <= roles(client, path, valid, legend)
+        client.shutdown()
+    print('interactive semantic tokens: cold type, name, syntax and indentation errors, repairs and rapid completion passed')
+
+
 if __name__ == '__main__':
-    run(Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve())
+    arguments = tuple(Path(argument).resolve() for argument in sys.argv[1:3])
+    run(*arguments)
+    run_members(*arguments)

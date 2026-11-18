@@ -523,7 +523,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
             seeds=capture.inventory();
             complete=true;
             for(const auto& id:seeds)capture.graph.parse(capture.from,{TokenKind::path,id,0});
-            capture.diagnostics.finish();
+            capture.diagnostics.finish_parse();
             if(!library) {
                 std::vector<std::pair<Unit*,const Function*>> candidates;
                 for(const auto& [id,unit]:capture.graph.parsed)for(const auto* functions:{&unit->functions,&unit->generic_functions})for(const auto& f:*functions)if(f.token.text=="main" && !f.receiver && !f.anonymous) {
@@ -531,7 +531,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
                         try {error(unit->source,f.token,Code::project_entry,"Automatic project main must be synchronous, nongeneric, parameterless and return no result or exact i32.","Correct this declaration or use an explicit project entry.");}catch(const CompilationError& failure){capture.diagnostics.add(failure);}
                     } else candidates.emplace_back(unit.get(),&f);
                 }
-                capture.diagnostics.finish();
+                capture.diagnostics.finish_parse();
                 std::sort(candidates.begin(),candidates.end(),[](const auto& a,const auto& b){return std::tie(a.first->identity,a.second->token.offset)<std::tie(b.first->identity,b.second->token.offset);});
                 if(candidates.empty())project_failure(capture.manifest->source(),Code::project_entry,"No eligible main() in application project.","Add a valid main() in the admitted source roots or set project.entry/--entry for an explicit script or source.");
                 if(candidates.size()!=1) {
@@ -556,7 +556,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         }
         if(library)for(const auto& id:seeds)capture.graph.load(capture.from,{TokenKind::path,id,0});
         else capture.graph.load(capture.from,{TokenKind::path,entry,0});
-        capture.diagnostics.finish();
+        capture.diagnostics.finish_parse();
         std::shared_ptr<Unit> library_scope;
         if(library) {library_scope=std::make_shared<Unit>(capture.manifest->source(),"");validate_graph(capture.graph.units,"",capture.diagnostics,library_scope.get());}
         else validate_graph(capture.graph.units,entry,capture.diagnostics);
@@ -601,7 +601,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         if(recovery) {
             if(!editor && recovery->repaired && capture.graph.units.contains(std::string(recovery->module)))
                 recovery->analysis=AnalysisAccess::build(std::move(capture.graph.units),entry,capture.diagnostics.warnings(),
-                    {},std::move(library_scope),{},false,capture.dependencies,true);
+                    {},std::move(library_scope),{},false,capture.dependencies,true,recovery->presentation);
             return result;
         }
         if(binding && !approved_payload.empty()) {
@@ -632,20 +632,21 @@ static std::shared_ptr<const ValidatedAnalysis> validated_editor_document(Projec
     capture.diagnostics.editor=editor;
     capture.diagnostics.recovery=recovery;
     capture.graph.load(capture.from,{TokenKind::path,id,0});
-    capture.diagnostics.finish();
+    capture.diagnostics.finish_parse();
     validate_graph(capture.graph.units,id,capture.diagnostics);
     ProjectCapture fresh(capture.root,capture.overlays,capture.manifest_overlays,&capture);
     for(const auto& [module,unit]:capture.graph.units)if(!package_source(module))
         fresh.changed(fresh.recapture_source(module).text()!=unit->source.text());
     if(editor && recovery)return {};
     return AnalysisAccess::build(std::move(capture.graph.units),id,capture.diagnostics.warnings(),
-        {}, {}, {}, false,capture.dependencies,true);
+        {}, {}, {}, false,capture.dependencies,true,recovery && recovery->presentation);
 }
 
 std::shared_ptr<const ValidatedAnalysis> recover_editor_analysis(const std::filesystem::path& context,
     const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides* manifests,
-    const EditorDiscovery& discovery,const std::string& module,bool document) {
+    const EditorDiscovery& discovery,const std::string& module,bool document,bool presentation) {
     EditorRecovery recovery{module,{}};
+    recovery.presentation=presentation;
     try {
         if(!manifests) recovery.analysis=validated_project(context,sources,true,nullptr,nullptr,{},document?&module:nullptr,&recovery);
         else if(document) {

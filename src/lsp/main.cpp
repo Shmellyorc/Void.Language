@@ -17,6 +17,7 @@
 #include <tuple>
 #include <chrono>
 #include <functional>
+#include <future>
 #include <cerrno>
 #ifdef _WIN32
 #include <fcntl.h>
@@ -41,8 +42,8 @@ static_assert(semantic_types.size()==static_cast<std::size_t>(vd::SemanticToken:
 constexpr char semantic_refresh_id[]="void/semanticTokens/refresh";
 constexpr std::size_t max_body=8*1024*1024, max_header=8192;
 struct FramingError : std::runtime_error { using std::runtime_error::runtime_error; };
-// One bounded transport buffer and one analysis thread. Drain ordered mutations
-// already on the pipe before analyzing; requests are barriers. No worker/cache.
+// The transport and project selection have one owner. Interactive analysis
+// takes immutable snapshots and hands results back to that owner.
 class Input {
     char bytes[65536];std::size_t begin=0,end=0;
 public:
@@ -217,6 +218,50 @@ class Server {
     bool guarded_fixes=false;
     bool semantic_full=false, semantic_refresh=false, semantic_requested=false;
     bool semantic_refresh_pending=false, semantic_refresh_needed=false;
+    bool interactive=false, catalog_current=false;
+    using Clock=std::chrono::steady_clock;
+    Clock::time_point analyze_after{};
+    std::future<std::shared_ptr<const vd::SessionAnalysis>> worker;
+    struct DisplayTokens {vd::SourceFile source; std::vector<vd::SemanticToken> tokens;};
+    std::map<std::string,DisplayTokens> displayed;
+    void changed() {
+        dirty=true;
+        analyze_after=Clock::now()+std::chrono::milliseconds(65);
+    }
+    void context_changed() {
+        displayed.clear();
+        catalog_current=false;
+        changed();
+    }
+    static void translate_tokens(DisplayTokens& cached,const vd::SourceFile& source) {
+        const auto& before=cached.source.text();
+        const auto& after=source.text();
+        if(before==after)return;
+        auto prefix=std::mismatch(before.begin(),before.end(),after.begin(),after.end()).first-before.begin();
+        const auto head=static_cast<std::size_t>(prefix);
+        const auto maximum=std::min(before.size(),after.size())-head;
+        std::size_t tail=0;
+        while(tail<maximum && before[before.size()-1-tail]==after[after.size()-1-tail])++tail;
+        const auto& lines=cached.source.line_starts();
+        const auto prefix_line=*std::prev(std::upper_bound(lines.begin(),lines.end(),head));
+        auto suffix_line=std::lower_bound(lines.begin(),lines.end(),before.size()-tail);
+        auto suffix=suffix_line==lines.end()?before.size():*suffix_line;
+        // Never reuse part of a changed line, or a line joined by a newline deletion.
+        while(suffix<before.size() && suffix &&
+              (after.size()-(before.size()-suffix)==0 || after[after.size()-(before.size()-suffix)-1]!='\n') &&
+              (after.size()-(before.size()-suffix)==0 || after[after.size()-(before.size()-suffix)-1]!='\r')) {
+            if(++suffix_line==lines.end()){suffix=before.size();break;}
+            suffix=*suffix_line;
+        }
+        std::erase_if(cached.tokens,[&](auto& token) {
+            if(token.end<=prefix_line)return false;
+            if(token.begin<suffix)return true;
+            token.begin=after.size()-(before.size()-token.begin);
+            token.end=after.size()-(before.size()-token.end);
+            return false;
+        });
+        cached.source=source;
+    }
     void refresh_semantics() {
         if(!semantic_refresh_needed || semantic_refresh_pending || state!=State::ready)return;
         semantic_refresh_needed=false;
@@ -225,7 +270,9 @@ class Server {
     }
     std::string identity(const std::string& uri) const {
         auto path=vd::lsp::uri_path(uri);
-        if(auto current=session.current_analysis();current) {
+        auto current=session.current_analysis();
+        if(!current && interactive && catalog_current)current=session.last_success();
+        if(current) {
             if(current->semantic_analysis())
                 for(const auto& m:current->semantic_analysis()->modules())if(read_only_source(m.identity) && known_source_path(path,vd::utf8_path(m.source.path())))return m.identity;
             if(current->project() && current->project()->state)
@@ -278,9 +325,22 @@ class Server {
         return revision+1;
     }
     void analyze() {
+        if(worker.valid()) {
+            auto finished=worker.get();
+            if(session.is_current(*finished)){publish(std::move(finished));return;}
+        }
+        publish(vd::ToolingSession::analyze(session.select(),interactive));
+    }
+    void publish(std::shared_ptr<const vd::SessionAnalysis> result) {
+        if(!session.accept(result) || !session.is_current(*result))return;
         dirty=false;
-        auto result=vd::ToolingSession::analyze(session.select());
-        if(!session.accept(result) || !session.is_current(*result)) return;
+        if(result->succeeded() && !session.requires_reselection())catalog_current=true;
+        const bool rejected_dependency=std::any_of(result->result().diagnostics.begin(),result->result().diagnostics.end(),
+            [](const auto& d){return d.code==vd::DiagnosticCode::project_changed || d.code==vd::DiagnosticCode::project_boundary;});
+        if(!result->project_root_available() || rejected_dependency || session.requires_reselection()) {
+            displayed.clear();
+            catalog_current=false;
+        }
         std::map<std::string,j::Array> groups;
         std::map<std::string,std::string> package_uris;
         for(const auto& [id,doc]:open) { (void)doc; groups[id]; }
@@ -358,7 +418,11 @@ class Server {
     }
     j::Value quick_fix(const j::Object& params, bool resolve) {
         if(!guarded_fixes) return resolve ? j::Value(nullptr) : j::Value(j::Array{});
-        flush();
+        const auto context=params.getObject("context");
+        const bool automatic=interactive && !resolve && context && context->getInteger("triggerKind")==2;
+        // A typing-triggered lightbulb can wait for diagnostics from the
+        // worker. An explicitly requested fix or its application is a barrier.
+        if(!automatic)flush();
         auto current=session.current_analysis();
         if(!current || !current->project() || !current->project()->state)
             return resolve ? j::Value(nullptr) : j::Value(j::Array{});
@@ -508,18 +572,25 @@ class Server {
         if(!semantic_full || document==open.end() || !document->second.source)return result;
         semantic_requested=true;
         auto current=session.current_analysis();
-        if(!current)return result;
-        const auto* index=current->index_for(id);
-        const auto* recovery=index?nullptr:current->recovery_for(id);
-        if(recovery)index=&recovery->index;
-        const auto* program=recovery?recovery->program.get():analysis_for(*current,id);
-        if(!index || (!recovery && session.requires_reselection() && !current->editor_documents().contains(id)))return result;
-        const auto* source=source_in(*program,id);
-        if(!source || source->text()!=document->second.source->text())return result;
-        Positions positions(*source);
+        std::vector<vd::SemanticToken> tokens;
+        if(current) {
+            const auto* index=current->index_for(id);
+            const auto* recovery=index?nullptr:current->presentation_for(id);
+            if(recovery)index=&recovery->index;
+            const auto* program=recovery?recovery->program.get():analysis_for(*current,id);
+            if(index && (recovery || !session.requires_reselection() || current->editor_documents().contains(id)))
+                if(const auto* source=source_in(*program,id);source && source->text()==document->second.source->text()) {
+                    tokens=index->semantic_tokens(id);
+                    if(interactive)displayed.insert_or_assign(id,DisplayTokens{*source,tokens});
+                }
+        }
+        if(interactive && tokens.empty()) {
+            if(auto cached=displayed.find(id);cached!=displayed.end())tokens=cached->second.tokens;
+        }
+        Positions positions(*document->second.source);
         vd::lsp::Position previous;
         auto& data=*result.getArray("data");
-        for(const auto& token:index->semantic_tokens(id)) {
+        for(const auto& token:tokens) {
             auto begin=positions.position(token.begin),end=positions.position(token.end);
             if(!begin || !end || begin->line!=end->line || begin->character>=end->character)continue;
             auto line=begin->line-previous.line;
@@ -620,7 +691,19 @@ class Server {
                 if(!current || !current->semantic_analysis() || !disk_current(*current->semantic_analysis()))
                     return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
             } else overlays.insert_or_assign(module,*source); // Position conversion and probe share exact bytes.
-            auto assistance=document?vd::document_editor_assistance(context,overlays,module,*offset,manifest_mode?&snapshot.manifests():nullptr)
+            std::optional<vd::EditorAssistance> cached;
+            if(interactive && catalog_current && method=="textDocument/completion" && !read_only_source(module)) {
+                if(const auto& last=session.last_success();last && last->semantic_analysis()) {
+                    const auto& known=*last->semantic_analysis();
+                    const bool other_changes=std::any_of(overlays.begin(),overlays.end(),[&](const auto& change) {
+                        if(change.first==module)return false;
+                        const auto* previous=source_in(known,change.first);
+                        return !change.second || !previous || previous->text()!=change.second->text();
+                    });
+                    if(!other_changes)cached=vd::editor_namespace_assistance(known,*source,module,*offset);
+                }
+            }
+            auto assistance=cached?std::move(*cached):document?vd::document_editor_assistance(context,overlays,module,*offset,manifest_mode?&snapshot.manifests():nullptr)
                 :manifest_mode?vd::project_editor_assistance(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),module,*offset,snapshot.discovery())
                 :vd::editor_assistance(entry_path,overlays,module,*offset);
             if(method=="textDocument/signatureHelp") {
@@ -641,9 +724,13 @@ class Server {
                 if(!no_parameters)help["activeParameter"]=assistance.active_parameter;
                 return help;
             }
-            j::Array items;for(const auto& c:assistance.candidates)items.push_back(j::Object{{"label",c.name},{"kind",c.kind},{"detail",c.detail},{"documentation",c.documentation},
-                {"textEdit",j::Object{{"range",range({std::make_shared<const vd::SourceFile>(*source),module,assistance.begin,assistance.end})},{"newText",c.insert_text.empty()?c.name:c.insert_text}}}});
-            if(assistance.import_context)return j::Object{{"isIncomplete",assistance.incomplete},{"items",std::move(items)}};
+            j::Array items;
+            if(!assistance.candidates.empty()) {
+                const j::Value edit_range=range({std::make_shared<const vd::SourceFile>(*source),module,assistance.begin,assistance.end});
+                for(const auto& c:assistance.candidates)items.push_back(j::Object{{"label",c.name},{"kind",c.kind},{"detail",c.detail},{"documentation",c.documentation},
+                    {"textEdit",j::Object{{"range",edit_range},{"newText",c.insert_text.empty()?c.name:c.insert_text}}}});
+            }
+            if(assistance.import_context || assistance.incomplete)return j::Object{{"isIncomplete",assistance.incomplete},{"items",std::move(items)}};
             return items;
         }
         if(!index || (document && method!="textDocument/hover"))return nullptr;
@@ -718,7 +805,7 @@ class Server {
         auto found=open.find(id);
         if(method=="textDocument/didClose") {
             if(found==open.end()) throw std::invalid_argument("Document is not open");
-            session.close(id,next(id)); open.erase(found);
+            session.close(id,next(id)); open.erase(found); displayed.erase(id);
         } else {
             auto version=integer(document.get("version"));
             std::string text;
@@ -747,9 +834,12 @@ class Server {
                 }
                 session.replace(id,next(id),std::move(text)); found->second.version=version;
                 found->second.source=(manifest_mode && id.ends_with("/void.project.toml")?session.select().manifests():session.select().overrides()).at(id);
+                if(auto cached=displayed.find(id);cached!=displayed.end() && found->second.source)
+                    translate_tokens(cached->second,*found->second.source);
             }
         }
-        dirty=true;
+        if(id.ends_with("/void.project.toml"))context_changed();
+        else changed();
     }
 public:
     void cancel_queued(const j::Value& id) {
@@ -759,6 +849,16 @@ public:
     void end_batch(){cancellations.clear();}
     bool pending() const {return dirty;}
     void flush() {if(dirty)analyze();}
+    bool interactive_loop() const {return interactive && state==State::ready;}
+    bool idle_work() const {return dirty || worker.valid();}
+    void run_idle_work() {
+        if(worker.valid() && worker.wait_for(std::chrono::seconds(0))==std::future_status::ready)
+            publish(worker.get());
+        if(dirty && !worker.valid() && Clock::now()>=analyze_after)
+            worker=std::async(std::launch::async,[snapshot=session.select()] {
+                return vd::ToolingSession::analyze(snapshot,true);
+            });
+    }
     bool parent_alive() const {
         if(!process_id)return true;
 #ifdef _WIN32
@@ -806,7 +906,9 @@ public:
             if(id && state==State::ready && name!="shutdown") {
                 std::string key;llvm::raw_string_ostream out(key);out<<*id;
                 if(cancellations.erase(key)){fail(-32800,"Request cancelled");return {};}
-                flush();
+                if(!interactive || (name!="textDocument/semanticTokens/full" && name!="textDocument/completion" &&
+                   name!="textDocument/documentSymbol" && name!="textDocument/signatureHelp" &&
+                   name!="textDocument/codeAction"))flush();
             }
             if(name=="initialize") {
                 if(!id || state!=State::initial) { fail(-32600,"Initialize must be the first request and occur once"); return {}; }
@@ -833,8 +935,10 @@ public:
                     rename_edits=edit->getBoolean("documentChanges").value_or(false) && (edit->getString("failureHandling")=="textOnlyTransactional" || (params.getObject("initializationOptions") && params.getObject("initializationOptions")->getBoolean("voidVersionedEdits").value_or(false)));
                 if(auto workspace=caps.getObject("workspace"))if(auto tokens=workspace->getObject("semanticTokens"))
                     semantic_refresh=semantic_full && tokens->getBoolean("refreshSupport").value_or(false);
-                if(auto options=params.getObject("initializationOptions"))
+                if(auto options=params.getObject("initializationOptions")) {
                     guarded_fixes=manifest_mode && options->getBoolean("voidGuardedFixes").value_or(false);
+                    interactive=semantic_refresh && options->getBoolean("voidInteractivePresentation").value_or(false);
+                }
                 state=State::waiting;
                 j::Object capabilities{{"positionEncoding","utf-16"},{"textDocumentSync",j::Object{{"openClose",true},{"change",1},{"save",j::Object{{"includeText",false}}}}},
                         {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/",":"}}}},
@@ -855,7 +959,7 @@ public:
             }
             if(name=="initialized") {
                 if(id || state!=State::waiting) { fail(-32600,"Unexpected initialized message"); return {}; }
-                (void)object(o->get("params")); state=State::ready; dirty=true; return {};
+                (void)object(o->get("params")); state=State::ready; changed(); return {};
             }
             if(state!=State::ready) { fail(-32002,"Awaiting initialized notification"); return {}; }
             if(name=="shutdown") {
@@ -900,7 +1004,7 @@ public:
                 if(name=="void/reselectProject") {
                     const auto& params=object(o->get("params"));std::optional<std::string> entry;
                     if(auto value=params.get("entry");value && !value->getAsNull())entry=string(params,"entry");
-                    session.reselect(entry);analyze();
+                    session.reselect(entry);context_changed();analyze();
                     send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",summary()}});return {};
                 }
                 const bool available=observe_project_root();
@@ -911,14 +1015,14 @@ public:
                 send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(result)}});return {};
             }
             if(name=="void/refreshProject") {
-                session.refresh();analyze();if(id)send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",nullptr}});return {};
+                session.refresh();context_changed();analyze();if(id)send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",nullptr}});return {};
             }
             if(name=="textDocument/didSave") {
                 if(id){fail(-32600,"Save requires a notification");return {};}
                 auto module=identity(string(object(object(o->get("params")).get("textDocument")),"uri"));
                 if(read_only_source(module))return {};
                 if(!open.contains(module))throw std::invalid_argument("Saved document is not open");
-                session.refresh();dirty=true;return {};
+                session.refresh();changed();return {};
             }
             if(manifest_mode && (name=="workspace/didCreateFiles" || name=="workspace/didDeleteFiles" || name=="workspace/didRenameFiles")) {
                 if(id){fail(-32600,"File operations require notifications");return {};}
@@ -945,15 +1049,22 @@ public:
                         } else if(next_id!=old)session.unavailable(old,next(old));
                     }
                 }
-                session.refresh();dirty=true;return {};
+                session.refresh();context_changed();return {};
             }
             if(name=="workspace/didChangeWatchedFiles") {
                 if(id){fail(-32600,"Watch changes require a notification");return {};}
                 auto changes=object(o->get("params")).getArray("changes");if(!changes)throw std::invalid_argument("Expected watched changes");
-                bool refresh=false;for(const auto& change:*changes)try{const auto& event=object(&change);auto event_uri=string(event,"uri");(void)vd::lsp::uri_path(event_uri);auto type=integer(event.get("type"),1);if(type>3)throw std::invalid_argument("Invalid watch type");
-                    if(manifest_mode)refresh=true; // Unknown/wrong-case boundary names still invalidate selection.
+                bool refresh=false, context=false;for(const auto& change:*changes)try{const auto& event=object(&change);auto event_uri=string(event,"uri");(void)vd::lsp::uri_path(event_uri);auto type=integer(event.get("type"),1);if(type>3)throw std::invalid_argument("Invalid watch type");
+                    if(manifest_mode)refresh=true;
                     auto module=identity(event_uri);
-                    if(read_only_source(module))continue;
+                    if(read_only_source(module)){context|=manifest_mode;continue;}
+                    // The open buffer owns source bytes. An auto-save notification
+                    // for this exact file must not clear its presentation tokens.
+                    if(type==2 && !module.ends_with("/void.project.toml") && open.contains(module)) {
+                        refresh=true;
+                        continue;
+                    }
+                    context=true;
                     // Disk watches invalidate analysis; document ownership changes through synchronization or explicit file operations.
                     if(type==1) {
                         auto selected=session.select();
@@ -961,8 +1072,8 @@ public:
                         if(auto found=overrides.find(module);found!=overrides.end() && !found->second && !open.contains(module))
                             session.close(module,next(module));
                     }
-                    refresh=true;}catch(const std::invalid_argument&){}
-                if(refresh){session.refresh();dirty=true;}return {};
+                    refresh=true;}catch(const std::invalid_argument&){context|=manifest_mode;}
+                if(refresh) {session.refresh();if(context)context_changed();else changed();}return {};
             }
             if(name=="$/cancelRequest") {
                 if(id){fail(-32600,"Cancellation requires a notification");return {};}
@@ -974,7 +1085,7 @@ public:
             fail(-32601,"Method not found");
         } catch(const std::invalid_argument& failure) { fail(-32602,failure.what()); }
           catch(const std::exception& failure) {
-            std::cerr<<"Internal language server failure: "<<failure.what()<<'\n';
+            std::cerr<<"Internal language server failure while handling "<<name<<": "<<failure.what()<<'\n';
             fail(-32603,"Internal server error"); return 2;
         }
         return {};
@@ -1062,7 +1173,10 @@ int run(const fs::path& entry,bool project=false,const std::optional<std::string
     unsigned batch=0;auto started=std::chrono::steady_clock::now();
     for(;;) {
         if(!server.parent_alive())return server.eof();
-        if(server.pending() && (++batch>=64 || std::chrono::steady_clock::now()-started>std::chrono::milliseconds(50) || !input.ready(10))) {
+        if(server.interactive_loop()) {
+            server.run_idle_work();
+            if(server.idle_work() && !input.ready(10))continue;
+        } else if(server.pending() && (++batch>=64 || std::chrono::steady_clock::now()-started>std::chrono::milliseconds(50) || !input.ready(10))) {
             server.flush();batch=0;started=std::chrono::steady_clock::now();
         }
         if(!server.pending()){batch=0;started=std::chrono::steady_clock::now();}

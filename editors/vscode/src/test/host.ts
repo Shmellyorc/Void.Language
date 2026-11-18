@@ -49,6 +49,11 @@ export async function run(): Promise<void> {
     const record = (message:string) => { console.log(message); appendFileSync(log, message + '\n'); };
     const mainUri = vscode.Uri.file(path.join(root, 'main.void'));
     const workerUri = vscode.Uri.file(path.join(root, 'worker space.void'));
+    const readOutput = async (name: string) => {
+        const logs = path.join(process.env.VOID_TEST_PROFILE!, 'logs');
+        const files = (await fs.readdir(logs, {recursive:true})).filter(f => path.basename(f).endsWith(name + '.log'));
+        return (await Promise.all(files.map(f => fs.readFile(path.join(logs, f), 'utf8')))).join('\n');
+    };
     const children: cp.ChildProcess[] = [];
     const original = cp.spawn;
     let disappearBeforeSpawn: string | undefined;
@@ -75,10 +80,9 @@ export async function run(): Promise<void> {
     const reportTimer = process.env.VOID_TEST_VSIX ? setInterval(async () => {
         if (readingReports) return; readingReports = true;
         try {
-            const logs = path.join(process.env.VOID_TEST_PROFILE!, 'logs');
-            const files = (await fs.readdir(logs, {recursive:true})).filter(f => f.endsWith(path.join('void-language.void-language', 'VOID.log')));
-            const content = (await Promise.all(files.map(f => fs.readFile(path.join(logs, f), 'utf8')))).join('\n');
-            const reports = content.split('\n').map(line => line.split('[info] ')[1] ?? '').filter(line =>
+            const content = await readOutput('VOID');
+            const reports = content.split('\n').map(line => line.replace(/^.*?\[(?:error|warning|warn)\] /, '')).map(line =>
+                line.startsWith('CRASH ') ? 'VOID language server terminated unexpectedly: ' + line : line).filter(line =>
                 line.startsWith('VOID: ') || line.startsWith('VOID native analysis requires') || line.startsWith('VOID requires a filesystem') ||
                 line.startsWith('VOID language server failed') || line.startsWith('VOID language server terminated'));
             messages.splice(0, messages.length, ...reports);
@@ -86,10 +90,14 @@ export async function run(): Promise<void> {
         finally { readingReports = false; }
     }, 25) : undefined;
     const originalError = vscode.window.showErrorMessage;
+    const originalWarning = vscode.window.showWarningMessage;
     // Capture UI error reporting without modal notifications obstructing the test.
     (vscode.window as {showErrorMessage: typeof originalError}).showErrorMessage = ((message: string) => {
         messages.push(message); record('Error notification: ' + message); return Promise.resolve(undefined);
     }) as typeof originalError;
+    (vscode.window as {showWarningMessage: typeof originalWarning}).showWarningMessage = ((message: string) => {
+        messages.push(message); record('Warning notification: ' + message); return Promise.resolve(undefined);
+    }) as typeof originalWarning;
     const config = vscode.workspace.getConfiguration('void');
     const extension = vscode.extensions.getExtension('void-language.void-language'); assert(extension);
     if (process.env.VOID_TEST_VSIX) assert(extension.extensionPath.includes(path.sep + 'extensions' + path.sep), 'Test the installed VSIX');
@@ -150,6 +158,41 @@ export async function run(): Promise<void> {
         const mainEditor=await vscode.window.showTextDocument(main);
         await vscode.commands.executeCommand('workbench.action.focusActiveEditorGroup');
         const typingChild=children[children.length-1], typingCount=children.length;
+        const traceLevel = (level: string) => config.update('trace.server', level, vscode.ConfigurationTarget.Workspace);
+        const traceLog = () => readOutput('VOID LSP Trace');
+        const traceHover = () => vscode.commands.executeCommand('vscode.executeHoverProvider', mainUri, point);
+        await traceHover();
+        await until(traceLog, log => log.includes('textDocument/hover') && log.includes('Params:'), 'verbose protocol bodies');
+        await traceLevel('messages');
+        const verboseEnd = (await traceLog()).length;
+        await traceHover();
+        const messagesTrace = await until(traceLog, log => log.slice(verboseEnd).includes('textDocument/hover'), 'message-only trace');
+        assert(!messagesTrace.slice(verboseEnd).includes('Params:'), messagesTrace.slice(verboseEnd));
+        await traceLevel('off');
+        const offEnd = (await traceLog()).length;
+        assert.equal(mainEditor.options.insertSpaces, true, 'existing four-space file controls typing');
+        const member = mainText.replace('    return', '    worker\n    return');
+        await replace(main,member);
+        mainEditor.selection = new vscode.Selection(3,10,3,10);
+        await vscode.commands.executeCommand('type',{text:'.'});
+        assert.equal(main.lineAt(3).text, '    worker.');
+        const tokens = () => vscode.commands.executeCommand<vscode.SemanticTokens>('vscode.provideDocumentSemanticTokens', mainUri);
+        await until(tokens, result => !!result?.data.length, 'semantic tokens after typing a namespace dot');
+        for (let repeat = 0; repeat < 3; repeat++) {
+            const menu = await vscode.commands.executeCommand<vscode.CompletionList>(
+                'vscode.executeCompletionItemProvider', mainUri, new vscode.Position(3,11), '.');
+            assert(menu?.items.some(item => (typeof item.label === 'string' ? item.label : item.label.label) === 'calculate'));
+        }
+        await until(() => readOutput('VOID'), log => /\[error\].*voidls analysis .*\[VOID1102\]/.test(log), 'diagnostics with trace off');
+        await vscode.commands.executeCommand('type',{text:'cal'});
+        assert.equal(main.lineAt(3).text, '    worker.cal');
+        await until(tokens, result => !!result?.data.length, 'semantic tokens after typing a prefix');
+        assert(!(await traceLog()).slice(offEnd).includes('textDocument/'), 'off still traced protocol messages');
+        assert.equal(children.length,typingCount,'trace changes must not restart the native server');
+        await vscode.commands.executeCommand('hideSuggestWidget');
+        await replace(main, mainText);
+        await until(() => vscode.languages.getDiagnostics(mainUri), list => !list.length, 'diagnostics clear after completing the edit');
+        record('PASS semantic tokens and completions across native typing, independently switchable protocol trace and diagnostics');
         for(const fragment of ['u','us','unknown','var pending =','return (','func pending(','use "']) {
             await vscode.commands.executeCommand('hideSuggestWidget');
             await replace(main,mainText);mainEditor.selection=new vscode.Selection(0,0,0,0);
@@ -493,6 +536,9 @@ export async function run(): Promise<void> {
         await until(() => api!.status().state, s => s === 'stopped', 'transport error shutdown');
         await until(() => terminationCount(), n => n === 1, 'transport error termination report');
         await until(() => gone(transportChild), Boolean, 'transport error child cleanup');
+        await until(() => readOutput('VOID'), content => content.includes('CRASH voidls connection closed while running') &&
+            /\[(?:warning|warn)\].*voidls transport error.*Focused transport failure/.test(content) &&
+            /\[info\].*voidls ready/.test(content), 'operational INFO, WARN and CRASH while trace is off');
         const transportCount = children.length;
         await new Promise(r => setTimeout(r, 200)); assert.equal(children.length, transportCount);
         assert.equal(messages.length, beforeTransportMessages + 1, 'Transport failure must notify exactly once');
@@ -540,6 +586,7 @@ export async function run(): Promise<void> {
         process.off('unhandledRejection', rejected);
         (cp as {spawn: typeof cp.spawn}).spawn = original;
         (vscode.window as {showErrorMessage: typeof originalError}).showErrorMessage = originalError;
+        (vscode.window as {showWarningMessage: typeof originalWarning}).showWarningMessage = originalWarning;
         await api?.deactivate();
         try { await until(() => children.every(gone), Boolean, 'final child cleanup'); }
         finally { for (const child of children) if (!gone(child)) child.kill(); }

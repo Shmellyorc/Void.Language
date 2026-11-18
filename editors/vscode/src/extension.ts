@@ -1,13 +1,14 @@
 import * as vscode from 'vscode';
 import {basename, isAbsolute, join, parse} from 'node:path';
 import {promises as fs, constants} from 'node:fs';
-import {LanguageClient, CloseAction, ErrorAction, Trace, State, RevealOutputChannelOn, ServerOptions, LanguageClientOptions} from 'vscode-languageclient/node';
+import {LanguageClient, CloseAction, ErrorAction, State, RevealOutputChannelOn, ServerOptions, LanguageClientOptions} from 'vscode-languageclient/node';
 import type {TextEdit as ProtocolTextEdit} from 'vscode-languageclient/node';
 import {inside, Project, resolveCompiler, resolveProject, Settings} from './config';
 import {CreationWorkflow} from './creationWorkflow';
 import {newProjectCommand} from './newProject';
 import {compilerExecution} from './projectTask';
 import {libraryCommands} from './libraryManagement';
+import {createProtocolTrace, DiagnosticLog} from './editorLog';
 
 let manager: ServerManager | undefined;
 let creation: CreationWorkflow | undefined;
@@ -30,7 +31,17 @@ interface QuickFixTicket {uri: string; version: number; revision: string; offset
 
 function applyIndentation(editor: vscode.TextEditor): void {
     if (editor.document.languageId !== 'void') return;
-    const useTabs = vscode.workspace.getConfiguration('void.editor', editor.document).get('useTabs', true);
+    const config = vscode.workspace.getConfiguration('void.editor', editor.document);
+    const specified = config.inspect<boolean>('useTabs');
+    const explicit = specified?.workspaceFolderLanguageValue ?? specified?.workspaceLanguageValue ??
+        specified?.globalLanguageValue ?? specified?.workspaceFolderValue ?? specified?.workspaceValue ?? specified?.globalValue;
+    let useTabs = explicit ?? true;
+    if (explicit === undefined) {
+        for (let line = 0; line < editor.document.lineCount; line++) {
+            const prefix = /^( +|\t+)[^\s#]/.exec(editor.document.lineAt(line).text)?.[1];
+            if (prefix) { useTabs = prefix[0] === '\t'; break; }
+        }
+    }
     editor.options = {insertSpaces: !useTabs, tabSize: 4, indentSize: 4};
 }
 
@@ -47,8 +58,19 @@ class ServerManager {
     private warned = new Set<string>();
     private fallback?: string;
     private createdRoot?: string;
-    constructor(private readonly output: vscode.LogOutputChannel, private readonly bundled: string, private readonly statusBar: vscode.StatusBarItem) {}
-    async refreshProject(): Promise<void> { await this.serial; if (this.client?.isRunning()) await this.client.sendRequest('void/refreshProject', {}); }
+    private readonly diagnostics: DiagnosticLog;
+    constructor(private readonly output: vscode.LogOutputChannel, private readonly trace: vscode.LogOutputChannel,
+        private readonly bundled: string, private readonly statusBar: vscode.StatusBarItem) {
+        this.diagnostics = new DiagnosticLog(output);
+    }
+    async refreshProject(): Promise<void> {
+        await this.serial;
+        try {
+            if (!this.client?.isRunning()) throw new Error('Start the VOID language server first.');
+            await this.client.sendRequest('void/refreshProject', {});
+            this.output.info(`Refreshed VOID project ${this.project?.root ?? ''}`);
+        } catch (error) { this.report(`Refresh VOID project: ${String(error)}`, true); }
+    }
     async applyQuickFix(offeredEpoch: number, ticket: QuickFixTicket): Promise<boolean> {
         await this.serial;
         const client = this.client, project = this.project, serial = this.requestSerial;
@@ -71,7 +93,8 @@ class ServerManager {
             if (document.getText(edit.range) !== proposal.expectedText) return false;
             // TextEditor.edit carries the editor model version through to application.
             return await editor.edit(builder => builder.replace(edit.range, edit.newText));
-        } catch {
+        } catch (error) {
+            this.output.error(`Apply VOID quick fix for ${ticket.uri}: ${String(error)}`);
             return false;
         }
     }
@@ -162,7 +185,7 @@ class ServerManager {
                 compilerExecution(invocation), '$void-compiler');
             task.presentationOptions = {panel: vscode.TaskPanelKind.Dedicated, clear: true};
             return await vscode.tasks.executeTask(task);
-        } catch (error) { this.report(`VOID: ${error instanceof Error ? error.message : String(error)}`, true); }
+        } catch (error) { this.report(`VOID ${command}: ${error instanceof Error ? error.message : String(error)}`, true); }
     }
     resolveDebugBuild(task: vscode.Task): vscode.Task | undefined {
         const folder = vscode.workspace.workspaceFolders?.length === 1 ? vscode.workspace.workspaceFolders[0] : undefined;
@@ -221,9 +244,13 @@ class ServerManager {
             await vscode.workspace.getConfiguration('void').update('project.entry', files[0].fsPath, vscode.ConfigurationTarget.Workspace);
         }
     }
-    report(message: string, repeat = false): void {
-        this.output.appendLine(message);
-        if (repeat || !this.warned.has(message)) { this.warned.add(message); void vscode.window.showErrorMessage(message + ' See Output → VOID.'); }
+    report(message: string, repeat = false, severity: 'error' | 'warn' = 'error'): void {
+        if (!repeat && this.warned.has(message)) return;
+        this.warned.add(message);
+        this.output[severity](message);
+        const text = message + ' See Output → VOID.';
+        if (severity === 'warn') void vscode.window.showWarningMessage(text);
+        else void vscode.window.showErrorMessage(text);
     }
     private documents(): vscode.TextDocument[] {
         return vscode.workspace.textDocuments.filter(d => (d.languageId === 'void' || basename(d.uri.fsPath) === 'void.project.toml') && d.uri.scheme === 'file');
@@ -249,14 +276,18 @@ class ServerManager {
         ++this.epoch; this.projectRevision = 0n;
         this.watcher?.dispose(); this.watcher = undefined;
         const client = this.client; this.client = undefined; this.project = undefined;
-        if (client) { await client.stop(5000); await client.dispose(); }
-        this.statusBar.text = "VOID: stopped";
+        try {
+            if (client?.isRunning()) await client.dispose(5000);
+        } finally {
+            this.diagnostics.flush();
+            this.statusBar.text = 'VOID: stopped';
+        }
     }
     private async update(restart: boolean, serial: number): Promise<void> {
         if (this.disposed || serial !== this.requestSerial) return;
-        if (!vscode.workspace.isTrusted) { await this.stop(); this.report('VOID native analysis requires a trusted workspace. Syntax highlighting remains available.'); return; }
+        if (!vscode.workspace.isTrusted) { await this.stop(); this.report('VOID native analysis requires a trusted workspace. Syntax highlighting remains available.', false, 'warn'); return; }
         const folders = vscode.workspace.workspaceFolders ?? [];
-        if (folders.some(f => f.uri.scheme !== 'file')) { await this.stop(); this.report('VOID requires a filesystem workspace on the extension host.'); return; }
+        if (folders.some(f => f.uri.scheme !== 'file')) { await this.stop(); this.report('VOID requires a filesystem workspace on the extension host.', false, 'warn'); return; }
         const config = vscode.workspace.getConfiguration('void');
         const settings: Settings = {server: config.get('server.path', ''), entry: config.get('project.entry', ''), root: config.get('project.root', ''), trace: config.get('trace.server', 'off')};
         const creationRoot = !settings.root && !settings.entry && this.createdRoot && folders.length === 1 &&
@@ -272,42 +303,48 @@ class ServerManager {
             folders.map(f => f.uri.fsPath), creationRoot ? undefined : this.fallback, this.bundled); }
         catch (e) { await this.stop(); this.report(`VOID: ${e instanceof Error ? e.message : String(e)}`); return; }
         for (const doc of docs) if (!inside(project.root, doc.uri.fsPath) || (project.singleFile && doc.uri.fsPath !== vscode.Uri.file(project.entry!).fsPath)) {
-            this.report('VOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects.');
+            this.report('VOID: This document is outside the selected project or single-file entry. Configure void.project.entry for a multi-file project; use a separate window for unrelated projects.', false, 'warn');
         }
-        if (!restart && this.client && this.project?.server === project.server && this.project.entry === project.entry && this.project.root === project.root && this.project.manifestMode === project.manifestMode && this.project.trace === project.trace) return;
+        if (!restart && this.client && this.project?.server === project.server && this.project.entry === project.entry && this.project.root === project.root && this.project.manifestMode === project.manifestMode) return;
         if (serial !== this.requestSerial) return;
         await this.stop();
         if (this.disposed || serial !== this.requestSerial || !vscode.workspace.isTrusted) return;
         const args = project.manifestMode ? ['--project', project.requestedRoot ?? project.root, ...(project.entryOverride ? ['--entry', project.entryOverride] : [])] : ['--entry', project.entry!];
-        this.output.appendLine(`Starting ${project.server} ${JSON.stringify(args)}`);
+        this.output.info(`Starting ${project.server} ${JSON.stringify(args)}`);
         const selector = {language: 'void', scheme: 'file', pattern: {baseUri: vscode.Uri.file(project.root).toString(),
             pattern: project.singleFile ? basename(project.entry!).replace(/[*?()[\]{}!+@,]/g, c => '[' + c + ']') : '**/*.void'}};
         const serverOptions: ServerOptions = {command: project.server, args,
             options: {cwd: project.root, shell: false}};
         let initialized = false;
         let failureReported = false;
-        const reportUnexpected = (reason: string): void => {
-            const intentional = this.disposed || this.client !== client;
-            this.output.appendLine(`VOID connection ${reason}; initialized=${initialized}, intentional=${intentional}, state=${client.state}`);
-            if (!initialized || intentional || failureReported) return;
+        const reportUnexpected = (): void => {
+            if (this.disposed || this.client !== client || failureReported) return;
             failureReported = true;
-            // Deduplicate error/close callbacks for this session, not later crashes.
-            this.report('VOID language server terminated unexpectedly. Use VOID: Restart Language Server after checking the log.', true);
+            this.diagnostics.flush();
+            this.output.error(`CRASH voidls connection closed ${initialized ? 'while running' : 'during initialization'} for ${project.root} (${project.server}). Check the process exit and stderr in Output → VOID, then run VOID: Restart Language Server.`);
+            this.statusBar.text = 'VOID: server stopped';
+            void vscode.window.showErrorMessage('VOID language server terminated unexpectedly. Check Output → VOID, then run VOID: Restart Language Server.');
         };
         this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(project.root, project.manifestMode ? '**/*' : '**/*.void'));
         const clientOptions: LanguageClientOptions = {
-            initializationOptions: {voidGuardedFixes: true},
+            initializationOptions: {voidGuardedFixes: true, voidInteractivePresentation: true},
             documentSelector: [selector, ...(project.manifestMode ? [{scheme: 'file', pattern: {baseUri: vscode.Uri.file(project.root).toString(), pattern: '**/void.project.toml'}}] : [])],
             synchronize: {fileEvents: this.watcher},
-            middleware: {provideDefinition: async (document, position, token, next) => {
+            middleware: {handleDiagnostics: (uri, diagnostics, next) => {
+                if (this.client !== client) return;
+                next(uri, diagnostics);
+                this.diagnostics.update(uri, diagnostics);
+            }, provideDefinition: async (document, position, token, next) => {
                 const epoch = this.epoch; const result = await next(document, position, token);
                 return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
             }, provideHover: async (document, position, token, next) => {
                 const epoch = this.epoch; const result = await next(document, position, token);
                 return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
             }, provideCompletionItem: async (document, position, context, token, next) => {
-                const epoch = this.epoch; const result = await next(document, position, context, token);
-                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
+                const epoch = this.epoch, version = document.version;
+                const result = await next(document, position, context, token);
+                return !token.isCancellationRequested && !document.isClosed && document.version === version &&
+                    this.client === client && epoch === this.epoch ? result : null;
             }, provideReferences: async (document, position, context, token, next) => {
                 const epoch = this.epoch; const result = await next(document, position, context, token);
                 return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
@@ -358,15 +395,16 @@ class ServerManager {
                 }
                 return result;
             }},
-            outputChannel: this.output, traceOutputChannel: this.output,
+            outputChannel: this.output, traceOutputChannel: this.trace,
             revealOutputChannelOn: RevealOutputChannelOn.Never, // Never steal focus; explicit errors include the channel location.
             errorHandler: {error: (error, _message, count) => {
                 // Do not enter Stopping here: it skips closed() and its handled result.
                 // A transport error alone is not proof of process termination.
-                this.output.appendLine(`VOID connection error (${count}): ${error.message}; state=${client.state}`);
+                if (this.client === client && !this.disposed)
+                    this.output.warn(`voidls transport error (${count}) for ${project.root} (${project.server}): ${error.message}`);
                 return {action: ErrorAction.Continue, handled: true};
             }, closed: () => {
-                reportUnexpected('closed');
+                reportUnexpected();
                 return {action: CloseAction.DoNotRestart, handled: true};
             }}
         };
@@ -389,8 +427,10 @@ class ServerManager {
             initialized = true;
             this.statusBar.text = 'VOID: ' + (project.singleFile ? 'standalone ' : '') + (project.entry ? basename(project.entry) : 'project (no entry)');
             this.statusBar.tooltip = project.server + '\n' + project.root + '\n' + (project.entry ?? 'No executable entry');
-            this.statusBar.show(); await client.setTrace(project.trace === 'verbose' ? Trace.Verbose : project.trace === 'messages' ? Trace.Messages : Trace.Off); }
-        catch (e) { this.report(`VOID language server failed to start: ${String(e)}`); await this.stop(); }
+            this.statusBar.show();
+            this.output.info(`voidls ready for ${project.root} (${project.server}, tooling protocol ${capabilities.experimental.voidToolingProtocol})`);
+        }
+        catch (e) { this.report(`VOID language server failed to start for ${project.root} (${project.server}): ${String(e)}`, true); await this.stop(); }
     }
     async dispose(): Promise<void> { this.disposed = true; await this.serial; await this.stop(); }
     changed(): void { ++this.epoch; }
@@ -400,14 +440,16 @@ class ServerManager {
 }
 export function activate(context: vscode.ExtensionContext): {ready: () => Promise<void>; status: () => {state: string; entry?: string}; deactivate: () => Promise<void>} {
     const output = vscode.window.createOutputChannel('VOID', {log: true});
+    const trace = createProtocolTrace();
+    output.info(`Activating VOID ${context.extension.packageJSON.version} from ${context.extensionPath}`);
     const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 10);
     statusBar.command = 'void.selectEntry'; statusBar.text = 'VOID: stopped'; statusBar.show();
     const bundled = join(context.extensionPath, 'server', process.platform === 'win32' ? 'voidls.exe' : 'voidls');
-    const current = manager = new ServerManager(output, bundled, statusBar);
+    const current = manager = new ServerManager(output, trace, bundled, statusBar);
     const workflow = creation = new CreationWorkflow(context.workspaceState, bundled, root => current.selectCreatedRoot(root),
         message => current.report(`VOID project creation: ${message}`));
     const libraries = libraryCommands(() => current.librarySelection(), output);
-    context.subscriptions.push(output, statusBar, workflow,
+    context.subscriptions.push(output, trace, statusBar, workflow,
         vscode.commands.registerCommand('void.addLibrary', () => libraries('add')),
         vscode.commands.registerCommand('void.removeLibrary', () => libraries('remove')),
         vscode.commands.registerCommand('void.newProject', newProjectCommand(bundled)),
@@ -424,6 +466,14 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         vscode.commands.registerCommand('void.debugProjectRoot', () => current.debugProjectLocation('root')),
         vscode.tasks.registerTaskProvider('void', {provideTasks: () => [], resolveTask: task => current.resolveDebugBuild(task)}),
         vscode.commands.registerCommand('void.restartLanguageServer', () => current.refresh(true)),
+        vscode.tasks.onDidEndTaskProcess(event => {
+            const {definition} = event.execution.task;
+            if (definition.type !== 'void' || typeof definition.command !== 'string') return;
+            const message = `VOID ${definition.command} for ${definition.project ?? 'selected project'}`;
+            if (event.exitCode === 0) output.info(`${message} completed`);
+            else if (event.exitCode === undefined) output.warn(`${message} stopped without an exit status`);
+            else output.error(`${message} failed with exit code ${event.exitCode}. See the task terminal and Problems.`);
+        }),
         vscode.workspace.onDidOpenTextDocument(d => { if (d.languageId === 'void' || basename(d.uri.fsPath) === 'void.project.toml') void current.refresh(); }),
         vscode.window.onDidChangeActiveTextEditor(e => { if (e && (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml')) void current.refresh(); }),
         vscode.workspace.onDidChangeTextDocument(e => { if (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml') current.changed(); }),
@@ -435,7 +485,8 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
             for (const editor of vscode.window.visibleTextEditors) {
                 if (e.affectsConfiguration('void.editor.useTabs', editor.document)) applyIndentation(editor);
             }
-            if (['void.server', 'void.project', 'void.trace'].some(setting => e.affectsConfiguration(setting))) void current.refresh(true);
+            if (e.affectsConfiguration('void.trace.server')) trace.update();
+            if (['void.server', 'void.project'].some(setting => e.affectsConfiguration(setting))) void current.refresh(true);
         }),
         vscode.workspace.onDidChangeWorkspaceFolders(() => { void current.refresh(true); }),
         vscode.workspace.onDidGrantWorkspaceTrust(() => { void current.refresh(true); }));

@@ -86,8 +86,34 @@ export async function run(): Promise<void> {
                 (typeof content === 'string' ? content : content.value).replaceAll('\\_', '_').includes('callback_registration'))), 'final retained callback signature hover');
         const original = document.getText();
         const editor = vscode.window.activeTextEditor!;
-        assert(await editor.edit(edit => edit.insert(document.positionAt(original.length), '\nfunc package_completion_probe():\n    rl.get_ray_\n')));
-        const completion = new vscode.Position(document.lineCount - 2, 15);
+        const semantic = () => vscode.commands.executeCommand<vscode.SemanticTokens>('vscode.provideDocumentSemanticTokens', uri);
+        const legend = await vscode.commands.executeCommand<vscode.SemanticTokensLegend>('vscode.provideDocumentSemanticTokensLegend', uri);
+        assert(legend);
+        const importedFunctionRetained = (tokens?: vscode.SemanticTokens): boolean => {
+            let line = 0, column = 0;
+            for (let index = 0; tokens && index < tokens.data.length; index += 5) {
+                if (tokens.data[index]) { line += tokens.data[index]; column = 0; }
+                column += tokens.data[index + 1];
+                if (line === position.line && column === position.character &&
+                    tokens.data[index + 2] === 'fade'.length && legend.tokenTypes[tokens.data[index + 3]] === 'function')
+                    return true;
+            }
+            return false;
+        };
+        await until(semantic, importedFunctionRetained, 'valid physical raylib function is semantically highlighted');
+        assert(await editor.edit(edit => edit.insert(document.positionAt(original.length), '\nfunc package_completion_probe():\n    rl\n')));
+        const dot = new vscode.Position(document.lineCount - 2, 6);
+        editor.selection = new vscode.Selection(dot, dot);
+        await vscode.commands.executeCommand('type', {text: '.'});
+        await until(semantic, importedFunctionRetained, 'physical raylib function stays highlighted after typing a dot');
+        const menu = await vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', uri, dot.translate(0, 1), '.');
+        assert(menu?.items.some(item => (typeof item.label === 'string' ? item.label : item.label.label) === 'set_target_fps'));
+        for (const character of 'get_ray_') {
+            await vscode.commands.executeCommand('type', {text: character});
+            assert(importedFunctionRetained(await semantic()), 'physical raylib function lost coloring during a rapid edit');
+        }
+        events.push('physical raylib function stays highlighted across consecutive keystrokes');
+        const completion = dot.translate(0, 9);
         await until(() => vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider', uri, completion),
             result => !!result?.items.some(item => (typeof item.label === 'string' ? item.label : item.label.label) === 'get_ray_collision_box'),
             'pinned pkg/raylib typed import completion');

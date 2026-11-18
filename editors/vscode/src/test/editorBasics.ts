@@ -101,7 +101,7 @@ export async function verifyEditorBasics(root: string): Promise<void> {
         await setting.update('useTabs', initialLanguageSetting, scope, true);
         await options(true);
         await setting.update('useTabs', initialSetting, scope);
-        await options(false);
+        await options(true);
         await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
         await fs.unlink(file.fsPath);
         console.log('editor_basics_host: pairing, overtype, surrounding, native indentation, setting changes, paste and save passed');

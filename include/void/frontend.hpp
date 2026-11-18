@@ -15,7 +15,12 @@ std::string inspect_native_provider(const SourceFile&);
 std::set<std::string> inspect_project_imports(const std::filesystem::path&,
                                            const std::optional<std::string>& manifest = {});
 // Records are owned by an immutable successful analysis, never by parser storage.
-struct AnalyzedModule { std::string identity; SourceFile source; std::vector<std::string> imports; };
+struct AnalyzedModule {
+    std::string identity;
+    SourceFile source;
+    std::vector<std::string> imports;
+    std::map<std::string,std::string> qualifiers;
+};
 struct AnalyzedParameter {
     std::string name; ir::Type type; SourceSpan source;
     std::optional<SourceSpan> default_source = {};
@@ -79,6 +84,7 @@ struct AnalyzedReference {
     std::string binding_contract = {}; // Exact native identities/specification, before editor normalization.
     std::string signature = {}; // Concrete selected callable, before source identity normalization.
     bool navigation_only = false; // Related target, with no distinct authored token.
+    bool semantic_only = false; // Resolved receiver in an unfinished selector.
 };
 // Presentation-only metadata. A slot is the same typed slot copied by the
 // frontend lowerer. Argument numbers are one-based; zero denotes a local.
@@ -204,7 +210,7 @@ ProjectAnalysisResult analyze_editor_project(const std::filesystem::path&, const
 // barred from lowering and never becomes the selected project analysis.
 std::shared_ptr<const ValidatedAnalysis> recover_editor_analysis(const std::filesystem::path&,
     const std::optional<std::string>& entry, const SourceOverrides&, const ManifestOverrides*,
-    const EditorDiscovery&, const std::string& module, bool independent_document);
+    const EditorDiscovery&, const std::string& module, bool independent_document, bool presentation = false);
 std::vector<Diagnostic> check_project_documents(const std::filesystem::path&,const SourceOverrides&,const ManifestOverrides&,const std::vector<std::string>&);
 struct ProjectPreflight {
     std::filesystem::path root;std::optional<std::filesystem::path> entry;
@@ -239,6 +245,10 @@ struct EditorAssistance {
     unsigned active_parameter = 0;
     std::size_t begin = 0, end = 0;
 };
+// Cheap probe against an already verified namespace. Unknown context delegates
+// to the ordinary compiler probe.
+std::optional<EditorAssistance> editor_namespace_assistance(const ValidatedAnalysis&, const SourceFile&,
+    const std::string& module, std::size_t cursor);
 // Bounded recovery uses the compiler parser and binder, never produces validated IR.
 EditorAssistance editor_assistance(const std::filesystem::path&, const SourceOverrides&,
     const std::string& module, std::size_t cursor);

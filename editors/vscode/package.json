@@ -2,7 +2,7 @@
   "name": "void-language",
   "displayName": "VOID Language",
   "description": "VOID compiler language assistance, navigation, guarded rename, formatting and diagnostics.",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "publisher": "void-language",
   "license": "MIT",
   "engines": {
@@ -179,7 +179,7 @@
           "type": "boolean",
           "default": true,
           "scope": "language-overridable",
-          "description": "Indent VOID code with tabs. Disable to insert four spaces. Changing this setting does not convert existing text."
+          "description": "Override the indentation inferred from the file. Use true for tabs or false for four spaces. Unindented files default to tabs. Changing this setting does not convert existing text."
         },
         "void.server.path": {
           "type": "string",
@@ -202,7 +202,7 @@
           ],
           "default": "off",
           "scope": "window",
-          "description": "Optional LSP trace in the VOID output channel. Verbose logs can include source text."
+          "description": "Optional protocol trace in Output → VOID LSP Trace. Verbose logs can include source text."
         },
         "void.project.root": {
           "type": "string",
@@ -226,7 +226,7 @@
     "build": "npm run typecheck && npm run compile",
     "test": "npm run build && node --test out/test/config.test.js",
     "test:host": "node out/test/runHost.js",
-    "package": "npm run build && vsce package --no-dependencies --allow-missing-repository --out dist/void-language-0.1.0.vsix",
+    "package": "npm run build && vsce package --no-dependencies --allow-missing-repository --out dist/void-language-0.1.2.vsix",
     "vscode:prepublish": "npm run build"
   },
   "dependencies": {

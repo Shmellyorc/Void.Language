@@ -110,6 +110,7 @@ struct EditorRecovery {
     bool repaired = false;
     bool member_probe = false;
     unsigned repairs = 0;
+    bool presentation = false;
     bool available() const { return repairs < 8; }
     void record() { ++repairs; repaired = true; }
 };
@@ -180,6 +181,21 @@ public:
         });
     }
     std::size_t size() const { return seen.size(); }
+    bool same_errors(const Diagnostics& other) const {
+        return seen == other.seen && suppressed == other.suppressed;
+    }
+    bool presentation_errors() const {
+        return recovery && recovery->presentation && !suppressed &&
+            std::all_of(items.begin(),items.end(),[&](const auto& item) {
+                return item.severity!=Severity::error || item.primary.module_identity==recovery->module;
+            });
+    }
+    void finish_parse() {
+        if(!presentation_errors() || std::any_of(items.begin(),items.end(),[](const auto& item) {
+            return item.severity==Severity::error && (item.code==Code::import_path ||
+                item.code==Code::import_read || item.code==Code::alias_conflict || item.code==Code::limit);
+        }))finish();
+    }
     void finish() {
         if (!failed()) return;
         // VFS owner, byte offset, then code: independent of discovery and host enumeration.
@@ -221,7 +237,7 @@ Indentation indentation_at(std::string_view text, std::size_t start) {
     }
     return result;
 }
-std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin=0, std::size_t end=std::string::npos, unsigned interpolation_depth=0,bool expand_interpolation=true) {
+std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin=0, std::size_t end=std::string::npos, unsigned interpolation_depth=0,bool expand_interpolation=true,EditorRecovery* recovery=nullptr) {
     const auto& text = source.text();
     std::vector<Token> tokens;
     struct IndentLevel {std::size_t width; char style;};
@@ -258,10 +274,16 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
                 const auto enclosing = indents.back();
                 if (dedenting && prefix.width != enclosing.width)
                     error(source, {TokenKind::symbol, "", p}, Code::indentation, "Indentation does not match an enclosing block.", "Align this statement with an earlier block level.");
-                if (enclosing.width && prefix.style != enclosing.style)
-                    error(source, {TokenKind::symbol, "", start}, Code::indentation, "Inconsistent tabs and spaces in an enclosing block.", "Match the indentation style of the enclosing block.");
+                const bool different_style=enclosing.width && prefix.style!=enclosing.style;
+                if (different_style) {
+                    // The block is still unambiguous at an existing column. Keep
+                    // the original bytes and the strict diagnostic on the normal pass.
+                    if(recovery && recovery->available() && (prefix.width==enclosing.width || recovery->presentation))
+                        recovery->record();
+                    else error(source, {TokenKind::symbol, "", start}, Code::indentation, "Inconsistent tabs and spaces in an enclosing block.", "Match the indentation style of the enclosing block.");
+                }
                 if (prefix.width > enclosing.width) {
-                    indents.push_back({prefix.width, prefix.style});
+                    indents.push_back({prefix.width, different_style ? enclosing.style : prefix.style});
                     emit(TokenKind::indent, "<indent>", p);
                 }
             }
@@ -480,7 +502,7 @@ struct Statement {
     Type assigned_type = Type::none;
     std::vector<Statement> body, otherwise;
     unsigned slot = 0, flow = 0;
-    bool readonly = false, invalid = false, using_field = false, event = false, task_group = false;
+    bool readonly = false, invalid = false, using_field = false, event = false, task_group = false, editor_checked = false;
     std::string visibility = "public";
     std::string cleanup_target; // Selected nonvirtual destructor for the compiler-owned with handler.
     Statement(Kind k, Token t) : kind(k), token(std::move(t)) {}
@@ -1225,11 +1247,13 @@ class Parser {
         const bool missing_member=repair_available() && peek().kind==TokenKind::name && peek(1).text=="." &&
             (typed_member || peek(2).kind==TokenKind::newline || (peek(2).text==":" && peek(3).kind==TokenKind::newline));
         if(missing_member) {
-            s.selection=std::make_unique<Expr>(Expr::Kind::name,name());
+            auto receiver=std::make_unique<Expr>(Expr::Kind::name,name());
             auto dot=take();
+            auto member=typed_member?take():Token{TokenKind::name,"",peek().offset};
+            s.selection=std::make_unique<Expr>(Expr::Kind::field,std::move(member));
+            s.selection->parts.push_back(std::move(receiver));
             s.expression=std::make_unique<Expr>(Expr::Kind::literal,std::move(dot));
             s.expression->type=Type::boolean;
-            if(typed_member)take();
             accept(":");
         } else s.expression=expression();
         const auto& condition=*s.expression;
@@ -1361,7 +1385,8 @@ class Parser {
         Statement s(Statement::Kind::expression, peek()); s.expression = expression(); newline(); return s;
     }
 public:
-    explicit Parser(const SourceFile& s, Diagnostics& d) : source(s), tokens(lex(s, d)), diagnostics(d) {}
+    explicit Parser(const SourceFile& s, Diagnostics& d, std::string_view module = {})
+        : source(s), tokens(lex(s,d,0,std::string::npos,0,true,d.recovery && d.recovery->module==module?d.recovery:nullptr)), diagnostics(d) {}
     Parser(const SourceFile& s,Diagnostics& d,std::vector<Token> syntax,std::map<std::string,Type> bindings)
         :source(s),tokens(std::move(syntax)),diagnostics(d),substitutions(std::move(bindings)),instantiating(true) {
         tokens.push_back({TokenKind::end,"<end of file>",tokens.empty()?0:tokens.back().offset});
@@ -2088,16 +2113,20 @@ class Semantics {
             error(source,e.token,Code::initializer_deferred,"Lifecycle methods cannot be called directly; construct a new value using its type.");
         if (module_call(e)) {
             e.qualifier = e.parts[0]->token.text; e.qualifier_token = e.parts[0]->token;
+            if(editor_cursor(e))editor_candidates(e);
             e.parts.erase(e.parts.begin()); e.kind = Expr::Kind::call;
-            return call_expression(e);
+            try {return call_expression(e);}
+            catch(const CompilationError& failure) {return recover_or_report_member(e,failure,Code::visibility);}
         }
         auto event_access=allow_event;allow_event=e.token.text=="emit";auto receiver=expression(*e.parts[0]);allow_event=event_access;
+        if(editor_cursor(e))editor_field_candidates(e,receiver);
         if(receiver.definition && receiver.definition->task_result && e.token.text=="cancel"){
             if(e.parts.size()!=1 || !e.type_arguments.empty() || !current)error(source,e.token,Code::unsupported_type,"Task cancellation requires a function activation and no arguments.");
             if(receiver.nullable)error(source,e.token,Code::type_mismatch,"Task cancellation requires a non-null handle.");
             e.kind=Expr::Kind::task_cancel;return e.type=Type::none;
         }
-        return resolved_method_expression(e,receiver);
+        try {return resolved_method_expression(e,receiver);}
+        catch(const CompilationError& failure) {return recover_or_report_member(e,failure,Code::unknown_method);}
     }
     // Resolve the receiver before reserving mutation/member-check temporaries.
     // Deep receiver chains must reach the existing semantic nesting guard on
@@ -2825,6 +2854,7 @@ class Semantics {
                 }
             }
             for(const auto& name:names) try {
+                if(!name.starts_with(diagnostics.editor->prefix))continue;
                 auto token = e.token;
                 token.text = name;
                 auto [owner, generic] = generic_method_declaration(t, token);
@@ -2867,14 +2897,20 @@ class Semantics {
         } else {
             if(e.qualifier.empty()) for(const auto& scope:scopes) for(const auto& [name,v]:scope) if(!v.task_group) add(name,v.type);
             std::set<std::string> names;
-            for(const auto& [id,u]:units) {
-                for(const auto& [name,f]:u->declarations) names.insert(name);
-                for(const auto& [name,c]:u->constant_names) names.insert(name);
-                for(const auto& [name,value]:u->global_names) names.insert(name);
-                for(const auto& [name,structure]:u->structure_names)names.insert(name);
+            auto collect=[&](const Unit& u) {
+                for(const auto& [name,f]:u.declarations) names.insert(name);
+                for(const auto& [name,c]:u.constant_names) names.insert(name);
+                for(const auto& [name,value]:u.global_names) names.insert(name);
+                for(const auto& [name,structure]:u.structure_names) names.insert(name);
+            };
+            if(e.qualifier.empty()) {
+                for(const auto& [id,u]:units)collect(*u);
+            } else if(auto found=unit.qualifiers.find(e.qualifier);
+                      found!=unit.qualifiers.end() && found->second.size()==1) {
+                collect(*found->second.front());
             }
             for(const auto& name:names) {
-                if(!valid_editor_identifier(name) || candidates.contains(name)) continue;
+                if(!name.starts_with(diagnostics.editor->prefix) || !valid_editor_identifier(name) || candidates.contains(name)) continue;
                 Expr test(Expr::Kind::name,e.token);test.token.text=name;test.qualifier=e.qualifier;test.qualifier_token=e.qualifier_token;
                 try {
                     auto [owner, value] = global(test);
@@ -2933,9 +2969,10 @@ class Semantics {
                 if(current && current->asynchronous)for(const auto& name:{"await","spawn"})candidates.emplace(name,EditorCandidate{name,"keyword",14});
             }
         }
+        const auto limit=e.qualifier.empty()?256u:2048u;
         for(auto& [name,candidate]:candidates) {
             if(!name.starts_with(diagnostics.editor->prefix))continue;
-            if(out.candidates.size()==256)break;
+            if(out.candidates.size()>=limit){out.incomplete=!e.qualifier.empty();break;}
             out.candidates.push_back(std::move(candidate));
         }
         throw EditorProbeFound{};
@@ -3389,13 +3426,20 @@ class Semantics {
             e.kind=K::literal;e.type=type;e.value=numeric::limit(type,api->name=="max_value");e.target=numeric::symbol(type,api->name);e.parts.clear();return type;
         }
         if (base.kind == K::name && !lookup(base.token.text) && unit.qualifiers.contains(base.token.text)) {
+            const bool resolved=unit.qualifiers.at(base.token.text).size()==1;
             e.qualifier = base.token.text; e.qualifier_token = base.token; e.kind = K::name; e.parts.clear();
-            return expression_impl(e,expected);
+            if(resolved && e.token.text.empty() && member_recovery_available())return recover_member(e);
+            try {return expression_impl(e,expected);}
+            catch(const CompilationError& failure) {
+                if(resolved)return recover_or_report_member(e,failure,Code::visibility);
+                throw;
+            }
         }
         if(auto variant=enum_expression(e,false))return *variant;
         auto t = expression(base);
         if (t == error_type) return error_type;
         if(editor_cursor(e)) editor_field_candidates(e,t);
+        if(e.token.text.empty() && member_recovery_available())return recover_member(e);
         if(t.definition && t.definition->task_result)error(source,e.token,Code::unsupported_type,"Inferred task handles support await; task internals are not source fields.");
         if(base.event)error(source,e.token,Code::invalid_value,"Event subscription storage is private.");
         if(t.kind==Type::string && (e.token.text=="length" || e.token.text=="byte_length"))return text_property(e);
@@ -3408,7 +3452,10 @@ class Semantics {
         Member selected;
         if(!e.type_arguments.empty()){auto* method=concrete_method(e,t,true);if(!method)error(source,e.token,Code::unsupported_type,"This member is not a generic method.");selected={{},method};}
         else if(expected && expected->definition && expected->definition->callable && t.kind!=Type::interface_ref && ir::select_member(*root.member_catalog,t,e.token.text,unit.identity,nullptr,lexical_owner()).status==ir::MemberSelection::missing){auto receiver=std::move(e.parts[0]);auto token=e.token;e=std::move(*receiver);return bind_method(e,token,*expected);}
-        else selected=member(t,e.token);
+        else {
+            try {selected=member(t,e.token);}
+            catch(const CompilationError& failure) {return recover_or_report_member(e,failure,Code::unknown_identifier);}
+        }
         if(selected.function && selected.function->accessor==1) {
             for(auto index:selected.path)embedded_receiver(e.parts[0],index,e.token);
             e.kind=K::method_call;e.property=true;
@@ -3428,6 +3475,28 @@ class Semantics {
         e.slot=selected.path.back(); e.target=owner.definition->fields[e.slot].owner+"::field::"+e.token.text;
         e.event=owner.definition->fields[e.slot].event;e.event_owner=owner.definition->fields[e.slot].owner;if(e.event && !allow_event)error(source,e.token,Code::invalid_value,"Events support subscriptions and owner emission; subscriber storage cannot escape.");
         return e.type=ir::field_type(owner,e.slot);
+    }
+    bool member_recovery_available() const {
+        return current && diagnostics.recovery && !diagnostics.editor &&
+            diagnostics.recovery->module==unit.identity && diagnostics.recovery->available() &&
+            !invalid_function && !unit.failed_import;
+    }
+    Type recover_member(Expr& e) {
+        diagnostics.recovery->record();
+        e.kind=Expr::Kind::editor_hole;
+        return e.type=error_type;
+    }
+    VOID_SEMANTIC_HANDLER Type recover_or_report_member(Expr& e,const CompilationError& failure,Code missing) {
+        if(current && !invalid_function && !unit.failed_import && failure.diagnostics().size()==1) {
+            auto diagnostic=failure.diagnostics().front();
+            if(diagnostic.code==missing && diagnostic.primary.begin==e.token.offset &&
+               diagnostic.primary.source && diagnostic.primary.source->path()==source.path()) {
+                if(member_recovery_available())return recover_member(e);
+                diagnostic.editor_member_recovery=true;
+                throw CompilationError({std::move(diagnostic)});
+            }
+        }
+        throw failure;
     }
 #include "collection_display.inc"
 #include "display_semantics.inc"
@@ -4153,7 +4222,7 @@ class Semantics {
             if (diagnostics.full()) break;
             unsigned result = next_flow;
             auto old_zero = suppress_zero;
-            try { result = statement(s); }
+            try { result = statement(s); s.editor_checked = true; }
             catch (const CompilationError& failure) { diagnostics.add(failure); }
             catch (const Poison&) {}
             suppress_zero = old_zero;
@@ -4286,9 +4355,21 @@ class Semantics {
             break;
         }
         case K::expression:
+        {
+            const bool member_selection=s.expression->kind==Expr::Kind::field;
             if (expression(*s.expression) == error_type) break;
-            if (s.expression->kind != Expr::Kind::spawned && s.expression->kind != Expr::Kind::task_cancel && s.expression->kind != Expr::Kind::awaited && s.expression->kind != Expr::Kind::call && s.expression->kind != Expr::Kind::method_call && s.expression->kind!=Expr::Kind::function_call) error(source, s.token, Code::invalid_value, "Only function calls can be standalone expressions.", "Assign this value with var or return it.");
+            if (s.expression->kind != Expr::Kind::spawned && s.expression->kind != Expr::Kind::task_cancel && s.expression->kind != Expr::Kind::awaited &&
+                s.expression->kind != Expr::Kind::call && s.expression->kind != Expr::Kind::method_call && s.expression->kind!=Expr::Kind::function_call) {
+                if(member_selection && member_recovery_available()){diagnostics.recovery->record();break;}
+                Diagnostic diagnostic(Code::invalid_value);
+                diagnostic.primary=span(source,s.token);
+                diagnostic.description="Only function calls can be standalone expressions.";
+                diagnostic.hint="Assign this value with var or return it.";
+                diagnostic.editor_member_recovery=member_selection;
+                throw CompilationError({std::move(diagnostic)});
+            }
             break;
+        }
         case K::returned:
             return_statement(s);
             flow = return_flow; break;
@@ -6034,7 +6115,7 @@ public:
         auto* result = unit.get(); parsed.emplace(id, std::move(unit));
         diagnostics.bind(result->source, id);
         auto before = diagnostics.size();
-        Parser(result->source, diagnostics).parse(*result);
+        Parser(result->source, diagnostics,id).parse(*result);
         result->parse_failed |= diagnostics.size() != before;
         if(id==console::source_module)for(auto& structure:result->structures)if(structure.token.text=="terminal_session"){structure.definition->native_resource=true;structure.definition->native_provider="void.console.v1";}
         if(imports_only)return *result;
@@ -6248,6 +6329,7 @@ void generic_provenance(ir::Module& module,const std::map<std::string,std::uniqu
     }
 }
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics, Unit* library_scope=nullptr) {
+    const auto parse_errors=diagnostics.size();
     for(const auto& [id,u]:units)if(!u->c_provider.empty() && !u->c_primitives)
         error(u->source,{TokenKind::name,"native",0},Code::unsupported_type,
               "Physical native declarations require the application's matching admitted descriptor.");
@@ -6810,6 +6892,8 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         catch (const CompilationError& failure) { diagnostics.add(failure); }
         catch (const Poison&) {}
     }
+    const bool presentation=diagnostics.recovery && diagnostics.recovery->presentation;
+    if(presentation && diagnostics.size()!=parse_errors)diagnostics.finish();
     bool pending_bodies=true;
     while(pending_bodies && !diagnostics.full()) {
         pending_bodies=false;
@@ -6817,6 +6901,10 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             for(const auto& f:u->functions)if(!f.analyzed && !f.interface_requirement){pending_bodies=true;break;}
             Semantics(*u,units,root,evaluate,diagnostics,defaults).analyze();
         }
+    }
+    if(presentation && diagnostics.failed() && diagnostics.presentation_errors()) {
+        diagnostics.recovery->repaired=true;
+        return; // No ownership/IR contracts are built from a broken body.
     }
     diagnostics.finish();
     try {root.member_catalog->interface_bindings=ir::interface_universe(*root.member_catalog);}
@@ -7053,7 +7141,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile&);
 std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem::path&, const SourceOverrides& = {}, bool verify_disk = false,const NativeProject* = nullptr,EditorProbe* = nullptr,CPrimitiveAdmission::Owner = {},const std::string* document = nullptr,EditorRecovery* = nullptr);
 // This factory is the only way to construct a successful result.
 struct AnalysisAccess {
-    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true,std::shared_ptr<const project::LockedDependencies> dependencies={},bool editor_only=false) {
+    static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true,std::shared_ptr<const project::LockedDependencies> dependencies={},bool editor_only=false,bool presentation=false) {
         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
         result->entry_ = entry;
         result->application_metadata_ = std::move(metadata);
@@ -7166,7 +7254,7 @@ struct AnalysisAccess {
             if(e.kind==Expr::Kind::method_call && e.token.text=="format" && e.parts.size()==2 && e.parts[1]->type==Type::string)return format_specification_syntax(*e.parts[1]);
             return {};
         };
-        auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false, bool native_contract = true, bool navigation_only = false) {
+        auto reference = [&](const std::string& from, const std::string& to, const Expr& e, const Unit& u, bool implicit = false, bool native_contract = true, bool navigation_only = false, bool semantic_only = false) {
             implicit |= from.find("::$json$")!=std::string::npos;
             auto location = span(u.source,e.token); location.module_identity = u.identity;
             auto spelling = e.qualifier + "::" + e.token.text;
@@ -7182,12 +7270,14 @@ struct AnalysisAccess {
             const bool written=visible_references.emplace(origin,target,u.identity,location.begin,location.end,implicit).second;
             std::string exact;field(exact,origin);field(exact,target);field(exact,u.identity);field(exact,std::to_string(location.begin));field(exact,std::to_string(location.end));field(exact,binding);field(exact,implicit?"implicit":"written");
             if(exact_references.insert(exact).second)
-                (native_contract ? result->references_ : result->editor_references_).push_back({origin,target,spelling,std::move(location),implicit || !written,std::move(binding),std::move(presentation),navigation_only});
+                (native_contract ? result->references_ : result->editor_references_).push_back({origin,target,spelling,std::move(location),implicit || !written,std::move(binding),std::move(presentation),navigation_only,semantic_only});
             if(native_contract) {field(result->contract_,"reference"); field(result->contract_,from); field(result->contract_,to);}
 
         };
         for (const auto& [id, unit] : *graph) {
-            AnalyzedModule module{id,unit->source,{}};
+            AnalyzedModule module{id,unit->source,{},{}};
+            for(const auto& [alias,targets]:unit->qualifiers)
+                if(targets.size()==1)module.qualifiers.emplace(alias,targets.front()->identity);
             field(result->contract_,"module"); field(result->contract_,id);
             auto synthetic_types=unit->synthetic_types;std::sort(synthetic_types.begin(),synthetic_types.end(),[](auto a,auto b){return Type::key(a)<Type::key(b);});
             for(auto type:synthetic_types){
@@ -7225,12 +7315,12 @@ struct AnalysisAccess {
             std::set<std::string> aliases;
             for(const auto& import:unit->imports)if(import.explicit_alias && aliases.insert(import.alias.text).second)
                 result->editor_declarations_.push_back({AnalyzedDeclaration::Kind::import_alias,id+"::import::"+import.alias.text,id,"private",location(import.alias),{},Type::none,{},{},id});
-            auto namespace_reference=[&](const std::string& owner,const Token& token,bool implicit=false) {
+            auto namespace_reference=[&](const std::string& owner,const Token& token,bool implicit=false,bool semantic_only=false) {
                 auto binding=unit->qualifiers.find(token.text);
                 if(binding==unit->qualifiers.end() || binding->second.size()!=1)return;
                 Expr use(Expr::Kind::name,token);
                 auto target=aliases.contains(token.text)?id+"::import::"+token.text:binding->second.front()->identity+"::$module";
-                reference(owner,target,use,*unit,implicit,false);
+                reference(owner,target,use,*unit,implicit,false,false,semantic_only);
             };
             auto primitive_reference=[&](const std::string& owner,const Token& token,Type type) {
                 Expr use(Expr::Kind::name,token);reference(owner,primitive_identity(type),use,*unit,false,false);
@@ -7269,7 +7359,7 @@ struct AnalysisAccess {
                     field(result->contract_,"format-specification");field(result->contract_,owner);field(result->contract_,*spec);
                     reference(owner,"$display.specification",e,*unit,true);
                 }
-                if(!e.qualifier.empty())namespace_reference(owner,e.qualifier_token,implicit_site);
+                if(!e.qualifier.empty())namespace_reference(owner,e.qualifier_token,implicit_site,e.kind==Expr::Kind::editor_hole);
                 if(!e.source_target.empty()) {
                     reference(owner,e.source_target,e,*unit,implicit_site,!e.source_target.starts_with("$result::"));if(!e.target.empty())reference(owner,e.target,e,*unit,true);
                     if(!implicit_site && e.source_target.starts_with("$display.") && display_hooks.contains(e.target)) {
@@ -7291,13 +7381,16 @@ struct AnalysisAccess {
                     for(const auto& binding:context.member_catalog->interface_bindings) if(binding.key==e.target)
                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
                 } else if (!e.target.empty() && e.target!="$interpolation" && e.target!="$hole" && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit_site);
-                else if (e.kind == Expr::Kind::name && locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit_site,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
+                else if (e.kind == Expr::Kind::name && (!presentation || (e.type!=Type::none && e.type!=error_type)) &&
+                         locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit_site,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
                 if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)
                     if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
                 if (!e.initializer.empty()) reference(owner,e.initializer,e,*unit,implicit);
                 if(!e.setter.empty())reference(owner,e.setter,e,*unit,true);
                 if(!e.display_adapter.empty())reference(owner,e.display_adapter,e,*unit,true);
-                if(!e.argument_indexes.empty() && !e.target.starts_with("$"))for(const auto& [target_id,target_unit]:*graph)for(const auto& target:target_unit->functions)if(target.symbol==e.target && target.generic_origin.empty()) {
+                if(!e.argument_indexes.empty() && !e.target.starts_with("$") &&
+                   std::any_of(e.names.begin(),e.names.end(),[](const auto& name){return !name.text.empty();}))
+                  for(const auto& [target_id,target_unit]:*graph)for(const auto& target:target_unit->functions)if(target.symbol==e.target && target.generic_origin.empty()) {
                     for(unsigned n=0;n<e.names.size();++n)if(!e.names[n].text.empty()) {
                         const auto& parameter=target.parameters.at(e.argument_indexes.at(n));
                         Expr use(Expr::Kind::name,e.names[n]);reference(owner,target.symbol+"::local::"+std::to_string(parameter.slot),use,*unit,false,false);
@@ -7427,7 +7520,7 @@ struct AnalysisAccess {
                     method_record.extent=r;}
                 declaration(std::move(method_record),true,!f.anonymous && !f.display_adapter && !f.json_adapter && !f.global_initializer && f.token.text!="$application");
                 return_components(f);
-                if(!f.asynchronous && !f.anonymous && f.generic_origin.empty() && !f.display_adapter &&
+                if(!presentation && !f.asynchronous && !f.anonymous && f.generic_origin.empty() && !f.display_adapter &&
                    !f.json_adapter && !f.global_initializer && !f.accessor && valid_editor_identifier(f.token.text)) {
                     auto binding=[&](const Token& token,unsigned slot,unsigned argument) {
                         const auto type=f.locals.at(slot);
@@ -7447,6 +7540,7 @@ struct AnalysisAccess {
                 for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
                 std::map<unsigned,std::string> locals;
                 for(const auto& binding:f.editor_bindings) {
+                    if(presentation && f.locals.at(binding.slot)==error_type)continue;
                     if(!f.generic_origin.empty() || f.display_adapter || f.json_adapter || (f.global_initializer && !valid_editor_identifier(binding.token.text)))continue;
                     const bool parameter=(f.receiver && f.receiver->slot==binding.slot) ||
                         std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;});
@@ -7469,6 +7563,10 @@ struct AnalysisAccess {
                 std::function<void(const std::vector<Statement>&)> body;
                 body = [&](const auto& statements) {
                     for (const auto& s : statements) {
+                        if(presentation && !s.editor_checked) {
+                            body(s.body);body(s.otherwise);
+                            continue;
+                        }
                         auto owner = f.symbol;
                         if (s.readonly) {
                             owner += "::const::" + s.name + "::" + std::to_string(names[s.name]++);
@@ -7479,7 +7577,8 @@ struct AnalysisAccess {
                         if(s.kind==Statement::Kind::assignment && locals.contains(s.slot) && !s.selection) {
                             Expr use(Expr::Kind::name,s.token);reference(owner,locals.at(s.slot),use,*unit,false,false);
                         }
-                        if (s.kind == Statement::Kind::assignment && !s.fields.empty()) {
+                        if (s.kind == Statement::Kind::assignment && !s.fields.empty() &&
+                            s.field_indexes.size()==s.fields.size()) {
                             auto t = f.locals.at(s.slot);
                             for (unsigned n = 0; n < s.fields.size(); ++n) {
                                 Expr use(Expr::Kind::name,s.fields[n]); reference(owner,t.definition->fields.at(s.field_indexes[n]).owner + "::field::" + s.fields[n].text,use,*unit,s.implicit_fields[n]);
@@ -7613,7 +7712,10 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
         check.bind(anchor.source,seed);
         try {
             again.load(anchor, {TokenKind::path, first.identity, 0});
-            check.finish();
+            // For ordinary checking, report repeated parse errors from the
+            // original graph alongside any independent semantic diagnostics.
+            // Keep the existing parse gates for completion and presentation.
+            if(editor || recovery || !diagnostics.same_errors(check))check.finish_parse();
         } catch(const CompilationError& failure) { throw check.owned_failure(failure); }
         bool same = graph.units.size() == again.units.size();
         for (const auto& [id, unit] : graph.units) {
@@ -7643,7 +7745,8 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
     }
     auto identity = first.identity;
     if(editor && recovery)return {};
-    return AnalysisAccess::build(std::move(graph.units), identity,diagnostics.warnings(),{}, {}, {}, true, {}, document || recovery);
+    return AnalysisAccess::build(std::move(graph.units), identity,diagnostics.warnings(),{}, {}, {}, true, {},
+        document || recovery,recovery && recovery->presentation);
     } catch(const CompilationError& failure) { throw diagnostics.owned_failure(failure); }
 }
 void require_module_identity(const std::string& identity) {
@@ -7779,6 +7882,78 @@ bool valid_editor_identifier(const std::string& name) {
     return !name.empty() && letter(name[0]) && !reserved.contains(name) &&
         std::all_of(name.begin(),name.end(),[](char c){return letter(c)||digit(c);});
 }
+std::optional<EditorAssistance> editor_namespace_assistance(const ValidatedAnalysis& known,const SourceFile& source,
+    const std::string& module,std::size_t cursor) {
+    const auto found=std::find_if(known.modules().begin(),known.modules().end(),[&](const auto& m){return m.identity==module;});
+    if(found==known.modules().end() || found->qualifiers.empty() || cursor>source.text().size())return {};
+    const auto& text=source.text();
+    const auto line=source.location(cursor).line-1;
+    const auto start=source.line_starts().at(line);
+    const auto stop=text.find_first_of("\r\n",cursor);
+    if(stop==std::string::npos)return {};
+    auto first=text.find_first_not_of(" \t",start);
+    if(first==std::string::npos || first==start || first>=cursor)return {};
+    auto dot=text.find('.',first);
+    if(dot==std::string::npos || dot>=cursor)return {};
+    const auto receiver=text.substr(first,dot-first);
+    auto target=found->qualifiers.find(receiver);
+    if(target==found->qualifiers.end())return {};
+    // Limit this lane to a single incomplete, standalone qualified selection.
+    // Strings, comments, type positions, chained values and call arguments
+    // continue to use the parser and binder on the current context.
+    auto name=std::string_view(text).substr(dot+1,stop-dot-1);
+    auto last=name.find_last_not_of(" \t");
+    name=name.substr(0,last==std::string_view::npos?0:last+1);
+    if(dot+1+name.size()<cursor ||
+       name.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")!=std::string_view::npos)return {};
+    const auto& before=found->source.text();
+    if(before.size()<start || before.compare(0,start,text,0,start)!=0)return {};
+    const auto previous_stop=before.find_first_of("\r\n",start);
+    const auto next_line=stop+(text.compare(stop,2,"\r\n")==0?2:1);
+    const bool replaced=previous_stop!=std::string::npos &&
+        before.compare(previous_stop,std::string::npos,text,stop,std::string::npos)==0;
+    const bool inserted=before.compare(start,std::string::npos,text,next_line,std::string::npos)==0;
+    if(!replaced && !inserted)return {};
+    // A per-line comparison alone cannot tell whether the line sits in a
+    // multiline string. Use the actual lexer and require a physical name/dot.
+    Diagnostics diagnostics;
+    EditorRecovery recovery{module,{}};
+    const auto lexed=lex(source,diagnostics,0,std::string::npos,0,false,&recovery);
+    if(diagnostics.failed() || !std::any_of(lexed.begin(),lexed.end(),[&](const auto& token){
+        return token.offset==dot && token.kind==TokenKind::symbol && token.text==".";
+    }))return {};
+    EditorAssistance out;out.begin=dot+1;out.end=dot+1+name.size();
+    const auto prefix=name.substr(0,cursor-out.begin);
+    std::map<std::string,EditorCandidate> candidates;
+    auto consider=[&](const AnalyzedDeclaration& d) {
+        if(d.module!=target->second || !source_visible(d.visibility,d.module,module) ||
+           !d.source.source || d.source.end<=d.source.begin)return;
+        const auto label=d.source.source->text().substr(d.source.begin,d.source.end-d.source.begin);
+        if(!label.starts_with(prefix) || !valid_editor_identifier(label))return;
+        using K=AnalyzedDeclaration::Kind;
+        int kind;
+        std::string detail;
+        switch(d.kind) {
+        case K::function: kind=3;break;
+        case K::global_variable: kind=6;break;
+        case K::module_constant: if(d.editor_symbol_kind==22)return;kind=21;break;
+        case K::value_structure: case K::managed_structure: case K::interface_type:
+            kind=7;detail=d.generic_template?"generic type":"type";break;
+        default:return;
+        }
+        if(d.builtin)return;
+        if(detail.empty())detail=!d.signature.empty() && d.kind==K::function?d.signature:ir::type_name(d.type);
+        candidates.try_emplace(label,EditorCandidate{label,std::move(detail),kind,{},
+            d.documentation.text(d.kind==K::function && d.type!=Type::none)});
+    };
+    for(const auto& d:known.declarations())consider(d);
+    for(const auto& d:known.editor_declarations())consider(d);
+    for(auto& [label,candidate]:candidates) {
+        if(out.candidates.size()==2048){out.incomplete=true;break;}
+        out.candidates.push_back(std::move(candidate));
+    }
+    return out.candidates.empty()?std::nullopt:std::optional(std::move(out));
+}
 EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor,ProjectCapture* project=nullptr,const std::optional<std::string>& project_entry={},bool document=false,const EditorDiscovery* discovery=nullptr) {
     const bool locked_source=project && package_source(module);
     if(!locked_source)require_module_identity(module);
@@ -7790,7 +7965,8 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     if(cursor>text.size() || text.find("_void_editor_cursor_")!=std::string::npos) return empty;
     if(auto imports=import_assistance(entry,overrides,module,source,cursor,project))return *imports;
     if(locked_source)return empty;
-    Diagnostics diagnostics;auto tokens=lex(source,diagnostics);
+    EditorRecovery token_recovery{module,{}};
+    Diagnostics diagnostics;auto tokens=lex(source,diagnostics,0,std::string::npos,0,true,&token_recovery);
     if(diagnostics.failed()) return empty;
     std::size_t begin=cursor,end=cursor;
     bool format_context=false,operator_context=false;
@@ -7825,7 +8001,8 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     if(!format_context && !operator_context) {
     // Repair physical delimiters only; interpolation lowering adds synthetic
     // parentheses at expression offsets that are not source characters.
-    Diagnostics physical_diagnostics;auto physical=lex(source,physical_diagnostics,0,std::string::npos,0,false);
+    EditorRecovery physical_recovery{module,{}};
+    Diagnostics physical_diagnostics;auto physical=lex(source,physical_diagnostics,0,std::string::npos,0,false,&physical_recovery);
     if(physical_diagnostics.failed())return empty;
     int parentheses=0;
     for(const auto& t:physical)if(t.offset>=line && t.offset<begin){if(t.text=="(")++parentheses;else if(t.text==")")--parentheses;}

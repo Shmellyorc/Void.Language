@@ -141,6 +141,7 @@ class SessionAnalysis {
     std::shared_ptr<const ValidatedAnalysis> semantic_;
     std::map<std::string, EditorDocumentAnalysis> editor_documents_;
     std::map<std::string, EditorRecoveryAnalysis> recovery_;
+    std::map<std::string, EditorRecoveryAnalysis> presentation_;
     bool project_root_available_ = true;
 public:
     const ProjectSnapshot& snapshot() const { return snapshot_; }
@@ -159,6 +160,10 @@ public:
             return found->second.index?&*found->second.index:nullptr;
         return index_.get();
     }
+    const EditorRecoveryAnalysis* presentation_for(const std::string& document) const {
+        auto found=presentation_.find(document);
+        return found==presentation_.end()?recovery_for(document):&found->second;
+    }
     bool succeeded() const {return project_?project_->succeeded():result_.succeeded();}
 };
 struct ProjectSession {std::filesystem::path root; std::optional<std::string> entry = {};};
@@ -168,7 +173,8 @@ class ToolingSession {
     ProjectSnapshot current_;
     std::vector<std::string> changed_;
     std::shared_ptr<const SessionAnalysis> latest_, last_success_;
-    InvalidationPlan accepted_plan_;
+    std::shared_ptr<const ValidatedAnalysis> comparison_base_;
+    std::vector<std::string> comparison_changes_;
     std::string selected_context_;
     void change(const std::string&, DocumentRevision, std::optional<SourceFile>, bool close);
     bool manifest_document(const std::string&) const;
@@ -190,7 +196,7 @@ public:
     bool matches_selection(const ProjectAnalysis&) const;
     bool requires_reselection() const;
     ProjectSnapshot select() const { return current_; }
-    static std::shared_ptr<const SessionAnalysis> analyze(ProjectSnapshot);
+    static std::shared_ptr<const SessionAnalysis> analyze(ProjectSnapshot, bool presentation = false);
     bool accept(std::shared_ptr<const SessionAnalysis>);
     bool is_current(const SessionAnalysis& result) const {
         return current_.same_revision(result.snapshot()) && (!result.project_root_available() || project_root_current());

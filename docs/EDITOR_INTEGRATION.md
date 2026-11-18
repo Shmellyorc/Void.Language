@@ -348,8 +348,9 @@ spelling, source docs, known-root navigation and readonly installed sources.
 
 ### VS Code / VSCodium
 
-VOID editors insert tabs by default. Set `void.editor.useTabs` to `false` in
-user or workspace settings to insert four spaces instead. Tabs display at four
+VOID editors follow the first indented code line of an existing file. Files
+without indentation start with tabs. Set `void.editor.useTabs` to `true` for
+tabs or `false` for four spaces to override this choice. Tabs display at four
 columns. Changing the setting preserves existing text. **Format Document**
 uses the active indentation style when the compiler can verify the edit.
 
@@ -379,9 +380,9 @@ Build an owner-local package with pinned Node 24.19.0 and existing locked depend
 npm --prefix editors/vscode test
 npm --prefix editors/vscode run package
 # Generic VSIX: configure/install voidls separately.
-code --install-extension editors/vscode/dist/void-language-0.1.0.vsix
+code --install-extension editors/vscode/dist/void-language-0.1.2.vsix
 # VSCodium uses the same offline workflow (execution remains separately verified):
-codium --install-extension editors/vscode/dist/void-language-0.1.0.vsix
+codium --install-extension editors/vscode/dist/void-language-0.1.2.vsix
 ```
 
 Prepare a shared native archive and a matching private platform VSIX:
@@ -623,7 +624,7 @@ projects are unsupported. Remote editor scenarios were not locally verified.
 From `editors/vscode/`, using Node 24.19.0 and the locked dependencies:
 
 ```sh
-if npm ci && npm run package && code --install-extension dist/void-language-0.1.0.vsix; then
+if npm ci && npm run package && code --install-extension dist/void-language-0.1.2.vsix; then
   printf '%s\n' 'VOID extension installed.'
 else
   printf 'VOID setup stopped with exit status %s. See the failing command above.\n' "$?" >&2
@@ -675,17 +676,27 @@ executes that code or publishes a native replacement.
 ## Lifecycle, trust and logs
 
 **VOID: Restart Language Server** stops the existing client and starts a fresh
-session. Entry/executable/trace setting changes also restart serially. Missing,
+session. Entry and executable setting changes also restart serially. Missing,
 non-file or non-executable server paths are validated and reported; spawn and
 startup failures are logged through the client and the VOID channel. Unexpected
 termination is reported without an automatic restart loop. Closing the editor or
 disabling the extension invokes the same asynchronous disposal lifecycle.
 
-View **Output → VOID** for startup errors/server stderr. Optional trace levels are
-`off`, `messages`, `verbose`; verbose traces can contain source text. The standard
-client may send optional `$/setTrace` notifications, which this minimal server logs
-as unsupported; compiler diagnostics/navigation are unaffected. All server protocol
-output remains on its private child stdout pipe.
+**Output → VOID** shows startup and shutdown, operational warnings, failed
+operations, persistent compiler diagnostics with their location and code, and
+unexpected server exits marked `CRASH`. Problems shows live compiler diagnostics.
+**Output → VOID LSP Trace** records optional protocol traffic. Set
+`void.trace.server` to `off`, `messages` (method and timing), or `verbose`
+(including message bodies, which may contain source text). Trace settings take
+effect on the running connection. The server protocol uses a private child stdout
+pipe.
+
+VS Code opts into interactive presentation. During edits, `voidls` can
+retain semantic colors for unchanged complete lines while it checks the
+newest document in the background. It publishes checked colors and Problems
+for the current revision. A source error can prevent coloring the broken
+expression while nearby checked code still has semantic colors. Formatting,
+rename and quick-fix edits require a current compiler check.
 
 Restricted Mode permits highlighting but **never launches native analysis**, even
 when a workspace configures an executable. Trust is checked before path validation

@@ -162,23 +162,26 @@ export function libraryCommands(selected: () => Promise<Selection>, output: vsco
                     library.verifySource?.();
                     return invoke(project, [command, ...library.args, '--edit-token', token], false);
                 });
-            if (result.trim()) output.appendLine(result.trim());
+            if (result.trim()) output.info(result.trim());
             const message = `VOID: ${command === 'add' ? 'Added' : 'Removed'} ${library.label} ${command === 'add' ? 'to' : 'from'} ${basename(project.root)}.`;
             let advice: string | undefined;
             try { await project.refresh(); }
-            catch { advice = 'Use VOID: Refresh Project to update editor diagnostics.'; }
+            catch (error) {
+                output.warn(`Refresh VOID libraries for ${project.root}: ${String(error)}`);
+                advice = 'Use VOID: Refresh Project to update editor diagnostics.';
+            }
             try {
                 const checked = await invoke(project, ['tidy', '--check'], true);
-                if (checked.trim()) output.appendLine(checked.trim());
+                if (checked.trim()) output.info(checked.trim());
             } catch (error) {
-                output.appendLine(`VOID tidy --check: ${error instanceof Error ? error.message : String(error)}`);
+                output.warn(`VOID tidy --check for ${project.root}: ${error instanceof Error ? error.message : String(error)}`);
                 advice ??= 'Review the dependency check in Output → VOID.';
             }
             if (advice) void vscode.window.showWarningMessage(`${message} ${advice}`);
             else void vscode.window.showInformationMessage(message);
         } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
-            output.appendLine(`VOID ${title}: ${message}`);
+            output.error(`VOID ${title}: ${message}`);
             void vscode.window.showErrorMessage(`VOID ${title}: ${message.split(/\r?\n/).slice(0, 6).join('\n')}`);
         } finally {
             active = false;
