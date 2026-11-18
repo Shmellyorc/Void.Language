@@ -1,0 +1,44 @@
+use pkg/raylib as rl
+
+func load_ship() -> rl.texture?:
+    var image = rl.load_image("assets/ship.png")
+    if image == null:
+        print("Could not load assets/ship.png. Launch from the game folder.")
+        return null
+    var pixels = image as rl.image
+    defer rl.unload_image(pixels)
+    return rl.load_texture_from_image(pixels)
+
+func main() -> i32:
+    var opened = rl.init_window(640, 360, "Star Harbor")
+    if opened == null:
+        return 1
+    var window = opened as rl.window
+    defer rl.close_window(window)
+
+    var uploaded = load_ship()
+    if uploaded == null:
+        return 1
+    var ship = uploaded as rl.texture
+    defer rl.unload_texture(ship)
+
+    var x: i32 = 296
+    var y: i32 = 220
+    rl.set_target_fps(60)
+    for not rl.window_should_close():
+        if rl.is_key_down(rl.key_left) and x > 4:
+            x -= 4
+        if rl.is_key_down(rl.key_right) and x < 588:
+            x += 4
+        if rl.is_key_down(rl.key_up) and y > 4:
+            y -= 4
+        if rl.is_key_down(rl.key_down) and y < 308:
+            y += 4
+
+        rl.begin_drawing()
+        rl.clear_background(rl.darkblue())
+        rl.draw_text("STAR HARBOR", 16, 16, 24, rl.white())
+        rl.draw_text("Arrow keys to fly | Esc to quit", 16, 326, 18, rl.skyblue())
+        rl.draw_texture(ship, x, y, rl.white())
+        rl.end_drawing()
+    return 0
