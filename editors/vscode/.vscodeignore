@@ -3,6 +3,7 @@
 !README.md
 !LICENSE.txt
 !language-configuration.json
+!icons/void-extension.png
 !syntaxes/**
 !dist/extension.js
 !dist/THIRD_PARTY_NOTICES.txt

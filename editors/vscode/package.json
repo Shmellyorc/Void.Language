@@ -2,6 +2,7 @@
   "name": "void-language",
   "displayName": "VOID Language",
   "description": "VOID compiler language assistance, navigation, guarded rename, formatting and diagnostics.",
+  "icon": "icons/void-extension.png",
   "version": "0.1.2",
   "publisher": "void-language",
   "license": "MIT",
