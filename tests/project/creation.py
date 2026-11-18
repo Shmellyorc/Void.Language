@@ -210,15 +210,24 @@ try:
             assert manifest(created)["project"]["name"] == project
             run("run", "--project", created)
             launch = created / ".vscode/launch.json"
-            if sys.platform.startswith("linux") and os.uname().machine == "x86_64":
+            linux_launch = sys.platform.startswith("linux") and os.uname().machine == "x86_64"
+            windows_launch = sys.platform == "win32" and os.environ.get("PROCESSOR_ARCHITECTURE", "").lower() == "amd64"
+            if linux_launch or windows_launch:
                 actual = json.loads(launch.read_text())["configurations"]
+                debugger = ({"type": "lldb-dap", "disableASLR": False} if linux_launch else
+                            {"type": "cppdbg", "MIMode": "gdb", "miDebuggerPath": "gdb.exe", "externalConsole": False})
                 assert actual == [{
-                    "name": "VOID Debug project", "type": "lldb-dap", "request": "launch",
+                    **debugger, "name": "VOID Debug project", "request": "launch",
+                    "preLaunchTask": "VOID: Build Debug Project",
                     "program": "${command:void.debugProjectProgram}", "cwd": "${command:void.debugProjectRoot}",
-                    "disableASLR": False,
                 }]
+                assert json.loads((created / ".vscode/tasks.json").read_text()) == {
+                    "version": "2.0.0", "tasks": [{"label": actual[0]["preLaunchTask"], "type": "void",
+                                                   "command": "debugBuild", "problemMatcher": "$void-compiler"}]}
+                assert json.loads((created / ".vscode/settings.json").read_text()) == {"debug.onTaskErrors": "abort"}
+                assert manifest(created)["build"]["debug"]["debug_info"] == "full"
             else:
-                assert not launch.exists()
+                assert not (created / ".vscode").exists()
 
         run("new", "classlib", "--name", "MyMath")
         run("new", "lib", "--name", "LegacyMath")

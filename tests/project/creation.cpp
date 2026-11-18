@@ -197,7 +197,8 @@ int main(int argc,char** argv) {
         check(inspect_creation_root(here).identity==into_current.parent.identity,
               "In-place publication replaced the original directory");
         check(fs::is_regular_file(here/"void.project.toml") && fs::is_regular_file(here/"src/app.void") &&
-              fs::is_regular_file(here/".vscode/launch.json"),"In-place publication lost project files");
+              fs::is_regular_file(here/".vscode/launch.json") && fs::is_regular_file(here/".vscode/tasks.json") &&
+              fs::is_regular_file(here/".vscode/settings.json"),"In-place publication lost project files");
 #if defined(_WIN32) || defined(__linux__)
         const auto package_parent=fixture.root/"package parent";
         fs::create_directory(package_parent);

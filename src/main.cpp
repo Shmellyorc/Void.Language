@@ -534,7 +534,7 @@ int create_project(const std::string& command,int argc,char** argv) {
     }
     if(!destination && options.new_directory)throw UsageError("new requires a destination PATH.");
     options.in_place=options.new_directory && (*destination=="." || *destination=="./");
-#if defined(__linux__) && defined(__x86_64__)
+#if (defined(__linux__) && defined(__x86_64__)) || (defined(_WIN32) && (defined(_M_X64) || defined(__x86_64__)))
     options.app_launch=starter=="app";
 #endif
     if(options.source && !options.new_directory)throw UsageError("--source is only available with new.");
@@ -553,8 +553,13 @@ int create_project(const std::string& command,int argc,char** argv) {
     if(app)std::cout<<"Automatic application selection requires one eligible main(). Use --entry for a deliberate override.\n";
     if(starter=="app") {
         std::cout<<"Run the starter from its directory with voidc run . or use VOID: Run Project in VS Code.\n";
-        if(options.app_launch)
-            std::cout<<"For F5 on Linux x64, build the Debug executable and configure the LLVM LLDB DAP extension.\n";
+        if(options.app_launch) {
+#ifdef _WIN32
+            std::cout<<"For F5 on Windows x64, install Microsoft C/C++ in VS Code and put native GDB 17.2 on PATH. F5 builds the Debug executable before launching.\n";
+#else
+            std::cout<<"For F5 on Linux x64, configure the LLVM LLDB DAP extension. F5 builds the Debug executable before launching.\n";
+#endif
+        }
     }
     return 0;
 }

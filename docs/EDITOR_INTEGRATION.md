@@ -8,8 +8,8 @@ The language server verifies the project lock and the package catalog from
 the project. Completions at `rl.`, typed hover, physical-source definitions,
 semantic tokens and diagnostics use the same declarations as the compiler.
 Parameter hints follow the existing documentation policy. Package refresh
-uses the existing watched-file pipeline. Run or build with explicit native
-authorization in the terminal. [Bundled raylib](NATIVE_LIBRARIES.md#bundled-raylib)
+uses the existing watched-file pipeline. To review and save native approval,
+open a regular interactive terminal in the project and run `voidc run .`. [Bundled raylib](NATIVE_LIBRARIES.md#bundled-raylib)
 
 
 ## VS Code project commands
@@ -29,8 +29,10 @@ arguments as separate strings in `void.tasks.runArguments`. Set
 `void.compiler.path` if the matching `voidc` is installed separately from
 `voidls`. Save dirty VOID sources and manifests in the selected root before
 launch. The task terminal shows output and the exit status, and compiler
-diagnostics appear in Problems. Use a regular terminal for TTY applications
-or explicit `--allow-native` authorization.
+diagnostics appear in Problems. These tasks use pipes. They do not prompt
+for native approval, use a saved approval, or add `--allow-native`. Use a
+regular interactive terminal for G63 approval or TTY applications. For
+automation, supply `--allow-native` deliberately on the CLI.
 
 Open VOID sources within the project get compiler-owned semantic highlighting,
 completion, hover, signatures, definitions, formatting and diagnostics from
@@ -93,18 +95,36 @@ a trusted folder in VS Code with the VOID extension and matching
 in the task terminal. The equivalent CLI command inside the project is
 `voidc run .`.
 
-On Linux x64, the app starter includes the **VOID Debug project**
-launch configuration. Install [LLVM's LLDB DAP extension](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.lldb-dap)
-and set `lldb-dap.executable-path` to LLVM 23.1.4's `lldb-dap`.
-Select the Debug task profile, save the source and run **VOID: Build
-Project**. Then press **F5** with **VOID Debug project** selected. It
-launches the built executable. Rebuild after changing source. Use
-the settings in the next section to enable source breakpoints and
-stepping.
+Install the debugger for your host:
 
-On Windows, use **VOID: Run Project** or the CLI. The generated F5
-launch workflow is for Linux x64. `classlib` generates a library
-manifest and source with a public declaration.
+- **Linux x64:** Install [LLVM's LLDB DAP extension](https://marketplace.visualstudio.com/items?itemName=llvm-vs-code-extensions.lldb-dap)
+  and set `lldb-dap.executable-path` to LLVM 23.1.4's `lldb-dap`.
+- **Windows x64:** Install [Microsoft C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools),
+  put native GDB 17.2 (`gdb.exe`) on PATH, and restart VS Code if you just
+  changed PATH. The starter uses the C/C++ extension's GDB adapter
+  (`cppdbg`) with the executable's embedded DWARF.
+
+Use the matching VOID extension, select **VOID Debug project**, and
+press **F5**. The generated prelaunch task builds the saved application
+in the Debug profile and then launches it. No manual build is needed,
+even the first time you open the folder. The starter enables full native
+debug information for source breakpoints, stepping and supported scalar
+locals. The general `void.tasks.profile` setting still controls the
+ordinary project commands; F5 always chooses Debug.
+
+The starter sets `debug.onTaskErrors` to `abort` so a failed build
+cannot launch an old executable. Keep `abort` or `showErrors` for this
+launch. If you switch the selected project or entry during a debug
+session, stop it and start F5 again. The JIT may report that the
+profile's native debug information is unavailable during **Run
+Project**; that warning does not prevent running the application.
+
+Use **VOID: Run Project** or the CLI if the debugger is unavailable.
+The tested Windows adapter can misreport a nonzero application exit
+code; confirm exact status through Run Project or the executable
+directly. `classlib` (or `lib`) creates a library
+without application debug files. Custom templates keep their authored
+files.
 
 ## Native AOT source debugging
 
@@ -136,10 +156,11 @@ On Linux x64, install the official **LLDB DAP** extension and set
 }
 ```
 
+This manual recipe is for projects without a generated prelaunch task.
 The command variables use the selected manifest and entry from `voidls`.
 They require a trusted workspace, a current application selection, saved
 project buffers, the adapter and an existing executable at the normal build
-path. The launch uses the existing executable. Set a breakpoint in a
+path. Set a breakpoint in a
 `.void` file and start debugging from Run and Debug. Put application
 arguments in the launch configuration's `args` array.
 
@@ -147,8 +168,9 @@ On Linux, the pinned LLDB 23.1.4 command line also opens the ELF executable.
 On Windows 10 x64, native GDB 17.2 opens the MSVC-targeted executable and
 reads its embedded DWARF. Open the exact executable reported by Build.
 In either debugger, use a file-and-line breakpoint and step past a scalar
-declaration before inspecting it. The VS Code launch recipe is qualified
-on Linux x64. Windows qualification uses GDB directly. Asynchronous frames,
+declaration before inspecting it. The manual LLDB
+recipe above is for Linux. The built-in Windows starter uses the
+`cppdbg`/GDB route described above; GDB also works directly. Asynchronous frames,
 captured locals, nested lexical scopes and managed values lack a qualified
 inspection contract.
 

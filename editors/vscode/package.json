@@ -21,6 +21,7 @@
     "onLanguage:void",
     "onLanguage:toml",
     "workspaceContains:void.project.toml",
+    "onTaskType:void",
     "onCommand:void.debugProjectProgram",
     "onCommand:void.debugProjectRoot"
   ],
@@ -105,6 +106,13 @@
       {
         "command": "void.resetCreationPrompt",
         "title": "VOID: Reset Project Creation Prompt"
+      }
+    ],
+    "taskDefinitions": [
+      {
+        "type": "void",
+        "required": ["command"],
+        "properties": {"command": {"type": "string"}}
       }
     ],
     "problemMatchers": [

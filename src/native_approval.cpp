@@ -27,7 +27,10 @@ namespace fs = std::filesystem;
 using namespace project;
 constexpr std::string_view record_header = "VOID native approval 1\n";
 constexpr std::size_t record_limit = 16 * 1024, approval_limit = 4096;
-constexpr auto missing_approval = "This project declares native code. Pass --allow-native to authorize this invocation, or approve the verified provider in a terminal.";
+constexpr auto missing_approval =
+    "This project declares native code. Pass --allow-native to explicitly authorize this invocation.\n"
+    "To review and save approval, open an ordinary interactive terminal in the project and run 'voidc run .'. "
+    "Saved approvals require a terminal; an editor task using pipes cannot use one.";
 
 bool valid_id(std::string_view id) {
     return id.size()==64 && std::ranges::all_of(id,[](char c) {

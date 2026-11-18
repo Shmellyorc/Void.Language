@@ -1109,13 +1109,40 @@ constexpr std::string_view app_launch_json=R"json({
   "configurations": [
     {
       "name": "VOID Debug project",
-      "type": "lldb-dap",
-      "request": "launch",
+)json"
+#ifdef _WIN32
+R"json(      "type": "cppdbg",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb.exe",
+      "externalConsole": false,
+)json"
+#else
+R"json(      "type": "lldb-dap",
+      "disableASLR": false,
+)json"
+#endif
+R"json(      "request": "launch",
+      "preLaunchTask": "VOID: Build Debug Project",
       "program": "${command:void.debugProjectProgram}",
-      "cwd": "${command:void.debugProjectRoot}",
-      "disableASLR": false
+      "cwd": "${command:void.debugProjectRoot}"
     }
   ]
+}
+)json";
+constexpr std::string_view app_tasks_json=R"json({
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "VOID: Build Debug Project",
+      "type": "void",
+      "command": "debugBuild",
+      "problemMatcher": "$void-compiler"
+    }
+  ]
+}
+)json";
+constexpr std::string_view app_editor_settings=R"json({
+  "debug.onTaskErrors": "abort"
 }
 )json";
 }
@@ -1152,6 +1179,7 @@ CreationPlan plan_creation(const fs::path& requested,const CreationOptions& opti
     if(!app)text+="\nname = "+toml_string(package);
     if(!app && starter)text+="\nentry = "+toml_string(*starter);
     if(starter)text+="\n\n[sources]\nroots = ["+toml_string(starter_parent(*starter))+"]";
+    if(options.app_launch)text+="\n\n[build.debug]\ndebug_info = \"full\"";
     text+='\n';
     auto parsed=parse_manifest(SourceFile(path_utf8(root/manifest_name),std::move(text)));
     if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
@@ -1236,7 +1264,11 @@ void publish_creation(const CreationPlan& plan,CreationCheckpoint before_publish
             (void)starter_parent(*plan.starter);
             stage_file(utf8_path(*plan.starter),starter_text);
         }
-        if(plan.app_launch)stage_file(".vscode/launch.json",app_launch_json);
+        if(plan.app_launch) {
+            stage_file(".vscode/launch.json",app_launch_json);
+            stage_file(".vscode/tasks.json",app_tasks_json);
+            stage_file(".vscode/settings.json",app_editor_settings);
+        }
         if(before_publish)before_publish(stage);
         auto rechecked=inspect_creation_root(parent.path);
         if(rechecked.identity!=plan.parent.identity)throw std::runtime_error("Project directory changed before publication.");

@@ -250,6 +250,7 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     piped = subprocess.run([str(compiler), 'run', '.'], cwd=project, env=terminal,
                            capture_output=True, input=b'approve\n', timeout=90)
     assert piped.returncode==2 and piped.stdout==b'' and b'Pass --allow-native' in piped.stderr, piped
+    assert b"run 'voidc run .'" in piped.stderr and b'editor task using pipes cannot use one' in piped.stderr, piped
     explicit = subprocess.run([str(compiler), 'run', '.', '--allow-native'], cwd=project, env=dict(terminal, CI='true'),
                               capture_output=True, stdin=subprocess.DEVNULL, check=True, timeout=90)
     assert explicit.stdout.replace(b'\r\n', b'\n')==b'42\n' and not explicit.stderr, explicit

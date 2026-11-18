@@ -2,7 +2,9 @@ import * as vscode from 'vscode';
 import {spawn, ChildProcessWithoutNullStreams} from 'node:child_process';
 import {constants} from 'node:os';
 
-export function compilerExecution(compiler: string, args: string[], cwd: string): vscode.CustomExecution {
+export interface CompilerInvocation {compiler: string; args: string[]; cwd: string}
+
+export function compilerExecution(invocation: CompilerInvocation | (() => Promise<CompilerInvocation>)): vscode.CustomExecution {
     // Task ProcessExecution substitutes ${...} in paths and arguments. Launch
     // directly so the compiler and application receive the exact argument vector.
     return new vscode.CustomExecution(async () => {
@@ -10,11 +12,25 @@ export function compilerExecution(compiler: string, args: string[], cwd: string)
         const finished = new vscode.EventEmitter<number>();
         let process: ChildProcessWithoutNullStreams | undefined;
         let launchFailed = false;
+        let closed = false;
+        const finish = (code: number) => {
+            finished.fire(code);
+            output.dispose();
+            finished.dispose();
+        };
         return {
             onDidWrite: output.event,
             onDidClose: finished.event,
-            open: () => {
-                process = spawn(compiler, args, {cwd, shell: false, windowsHide: true});
+            open: async () => {
+                try {
+                    const {compiler, args, cwd} = typeof invocation === 'function' ? await invocation() : invocation;
+                    if (closed) { finish(1); return; }
+                    process = spawn(compiler, args, {cwd, shell: false, windowsHide: true});
+                } catch (error) {
+                    output.fire(`VOID: ${error instanceof Error ? error.message : String(error)}\r\n`);
+                    finish(1);
+                    return;
+                }
                 const streamOutput = (stream: NodeJS.ReadableStream) => {
                     let previousCR = false;
                     stream.setEncoding('utf8').on('data', (chunk: string) => {
@@ -31,14 +47,12 @@ export function compilerExecution(compiler: string, args: string[], cwd: string)
                 });
                 process.on('close', (code, signal) => {
                     process = undefined;
-                    finished.fire(launchFailed ? 1 : code ?? (signal ? 128 + constants.signals[signal] : 1));
-                    output.dispose();
-                    finished.dispose();
+                    finish(launchFailed ? 1 : code ?? (signal ? 128 + constants.signals[signal] : 1));
                 });
                 // The child may exit or close its stdin while the user is typing.
                 process.stdin.on('error', () => undefined);
             },
-            close: () => { process?.kill(); },
+            close: () => { closed = true; process?.kill(); },
             handleInput: input => {
                 if (input === '\x03') process?.kill('SIGINT');
                 else if (input === '\x04') process?.stdin.end();

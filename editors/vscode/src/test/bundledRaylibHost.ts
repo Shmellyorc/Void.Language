@@ -88,6 +88,16 @@ export async function run(): Promise<void> {
         assert(await document.save());
         await until(() => vscode.languages.getDiagnostics(uri), items => !items.some(item =>
             item.severity === vscode.DiagnosticSeverity.Error), 'valid unsaved-source recovery');
+        const exits = new Map<vscode.TaskExecution, number | undefined>();
+        const listener = vscode.tasks.onDidEndTaskProcess(event => exits.set(event.execution, event.exitCode));
+        try {
+            for (const command of ['run', 'build']) {
+                const task = await vscode.commands.executeCommand<vscode.TaskExecution>(`void.${command}Project`);
+                assert(task);
+                assert.equal(await until(() => exits.get(task), () => exits.has(task),
+                    `native ${command} task requires terminal approval`), 2);
+            }
+        } finally { listener.dispose(); }
         await fs.writeFile(process.env.VOID_RAYLIB_EDITOR_EVIDENCE!, JSON.stringify({
             status: 'PASS', editor: vscode.version, events, hover, signature, completionCount: completion?.items.length
         }, null, 2));
