@@ -67,7 +67,7 @@ func main() -> i32:
  assert 'entry = "src/raylib.void"' in (package/'void.project.toml').read_text()
  assert not list(package.rglob('*.void.inc'))
  assert 'raylib_checked.void' not in api.read_text()
- inventory=json.loads((package/'inventory.json').read_text());names=set(re.findall(r'^func (\w+)',api.read_text(),re.M))
+ inventory=json.loads((repo/'tools/raylib/inventory.json').read_text());names=set(re.findall(r'^func (\w+)',api.read_text(),re.M))
  assert len(inventory['functions'])==600 and all(f['void_name'] in names for f in inventory['functions'])
  run(compiler,'tidy','--project',project);run(compiler,'tidy','--check','--project',project)
  for profile in ['debug','release']:run(compiler,'run','--project',project,'--allow-native','--profile',profile,text='PHYSICAL: 41')

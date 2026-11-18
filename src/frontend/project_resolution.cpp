@@ -854,7 +854,8 @@ void import_advice(const fs::path& root,const Manifest& manifest,MaintenanceRepo
 static MaintenanceReport add_dependency_impl(const fs::path& requested, AddOptions options,
     const std::function<ProjectFiles()>& prepare_raylib = {},
     const std::function<fs::path()>& clang = {}, bool sanitize=false,
-    const ProjectFiles* registered=nullptr, const fs::path& acquisition_root={}) {
+    const ProjectFiles* registered=nullptr, const fs::path& acquisition_root={},
+    const ProjectFiles* bundled_source=nullptr) {
     if(!valid_editor_identifier(options.alias) || options.alias.size()>128 || bool(options.path)==bool(options.git) ||
        ((options.copy || options.edit_token) && !portable_path_component(options.alias)))
         throw std::invalid_argument("add requires a valid alias and exactly one explicit --path or --git with --rev.");
@@ -906,12 +907,17 @@ static MaintenanceReport add_dependency_impl(const fs::path& requested, AddOptio
         publish_git_snapshot(root,options.git->pin,*snapshot);
     } else {
         const auto source=admit_source_directory(root.path,*options.path);
-        selected=maintenance_manifest(source/manifest_name);
+        if(bundled_source) {
+            files=*bundled_source;
+            selected=maintenance_manifest(source/manifest_name,files.at(std::string(manifest_name)));
+        } else {
+            selected=maintenance_manifest(source/manifest_name);
+            files=local_source_files(source);
+        }
         auto relative=source.lexically_relative(root.path);
         if(relative.empty() || relative==".")throw std::runtime_error("A project cannot depend on itself.");
         if(!registered && !options.copy && *relative.begin()!="..")path=path_utf8(relative);
         else {path="libs/"+options.alias;install_local=true;}
-        files=local_source_files(source);
     }
     if(!selected->package() || !selected->package_entry())throw std::runtime_error("Source must be a VOID library with an explicit package.entry.");
     const auto& identity=*selected->package();
@@ -1289,10 +1295,38 @@ void uninstall_user_package(const std::string& alias) {
     if(!removed)throw std::runtime_error("No user package named '"+alias+"'.");
 }
 
-MaintenanceReport add_verified_raylib(const fs::path& requested, const fs::path& source,
+MaintenanceReport add_verified_raylib(const fs::path& requested, const BundledRaylib& bundle,
     const fs::path& compiler, const fs::path& clang, bool sanitize, const std::optional<std::string>& edit_token) {
     require_outside_user_package_store(requested);
-    return add_dependency_impl(requested, {"raylib", source, {}, false, edit_token}, [&] {
+    // The compiler's build records the exact inventory. An older file left
+    // in an upgraded prefix is neither installed into the project nor used.
+    ProjectFiles source;
+    Digest snapshot;
+    llvm::SmallVector<llvm::StringRef> names;
+    llvm::StringRef(bundle.inventory).split(names, '|');
+    auto remaining=package_bytes;
+    for(const auto name:names) {
+        auto relative=utf8_path(name.str());
+        auto bytes=read_project_input(bundle.source/relative,remaining);
+        remaining-=bytes.size();
+        snapshot.bytes(sha256(bytes)+"  "+name.str()+"\n");
+        for(auto parent=relative.parent_path();!parent.empty();parent=parent.parent_path())
+            source.try_emplace(path_utf8(parent)+"/","");
+        source.emplace(name.str(),std::move(bytes));
+    }
+    if(snapshot.finish()!=bundle.snapshot_sha256)
+        throw std::runtime_error("Bundled raylib source does not match this compiler. Reinstall the matching compiler resources.");
+    constexpr auto receipt_name="SOURCE_ORIGIN.txt";
+    auto receipt=read_project_input(bundle.source/receipt_name,65536);
+    if(sha256(receipt)!=bundle.receipt_sha256)
+        throw std::runtime_error("Bundled raylib source receipt does not match this compiler.");
+    source.emplace(receipt_name,std::move(receipt));
+
+    return add_dependency_impl(requested, {"raylib", bundle.source, {}, false, edit_token}, [&] {
+        constexpr auto preparer_name="raylib-prepare.py";
+        const auto preparer=read_project_input(bundle.source.parent_path()/preparer_name,65536);
+        if(sha256(preparer)!=bundle.preparer_sha256)
+            throw std::runtime_error("Bundled raylib preparation tool does not match this compiler. Reinstall the matching compiler resources.");
         // Find Python through absolute PATH entries only. Never run a program
         // selected from the consumer or execute a script from installed sources.
         llvm::SmallVector<llvm::StringRef> entries;
@@ -1318,7 +1352,18 @@ MaintenanceReport add_verified_raylib(const fs::path& requested, const fs::path&
         const auto scratch=utf8_path(temp.str().str());
         const auto catalog=scratch/"catalog";
         try {
-            std::vector<std::string> args{*python,"-I","-B",path_utf8(source/"prepare.py"),"--bundled",
+            // Stage verified bytes before invoking Python or Clang. Neither
+            // process reads executable inputs from the package or installation.
+            std::map<std::string,std::string_view> inputs{{"raylib/",""},{preparer_name,preparer}};
+            for(const auto& [name,bytes]:source)inputs.emplace("raylib/"+name,bytes);
+            publish_project_directory(inspect_creation_root(scratch),"inputs",inputs,
+                [&](const fs::path& directory,const ProjectDirectoryReader& reader) {
+                    const auto staged=read_package_directory(directory,reader);
+                    if(staged.size()!=inputs.size() || !std::equal(staged.begin(),staged.end(),inputs.begin(),
+                        [](const auto& left,const auto& right) {return left.first==right.first && left.second==right.second;}))
+                        throw std::runtime_error("Bundled raylib preparation inputs changed during staging.");
+                });
+            std::vector<std::string> args{*python,"-I","-B",path_utf8(scratch/"inputs"/preparer_name),"--bundled",
                 "--voidc",path_utf8(compiler),"--clang",path_utf8(clang),"--managed-catalog",path_utf8(catalog)};
             if(sanitize)args.emplace_back("--sanitize");
             const std::vector<llvm::StringRef> refs(args.begin(),args.end());
@@ -1335,7 +1380,7 @@ MaintenanceReport add_verified_raylib(const fs::path& requested, const fs::path&
             fs::remove_all(scratch,ignored);
             throw;
         }
-    });
+    },{},false,nullptr,{},&source);
 }
 
 MaintenanceReport tidy_dependencies(const fs::path& requested,bool check) {

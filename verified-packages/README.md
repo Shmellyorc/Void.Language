@@ -1,16 +1,13 @@
-# VOID source package collection
+# VOID source packages
 
-These are first-party, independently versioned VOID source libraries. They are
-separate from `stdlib`. Each package has its own `void.project.toml`, identity,
-version and entry. Fetching source never prepares or executes native code.
+Each library has its own `void.project.toml`, package ID, version and
+public entry. Use `voidc add` for application dependencies and
+`voidc package install` to register a library for reuse across projects.
+Git dependencies record an exact commit and package directory in the
+consumer's manifest and lock.
 
-Use the existing Git dependency mechanism: HTTPS origin, full lowercase commit
-SHA, package `subdir`, explicit `voidc deps fetch`, `voidc resolve`, `void.lock`
-and `pkg/<alias>`. There is no registry, second cache or installer. VOIDUP manages
-the toolchain; `voidc` manages project dependencies.
-
-[raylib](raylib/README.md) is the first package. Its 600 declarations have usable
-interfaces, with direct, ownership, callback and typed-equivalent counts explicit.
-Native global-hook concurrency restrictions and unsuppressed device leaks remain
-in its qualification report. Source inclusion does not imply public GitHub
-post-push qualification or runtime exercise of every native declaration.
+[raylib](raylib/README.md) documents how to add a bundled library,
+inspect its source and use the same package layout for a new library.
+Its preparation tool is a separate compiler resource. Binding
+generators and verification records live in `tools/raylib/` in the
+VOID source checkout.

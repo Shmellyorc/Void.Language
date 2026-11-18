@@ -1,10 +1,10 @@
-"""Compatibility entry for the canonical package-owned native preparation command."""
+"""Compatibility entry for the canonical raylib native preparation tool."""
 from pathlib import Path
 import runpy
 import shutil
 import sys
 import tempfile
-canonical = Path(__file__).resolve().parents[2]/'verified-packages/raylib/prepare.py'
+canonical = Path(__file__).resolve().parents[2]/'verified-packages/raylib-prepare.py'
 def has_option(name):
     return any(argument.partition('=')[0] == name for argument in sys.argv[1:])
 if not has_option('--api-package'):

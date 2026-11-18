@@ -6,12 +6,14 @@ import re
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 clang, package, catalog = map(lambda p:Path(p).resolve(),sys.argv[1:4])
 sanitized=sys.argv[4:]==['ON']
 windows=os.name=='nt'
 assert re.search(r'\b23\.1\.4\b',subprocess.check_output([str(clang),'--version'],text=True))
-inventory=json.loads((package/'inventory.json').read_text())
+inventory_path=Path(__file__).resolve().parents[2]/'tools/raylib/inventory.json'
+inventory=json.loads(inventory_path.read_text())
 names=[entry['name'] for entry in inventory['functions']]
 assert len(names)==len(set(names))==600
 with tempfile.TemporaryDirectory(prefix='VOID 600 raylib symbols ') as temporary:
@@ -25,7 +27,8 @@ with tempfile.TemporaryDirectory(prefix='VOID 600 raylib symbols ') as temporary
            '-I'+str(package/'upstream'),'-I'+str(package/'native')]
     if windows:
         flags+=['--target=x86_64-pc-windows-msvc','-DUSE_LIBTYPE_SHARED','-fms-runtime-lib=static']
-        library=catalog/'raylib.lib'
+        link, = tomllib.loads((catalog/'void.native.toml').read_text())['native']['link']
+        library=catalog/link
     else:
         library=catalog/'libraylib.so.600';flags+=['-Wl,-rpath,'+str(catalog)]
     if sanitized:flags+=['-fsanitize=address,undefined','-fno-sanitize-recover=all']

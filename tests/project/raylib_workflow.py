@@ -73,7 +73,7 @@ def workspace(args, root):
     cli("unregister local package", "package", "uninstall", "local_lib", cwd=root)
     cli("local consumer lock verifies", "resolve", "--project", ".", "--locked", cwd=consumer)
 
-    cli("new", "new", project, cwd=root)
+    cli("new", "new", "app", "--name", "TestGame", cwd=root)
     discovery = cli("discovery", "package", "list", contains="raylib 0.1.0")
     search = cli("search", "package", "search", "ray", contains="Native raylib 6.0.0 (ABI 3)")
     cli("unlisted package", "package", "search", "unknown", contains="No matching bundled packages")
@@ -104,23 +104,40 @@ def workspace(args, root):
                      for name in sorted(source_files))
     snapshot = sha256(hashes.encode()).hexdigest()
     assert provenance["Shipped snapshot SHA-256"] == snapshot
+    for name in ("prepare.py", "generate.py", "callback_bindings.py", "owned_bindings.py", "inventory.json"):
+        assert name not in source_files, name
+    assert (catalog / "RAYLIB-LICENSE.txt").read_bytes() == (installed / "upstream/LICENSE").read_bytes()
     for result in (discovery, search):
         assert f'Base revision: {provenance["Base revision"]}' in result
         assert f"Shipped snapshot SHA-256: {snapshot}" in result
     assert (installed / "src/raylib_native.void").read_text(encoding="utf-8").splitlines()[1] == 'native "org.voidlang.raylib"'
     entry = project / "src/app.void"
-    entry.write_text(HEADLESS, encoding="utf-8")
+    readme = (installed / "README.md").read_text(encoding="utf-8")
+    example, = re.findall(r"```void\n(.*?)```", readme, re.S)
+    assert example
+    entry.write_text(example, encoding="utf-8")
+    # Imports, checks, JIT and AOT use the prepared catalog without Python.
+    no_python = dict(env, PATH=str(Path(os.environ["SystemRoot"]) / "System32") if windows else ".")
+    cli("README tidy check", "tidy", "--check", environment=no_python)
+    cli("README check", "check", ".", environment=no_python)
 
     cli("execution without consent", "run", ".", status=2, contains="Pass --allow-native")
     cli("build without consent", "build", ".", status=2, contains="Pass --allow-native")
     terminal = dict(env)
     terminal.pop("CI", None)
-    interact(compiler, ["run", "."], project, terminal, reply=b"approve", contains=b"G59 raylib pixel: 241")
-    interact(compiler, ["run", "."], project, terminal, contains=b"G59 raylib pixel: 241")
+    approved = interact(compiler, ["run", "."], project, terminal, reply=b"approve", contains=b"Saved native approval")
+    assert b"241" in approved.splitlines(), approved
+    interact(compiler, ["run", "."], project, terminal, contains=b"241")
+    output = cli("README JIT without Python", "run", ".", "--reuse-native-approval", environment=no_python)
+    assert output.replace("\r\n", "\n") == "241\n", output
+    cli("README AOT without Python", "build", ".", "--reuse-native-approval", environment=no_python)
+    app = project / "build" / ("app.exe" if windows else "app")
+    assert run("README AOT execution", app, environment=no_python).replace("\r\n", "\n") == "241\n"
     approvals = cli("inspect native approval", "native", "approvals", contains="org.voidlang.raylib")
     cli("revoke native approval", "native", "revoke", approvals.split(" | ", 1)[0])
     interact(compiler, ["run", "."], project, terminal, reply=b"no", status=2, contains=b"approval declined")
-    print("G63 bundled raylib approval, reuse and revocation passed", flush=True)
+    print("Bundled raylib approval, reuse and revocation passed", flush=True)
+    entry.write_text(HEADLESS, encoding="utf-8")
     cli("verify locked catalog", "resolve", "--project", ".", "--locked")
     original_receipt = receipt.read_bytes()
     try:

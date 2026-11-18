@@ -13,7 +13,8 @@ import subprocess
 from owned_bindings import OWNERS, extend
 from callback_bindings import extend as callback_extensions
 
-ROOT = Path(__file__).resolve().parent
+TOOLS = Path(__file__).resolve().parent
+ROOT = TOOLS.parents[1] / "verified-packages/raylib"
 HEADER_HASH = '047e7255f93f8c34039cab906ad76136706b5c7b4c5b5b065d84141963ee9b6b'
 SCALARS = {'void': 'void', 'int': 'c_int', 'unsigned int': 'u32',
            'unsigned char': 'u8', 'char': 'c_char', 'float': 'f32', 'double': 'f64', 'bool': 'c_bool', '_Bool': 'c_bool'}
@@ -39,7 +40,10 @@ def snake(name):
 
 
 def clang_run(clang, *args):
-    result = subprocess.run([str(clang), '-x', 'c', '-std=c11', '-fsyntax-only', *args,
+    # The checked-in inventory uses one reference target. The prepared C
+    # provider checks the actual host ABI independently on both targets.
+    result = subprocess.run([str(clang), '-target', 'x86_64-unknown-linux-gnu',
+                             '-x', 'c', '-std=c11', '-fsyntax-only', *args,
                              str(ROOT / 'upstream/raylib.h')], capture_output=True, text=True, check=True)
     return result.stdout
 
@@ -67,7 +71,7 @@ def blocker(node, aliases):
     if node.get('variadic'):
         return 'Technically unsupported: native-bind admits fixed prototypes only. Exact arbitrary C varargs/va_list calls are not representable; a formatted-message substitute is not this declaration.'
     if any('Callback' in p['type']['qualType'] for p in node.get('inner', []) if p['kind']=='ParmVarDecl'):
-        return 'Technically unsupported: G5 callbacks require context-first scalar signatures and a provider unregister-and-drain barrier. This upstream context-free pointer/buffer/va_list callback is outside that ABI; no source callback is registered.'
+        return 'Technically unsupported: VOID callbacks require context-first scalar signatures and a provider unregister-and-drain barrier. This upstream context-free pointer/buffer/va_list callback is outside that ABI; no source callback is registered.'
     types = [signature.split('(', 1)[0].strip(), *[p['type']['qualType'] for p in node.get('inner', []) if p['kind'] == 'ParmVarDecl']]
     failures = []
     for typ in types:
@@ -75,7 +79,7 @@ def blocker(node, aliases):
         if canonical in SCALARS or canonical in POD:
             continue
         if 'Callback' in typ:
-            failures.append('Retained context-free callbacks lack a provider unregister-and-drain barrier; G11 hold applies. Pointer/buffer callback parameters are not admitted.')
+            failures.append('Retained context-free callbacks lack a provider unregister-and-drain barrier. Pointer/buffer callback parameters are not admitted.')
         elif '*' in canonical or canonical in {'ModelAnimPose', 'va_list', '__builtin_va_list'}:
             failures.append('Pointer input/output needs audited extent, allocation and retention adapters; resource calls cannot combine byte spans or records (src/ir/c_primitive.cpp).')
         else:
@@ -268,20 +272,20 @@ def main():
     parser.add_argument('--require-complete', action='store_true', help='require a usable direct, owned or explicitly adapted interface for every declaration; does not require arbitrary C varargs ABI')
     args = parser.parse_args()
     for name, content in generate(args.clang).items():
-        path = ROOT / name
+        path = (TOOLS if name == "inventory.json" else ROOT) / name
         if args.check:
             if not path.is_file() or path.read_bytes() != content.encode():
                 raise SystemExit('Stale generated file: ' + name)
         else:
             path.write_text(content, encoding='utf-8', newline='\n')
-    inventory = json.loads((ROOT / 'inventory.json').read_text())
+    inventory = json.loads((TOOLS / 'inventory.json').read_text())
     source = (ROOT / 'src/raylib.void').read_text()
     names = set(re.findall(r'^func (\w+)', source, re.M))
     missing = [n['name'] for n in inventory['functions'] if n['void_name'] not in names]
     if missing: raise SystemExit('Missing physical public API: ' + ', '.join(missing))
     print('Pinned raylib header inventory and generated outputs verified' if args.check else 'Generated pinned raylib inventory and supported bindings')
     if args.require_complete:
-        inventory = json.loads((ROOT / 'inventory.json').read_text())
+        inventory = json.loads((TOOLS / 'inventory.json').read_text())
         if not inventory['complete_usable_api']:
             raise SystemExit(f'Incomplete raylib API: {inventory["counts"]["exposed_functions"]}/600 functions exposed; see inventory.json')
 

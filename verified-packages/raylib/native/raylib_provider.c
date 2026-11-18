@@ -64,7 +64,7 @@ int vd_raylib_trace(VoidRaylibTrace callback, void* context) {
     struct TraceCall call = {callback, context, 0};
     trace_call = &call;
     SetTraceLogCallback(raylib_trace);
-    TraceLog(LOG_WARNING, "VOID G5 trace %d %s", 7, "raylib");
+    TraceLog(LOG_WARNING, "VOID raylib trace %d %s", 7, "raylib");
     SetTraceLogCallback(NULL);
     trace_call = NULL;
     atomic_store(&trace_active,false);

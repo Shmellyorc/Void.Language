@@ -97,8 +97,12 @@ std::optional<MaintenanceReport> add_user_package(const std::filesystem::path&, 
 std::vector<RegisteredPackage> list_user_packages();
 void uninstall_user_package(const std::string& alias);
 void require_outside_user_package_store(const std::filesystem::path&);
+struct BundledRaylib {
+    std::filesystem::path source;
+    std::string_view inventory, snapshot_sha256, receipt_sha256, preparer_sha256;
+};
 MaintenanceReport add_verified_raylib(const std::filesystem::path& project,
-    const std::filesystem::path& source, const std::filesystem::path& compiler,
+    const BundledRaylib&, const std::filesystem::path& compiler,
     const std::filesystem::path& clang, bool sanitize,
     const std::optional<std::string>& edit_token = {});
 MaintenanceReport tidy_dependencies(const std::filesystem::path&, bool check);

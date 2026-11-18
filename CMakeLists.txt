@@ -271,15 +271,19 @@ target_link_libraries(void_native_example PRIVATE void_llvm void_cache_identity)
 include(verified-packages/raylib.package.cmake)
 set(verified_raylib_files
   .gitattributes .gitignore
-  README.md OWNERSHIP.md inventory.json void.project.toml
-  prepare.py generate.py callback_bindings.py owned_bindings.py
+  README.md OWNERSHIP.md void.project.toml
   src/raylib.void src/raylib_native.void upstream/raylib.h upstream/LICENSE
   native/raylib_provider.c native/raylib_provider.h native/raylib.descriptor.in
   native/raylib_api.c native/raylib_api.h native/raylib_api.descriptor.inc
   native/raylib_callbacks.inc native/raylib_parity.h)
 set(verified_raylib_build_root "${CMAKE_CURRENT_BINARY_DIR}/verified-packages/raylib")
 list(SORT verified_raylib_files)
+list(JOIN verified_raylib_files "|" verified_raylib_inventory)
 set(verified_raylib_snapshot_manifest "")
+# Remove files tracked by earlier configure runs from this private staging tree.
+foreach(retired IN ITEMS prepare.py generate.py callback_bindings.py owned_bindings.py inventory.json)
+  file(REMOVE "${verified_raylib_build_root}/${retired}")
+endforeach()
 foreach(file IN LISTS verified_raylib_files)
   configure_file("${verified_raylib_subdirectory}/${file}" "${verified_raylib_build_root}/${file}" COPYONLY)
   file(SHA256 "${verified_raylib_build_root}/${file}" hash)
@@ -298,11 +302,19 @@ Package version: ${verified_raylib_version}
 Shipped snapshot SHA-256: ${verified_raylib_snapshot_sha256}
 " NEWLINE_STYLE UNIX)
 install(FILES "${verified_raylib_build_root}/SOURCE_ORIGIN.txt" DESTINATION share/void/verified-packages/raylib COMPONENT compiler)
+file(SHA256 "${verified_raylib_build_root}/SOURCE_ORIGIN.txt" verified_raylib_receipt_sha256)
+set(verified_raylib_preparer "${CMAKE_CURRENT_BINARY_DIR}/verified-packages/raylib-prepare.py")
+configure_file(verified-packages/raylib-prepare.py "${verified_raylib_preparer}" COPYONLY)
+file(SHA256 "${verified_raylib_preparer}" verified_raylib_preparer_sha256)
+install(FILES "${verified_raylib_preparer}" DESTINATION share/void/verified-packages COMPONENT compiler)
 add_library(voidc_objects OBJECT src/main.cpp src/native_approval.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
 target_compile_definitions(voidc_objects PRIVATE VOID_RAYLIB_BUILD_ROOT="${verified_raylib_build_root}"
   VOID_RAYLIB_SANITIZE=$<BOOL:${VOID_SANITIZERS}>
   VOID_RAYLIB_ORIGIN="${verified_raylib_origin}" VOID_RAYLIB_BASE_REVISION="${verified_raylib_base_revision}"
   VOID_RAYLIB_SNAPSHOT_SHA256="${verified_raylib_snapshot_sha256}"
+  VOID_RAYLIB_RECEIPT_SHA256="${verified_raylib_receipt_sha256}"
+  VOID_RAYLIB_PREPARER_SHA256="${verified_raylib_preparer_sha256}"
+  VOID_RAYLIB_INVENTORY="${verified_raylib_inventory}"
   VOID_RAYLIB_SUBDIR="${verified_raylib_subdirectory}" VOID_RAYLIB_VERSION="${verified_raylib_version}")
 target_compile_definitions(voidc_objects PRIVATE VOID_COMPILER_VERSION="${PROJECT_VERSION}")
 target_include_directories(voidc_objects SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
@@ -419,14 +431,16 @@ if(BUILD_TESTING)
       "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_SANITIZERS}" "" --package)
     set_tests_properties(project_package_native PROPERTIES TIMEOUT 300)
   endif()
+  if((CMAKE_SYSTEM_NAME STREQUAL "Linux" OR WIN32) AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+    add_test(NAME project_raylib_api_parity COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tools/raylib/generate.py" --check --require-complete --clang "${VOID_CLANG}")
+    set_tests_properties(project_raylib_api_parity PROPERTIES TIMEOUT 60)
+  endif()
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
     add_test(NAME project_managed_native_resolution COMMAND "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/project/managed_native_resolution.py"
       "$<TARGET_FILE:voidc>" "${VOID_CLANG}" "${VOID_GIT_EXECUTABLE}")
     set_tests_properties(project_managed_native_resolution PROPERTIES TIMEOUT 120)
-    add_test(NAME project_raylib_api_parity COMMAND "${Python3_EXECUTABLE}"
-      "${PROJECT_SOURCE_DIR}/verified-packages/raylib/generate.py" --check --clang "${VOID_CLANG}")
-    set_tests_properties(project_raylib_api_parity PROPERTIES TIMEOUT 60)
     if(VOID_TEST_RAYLIB_ROOT)
       add_test(NAME project_managed_raylib COMMAND "${Python3_EXECUTABLE}"
         "${PROJECT_SOURCE_DIR}/tests/project/managed_raylib.py"

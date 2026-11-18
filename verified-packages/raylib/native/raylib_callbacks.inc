@@ -1,5 +1,5 @@
 /* Context-free raylib routing only. Managed state, code generations and callback
- * retirement belong to G5. No managed address is stored in these I/O buffers. */
+ * retirement belong to the VOID runtime. No managed address is stored in these I/O buffers. */
 #if defined(_WIN32)
 #define WIN32_LEAN_AND_MEAN
 #define NOUSER
@@ -81,8 +81,8 @@ static int vd_cb_invoke(VdCallbackRegistration* p,const char* name,const void* i
     if(!ready)atomic_store(&p->failed,true);
     int status=ready?p->callback(p->context,frames,level):0;
     vd_cb_current=previous;atomic_fetch_add(&p->calls,1);
-    /* G5 returns zero both for a captured managed fault and for its sealed
-     * close-entry gate. G5 reports the former itself. During audio shutdown the
+    /* The runtime returns zero both for a captured managed fault and for its sealed
+     * close-entry gate. The runtime reports captured faults. During audio shutdown the
      * latter is ordinary cancellation, not an adapter failure. */
     if(status!=1 && status!=2 && !(status==0&&p->kind>=VD_CB_STREAM))atomic_store(&p->failed,true);
     if(atomic_load(&p->failed)){vd_error=3;status=0;}
@@ -164,7 +164,7 @@ static void vd_cb_disconnect(VdCallbackRegistration* p) {
         else DetachAudioMixedProcessor(vd_cb_audio_functions[p->slot]);
     }
     /* The mixer mutex covers the complete native trampoline. Keep its route
-     * published until that barrier has returned, including G5-sealed entries. */
+     * published until that barrier has returned, including sealed callback entries. */
     vd_cb_lock();if(*location==p)*location=NULL;atomic_store(&p->active,false);vd_cb_unlock();
     while(atomic_load(&p->entered))vd_cb_yield();
 }

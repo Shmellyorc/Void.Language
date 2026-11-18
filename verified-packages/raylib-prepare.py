@@ -1,6 +1,7 @@
-"""Generate the checked adapter and prepare the native directory from local raylib 6.0 inputs."""
+"""Prepare the checked native provider from official or explicitly supplied raylib 6.0 inputs."""
 
 import argparse
+import os
 from hashlib import sha256
 from io import BytesIO
 from pathlib import Path
@@ -13,13 +14,15 @@ from urllib.request import urlopen
 from zipfile import ZipFile
 
 
+PACKAGE = Path(__file__).resolve().with_name("raylib")
+
+
 def digest(path):
     return sha256(path.read_bytes()).hexdigest()
 
 
 def run(*args, cwd=None):
     command = list(map(str, args))
-    print(command, flush=True)
     subprocess.run(command, check=True, cwd=cwd)
 
 
@@ -102,18 +105,18 @@ def main():
     parser.add_argument('--import-library', type=Path)
     parser.add_argument('--managed-catalog', type=Path, help='write an approved local catalog to a new directory')
     parser.add_argument('--sanitize', action='store_true', help='instrument the shim when running a sanitized Linux Runtime')
-    parser.add_argument('--api-package', type=Path, default=Path(__file__).resolve().parent, help='include generated bindings from verified-packages/raylib')
+    parser.add_argument('--api-package', type=Path, default=PACKAGE, help='include the checked binding inputs from the raylib source directory')
     parser.add_argument('--gallery-only', action='store_true', help='prepare the legacy gallery subset')
     parser.add_argument('--bundled', action='store_true', help='use the pinned official release for the shipped recipe')
     args = parser.parse_args()
     if args.bundled:
         if (not args.managed_catalog or any((args.header, args.library, args.license, args.import_library, args.gallery_only))
-                or args.api_package != Path(__file__).resolve().parent):
+                or args.api_package != PACKAGE):
             parser.error('--bundled requires --managed-catalog and the shipped package inputs')
         if sys.platform not in ('win32', 'linux'):
             parser.error('bundled raylib supports x86-64 GNU/Linux and Windows only')
         with tempfile.TemporaryDirectory(prefix='upstream-', dir=args.managed_catalog.parent) as scratch:
-            bundled_inputs(args, Path(__file__).resolve().parent, Path(scratch), sys.platform == 'win32')
+            bundled_inputs(args, PACKAGE, Path(scratch), sys.platform == 'win32')
             prepare(args, parser)
     else:
         if not all((args.header, args.library, args.license)):
@@ -129,13 +132,13 @@ def prepare(args, parser):
         parser.error('provide a COFF import library on Windows and use --sanitize only on Linux')
     for path in (args.header, args.library, args.license, args.import_library):
         if path is not None:
-            print(f'{digest(path)}  {path}', flush=True)
+            print(f'{digest(path)}  {path.name}', flush=True)
     if args.header.name != 'raylib.h':
         parser.error('--header must name raylib.h')
     if args.managed_catalog is not None and args.managed_catalog.exists():
         parser.error('--managed-catalog must name a new directory')
 
-    native = Path(__file__).resolve().parent / 'native'
+    native = PACKAGE / 'native'
     platform = 'windows' if windows else 'linux'
     provider = 'void_raylib.dll' if windows else 'libvoid_raylib.so'
     dependency = 'raylib.dll' if windows else 'libraylib.so.600'
@@ -187,10 +190,14 @@ def prepare(args, parser):
         shutil.copyfile(args.library, stage / dependency)
         shutil.copyfile(args.license, stage / 'RAYLIB-LICENSE.txt')
         run(args.voidc, 'native-bind', stage / descriptor, 'raylib_api.h' if api_native else header.name, '-o', stage / generated)
-        flags = ['-std=c11', '-shared', '-fuse-ld=lld', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-I' + str(native), '-I' + str(args.header.resolve().parent)]
+        flags = ['-std=c11', '-shared', '-fuse-ld=lld', '-O2', '-Wall', '-Wextra', '-Werror']
+        include_dirs = [native, args.header.resolve().parent]
         if api_native is not None:
-            flags += ['-I' + str(api_native),'-DVOID_RAYLIB_API_CALLBACKS=1']
+            include_dirs.append(api_native)
+            flags.append('-DVOID_RAYLIB_API_CALLBACKS=1')
+        # Sanitizer locations in included C code must be reproducible too.
+        flags += ['-I' + (os.path.relpath(path, stage) if args.bundled else str(path))
+                  for path in include_dirs]
         if windows:
             flags += ['--target=x86_64-pc-windows-msvc', '-DUSE_LIBTYPE_SHARED', '-fms-runtime-lib=static']
             if args.bundled:
@@ -202,9 +209,9 @@ def prepare(args, parser):
                 flags += ['-fsanitize=address,undefined', '-fno-sanitize-recover=all']
             imports = stage / dependency
         sources = [source, *([api_native / 'raylib_api.c'] if api_native else []), stage / generated]
-        if args.bundled and args.sanitize:
-            # UBSan stores the primary source spelling in the shared object.
-            # Relative names keep random scratch paths out of the locked bytes.
+        if args.bundled:
+            # Use stable source spellings so the catalog can be rebuilt in a
+            # new temporary directory, including with sanitizers enabled.
             for item in sources[:-1]:
                 shutil.copyfile(item, stage / item.name)
             run(args.clang, *flags, *(item.name for item in sources), imports, '-o', stage / provider, cwd=stage)

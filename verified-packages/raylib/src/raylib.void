@@ -1,4 +1,4 @@
-# Public, editable raylib 6.0 implementation. See inventory.json and OWNERSHIP.md.
+# Public, editable raylib 6.0 implementation. See OWNERSHIP.md for resource and callback contracts.
 use "./raylib_native.void" as native
 use convert as conversion
 use error as core_error
@@ -4436,7 +4436,7 @@ func set_audio_stream_pan(p0: audio_stream, p1: f32):
     native.set_audio_stream_pan(p0.owner, p1)
     _check()
 
-# G5 owns the closure and generation; invocation I/O exists only on its callback thread.
+# The runtime owns the closure and generation. Invocation I/O is scoped to its callback thread.
 struct callback_registration:
     owner: native.callback_registration
 

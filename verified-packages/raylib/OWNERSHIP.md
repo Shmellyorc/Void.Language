@@ -159,8 +159,8 @@ The spec is VOID's invariant format syntax. Use ordinary interpolation for
 multiple typed values. Invalid specs return Err. There is no duplicate formatter,
 printf parser or claim of C TextFormat's rotating static buffer/varargs semantics.
 
-All ten context-free declarations use one small native routing adapter to G5's
-existing context-first `i32(u32, i32)` retained callback. G5 owns the closure,
+All ten context-free declarations route through a retained VOID callback with
+signature `i32(u32, i32)`. The runtime owns the closure,
 managed captures, generation lease, entry barrier and retirement. Native owned
 registrations route only to that context; no managed address escapes as an
 integer. Invocation data crosses bounded, invocation-scoped byte spans copied
@@ -181,12 +181,12 @@ into owned VOID values. No second callback ownership framework is introduced.
 
 Registration returns `callback_registration`. `callback_count` and
 `callback_active` inspect it; `callback_close` unregisters and consumes it. Global
-setter replacement makes the former registration inactive while its G5 closure
+setter replacement makes the former registration inactive while its retained closure
 remains owned until close/Runtime shutdown. Closing an inactive former owner
 cannot unregister its replacement. Closing the active owner restores native NULL
 behavior, rather than a previous callback. Explicit close and implicit Runtime
 cleanup both unregister before managed context/generation release. Closing or borrowing a
-callback registration from its own invocation is rejected by G5. Reentrant
+callback registration from its own invocation is rejected by the runtime. Reentrant
 invocation of the same registration is rejected. The historical scoped gallery
 trace helper and the retained trace hook mutually exclude each other.
 
@@ -199,7 +199,7 @@ while globals are registered are rejected. Global installation/replacement and
 provider call admission share a gate; registration requires no provider calls in
 flight. Native callers outside this provider must honor the same exclusive
 window. Concurrent arbitrary third-party C use is a precisely unsupported native
-case, not a fictitious G5 guarantee.
+case.
 
 Audio unregistration uses raylib 6.0's own mixer mutex: SetAudioStreamCallback(NULL)
 and both Detach operations wait for the current mixer invocation. The adapter
@@ -211,7 +211,7 @@ source stream/device owner may close first without freeing that native parent
 prematurely. Shutdown drains callbacks before the underlying device can close.
 PCM handlers cannot call raylib/provider operations recursively: raylib invokes
 them while holding its audio mutex. The provider rejects such calls, records
-failure and G5 reports the managed error. Use owned invocation data and ordinary
+failure and the runtime reports the managed error. Use owned invocation data and ordinary
 VOID computation; shared captures still require ordinary thread synchronization.
 This managed copying path does not promise hard real-time latency.
 
@@ -221,7 +221,7 @@ transfer. PCM is native little-endian x64 bytes (use the existing encoding/binar
 codec for float representations); processors are float32 stereo,
 independent of the stream's input format. Exhaustion and size/type violations fail
 explicitly. Failed generators leave initialized silence; failed processors leave
-the input unchanged **and record failure**. G5 faults are observable through the
+the input unchanged **and record failure**. Callback faults are observable through the
 owner and cleanup, and native failure flags are checked by callback_count/active;
 these fallbacks are not reported as successful callbacks. No callback is silently
 registered as a no-op or kept alive by an unowned trampoline.

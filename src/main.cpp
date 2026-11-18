@@ -158,11 +158,15 @@ std::int32_t input(const char* text) {
 }
 std::filesystem::path bundled_raylib_source(const std::filesystem::path& executable) {
     const auto installed=(executable.parent_path()/"../share/void/verified-packages/raylib").lexically_normal();
-    if(std::filesystem::is_regular_file(installed/"prepare.py"))return installed;
+    const auto complete=[](const std::filesystem::path& source) {
+        return std::filesystem::is_regular_file(source/"SOURCE_ORIGIN.txt") &&
+               std::filesystem::is_regular_file(source.parent_path()/"raylib-prepare.py");
+    };
+    if(complete(installed))return installed;
     const auto build=vd::utf8_path(VOID_RAYLIB_BUILD_ROOT);
     // A build-tree compiler can use its CMake-staged resources. An installed
     // compiler must use its own resources, even if a checkout still exists.
-    if(std::filesystem::is_regular_file(build/"prepare.py") &&
+    if(complete(build) &&
        (executable.parent_path()==build.parent_path().parent_path() ||
         executable.parent_path().parent_path()==build.parent_path().parent_path()))return build;
     return {};
@@ -272,7 +276,9 @@ int maintain_project(const std::string& command,int argc,char** argv,const std::
             const auto source=bundled_raylib_source(executable);
             if(source.empty() || !vd::native_source_debug_supported())
                 throw std::runtime_error("Bundled raylib is unavailable for this compiler or target. Use an explicit --path or --git source.");
-            const auto report=add_verified_raylib(root,source,executable,vd::native_clang_driver(argv[0]),VOID_RAYLIB_SANITIZE,options.edit_token);
+            const BundledRaylib bundle{source,VOID_RAYLIB_INVENTORY,VOID_RAYLIB_SNAPSHOT_SHA256,
+                VOID_RAYLIB_RECEIPT_SHA256,VOID_RAYLIB_PREPARER_SHA256};
+            const auto report=add_verified_raylib(root,bundle,executable,vd::native_clang_driver(argv[0]),VOID_RAYLIB_SANITIZE,options.edit_token);
             std::cout<<(report.changed?"Installed and locked bundled raylib.":"Bundled raylib and native lock verified; reused the prepared catalog.")
                      <<"\nNative execution still needs explicit consent: review with voidc run .\n";
             return 0;

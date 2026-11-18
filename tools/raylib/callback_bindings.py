@@ -1,4 +1,7 @@
-"""Typed last-twelve interfaces. G5 retains all managed callbacks and code leases."""
+"""Typed callback adapters and variadic equivalents for raylib.
+
+The VOID runtime retains managed callbacks and their code leases.
+"""
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parent
@@ -40,21 +43,26 @@ def extend():
         binds.append('bind '+name+' '+symbol+' '+result+(' '+' '.join(parameters) if parameters else ''))
     declarations.append('VOID_RAYLIB_EXPORT void vd_raylib_api_TraceLog(int32_t,const VdBuffer*);')
     binds.append('bind trace_log vd_raylib_api_TraceLog void i32 borrow:owner_buffer')
-    outcomes={name:{'void_name':_snake(name),'exposure':'lifecycle_adapter','native_abi':'G5 retained context-first i32(u32,i32); owned target and bounded invocation-scoped byte I/O',
-        'ownership':'G5 owns the managed closure/generation; native registration unregisters and drains before release. Global hooks require an exclusive application-thread window without an audio device; audio hooks retain their stream/device.',
-        'implementation':'native context-free routing adapter to existing G5 callback ownership',
+    outcomes={name:{'void_name':_snake(name),'exposure':'lifecycle_adapter',
+        'native_abi':'Retained context-first i32(u32, i32) callback with an owned target and bounded byte I/O scoped to each invocation.',
+        'ownership':'the VOID runtime owns the managed closure/generation; native registration unregisters and drains before release. Global hooks require an exclusive application-thread window without an audio device; audio hooks retain their stream/device.',
+        'implementation':'The native adapter routes context-free raylib callbacks to the managed callback retained by the VOID runtime.',
         'blocker':None,'native_limitation':'Global setters have no native concurrent-caller barrier; adapter rejects coexistence with audio and foreign-thread calls. PCM callbacks are synchronous, bounded and cannot call raylib recursively.',
         'test_coverage':'tests/project/raylib_callbacks.py; callback invocation/replacement/retirement/failure; real audio qualification'} for name in NAMES}
     for name in NAMES:
         outcomes[name]['lifecycle']=(
-            'unregistration: consume the matching registration; native mixer mutex drains before G5 retirement' if name.startswith('Detach') else
+            ('Detach consumes the matching registration and uses the native mixer mutex to wait for in-flight invocations '
+             'before the VOID runtime retires the callback.') if name.startswith('Detach') else
             'retained global setter; synchronous invocation on the application thread; replacement or owned close unregisters; no audio coexistence' if name in NAMES[:5] else
             'retained stream-owned generator; foreign mixer-thread invocation; replacement or owned close unregisters and drains' if name=='SetAudioStreamCallback' else
             'retained stream-owned processor; ordered foreign mixer-thread invocation; matching detach/owned close unregisters and drains' if name=='AttachAudioStreamProcessor' else
             'retained audio-device-owned processor; ordered foreign mixer-thread invocation; matching detach/owned close unregisters and drains')
         if name.startswith('Detach'):
-            outcomes[name]['native_abi']='G5 close:callback_registration -> i32; original native void detach uses the stream/function identity recorded by the matching attachment'
-            outcomes[name]['implementation']='matching native detach through the existing G5 owned-registration terminal; kind checked before consumption'
+            outcomes[name]['native_abi']=(
+                'The VOID close:callback_registration operation returns i32. Native detach returns void and uses the callback identity '
+                'and, for stream processors, the stream recorded at attachment.')
+            outcomes[name]['implementation']=(
+                'The adapter checks the registration kind before consuming it through callback_close, which invokes the matching native detach.')
     for name in ('TraceLog','TextFormat'):
         outcomes[name]={'void_name':_snake(name),'exposure':'safe_equivalent','native_abi':'Original C variadic declaration remains inventoried; no arbitrary varargs transport.',
           'ownership':'Owned UTF-8 text through TraceLog(level,"%s",text).' if name=='TraceLog' else 'Owned VOID string/result from existing format(value,spec) and interpolation.',
