@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import tomllib
+from approval_console import interact
 
 compiler, git, readobj = (Path(arg).resolve() for arg in sys.argv[1:])
 windows = sys.platform == 'win32'
@@ -213,6 +214,99 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
         cli('run', '.', '--allow-native', cwd=project, status=1, contains=message)
         path.write_bytes(original)
     cli('run', '.', '--allow-native', cwd=project, exact='42\n')
+    approvals = store.parent/'native-approvals'
+    terminal = dict(env)
+    terminal.pop('CI', None)
+    approve_run = lambda *args, **kw: interact(compiler, args, project, terminal, **kw)
+    cli('native', 'approvals', cwd=root, contains='No native approvals')
+    assert not approvals.exists()  # Install, check and one-time flags confer no durable consent.
+    approve_run('run', '.', reply=b'no', status=2, contains=b'approval declined')
+    assert not approvals.exists()
+    catalog_file = catalog/'void.native.toml'
+    catalog_bytes = catalog_file.read_bytes()
+    try:
+        approve_run('build', '.', reply=b'approve', status=1, contains=b'changed',
+                    change_at_prompt=lambda: catalog_file.write_bytes(catalog_bytes + b'\n# changed at prompt\n'))
+        assert not approvals.exists()
+    finally:
+        catalog_file.write_bytes(catalog_bytes)
+    output = approve_run('run', '.', reply=b'approve', contains=b'Saved native approval')
+    assert any(line.strip()==b'42' for line in output.splitlines()), output
+    listing = cli('native', 'approvals', cwd=root, contains='org.example.g61')
+    approval_id = listing.split(' | ', 1)[0]
+    assert len(approval_id) == 64
+    for profile in ('debug', 'release'):
+        output = approve_run('run', '.', '--profile', profile, contains=b'42')
+        assert any(line.strip()==b'42' for line in output.splitlines()), output
+        executable = root/('durable-' + profile)/('app.exe' if windows else 'app')
+        approve_run('build', '.', '--profile', profile, '-o', executable, contains=b'Built native executable')
+        run(executable, cwd=root, exact='42\n')
+        if windows:
+            run(readobj, '--file-headers', executable, cwd=root, contains='SizeOfStackReserve: 1048576')
+    cli('run', '.', cwd=project, status=2, contains='Pass --allow-native')
+    cli('emit', '.', '-o', root/'unapproved.o', cwd=project, status=2, contains='Pass --allow-native')
+    interact(compiler, ['run', '.'], project, dict(terminal, CI='true'),
+             status=2, contains=b'CI requires explicit --allow-native')
+    piped = subprocess.run([str(compiler), 'run', '.'], cwd=project, env=terminal,
+                           capture_output=True, input=b'approve\n', timeout=90)
+    assert piped.returncode==2 and piped.stdout==b'' and b'Pass --allow-native' in piped.stderr, piped
+    explicit = subprocess.run([str(compiler), 'run', '.', '--allow-native'], cwd=project, env=dict(terminal, CI='true'),
+                              capture_output=True, stdin=subprocess.DEVNULL, check=True, timeout=90)
+    assert explicit.stdout.replace(b'\r\n', b'\n')==b'42\n' and not explicit.stderr, explicit
+    other_root = root/'same-manifest-other-project'
+    shutil.copytree(project, other_root)
+    interact(compiler, ['run', '.'], other_root, terminal, reply=b'no', status=2, contains=b'approval declined')
+    if not windows:
+        with tempfile.TemporaryDirectory(prefix='void-unsafe-data-', dir='/tmp') as unsafe:
+            Path(unsafe).chmod(0o777)
+            interact(compiler, ['run', '.'], project, dict(terminal, XDG_DATA_HOME=unsafe),
+                     status=1, contains=b'untrusted directory')
+
+    for path, replacement, outcome, reply in (
+        (catalog_file, catalog_bytes + b'\n# valid catalog edit requires consent\n', b'approval declined', b'no'),
+        (catalog_file, catalog_bytes.replace(target.split()[0].encode(),
+            b'x86_64-unknown-linux-gnu' if windows else b'x86_64-pc-windows-msvc'), b'does not match this host', None),
+        (catalog/descriptor.name, b'invalid descriptor\n', b'artifact identity mismatch', None),
+        (next(catalog.glob('*.dll' if windows else '*.so')), b'changed artifact', b'artifact', None),
+        (project/'libs/cdemo/src/ffi.void', b'invalid binding\n', b'Stale or tampered void.lock', None),
+        (project/'libs/cdemo/native/provider.c', b'invalid native source\n', b'Stale or tampered void.lock', None),
+        (project/'void.lock', b'invalid lock\n', b'lock', None),
+    ):
+        original = path.read_bytes()
+        try:
+            path.write_bytes(replacement)
+            approve_run('run', '.', reply=reply, status=2 if reply else 1, contains=outcome)
+        finally:
+            path.write_bytes(original)
+
+    record = approvals/approval_id/'approval'
+    original = record.read_bytes()
+    record.write_bytes(original + b'malformed\n')
+    approve_run('run', '.', status=1, contains=b'Malformed native approval record')
+    cli('native', 'approvals', cwd=root, status=1, contains='Malformed native approval record')
+    record.write_bytes(original)
+    alias = root/'approval-hard-link'
+    os.link(record, alias)
+    try:
+        approve_run('run', '.', status=1)
+    finally:
+        alias.unlink()
+    cli('new', '--', approvals/'foreign', cwd=root, status=1, contains='cannot overlap')
+
+    # A second lock for the same application/provider requires its own consent.
+    new_dependency = root/'newdep'
+    cli('new', 'classlib', new_dependency, cwd=root)
+    cli('add', 'newdep', '--dir', new_dependency, cwd=project)
+    approve_run('run', '.', reply=b'no', status=2, contains=b'approval declined')
+    approve_run('run', '.', reply=b'approve', contains=b'Saved native approval')
+    second_listing = cli('native', 'approvals', cwd=root)
+    assert len(second_listing.splitlines()) == 2 and approval_id in second_listing
+    cli('remove', 'newdep', cwd=project)
+    approve_run('run', '.', contains=b'42')
+    cli('native', 'revoke', approval_id, cwd=root)
+    approve_run('run', '.', reply=b'no', status=2, contains=b'approval declined')
+    print('G63 native approval lifecycle, lock renewal, terminal/CI gates, exact JIT/AOT, tampering and revocation passed', flush=True)
+
     cli('remove', 'cdemo', cwd=project)
     assert 'native-requirements' not in tomllib.loads((project/'void.project.toml').read_text())
     cli('check', '.', cwd=project, status=1, contains='pkg/cdemo')

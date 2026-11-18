@@ -6,7 +6,9 @@
 #include "void/native_import.hpp"
 #include "void/project_creation.hpp"
 #include "void/project_resolution.hpp"
+#include "frontend/project_files.hpp"
 #include "frontend/project_templates.hpp"
+#include "native_approval.hpp"
 #include "void/runtime.hpp"
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/JSON.h>
@@ -49,7 +51,9 @@ void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
     if(command.empty() || command=="deps")out<<"Usage: voidc deps explain --project DIR [--json]\n"
       "       voidc deps fetch --project DIR [--allow-git ORIGIN REV]...\n";
-    if(command.empty() || command=="native")out<<"Usage: voidc native import <header> --provider ID --out NEW-DIR [--source /native.void] [--clang PATH] [--language c|c++] [-- -Ipath -Dname=value -Uname]\n";
+    if(command.empty() || command=="native")out<<"Usage: voidc native import <header> --provider ID --out NEW-DIR [--source /native.void] [--clang PATH] [--language c|c++] [-- -Ipath -Dname=value -Uname]\n"
+      "       voidc native approvals\n"
+      "       voidc native revoke APPROVAL_ID\n";
     if(command.empty() || command=="native-bind")out<<"Usage: voidc native-bind <descriptor> <C-header> -o <adapter.c>\n";
 }
 void help(const std::string& command={}) {
@@ -71,6 +75,7 @@ void help(const std::string& command={}) {
           "  deps explain Inspect the verified local dependency graph without changes.\n"
           "  deps fetch   Explicitly acquire pinned Git source snapshots.\n"
           "  native import Inspect a C header and publish editable candidate bindings.\n"
+          "  native approvals | native revoke APPROVAL_ID  Manage per-application native approvals.\n"
           "  native-bind  Generate a checked C11 adapter for a native library.\n"
           "\nOptions:\n"
           "  -h, --help  Show help; use <command> --help for examples.\n"
@@ -79,7 +84,7 @@ void help(const std::string& command={}) {
           "  --cache     Select Debug code and report cache status (run only).\n"
           "  --no-cache  Disable disk caching (run only).\n"
           "  --project DIR  Select exactly DIR/void.project.toml.\n"
-          "  --allow-native  Authorize this project's declared native provider for run/build/emit/package.\n"
+          "  --allow-native  Authorize this project's verified native provider for this invocation only.\n"
           "  --entry PATH   Override its entry with a manifest-relative source.\n"
           "  --profile debug|release  Select project optimization/cache settings.\n"
           "                           Project build/emit can emit line/full DWARF on supported native targets.\n"
@@ -101,6 +106,7 @@ void help(const std::string& command={}) {
       "  --no-opt    Disable O2; eligible Debug code uses the automatic disk cache.\n"
       "  --cache     Select Debug code and print cache status.\n"
       "  --no-cache  Disable disk caching; does not disable O2.\n"
+      "  Verified managed native code requires approval; interactive runs can save it.\n"
       "Examples: voidc run .\n"
       "          voidc run calculation.void 10 --no-cache\n"
       "          voidc run main.void -- --help \"two words\"\n";
@@ -181,7 +187,7 @@ int discover_packages(const std::filesystem::path& executable, int argc, char** 
     const auto catalog=std::filesystem::current_path()/"libs/raylib/.void/native/void.native.toml";
     if(std::filesystem::is_regular_file(catalog))
         std::cout<<"  Local catalog present; run voidc resolve --project . --locked to verify it.\n";
-    else std::cout<<"  Install with voidc add raylib; authorize execution with voidc run . --allow-native.\n";
+    else std::cout<<"  Install with voidc add raylib, then approve the verified provider with voidc run .\n";
     return 0;
 }
 int maintain_project(const std::string& command,int argc,char** argv,const std::filesystem::path& executable,
@@ -229,7 +235,7 @@ int maintain_project(const std::string& command,int argc,char** argv,const std::
                 throw std::runtime_error("Bundled raylib is unavailable for this compiler or target. Use an explicit --path or --git source.");
             const auto report=add_verified_raylib(root,source,executable,vd::native_clang_driver(argv[0]),VOID_RAYLIB_SANITIZE);
             std::cout<<(report.changed?"Installed and locked bundled raylib.":"Bundled raylib and native lock verified; reused the prepared catalog.")
-                     <<"\nNative execution still needs explicit consent: voidc run . --allow-native.\n";
+                     <<"\nNative execution still needs explicit consent: review with voidc run .\n";
             return 0;
         }
         if(options.alias.empty() || bool(options.path)==bool(origin) || (!origin && (rev || subdir)))
@@ -536,6 +542,7 @@ int create_project(const std::string& command,int argc,char** argv) {
         throw UsageError("Identity options must match the selected project kind.");
     const auto root=destination?*destination:std::filesystem::current_path();
     vd::project::require_outside_user_package_store(root);
+    vd::project::require_outside_native_approval_store(root,true);
     const auto plan=vd::project::plan_creation(root,options);
     const auto manifest=plan.root/"void.project.toml";
     std::cout<<"Manifest: "<<vd::path_utf8(manifest)<<"\nProject ID: "<<plan.manifest->project().id<<'\n'
@@ -650,6 +657,13 @@ static int run_cli(int argc, char** argv) {
             return fetch_project(argc,argv);
         }
         if(command=="native") {
+            if(argc==3 && std::string_view(argv[2])=="approvals") {
+                const auto approvals=vd::native_approvals();
+                if(approvals.empty())std::cout<<"No native approvals.\n";
+                for(const auto& record:approvals)std::cout<<record<<'\n';
+                return 0;
+            }
+            if(argc==4 && std::string_view(argv[2])=="revoke"){vd::revoke_native_approval(argv[3]);return 0;}
             if(argc==4 && std::string_view(argv[2])=="import" && std::string_view(argv[3])=="--help") {help(command);return 0;}
             if(argc<4 || std::string_view(argv[2])!="import")throw UsageError("Expected native import <header> --provider ID --out NEW-DIR.");
             vd::NativeImportOptions options;options.header=vd::utf8_path(argv[3]);std::set<std::string> seen;
@@ -749,7 +763,10 @@ static int run_cli(int argc, char** argv) {
         auto value=operands.size()==2?input(operands[1].c_str()):0;
         auto path=project_root?*project_root:operands.empty()?std::filesystem::current_path():vd::utf8_path(operands[0]);
         vd::project::require_outside_user_package_store(path);
-        if(output)vd::project::require_outside_user_package_store(*output);
+        if(output) {
+            vd::project::require_outside_user_package_store(*output);
+            if(command=="package")vd::project::require_outside_native_approval_store(*output,true);
+        }
         const bool project_mode=project_root || (std::filesystem::is_directory(path) && vd::project_manifest_present(path));
         if(command=="package" && !project_mode)throw UsageError("Package requires a manifest-selected application project.");
         if(allow_native && (!project_mode || command=="check"))
@@ -759,11 +776,12 @@ static int run_cli(int argc, char** argv) {
         std::shared_ptr<const vd::ProjectAnalysis> project;
         std::filesystem::path selected;
         vd::AnalysisResult analysis;
+        vd::NativeApproval approval;
         if(project_mode) {
-            auto result=vd::analyze_manifest_project(path,project_entry,{},{},allow_native);
-            if(result.manifest && (!result.manifest->native().empty() || result.manifest->native_requirement()) &&
-                command!="check" && !allow_native)
-                throw UsageError("This project declares native code. Pass --allow-native to authorize its execution.");
+            const bool durable=!allow_native && (command=="run" || command=="build");
+            auto result=durable?vd::analyze_manifest_project_with_native_approval(path,project_entry,
+                [&](const auto& subject){return approval.authorize(subject,command=="run");}):
+                vd::analyze_manifest_project(path,project_entry,{},{},allow_native);
             if(result.manifest && result.manifest->kind()==vd::project::Kind::library && project_entry)throw UsageError("--entry cannot select an application entry in a library project.");
             if(result.manifest) {
                 vd::project::EffectiveProfile selected_profile;
@@ -777,6 +795,9 @@ static int run_cli(int argc, char** argv) {
                 for(const auto& warning:selected_profile.diagnostics)std::cerr<<vd::render_diagnostic(warning)<<'\n';
             }
             if(!result.succeeded())throw vd::CompilationError(std::move(result.diagnostics));
+            if((!result.manifest->native().empty() || result.manifest->native_requirement()) &&
+                command!="check" && !allow_native && !approval.authorized())
+                throw UsageError("This project declares native code. Pass --allow-native to authorize its execution.");
             project=std::move(result.project);
             if(project->manifest()->kind()==vd::project::Kind::library) {
                 if(command=="package")throw UsageError("Package requires an application project.");
@@ -797,8 +818,10 @@ static int run_cli(int argc, char** argv) {
         }
         if(application && operands.size()==2)throw UsageError("Application entries do not accept arguments.");
         vd::require_source_entry(*analysis.program);
+        approval.remember();
         if(command=="package") {
             if(!output)output=project->root()/"dist";
+            vd::project::require_outside_native_approval_store(*output,true);
             vd::build_application_package(*project,*output,optimize,argv[0],profile_key,replace_package);
             std::cout<<"Packaged application: "<<vd::path_utf8(*output)<<'\n';
             return 0;
@@ -824,6 +847,7 @@ static int run_cli(int argc, char** argv) {
 #endif
                 output=(project?project->root():entry.parent_path())/"build"/name;
             }
+            vd::project::require_outside_native_approval_store(*output);
             vd::build_executable(*analysis.program,*output,optimize,argv[0],profile_key,source_debug);
             std::cout<<"Built native executable: "<<vd::path_utf8(*output)<<'\n';
         } else {
@@ -831,6 +855,8 @@ static int run_cli(int argc, char** argv) {
             std::cout<<"Wrote native source object: "<<vd::path_utf8(*output)<<'\n';
         }
         return 0;
+    } catch(const vd::NativeApprovalRequired& error) {
+        std::cerr<<error.what()<<'\n';return 2;
     } catch(const UsageError& error) {
         std::cerr<<"Invalid invocation: "<<error.what()<<'\n';
         usage(std::cerr,known_command(command)?command:std::string{});

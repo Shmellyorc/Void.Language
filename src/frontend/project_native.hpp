@@ -10,6 +10,7 @@ namespace vd::project {
 struct SelectedNative {
     NativeCatalog artifacts;
     CPrimitiveAdmission::Owner admission;
+    std::string catalog_identity;
 };
 const NativeRequirement& verified_raylib_requirement();
 inline constexpr std::string_view verified_raylib_catalog = ".void/native";

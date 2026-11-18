@@ -632,7 +632,32 @@ Snapshot capture_locked_project(const CreationRoot& root, Resolver& resolver, co
 }
 }
 
+fs::path native_approval_store() {
+    const auto data=user_data_directory();
+    return data.empty()?data:data/"native-approvals";
+}
+
+void require_outside_native_approval_store(const fs::path& path, bool reject_ancestor) {
+    const auto store=native_approval_store();
+    if(store.empty())return;
+    const auto location=fs::weakly_canonical(fs::absolute(path)).lexically_normal();
+    const auto within=[](const fs::path& child,const fs::path& parent) {
+        return std::ranges::mismatch(child,parent,[](const auto& a,const auto& b) {
+#ifdef _WIN32
+            return fold_project_name(path_utf8(a))==fold_project_name(path_utf8(b));
+#else
+            return a==b;
+#endif
+        }).in2==parent.end();
+    };
+    const auto physical=fs::weakly_canonical(store);
+    if(within(location,store) || within(location,physical) ||
+       (reject_ancestor && (within(store,location) || within(physical,location))))
+        throw std::runtime_error("Project and output paths cannot overlap the user native approval store.");
+}
+
 void require_outside_user_package_store(const fs::path& path) {
+    require_outside_native_approval_store(path);
     const auto store=user_package_store();
     if(store.empty())return;
     const auto location=fs::weakly_canonical(fs::absolute(path)).lexically_normal();
@@ -672,6 +697,8 @@ std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
     plan->packages_ = resolver.take_packages();
     if (auto native = resolver.take_native()) {
         plan->native_ = std::move(native->admission);
+        plan->native_catalog_identity_ = std::move(native->catalog_identity);
+        plan->root_identity_ = root.identity;
         plan->native_link_inputs_ = std::move(native->artifacts.link);
     }
     return plan;

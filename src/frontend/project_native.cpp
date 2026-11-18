@@ -283,7 +283,8 @@ SelectedNative select_managed_native(const Manifest& manifest, const fs::path& p
                 "manual catalog with the absolute VOID_NATIVE_CATALOG path.");
     }
     const auto directory = inspect_creation_root(selected).path;
-    auto plan = parse_native_catalog(read_project_input(directory / "void.native.toml", native_catalog_byte_limit));
+    const auto catalog_bytes = read_project_input(directory / "void.native.toml", native_catalog_byte_limit);
+    auto plan = parse_native_catalog(catalog_bytes);
     if (plan.target != target)
         throw std::runtime_error("Managed native catalog target '" + plan.target +
             "' does not match this host ('" + std::string(target) + "').");
@@ -322,7 +323,7 @@ SelectedNative select_managed_native(const Manifest& manifest, const fs::path& p
     if (admission->provider() != plan.id || admission->target() != plan.target || admission->abi_revision() != plan.abi)
         throw std::runtime_error("Managed native descriptor does not match the approved provider, target or ABI.");
 
-    return {std::move(plan), std::move(admission)};
+    return {std::move(plan), std::move(admission), native_hash(catalog_bytes)};
 }
 
 std::map<std::string, std::string> read_managed_payload(const CPrimitiveAdmission& native) {

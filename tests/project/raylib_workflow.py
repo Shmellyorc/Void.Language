@@ -9,6 +9,7 @@ import sys
 import tempfile
 import time
 import tomllib
+from approval_console import interact
 
 HEADLESS = """use pkg/raylib as rl
 
@@ -112,6 +113,14 @@ def workspace(args, root):
 
     cli("execution without consent", "run", ".", status=2, contains="Pass --allow-native")
     cli("build without consent", "build", ".", status=2, contains="Pass --allow-native")
+    terminal = dict(env)
+    terminal.pop("CI", None)
+    interact(compiler, ["run", "."], project, terminal, reply=b"approve", contains=b"G59 raylib pixel: 241")
+    interact(compiler, ["run", "."], project, terminal, contains=b"G59 raylib pixel: 241")
+    approvals = cli("inspect native approval", "native", "approvals", contains="org.voidlang.raylib")
+    cli("revoke native approval", "native", "revoke", approvals.split(" | ", 1)[0])
+    interact(compiler, ["run", "."], project, terminal, reply=b"no", status=2, contains=b"approval declined")
+    print("G63 bundled raylib approval, reuse and revocation passed", flush=True)
     cli("verify locked catalog", "resolve", "--project", ".", "--locked")
     original_receipt = receipt.read_bytes()
     try:

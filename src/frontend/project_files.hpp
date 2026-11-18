@@ -19,6 +19,8 @@ bool valid_dependency_path(std::string_view);
 bool valid_git_subdir(std::string_view);
 bool project_path_alias(const std::filesystem::path&);
 std::filesystem::path user_data_directory();
+std::filesystem::path native_approval_store();
+void require_outside_native_approval_store(const std::filesystem::path&, bool reject_ancestor = false);
 std::filesystem::path admit_source_directory(const std::filesystem::path& root, const std::filesystem::path&);
 std::string read_project_input(const std::filesystem::path&, std::size_t limit);
 

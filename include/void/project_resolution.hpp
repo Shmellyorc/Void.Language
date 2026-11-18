@@ -18,6 +18,7 @@ struct LockedPackage {
 };
 class LockedDependencies {
     std::string identity_;
+    std::string native_catalog_identity_, root_identity_;
     DependencyEdges direct_;
     std::map<std::string, LockedPackage, std::less<>> packages_;
     std::shared_ptr<const CPrimitiveAdmission> native_;
@@ -27,6 +28,8 @@ class LockedDependencies {
         const std::filesystem::path&, const Manifest&, bool);
 public:
     const auto& identity() const { return identity_; }
+    const auto& native_catalog_identity() const { return native_catalog_identity_; }
+    const auto& root_identity() const { return root_identity_; }
     const auto& direct() const { return direct_; }
     const auto& packages() const { return packages_; }
     const auto& native() const { return native_; }

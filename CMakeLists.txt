@@ -298,7 +298,7 @@ Package version: ${verified_raylib_version}
 Shipped snapshot SHA-256: ${verified_raylib_snapshot_sha256}
 " NEWLINE_STYLE UNIX)
 install(FILES "${verified_raylib_build_root}/SOURCE_ORIGIN.txt" DESTINATION share/void/verified-packages/raylib COMPONENT compiler)
-add_library(voidc_objects OBJECT src/main.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
+add_library(voidc_objects OBJECT src/main.cpp src/native_approval.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
 target_compile_definitions(voidc_objects PRIVATE VOID_RAYLIB_BUILD_ROOT="${verified_raylib_build_root}"
   VOID_RAYLIB_SANITIZE=$<BOOL:${VOID_SANITIZERS}>
   VOID_RAYLIB_ORIGIN="${verified_raylib_origin}" VOID_RAYLIB_BASE_REVISION="${verified_raylib_base_revision}"

@@ -379,6 +379,7 @@ std::optional<fs::path> create_from_project_template(std::string_view short_name
     if(!valid_template_project_name(*name))
         throw std::invalid_argument("Template project name must be a portable identifier beginning with a letter.");
     require_outside_user_package_store(utf8_path(*name));
+    require_outside_native_approval_store(utf8_path(*name),true);
     const auto manifest=template_manifest(selected->files);
     CreationOptions options;
     options.new_directory=true;

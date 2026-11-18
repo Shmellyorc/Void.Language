@@ -483,7 +483,8 @@ bool project_manifest_present(const std::filesystem::path& root) {
     for(const auto& item:std::filesystem::directory_iterator(root))if(folded(path_utf8(item.path().filename()))=="void.project.toml")return true;
     return false;
 }
-ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native,const EditorDiscovery* editor_discovery=nullptr,EditorRecovery* recovery=nullptr) {
+using ManagedNativeApproval = std::function<std::filesystem::path(const ManagedNativeApprovalSubject&)>;
+ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native,const EditorDiscovery* editor_discovery=nullptr,EditorRecovery* recovery=nullptr,const ManagedNativeApproval* approve=nullptr) {
     ProjectAnalysisResult result;
     std::unique_ptr<ProjectCapture> owned;
     std::set<std::string> seeds;std::string entry;bool automatic=false,complete=false;
@@ -559,12 +560,30 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         std::shared_ptr<Unit> library_scope;
         if(library) {library_scope=std::make_shared<Unit>(capture.manifest->source(),"");validate_graph(capture.graph.units,"",capture.diagnostics,library_scope.get());}
         else validate_graph(capture.graph.units,entry,capture.diagnostics);
+        Unit* binding=nullptr;
+        std::filesystem::path approved_payload;
+        if(approve && capture.native && !library && capture.dependencies &&
+           capture.dependencies->native()==capture.native && !capture.native->dynamic()->payload().empty()) {
+            for(const auto& [id,unit]:capture.graph.units)if(unit->c_primitives) {
+                binding=unit.get();
+                break; // The graph admits at most one declaration module for this provider.
+            }
+            approved_payload=(*approve)({capture.root,*capture.manifest,entry,
+                binding?std::string_view(binding->identity):std::string_view{},
+                binding?std::string_view(binding->source.text()):std::string_view{},*capture.dependencies});
+            authorize_native=true;
+        }
         // Recapture membership, boundary observations, spelling/aliases and bytes.
         // No second source parse, no OS-transaction claim, and no stale success.
         // Compare observations before downstream validation can reinterpret new
         // membership/bytes. Failed admission/read operations retain their own
         // diagnostics; an exception alone is not evidence of a changed snapshot.
         ProjectCapture fresh(root,sources,manifests,&capture);
+        if(approve && authorize_native) {
+            fresh.changed(!fresh.dependencies ||
+                fresh.dependencies->native_catalog_identity()!=capture.dependencies->native_catalog_identity() ||
+                fresh.dependencies->root_identity()!=capture.dependencies->root_identity());
+        }
         fresh.editor_discovery=editor_discovery;
         fresh.changed(automatic && fresh.inventory()!=seeds);
         fresh.editor_discovery=nullptr;
@@ -585,6 +604,10 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
                     {},std::move(library_scope),{},false,capture.dependencies,true);
             return result;
         }
+        if(binding && !approved_payload.empty()) {
+            auto admitted=CPrimitiveAdmission::admit_dynamic(binding->c_primitives->dynamic()->bytes(),std::move(approved_payload));
+            binding->c_primitives=admitted->physical_source()?admitted->at_source_module(binding->identity):std::move(admitted);
+        }
         result.project=ProjectAnalysisAccess::build(capture,seeds,entry,automatic,std::move(library_scope),authorize_native);result.diagnostics=capture.diagnostics.warnings();retain();return result;
     } catch(const CompilationError& failure) {result.diagnostics=failure.diagnostics();retain();return result;}
       catch(const std::filesystem::filesystem_error& failure) {Diagnostic d{Code::project_boundary};d.primary={std::make_shared<const SourceFile>(path_utf8(root),""),{},0,0};d.description=failure.what();d.hint="Check the selected project root, permissions and exact path spelling.";result.diagnostics.push_back(std::move(d));retain();return result;}
@@ -593,6 +616,11 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
 
 ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests,bool authorize_native) {
     return analyze_manifest_project_impl(root,entry,sources,manifests,nullptr,authorize_native);
+}
+
+ProjectAnalysisResult analyze_manifest_project_with_native_approval(const std::filesystem::path& root,
+    const std::optional<std::string>& entry,const ManagedNativeApproval& approve) {
+    return analyze_manifest_project_impl(root,entry,{},{},nullptr,false,nullptr,nullptr,&approve);
 }
 ProjectAnalysisResult analyze_editor_project(const std::filesystem::path& root,const std::optional<std::string>& entry,
     const SourceOverrides& sources,const ManifestOverrides& manifests,const EditorDiscovery& discovery) {

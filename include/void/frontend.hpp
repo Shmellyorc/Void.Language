@@ -216,6 +216,17 @@ bool project_manifest_present(const std::filesystem::path& root);
 ProjectAnalysisResult analyze_manifest_project(const std::filesystem::path& root,
     const std::optional<std::string>& entry_override = {},
     const SourceOverrides& sources = {}, const ManifestOverrides& manifests = {}, bool authorize_native = false);
+struct ManagedNativeApprovalSubject {
+    const std::filesystem::path& root;
+    const project::Manifest& manifest;
+    std::string_view entry, binding, binding_source;
+    const project::LockedDependencies& dependencies;
+};
+// CLI consent is requested only after managed-native and source validation.
+// The callback may return a private, verified payload directory for JIT use.
+ProjectAnalysisResult analyze_manifest_project_with_native_approval(const std::filesystem::path& root,
+    const std::optional<std::string>& entry_override,
+    const std::function<std::filesystem::path(const ManagedNativeApprovalSubject&)>& approve);
 struct EditorCandidate { std::string name, detail; int kind = 6; std::string insert_text = {}, documentation = {}; };
 struct EditorAssistance {
     std::vector<EditorCandidate> candidates;
