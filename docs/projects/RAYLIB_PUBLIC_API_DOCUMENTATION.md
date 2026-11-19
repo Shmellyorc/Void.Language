@@ -223,3 +223,121 @@ error types/members. The pinned 600-function native inventory and generated ABI
 outputs are unchanged. New checks preserve the existing 20 historical meaning
 regressions and add four companion documentation/signature mutations. Current
 results and qualifications belong to G77; earlier results above remain history.
+
+## Numeric-unit naming and partial camera correction — 19 November 2026
+
+Follow-up to committed G77 `2bb57ba167b59e7015244f7c5b32515d49101d52`,
+within the raylib API maintenance scope. No new milestone or compiler redesign.
+
+The original CamelCase converter treated the `D` following a digit as a separate
+word, yielding `camera3_d`, `begin_mode2_d` and `draw_triangle_strip3_d`.
+Public naming now preserves the meaningful numeric-letter unit: `camera_3d`,
+`begin_mode_2d`, `draw_triangle_strip_3d`. The
+[package guide](../../verified-packages/raylib/README.md#camera-construction-and-numeric-unit-names)
+lists all 14 preferred/compatible pairs. Trailing numbers without a following
+letter, including `vector3`, `compute_sha256` and `load_utf8`, are unchanged.
+
+Every original G77 public function remains available. New functions forward to
+the original implementations, with the same parameter labels, order, types,
+returns and ownership. Old `##` comments identify the preferred spelling; new
+functions have actual descriptions, ordered parameter docs and applicable return
+docs. Native camera records still carry their existing `camera2_d`/`camera3_d`
+identities, and both constructor spellings return those identical value types.
+No descriptor, native declaration, C wrapper, layout, resource owner or consuming
+terminal changes. The generator's `abi_snake` retains native identifiers;
+public `snake` groups numeric-letter units. `inventory.json` keeps `void_name`
+stable and adds preferred `public_name` / `compatibility_aliases` metadata.
+
+### Camera inconvenience and compatible correction
+
+Before editing, a fully specified global `camera2_d` checked successfully.
+`camera2_d(zoom = 2)` failed both locally and globally with `VOID2004`, missing
+the required `offset` argument. That directly identifies the helper's required
+parameters, rather than a top-level initialization restriction.
+
+Both old and preferred camera helpers now accept pure named/default arguments.
+2D defaults are zero offset/target/rotation and zoom 1. 3D defaults are position
+`(0, 0, 1)`, target zero, up `(0, 1, 0)`, fovy 45 and perspective projection.
+These produce an ordinary nondegenerate initial view; explicit custom values
+retain their original meaning and remain the caller's responsibility. Supplying
+every field keeps the previous behavior. No window/native allocation is involved
+in these value constructors. For example:
+
+```void
+use pkg/raylib as rl
+
+var camera = rl.camera_3d(position = rl.vector3(0, 2, 10))
+var overlay = rl.camera_2d(zoom = 2)
+
+func main():
+    var local = rl.camera_3d(fovy = 60)
+    print(local.fovy)
+```
+
+The consumer examples use preferred names and omit the unchanged camera fields.
+The adjustment uses existing named/default and pure aggregate construction;
+no parser, semantic, global-initialization or backend change was needed.
+
+### Bounded upstream comparison
+
+[Rust's API naming guidance](https://rust-lang.github.io/api-guidelines/naming.html)
+treats compound abbreviations as units. VOID retains its own existing lowercase
+conventions and repairs only the affected numeric-letter split. Pinned raylib
+6.0 [2D camera](https://github.com/raysan5/raylib/blob/6.0/examples/core/core_2d_camera.c)
+and [3D camera](https://github.com/raysan5/raylib/blob/6.0/examples/core/core_3d_camera_free.c)
+examples use ordinary value construction followed by selected fields, with 2D
+zoom 1 and 3D Y-up, 45-degree perspective. Those released examples inform the
+helper defaults; they are not an upstream patch or proof of a universal camera
+configuration. VOID uses a minimal nonzero default camera position.
+
+### Focused verification and limits
+
+Current source documentation covers **805 functions, 1,624 ordered parameters
+and 544 value returns**: the 791 G77 functions plus 14 preferred spellings.
+The maintained documentation check retains all 20 historical and four G77
+mutations, adds eight naming cases and three compatibility mutations, and checks
+all 14 aliases. The native naming test compares old/new camera transforms and
+plain ABI fields, global/local partial constructors, full positional calls,
+all preferred/old drawing names, and rejection of an unknown camera label.
+Compiler/LSP checks cover namespace completion of both spellings, actual source
+hover docs, displayed optional parameters and active named-parameter selection.
+
+Final results and exact changed-file inventory are recorded in
+[evidence/raylib-naming/results.json](evidence/raylib-naming/results.json).
+Focused results on the final code:
+
+| Check | Result |
+| --- | --- |
+| Release compiler, headless + real graphics, JIT/AOT O0/O2 | 15/15 commands PASS |
+| Debug compiler, same source and modes | 15/15 commands PASS |
+| Fatal ASan/UBSan/leaks headless, JIT/AOT O0/O2 | 11/11 commands PASS |
+| Documentation/native named-call/LSP regressions | PASS with Release, Debug and strict tools |
+| Actual VS Code 1.144.0 | 12/12 checks PASS, including visible optional-camera parameter help |
+| Registered source documentation test | 1/1 PASS |
+| Updated consumer examples | Source check PASS |
+| Actual regeneration and subsequent complete inventory check | PASS; native files byte-identical |
+
+No compiler, Runtime, LLVM, extension implementation or optimization changes
+were made. The additional public forwarders and defaults were not independently
+throughput-benchmarked; this correction makes no new performance claim. Tests
+use the already-qualified LLVM 23.1.4 binaries and explicit local native catalogs.
+No rebuild or unrelated full compiler suite was needed. Native-value return type
+labels retain `camera2_d` / `camera3_d`; preferred callable names are corrected
+without inventing new nominal types or changing native identity. VSCodium was
+not rerun for this correction.
+
+Original pre-correction diagnostics and all unsuccessful intermediate evidence
+remain under `/tmp/raylib-naming-o9tvv7ve`. The first added LSP assertion looked
+for a top-level SignatureInformation documentation field; VOID publishes the
+operation description through hover and individual parameter docs through
+signature help. That test harness assumption was corrected without altering
+the server or weakening the documentation checks. An intermediate hover probe
+used an unfinished call; the final check uses a valid constructor call. The first
+expanded real-editor test also inherited a Result-return assertion for camera
+values; it now verifies the actual native camera return types. All these failed
+harness runs remain in the raw evidence.
+
+Native Windows/macOS remain unqualified. Strict graphics/audio device leak
+failures from G77 remain preserved and are not claimed as passes here. Existing
+stack limits, fatal sanitizer policy, native approvals and installed tools are
+unchanged. No staging, commit, push, installation or hosted CI is authorized.

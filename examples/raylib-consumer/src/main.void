@@ -20,7 +20,7 @@ func main() -> i32:
     var faded = rl.fade(shade, 0.5 as f32)
     if faded.r != 10 as u8 or faded.a != 127 as u8:
         return 12
-    var camera = rl.camera3_d(rl.vector3(0, 0, 10), rl.vector3(0, 0, 0), rl.vector3(0, 1, 0), 45 as f32, rl.camera_perspective)
+    var camera = rl.camera_3d(position = rl.vector3(0, 0, 10))
     var view = rl.get_camera_matrix(camera)
     if view.m15 != 1 as f32:
         return 13

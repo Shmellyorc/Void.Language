@@ -60,6 +60,8 @@ exports.run = async function () {
         report.completion={detail:item.detail,documentation:normalized(item.documentation)};
         report.checks.push('Discoverable try_load_ completion with owning-result docs');
         for(const [call,active,label,description] of [
+            ['rl.camera_2d(zoom = ',3,'zoom: f32 = …','Dimensionless camera zoom factor.'],
+            ['rl.camera_3d(fovy = ',3,'fovy: f32 = …','Vertical field of view in degrees'],
             ['rl.try_load_image(',0,'file_name: string','Relative paths use the process working directory.'],
             ['rl.try_load_image_raw(width = ',1,'width: i32','Width in pixels.'],
             ['rl.try_load_shader(fs_file_name = ',1,'fs_file_name: c_string?','Optional fragment-shader file path.'],
@@ -68,11 +70,25 @@ exports.run = async function () {
             const help=await until(()=>vscode.commands.executeCommand('vscode.executeSignatureHelpProvider',document.uri,document.positionAt(document.getText().length),'('),
                 h=>h?.signatures.length>0&&h.activeParameter===active,'signature '+call);
             const signature=help.signatures[help.activeSignature??0];const parameter=signature.parameters[active];
-            assert(signature.label.includes('load_error>')&&!signature.label.includes('/@pkg/'),signature.label);
+            assert(!signature.label.includes('/@pkg/'),signature.label);
+            if(call.includes('camera_')) assert(signature.label.endsWith('-> '+(call.includes('2d')?'camera2_d':'camera3_d')),signature.label);
+            else assert(signature.label.includes('load_error>'),signature.label);
             assert(normalized(parameter.documentation).includes(description),normalized(parameter.documentation));
             const printed=Array.isArray(parameter.label)?signature.label.slice(...parameter.label):parameter.label;
             assert.equal(printed,label);report.checks.push('Named active parameter '+call+' = '+label);
+            if(call.includes('camera_')) {
+                editor.selection=new vscode.Selection(document.positionAt(document.getText().length),document.positionAt(document.getText().length));
+                await vscode.commands.executeCommand('editor.action.triggerParameterHints');
+                await until(()=>browser.visible(printed,'.parameter-hints-widget.visible'),n=>n>0,'visible optional camera parameter');
+            }
         }
+        await replace(good+'    rl.');
+        const namespace=await until(()=>vscode.commands.executeCommand('vscode.executeCompletionItemProvider',document.uri,document.positionAt(document.getText().length)),
+            r=>r?.items.some(i=>(typeof i.label==='string'?i.label:i.label.label)==='camera_3d'),'preferred camera completion');
+        const names=new Set(namespace.items.map(i=>typeof i.label==='string'?i.label:i.label.label));
+        assert(['camera_2d','camera_3d','camera2_d','camera3_d','begin_mode_3d','begin_mode3_d','draw_triangle_strip_3d','draw_triangle_strip3_d'].every(n=>names.has(n)));
+        report.checks.push('Preferred numeric-unit names and compatibility functions complete together');
+        await replace(good+'    rl.try_load_font_ex(font_size = ');
         editor.selection=new vscode.Selection(document.positionAt(document.getText().length),document.positionAt(document.getText().length));
         await vscode.commands.executeCommand('editor.action.triggerParameterHints');
         await until(()=>browser.visible('font_size','.parameter-hints-widget.visible'),n=>n>0,'visible named parameter widget');

@@ -1,5 +1,53 @@
 # raylib for VOID
 
+## Camera construction and numeric-unit names
+
+Prefer `camera_2d`, `camera_3d`, `begin_mode_2d`, `begin_mode_3d` and
+`draw_line_3d`: numeric units stay together. The complete compatibility list is
+below. The original spellings continue working, including existing named and
+positional calls. Native record names such as `native.camera3_d` are unchanged
+ABI identities; both constructor spellings produce the very same value type.
+
+Camera helpers accept just the named fields you want, locally or at global scope:
+
+```void
+use pkg/raylib as rl
+
+var camera = rl.camera_3d(position = rl.vector3(0, 2, 10))
+var overlay = rl.camera_2d(zoom = 2)
+
+func main():
+    var view = rl.camera_3d(fovy = 60)
+    print(view.fovy)
+```
+
+For 2D cameras, omitted offset/target/rotation are zero and zoom is 1.
+For 3D cameras, omitted position is `(0, 0, 1)`, target `(0, 0, 0)`, up
+`(0, 1, 0)`, fovy 45 degrees and projection `camera_perspective`. Supplying
+every field retains the previous exact behavior. These are plain native values:
+construction needs no window or resource release. Caller-supplied camera values
+still need to suit the intended projection; defaults do not validate a custom
+position equal to its target or a custom degenerate up vector.
+
+| Preferred name | Compatible original spelling |
+| --- | --- |
+| `camera_2d` | `camera2_d` |
+| `camera_3d` | `camera3_d` |
+| `begin_mode_2d` | `begin_mode2_d` |
+| `end_mode_2d` | `end_mode2_d` |
+| `begin_mode_3d` | `begin_mode3_d` |
+| `end_mode_3d` | `end_mode3_d` |
+| `get_world_to_screen_2d` | `get_world_to_screen2_d` |
+| `get_screen_to_world_2d` | `get_screen_to_world2_d` |
+| `get_camera_matrix_2d` | `get_camera_matrix2_d` |
+| `draw_line_3d` | `draw_line3_d` |
+| `draw_point_3d` | `draw_point3_d` |
+| `draw_circle_3d` | `draw_circle3_d` |
+| `draw_triangle_3d` | `draw_triangle3_d` |
+| `draw_triangle_strip_3d` | `draw_triangle_strip3_d` |
+
+## Package overview
+
 This library wraps raylib 6.0 for graphics, input, audio and image processing.
 It exposes all 600 supported interfaces in snake case. The API includes 236
 direct C ABI mappings, 352 ownership and value adapters, 10 callback

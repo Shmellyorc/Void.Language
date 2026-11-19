@@ -922,7 +922,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "begin_mode_2d",
+      "compatibility_aliases": [
+        "begin_mode2_d"
+      ]
     },
     {
       "name": "EndMode2D",
@@ -937,7 +941,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "end_mode_2d",
+      "compatibility_aliases": [
+        "end_mode2_d"
+      ]
     },
     {
       "name": "BeginMode3D",
@@ -954,7 +962,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "begin_mode_3d",
+      "compatibility_aliases": [
+        "begin_mode3_d"
+      ]
     },
     {
       "name": "EndMode3D",
@@ -969,7 +981,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "end_mode_3d",
+      "compatibility_aliases": [
+        "end_mode3_d"
+      ]
     },
     {
       "name": "BeginTextureMode",
@@ -1445,7 +1461,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "get_world_to_screen_2d",
+      "compatibility_aliases": [
+        "get_world_to_screen2_d"
+      ]
     },
     {
       "name": "GetScreenToWorld2D",
@@ -1463,7 +1483,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "get_screen_to_world_2d",
+      "compatibility_aliases": [
+        "get_screen_to_world2_d"
+      ]
     },
     {
       "name": "GetCameraMatrix",
@@ -1497,7 +1521,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "get_camera_matrix_2d",
+      "compatibility_aliases": [
+        "get_camera_matrix2_d"
+      ]
     },
     {
       "name": "SetTargetFPS",
@@ -8188,7 +8216,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "draw_line_3d",
+      "compatibility_aliases": [
+        "draw_line3_d"
+      ]
     },
     {
       "name": "DrawPoint3D",
@@ -8206,7 +8238,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "draw_point_3d",
+      "compatibility_aliases": [
+        "draw_point3_d"
+      ]
     },
     {
       "name": "DrawCircle3D",
@@ -8227,7 +8263,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "draw_circle_3d",
+      "compatibility_aliases": [
+        "draw_circle3_d"
+      ]
     },
     {
       "name": "DrawTriangle3D",
@@ -8247,7 +8287,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h; native-bind signature/layout assertions",
       "test_coverage": "declaration inventory and C signature assertion; not individually runtime-exercised",
-      "exposure": "direct_c_abi"
+      "exposure": "direct_c_abi",
+      "public_name": "draw_triangle_3d",
+      "compatibility_aliases": [
+        "draw_triangle3_d"
+      ]
     },
     {
       "name": "DrawTriangleStrip3D",
@@ -8266,7 +8310,11 @@
       "blocker": null,
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "native prototype/layout compilation; representative subsystem runtime tests in examples/raylib-consumer/src/subsystems.void, not individual execution of every declaration",
-      "exposure": "ownership_adapter"
+      "exposure": "ownership_adapter",
+      "public_name": "draw_triangle_strip_3d",
+      "compatibility_aliases": [
+        "draw_triangle_strip3_d"
+      ]
     },
     {
       "name": "DrawCube",
@@ -10957,7 +11005,11 @@
       "ownership": "plain value",
       "blocker": null,
       "compile_verification": "native/raylib_parity.h",
-      "test_coverage": "Clang AST inventory and native layout assertions"
+      "test_coverage": "Clang AST inventory and native layout assertions",
+      "public_name": "camera_3d",
+      "compatibility_aliases": [
+        "camera3_d"
+      ]
     },
     {
       "name": "Camera2D",
@@ -10977,7 +11029,11 @@
       "ownership": "plain value",
       "blocker": null,
       "compile_verification": "native/raylib_parity.h",
-      "test_coverage": "Clang AST inventory and native layout assertions"
+      "test_coverage": "Clang AST inventory and native layout assertions",
+      "public_name": "camera_2d",
+      "compatibility_aliases": [
+        "camera2_d"
+      ]
     },
     {
       "name": "Mesh",
@@ -13343,7 +13399,11 @@
       "void_name": "camera3_d",
       "implementation": "alias to exact native record/owner",
       "compile_verification": "Clang AST; native/raylib_parity.h",
-      "test_coverage": "inventory parity"
+      "test_coverage": "inventory parity",
+      "public_name": "camera_3d",
+      "compatibility_aliases": [
+        "camera3_d"
+      ]
     },
     {
       "name": "Camera",
@@ -13352,7 +13412,11 @@
       "void_name": "camera3_d",
       "implementation": "alias to exact native record/owner",
       "compile_verification": "Clang AST; native/raylib_parity.h",
-      "test_coverage": "inventory parity"
+      "test_coverage": "inventory parity",
+      "public_name": "camera_3d",
+      "compatibility_aliases": [
+        "camera3_d"
+      ]
     },
     {
       "name": "Camera2D",
@@ -13361,7 +13425,11 @@
       "void_name": "camera2_d",
       "implementation": "alias to exact native record/owner",
       "compile_verification": "Clang AST; native/raylib_parity.h",
-      "test_coverage": "inventory parity"
+      "test_coverage": "inventory parity",
+      "public_name": "camera_2d",
+      "compatibility_aliases": [
+        "camera2_d"
+      ]
     },
     {
       "name": "Mesh",

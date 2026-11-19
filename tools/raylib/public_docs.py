@@ -4,6 +4,7 @@ This maintenance check reads the library's one-line top-level signatures. It
 does not generate native declarations or change compiler-owned import behavior.
 """
 import re
+from names import canonical_name
 
 # These source interfaces intentionally differ from their C prototypes.
 # Entries include all source parameters, in their existing order.
@@ -144,6 +145,7 @@ def verify_documentation_meanings(function):
 def verify_public_api(source, nodes, inventory, snake):
     upstream = {node['name']: node for node in nodes if node['kind'] == 'FunctionDecl'}
     entries = {entry['void_name']: entry for entry in inventory['functions']}
+    entries.update((entry['public_name'], entry) for entry in inventory['functions'] if 'public_name' in entry)
     occupied = set(re.findall(r'^(?:func|struct|value struct|const) (\w+)', source, re.M))
     count = parameters = returns = 0
     for function in public_functions(source):
@@ -169,6 +171,7 @@ def verify_public_api(source, nodes, inventory, snake):
         parameters += len(labels)
         returns += bool(function['result'])
     verify_fallible_api(source)
+    verify_numeric_names(source)
     print(f'Public documentation verified: {count} functions, {parameters} parameters, {returns} returns')
 
 
@@ -196,7 +199,8 @@ def verify_fallible_api(source):
     expected = {operation: typ for typ, names in FALLIBLE_RESOURCES.items() for operation in names}
     expected.update((name, 'bool') for name in FALLIBLE_WRITES)
     companions = {'try_' + name for name in expected}
-    if len(functions) != 791 or len(functions.keys() - companions) != 757:
+    preferred = {canonical_name(name) for name in functions if canonical_name(name) != name}
+    if len(functions) != 791 + len(preferred) or len(functions.keys() - companions - preferred) != 757:
         raise ValueError('Keep all 757 original documented functions and the 34 G77 companions')
     for operation, typ in expected.items():
         name = 'try_' + operation
@@ -226,3 +230,18 @@ def verify_fallible_api(source):
         if at < 0 or not source[:at].splitlines()[-1].lstrip().startswith('## '):
             raise ValueError('Missing source documentation for ' + declaration.strip())
     return len(companions)
+
+
+def verify_numeric_names(source):
+    """Every historical numeric-unit spelling keeps an exact public companion."""
+    functions = {f['name']: f for f in public_functions(source)}
+    aliases = {name: canonical_name(name) for name in functions if canonical_name(name) != name}
+    if len(aliases) != 14:
+        raise ValueError('Retain all 14 numeric-unit compatibility names and their preferred spellings')
+    for legacy, preferred in aliases.items():
+        old, new = functions[legacy], functions.get(preferred)
+        if not new or new['parameters'] != old['parameters'] or new['result'] != old['result']:
+            raise ValueError(preferred + ': missing or incompatible numeric-unit companion')
+        if not any('Compatibility spelling' in line and preferred in line for line in old['docs']):
+            raise ValueError(legacy + ': document the preferred spelling')
+    return aliases

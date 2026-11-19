@@ -58,3 +58,31 @@ the 757-function original coverage. `tests/project/raylib_documentation.py
 --docs-only` also injects four broken-companion documentation cases alongside
 the twenty historical meaning errors. Native acceptance remains the 600 pinned
 C APIs; source companions are not counted as new native ABI declarations.
+
+## Numeric units and compatibility
+
+Public snake_case keeps units such as `2D` and `3D` together: `Camera3D`
+becomes `camera_3d`, `BeginMode2D` becomes `begin_mode_2d`, and
+`DrawTriangleStrip3D` becomes `draw_triangle_strip_3d`. A trailing number
+without a letter stays attached (`vector3`, `compute_sha256`, `load_utf8`).
+`names.py` separates public spelling from the original `abi_snake` mapping.
+Native record/binding identifiers and C symbols retain their published bytes.
+
+The 14 preferred functions forward to the existing public implementations.
+Original spellings remain documented compatibility functions. The generated
+inventory retains its existing `void_name` native identity and adds `public_name`
+and `compatibility_aliases` for affected entries. Regeneration checks both public
+forms and their signatures; it does not regenerate the physical VOID source.
+Camera helpers in both spellings accept named/default arguments. Their defaults
+are pure native value construction, with no compiler or native ownership changes.
+
+The documentation-only test includes naming and compatibility mutations. For
+native construction/ABI checks, supply an already-prepared, explicit catalog:
+
+```sh
+python3 tests/project/raylib_naming.py /path/to/voidc /path/to/catalog /fresh/evidence
+```
+
+`--graphics` additionally exercises all preferred/old drawing spellings with a
+real hidden window; it requires a native display. Keep fatal sanitizer policies
+when running the headless cases. Known upstream device leak limits still apply.

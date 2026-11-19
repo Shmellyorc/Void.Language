@@ -13,6 +13,7 @@ import subprocess
 from owned_bindings import OWNERS, extend
 from callback_bindings import extend as callback_extensions
 from public_docs import verify_public_api
+from names import abi_snake, canonical_name, snake
 
 TOOLS = Path(__file__).resolve().parent
 ROOT = TOOLS.parents[1] / "verified-packages/raylib"
@@ -33,11 +34,6 @@ RECORD_GAPS = {
     'VrStereoConfig': 'Inline arrays of Matrix records are not representable by the current scalar-array descriptor shape.',
 }
 RUNTIME_FUNCTIONS = {'CheckCollisionCircles', 'Fade', 'GetCameraMatrix', 'GetRayCollisionBox'}
-
-
-def snake(name):
-    name = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', name)
-    return re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', name).lower()
 
 
 def clang_run(clang, *args):
@@ -128,14 +124,14 @@ def generate(clang):
             if base in SCALARS:
                 stride = {'char':1,'unsigned char':1,'int':4,'unsigned int':4,'float':4,'double':8}[base]
                 return f'array:{SCALARS[base]}:{array[2]}:{stride}'
-            return f'array_record:{snake(base)}:{array[2]}:{layouts[base]["size"]}'
+            return f'array_record:{abi_snake(base)}:{array[2]}:{layouts[base]["size"]}'
         canonical = resolve_type(t, aliases)
-        return SCALARS[canonical] if canonical in SCALARS else 'record:' + snake(canonical)
+        return SCALARS[canonical] if canonical in SCALARS else 'record:' + abi_snake(canonical)
     for n in records:
         name = n['name']
         complete = n.get('completeDefinition', False)
         layout = layouts.get(name)
-        entry = {'name': name, 'c_declaration': declaration(text, n), 'void_name': snake(name) if name in POD else None,
+        entry = {'name': name, 'c_declaration': declaration(text, n), 'void_name': abi_snake(name) if name in POD else None,
                  'abi': layout, 'implementation': 'record' if name in POD else 'blocked',
                  'ownership': 'plain value' if name in POD or name in RECORD_GAPS else 'native pointer/resource fields require audited owners' if complete else 'opaque upstream type',
                  'blocker': RECORD_GAPS.get(name, 'native resource/borrow adapter is unfinished') if name not in POD else None,
@@ -154,9 +150,9 @@ def generate(clang):
         # Color is already in the historical descriptor. Every other POD record
         # keeps its real nested fields and native layout, not opaque handles.
         if name != 'Color':
-            descriptor.append(f'record {snake(name)} {name} {layout["size"]} {layout["alignment"]} {len(fields)}')
+            descriptor.append(f'record {abi_snake(name)} {name} {layout["size"]} {layout["alignment"]} {len(fields)}')
             for f in fields:
-                descriptor.append(f'field {snake(f["name"])} {f["name"]} {mapped(f["type"]["qualType"])} {layout["offsets"][f["name"]]}')
+                descriptor.append(f'field {abi_snake(f["name"])} {f["name"]} {mapped(f["type"]["qualType"])} {layout["offsets"][f["name"]]}')
     for n in functions:
         name = n['name']
         typ = n['type']['qualType']
@@ -166,7 +162,7 @@ def generate(clang):
         check_params = ', '.join(param_types + (['...'] if n.get('variadic') else [])) or 'void'
         checks.append(f'_Static_assert(_Generic(&{name}, {result} (*)({check_params}): 1, default: 0), "{name} signature");')
         failure = blocker(n, aliases)
-        exposed = snake(name) if failure is None else None
+        exposed = abi_snake(name) if failure is None else None
         inventory['functions'].append({'name': name, 'c_declaration': declaration(text, n), 'void_name': exposed,
             'native_abi': {'result': mapped(result), 'parameters': list(map(mapped, param_types))} if exposed else None,
             'ownership': 'no transferred ownership; arguments and results are scalar/POD values' if exposed else 'requires per-signature ownership adapter; see blocker and original C declaration',
@@ -182,7 +178,7 @@ def generate(clang):
         declarations.append(f'VOID_RAYLIB_EXPORT {result} {symbol}({cparams});')
         args = ', '.join('p' + str(i) for i in range(len(parameters)))
         c.append(f'{result} {symbol}({cparams}) {{ VdRaylibCallScope vd_scope __attribute__((cleanup(vd_raylib_call_end)))=vd_raylib_call_begin(); if(!vd_scope.entered) '+('return;' if result=='void' else f'return ({result}){{0}};')+' '+('return ' if result!='void' else '')+f'{name}({args}); }}')
-    additional = extend(nodes, inventory, aliases, POD, SCALARS, VOID, snake, resolve_type)
+    additional = extend(nodes, inventory, aliases, POD, SCALARS, VOID, abi_snake, resolve_type)
     callbacks=callback_extensions()
     for key in ('declarations','resources','records','bindings','body'):additional[key]+=callbacks[key]
     additional['outcomes'].update(callbacks['outcomes'])
@@ -195,7 +191,7 @@ def generate(clang):
             entry.update(additional['outcomes'][entry['name']])
     for entry in inventory['records']:
         if entry['name'] in OWNERS and entry['name'] not in POD:
-            entry.update(void_name=snake(entry['name']), implementation='sealed native owner or parent-retained view',
+            entry.update(void_name=abi_snake(entry['name']), implementation='sealed native owner or parent-retained view',
                          ownership='Native struct remains exact C storage. Nested owner/pointer fields are parent-retained, generation-checked readonly views. Internal addresses stay opaque.',
                          blocker=None)
         elif entry['name'] in ('rAudioBuffer','rAudioProcessor'):
@@ -216,7 +212,7 @@ def generate(clang):
         canonical=resolve_type(n['name'], aliases)
         known_record=canonical in POD or canonical in OWNERS
         inventory['typedefs'].append({'name': n['name'], 'c_declaration': declaration(text, n), 'native_abi': n['type']['qualType'],
-            'void_name': snake(canonical) if known_record else 'transform_array' if n['name']=='ModelAnimPose' else None,
+            'void_name': abi_snake(canonical) if known_record else 'transform_array' if n['name']=='ModelAnimPose' else None,
             'implementation': 'alias to exact native record/owner' if known_record else 'extent-checked transform-array view' if n['name']=='ModelAnimPose' else 'enumerator constants' if enum_id(n) in enum_by_id else 'opaque internal audio pointer' if n['name'] in ('rAudioBuffer','rAudioProcessor') else 'technically unsupported context-free callback; exact C signature asserted' if 'Callback' in n['name'] else 'C compatibility typedef',
             'compile_verification': 'Clang AST; native/raylib_parity.h', 'test_coverage': 'inventory parity'})
         if enum_id(n) not in enum_by_id:
@@ -261,6 +257,13 @@ def generate(clang):
     inventory['complete_binding_semantics']='Legacy exact-C-signature completeness; arbitrary C variadics are not exposed. complete_usable_api includes explicitly identified typed equivalents and lifecycle adapters.'
     inventory['complete_direct_c_abi']=False
     inventory['arbitrary_c_varargs_supported']=False
+    # Source-friendly names are additive; void_name remains the published native
+    # identity consumed by descriptors and existing package tooling.
+    for category in ('functions', 'records', 'typedefs'):
+        for entry in inventory[category]:
+            legacy = entry.get('void_name')
+            if legacy and (preferred := canonical_name(legacy)) != legacy:
+                entry.update(public_name=preferred, compatibility_aliases=[legacy])
     verify_public_api((ROOT / 'src/raylib.void').read_text(), nodes, inventory, snake)
     return {'inventory.json': json.dumps(inventory, indent=2) + '\n',
             'native/raylib_api.h': '\n'.join(declarations) + '\n', 'native/raylib_api.c': '\n'.join(c) + '\n',

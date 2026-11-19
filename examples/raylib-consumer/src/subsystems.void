@@ -232,10 +232,10 @@ func graphics() -> i32:
     rl.mesh_array_close(mesh_list)
     rl.begin_drawing()
     rl.clear_background(rl.black())
-    var camera = rl.camera3_d(rl.vector3(4, 4, 4), rl.vector3(0, 0, 0), rl.vector3(0, 1, 0), 45 as f32, rl.camera_perspective)
-    rl.begin_mode3_d(camera)
+    var camera = rl.camera_3d(position = rl.vector3(4, 4, 4))
+    rl.begin_mode_3d(camera)
     rl.draw_model(scene, rl.vector3(0, 0, 0), 1 as f32, rl.white())
-    rl.end_mode3_d()
+    rl.end_mode_3d()
     rl.end_drawing()
     rl.unload_model(scene)
     var face = rl.get_font_default() as rl.font
