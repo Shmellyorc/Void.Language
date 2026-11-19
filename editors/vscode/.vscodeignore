@@ -4,6 +4,8 @@
 !LICENSE.txt
 !language-configuration.json
 !icons/void-extension.png
+!icons/void-light.png
+!icons/void-dark.png
 !syntaxes/**
 !dist/extension.js
 !dist/THIRD_PARTY_NOTICES.txt

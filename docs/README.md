@@ -91,6 +91,9 @@ The ordinary CLI entry is synchronous; async examples use the explicit host abov
 
 ## Engineering documentation
 
+- [G69 VOID file icons and corrected qualification](projects/G69_VOID_FILE_ICONS.md):
+  standard language-icon fallback, theme-owned mappings and preserved original evidence.
+
 - [G76 IntelliSense implementation and qualification](projects/G76_INTELLISENSE.md):
   readable signatures, versioned assistance, incremental reuse and measured editor responsiveness.
 - [Worktree management](WORKTREE_MANAGEMENT.md): standard linked-worktree

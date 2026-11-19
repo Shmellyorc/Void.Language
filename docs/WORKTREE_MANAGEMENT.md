@@ -77,7 +77,7 @@ Use these classifications:
 | Class | Default disposition |
 | --- | --- |
 | Active | Retain; coordinate the owner before an approved move. |
-| ON HOLD | Retain all unfinished work and evidence; relocation does not clear the hold. G69 remains ON HOLD. |
+| ON HOLD | Retain all unfinished work and evidence; relocation does not clear the hold. Only an explicit owner decision changes that status. |
 | Completed | Retire only once commits and necessary local contents are demonstrably preserved. |
 | Uncertain | Retain until ownership and contents are established; an approved move can organize it without discarding its data. |
 

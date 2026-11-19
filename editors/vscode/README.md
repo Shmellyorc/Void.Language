@@ -1,5 +1,12 @@
 # VOID Language for VS Code and VSCodium
 
+## File icons
+
+The extension supplies the VOID mark for `.void` files in Explorer and editor
+tabs: white in dark appearances and black in light appearances. VS Code and
+VSCodium resolve it through the active file-icon theme. A theme can supply its
+own `void` language icon or disable language fallback icons.
+
 ## Manifest projects
 
 Set `void.project.root` to a literal absolute or workspace-relative manifest root.

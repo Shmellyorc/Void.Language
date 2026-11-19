@@ -102,6 +102,13 @@ existing theme's explicit `*.void` mapping in VS Code and VSCodium.
 G69 remains on HOLD. Revisit that work when both editors preserve explicit
 theme overrides in the original replay.
 
+### G69 status correction — 19 November 2026
+
+Boss has superseded G69's blanket HOLD. The observations above remain historical;
+normal theme fallback and the manually configured extension-mapping case are
+distinguished in the [current G69 record](G69_VOID_FILE_ICONS.md#correction--19-november-2026).
+The G73 top-level extension icon remains unchanged.
+
 ## Proposed commit inventory
 
 - `editors/vscode/package.json`
