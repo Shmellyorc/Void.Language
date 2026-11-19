@@ -127,6 +127,9 @@ without current evidence.
 
 ## Permanent engineering evidence and cleanup
 
+Follow [worktree management](WORKTREE_MANAGEMENT.md) for linked-checkout
+locations, ownership, preservation, relocation and retirement.
+
 Use the [canonical archive and retention policy](projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md)
 without duplicating its procedures in every assignment. Record milestone findings,
 behavior, failures, qualification limits, exact checks and reproduction requirements

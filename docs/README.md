@@ -91,6 +91,8 @@ The ordinary CLI entry is synchronous; async examples use the explicit host abov
 
 ## Engineering documentation
 
+- [Worktree management](WORKTREE_MANAGEMENT.md): standard linked-worktree
+  location, ownership, preservation, Git relocation and retirement procedures.
 - [G75 CLI experience implementation and qualification](projects/G75_CLI_EXPERIENCE_IMPLEMENTATION.md):
   aligned help, terminal status, inclusive timing reports, VOIDUP presentation and
   the managed F5 compiler-success guard; native-platform limits remain explicit.
