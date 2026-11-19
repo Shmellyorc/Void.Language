@@ -29,3 +29,15 @@ Native renderer limitations and the
 unsuppressed strict graphics/audio leak failures are documented in the
 [ownership contract](../../verified-packages/raylib/OWNERSHIP.md) and
 [qualification report](../../docs/projects/G23_G24_IMPLEMENTATION.md).
+
+
+## Recoverable resource examples
+
+`src/fallible.void` supplies `transcode_image(source_file, destination_file)` and
+`describe_image(file_name)`. Call them from the application entry after importing
+`"./fallible.void"`. The first uses `?` to propagate load failure and `defer` to
+unload the acquired image whether export succeeds or fails. The second explicitly
+matches `Ok`/`Err` and releases the successful owner. Use writable output paths;
+these helpers do not guess missing-file, permission or decoder-specific causes.
+See the package's [fallible API guide](../../verified-packages/raylib/README.md#recoverable-resource-loading)
+for context requirements, default font/shader detection and native-guard limits.

@@ -211,3 +211,15 @@ installations passed preservation checks. Candidate tools were used in
 isolated processes. G69 remains on HOLD.
 
 All ten files are unstaged for review on the branch above.
+
+
+## G77 additive source companions — 19 November 2026
+
+The [G77 implementation record](G77_FALLIBLE_RAYLIB_LOADERS.md) adds 34 documented
+source-level resource/file companions. All 757 functions qualified above remain
+byte-identical in the original source prefix. Current documentation coverage is
+791 functions, 1,591 ordered parameters and 539 value returns, plus documented
+error types/members. The pinned 600-function native inventory and generated ABI
+outputs are unchanged. New checks preserve the existing 20 historical meaning
+regressions and add four companion documentation/signature mutations. Current
+results and qualifications belong to G77; earlier results above remain history.

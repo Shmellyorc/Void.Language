@@ -48,3 +48,13 @@ header must match the pinned bytes from the library's `upstream/`
 directory. Re-run the package and native verification tests when
 changing preparation or the binding. Keep official release hashes
 and their licenses with the verified inputs.
+
+
+G77 source-only `try_` companions remain in `src/raylib.void`; native generation
+never overwrites that public module. `public_docs.verify_fallible_api` requires
+all 34 companions, their existing ordered parameters, real `result<t, load_error>`
+returns, ownership/result docs and documented error declarations. It preserves
+the 757-function original coverage. `tests/project/raylib_documentation.py
+--docs-only` also injects four broken-companion documentation cases alongside
+the twenty historical meaning errors. Native acceptance remains the 600 pinned
+C APIs; source companions are not counted as new native ABI declarations.

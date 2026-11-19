@@ -15,12 +15,14 @@ sys.path.insert(0, str(ROOT / 'tools'))
 from lsp_client import Client
 
 sys.path.insert(0, str(ROOT / 'tools/raylib'))
-from public_docs import public_functions, verify_documentation_meanings
+from public_docs import public_functions, verify_documentation_meanings, verify_fallible_api
 
 
 def documentation_checks():
     functions = {function['name']: function for function in public_functions(
         (ROOT / 'verified-packages/raylib/src/raylib.void').read_text())}
+    source = (ROOT / 'verified-packages/raylib/src/raylib.void').read_text()
+    assert verify_fallible_api(source) == 34
     for function in functions.values():
         verify_documentation_meanings(function)
     # Reintroduce independent historical template errors in memory. These
@@ -61,7 +63,24 @@ def documentation_checks():
             pass
         else:
             raise AssertionError((name, 'accepted inaccurate documentation', replacement))
-    print(f'Raylib documentation checks: {len(functions)} public functions and {len(mistakes)} rejected template errors passed')
+    for original, replacement in [
+        ('func try_load_image(file_name: string)', 'func try_load_image(path: string)'),
+        ('func try_load_image(file_name: string) -> result<image, load_error>:', 'func try_load_image(file_name: string) -> result<image, string>:'),
+        ('## @return Ok with one image owner', '## @return A resource'),
+        ('## A requested font or custom shader resolved', '# A requested font or custom shader resolved'),
+    ]:
+        # Target the public companion section, preserving original coverage.
+        start = source.index('# G77 fallible companions.')
+        tail = source[start:]
+        assert original in tail, original
+        changed = source[:start] + tail.replace(original, replacement, 1)
+        try:
+            verify_fallible_api(changed)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError(('accepted broken fallible documentation', original))
+    print(f'Raylib documentation checks: {len(functions)} public functions, 34 companions, {len(mistakes)} historical and 4 new rejected documentation errors passed')
 
 
 documentation_checks()
@@ -190,6 +209,27 @@ with tempfile.TemporaryDirectory(prefix='VOID raylib documentation ') as scratch
             assert help and help['activeParameter'] == active, (call, help)
             signature = help['signatures'][0]
             assert signature['parameters'][active]['documentation']['value'] == description, help
+
+        for call, active, description in [
+            ('rl.try_load_image(', 0, 'Path to the file. Relative paths use the process working directory.'),
+            ('rl.try_load_image_raw(width = ', 1, 'Width in pixels.'),
+            ('rl.try_load_shader(fs_file_name = ', 1, 'Optional fragment-shader file path. null requests the native default. Present text must be NUL-free UTF-8.'),
+            ('rl.try_load_font_ex(font_size = ', 1, 'Font size in pixels.'),
+        ]:
+            update(base + call)
+            help = query('signatureHelp', call, len(call))
+            assert help and help['activeParameter'] == active, (call, help)
+            signature = help['signatures'][0]
+            assert 'result<' in signature['label'] and 'load_error>' in signature['label'], signature
+            assert signature['parameters'][active]['documentation']['value'] == description, help
+        update(base + 'rl.try_load_')
+        response = query('completion', 'rl.try_load_', len('rl.try_load_'))
+        candidates = response['items'] if isinstance(response, dict) else response
+        image_item = next(item for item in candidates if item['label'] == 'try_load_image')
+        assert 'Ok' in image_item['documentation'] and 'Err' in image_item['documentation'] and 'unload_image' in image_item['documentation'], image_item
+        update(base + 'var candidate = rl.try_load_image("missing.png")')
+        hover = query('hover', 'rl.try_load_image', len('rl.'))['contents']['value']
+        assert 'result<image, load_error>' in hover and 'unload_image' in hover and 'Err' in hover, hover
 
         update(base + 'var closing = rl.window_should_close()')
         closing = query('hover', 'rl.window_should_close', len('rl.'))['contents']['value']

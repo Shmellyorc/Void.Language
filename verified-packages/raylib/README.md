@@ -18,6 +18,84 @@ For example, replace `get_random_value(p0 = 1, p1 = 6)` with
 are preserved. Adapted APIs document VOID-owned buffers, nullable results,
 callback lifetimes and the matching cleanup operation.
 
+## Recoverable resource loading
+
+Use the `try_` companions when acquisition failure should be handled or propagated
+with VOID's lowercase `result<t,e>`. Existing nullable loaders and boolean
+save/export functions are unchanged.
+
+```void
+use pkg/raylib as rl
+
+## Read image dimensions, releasing the acquired native image on all return paths.
+## @param file_name Supported image file, relative to the process working directory when not absolute.
+## @return Ok with dimensions, or the original recoverable loader error.
+func dimensions(file_name: string) -> result<string, rl.load_error>:
+    var loaded = rl.try_load_image(file_name = file_name)?
+    defer rl.unload_image(loaded)
+    return Ok("{loaded.width} x {loaded.height}")
+
+## Show explicit success and failure handling.
+## @return Zero when sprite.png loads; one after reporting its known loading failure.
+func main() -> i32:
+    var outcome = dimensions("sprite.png")
+    if outcome is Ok(var size):
+        print(size)
+        return 0
+    else if outcome is Err(var failure):
+        print("{failure.operation}: {failure.message}")
+    return 1
+```
+
+A successful resource result owns the same sealed native resource as the existing
+loader. Release it once with the documented unload function; copying the result
+or owner does not create independent native ownership. Inputs are borrowed, and
+music loaded from memory retains its own native byte copy. Rejected invalid or
+fallback results release their temporary owners before returning `Err`. Use
+`buffer_close` for byte-buffer results: their recorded producer chooses the right
+native deallocator. A sound alias retains its source and uses `unload_sound_alias`.
+
+`load_error` extends the standard managed error and adds `operation` and `kind`.
+`kind` is `load_error_kind.acquisition_failed`, `invalid_resource`,
+`default_fallback`, or `operation_failed`. The first reports that no owner was
+acquired; it does not guess missing files, permissions, unsupported encodings or
+allocation causes. `operation_failed` records a false save/export result. Native
+contract violations (closed/stale owners, invalid extents, wrong thread or a
+missing required window/audio device) keep the existing checked failure behavior;
+`try_` is not a mechanism for bypassing those guards. Runtime allocation failures
+also retain their normal checked behavior.
+
+Font companions reject raylib's built-in default font in place of the requested
+font, checking both font metadata and its texture. Shader companions reject a
+wholly default program when custom paths/code were requested; both null arguments
+intentionally request the default and may return `Ok`. A nondefault program does
+not prove every requested stage was used: raylib does not expose complete
+per-stage loading/compiler diagnostics through these APIs. Valid models may
+still use raylib's default materials. No filesystem preflight or log parsing is
+used to manufacture a more precise error.
+
+| Family | Companions (all names start with `try_`) | Successful owner cleanup |
+| --- | --- | --- |
+| CPU images | `load_image`, `load_image_raw`, `load_image_anim`, `load_image_anim_from_memory`, `load_image_from_memory`, `load_image_from_texture`, `load_image_from_screen` | `unload_image` |
+| GPU textures | `load_texture`, `load_texture_from_image`, `load_texture_cubemap` | `unload_texture` |
+| Render target | `load_render_texture` | `unload_render_texture` |
+| Fonts | `load_font`, `load_font_ex`, `load_font_from_memory` | `unload_font` |
+| Shader programs | `load_shader`, `load_shader_from_memory` | `unload_shader` |
+| Decoded audio | `load_wave`, `load_wave_from_memory` | `unload_wave` |
+| Sounds | `load_sound`, `load_sound_from_wave`, `load_sound_alias` | `unload_sound`; alias uses `unload_sound_alias` |
+| Music | `load_music_stream`, `load_music_stream_from_memory` | `unload_music_stream` |
+| Audio stream | `load_audio_stream` | `unload_audio_stream` |
+| Model | `load_model` | `unload_model` |
+| Owned bytes | `load_file_data`, `load_file_text`, `export_image_to_memory`, `compress_data`, `decompress_data` | `buffer_close` |
+| File/export status | `save_file_data`, `save_file_text`, `export_image`, `export_wave` | `Ok(true)`; input owners remain caller-owned |
+
+The 34 companions use the existing GPU/audio context and owner-thread rules.
+They add no native ABI functions. Their actual declarations contain ordered
+`## @param` and `## @return` docs for hover, completion and signature help. See the
+[working propagation/cleanup example](../../examples/raylib-consumer/src/fallible.void)
+in a source checkout and the [ownership contract](OWNERSHIP.md). The physical
+public source is authoritative; maintenance generation verifies and preserves it.
+
 ## Add raylib to an application
 
 The bundled library supports x86-64 GNU/Linux and Windows x64 with the MSVC

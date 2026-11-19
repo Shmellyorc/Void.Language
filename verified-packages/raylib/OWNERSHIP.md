@@ -249,3 +249,20 @@ The final callback-only strict suite separately passes headless and real audio
 invocation, replacement, implicit shutdown and failure cleanup without sanitizer
 reports. It avoids the independently leaking music/alias paths and does not
 reclassify those full-device failures as green.
+
+
+## Fallible source companions
+
+The `try_` resource loaders return `result<resource, load_error>` using the same
+sealed owner as the existing nullable loader. `Ok` transfers one owning reference
+to the caller; `Err` carries no usable resource. Owner aliases retain their normal
+consuming-terminal restrictions. A candidate that fails the existing validity
+query is closed through its normal terminal before rejection. Font texture views
+and default-resource probe owners are explicitly closed; native default assets
+remain owned by raylib. Intentional default shaders are supported. Source-level
+error propagation does not replace the caller's obligation to unload successful
+resources, and native input/lifecycle violations remain checked failures.
+
+No native descriptor, transport, FFI approval, callback, ownership transfer or
+existing loader contract changes. The source-only companions are listed in the
+[package guide](README.md#recoverable-resource-loading).

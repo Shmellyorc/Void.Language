@@ -1,0 +1,23 @@
+use pkg/raylib as rl
+
+## Decode a PNG or other supported image, export it, and release the image on every return path.
+## @param source_file File to decode using raylib; relative paths use the process working directory.
+## @param destination_file Output path whose extension selects a supported image exporter.
+## @return Ok(true) after export; Err with the original load/export operation. No acquired image escapes or leaks on failure.
+func transcode_image(source_file: string, destination_file: string) -> result<bool, rl.load_error>:
+    var loaded = rl.try_load_image(file_name = source_file)?
+    defer rl.unload_image(loaded)
+    return rl.try_export_image(image_value = loaded, file_name = destination_file)
+
+## Show explicit result handling while keeping resource cleanup local to the successful branch.
+## @param file_name Image path to load using the process working directory for relative paths.
+## @return True if an image was loaded; false after printing the known operation failure without guessing its cause.
+func describe_image(file_name: string) -> bool:
+    var outcome = rl.try_load_image(file_name = file_name)
+    if outcome is Ok(var loaded):
+        defer rl.unload_image(loaded)
+        print("Image dimensions: {loaded.width} x {loaded.height}")
+        return true
+    else if outcome is Err(var failure):
+        print("{failure.operation}: {failure.message}")
+    return false

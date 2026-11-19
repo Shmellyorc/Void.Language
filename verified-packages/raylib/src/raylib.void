@@ -7970,3 +7970,469 @@ func gallery_should_close(gallery: gallery_window) -> bool:
 ## @return -1 while only Left is held, 1 while only Right is held, or 0 when neither or both are held.
 func gallery_direction(gallery: gallery_window) -> i32:
     return native.direction(gallery.owner)
+
+
+# G77 fallible companions. Physical source; native declarations and ABI are unchanged.
+
+## Observable failures from fallible raylib operations, without guessing an OS or decoder cause.
+enum load_error_kind:
+    ## The existing loader returned no acquired owner.
+    acquisition_failed
+    ## Raylib rejected the acquired resource's validity; the temporary owner was released.
+    invalid_resource
+    ## A requested font or custom shader resolved to raylib's built-in default instead.
+    default_fallback
+    ## A file/data operation explicitly returned false.
+    operation_failed
+
+## Recoverable raylib operation failure. Native contract violations retain their existing checked failure behavior.
+struct load_error extends core_error.error:
+    ## Exact existing raylib wrapper name that reported the failure.
+    operation: string
+    ## Observable failure category; it does not distinguish absent files, permissions or unsupported formats.
+    kind: load_error_kind
+
+private func _load_failure(operation: string, kind: load_error_kind) -> load_error:
+    var message = "Raylib did not acquire a resource"
+    var code: i32 = 1
+    if kind is load_error_kind.invalid_resource:
+        message = "Raylib reported an invalid acquired resource"
+        code = 2
+    else if kind is load_error_kind.default_fallback:
+        message = "Raylib returned its built-in default instead of the requested resource"
+        code = 3
+    else if kind is load_error_kind.operation_failed:
+        message = "Raylib reported that the operation failed"
+        code = 4
+    return load_error(message = message, code = code, operation = operation, kind = kind)
+
+private func _try_image(candidate: image?, operation: string) -> result<image, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as image
+    if not is_image_valid(acquired):
+        unload_image(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    return Ok(acquired)
+
+private func _try_texture(candidate: texture?, operation: string) -> result<texture, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as texture
+    if not is_texture_valid(acquired):
+        unload_texture(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    return Ok(acquired)
+
+private func _try_render_texture(candidate: render_texture?, operation: string) -> result<render_texture, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as render_texture
+    if not is_render_texture_valid(acquired):
+        unload_render_texture(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    return Ok(acquired)
+
+private func _try_wave(candidate: wave?, operation: string) -> result<wave, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as wave
+    if not is_wave_valid(acquired):
+        unload_wave(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    return Ok(acquired)
+
+private func _try_sound(candidate: sound?, operation: string) -> result<sound, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as sound
+    if not is_sound_valid(acquired):
+        unload_sound(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    return Ok(acquired)
+
+private func _try_music(candidate: music?, operation: string) -> result<music, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as music
+    if not is_music_valid(acquired):
+        unload_music_stream(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    return Ok(acquired)
+
+private func _try_audio_stream(candidate: audio_stream?, operation: string) -> result<audio_stream, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as audio_stream
+    if not is_audio_stream_valid(acquired):
+        unload_audio_stream(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    return Ok(acquired)
+
+private func _try_model(candidate: model?, operation: string) -> result<model, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as model
+    if not is_model_valid(acquired):
+        unload_model(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    return Ok(acquired)
+
+private func _try_byte_buffer(candidate: byte_buffer?, operation: string) -> result<byte_buffer, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as byte_buffer
+    return Ok(acquired)
+
+private func _try_font(candidate: font?, operation: string) -> result<font, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as font
+    if not is_font_valid(acquired):
+        unload_font(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    var candidate_texture = acquired.texture
+    if candidate_texture == null:
+        unload_font(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    var acquired_texture = candidate_texture as texture
+    defer unload_texture(acquired_texture)
+    if not is_texture_valid(acquired_texture):
+        unload_font(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    var default_candidate = get_font_default()
+    if default_candidate == null:
+        unload_font(acquired)
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var default_font = default_candidate as font
+    defer unload_font(default_font)
+    var default_texture_candidate = default_font.texture
+    if default_texture_candidate == null:
+        unload_font(acquired)
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var default_texture = default_texture_candidate as texture
+    defer unload_texture(default_texture)
+    if acquired_texture.id == default_texture.id:
+        unload_font(acquired)
+        return Err(_load_failure(operation, load_error_kind.default_fallback))
+    return Ok(acquired)
+
+private func _try_shader(candidate: shader?, operation: string, allow_default: bool) -> result<shader, load_error>:
+    if candidate == null:
+        return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+    var acquired = candidate as shader
+    if not is_shader_valid(acquired):
+        unload_shader(acquired)
+        return Err(_load_failure(operation, load_error_kind.invalid_resource))
+    if not allow_default:
+        var default_candidate = load_shader(null, null)
+        if default_candidate == null:
+            unload_shader(acquired)
+            return Err(_load_failure(operation, load_error_kind.acquisition_failed))
+        var default_shader = default_candidate as shader
+        defer unload_shader(default_shader)
+        if acquired.id == default_shader.id:
+            unload_shader(acquired)
+            return Err(_load_failure(operation, load_error_kind.default_fallback))
+    return Ok(acquired)
+
+## Try to load image from file into CPU memory (RAM).
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one image owner to release using unload_image; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_image(file_name: string) -> result<image, load_error>:
+    return _try_image(load_image(file_name), "load_image")
+
+## Try to load image from RAW file data.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## @param width Width in pixels.
+## @param height Height in pixels.
+## @param format Pixel format from the pixel-format constants.
+## @param header_size Number of file-header bytes skipped before the raw pixels.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one image owner to release using unload_image; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_image_raw(file_name: string, width: i32, height: i32, format: i32, header_size: i32) -> result<image, load_error>:
+    return _try_image(load_image_raw(file_name, width, height, format, header_size), "load_image_raw")
+
+## Try to load all frames of an animated image and retain the frame count.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one image owner to release using unload_image; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_image_anim(file_name: string) -> result<image, load_error>:
+    return _try_image(load_image_anim(file_name), "load_image_anim")
+
+## Try to load all frames from encoded animation bytes and retain the frame count.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_type Animated image format extension, including the leading dot, such as ".gif".
+## @param file_data Encoded file bytes in a live buffer.
+## @param data_size Number of input bytes to read, within the supplied buffer.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one image owner to release using unload_image; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_image_anim_from_memory(file_type: string, file_data: byte_buffer, data_size: i32) -> result<image, load_error>:
+    return _try_image(load_image_anim_from_memory(file_type, file_data, data_size), "load_image_anim_from_memory")
+
+## Try to load image from memory buffer, fileType refers to extension: i.e. '.png'.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_type File format extension, including the leading dot, such as ".png".
+## @param file_data Encoded file bytes in a live buffer.
+## @param data_size Number of input bytes to read, within the supplied buffer.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one image owner to release using unload_image; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_image_from_memory(file_type: string, file_data: byte_buffer, data_size: i32) -> result<image, load_error>:
+    return _try_image(load_image_from_memory(file_type, file_data, data_size), "load_image_from_memory")
+
+## Try to load image from GPU texture data.
+## @param texture_value Texture resource, borrowed for this call.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one image owner to release using unload_image; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_image_from_texture(texture_value: texture) -> result<image, load_error>:
+    return _try_image(load_image_from_texture(texture_value), "load_image_from_texture")
+
+## Try to load image from screen buffer and (screenshot).
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one image owner to release using unload_image; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_image_from_screen() -> result<image, load_error>:
+    return _try_image(load_image_from_screen(), "load_image_from_screen")
+
+## Try to load texture from file into GPU memory (VRAM).
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one texture owner to release using unload_texture; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_texture(file_name: string) -> result<texture, load_error>:
+    return _try_texture(load_texture(file_name), "load_texture")
+
+## Try to load texture from image data.
+## @param image_value Image resource, borrowed for this call.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one texture owner to release using unload_texture; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_texture_from_image(image_value: image) -> result<texture, load_error>:
+    return _try_texture(load_texture_from_image(image_value), "load_texture_from_image")
+
+## Try to load cubemap from image, multiple image cubemap layouts supported.
+## @param image_value Image resource, borrowed for this call.
+## @param layout Layout selector from the constants for this operation.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one texture owner to release using unload_texture; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_texture_cubemap(image_value: image, layout: i32) -> result<texture, load_error>:
+    return _try_texture(load_texture_cubemap(image_value, layout), "load_texture_cubemap")
+
+## Try to load texture for rendering (framebuffer).
+## @param width Width in pixels.
+## @param height Height in pixels.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one render_texture owner to release using unload_render_texture; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_render_texture(width: i32, height: i32) -> result<render_texture, load_error>:
+    return _try_render_texture(load_render_texture(width, height), "load_render_texture")
+
+## Try to load font from file into GPU memory (VRAM).
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one font owner to release using unload_font; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released. A built-in default-font fallback is Err(default_fallback), not a successful requested font.
+func try_load_font(file_name: string) -> result<font, load_error>:
+    return _try_font(load_font(file_name), "load_font")
+
+## Try to load a font with an explicit size and codepoint array.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## @param font_size Font size in pixels.
+## @param codepoints Unicode codepoint array, borrowed for this call.
+## @param codepoint_count Number of codepoints to use from the supplied array.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one font owner to release using unload_font; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released. A built-in default-font fallback is Err(default_fallback), not a successful requested font.
+func try_load_font_ex(file_name: string, font_size: i32, codepoints: int_array, codepoint_count: i32) -> result<font, load_error>:
+    return _try_font(load_font_ex(file_name, font_size, codepoints, codepoint_count), "load_font_ex")
+
+## Try to load font from memory buffer, fileType refers to extension: i.e. '.ttf'.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_type Font format extension, including the leading dot, such as ".ttf".
+## @param file_data Encoded file bytes in a live buffer.
+## @param data_size Number of input bytes to read, within the supplied buffer.
+## @param font_size Font size in pixels.
+## @param codepoints Unicode codepoint array, borrowed for this call.
+## @param codepoint_count Number of codepoints to use from the supplied array.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one font owner to release using unload_font; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released. A built-in default-font fallback is Err(default_fallback), not a successful requested font.
+func try_load_font_from_memory(file_type: string, file_data: byte_buffer, data_size: i32, font_size: i32, codepoints: int_array, codepoint_count: i32) -> result<font, load_error>:
+    return _try_font(load_font_from_memory(file_type, file_data, data_size, font_size, codepoints, codepoint_count), "load_font_from_memory")
+
+## Try to load shader from files and bind default locations.
+## @param vs_file_name Optional vertex-shader file path. null requests the native default. Present text must be NUL-free UTF-8.
+## @param fs_file_name Optional fragment-shader file path. null requests the native default. Present text must be NUL-free UTF-8.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one shader owner to release using unload_shader; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released. Both null arguments intentionally request the default and may succeed; otherwise a wholly default program is Err(default_fallback). A nondefault program does not prove every requested stage was used.
+func try_load_shader(vs_file_name: c_string?, fs_file_name: c_string?) -> result<shader, load_error>:
+    return _try_shader(load_shader(vs_file_name, fs_file_name), "load_shader", vs_file_name == null and fs_file_name == null)
+
+## Try to load shader from code strings and bind default locations.
+## @param vs_code Optional vertex-shader source code. null requests the native default. Present text must be NUL-free UTF-8.
+## @param fs_code Optional fragment-shader source code. null requests the native default. Present text must be NUL-free UTF-8.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one shader owner to release using unload_shader; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released. Both null arguments intentionally request the default and may succeed; otherwise a wholly default program is Err(default_fallback). A nondefault program does not prove every requested stage was used.
+func try_load_shader_from_memory(vs_code: c_string?, fs_code: c_string?) -> result<shader, load_error>:
+    return _try_shader(load_shader_from_memory(vs_code, fs_code), "load_shader_from_memory", vs_code == null and fs_code == null)
+
+## Try to load wave data from file.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one wave owner to release using unload_wave; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_wave(file_name: string) -> result<wave, load_error>:
+    return _try_wave(load_wave(file_name), "load_wave")
+
+## Try to load wave from memory buffer, fileType refers to extension: i.e. '.wav'.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_type Audio format extension, including the leading dot, such as ".wav".
+## @param file_data Encoded file bytes in a live buffer.
+## @param data_size Number of input bytes to read, within the supplied buffer.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one wave owner to release using unload_wave; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_wave_from_memory(file_type: string, file_data: byte_buffer, data_size: i32) -> result<wave, load_error>:
+    return _try_wave(load_wave_from_memory(file_type, file_data, data_size), "load_wave_from_memory")
+
+## Try to load sound from file.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one sound owner to release using unload_sound; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_sound(file_name: string) -> result<sound, load_error>:
+    return _try_sound(load_sound(file_name), "load_sound")
+
+## Try to load sound from wave data.
+## @param wave_value Wave resource, borrowed for this call.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one sound owner to release using unload_sound; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_sound_from_wave(wave_value: wave) -> result<sound, load_error>:
+    return _try_sound(load_sound_from_wave(wave_value), "load_sound_from_wave")
+
+## Try to create an alias sharing sample data and retaining its source sound.
+## @param source Source sound retained by the alias. Closing its source owner defers destruction until dependent aliases release.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one sound owner to release using unload_sound_alias; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released. Ok retains the source sound; release this alias with unload_sound_alias before releasing its source.
+func try_load_sound_alias(source: sound) -> result<sound, load_error>:
+    return _try_sound(load_sound_alias(source), "load_sound_alias")
+
+## Try to load music stream from file.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one music owner to release using unload_music_stream; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_music_stream(file_name: string) -> result<music, load_error>:
+    return _try_music(load_music_stream(file_name), "load_music_stream")
+
+## Try to load streaming music from a private copy of the encoded audio bytes.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_type Audio format extension, including the leading dot, such as ".wav".
+## @param data Input data, borrowed for this call.
+## @param data_size Number of input bytes to read, within the supplied buffer.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one music owner to release using unload_music_stream; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released. The successful stream retains its own native copy of the input bytes.
+func try_load_music_stream_from_memory(file_type: string, data: byte_buffer, data_size: i32) -> result<music, load_error>:
+    return _try_music(load_music_stream_from_memory(file_type, data, data_size), "load_music_stream_from_memory")
+
+## Try to load audio stream (to stream raw audio pcm data).
+## @param sample_rate Samples per second.
+## @param sample_size Bits per audio sample.
+## @param channels Audio channel count.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one audio_stream owner to release using unload_audio_stream; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_audio_stream(sample_rate: u32, sample_size: u32, channels: u32) -> result<audio_stream, load_error>:
+    return _try_audio_stream(load_audio_stream(sample_rate, sample_size, channels), "load_audio_stream")
+
+## Try to load model from files (meshes and materials).
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one model owner to release using unload_model; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_model(file_name: string) -> result<model, load_error>:
+    return _try_model(load_model(file_name), "load_model")
+
+## Try to load file data as byte array (read).
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one byte_buffer owner to release using buffer_close; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_file_data(file_name: string) -> result<byte_buffer, load_error>:
+    return _try_byte_buffer(load_file_data(file_name), "load_file_data")
+
+## Try to load text data from file (read), returns a '\0' terminated string.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one byte_buffer owner to release using buffer_close; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_load_file_text(file_name: string) -> result<byte_buffer, load_error>:
+    return _try_byte_buffer(load_file_text(file_name), "load_file_text")
+
+## Try to encode an image into a byte buffer using the selected file format.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param image_value Image resource, borrowed for this call.
+## @param file_type File format extension, including the leading dot, such as ".png".
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one byte_buffer owner to release using buffer_close; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_export_image_to_memory(image_value: image, file_type: string) -> result<byte_buffer, load_error>:
+    return _try_byte_buffer(export_image_to_memory(image_value, file_type), "export_image_to_memory")
+
+## Try to compress input bytes using DEFLATE.
+## @param data Input data, borrowed for this call.
+## @param data_size Number of input bytes to read, within the supplied buffer.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one byte_buffer owner to release using buffer_close; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_compress_data(data: byte_buffer, data_size: i32) -> result<byte_buffer, load_error>:
+    return _try_byte_buffer(compress_data(data, data_size), "compress_data")
+
+## Try to decompress DEFLATE bytes into an owning byte buffer.
+## @param comp_data Compressed bytes in a live buffer.
+## @param comp_data_size Number of compressed input bytes to read.
+## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
+## @return Ok with one byte_buffer owner to release using buffer_close; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
+func try_decompress_data(comp_data: byte_buffer, comp_data_size: i32) -> result<byte_buffer, load_error>:
+    return _try_byte_buffer(decompress_data(comp_data, comp_data_size), "decompress_data")
+
+## Try to save data to file from byte array (write), returns true on success.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## @param data Input data, borrowed for this call.
+## @param data_size Number of input bytes to read, within the supplied buffer.
+## Input resources are borrowed and remain caller-owned. Native guard violations retain their checked failures.
+## @return Ok(true) when raylib reports success; Err(load_error) when it returns false. No more specific filesystem or encoding cause is available.
+func try_save_file_data(file_name: string, data: byte_buffer, data_size: i32) -> result<bool, load_error>:
+    if save_file_data(file_name, data, data_size):
+        return Ok(true)
+    return Err(_load_failure("save_file_data", load_error_kind.operation_failed))
+
+## Try to save NUL-free UTF-8 text to a file.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## @param text Text supplied to this operation.
+## Input resources are borrowed and remain caller-owned. Native guard violations retain their checked failures.
+## @return Ok(true) when raylib reports success; Err(load_error) when it returns false. No more specific filesystem or encoding cause is available.
+func try_save_file_text(file_name: string, text: string) -> result<bool, load_error>:
+    if save_file_text(file_name, text):
+        return Ok(true)
+    return Err(_load_failure("save_file_text", load_error_kind.operation_failed))
+
+## Try to export image data to file, returns true on success.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param image_value Image resource, borrowed for this call.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Input resources are borrowed and remain caller-owned. Native guard violations retain their checked failures.
+## @return Ok(true) when raylib reports success; Err(load_error) when it returns false. No more specific filesystem or encoding cause is available.
+func try_export_image(image_value: image, file_name: string) -> result<bool, load_error>:
+    if export_image(image_value, file_name):
+        return Ok(true)
+    return Err(_load_failure("export_image", load_error_kind.operation_failed))
+
+## Try to export wave data to file, returns true on success.
+## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
+## @param wave_value Wave resource, borrowed for this call.
+## @param file_name Path to the file. Relative paths use the process working directory.
+## Input resources are borrowed and remain caller-owned. Native guard violations retain their checked failures.
+## @return Ok(true) when raylib reports success; Err(load_error) when it returns false. No more specific filesystem or encoding cause is available.
+func try_export_wave(wave_value: wave, file_name: string) -> result<bool, load_error>:
+    if export_wave(wave_value, file_name):
+        return Ok(true)
+    return Err(_load_failure("export_wave", load_error_kind.operation_failed))

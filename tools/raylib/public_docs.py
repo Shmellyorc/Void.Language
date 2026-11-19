@@ -168,4 +168,61 @@ def verify_public_api(source, nodes, inventory, snake):
         count += 1
         parameters += len(labels)
         returns += bool(function['result'])
+    verify_fallible_api(source)
     print(f'Public documentation verified: {count} functions, {parameters} parameters, {returns} returns')
+
+
+# Source-level companions; these do not add native declarations or ABI entries.
+FALLIBLE_RESOURCES = {
+    'image': ('load_image', 'load_image_raw', 'load_image_anim', 'load_image_anim_from_memory',
+              'load_image_from_memory', 'load_image_from_texture', 'load_image_from_screen'),
+    'texture': ('load_texture', 'load_texture_from_image', 'load_texture_cubemap'),
+    'render_texture': ('load_render_texture',),
+    'font': ('load_font', 'load_font_ex', 'load_font_from_memory'),
+    'shader': ('load_shader', 'load_shader_from_memory'),
+    'wave': ('load_wave', 'load_wave_from_memory'),
+    'sound': ('load_sound', 'load_sound_from_wave', 'load_sound_alias'),
+    'music': ('load_music_stream', 'load_music_stream_from_memory'),
+    'audio_stream': ('load_audio_stream',),
+    'model': ('load_model',),
+    'byte_buffer': ('load_file_data', 'load_file_text', 'export_image_to_memory',
+                    'compress_data', 'decompress_data'),
+}
+FALLIBLE_WRITES = ('save_file_data', 'save_file_text', 'export_image', 'export_wave')
+
+
+def verify_fallible_api(source):
+    functions = {f['name']: f for f in public_functions(source)}
+    expected = {operation: typ for typ, names in FALLIBLE_RESOURCES.items() for operation in names}
+    expected.update((name, 'bool') for name in FALLIBLE_WRITES)
+    companions = {'try_' + name for name in expected}
+    if len(functions) != 791 or len(functions.keys() - companions) != 757:
+        raise ValueError('Keep all 757 original documented functions and the 34 G77 companions')
+    for operation, typ in expected.items():
+        name = 'try_' + operation
+        function = functions.get(name)
+        if not function or function['parameters'] != functions[operation]['parameters']:
+            raise ValueError(name + ': parameters must retain the existing operation labels/types/order')
+        if function['result'] != f'result<{typ}, load_error>':
+            raise ValueError(name + ': expected actual lowercase result type')
+        docs = function['docs']
+        labels = [label for label, _ in function['parameters']]
+        tags = [m[1] for line in docs if (m := re.fullmatch(r'@param (\w+) \S.*', line))]
+        if labels != tags:
+            raise ValueError(name + ': missing or unordered parameter documentation')
+        returns = [line for line in docs if line.startswith('@return ')]
+        if len(returns) != 1 or not all(word in returns[0] for word in ('Ok', 'Err', 'load_error')):
+            raise ValueError(name + ': document actual success and failure results')
+        if typ != 'bool' and not all(word in returns[0] for word in ('owner', 'release')):
+            raise ValueError(name + ': document resource ownership and release')
+        if typ in ('font', 'shader') and 'default_fallback' not in returns[0]:
+            raise ValueError(name + ': document native default fallback behavior')
+        if not any(line and not line.startswith('@') for line in docs):
+            raise ValueError(name + ': missing operation description')
+    for declaration in ('enum load_error_kind:', 'struct load_error extends core_error.error:',
+                        '    acquisition_failed', '    invalid_resource', '    default_fallback',
+                        '    operation_failed', '    operation: string', '    kind: load_error_kind'):
+        at = source.find('\n' + declaration + '\n')
+        if at < 0 or not source[:at].splitlines()[-1].lstrip().startswith('## '):
+            raise ValueError('Missing source documentation for ' + declaration.strip())
+    return len(companions)
