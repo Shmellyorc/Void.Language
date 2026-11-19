@@ -4,6 +4,7 @@ Runs on the native host in CTest; Windows/macOS coverage requires those hosts.
 """
 from pathlib import Path
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -38,17 +39,44 @@ for args in ([], ['--help'], ['-h'], ['help']):
     assert lines.index('Commands:') < lines.index('Options:'), lines
     assert b'--app has been removed.' not in result.stdout
     assert 'Documentation: https://github.com/Shmellyorc/Void.Language/wiki' in lines
-    for option in ('--help', '--version', '--no-opt', '--cache', '--no-cache', '-o PATH'):
+    for option in ('--help', '--version'):
         assert option in result.stdout.decode('utf-8')
     for command in ('check', 'run', 'build', 'emit'):
         assert command in result.stdout.decode()
 version = run(['--version'], out='LLVM 23.1.4')
 assert b'VOID Language Compiler v0.1.0 (development)' in version.stdout and b'Target:' in version.stdout
-for command in ('check', 'run', 'build', 'emit'):
+for command in ('check', 'run', 'build', 'emit', 'init', 'new', 'add', 'remove', 'tidy', 'resolve', 'deps', 'package', 'native', 'native-bind'):
     for args in ([command, '--help'], [command, '-h'], ['help', command]):
         result = run(args, out='Usage: voidc ' + command)
         assert b'Example' in result.stdout and not result.stderr
         assert result.stdout.decode('utf-8').splitlines()[:2] == ['VOID Language Compiler v0.1.0 (development)', 'LLVM 23.1.4']
+
+# Top-level columns come from the command inventory, not literal padding.
+rows = full_help.decode().split('Commands:\n', 1)[1].split('\nOptions:', 1)[0].strip('\n').splitlines()
+assert len(rows) == 15
+assert {re.match(r'  (\S+)( +)(.+)', line).start(3) for line in rows} == {15}
+assert all('\t' not in line for line in rows)
+for command, flags in {'run': ['--cache', '--no-cache'], 'build': ['-o PATH', '--no-opt'],
+                       'add': ['--path', '--registered', '--edit-token'], 'deps': ['--for-edit'],
+                       'native-bind': ['.void']}.items():
+    output = run([command, '--help']).stdout.decode()
+    assert all(flag in output for flag in flags), (command, output)
+for args in (['deps','explain','-h'], ['deps','fetch','--help'], ['native','import','--help'],
+             ['package','install','--help'], ['package','uninstall','--help'],
+             ['new','install','-h'], ['new','uninstall','--help']):
+    run(args, out='Help for ')
+
+# Each option table computes its own width from its actual spellings.
+for command in ('check','run','build','emit','init','new','add','remove','tidy','resolve','deps','package','native','native-bind'):
+    table = []
+    for line in run([command,'--help']).stdout.decode().splitlines() + ['']:
+        row = re.match(r'^  (\S.*?)( {2,})(\S.*)$', line)
+        if row:
+            assert '\t' not in line
+            table.append(row)
+        elif table:
+            assert {row.start(3) for row in table} == {max(len(row.group(1)) for row in table)+4}, (command,table)
+            table = []
 
 invalid = [(['unknown'], 'Unknown command'),
            (['--version', 'extra'], 'Unknown command'), (['help', 'unknown'], 'Expected help'),
@@ -133,6 +161,7 @@ with tempfile.TemporaryDirectory(prefix='VOID CLI é # % ') as directory:
     original_files = {p.relative_to(isolated): p.read_bytes() for p in isolated.rglob('*') if p.is_file()}
     assert run(['--version'], tool=copied, cwd=isolated, env=metadata_env).stdout == version.stdout
     run(['--help'], tool=copied, cwd=isolated, env=metadata_env, out='Options:')
+    assert run(['--capabilities'], tool=copied, cwd=isolated, env=metadata_env).stdout == run(['--capabilities']).stdout
     assert {p.relative_to(isolated): p.read_bytes() for p in isolated.rglob('*') if p.is_file()} == original_files
     assert list(profile.iterdir()) == []
     before = output.read_bytes()

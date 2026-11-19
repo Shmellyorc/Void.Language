@@ -42,6 +42,7 @@ struct ProjectCapture {
     Unit from;
     ProjectCapture(const project_fs::path& requested,const SourceOverrides& o,const ManifestOverrides& m,const ProjectCapture* previous=nullptr,bool inventory_only=false,bool imports_only=false)
       :root(admit_root(requested)),overlays(bounded_overlays(o)),manifest_overlays(m),original(previous),anchor(path_utf8(root/"void.project.toml"),""),graph(root,diagnostics,overlays),from(anchor,"/") {
+        observation::Scope timing(observation::Phase::project_capture);
         changed(original && root!=original->root);
         if(manifest_overlays.size()>project_visit_limit)project_failure(anchor,Code::limit,"Manifest overlay work limit exceeded.");
         for(const auto& [id,value]:overlays) {
@@ -185,6 +186,7 @@ struct ProjectCapture {
         return root;
     }
     SourceFile read_bounded(const project_fs::path& path,std::size_t limit) {
+        observation::Scope timing(observation::Phase::source_loading);
         std::ifstream stream(path,std::ios::binary);
         if(!stream)throw SourceReadError(path_utf8(path),"Cannot read admitted project source.");
         std::string text;char buffer[4096];
@@ -299,6 +301,7 @@ struct ProjectCapture {
         }
     }
     std::set<std::string> inventory() {
+        observation::Scope timing(observation::Phase::project_capture);
         std::set<std::string> result;
         for(const auto& name:(manifest?manifest->sources():creation_policy).roots) {
             auto id=name=="."?std::string{}:"/"+name;
@@ -568,6 +571,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
                 binding=unit.get();
                 break; // The graph admits at most one declaration module for this provider.
             }
+            observation::Scope authorization_timing(observation::Phase::authorization_wait);
             approved_payload=(*approve)({capture.root,*capture.manifest,entry,
                 binding?std::string_view(binding->identity):std::string_view{},
                 binding?std::string_view(binding->source.text()):std::string_view{},*capture.dependencies});

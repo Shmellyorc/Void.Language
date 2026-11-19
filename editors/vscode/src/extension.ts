@@ -7,6 +7,8 @@ import {inside, Project, resolveCompiler, resolveProject, Settings} from './conf
 import {CreationWorkflow} from './creationWorkflow';
 import {newProjectCommand} from './newProject';
 import {compilerExecution} from './projectTask';
+import {DebugBuildReceipts} from './debugBuildReceipt';
+import {plainStatusCapability} from './config';
 import {libraryCommands} from './libraryManagement';
 import {createProtocolTrace, DiagnosticLog} from './editorLog';
 
@@ -147,6 +149,18 @@ class ServerManager {
         };
         return {compiler, root: project.root, requestedRoot: project.requestedRoot ?? project.root, verify, verifySelection, refresh};
     }
+    private readonly debugArtifacts = new Map<number, string>();
+    private readonly debugCancellations = new Map<number, vscode.Disposable>();
+    private readonly debugReceipts = new DebugBuildReceipts();
+    private debugTask?: vscode.Task;
+    private debugSelection?: {id: number; serial: number};
+    debugBuildTasks(): vscode.Task[] { return this.debugTask ? [this.debugTask] : []; }
+    private clearDebugBuild(id: number): void {
+        this.debugCancellations.get(id)?.dispose(); this.debugCancellations.delete(id);
+        this.debugArtifacts.delete(id);
+        if(this.debugSelection?.id === id) {this.debugSelection = undefined; this.debugTask = undefined;}
+    }
+    private cancelDebugBuild(id: number): void {this.debugReceipts.cancel(id); this.clearDebugBuild(id);}
     private async projectInvocation(command: ProjectCommand, debugBuild = false) {
         await this.ensureProject();
         const folder = vscode.workspace.workspaceFolders?.length === 1 ? vscode.workspace.workspaceFolders[0] : undefined;
@@ -171,9 +185,16 @@ class ServerManager {
         // from saving a buffer or publishing an output is not a reselection.
         if (!vscode.workspace.isTrusted || this.project !== project || this.requestSerial !== selection)
             throw new Error('The editor or selected project changed. Invoke the command again.');
+        const capabilityIdentity = await plainStatusCapability(compiler, project.root);
+        if (capabilityIdentity) {
+            const forwarded = args.indexOf('--');
+            args.splice(forwarded < 0 ? args.length : forwarded, 0, '--status', 'plain');
+        }
+        if (!vscode.workspace.isTrusted || this.project !== project || this.requestSerial !== selection)
+            throw new Error('The editor or selected project changed during compiler capability negotiation.');
         const dirty = this.dirtyProjectDocument(project.root);
         if (dirty) throw new Error(`Save ${basename(dirty.uri.fsPath)} before running a project command. Project commands use saved files.`);
-        return {folder, profile, compiler, args, cwd: project.root};
+        return {folder, profile, compiler, args, cwd: project.root, capabilityIdentity};
     }
     async projectTask(command: ProjectCommand): Promise<vscode.TaskExecution | undefined> {
         if (!vscode.workspace.isTrusted) return;
@@ -187,19 +208,91 @@ class ServerManager {
             return await vscode.tasks.executeTask(task);
         } catch (error) { this.report(`VOID ${command}: ${error instanceof Error ? error.message : String(error)}`, true); }
     }
-    resolveDebugBuild(task: vscode.Task): vscode.Task | undefined {
+    resolveDebugBuild(task: vscode.Task, boundReceipt?: number): vscode.Task | undefined {
         const folder = vscode.workspace.workspaceFolders?.length === 1 ? vscode.workspace.workspaceFolders[0] : undefined;
         if (task.definition.command !== 'debugBuild' || !folder ||
             typeof task.scope !== 'object' || task.scope.uri.toString() !== folder.uri.toString()) return;
-        const executable = new vscode.Task(task.definition, folder, task.name, task.source,
+        const receipt = boundReceipt ?? (typeof task.definition.receipt === 'number' ? task.definition.receipt : undefined);
+        let program: string | undefined, previousArtifact: string | undefined;
+        const executable = new vscode.Task(boundReceipt === undefined ? task.definition : {...task.definition, receipt: boundReceipt}, folder,
+            boundReceipt === undefined ? task.name : `${debugBuildTask} (${boundReceipt})`, task.source,
             compilerExecution(async () => {
                 requireDebugTaskErrorsStop();
-                return this.projectInvocation('build', true);
+                const invocation = await this.projectInvocation('build', true);
+                if (receipt !== undefined) {
+                    if(this.debugSelection?.id !== receipt || this.debugSelection.serial !== this.requestSerial)
+                        throw new Error('The selected VOID project changed. Start debugging again.');
+                    program = await this.debugProjectLocation('program', true);
+                    previousArtifact = await this.debugArtifact(program).catch(() => undefined);
+                    this.debugReceipts.start(receipt, {root: invocation.cwd, program,
+                        entry: await this.debugProjectLocation('entry', true)});
+                }
+                return invocation;
+            }, async result => {
+                if (receipt === undefined) return;
+                let success = result.spawned && !result.cancelled && result.code === 0;
+                let artifact: string | undefined;
+                if (success && program) {
+                    artifact = await this.debugArtifact(program).catch(() => undefined);
+                    success = !!artifact && artifact !== previousArtifact;
+                } else success = false;
+                success = this.debugReceipts.complete(receipt, success);
+                if (success) this.debugArtifacts.set(receipt, artifact!);
+                if (!success) {
+                    this.clearDebugBuild(receipt);
+                }
             }), '$void-compiler');
         executable.presentationOptions = {panel: vscode.TaskPanelKind.Dedicated, clear: true};
         return executable;
     }
-    async debugProjectLocation(part: 'program' | 'root', beforeBuild = false): Promise<string> {
+    private async debugArtifact(program: string): Promise<string> {
+        const value = await fs.lstat(program, {bigint: true});
+        if (!value.isFile()) throw new Error('The Debug output must be an ordinary executable.');
+        await fs.access(program, constants.X_OK);
+        return `${value.dev}:${value.ino}:${value.size}:${value.mtimeNs}:${value.ctimeNs}`;
+    }
+    async beginDebugBuild(token?: vscode.CancellationToken): Promise<{id: number; task: string} | undefined> {
+        const selection = {root: await this.debugProjectLocation('root', true),
+            program: await this.debugProjectLocation('program', true), entry: await this.debugProjectLocation('entry', true)};
+        const serial = this.requestSerial;
+        const tasks = await vscode.tasks.fetchTasks({type: 'void'});
+        if(token?.isCancellationRequested)return;
+        if(serial !== this.requestSerial)throw new Error('The selected VOID project changed. Start debugging again.');
+        const previous = this.debugReceipts.current();
+        const id = this.debugReceipts.begin(selection);
+        if(previous !== undefined)this.clearDebugBuild(previous);
+        this.debugSelection = {id, serial};
+        // Bind the child to this invocation, never to the latest pending launch.
+        // An absent configured task still goes through the host's normal dialog.
+        const base = tasks.find(task => task.name === debugBuildTask && task.definition.command === 'debugBuild' &&
+            task.definition.receipt === undefined && typeof task.scope === 'object' &&
+            task.scope.uri.toString() === vscode.workspace.workspaceFolders?.[0]?.uri.toString());
+        this.debugTask = base ? this.resolveDebugBuild(base, id) : undefined;
+        // Cancellation invalidates only this invocation, never a later receipt.
+        const cancellation = token?.onCancellationRequested(() => {
+            this.cancelDebugBuild(id);
+        });
+        if (cancellation) this.debugCancellations.set(id, cancellation);
+        if (token?.isCancellationRequested) {this.cancelDebugBuild(id); return;}
+        return {id, task: this.debugTask ? `${this.debugTask.source}: ${this.debugTask.name}` : debugBuildTask};
+    }
+    async requireDebugBuild(id: unknown): Promise<void> {
+        try {
+            if(!this.debugSelection || this.debugSelection.id !== id || this.debugSelection.serial !== this.requestSerial)
+                throw new Error('VOID requires this launch’s compiler process to finish successfully before debugging.');
+            const selection = {root: await this.debugProjectLocation('root'),
+                program: await this.debugProjectLocation('program'), entry: await this.debugProjectLocation('entry')};
+            if (typeof id !== 'number' || this.debugArtifacts.get(id) !== await this.debugArtifact(selection.program))
+                throw new Error('VOID requires this launch’s compiler process to finish successfully before debugging.');
+            this.debugReceipts.require(id, selection);
+        } catch (error) {
+            if (typeof id === 'number') this.debugReceipts.cancel(id);
+            throw error;
+        } finally {
+            if (typeof id === 'number') this.clearDebugBuild(id);
+        }
+    }
+    async debugProjectLocation(part: 'program' | 'root' | 'entry', beforeBuild = false): Promise<string> {
         if (!vscode.workspace.isTrusted) throw new Error('VOID debugging requires a trusted workspace.');
         if (!debugType) throw new Error('VOID’s generated launch supports Linux x64 and Windows x64.');
         if (debugType === 'lldb-dap' && !vscode.extensions.getExtension('llvm-vs-code-extensions.lldb-dap'))
@@ -229,7 +322,7 @@ class ServerManager {
             if (!vscode.workspace.isTrusted || this.project !== project || this.client !== client) break;
             const dirty = this.dirtyProjectDocument(project.root);
             if (dirty) throw new Error(`Save ${basename(dirty.uri.fsPath)} and build the Debug project before debugging.`);
-            if (this.epoch === epoch) return part === 'program' ? program : project.root;
+            if (this.epoch === epoch) return part === 'program' ? program : part === 'entry' ? state.entry : project.root;
         }
         throw new Error('The selected project changed. Start debugging again.');
     }
@@ -432,7 +525,7 @@ class ServerManager {
         }
         catch (e) { this.report(`VOID language server failed to start for ${project.root} (${project.server}): ${String(e)}`, true); await this.stop(); }
     }
-    async dispose(): Promise<void> { this.disposed = true; await this.serial; await this.stop(); }
+    async dispose(): Promise<void> { this.debugCancellations.forEach(value => value.dispose()); this.debugCancellations.clear(); this.debugArtifacts.clear(); this.disposed = true; await this.serial; await this.stop(); }
     changed(): void { ++this.epoch; }
     status(): {state: string; entry?: string} {
         return {state: this.client?.state === State.Running ? 'running' : 'stopped', entry: this.project?.entry ?? undefined};
@@ -462,9 +555,10 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         vscode.commands.registerCommand('void.buildProject', () => current.projectTask('build')),
         vscode.commands.registerCommand('void.runProject', () => current.projectTask('run')),
         vscode.commands.registerCommand('void.packageProject', () => current.projectTask('package')),
-        vscode.commands.registerCommand('void.debugProjectProgram', config => current.debugProjectLocation('program', config?.preLaunchTask === debugBuildTask)),
+        vscode.commands.registerCommand('void.debugProjectProgram', config => current.debugProjectLocation('program',
+            config?.preLaunchTask === debugBuildTask || typeof config?.__voidBuildReceipt === 'number')),
         vscode.commands.registerCommand('void.debugProjectRoot', () => current.debugProjectLocation('root')),
-        vscode.tasks.registerTaskProvider('void', {provideTasks: () => [], resolveTask: task => current.resolveDebugBuild(task)}),
+        vscode.tasks.registerTaskProvider('void', {provideTasks: () => current.debugBuildTasks(), resolveTask: task => current.resolveDebugBuild(task)}),
         vscode.commands.registerCommand('void.restartLanguageServer', () => current.refresh(true)),
         vscode.tasks.onDidEndTaskProcess(event => {
             const {definition} = event.execution.task;
@@ -491,9 +585,21 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         vscode.workspace.onDidChangeWorkspaceFolders(() => { void current.refresh(true); }),
         vscode.workspace.onDidGrantWorkspaceTrust(() => { void current.refresh(true); }));
     if (debugType) context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(debugType, {
-        async resolveDebugConfigurationWithSubstitutedVariables(_folder, config) {
+        async resolveDebugConfiguration(_folder, config, token) {
             if (config.request === 'launch' && config.preLaunchTask === debugBuildTask) {
+                const attempt = await current.beginDebugBuild(token);
+                if(!attempt)return undefined;
+                config.__voidBuildReceipt = attempt.id;
+                config.preLaunchTask = attempt.task;
+            }
+            return config;
+        },
+        async resolveDebugConfigurationWithSubstitutedVariables(_folder, config) {
+            if (config.request === 'launch' && (config.preLaunchTask === debugBuildTask || typeof config.__voidBuildReceipt === 'number')) {
                 requireDebugTaskErrorsStop();
+                await current.requireDebugBuild(config.__voidBuildReceipt);
+                delete config.__voidBuildReceipt;
+                config.preLaunchTask = debugBuildTask;
                 if (!samePath(config.program, await current.debugProjectLocation('program')) ||
                     !samePath(config.cwd, await current.debugProjectLocation('root')))
                     throw new Error('The selected VOID entry changed during the Debug build. Start debugging again.');

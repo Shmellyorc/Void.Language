@@ -191,7 +191,7 @@ the remaining project roadmap is future work.
 ```text
 voidc --help | -h
 voidc --version
-voidc help [check|run|build|emit]
+voidc help [COMMAND]
 voidc <command> --help | -h
 voidc check <file-or-directory> [--no-opt]
 voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache]
@@ -219,6 +219,89 @@ SDK default target and whole-compiler build identity, not a release support prom
 Help starts with the same compiler version, followed by LLVM, usage, commands
 and options. Version reporting returns before standard-source discovery and needs
 no source project, installed stdlib or native resource manifest.
+
+Top-level help lists every public command with space-padded columns. Each
+command's own help lists its source, command and presentation options with
+widths calculated from that section's spellings. `help COMMAND` accepts all
+fourteen listed commands. Existing nested routes remain exact:
+
+```text
+voidc deps explain --help    # also -h
+voidc deps fetch --help      # also -h
+voidc native import --help
+voidc package install --help
+voidc package uninstall --help
+voidc new install --help
+voidc new uninstall --help
+```
+
+Use the parent command page for other nested operations. Help is not a token
+that can be inserted into arbitrary argument vectors. In particular,
+`native import -h` and `package install -h` retain their existing parser behavior;
+literal application arguments after `run ... --` never become compiler help.
+
+## Status and compiler timings (G75)
+
+`check`, `run`, `build`, `emit`, and application assembly with `package` accept:
+
+| Option | Behavior |
+| --- | --- |
+| `--status auto` | Default. Emit concise phase lines and a build total only when stderr is an eligible interactive terminal. CI and dumb/unknown terminals remain quiet. |
+| `--status plain` | Explicit plain stderr status, including pipes and task terminals. |
+| `--status off` | Suppress the new status lines. Existing diagnostics, cache messages and application output still apply. |
+| `--timings` | Opt in to detailed inclusive wall timings on stderr. |
+| `--timings-format text\|json` | Require `--timings`; default text. JSON requires a separate report file. |
+| `--timings-output PATH` | Fresh JSON report destination; valid only with JSON timings. |
+
+Default redirected stdout and stderr retain their existing contents. There are
+no spinners, ANSI controls or animation threads. Manifest Debug/Release labels
+describe the selected profile; bare source builds have no invented profile.
+Run reports build completion before invoking the application. The application's
+duration, return status and legacy numeric result are separate from compiler
+work. Explicit timing output can accompany `--status off`.
+
+```sh
+voidc build --project . --status plain
+voidc run --project . --no-cache --timings
+# Create the reports directory first, outside the source project.
+voidc build --project . --timings --timings-format json --timings-output /tmp/void-reports/build-1.json
+```
+
+JSON is written only to the explicitly selected file. The file must not exist;
+its parent must already be an admitted ordinary directory. Reports cannot go
+inside the selected source tree, a manifest project, the artifact tree, reserved
+source/resource directories, package storage or native approval storage. Aliased
+parents, reserved filenames and case collisions are refused. Use a distinct path
+for each invocation. JSON mode emits no new status lines and never puts the
+report on stdout or stderr.
+
+The [version-1 JSON schema](schemas/cli-timings-v1.schema.json) describes actual
+emitted reports. Durations use a monotonic clock and integer microseconds, rounded
+once at serialization. Scopes are inclusive: nested phases overlap, and adding
+them does not produce the total. Repeated scopes of one category aggregate;
+same-category recursion is measured once. Combined lex/parse, object emission
+and ORC materialization intervals reflect the compiler's real boundaries.
+Unavailable phases have null durations and explicit states/reasons. Clock tick
+metadata is nominal; effective resolution is uncalibrated and null. Authorization
+wait, when reached, remains inside compiler wall time and is identified explicitly.
+
+Invalid timing options or report destinations fail before compilation with exit
+2. After report admission, ordinary compiler failures can produce partial reports.
+A late report write/publication failure prints `Timing report failed:` on stderr,
+preserves the compiler/application exit status, and leaves a successfully published
+artifact valid. Process termination or a fatal signal can prevent report completion;
+no signal handler fabricates a final report. Interrupted private staging may remain.
+
+`voidc --capabilities` is a resource-independent metadata query for editor
+integration. Schema 1 advertises `cliPresentation: 1`, `statusPlain: true` and
+`timingsSchema: 1`. Integrations should probe before sending new flags to an older
+compiler. [Implementation and qualification](projects/G75_CLI_EXPERIENCE_IMPLEMENTATION.md)
+
+VOIDUP accepts global `--status auto|plain|off` before its command. The small
+adapter reports fixed operation labels and a total for install/default/rollback/
+verify/doctor. Run, which and list retain their existing forwarding, path and
+inventory output. VOIDUP has no compiler timing-report interface. Its status
+uses existing console/time facilities and grants no installation or trust authority.
 
 ## Entries, input and exit status
 

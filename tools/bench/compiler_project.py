@@ -37,7 +37,11 @@ def position(text, offset):
 
 
 class Benchmark:
-    def __init__(self, build):
+    def __init__(self, build, presentation="legacy", timing_directory=None):
+        self.presentation = presentation
+        self.timing_directory = timing_directory
+        self.timing_reports = []
+        self.timing_sequence = 0
         self.compiler = build / ("voidc.exe" if WINDOWS else "voidc")
         self.server = build / ("voidls.exe" if WINDOWS else "voidls")
         marker, driver, linker, *self.resources = (build / "void-native.txt").read_text(encoding="utf-8").splitlines()
@@ -83,14 +87,37 @@ class Benchmark:
         return result
 
     def cli(self, root, command, *args, **options):
-        return self.run([self.compiler, command, "--project", root, *args], root, **options)
+        presentation = []
+        timing = None
+        if command in ("check", "run", "emit", "build", "package"):
+            if self.presentation in ("off", "plain"):
+                presentation = ["--status", self.presentation]
+            elif self.presentation == "timings-json":
+                self.timing_sequence += 1
+                timing = self.timing_directory / f"timing-{self.timing_sequence}.json"
+                presentation = ["--timings", "--timings-format", "json", "--timings-output", timing]
+        result = self.run([self.compiler, command, "--project", root, *presentation, *args], root, **options)
+        if timing is not None:
+            if timing.exists():
+                report = json.loads(timing.read_bytes())
+                assert report["schema"] == "void.cli.timings" and report["schema_version"] == 1
+                assert report["process_exit_code"] == result.returncode
+                self.timing_reports.append(report)
+                timing.unlink()
+            else:
+                # Parser/profile errors can precede timing report admission.
+                assert result.returncode != 0, (command, result)
+        return result
 
     def check_cache(self, root, metric, output, expected):
         cache = root / ".void/cache/v1"
         before = set(cache.glob("[0-9a-f]" * 64))
         result = self.cli(root, "run", "--cache", metric=metric, output=output)
         mode = "unavailable" if WINDOWS else expected
-        assert result.stderr.strip() == f"Debug cache: {mode}", result
+        cache_lines = [line for line in result.stderr.splitlines() if line.startswith("Debug cache:")]
+        assert cache_lines == [f"Debug cache: {mode}"], result
+        if self.presentation != "plain":
+            assert result.stderr.strip() == f"Debug cache: {mode}", result
         after = set(cache.glob("[0-9a-f]" * 64))
         new = after - before
         assert (len(new) == 1 if mode == "miss" else not new), (metric, mode, before, after)
@@ -163,6 +190,20 @@ class Benchmark:
         self.cli(root, "resolve", "--refresh")
         assert digest(lock) != original
         self.check_cache(root, "cache.dependency_changed", "inventory 7 7 55\n", "miss")
+
+    def controls(self, root):
+        source = root / "src"
+        source.mkdir(parents=True)
+        (root / "void.project.toml").write_text(
+            "schema=1\n[project]\nid='org.test.tiny'\nname='Tiny'\nversion='1.0.0'\nkind='application'\nentry='src/main.void'\n"
+            "[application]\nid='org.test.tiny.app'\n[sources]\nroots=['src']\n", encoding="utf-8")
+        (source / "main.void").write_text("func main() -> i32:\n    return 7\n", encoding="utf-8")
+        (source / "bad.void").write_text("func main() -> i32:\n    return absent\n", encoding="utf-8")
+        self.cli(root, "check", metric="control.check", output="Source checked successfully\n")
+        self.cli(root, "check", "--entry", "src/bad.void", status=1, metric="control.check.failure", output="")
+        self.cli(root, "run", "--no-cache", status=7, metric="control.jit.no_cache", output="")
+        self.cli(root, "emit", "-o", root / "tiny.o", metric="control.emit")
+        self.cli(root, "build", "-o", root / ("tiny.exe" if WINDOWS else "tiny"), metric="control.build")
 
     def editor(self, root, query_count):
         main, stock, draft, audit = (root / f"src/{name}.void" for name in ("main", "stock", "draft", "audit"))
@@ -321,7 +362,8 @@ class Benchmark:
             summary[name] = {"n": len(values), "median": median(values),
                              "p95": ordered[math.ceil(len(values) * 0.95) - 1], "worst": ordered[-1]}
         return {"metadata": self.metadata, "summary": summary, "samples": self.samples,
-                "receipts": {name: sorted(values) for name, values in self.receipts.items()}}
+                "receipts": {name: sorted(values) for name, values in self.receipts.items()},
+                "timing_reports": self.timing_reports}
 
 
 def update(path, old, new):
@@ -337,12 +379,18 @@ def main():
     parser.add_argument("--repetitions", type=int, default=20)
     parser.add_argument("--queries", type=int, default=10, help="Repeated requests per method and server")
     parser.add_argument("--lane", choices=("both", "editor", "native"), default="both")
+    parser.add_argument("--presentation", choices=("legacy", "off", "plain", "timings-json"), default="legacy",
+                        help="G75 overhead control; legacy preserves the original invocation argv")
+    parser.add_argument("--controls", action="store_true", help="Include tiny successful/failed compiler controls")
     args = parser.parse_args()
     if min(args.repetitions, args.queries) < 1:
         parser.error("repetitions and queries must be positive")
     with args.output.open("x", encoding="utf-8") as receipt, TemporaryDirectory(prefix="VOID inventory ") as temp:
-        benchmark = Benchmark(args.build.resolve())
-        benchmark.metadata.update(repetitions=args.repetitions, queries=args.queries, lane=args.lane)
+        directory = Path(temp)
+        timing_directory = directory / "reports"
+        timing_directory.mkdir()
+        benchmark = Benchmark(args.build.resolve(), args.presentation, timing_directory)
+        benchmark.metadata.update(repetitions=args.repetitions, queries=args.queries, lane=args.lane, presentation=args.presentation, controls=args.controls)
         directory = Path(temp)
         template = shutil.copytree(FIXTURE, directory / "template")
         try:
@@ -350,6 +398,9 @@ def main():
             benchmark.metadata["lock_sha256"] = digest(template / "void.lock")
             for repetition in range(args.repetitions):
                 print(f"Inventory benchmark repetition {repetition + 1}/{args.repetitions}", flush=True)
+                if args.controls:
+                    with TemporaryDirectory(prefix="controls ", dir=directory) as iteration:
+                        benchmark.controls(Path(iteration) / "project")
                 for lane in ("native", "editor") if args.lane == "both" else (args.lane,):
                     with TemporaryDirectory(prefix=lane + " ", dir=directory) as iteration:
                         root = shutil.copytree(template, Path(iteration) / "project")

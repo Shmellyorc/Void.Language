@@ -1,0 +1,16 @@
+struct box:
+    value: i32
+
+func identity(value: box) -> box:
+    return value
+
+func choose(value: box, first: bool) -> box:
+    if first:
+        return value
+    return identity(value)
+
+func entry(n: i32) -> i32:
+    var a = identity(box(value = n))
+    var b = choose(box(value = 7), n > 0)
+    var c = choose(box(value = 11), n < 0)
+    return a.value + b.value + c.value

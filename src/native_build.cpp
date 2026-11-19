@@ -1,3 +1,4 @@
+#include "void/compiler_observation.hpp"
 #include "void/native_build.hpp"
 #include "void/native_import.hpp"
 #include "void/backend.hpp"
@@ -124,6 +125,7 @@ struct Staging {
 };
 #endif
 void publish(const fs::path& staged,const fs::path& output) {
+    observation::Scope timing(observation::Phase::publication);
     // POSIX rename and Windows MoveFileEx replace in one operation. Never remove
     // a good executable first; an executing/locked Windows file leaves it intact.
 #ifdef _WIN32
@@ -184,6 +186,7 @@ void verify_resources(const fs::path& config, Resources& resources) {
     }
 }
 Resources resources(const char* argv0) {
+    observation::Scope timing(observation::Phase::toolchain_validation);
     auto executable=utf8_path(llvm::sys::fs::getMainExecutable(argv0,reinterpret_cast<void*>(&resources)));
     const auto config=executable.parent_path()/"void-native.txt";
     std::ifstream file(config);std::vector<std::string> lines;std::string line;
@@ -225,6 +228,7 @@ int execute(const std::vector<std::string>& arguments,const fs::path& capture={}
     return status;
 }
 void version(const fs::path& tool,const char* expected,const fs::path& capture) {
+    observation::Scope timing(observation::Phase::toolchain_validation);
     if(execute({path_utf8(tool),"--version"},capture)!=0)throw std::runtime_error("Native toolchain version check failed: "+path_utf8(tool));
     std::ifstream file(capture);std::string text((std::istreambuf_iterator<char>(file)),{});
     const auto position=text.find(expected);
@@ -350,7 +354,10 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
     args.push_back("-ldl"); // Optional system terminfo binding in the Runtime archive.
 #endif
     emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance,source_debug);
+    observation::Scope link_timing(observation::Phase::native_link_driver);
     auto status=execute(args);
+    if(status!=0)link_timing.fail();
+    link_timing.finish();
     if(status!=0)throw std::runtime_error("Native linker failed (status "+std::to_string(status)+
       "). Driver: "+path_utf8(config.driver)+"\nCheck the linker diagnostics above and host C/C++ development libraries. See docs/install/README.md.");
     if(!fs::is_regular_file(executable) || fs::file_size(executable)==0 || !llvm::sys::fs::can_execute(path_utf8(executable)))
@@ -628,6 +635,7 @@ ApplicationMetadata::Owner verify_package(const fs::path& directory, const proje
 
 void build_application_package(const ProjectAnalysis& project_analysis, const fs::path& requested, bool optimize,
                                const char* argv0, std::string_view profile, bool replace) {
+    observation::Scope timing(observation::Phase::package_assembly);
 #ifdef VOID_APPLICATION_PACKAGING
     if (!project_analysis.program()) throw std::runtime_error("Application packaging requires a checked application entry.");
     const auto& analysis = *project_analysis.program();

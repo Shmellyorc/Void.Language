@@ -13,6 +13,8 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/JSON.h>
 #include <llvm/Config/llvm-config.h>
+#include "cli_help.hpp"
+#include "cli_presentation.hpp"
 #include <llvm/Support/raw_ostream.h>
 #include <array>
 #include <cerrno>
@@ -25,130 +27,9 @@
 #include <vector>
 namespace {
 struct UsageError : std::invalid_argument {using std::invalid_argument::invalid_argument;};
-bool known_command(const std::string& command) {
-    return command=="add" || command=="remove" || command=="tidy" || command=="check" || command=="run" || command=="build" || command=="package" || command=="emit" || command=="init" || command=="new" || command=="resolve" || command=="deps" || command=="native-bind" || command=="native";
-}
-void usage(std::ostream& out, const std::string& command={}) {
-    if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
-    if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
-    if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
-    if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
-      "       voidc package --verify DIR\n"
-      "       voidc package list | voidc package search NAME\n"
-      "       voidc package list --json\n"
-      "       voidc package install ALIAS (--dir DIR | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n"
-      "       voidc package uninstall ALIAS\n";
-    if(command.empty() || command=="emit")out<<"Usage: voidc emit <file-or-directory> -o <object> [--no-opt]\n";
-    if(command.empty() || command=="init")out<<"Usage: voidc init [DIR] [project options]\n";
-    if(command.empty() || command=="new")out<<"Usage: voidc new [list]\n"
-      "       voidc new list --json\n"
-      "       voidc new (app | classlib | lib) [PATH | .] [--name NAME] [project options]\n"
-      "       voidc new PATH [project options] [--source PATH]\n"
-      "       voidc new SHORT-NAME --name NAME [--nested]\n"
-      "       voidc new --template SHORT-NAME --name NAME [--in-place]\n"
-      "       voidc new install (--dir PATH | --git URL)\n"
-      "       voidc new uninstall SHORT-NAME\n";
-    if(command.empty() || command=="add")out<<"Usage: voidc add ALIAS [--project DIR]\n"
-      "       voidc add ALIAS [--project DIR] (--dir DIR [--copy] | --git ORIGIN [--rev FULL_SHA] [--subdir DIR])\n"
-      "       voidc add --suggest-alias --dir DIR [--project DIR]\n";
-    if(command.empty() || command=="tidy")out<<"Usage: voidc tidy [--project DIR] [--check]\n";
-    if(command.empty() || command=="remove")out<<"Usage: voidc remove ALIAS [--project DIR]\n";
-    if(command.empty() || command=="resolve")out<<"Usage: voidc resolve --project DIR [--locked | --refresh]\n";
-    if(command.empty() || command=="deps")out<<"Usage: voidc deps explain --project DIR [--json]\n"
-      "       voidc deps fetch --project DIR [--allow-git ORIGIN REV]...\n";
-    if(command.empty() || command=="native")out<<"Usage: voidc native import <header> --provider ID --out NEW-DIR [--source /native.void] [--clang PATH] [--language c|c++] [-- -Ipath -Dname=value -Uname]\n"
-      "       voidc native approvals\n"
-      "       voidc native revoke APPROVAL_ID\n";
-    if(command.empty() || command=="native-bind")out<<"Usage: voidc native-bind <descriptor> <C-header> -o <adapter.c>\n";
-}
-void help(const std::string& command={}) {
-    std::cout<<"VOID Language Compiler v"<<VOID_COMPILER_VERSION<<" (development)\nLLVM "<<LLVM_VERSION_STRING<<"\n\n";
-    usage(std::cout,command);
-    if(command.empty()) {
-        std::cout<<"\nCommands:\n"
-          "  check   Analyze source and imports without executing startup code.\n"
-          "  run     Execute through the JIT.\n"
-          "  build   Compile and link a native executable with the matching Runtime.\n"
-          "  package Assemble a relocatable application directory.\n"
-          "  emit    Write a native object for manual linking.\n"
-          "  init    Add a project manifest to an existing directory.\n"
-          "  new     Create a project and starter source in a new directory.\n"
-          "  add     Add a bundled, explicit local or immutable Git source package.\n"
-          "  remove  Remove a direct project dependency.\n"
-          "  tidy    Validate imports, reconcile dependencies and maintain installed views.\n"
-          "  resolve Resolve available library dependencies and verify or write void.lock.\n"
-          "  deps explain Inspect the verified local dependency graph without changes.\n"
-          "  deps fetch   Explicitly acquire pinned Git source snapshots.\n"
-          "  native import Inspect a C header and publish editable candidate bindings.\n"
-          "  native approvals | native revoke APPROVAL_ID  Manage per-application native approvals.\n"
-          "  native-bind  Generate a checked C11 adapter for a native library.\n"
-          "\nOptions:\n"
-          "  -h, --help  Show help; use <command> --help for examples.\n"
-          "  --version   Show compiler, LLVM, target and build identity.\n"
-          "  --no-opt    Disable O2 (accepted as a no-op by check).\n"
-          "  --cache     Select Debug code and report cache status (run only).\n"
-          "  --no-cache  Disable disk caching (run only).\n"
-          "  --project DIR  Select exactly DIR/void.project.toml.\n"
-          "  --allow-native  Authorize this project's verified native provider for this invocation only.\n"
-          "  --entry PATH   Override its entry with a manifest-relative source.\n"
-          "  --profile debug|release  Select project optimization/cache settings.\n"
-          "                           Project build/emit can emit line/full DWARF on supported native targets.\n"
-          "  -o PATH     Set output path (build, emit or package; required by emit).\n"
-          "  --          End options before a source path.\n";
-    }
-    if(command=="check")std::cout<<"\nCheck source and imported modules; no application entry is required.\n"
-      "--no-opt is accepted for compatibility and has no effect on checking.\n"
-      "Example: voidc check main.void\n";
-    if(command=="package")std::cout<<"\nPackage a manifest-selected Linux x86-64 GNU or Windows x64 MSVC application.\n"
-      "The default directory is <project>/dist. On Linux, --replace accepts an existing verified package of the same application.\n"
-      "Windows requires a fresh destination, including when --replace is supplied.\n"
-      "Use --verify DIR to check the package inventory without building.\n"
-      "Example: voidc package --project . --profile release -o dist\n";
-    if(command=="run")std::cout<<"\nRun a synchronous application; its return value is the process status.\n"
-      "Legacy entry(i32) -> i32 accepts one decimal i32 (default 0), prints its\n"
-      "result, and exits 0. Applications read os.args() after an explicit source\n"
-      "and -- separator; subsequent tokens are literal application arguments.\n"
-      "  --no-opt    Disable O2; eligible Debug code uses the automatic disk cache.\n"
-      "  --cache     Select Debug code and print cache status.\n"
-      "  --no-cache  Disable disk caching; does not disable O2.\n"
-      "  Verified managed native code requires approval; interactive runs can save it.\n"
-      "Examples: voidc run .\n"
-      "          voidc run calculation.void 10 --no-cache\n"
-      "          voidc run main.void -- --help \"two words\"\n";
-    if(command=="build")std::cout<<"\nLink an executable using the installed Runtime, dependency archives and\n"
-      "void-native.txt beside voidc. The original Clang/LLD 23.1.4 SDK and host\n"
-      "development libraries must remain available; this is a source installation.\n"
-      "  -o PATH     Output file; default: <entry-directory>/build/<entry-stem>\n"
-      "              (with .exe on Windows). Missing parent directories are created.\n"
-      "  --no-opt    Disable O2.\n"
-      "Examples: voidc build .\n"
-      "          voidc build main.void -o \"output folder/hello\"\n";
-    if(command=="emit")std::cout<<"\nWrite a host-native object, not an executable. Manual linking must supply\n"
-      "the matching Runtime and dependencies; prefer build for an application.\n"
-      "  -o PATH     Required output object path (.o on Unix, .obj on Windows).\n"
-      "  --no-opt    Disable O2.\n"
-      "Example: voidc emit main.void -o main.o\n";
-    if(command=="init" || command=="new")std::cout<<"\nProject options: --kind application|library, --name TEXT, --version SEMVER,\n"
-      "  --project-id ID, --app-id ID or --package-id ID --package-name IDENTIFIER, --nested.\n"
-      "Default: application, destination basename, version 0.1.0 and independent local IDs.\n"
-      "--source is available with new. The destination and manifest are created exclusively.\n";
-    if(command=="new")std::cout<<"Use --name NAME with app or classlib to create NAME when PATH is omitted.\n"
-      "Use . for an empty current directory and ./PATH or -- PATH for a literal starter name.\n"
-      "lib is an alias for classlib. Built-in starters are available without installation.\n";
-    if(command=="resolve")std::cout<<"\nVerify an existing local dependency lock or create one.\n"
-      "  --locked   Require an existing lock when dependencies are declared.\n"
-      "  --refresh  Replace a stale lock after recomputing the local graph.\n";
-    std::cout<<"\nA directory with void.project.toml selects its project; otherwise it selects main.void.\n"
-      "run/build default to the current directory. Bare explicit files retain their parent root.\n"
-      "Project discovery selects a unique eligible main in any filename; --entry bypasses scanning.\n"
-      "Library projects support check only. Project build output defaults to <project-root>/build/<entry-stem>.\n"
-      "Application entry selection is automatic (main or executable top-level code);\n"
-      "Use -- before a source path beginning with '-'.\n"
-      "Quote paths containing spaces. Options may precede or follow operands.\n"
-      "Exit status: 0 success; 1 compilation/toolchain failure; 2 invocation error.\n"
-      "run propagates an application's process status.\n"
-      "Documentation: https://github.com/Shmellyorc/Void.Language/wiki\n";
-}
+using vd::cli::known_command;
+using vd::cli::usage;
+using vd::cli::help;
 std::int32_t input(const char* text) {
     char* end = nullptr; errno = 0;
     auto value = std::strtoll(text, &end, 10);
@@ -565,7 +446,7 @@ std::optional<int> custom_template_command(int argc,char** argv) {
     const std::string_view command=argv[2];
     if(command=="install" && argc>=4) {
         const std::string_view source=argv[3];
-        if(argc==4 && (source=="--help" || source=="-h")) {help("new");return 0;}
+        if(argc==4 && (source=="--help" || source=="-h")) {help("new", command);return 0;}
         if(source=="--dir" || source=="--git") {
             if(argc!=5 || !*argv[4] || argv[4][0]=='-')
                 throw UsageError("Use voidc new install with exactly one --dir PATH or --git URL.");
@@ -577,7 +458,7 @@ std::optional<int> custom_template_command(int argc,char** argv) {
     }
     if(command=="uninstall" && argc==4) {
         const std::string_view name=argv[3];
-        if(name=="--help" || name=="-h") {help("new");return 0;}
+        if(name=="--help" || name=="-h") {help("new", command);return 0;}
         if(!name.empty() && !name.starts_with('-')) {
             if(name=="app" || name=="classlib" || name=="lib")
                 throw UsageError("Built-in starters cannot be uninstalled.");
@@ -715,7 +596,7 @@ void generate_native_binding(int argc, char** argv) {
     }
 }
 }
-static int run_cli(int argc, char** argv) {
+static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentation) {
     std::string command;
     try {
         if(argc>=2 && (std::string_view(argv[1])=="init" || std::string_view(argv[1])=="new")) {
@@ -752,12 +633,19 @@ static int run_cli(int argc, char** argv) {
               <<"\nTarget: "<<LLVM_DEFAULT_TARGET_TRIPLE<<"\nBuild identity: "<<vd::compiler_build_identity()<<'\n';
             return 0;
         }
+        if(argc==2 && std::string_view(argv[1])=="--capabilities") {
+            std::cout << "{\"schema\":1,\"cliPresentation\":1,\"statusPlain\":true,\"timingsSchema\":1}\n";
+            return 0;
+        }
         if(argc>=2 && std::string(argv[1])=="help") {
             if(argc==2) {help();return 0;}
             if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|add|remove|tidy|resolve|deps|native-bind|native].");
             help(argv[2]);return 0;
         }
-        const auto executable=vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&run_cli)));
+        if (argc>=2 && (std::string_view(argv[1])=="check" || std::string_view(argv[1])=="run" ||
+            std::string_view(argv[1])=="build" || std::string_view(argv[1])=="emit" || std::string_view(argv[1])=="package"))
+            presentation.begin(argv[1]);
+        const auto executable=vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&execute_cli)));
         vd::configure_standard_library_root(executable);
         if(argc==3 && std::string(argv[1])=="--emit-proof") {
             vd::project::require_outside_user_package_store(vd::utf8_path(argv[2]));
@@ -777,7 +665,7 @@ static int run_cli(int argc, char** argv) {
         if(command=="resolve")return resolve_project(argc,argv);
         if(command=="deps") {
             if(argc==4 && (std::string_view(argv[2])=="explain" || std::string_view(argv[2])=="fetch") &&
-               (std::string_view(argv[3])=="--help" || std::string_view(argv[3])=="-h")) { help(command); return 0; }
+               (std::string_view(argv[3])=="--help" || std::string_view(argv[3])=="-h")) { help(command, argv[2]); return 0; }
             if(argc>=3 && std::string_view(argv[2])=="explain")return explain_project(argc,argv);
             return fetch_project(argc,argv);
         }
@@ -789,7 +677,7 @@ static int run_cli(int argc, char** argv) {
                 return 0;
             }
             if(argc==4 && std::string_view(argv[2])=="revoke"){vd::revoke_native_approval(argv[3]);return 0;}
-            if(argc==4 && std::string_view(argv[2])=="import" && std::string_view(argv[3])=="--help") {help(command);return 0;}
+            if(argc==4 && std::string_view(argv[2])=="import" && std::string_view(argv[3])=="--help") {help(command, argv[2]);return 0;}
             if(argc<4 || std::string_view(argv[2])!="import")throw UsageError("Expected native import <header> --provider ID --out NEW-DIR.");
             vd::NativeImportOptions options;options.header=vd::utf8_path(argv[3]);std::set<std::string> seen;
             for(int i=4;i<argc;++i) {
@@ -814,7 +702,7 @@ static int run_cli(int argc, char** argv) {
             return discover_packages(executable,argc,argv);
         if(command=="package" && argc>=3 &&
            (std::string_view(argv[2])=="install" || std::string_view(argv[2])=="uninstall")) {
-            if(argc==4 && std::string_view(argv[3])=="--help") {help(command);return 0;}
+            if(argc==4 && std::string_view(argv[3])=="--help") {help(command, argv[2]);return 0;}
             return maintain_project(std::string_view(argv[2])=="install"?"add":"remove",argc,argv,executable,true);
         }
         if(command=="package" && argc>=3 && std::string_view(argv[2])=="--verify") {
@@ -823,6 +711,7 @@ static int run_cli(int argc, char** argv) {
             std::cout<<"Application package verified\n";
             return 0;
         }
+        vd::cli::PresentationOptions presentation_options;
         bool optimize=true,cache=false,no_cache=false,no_opt=false;
         bool allow_native=false,reuse_native_approval=false;
         bool replace_package=false;
@@ -846,6 +735,23 @@ static int run_cli(int argc, char** argv) {
             if(arg=="--app" && !positional_only)throw UsageError("--app has been removed; entry selection is automatic.");
             if(positional_only)operands.push_back(arg);
             else if(arg=="--")positional_only=true;
+            else if(arg=="--timings") {
+                if(presentation_options.timings)throw UsageError("Duplicate --timings.");
+                presentation_options.timings=true;
+            }
+            else if(arg=="--status" || arg=="--timings-format" || arg=="--timings-output") {
+                if(++i==argc || !*argv[i] || argv[i][0]=='-')throw UsageError("Expected one value after "+arg+".");
+                if(arg=="--status") {
+                    if(presentation_options.status_seen)throw UsageError("Duplicate --status.");
+                    presentation_options.status_seen=true;presentation_options.status=argv[i];
+                } else if(arg=="--timings-format") {
+                    if(presentation_options.format_seen)throw UsageError("Duplicate --timings-format.");
+                    presentation_options.format_seen=true;presentation_options.format=argv[i];
+                } else {
+                    if(presentation_options.output)throw UsageError("Duplicate --timings-output.");
+                    presentation_options.output=vd::utf8_path(argv[i]);
+                }
+            }
             else if(arg=="--no-opt") {if(no_opt)throw UsageError("Duplicate --no-opt.");no_opt=true;optimize=false;}
             else if(arg=="--cache") {if(cache)throw UsageError("Duplicate --cache.");cache=true;optimize=false;}
             else if(arg=="--no-cache") {if(no_cache)throw UsageError("Duplicate --no-cache.");no_cache=true;}
@@ -904,6 +810,11 @@ static int run_cli(int argc, char** argv) {
             throw UsageError("--reuse-native-approval requires a manifest-selected run or build without --allow-native.");
         if(profile && !project_mode)throw UsageError("--profile requires a manifest-selected project context.");
         if(project_entry && !project_mode)throw UsageError("--entry requires a manifest-selected project context.");
+        try { presentation.configure(std::move(presentation_options),path,output); }
+        catch(const std::exception& error) {throw UsageError(error.what());}
+        presentation.project_context(project_mode);
+        if(!project_mode)presentation.configuration(false,{},optimize,"none");
+        vd::observation::Scope frontend(vd::observation::Phase::frontend);
         std::shared_ptr<const vd::ProjectAnalysis> project;
         std::filesystem::path selected;
         vd::AnalysisResult analysis;
@@ -913,6 +824,8 @@ static int run_cli(int argc, char** argv) {
             auto result=durable?vd::analyze_manifest_project_with_native_approval(path,project_entry,
                 [&](const auto& subject){return approval.authorize(subject,command=="run");}):
                 vd::analyze_manifest_project(path,project_entry,{},{},allow_native);
+            if(!result.succeeded())frontend.fail();
+            frontend.finish();
             if(result.manifest && result.manifest->kind()==vd::project::Kind::library && project_entry)throw UsageError("--entry cannot select an application entry in a library project.");
             if(result.manifest) {
                 vd::project::EffectiveProfile selected_profile;
@@ -922,6 +835,9 @@ static int run_cli(int argc, char** argv) {
                     supports_debug?vd::project::ProfileDebugSupport::available:vd::project::ProfileDebugSupport::unavailable);}
                 catch(const std::invalid_argument& error){throw UsageError(error.what());}
                 optimize=selected_profile.optimize;profile_key=selected_profile.cache_key;
+                presentation.configuration(true,selected_profile.name==vd::project::ProfileName::debug?"debug":"release",optimize,
+                    selected_profile.debug_info==vd::project::DebugInfo::none?"none":!supports_debug?"unavailable":
+                    selected_profile.debug_info==vd::project::DebugInfo::line?"line":"full");
                 if(supports_debug && command!="check")source_debug=selected_profile.debug_info;
                 for(const auto& warning:selected_profile.diagnostics)std::cerr<<vd::render_diagnostic(warning)<<'\n';
             }
@@ -941,13 +857,19 @@ static int run_cli(int argc, char** argv) {
                 if(command=="package")throw UsageError("Package requires an application project.");
                 if(command!="check")throw std::invalid_argument("Library project run/build/emit is unsupported; use check for source analysis.");
                 for(const auto& warning:result.diagnostics)std::cerr<<vd::render_diagnostic(warning)<<'\n';
-                std::cout<<"Library project checked successfully\n";return 0;
+                frontend.finish();presentation.build_finished();std::cout<<"Library project checked successfully\n";return 0;
             }
             selected=*project->entry();analysis={project->program(),std::move(result.diagnostics)};
-        } else {selected=std::filesystem::is_directory(path)?vd::discover_project(path).entry:path;analysis=vd::analyze_project(selected);}
+        } else {
+            selected=std::filesystem::is_directory(path)?vd::discover_project(path).entry:path;
+            analysis=vd::analyze_project(selected);
+            if(!analysis.succeeded())frontend.fail();
+            frontend.finish();
+        }
         if(!analysis.succeeded())throw vd::CompilationError(std::move(analysis.diagnostics));
         for(const auto& warning:analysis.program->warnings())std::cerr<<vd::render_diagnostic(warning)<<'\n';
-        if(command=="check") {std::cout<<"Source checked successfully\n";return 0;}
+        frontend.finish();
+        if(command=="check") {presentation.build_finished();std::cout<<"Source checked successfully\n";return 0;}
         const bool application=analysis.program->application();
         if(forwarded && !application) {
             if(application_arguments.size()>1)throw UsageError("Legacy entry accepts one optional decimal i32 input.");
@@ -961,6 +883,7 @@ static int run_cli(int argc, char** argv) {
             if(!output)output=project->root()/"dist";
             vd::project::require_outside_native_approval_store(*output,true);
             vd::build_application_package(*project,*output,optimize,argv[0],profile_key,replace_package);
+            presentation.build_finished();
             std::cout<<"Packaged application: "<<vd::path_utf8(*output)<<'\n';
             return 0;
         }
@@ -971,8 +894,12 @@ static int run_cli(int argc, char** argv) {
             auto code=jit->compile(*analysis.program,optimize);
             if(auto runtime=code->runtime_owner())
                 runtime->application_arguments(vd::checked_application_arguments(std::move(application_arguments)));
+            presentation.cache_status(jit->cache_status());
             if(cache)std::cerr<<"Debug cache: "<<jit->cache_status()<<'\n';
+            presentation.build_finished();
+            presentation.application_begin(application);
             auto status=code->invoke(value);
+            presentation.application_finished(status);
             if(application)return status;
             std::cout<<status<<'\n';return 0;
         }
@@ -987,20 +914,31 @@ static int run_cli(int argc, char** argv) {
             }
             vd::project::require_outside_native_approval_store(*output);
             vd::build_executable(*analysis.program,*output,optimize,argv[0],profile_key,source_debug);
+            presentation.build_finished();
             std::cout<<"Built native executable: "<<vd::path_utf8(*output)<<'\n';
         } else {
             vd::publish_object(*analysis.program,*output,optimize,profile_key,source_debug);
+            presentation.build_finished();
             std::cout<<"Wrote native source object: "<<vd::path_utf8(*output)<<'\n';
         }
         return 0;
     } catch(const vd::NativeApprovalRequired& error) {
+        presentation.failure("approval_required");
         std::cerr<<error.what()<<'\n';return 2;
     } catch(const UsageError& error) {
+        presentation.failure("invocation_error");
         std::cerr<<"Invalid invocation: "<<error.what()<<'\n';
         usage(std::cerr,known_command(command)?command:std::string{});
         std::cerr<<"Try 'voidc "<<(known_command(command)?command+" ":std::string{})<<"--help' for examples.\n";
         return 2;
     } catch(const std::exception& error) {std::cerr<<error.what()<<'\n';return 1;}
+}
+
+static int run_cli(int argc, char** argv) {
+    vd::cli::Presentation presentation;
+    auto code=execute_cli(argc,argv,presentation);
+    presentation.finish(code);
+    return code;
 }
 
 #ifdef _WIN32

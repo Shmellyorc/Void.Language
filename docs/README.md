@@ -91,6 +91,12 @@ The ordinary CLI entry is synchronous; async examples use the explicit host abov
 
 ## Engineering documentation
 
+- [G75 CLI experience implementation and qualification](projects/G75_CLI_EXPERIENCE_IMPLEMENTATION.md):
+  aligned help, terminal status, inclusive timing reports, VOIDUP presentation and
+  the managed F5 compiler-success guard; native-platform limits remain explicit.
+  [Debug compiler correctness repair](projects/G75_DEBUG_CORRECTNESS_REPAIR.md)
+  records the bounded terminator-use indexing correction and its regression evidence.
+
 - [Archive and retention policy](projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md)
   governs qualification outputs and cleanup for every milestone.
 - [Windows x64 D5 application packaging](projects/W2_WINDOWS_D5_IMPLEMENTATION.md)

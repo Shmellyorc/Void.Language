@@ -12,4 +12,5 @@
     X(escape, 46995, 1000) \
     X(reference, 46995, 0) \
     X(across_edge, 47495, 0) \
-    X(survives_allocation, 46995, 0)
+    X(survives_allocation, 46995, 0) \
+    X(terminator_escape, 1018, 3)

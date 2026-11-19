@@ -471,6 +471,9 @@ if(BUILD_TESTING)
   void_add_output_test(voidup_smoke "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/smoke.py"
     "${voidup_application}" "@VOID_TEST_OUTPUT@/voidup-smoke-evidence")
   set_tests_properties(voidup_smoke PROPERTIES TIMEOUT 240)
+  add_test(NAME voidup_presentation COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/voidup/presentation.py" "${voidup_application}")
+  set_tests_properties(voidup_presentation PROPERTIES TIMEOUT 240)
   add_test(NAME voidup_ci_integration COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/voidup/ci_integration.py")
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_test(NAME project_manifest_no_authority COMMAND "${Python3_EXECUTABLE}"
@@ -574,6 +577,11 @@ if(BUILD_TESTING)
   set_tests_properties(project_nested_cli PROPERTIES TIMEOUT 180)
   add_test(NAME cli_contract COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/contract.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(cli_contract PROPERTIES TIMEOUT 180)
+  add_test(NAME cli_presentation COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/cli/presentation.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(cli_presentation PROPERTIES TIMEOUT 180)
+  add_executable(void_cli_report_path_tests tests/cli/report_path.cpp)
+  target_link_libraries(void_cli_report_path_tests PRIVATE void_options)
+  add_test(NAME cli_report_path COMMAND void_cli_report_path_tests)
   if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR WIN32)
     add_test(NAME ascii_adventure COMMAND "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tests/cli/ascii_adventure.py" "$<TARGET_FILE:voidc>" "$<TARGET_FILE_DIR:voidc>/void-native.txt")
@@ -1133,7 +1141,7 @@ if(BUILD_TESTING)
   set_tests_properties(allocation_elimination PROPERTIES TIMEOUT 180)
   foreach(mode normal optimized)
     set(elision_objects)
-    foreach(fixture local direct alias effects numeric init escape reference across_edge survives_allocation)
+    foreach(fixture local direct alias effects numeric init escape reference across_edge survives_allocation terminator_escape)
       set(object "${CMAKE_CURRENT_BINARY_DIR}/elision-${fixture}-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
       add_custom_command(OUTPUT "${object}"
         COMMAND void_allocation_elimination_tests --emit "${fixture}" "${elision_fixtures}/${fixture}.void" "${object}" "${mode}"

@@ -80,3 +80,27 @@ export async function resolveProject(settings: Settings, workspaces: readonly st
         throw new Error('Invalid voidls project discovery response');
     return {server, entry, root, manifestMode, requestedRoot: selected.requestedRoot, entryOverride, trace: settings.trace, singleFile: selected.standalone};
 }
+
+// Probe only a metadata command, with bounded output/time, before passing any
+// new flags. Older compilers reject it safely and retain their original argv.
+// Do not infer feature support from the long-lived 0.1.0 version string.
+export async function compilerFileIdentity(compiler: string): Promise<string> {
+    const value = await fs.stat(compiler, {bigint: true});
+    return `${value.dev}:${value.ino}:${value.size}:${value.mtimeNs}`;
+}
+export async function plainStatusCapability(compiler: string, cwd: string): Promise<string | undefined> {
+    try {
+        const before = await compilerFileIdentity(compiler);
+        const {stdout, stderr} = await promisify(execFile)(compiler, ['--capabilities'],
+            {cwd, encoding: 'utf8', timeout: 5000, maxBuffer: 4096, windowsHide: true});
+        const after = await compilerFileIdentity(compiler);
+        if (before !== after)
+            throw new Error('The compiler changed during capability negotiation.');
+        const result: unknown = JSON.parse(stdout);
+        const supported = !stderr && !!result && typeof result === 'object' &&
+            (result as {schema?: unknown}).schema === 1 &&
+            (result as {cliPresentation?: unknown}).cliPresentation === 1 &&
+            (result as {statusPlain?: unknown}).statusPlain === true;
+        return supported ? after : undefined;
+    } catch { return undefined; }
+}

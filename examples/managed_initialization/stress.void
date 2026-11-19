@@ -28,6 +28,9 @@ func child_of(p: parent) -> child:
     var i = 0
     for i < 300:
         var garbage = child(i)
+        # Keep identity observable so this GC stress loop performs real allocations.
+        if garbage == original:
+            return garbage
         i++
     return original
 

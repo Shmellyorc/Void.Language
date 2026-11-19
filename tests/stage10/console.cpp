@@ -187,7 +187,9 @@ void cleanup_allocations(){
     }
     // First console use may itself be reached after Runtime close. No native
     // session may be initialized, but the admitted source must report closed.
-    auto first=analyze("struct gate:\n    n: i32\nfunc entry(n: i32) -> i32:\n    var state = gate(n = n)\n    print(\"first I/O\", state.n)\n    return n\n");
+    // Force the gate to escape through a managed return so allocation elision
+    // cannot remove the construction hook that initiates Runtime close.
+    auto first=analyze("struct gate:\n    n: i32\nfunc keep(value: gate) -> gate:\n    return value\nfunc entry(n: i32) -> i32:\n    var state = keep(gate(n = n))\n    print(\"first I/O\", state.n)\n    return n\n");
     for(bool opt:{false,true}){auto runtime=std::make_shared<vd::Runtime>(1);vd::Jit jit;auto code=jit.compile(first->lower(),first->entry_symbol(),opt,{},runtime);managed_test::Probe p;bool closed=false;p.before_construct=[&](auto n,const void*,auto){if(n==1){vd::Runtime::Native safe(*runtime);runtime->close();closed=true;}};std::string diagnostic;
         {managed_test::Observe observe(p);try{code->invoke(17);}catch(const std::runtime_error& e){diagnostic=e.what();}}
         check(closed && diagnostic.find("console print stdout: closed")!=std::string::npos,("first console admission during close misreported: "+diagnostic).c_str());

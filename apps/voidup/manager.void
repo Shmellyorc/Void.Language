@@ -1,3 +1,4 @@
+use "./presentation.void" as presentation
 use "./support.void" as support
 use "./model.void" as model
 use "./cli.void" as cli
@@ -15,6 +16,7 @@ use text
 use json as codec
 
 struct up_context:
+    presentation: presentation.up_presentation
     options: cli.up_options
     root_cap: io.private_directory
     versions_cap: io.private_directory
@@ -95,12 +97,14 @@ func up_cache_inventory(context: up_context, release: model.up_release, const ra
         return support.up_publication(pending.publish(context.metadata_cap, "i-" + release.inventory_sha256), "inventory-publication")
 
 func up_fetch_catalog(context: up_context) -> result<model.up_catalog, support.up_error>:
+    presentation.up_status(context.presentation, "Fetching", "authenticated metadata")
     if context.options.catalog_url == "":
         return Err(support.up_fail("this command requires an explicit private --catalog HTTPS URL", "arguments", 2))
     var checked_origin = transport.up_same_origin(context.options.catalog_url, context.options.catalog_url)?
     with transport.up_client(context.options.ca_file)? as client:
         var raw_catalog = transport.up_fetch(client, context.options.catalog_url, context.options.catalog_url, support.up_metadata_limit, context.options.timeout_ms)?
         var raw_signatures = transport.up_fetch(client, context.options.catalog_url, context.options.catalog_url + ".sig", 4096, context.options.timeout_ms)?
+        presentation.up_status(context.presentation, "Verifying", "catalog signatures and freshness")
         var document = trust.up_authenticate(raw_catalog, raw_signatures)?
         var digest = support.up_digest(raw_catalog)?
         var now = support.up_clock(time.now_utc())?.seconds
@@ -146,6 +150,7 @@ func up_verify_version(context: up_context, release_id: string) -> result<model.
     return Ok(manifest)
 
 func up_activate(context: up_context, release_id: string) -> result<bool, support.up_error>:
+    presentation.up_status(context.presentation, "Verifying", "selected toolchain")
     var verified = up_verify_version(context, release_id)?
     var now = support.up_clock(time.now_utc())?.seconds
     if now < context.control_state.last_time:
@@ -154,6 +159,7 @@ func up_activate(context: up_context, release_id: string) -> result<bool, suppor
         context.control_state.previous = context.control_state.current
         context.control_state.current = release_id
         context.control_state.last_time = now
+        presentation.up_status(context.presentation, "Selecting", "default toolchain")
         var saved = storage.up_write_control(context.root_cap, context.control_state)?
     return up_say("default {release_id}")
 
@@ -184,9 +190,12 @@ func up_install(context: up_context) -> result<bool, support.up_error>:
                 with support.up_io(transaction.create_file("package.zip"))? as package:
                     with transport.up_client(context.options.ca_file)? as client:
                         var target = transport.up_remote(context.options.catalog_url, release.artifact_url)?
+                        presentation.up_status(context.presentation, "Downloading", "toolchain artifact")
                         var downloaded = transport.up_download(client, context.options.catalog_url, target, package, release.artifact_bytes, context.options.timeout_ms)?
+                    presentation.up_status(context.presentation, "Verifying", "archive members and content")
                     var extracted = inventory.up_extract(package, payload, release, manifest)?
                 # All exact signed members have been hashed and ZIP CRC-checked.
+                presentation.up_status(context.presentation, "Publishing", "verified toolchain")
                 var published = support.up_publication(payload.publish(context.versions_cap, release.id), "toolchain-publication")?
     var registered = false
     for item in context.control_state.installed:
@@ -287,12 +296,12 @@ func up_dispatch(context: up_context, writer: io.directory_lock) -> result<i32, 
         var printed = up_say("VOIDUP root verified; host={model.up_host()} trust=2-of-3-private-test-keys serial={context.control_state.serial} current={context.control_state.current} previous={context.control_state.previous} retained-transactions={pending.count}; native linking requires the declared host development SDK")?
     return Ok(0)
 
-func up_execute(options: cli.up_options) -> result<i32, support.up_error>:
+func up_execute(options: cli.up_options, status: presentation.up_presentation) -> result<i32, support.up_error>:
     with storage.up_root(options.root_path)? as root_cap:
         with support.up_io(root_cap.lock("writer.lock"))? as writer:
             with support.up_io(root_cap.open_directory("toolchains"))? as versions_cap:
                 with support.up_io(root_cap.open_directory("metadata"))? as metadata_cap:
                     with support.up_io(root_cap.open_directory("transactions"))? as transactions_cap:
-                        var context = up_context(options = options, root_cap = root_cap, versions_cap = versions_cap, metadata_cap = metadata_cap, transactions_cap = transactions_cap, control_state = storage.up_read_control(root_cap)?)
+                        var context = up_context(presentation = status, options = options, root_cap = root_cap, versions_cap = versions_cap, metadata_cap = metadata_cap, transactions_cap = transactions_cap, control_state = storage.up_read_control(root_cap)?)
                         var retained = up_check_retained(context)?
                         return up_dispatch(context, writer)

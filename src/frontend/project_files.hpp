@@ -32,6 +32,19 @@ struct ProjectDirectoryReader {
     const native_windows::DirectoryReservation* reservation = nullptr;
 #endif
 };
+// Invocation-owned staging for a fresh telemetry file. The destination is never
+// overwritten, even when another writer creates it while compilation runs.
+class FreshProjectFile {
+    struct Impl;
+    std::unique_ptr<Impl> impl_;
+public:
+    explicit FreshProjectFile(const std::filesystem::path&);
+    ~FreshProjectFile();
+    void publish(std::string_view);
+    FreshProjectFile(const FreshProjectFile&) = delete;
+    FreshProjectFile& operator=(const FreshProjectFile&) = delete;
+};
+
 using VerifyProjectDirectory = std::function<void(const std::filesystem::path&, const ProjectDirectoryReader&)>;
 
 std::optional<std::string> read_dependency_lock(const std::filesystem::path&);

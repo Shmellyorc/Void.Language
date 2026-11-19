@@ -1,10 +1,12 @@
 import * as vscode from 'vscode';
 import {spawn, ChildProcessWithoutNullStreams} from 'node:child_process';
 import {constants} from 'node:os';
+import {compilerFileIdentity} from './config';
 
-export interface CompilerInvocation {compiler: string; args: string[]; cwd: string}
+export interface CompilerInvocation {compiler: string; args: string[]; cwd: string; capabilityIdentity?: string}
 
-export function compilerExecution(invocation: CompilerInvocation | (() => Promise<CompilerInvocation>)): vscode.CustomExecution {
+export interface CompilerCompletion {code: number; spawned: boolean; cancelled: boolean}
+export function compilerExecution(invocation: CompilerInvocation | (() => Promise<CompilerInvocation>), completed?: (result: CompilerCompletion) => void | Promise<void>): vscode.CustomExecution {
     // Task ProcessExecution substitutes ${...} in paths and arguments. Launch
     // directly so the compiler and application receive the exact argument vector.
     return new vscode.CustomExecution(async () => {
@@ -13,7 +15,13 @@ export function compilerExecution(invocation: CompilerInvocation | (() => Promis
         let process: ChildProcessWithoutNullStreams | undefined;
         let launchFailed = false;
         let closed = false;
-        const finish = (code: number) => {
+        let spawned = false;
+        let didFinish = false;
+        const finish = async (code: number) => {
+            if (didFinish) return;
+            didFinish = true;
+            try { await completed?.({code, spawned, cancelled: closed}); }
+            catch { /* Receipt failure cannot manufacture compiler success. */ }
             finished.fire(code);
             output.dispose();
             finished.dispose();
@@ -23,7 +31,9 @@ export function compilerExecution(invocation: CompilerInvocation | (() => Promis
             onDidClose: finished.event,
             open: async () => {
                 try {
-                    const {compiler, args, cwd} = typeof invocation === 'function' ? await invocation() : invocation;
+                    const {compiler, args, cwd, capabilityIdentity} = typeof invocation === 'function' ? await invocation() : invocation;
+                    if (capabilityIdentity && await compilerFileIdentity(compiler) !== capabilityIdentity)
+                        throw new Error('The compiler changed after capability negotiation. Invoke the command again.');
                     if (closed) { finish(1); return; }
                     process = spawn(compiler, args, {cwd, shell: false, windowsHide: true});
                 } catch (error) {
@@ -31,6 +41,7 @@ export function compilerExecution(invocation: CompilerInvocation | (() => Promis
                     finish(1);
                     return;
                 }
+                process.once('spawn', () => { spawned = true; });
                 const streamOutput = (stream: NodeJS.ReadableStream) => {
                     let previousCR = false;
                     stream.setEncoding('utf8').on('data', (chunk: string) => {

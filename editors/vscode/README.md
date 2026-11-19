@@ -81,6 +81,14 @@ Use a regular terminal for programs
 that require a TTY or commands that deliberately authorize a native dependency
 with `--allow-native`.
 
+G75 tasks negotiate compiler capabilities before requesting plain phase status.
+Older compilers keep their original arguments. Managed F5 launches require the
+actual compiler child to succeed and publish a new executable for that invocation;
+the editor's **Debug Anyway** override cannot authorize a stale output. Compiler
+and application timing remain separate. G75 override qualification currently
+covers Linux x64; Windows and macOS require native qualification. See the
+[G75 implementation report](https://github.com/Shmellyorc/Void.Language/blob/main/docs/projects/G75_CLI_EXPERIENCE_IMPLEMENTATION.md).
+
 Syntax highlighting works in Restricted Mode; native execution requires trust.
 Multi-root, virtual/untitled, network/UNC and unrelated projects need separate
 windows or are unsupported. Source debugging uses an existing native debugger.

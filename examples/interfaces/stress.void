@@ -12,7 +12,7 @@ func entry(value: i32) -> i32:
     var h = holder(view = cell(n = value))
     var n = 0
     for n < 1500:
-        var garbage = cell(n = n)
+        var garbage = keep_gc_marker(cell(n = n))
         n++
     return inspect(h) + n
 value struct part:
@@ -27,7 +27,7 @@ func make(value: i32) -> parcel:
 func consume(p: parcel) -> i32:
     var n = 0
     for n < 100:
-        var garbage = cell(n = n)
+        var garbage = keep_gc_marker(cell(n = n))
         n++
     return (p.nested.view as readable).read() + n
 func handoff(value: i32) -> i32:
@@ -50,3 +50,7 @@ func ordering(value: i32) -> i32:
     var view: sampleable = o
     var result = view.sample(o.replace())
     return result * 100 + o.child.n + value
+
+# This probe needs real heap activity; keep the marker observable as a return value.
+private func keep_gc_marker(value: cell) -> cell:
+    return value

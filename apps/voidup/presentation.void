@@ -1,0 +1,53 @@
+# Cosmetic observations only. This module has no trust, transaction or process authority.
+use console
+use os
+use time
+
+value struct up_presentation:
+    enabled: bool
+    started: [time.monotonic_tick]
+
+func up_begin(mode: string, command: string) -> up_presentation:
+    var state = up_presentation()
+    # Never surround a forwarded tool, a path query or local inventory with status.
+    if command != "install" and command != "default" and command != "rollback" and command != "verify" and command != "doctor":
+        return state
+    state.enabled = mode == "plain"
+    if mode == "auto":
+        state.enabled = console.stderr.capabilities().size
+        if os.env("CI") is Ok(var ci):
+            state.enabled = false
+        if os.platform() != "windows":
+            if os.env("TERM") is Ok(var terminal):
+                if terminal == "" or terminal == "dumb" or terminal == "unknown":
+                    state.enabled = false
+            else:
+                state.enabled = false
+    if state.enabled:
+        if time.monotonic_now() is Ok(var sample):
+            state.started.push(sample)
+    return state
+
+func up_status(state: up_presentation, label: string, detail: string):
+    if state.enabled:
+        # Callers supply fixed labels, never raw metadata or provider-controlled text.
+        var padding = "  "
+        for padding.length < 11 - label.length:
+            padding += " "
+        var ignored = console.stderr.write(label + padding + detail + "\n")
+
+func up_finish(state: up_presentation, success: bool):
+    if not state.enabled or state.started.count != 1:
+        return
+    if time.monotonic_now() is Ok(var sample):
+        if time.elapsed(state.started[0], sample) is Ok(var wall):
+            var label = "Failed"
+            if success:
+                label = "Finished"
+            var duration_text = "<0.01s"
+            if wall.seconds != 0 or wall.nanosecond >= 10000000:
+                var fraction = string((wall.nanosecond as i64) / 10000000)
+                if fraction.length < 2:
+                    fraction = "0" + fraction
+                duration_text = "{wall.seconds}.{fraction}s"
+            up_status(state, label, "VOIDUP in {duration_text}")

@@ -1,0 +1,330 @@
+{
+  "type": "object",
+  "properties": {
+    "schema": {
+      "enum": [
+        "void.cli.timings"
+      ]
+    },
+    "schema_version": {
+      "enum": [
+        1
+      ]
+    },
+    "tool": {
+      "enum": [
+        "voidc"
+      ]
+    },
+    "compiler_version": {
+      "type": "string"
+    },
+    "compiler_build_identity": {
+      "type": "string"
+    },
+    "llvm_version": {
+      "type": "string"
+    },
+    "target": {
+      "type": "string"
+    },
+    "command": {
+      "type": "string"
+    },
+    "execution_mode": {
+      "enum": [
+        "jit",
+        "aot",
+        "check",
+        "package"
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "enum": [
+            null,
+            "debug",
+            "release"
+          ]
+        },
+        "optimization": {
+          "enum": [
+            null,
+            "none",
+            "O2"
+          ]
+        },
+        "debug_info": {
+          "enum": [
+            null,
+            "none",
+            "line",
+            "full",
+            "unavailable"
+          ]
+        },
+        "project_mode": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "profile",
+        "optimization",
+        "debug_info",
+        "project_mode"
+      ],
+      "additionalProperties": true
+    },
+    "cache": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "hit",
+            "miss",
+            "disabled",
+            "unavailable",
+            "not_applicable",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": true
+    },
+    "clock": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "monotonic"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "us"
+          ]
+        },
+        "nominal_tick_ns": {
+          "type": "number",
+          "minimum": 0
+        },
+        "effective_resolution_us": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      },
+      "required": [
+        "kind",
+        "unit",
+        "nominal_tick_ns",
+        "effective_resolution_us"
+      ],
+      "additionalProperties": true
+    },
+    "build": {
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "enum": [
+            "success",
+            "failure",
+            "approval_required",
+            "invocation_error",
+            "interrupted"
+          ]
+        },
+        "wall_duration_us": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "includes_authorization_wait": {
+          "type": "boolean"
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "outcome",
+        "wall_duration_us",
+        "includes_authorization_wait",
+        "complete"
+      ],
+      "additionalProperties": true
+    },
+    "application": {
+      "type": "object",
+      "properties": {
+        "entry_contract": {
+          "enum": [
+            null,
+            "application",
+            "legacy_i32"
+          ]
+        },
+        "state": {
+          "enum": [
+            "not_started",
+            "running",
+            "returned",
+            "interrupted"
+          ]
+        },
+        "wall_duration_us": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "exit_code": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "legacy_result": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "entry_contract",
+        "state",
+        "wall_duration_us",
+        "exit_code",
+        "legacy_result"
+      ],
+      "additionalProperties": true
+    },
+    "process_exit_code": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kind": {
+            "enum": [
+              "scope",
+              "aggregate",
+              "unavailable"
+            ]
+          },
+          "state": {
+            "enum": [
+              "complete",
+              "partial",
+              "skipped",
+              "unavailable",
+              "not_reached"
+            ]
+          },
+          "duration_us": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "parent_id",
+          "kind",
+          "state",
+          "duration_us",
+          "count",
+          "reason"
+        ],
+        "additionalProperties": true
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "properties": {
+        "durations": {
+          "enum": [
+            "inclusive_wall"
+          ]
+        },
+        "phase_sum_is_total": {
+          "enum": [
+            false
+          ]
+        },
+        "detailed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "durations",
+        "phase_sum_is_total",
+        "detailed"
+      ],
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "schema",
+    "schema_version",
+    "tool",
+    "compiler_version",
+    "compiler_build_identity",
+    "llvm_version",
+    "target",
+    "command",
+    "execution_mode",
+    "configuration",
+    "cache",
+    "clock",
+    "build",
+    "application",
+    "process_exit_code",
+    "phases",
+    "measurement"
+  ],
+  "additionalProperties": true,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://voidlang.dev/schemas/cli-timings-v1.schema.json",
+  "title": "VOID CLI timings version 1"
+}

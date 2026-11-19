@@ -1,4 +1,5 @@
 #include "void/frontend.hpp"
+#include "void/compiler_observation.hpp"
 #include "void/path.hpp"
 #include <chrono>
 #include <fstream>
@@ -124,18 +125,22 @@ void tombstone_safety(){
 }
 #ifdef __linux__
 template<class Mutation> void during_capture(Fixture& f,Mutation mutate,Code expected){
- // Lexing this captured source leaves time for the notified mutation to finish
- // before recapture. No public test hook or mutable overlay map is needed.
+ // Complete the mutation synchronously after D/E source capture and before
+ // recapture. A filesystem access notification cannot establish this ordering.
  f.write("src/zz-slow.void",std::string(2*1024*1024,' '));
  f.write("libs/tool/tool.void","func value():\n    pass\n");
  f.write("src/app.void","use \"/libs/tool/tool.void\"\nuse \"./zz-slow.void\"\n"+main_source);
  f.write("void.project.toml",app+"exclude=['src/zz-slow.void']\n");
- int fd=inotify_init1(IN_CLOEXEC);check(fd>=0,"recapture inotify admission");
- int watch=inotify_add_watch(fd,(f.root/"src/zz-slow.void").c_str(),IN_ACCESS);check(watch>=0,"recapture read notification");
- std::atomic<bool> changed=false;std::exception_ptr problem;
- std::thread writer([&]{try{pollfd wait{fd,POLLIN,0};if(poll(&wait,1,5000)>0){char data[4096];if(read(fd,data,sizeof data)>0){mutate();changed=true;}}}catch(...){problem=std::current_exception();}});
- auto result=f.analyze();writer.join();close(fd);if(problem)std::rethrow_exception(problem);
- check(changed && !result.succeeded(),"recapture mutation completed and failed closed");
+ struct State {Mutation* mutation;bool changed=false;std::exception_ptr failure;};
+ State state{&mutate,false,{}};vd::observation::Sink sink;sink.context=&state;
+ sink.enter=[](vd::observation::Phase phase,void* context)noexcept {
+  auto& state=*static_cast<State*>(context);
+  if(phase!=vd::observation::Phase::semantic_analysis || state.changed || state.failure)return;
+  try{(*state.mutation)();state.changed=true;}catch(...){state.failure=std::current_exception();}
+ };
+ vd::observation::Binding binding(&sink);auto result=f.analyze();
+ if(state.failure)std::rethrow_exception(state.failure);
+ check(state.changed && !result.succeeded() && !result.project,"recapture mutation completed and failed closed");
  std::string details;bool found=false;
  for(const auto& d:result.diagnostics){found|=d.code==expected;details+=vd::render_diagnostic(d);check(d.primary.source && d.primary.end<=d.primary.source->text().size(),"recapture owns bounded diagnostic");}
  check(found,"recapture expected "+vd::diagnostic_code(expected)+"; got:\n"+details);

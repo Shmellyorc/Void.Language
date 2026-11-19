@@ -1,3 +1,4 @@
+#include "void/compiler_observation.hpp"
 #include "void/project_resolution.hpp"
 #include "project_files.hpp"
 #include "project_digest.hpp"
@@ -701,6 +702,7 @@ void require_outside_user_package_store(const fs::path& path) {
 
 std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
     const fs::path& requested, const Manifest& manifest, bool retain_sources) {
+    observation::Scope timing(observation::Phase::dependency_verification);
     require_no_package_edit(requested);
     if (manifest.dependencies().empty() && !manifest.native_requirement()) return {};
     const auto root = inspect_creation_root(requested);

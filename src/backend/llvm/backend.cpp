@@ -1,3 +1,4 @@
+#include "void/compiler_observation.hpp"
 #include "void/path.hpp"
 #include "native_cache.hpp"
 #include "target.hpp"
@@ -136,8 +137,11 @@ void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_m
             bool version_loops = false) {
     std::string message;
     llvm::raw_string_ostream stream(message);
-    if (llvm::verifyModule(module, &stream)) throw std::runtime_error("invalid LLVM lowering: " + message);
+    { observation::Scope timing(observation::Phase::llvm_verification);
+      if (llvm::verifyModule(module, &stream)) throw std::runtime_error("invalid LLVM lowering: " + message); }
+    if (!optimize) observation::skipped(observation::Phase::llvm_optimization);
     if (optimize) {
+        observation::Scope optimization_timing(observation::Phase::llvm_optimization);
         llvm::LoopAnalysisManager loops;
         llvm::FunctionAnalysisManager functions;
         llvm::CGSCCAnalysisManager cgscc;
@@ -165,7 +169,9 @@ void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_m
         for (auto& function : module) remove_dominated_scalar_defaults(function, functions);
         auto pipeline = builder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O2);
         pipeline.run(module, modules);
-        if (llvm::verifyModule(module, &stream)) throw std::runtime_error("invalid optimized LLVM IR: " + message);
+        optimization_timing.finish();
+        { observation::Scope timing(observation::Phase::llvm_verification);
+          if (llvm::verifyModule(module, &stream)) throw std::runtime_error("invalid optimized LLVM IR: " + message); }
     }
 }
 std::unique_ptr<llvm::TargetMachine> native_machine() {
@@ -211,6 +217,7 @@ static llvm::CallInst* call_c_primitive(llvm::IRBuilder<>& b, llvm::Module& modu
         b.getInt32(ordinal), words, b.getInt32(count), result});
 }
 void write_object(llvm::Module& module, llvm::TargetMachine& machine, const std::filesystem::path& output) {
+    observation::Scope timing(observation::Phase::native_object_emission);
     std::error_code ec;
     llvm::raw_fd_ostream file(path_utf8(output), ec, llvm::sys::fs::OF_None);
     if (ec) throw std::runtime_error("cannot write object: " + ec.message());
@@ -564,6 +571,9 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
     for(std::size_t next=0;next<uncertain.size();++next) {
         auto [block,id]=uncertain[next];
         for(const auto& use:uses[block][id]) {
+            // Only field/store uses propagate heap affinity through an instruction.
+            // Return/branch escapes carry ~0u, not an instruction index.
+            if(use.kind!=Use::field && use.kind!=Use::store)continue;
             const auto& access=f.blocks[use.block].instructions[use.index];
             if(use.kind==Use::field && access.op==O::gc_read &&
                instruction_types[use.block][use.index].kind==ir::Type::managed_ref &&
@@ -3303,6 +3313,7 @@ struct Jit::Impl {
             llvm::ConstantAsMetadata::get(builder.getInt32(checked ? VOID_CHECKED_SANITIZER_HASH : VOID_FUNCTION_SANITIZER_HASH))}));
         }
 #endif
+        observation::Scope timing(observation::Phase::jit_materialization);
         auto generation = std::make_shared<Generation>();
         generation->jit=jit;generation->live=live;++*live;
         generation->application_metadata=contract.application_metadata;
@@ -3551,11 +3562,13 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         for (const auto& [name,text] : layouts) { (void)name; contract.source_contract += std::to_string(text.size()) + ":" + text; }
     }
     if (!selected->module_identity.empty()) contract.constant_contract = input.analysis ? input.analysis->constant_contract() : input.constant_contract;
+    observation::Scope ir_timing(observation::Phase::llvm_ir);
     auto suffix = impl_->canonical ? "__cache" : "__v" + std::to_string(++impl_->serial);
     auto context = std::make_unique<llvm::LLVMContext>();
     auto module = lower(input, *context, suffix, impl_->jit->getDataLayout(),selected->name);
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple());
+    ir_timing.finish();
     finish(*module, optimize);
     std::shared_ptr<const DynamicBinding> dynamic;
     if (input.c_primitives && input.c_primitives->dynamic()) {
@@ -3586,6 +3599,7 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
         return cold();
     }
     if(impl_->custom_bindings || impl_->cache.project_root.empty())return cold();
+    observation::Scope lookup_timing(observation::Phase::cache_lookup);
     std::string identity;
     try {
     identity="VOID-native-object-v2";
@@ -3597,10 +3611,11 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     field(analysis.application_metadata()?std::string_view(analysis.application_metadata()->bytes()):std::string_view{});
     field(std::to_string(analysis.modules().size()));
     for(const auto& m:analysis.modules()) {field("module");field(m.identity);field(m.source.path());field(m.source.text());field(std::to_string(m.imports.size()));for(const auto& i:m.imports)field(i);}
-    } catch(const std::bad_alloc&) {impl_->cache_status="unavailable";return cold();}
+    } catch(const std::bad_alloc&) {impl_->cache_status="unavailable";lookup_timing.finish();return cold();}
     llvm_backend::NativeCache store(impl_->cache.project_root,identity);
-    if(!store.available()){impl_->cache_status="unavailable";return cold();}
+    if(!store.available()){impl_->cache_status="unavailable";lookup_timing.finish();return cold();}
     auto artifact=store.read();
+    lookup_timing.finish();
     if(artifact) {
         try {
             auto object=llvm::MemoryBuffer::getMemBufferCopy(artifact->object);
@@ -3631,7 +3646,8 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     impl_->cache_status="miss";impl_->canonical=true;impl_->capture=true;impl_->captured.clear();
     try {
         auto result=cold();impl_->canonical=false;impl_->capture=false;
-        if(!impl_->captured.empty())store.write(bool(result->runtime_owner()),impl_->captured);
+        if(!impl_->captured.empty()) { observation::Scope timing(observation::Phase::cache_store);
+            store.write(bool(result->runtime_owner()),impl_->captured); }
         impl_->captured.clear();return result;
     } catch(...) {impl_->canonical=false;impl_->capture=false;impl_->captured.clear();throw;}
 }
@@ -3723,6 +3739,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     if (storage_proof) throw std::invalid_argument("LLVM research certification is not enabled");
     (void)proof_report;
 #endif
+    observation::Scope ir_timing(observation::Phase::llvm_ir);
     auto module = lower(input, context, source_program ? "__void" : generation_suffix, machine->createDataLayout(),input.entry_symbol,
                         nullptr,nullptr
 #ifdef VOID_LLVM_RESEARCH
@@ -3921,6 +3938,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     // and its CLI-home normalization are deliberately NOT activated here.
     // Analyze against the same generic deployment machine that emits the object.
     // JIT callers retain target-independent O2 and their existing ORC policy.
+    ir_timing.finish();
     finish(*module, optimize, machine.get(), !input.coordinated);
     write_object(*module,*machine,output);
 }

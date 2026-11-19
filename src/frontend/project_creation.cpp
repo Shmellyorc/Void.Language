@@ -344,6 +344,54 @@ CreationRoot inspect_creation_root(const fs::path& path) {
     Parent admitted(path);
     return {admitted.path,admitted.identity_key()};
 }
+struct FreshProjectFile::Impl {
+    Parent parent;
+    std::string leaf, temporary;
+    std::optional<Node> stage, file;
+    bool published = false;
+    explicit Impl(const fs::path& requested) : parent(absolute_target(requested).parent_path()),
+        leaf(path_utf8(requested.filename())), temporary("timing-" + random_hex()) {
+        if (leaf.empty() || !portable_path_component(leaf) || named(parent.path, leaf))
+            throw CreationCollision("Timing report requires a fresh ordinary filename.");
+        try {
+#ifdef _WIN32
+            stage.emplace(make_directory(parent.path / utf8_path(temporary), true));
+            file.emplace(make_file(stage->path / "report.json"));
+#else
+            stage.emplace(make_directory(parent.handle.fd, temporary));
+            file.emplace(make_file(stage->handle.fd, "report.json"));
+#endif
+        } catch (...) { cleanup(); throw; }
+    }
+    void cleanup() noexcept {
+        // Only remove names still proven to belong to this invocation. Retain
+        // uncertain objects rather than traverse an attacker-replaced tree.
+        if (file && !published) try { erase(*file); } catch (...) {}
+        file.reset();
+        if (stage) try { erase(*stage); } catch (...) {}
+        stage.reset();
+    }
+    ~Impl() { cleanup(); }
+    void publish(std::string_view bytes) {
+        if (published) throw std::runtime_error("Timing report was already published.");
+        write_file(*file, bytes);
+        if (inspect_creation_root(parent.path).identity != parent.identity_key() ||
+            !owns(*stage) || !owns(*file) || !matches_file(*file, bytes))
+            throw std::runtime_error("Timing report staging changed before publication.");
+        if (named(parent.path, leaf)) throw CreationCollision("Timing report destination appeared during compilation.");
+#ifdef _WIN32
+        publish_file(*file, parent.path / utf8_path(leaf));
+#else
+        rename_exclusive(*file, parent.handle.fd, leaf);
+#endif
+        published = true;
+        cleanup();
+    }
+};
+FreshProjectFile::FreshProjectFile(const fs::path& requested) : impl_(std::make_unique<Impl>(requested)) {}
+FreshProjectFile::~FreshProjectFile() = default;
+void FreshProjectFile::publish(std::string_view bytes) { impl_->publish(bytes); }
+
 bool creation_manifest_present(const fs::path& directory) {
     return named(directory,std::string(manifest_name));
 }

@@ -18,7 +18,7 @@ func replace(r: root) -> i32:
     r.child = container(motion = movement(x = 90))
     var i = 0
     for i < 256:
-        var garbage = container()
+        var garbage = keep_gc_marker(container())
         i++
     return 3
 
@@ -26,3 +26,7 @@ func entry(value: i32) -> i32:
     var r = make(value)
     var selected = r.child.move(replace(r))
     return selected + r.child.x
+
+# This probe needs real heap activity; keep the marker observable as a return value.
+private func keep_gc_marker(value: container) -> container:
+    return value

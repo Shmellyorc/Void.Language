@@ -176,13 +176,27 @@ debug information for source breakpoints, stepping and supported scalar
 locals. The general `void.tasks.profile` setting still controls the
 ordinary project commands; F5 always chooses Debug.
 
-The starter sets `debug.onTaskErrors` to `abort` so a failed build
-cannot launch an old executable, including when native approval is missing,
-changed or revoked. Keep `abort` or `showErrors` for this
-launch. If you switch the selected project or entry during a debug
+The starter sets `debug.onTaskErrors` to `abort`. Keep `abort` or `showErrors`
+for this launch. The matching G75 extension additionally requires an
+invocation-specific receipt from its actual compiler child: successful spawn,
+uncancelled exit zero, and a newly published ordinary executable for the same
+root, entry and output. It consumes the receipt once and rechecks the executable
+before launch. The editor's slow-task or task-exception **Debug Anyway** override
+cannot manufacture that receipt. Missing, changed or revoked native approval
+therefore cannot substitute an old executable for the required build.
+If you switch the selected project or entry during a debug
 session, stop it and start F5 again. The JIT may report that the
 profile's native debug information is unavailable during **Run
 Project**; that warning does not prevent running the application.
+
+Project tasks probe the selected compiler's bounded `--capabilities` response
+before requesting `--status plain`. Older compilers keep the original argument
+vector. The executable's file identity is checked across negotiation and before
+spawn. New status lines use the existing task terminal; diagnostics and the
+problem matcher are unchanged. The extension never changes the user's debugger
+error policy. G75's real slow-task/exception override qualification ran on Linux
+x64 only; Windows and macOS remain unqualified for these changes. See the
+[G75 report](projects/G75_CLI_EXPERIENCE_IMPLEMENTATION.md).
 
 Use **VOID: Run Project** or the CLI if the debugger is unavailable.
 The tested Windows adapter can misreport a nonzero application exit

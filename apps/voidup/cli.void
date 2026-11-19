@@ -4,6 +4,7 @@ use path
 use convert
 
 struct up_options:
+    status: string = "auto"
     root_path: string
     catalog_url: string
     ca_file: string
@@ -22,7 +23,7 @@ func up_parse(const operands: [string]) -> result<up_options, support.up_error>:
     var seen_options: {string: bool}
     for position < operands.count:
         var token = operands[position]
-        if token != "--root" and token != "--catalog" and token != "--ca-file" and token != "--timeout-ms":
+        if token != "--root" and token != "--catalog" and token != "--ca-file" and token != "--timeout-ms" and token != "--status":
             break
         if position + 1 >= operands.count:
             return Err(support.up_fail("option requires a value", "arguments", 2))
@@ -30,7 +31,11 @@ func up_parse(const operands: [string]) -> result<up_options, support.up_error>:
             return Err(support.up_fail("duplicate global option", "arguments", 2))
         seen_options[token] = true
         var operand = operands[position + 1]
-        if token == "--root":
+        if token == "--status":
+            if operand != "auto" and operand != "plain" and operand != "off":
+                return Err(support.up_fail("status requires auto, plain or off", "arguments", 2))
+            options.status = operand
+        else if token == "--root":
             options.root_path = operand
         else if token == "--catalog":
             options.catalog_url = operand
@@ -90,4 +95,4 @@ func up_parse(const operands: [string]) -> result<up_options, support.up_error>:
     return Ok(options)
 
 func up_help() -> string:
-    return "VOIDUP 0.1 engineering — private 2-of-3 test trust roots\n\nGlobal options (before command):\n  --root ABSOLUTE-PATH  Dedicated per-user root\n  --catalog HTTPS-URL   Explicit private catalog endpoint\n  --ca-file PEM         Explicit replacement TLS roots\n  --timeout-ms N        100..120000, default 30000\n\nCommands:\n  --help | --version\n  list [--available]\n  install RELEASE [--activate]\n  default RELEASE\n  rollback\n  which <voidc|voidls>\n  verify RELEASE\n  doctor\n  run <RELEASE|default> <voidc|voidls> -- <literal arguments...>\n\nPublished versions are retained. No pruning, self-update, PATH or shell changes.\n"
+    return "VOIDUP 0.1 engineering — private 2-of-3 test trust roots\n\nGlobal options (before command):\n  --root ABSOLUTE-PATH  Dedicated per-user root\n  --catalog HTTPS-URL   Explicit private catalog endpoint\n  --ca-file PEM         Explicit replacement TLS roots\n  --timeout-ms N        100..120000, default 30000\n  --status MODE         auto|plain|off; default auto uses terminal stderr\n\nCommands:\n  --help | --version\n  list [--available]\n  install RELEASE [--activate]\n  default RELEASE\n  rollback\n  which <voidc|voidls>\n  verify RELEASE\n  doctor\n  run <RELEASE|default> <voidc|voidls> -- <literal arguments...>\n\nPublished versions are retained. No pruning, self-update, PATH or shell changes.\n"

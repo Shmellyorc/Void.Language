@@ -79,8 +79,10 @@ void roots(bool optimize) {
     auto program=analyze(R"VOID(use math
 struct box:
     value: i32
+func keep_gc_marker(value: box) -> box:
+    return value
 func entry(n: i32) -> i32:
-    var kept = box(value = n)
+    var kept = keep_gc_marker(box(value = n))
     var total: f64 = 0.0
     for i in 0..<20:
         total += math.sqrt(9.0 as f64) + math.sin(0.0 as f64) + math.pow(2.0 as f64, 3.0 as f64)

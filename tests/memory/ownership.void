@@ -125,7 +125,7 @@ func entry(mode: i32) -> i32:
         return 0
 
     if mode == -3:
-        var collected = marker(value = active.position as i32)
+        var collected = keep_gc_marker(marker(value = active.position as i32))
         return collected.value
 
     if scenario == 12:
@@ -185,3 +185,7 @@ func entry(mode: i32) -> i32:
         return 1
 
     return 0
+
+# This probe needs real heap activity; keep the marker observable as a return value.
+private func keep_gc_marker(value: marker) -> marker:
+    return value

@@ -45,8 +45,11 @@ with tempfile.TemporaryDirectory(prefix="void manifest legacy ") as temporary:
     (root / "manifest-held.toml").rename(manifest)
     run(["check", "--project", root], 1, root)
     # Malformed creation commands cannot touch the existing manifest or source.
-    for args in (["init", root, "--source", "main.void"], ["new"]):
-        run(args, 2, root)
+    run(["init", root, "--source", "main.void"], 2, root)
+    # Current new-without-operands lists templates, without touching the project.
+    # This source contract predates G75; the obsolete Slice 1 expectation of 2
+    # was independently reproduced against the freshly rebuilt G74 compiler.
+    assert b"Template Name" in run(["new"], 0, root).stdout
     no_id = root / "missing_context.void"
     no_id.write_text(
         'use os\nfunc main() -> i32:\n'

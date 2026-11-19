@@ -5,7 +5,7 @@ var bus = channel.router<i32>()
 var saved: channel.subscription? = null
 var score = 0
 func receive(const amount: i32):
-    var frame = callback_frame(value = amount as i64)
+    var frame = keep_gc_marker(callback_frame(value = amount as i64))
     score += amount
 func entry(command: i32) -> i32:
     if command == 0:
@@ -18,3 +18,7 @@ func entry(command: i32) -> i32:
     else:
         bus.emit("score", 1)
     return score
+
+# This probe needs real heap activity; keep the marker observable as a return value.
+private func keep_gc_marker(value: callback_frame) -> callback_frame:
+    return value

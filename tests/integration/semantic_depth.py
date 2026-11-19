@@ -33,6 +33,13 @@ with tempfile.TemporaryDirectory(prefix="void-semantic-depth-") as directory:
             preexec_fn=small_stack if sys.platform == "linux" else None)
         assert accepted.returncode == 0, (count, accepted.returncode, accepted.stdout, accepted.stderr)
         assert accepted.stderr == "", accepted.stderr
+        if count == 124:
+            for flags in (['--no-opt'], []):
+                executed = subprocess.run(
+                    [sys.argv[1], "run", str(source), "7", "--no-cache", *flags], capture_output=True,
+                    encoding="utf-8", errors="strict", timeout=20,
+                    preexec_fn=small_stack if sys.platform == "linux" else None)
+                assert executed.returncode == 0 and executed.stdout == "0\n" and executed.stderr == "", executed
     for suffix in (".inspect()", ".inspect() + 1"):
         text = prefix + ".same()" * 400 + suffix + "\nfunc later():\n    missing()\n"
         source.write_text(text, encoding="utf-8")
@@ -102,6 +109,21 @@ with tempfile.TemporaryDirectory(prefix="void-semantic-depth-") as directory:
                                 preexec_fn=small_stack if sys.platform == "linux" else None)
         assert result.returncode == 1, (kind, result.returncode, result.stdout, result.stderr)
         assert "code: VOID1107" in result.stderr, (kind, result.stderr)
+
+    # Valid deferred lambdas must also fit through semantic body analysis, not
+    # merely survive parsing until an over-limit program is rejected.
+    for count in (16, 32, 63):
+        lines = ["func entry(value: i32) -> i32:"]
+        lines += ["    " * (depth + 1) + "defer {" for depth in range(count)]
+        lines += ["    " * (count + 1) + "pass"]
+        lines += ["    " * (depth + 1) + "}" for depth in reversed(range(count))]
+        lines += ["    return value", ""]
+        source.write_text("\n".join(lines), encoding="utf-8")
+        result = subprocess.run([sys.argv[1], "check", str(source)], capture_output=True,
+                                encoding="utf-8", errors="strict", timeout=20,
+                                preexec_fn=small_stack if sys.platform == "linux" else None)
+        assert result.returncode == 0 and result.stderr == "", (count, result.returncode, result.stderr)
+    print("Valid deferred nesting: parser and semantic analysis fit the unchanged 1 MiB budget")
 
     # CI #67: unused type-grammar temporaries exhausted a Debug 1 MiB stack
     # before the shared 128-level parser guard could reject deep fixed arrays.

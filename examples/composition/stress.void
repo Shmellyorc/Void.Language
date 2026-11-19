@@ -24,7 +24,7 @@ func make(value: i32) -> carrier:
 func churn(p: carrier, limit: i32) -> carrier:
     var i = 0
     for i < limit:
-        var garbage = node(value = i)
+        var garbage = keep_gc_marker(node(value = i))
         p.count++
         i++
     return p
@@ -34,3 +34,7 @@ func entry(value: i32) -> i32:
     var q = p
     q.count++
     return p.required.value + (q.next as node).value + p.count + q.count
+
+# This probe needs real heap activity; keep the marker observable as a return value.
+private func keep_gc_marker(value: node) -> node:
+    return value

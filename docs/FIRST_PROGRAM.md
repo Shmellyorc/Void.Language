@@ -80,22 +80,13 @@ On Linux x64 or Windows x64, append the following table to `void.project.toml`.
 debug_info = "full"
 ```
 
-Replace `src/hello.void` with this program.
-
-```void
-func doubled(input: i32) -> i32:
-    var answer = input * 2
-    return answer
-
-func main() -> i32:
-    return doubled(7)
-```
+Keep the canonical hello program shown above in `src/hello.void`.
 
 Run `voidc build --project . --profile debug`. On Linux, open
 `build/hello` in LLVM 23.1.4 LLDB. Run `settings set target.disable-aslr false`
-and `breakpoint set -f hello.void -l 2`, then `run`, `next`, and
-`frame variable answer`. On Windows, open
-`build\hello.exe` in native GDB and run `break hello.void:2`, `run`,
-`next`, and `print answer`. The initialized value is 14. Use `continue`
-to finish and observe the application exit status.
+and `breakpoint set -f hello.void -l 4`, then `run` and `next`.
+On Windows, open
+`build\hello.exe` in native GDB and run `break hello.void:4`, `run`,
+and `next`. The print statement writes `Hello, world!`. Use `continue`
+to finish and observe application exit status 0.
 [VS Code launch and native debugger setup](EDITOR_INTEGRATION.md#native-aot-source-debugging)

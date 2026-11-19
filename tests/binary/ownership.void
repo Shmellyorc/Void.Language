@@ -10,7 +10,7 @@ func entry(input: i32) -> i32:
     var independent = binary.encode(input, binary.byte_order.big)
     independent[0] = 255
 
-    var collected = marker(value = input)
+    var collected = keep_gc_marker(marker(value = input))
 
     if bytes[0] != 0 or prior[0] != 255 or collected.value != input:
         return -1
@@ -21,3 +21,7 @@ func entry(input: i32) -> i32:
                 return value
 
     return -2
+
+# This probe needs real heap activity; keep the marker observable as a return value.
+private func keep_gc_marker(value: marker) -> marker:
+    return value

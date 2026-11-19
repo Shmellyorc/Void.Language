@@ -1,3 +1,4 @@
+use "./presentation.void" as presentation
 use "./support.void" as support
 use "./cli.void" as cli
 use "./manager.void" as manager
@@ -29,9 +30,13 @@ func main() -> i32:
             if options.command == "--version":
                 var written = console.stdout.write("VOIDUP 0.1.0 engineering; schema=1; private 2-of-3 test trust; no production publishing keys\n")
                 return 0
-            var outcome = manager.up_execute(options)
+            var display = presentation.up_begin(options.status, options.command)
+            var outcome = manager.up_execute(options, display)
             if outcome is Ok(var status):
+                presentation.up_finish(display, status == 0)
                 return status
             else if outcome is Err(var cause):
-                return up_report(cause)
+                var status = up_report(cause)
+                presentation.up_finish(display, false)
+                return status
     return 1

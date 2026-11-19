@@ -1,3 +1,4 @@
+#include "void/compiler_observation.hpp"
 #include "void/frontend.hpp"
 #include "void/c_primitive.hpp"
 #include "void/path.hpp"
@@ -1274,6 +1275,22 @@ class Parser {
     }
     Statement statement() {
         nodes = 0;
+        if(at("defer"))return deferred_statement();
+        return ordinary_statement();
+    }
+    // A deferred body recurses through statement(). Keep unrelated statement
+    // temporaries off that path so its existing 64-level guard can report.
+    VOID_SEMANTIC_HANDLER Statement deferred_statement() {
+        auto token=take();Depth guard(depth,source,token,64);Statement statement(Statement::Kind::deferred,token);
+        if(at("{")) {
+            need("{");newline();need("<indent>");Function lambda;lambda.anonymous=true;lambda.deferred=true;lambda.token=token;lambda.token.text="$defer$"+std::to_string(parsing_function->lambdas.size());lambda.visibility="private";
+            auto* parent=parsing_function;{FunctionScope scope(parsing_function,lambda);
+            while(!at("<dedent>") && !at("<end of file>"))lambda.body.push_back(this->statement());need("<dedent>");need("}");newline();}
+            statement.expression=std::make_unique<Expr>(Expr::Kind::lambda,token);statement.expression->slot=parent->lambdas.size();parent->lambdas.push_back(std::move(lambda));
+        }else{statement.expression=expression();newline();}
+        return statement;
+    }
+    VOID_SEMANTIC_HANDLER Statement ordinary_statement() {
         if (at("pass")) {
             Statement s(Statement::Kind::no_op, take());
             newline(); return s;
@@ -1332,16 +1349,6 @@ class Parser {
             Statement statement(Statement::Kind::scoped,take());statement.expression=expression(7);
             if(accept("as"))statement.binder=name();else statement.binder={TokenKind::name,"$with$"+std::to_string(statement.token.offset),statement.token.offset};
             statement.body=block();return statement;
-        }
-        if(at("defer")) {
-            auto token=take();Depth guard(depth,source,token,64);Statement statement(Statement::Kind::deferred,token);
-            if(at("{")) {
-                need("{");newline();need("<indent>");Function lambda;lambda.anonymous=true;lambda.deferred=true;lambda.token=token;lambda.token.text="$defer$"+std::to_string(parsing_function->lambdas.size());lambda.visibility="private";
-                auto* parent=parsing_function;{FunctionScope scope(parsing_function,lambda);
-                while(!at("<dedent>") && !at("<end of file>"))lambda.body.push_back(this->statement());need("<dedent>");need("}");newline();}
-                statement.expression=std::make_unique<Expr>(Expr::Kind::lambda,token);statement.expression->slot=parent->lambdas.size();parent->lambdas.push_back(std::move(lambda));
-            }else{statement.expression=expression();newline();}
-            return statement;
         }
         if (at("return")) {
             Statement s(Statement::Kind::returned, take());
@@ -3038,11 +3045,7 @@ class Semantics {
         case Expr::Kind::construction: return e.type; // An inferred literal may revisit its already checked constructor.
         case Expr::Kind::dictionary_literal: return dictionary_expression(e,expected);
         case Expr::Kind::array_literal: return array_expression(e,expected);
-        case Expr::Kind::array_default:
-            if(e.type.kind!=Type::fixed_array || e.parts.size()!=1)
-                error(source,e.token,Code::unsupported_type,"Invalid generated fixed-array recipe.");
-            expect(expression(*e.parts[0],ir::array_element(e.type)),ir::array_element(e.type),e.token);
-            return e.type;
+        case Expr::Kind::array_default: return array_default_expression(e);
         case Expr::Kind::array_index: return index_expression(e);
         case Expr::Kind::array_slice: return slice_expression(e);
         case Expr::Kind::literal: return literal_expression(e, expected);
@@ -3060,6 +3063,13 @@ class Semantics {
         case Expr::Kind::unary: return unary_expression(e, expected);
         default: return binary_expression(e, expected);
         }
+    }
+    // Fixed-array temporaries belong to this case, not every recursive dispatch.
+    VOID_SEMANTIC_HANDLER Type array_default_expression(Expr& e) {
+        if(e.type.kind!=Type::fixed_array || e.parts.size()!=1)
+            error(source,e.token,Code::unsupported_type,"Invalid generated fixed-array recipe.");
+        expect(expression(*e.parts[0],ir::array_element(e.type)),ir::array_element(e.type),e.token);
+        return e.type;
     }
     VOID_SEMANTIC_HANDLER Type test_expression(Expr& e){
         if(!current)error(source,e.token,Code::constant_call,"Patterns require a function body; compile-time pattern evaluation is not implemented.");
@@ -4260,6 +4270,17 @@ class Semantics {
         return flow;
     }
     unsigned statement(Statement& s) {
+        // Deferred lambdas recursively analyze their bodies. Other statement
+        // cases must not reserve their temporaries at every deferred level.
+        if(s.kind==Statement::Kind::deferred) {
+            if(!current)error(source,s.token,Code::invalid_value,"defer requires a function activation.");
+            if(s.expression->kind==Expr::Kind::lambda)expression(*s.expression);else deferred_call(s);
+            current->cleanup_type=unit.make_cleanup();
+            return s.flow = next_flow;
+        }
+        return ordinary_statement(s);
+    }
+    VOID_SEMANTIC_HANDLER unsigned ordinary_statement(Statement& s) {
         using K = Statement::Kind;
         unsigned flow = next_flow;
         switch (s.kind) {
@@ -4285,10 +4306,7 @@ class Semantics {
             }
             current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();break;
         }
-        case K::deferred:
-            if(!current)error(source,s.token,Code::invalid_value,"defer requires a function activation.");
-            if(s.expression->kind==Expr::Kind::lambda)expression(*s.expression);else deferred_call(s);
-            current->cleanup_type=unit.make_cleanup();break;
+        case K::deferred: break; // Handled before the ordinary statement frame.
         case K::assignment: {
             if (diagnostics.editor && diagnostics.editor->module == unit.identity) {
                 auto cursor = [&](const Token& token) { return token.text == "_void_editor_cursor_" && token.offset == diagnostics.editor->offset; };
@@ -5232,6 +5250,9 @@ class Lowering {
         case K::global: return extract_managed(global_cell(e), 0, e.token);
         case K::name: return emit({ir::Op::load, e.slot}, e.token);
         case K::method_call: case K::call: return frontend_case([&]() -> unsigned {
+            // Finish builtin dispatch before recursively lowering an ordinary
+            // receiver, so unrelated builtin temporaries do not stack per call.
+            auto builtin=frontend_case([&]() -> std::optional<unsigned> {
             if(e.target=="$console.print")return frontend_case([&]() -> unsigned {
                 std::vector<unsigned> captured(e.parts.size());
                 for(unsigned n=0;n<e.parts.size();++n){
@@ -5488,6 +5509,9 @@ class Lowering {
                 }
                 return emit({e.token.text=="push" ? ir::Op::list_push : ir::Op::list_remove,emit({ir::Op::load,owner},e.token),argument},e.token);
             });
+            return {};
+            });
+            if(builtin)return *builtin;
             std::optional<ir::Place> receiver;
             std::optional<Selection> selected_receiver;
             std::size_t first = 0;
@@ -6141,7 +6165,8 @@ public:
         auto* result = unit.get(); parsed.emplace(id, std::move(unit));
         diagnostics.bind(result->source, id);
         auto before = diagnostics.size();
-        Parser(result->source, diagnostics,id).parse(*result);
+        { observation::Scope timing(observation::Phase::lex_parse);
+          Parser(result->source, diagnostics,id).parse(*result); }
         result->parse_failed |= diagnostics.size() != before;
         if(id==console::source_module)for(auto& structure:result->structures)if(structure.token.text=="terminal_session"){structure.definition->native_resource=true;structure.definition->native_provider="void.console.v1";}
         if(imports_only)return *result;
@@ -6355,6 +6380,7 @@ void generic_provenance(ir::Module& module,const std::map<std::string,std::uniqu
     }
 }
 void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry, Diagnostics& diagnostics, Unit* library_scope=nullptr) {
+    observation::Scope timing(observation::Phase::semantic_analysis);
     const auto parse_errors=diagnostics.size();
     for(const auto& [id,u]:units)if(!u->c_provider.empty() && !u->c_primitives)
         error(u->source,{TokenKind::name,"native",0},Code::unsupported_type,
@@ -7168,6 +7194,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
 // This factory is the only way to construct a successful result.
 struct AnalysisAccess {
     static std::shared_ptr<const ValidatedAnalysis> build(std::map<std::string, std::unique_ptr<Unit>> units, const std::string& entry,std::vector<Diagnostic> warnings={},const std::string& context_key={},std::shared_ptr<Unit> library_scope={},ApplicationMetadata::Owner metadata={},bool native_authorized=true,std::shared_ptr<const project::LockedDependencies> dependencies={},bool editor_only=false,bool presentation=false) {
+        observation::Scope timing(observation::Phase::analysis_assembly);
         auto result = std::shared_ptr<ValidatedAnalysis>(new ValidatedAnalysis);result->warnings_=std::move(warnings);
         result->entry_ = entry;
         result->application_metadata_ = std::move(metadata);
@@ -7657,6 +7684,7 @@ struct AnalysisAccess {
     }
 };
 ir::Module ValidatedAnalysis::lower(ir::Emission emission) const {
+    observation::Scope timing(observation::Phase::typed_ir);
     auto module = lower_(); module.constant_contract = constants_; module.analysis = shared_from_this();
     module.application_metadata = application_metadata_;
     // The complete graph has already passed checking and typed-IR validation.
@@ -7692,6 +7720,7 @@ AnalysisResult analyze_project(const std::filesystem::path& entry) {
     catch (const CompilationError& e) { return {nullptr,e.diagnostics()}; }
 }
 SourceFile read_source(const std::filesystem::path& path) {
+    observation::Scope timing(observation::Phase::source_loading);
     std::ifstream stream(path, std::ios::binary);
     if (!stream) throw SourceReadError(path_utf8(path), "Cannot read source file.");
     std::string text{std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>()};
@@ -7703,7 +7732,8 @@ std::shared_ptr<const ValidatedAnalysis> validated_source(const SourceFile& sour
     auto identity = source.path().empty() ? std::string("<source>") : source.path();
     auto unit = std::make_unique<Unit>(source, identity);
     Diagnostics diagnostics; diagnostics.bind(source, identity);
-    Parser(source, diagnostics).parse(*unit);
+    { observation::Scope timing(observation::Phase::lex_parse);
+      Parser(source, diagnostics).parse(*unit); }
     if (!unit->imports.empty()) {
         try { error(source, unit->imports.front().path, Code::import_context, "Imports need a filesystem project context.", "Use compile_project or the check/run/emit CLI with a source filename."); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }

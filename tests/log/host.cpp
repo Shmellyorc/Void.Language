@@ -203,25 +203,36 @@ void allocations(const fs::path& root,bool optimize){
     vd::Jit jit;
 #endif
 auto code=compile(jit,root/"tests/log/publication.void",optimize);
+    // The valid preflight error message can itself exhaust memory while joining
+    // its text. Accept that existing diagnostic only in this stdlib error path
+    // during the explicit allocation sweeps; unrelated failures still propagate.
+    auto allocation_failure=[](const std::runtime_error& error) {
+        auto text=std::string(error.what());
+        return text.find("allocation")!=std::string::npos || text.find("bad_alloc")!=std::string::npos ||
+            text.find("String operation failed")!=std::string::npos || text.find("UTF-8 text operation failed")!=std::string::npos ||
+            text.find("Array operation failed")!=std::string::npos || text.find("Display operation failed")!=std::string::npos ||
+            (text.find("runtime error: Interpolation failed\n")!=std::string::npos &&
+             text.find("In function /@stdlib/io.void::_error\n")!=std::string::npos);
+    };
     check(code->invoke(0)==7,"initialize default before fault sweep");unsigned failures=0,post_effect=0;bool success=false;
     auto hooks=std::make_shared<vd::filesystem::testing::Hooks>();unsigned writes=0;hooks->before=[&](Op op){if(op==Op::write_bytes)++writes;};vd::filesystem::testing::Observe observe(hooks);
     for(int budget=0;budget<=65536 && !success;budget=budget<64?budget+1:budget*2){
         clear("publication.log");const auto before=descriptors();bool failed=false;
         managed_test::Probe p;p.inspect_roots=true;p.frames.reserve(32768);
-        {managed_test::Observe source(p);try{managed_test::AllocationFailure injection(budget,true);check(code->invoke(1)==7,"acquisition allocation success");}catch(const std::bad_alloc&){failed=true;}catch(const std::runtime_error& error){auto text=std::string(error.what());if(text.find("allocation")==std::string::npos && text.find("bad_alloc")==std::string::npos && text.find("String operation failed")==std::string::npos && text.find("UTF-8 text operation failed")==std::string::npos && text.find("Array operation failed")==std::string::npos && text.find("Display operation failed")==std::string::npos)throw;failed=true;}}
+        {managed_test::Observe source(p);try{managed_test::AllocationFailure injection(budget,true);check(code->invoke(1)==7,"acquisition allocation success");}catch(const std::bad_alloc&){failed=true;}catch(const std::runtime_error& error){if(!allocation_failure(error))throw;failed=true;}}
         check(p.roots_valid && p.commits_valid && p.frames.empty(),"acquisition failure root imbalance");check(code->invoke(0)==7,"acquisition failure cleanup state");collect(*code->runtime_owner());check(descriptors()==before,"failed acquisition lost native ownership");
         if(failed)++failures;else success=true;
     }
     check(success && failures,"acquisition allocation sweep missed failure/success");
     for(int budget: {0,1,2,4,8,16,32,64,128,256,512}){
         clear("publication.log");check(code->invoke(1)==7,"write sweep acquisition");auto before=writes;bool failed=false;
-        try{managed_test::AllocationFailure injection(budget,true);check(code->invoke(2)==7,"write allocation success");}catch(const std::bad_alloc&){failed=true;}catch(const std::runtime_error& error){auto text=std::string(error.what());if(text.find("allocation")==std::string::npos && text.find("bad_alloc")==std::string::npos && text.find("String operation failed")==std::string::npos && text.find("UTF-8 text operation failed")==std::string::npos && text.find("Array operation failed")==std::string::npos && text.find("Display operation failed")==std::string::npos)throw;failed=true;}
+        try{managed_test::AllocationFailure injection(budget,true);check(code->invoke(2)==7,"write allocation success");}catch(const std::bad_alloc&){failed=true;}catch(const std::runtime_error& error){if(!allocation_failure(error))throw;failed=true;}
         auto observed=code->invoke(3);check(observed==7 || observed==8,"write failure stranded busy guard");if(failed && writes>before && observed==8)++post_effect;
         check(code->invoke(0)==7,"write sweep cleanup");
     }
     for(int budget:{0,1,2,4,8,16,32,64,128,256,512,1024,2048,4096}){
         clear("publication.log");auto before=descriptors();check(code->invoke(1)==7,"close allocation acquisition");
-        try{managed_test::AllocationFailure injection(budget,true);check(code->invoke(9)==7,"close allocation success");}catch(const std::bad_alloc&){}catch(const std::runtime_error& error){auto text=std::string(error.what());if(text.find("allocation")==std::string::npos && text.find("bad_alloc")==std::string::npos && text.find("String operation failed")==std::string::npos && text.find("UTF-8 text operation failed")==std::string::npos && text.find("Array operation failed")==std::string::npos && text.find("Display operation failed")==std::string::npos)throw;}
+        try{managed_test::AllocationFailure injection(budget,true);check(code->invoke(9)==7,"close allocation success");}catch(const std::bad_alloc&){}catch(const std::runtime_error& error){if(!allocation_failure(error))throw;}
         check(code->invoke(0)==7 && descriptors()==before,"close allocation failure lost ownership or stranded busy/terminal state");
     }
     clear("publication.log");check(code->invoke(1)==7,"post-transfer publication acquisition");
