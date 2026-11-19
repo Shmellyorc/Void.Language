@@ -19,3 +19,22 @@ def canonical_name(name):
 
 def snake(name):
     return canonical_name(abi_snake(name))
+
+
+# Retired public names are listed only to prevent their reintroduction.
+NUMERIC_PUBLIC_NAMES = {
+    'camera3_d': 'camera_3d',
+    'camera2_d': 'camera_2d',
+    'begin_mode2_d': 'begin_mode_2d',
+    'end_mode2_d': 'end_mode_2d',
+    'begin_mode3_d': 'begin_mode_3d',
+    'end_mode3_d': 'end_mode_3d',
+    'get_world_to_screen2_d': 'get_world_to_screen_2d',
+    'get_screen_to_world2_d': 'get_screen_to_world_2d',
+    'get_camera_matrix2_d': 'get_camera_matrix_2d',
+    'draw_line3_d': 'draw_line_3d',
+    'draw_point3_d': 'draw_point_3d',
+    'draw_circle3_d': 'draw_circle_3d',
+    'draw_triangle3_d': 'draw_triangle_3d',
+    'draw_triangle_strip3_d': 'draw_triangle_strip_3d',
+}

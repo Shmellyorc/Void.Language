@@ -224,7 +224,11 @@ outputs are unchanged. New checks preserve the existing 20 historical meaning
 regressions and add four companion documentation/signature mutations. Current
 results and qualifications belong to G77; earlier results above remain history.
 
-## Numeric-unit naming and partial camera correction — 19 November 2026
+## Historical numeric-unit naming and partial camera correction — 19 November 2026
+
+**Superseded by the final public API cleanup below.** The compatibility spellings
+and passing runs in this section describe commit `2ed2c0e1` only. Those public
+spellings are now retired; this section and its evidence remain historical.
 
 Follow-up to committed G77 `2bb57ba167b59e7015244f7c5b32515d49101d52`,
 within the raylib API maintenance scope. No new milestone or compiler redesign.
@@ -341,3 +345,64 @@ Native Windows/macOS remain unqualified. Strict graphics/audio device leak
 failures from G77 remain preserved and are not claimed as passes here. Existing
 stack limits, fatal sanitizer policy, native approvals and installed tools are
 unchanged. No staging, commit, push, installation or hosted CI is authorized.
+
+
+## Final public API cleanup — Boss-directed correction
+
+Baseline: `2ed2c0e101e1c503fdddce8bd8f6564caf506593`.
+The Boss superseded the prior compatibility instruction and authorized immediate
+commit/push with source/Git consistency checks only. **Tests, editor runs,
+benchmarks and independent review were not rerun at Boss direction.** Earlier
+15/15, 11/11 and 12/12 records above are historical and do not qualify this change.
+
+All 14 corrected names are now the only public spellings. The duplicate
+forwarding functions were removed and the original implementations renamed
+in place. The native calls and nominal record identities are unchanged.
+Generator metadata retains native `void_name`, publishes canonical `public_name`
+and removes `compatibility_aliases`. Source verification and maintained
+IntelliSense expectations reject retired public names instead of requiring them.
+The public module now has 791 functions, with one constructor per value helper.
+
+Partial construction extends beyond cameras. Vectors default to zero, matrices
+to identity, colors to opaque black, rectangles to empty values, transforms to
+zero translation / identity quaternion / unit scale, rays to origin / unit -Z,
+ray collisions to no-hit/zero payload and bounding boxes to zero-sized origin
+boxes. Patch source rectangles remain required, with zero borders and nine-patch
+layout defaults. Bone names remain required, with parent -1. VR device/stereo
+calibration and automation frame/type/payload remain explicit because there is
+no universal valid calibration or event-specific payload. Camera defaults remain
+as requested. The package guide and each physical `##` description document the
+choices; supplied arguments keep their existing meanings and validity obligations.
+All defaults use existing pure value construction and default arguments, for
+both globals and locals. No compiler redesign or duplicate constructor was added.
+
+Examples, public API references, source-documentation checks and editor/native
+fixtures now target canonical public names and broader partial value construction.
+Those maintained checks were updated but **not executed**. Native C, descriptors,
+layouts, declarations, resource ownership and installed tools remain unchanged.
+Source checks cover Python/JavaScript syntax, declaration/name/default consistency,
+metadata agreement, unchanged native bytes, intended-file inventory and Git
+whitespace. No compiler build, regression suite, benchmark or hosted CI was run.
+Windows/macOS remain unqualified; the original strict graphics/audio failures
+and all prior unsuccessful evidence remain preserved. No tools were installed
+and no backups were created. Integration stops after the authorized normal push.
+
+
+Exact final-cleanup changed-file inventory (14 files):
+
+```text
+docs/README.md
+docs/projects/RAYLIB_PUBLIC_API_DOCUMENTATION.md
+examples/raylib-consumer/README.md
+examples/raylib-consumer/src/main.void
+tests/project/raylib_documentation.py
+tests/project/raylib_fallible_editor.cjs
+tests/project/raylib_naming.py
+tools/raylib/README.md
+tools/raylib/generate.py
+tools/raylib/inventory.json
+tools/raylib/names.py
+tools/raylib/public_docs.py
+verified-packages/raylib/README.md
+verified-packages/raylib/src/raylib.void
+```

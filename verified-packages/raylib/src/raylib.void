@@ -3,31 +3,31 @@ use "./raylib_native.void" as native
 use convert as conversion
 use error as core_error
 
-## Construct a vector2 value with the exact native field layout.
+## Construct a vector2 value; omitted components are zero.
 ## @param x Horizontal component.
 ## @param y Vertical component.
 ## @return The computed vector2 value.
-func vector2(x: f32, y: f32) -> native.vector2:
+func vector2(x: f32 = 0, y: f32 = 0) -> native.vector2:
     return native.vector2(x = x, y = y)
 
-## Construct a vector3 value with the exact native field layout.
+## Construct a vector3 value; omitted components are zero.
 ## @param x Horizontal component.
 ## @param y Vertical component.
 ## @param z Depth component.
 ## @return The computed vector3 value.
-func vector3(x: f32, y: f32, z: f32) -> native.vector3:
+func vector3(x: f32 = 0, y: f32 = 0, z: f32 = 0) -> native.vector3:
     return native.vector3(x = x, y = y, z = z)
 
-## Construct a vector4 value with the exact native field layout.
+## Construct a vector4 value; omitted components are zero. This general vector is not an identity quaternion.
 ## @param x Horizontal component.
 ## @param y Vertical component.
 ## @param z Depth component.
 ## @param w Fourth vector component.
 ## @return The computed vector4 value.
-func vector4(x: f32, y: f32, z: f32, w: f32) -> native.vector4:
+func vector4(x: f32 = 0, y: f32 = 0, z: f32 = 0, w: f32 = 0) -> native.vector4:
     return native.vector4(x = x, y = y, z = z, w = w)
 
-## Construct a matrix value with the exact native field layout.
+## Construct a matrix; omitted diagonal elements are one and all other elements are zero (identity).
 ## @param m0 Matrix element m0 in raylib column-major layout.
 ## @param m4 Matrix element m4 in raylib column-major layout.
 ## @param m8 Matrix element m8 in raylib column-major layout.
@@ -45,28 +45,28 @@ func vector4(x: f32, y: f32, z: f32, w: f32) -> native.vector4:
 ## @param m11 Matrix element m11 in raylib column-major layout.
 ## @param m15 Matrix element m15 in raylib column-major layout.
 ## @return The computed matrix value.
-func matrix(m0: f32, m4: f32, m8: f32, m12: f32, m1: f32, m5: f32, m9: f32, m13: f32, m2: f32, m6: f32, m10: f32, m14: f32, m3: f32, m7: f32, m11: f32, m15: f32) -> native.matrix:
+func matrix(m0: f32 = 1, m4: f32 = 0, m8: f32 = 0, m12: f32 = 0, m1: f32 = 0, m5: f32 = 1, m9: f32 = 0, m13: f32 = 0, m2: f32 = 0, m6: f32 = 0, m10: f32 = 1, m14: f32 = 0, m3: f32 = 0, m7: f32 = 0, m11: f32 = 0, m15: f32 = 1) -> native.matrix:
     return native.matrix(m0 = m0, m4 = m4, m8 = m8, m12 = m12, m1 = m1, m5 = m5, m9 = m9, m13 = m13, m2 = m2, m6 = m6, m10 = m10, m14 = m14, m3 = m3, m7 = m7, m11 = m11, m15 = m15)
 
-## Construct a color value with the exact native field layout.
+## Construct a color; omitted RGB channels are zero and alpha is 255 (opaque black).
 ## @param r Red channel from 0 to 255.
 ## @param g Green channel from 0 to 255.
 ## @param b Blue channel from 0 to 255.
 ## @param a Alpha channel from 0 to 255.
 ## @return The computed color value.
-func color(r: u8, g: u8, b: u8, a: u8) -> native.color:
+func color(r: u8 = 0, g: u8 = 0, b: u8 = 0, a: u8 = 255) -> native.color:
     return native.color(r = r, g = g, b = b, a = a)
 
-## Construct a rectangle value with the exact native field layout.
+## Construct a rectangle; omitted coordinates and extents are zero (an empty rectangle).
 ## @param x Horizontal component.
 ## @param y Vertical component.
 ## @param width Width in the coordinates used by this operation.
 ## @param height Height in the coordinates used by this operation.
 ## @return The computed rectangle value.
-func rectangle(x: f32, y: f32, width: f32, height: f32) -> native.rectangle:
+func rectangle(x: f32 = 0, y: f32 = 0, width: f32 = 0, height: f32 = 0) -> native.rectangle:
     return native.rectangle(x = x, y = y, width = width, height = height)
 
-## Construct a n patch info value with the exact native field layout.
+## Construct patch information from an explicit source rectangle; omitted borders are zero and layout is npatch_nine_patch.
 ## @param source Source region of the texture in pixels.
 ## @param left Left border or coordinate.
 ## @param top Top border or coordinate.
@@ -74,10 +74,9 @@ func rectangle(x: f32, y: f32, width: f32, height: f32) -> native.rectangle:
 ## @param bottom Bottom border or coordinate.
 ## @param layout Layout selector from the constants for this operation.
 ## @return The computed n patch info value.
-func n_patch_info(source: native.rectangle, left: i32, top: i32, right: i32, bottom: i32, layout: i32) -> native.n_patch_info:
+func n_patch_info(source: native.rectangle, left: i32 = 0, top: i32 = 0, right: i32 = 0, bottom: i32 = 0, layout: i32 = npatch_nine_patch) -> native.n_patch_info:
     return native.n_patch_info(source = source, left = left, top = top, right = right, bottom = bottom, layout = layout)
 
-## Compatibility spelling; prefer camera_3d.
 ## Construct a 3D camera; omitted fields use position (0, 0, 1), target (0, 0, 0), up (0, 1, 0), fovy 45 and perspective projection.
 ## @param position Camera position in world coordinates.
 ## @param target Point in world coordinates toward which the camera looks.
@@ -85,58 +84,57 @@ func n_patch_info(source: native.rectangle, left: i32, top: i32, right: i32, bot
 ## @param fovy Vertical field of view in degrees for perspective, or near-plane height in world units for orthographic projection.
 ## @param projection Projection mode selected from camera_perspective or camera_orthographic.
 ## @return The exact native 3D camera value; no window or native allocation is required.
-func camera3_d(position: native.vector3 = native.vector3(x = 0, y = 0, z = 1), target: native.vector3 = native.vector3(x = 0, y = 0, z = 0), up: native.vector3 = native.vector3(x = 0, y = 1, z = 0), fovy: f32 = 45, projection: i32 = camera_perspective) -> native.camera3_d:
+func camera_3d(position: native.vector3 = native.vector3(x = 0, y = 0, z = 1), target: native.vector3 = native.vector3(x = 0, y = 0, z = 0), up: native.vector3 = native.vector3(x = 0, y = 1, z = 0), fovy: f32 = 45, projection: i32 = camera_perspective) -> native.camera3_d:
     return native.camera3_d(position = position, target = target, up = up, fovy = fovy, projection = projection)
 
-## Compatibility spelling; prefer camera_2d.
 ## Construct a 2D camera; omitted offset, target and rotation are zero, and zoom is 1.
 ## @param offset Screen-space camera offset in pixels.
 ## @param target Target position in 2D world coordinates.
 ## @param rotation Rotation for this operation, in degrees for 2D drawing.
 ## @param zoom Dimensionless camera zoom factor.
 ## @return The exact native 2D camera value; no window or native allocation is required.
-func camera2_d(offset: native.vector2 = native.vector2(x = 0, y = 0), target: native.vector2 = native.vector2(x = 0, y = 0), rotation: f32 = 0, zoom: f32 = 1) -> native.camera2_d:
+func camera_2d(offset: native.vector2 = native.vector2(x = 0, y = 0), target: native.vector2 = native.vector2(x = 0, y = 0), rotation: f32 = 0, zoom: f32 = 1) -> native.camera2_d:
     return native.camera2_d(offset = offset, target = target, rotation = rotation, zoom = zoom)
 
-## Construct a transform value with the exact native field layout.
+## Construct a transform; omitted translation is zero, rotation is the identity quaternion (0, 0, 0, 1), and scale is (1, 1, 1).
 ## @param translation Translation in world coordinates.
 ## @param rotation Rotation quaternion in native x, y, z, w component order.
 ## @param scale Scale used by this operation.
 ## @return The computed transform value.
-func transform(translation: native.vector3, rotation: native.vector4, scale: native.vector3) -> native.transform:
+func transform(translation: native.vector3 = native.vector3(x = 0, y = 0, z = 0), rotation: native.vector4 = native.vector4(x = 0, y = 0, z = 0, w = 1), scale: native.vector3 = native.vector3(x = 1, y = 1, z = 1)) -> native.transform:
     return native.transform(translation = translation, rotation = rotation, scale = scale)
 
-## Construct a bone info value with the exact native field layout.
+## Construct bone information from an explicit fixed-width name; omitted parent is -1 (root).
 ## @param name Bone name stored in the fixed native character array.
 ## @param parent Parent bone index, with -1 for a root bone.
 ## @return The computed bone info value.
-func bone_info(name: [i8, 32], parent: i32) -> native.bone_info:
+func bone_info(name: [i8, 32], parent: i32 = -1) -> native.bone_info:
     return native.bone_info(name = name, parent = parent)
 
-## Construct a ray value with the exact native field layout.
+## Construct a ray; omitted position is the origin and direction is the unit vector (0, 0, -1).
 ## @param position Position used by this operation.
 ## @param direction Direction vector.
 ## @return The computed ray value.
-func ray(position: native.vector3, direction: native.vector3) -> native.ray:
+func ray(position: native.vector3 = native.vector3(x = 0, y = 0, z = 0), direction: native.vector3 = native.vector3(x = 0, y = 0, z = -1)) -> native.ray:
     return native.ray(position = position, direction = direction)
 
-## Construct a ray collision value with the exact native field layout.
+## Construct a ray collision; omitted fields describe no hit, zero distance, and zero point/normal.
 ## @param hit Whether a collision occurred.
 ## @param distance Distance from the ray origin to the collision.
 ## @param point Point to test or draw.
 ## @param normal Surface normal at the collision.
 ## @return The computed ray collision value.
-func ray_collision(hit: bool, distance: f32, point: native.vector3, normal: native.vector3) -> native.ray_collision:
+func ray_collision(hit: bool = false, distance: f32 = 0, point: native.vector3 = native.vector3(x = 0, y = 0, z = 0), normal: native.vector3 = native.vector3(x = 0, y = 0, z = 0)) -> native.ray_collision:
     return native.ray_collision(hit = hit, distance = distance, point = point, normal = normal)
 
-## Construct a bounding box value with the exact native field layout.
+## Construct a bounding box; omitted bounds are zero, describing a zero-sized box at the origin. Custom bounds must remain ordered.
 ## @param min Lower bound.
 ## @param max Upper bound.
 ## @return The computed bounding box value.
-func bounding_box(min: native.vector3, max: native.vector3) -> native.bounding_box:
+func bounding_box(min: native.vector3 = native.vector3(x = 0, y = 0, z = 0), max: native.vector3 = native.vector3(x = 0, y = 0, z = 0)) -> native.bounding_box:
     return native.bounding_box(min = min, max = max)
 
-## Construct a vr device info value with the exact native field layout.
+## Construct VR device information from explicit hardware calibration; no universal device defaults are supplied.
 ## @param h_resolution Horizontal screen resolution in pixels.
 ## @param v_resolution Vertical screen resolution in pixels.
 ## @param h_screen_size Horizontal physical screen size in meters.
@@ -150,7 +148,7 @@ func bounding_box(min: native.vector3, max: native.vector3) -> native.bounding_b
 func vr_device_info(h_resolution: i32, v_resolution: i32, h_screen_size: f32, v_screen_size: f32, eye_to_screen_distance: f32, lens_separation_distance: f32, interpupillary_distance: f32, lens_distortion_values: [f32, 4], chroma_ab_correction: [f32, 4]) -> native.vr_device_info:
     return native.vr_device_info(h_resolution = h_resolution, v_resolution = v_resolution, h_screen_size = h_screen_size, v_screen_size = v_screen_size, eye_to_screen_distance = eye_to_screen_distance, lens_separation_distance = lens_separation_distance, interpupillary_distance = interpupillary_distance, lens_distortion_values = lens_distortion_values, chroma_ab_correction = chroma_ab_correction)
 
-## Construct a vr stereo config value with the exact native field layout.
+## Construct VR stereo configuration from explicit calibrated eye transforms and distortion parameters.
 ## @param projection Projection matrix for each eye.
 ## @param view_offset View offset matrix for each eye.
 ## @param left_lens_center Left lens center coordinates.
@@ -163,7 +161,7 @@ func vr_device_info(h_resolution: i32, v_resolution: i32, h_screen_size: f32, v_
 func vr_stereo_config(projection: [native.matrix, 2], view_offset: [native.matrix, 2], left_lens_center: [f32, 2], right_lens_center: [f32, 2], left_screen_center: [f32, 2], right_screen_center: [f32, 2], scale: [f32, 2], scale_in: [f32, 2]) -> native.vr_stereo_config:
     return native.vr_stereo_config(projection = projection, view_offset = view_offset, left_lens_center = left_lens_center, right_lens_center = right_lens_center, left_screen_center = left_screen_center, right_screen_center = right_screen_center, scale = scale, scale_in = scale_in)
 
-## Construct a automation event value with the exact native field layout.
+## Construct an automation event from an explicit frame, event type and type-specific payload.
 ## @param frame Animation or automation frame.
 ## @param type Type selector from the constants for this operation.
 ## @param params Four event-specific integer parameters.
@@ -481,29 +479,25 @@ func end_drawing():
     native.end_drawing()
     _check()
 
-## Compatibility spelling; prefer begin_mode_2d.
 ## Begin 2D mode with custom camera (2D).
 ## @param camera Camera value used by this operation.
-func begin_mode2_d(camera: native.camera2_d):
+func begin_mode_2d(camera: native.camera2_d):
     native.begin_mode2_d(camera)
     _check()
 
-## Compatibility spelling; prefer end_mode_2d.
 ## Ends 2D mode with custom camera.
-func end_mode2_d():
+func end_mode_2d():
     native.end_mode2_d()
     _check()
 
-## Compatibility spelling; prefer begin_mode_3d.
 ## Begin 3D mode with custom camera (3D).
 ## @param camera Camera value used by this operation.
-func begin_mode3_d(camera: native.camera3_d):
+func begin_mode_3d(camera: native.camera3_d):
     native.begin_mode3_d(camera)
     _check()
 
-## Compatibility spelling; prefer end_mode_3d.
 ## Ends 3D mode and returns to default 2D orthographic mode.
-func end_mode3_d():
+func end_mode_3d():
     native.end_mode3_d()
     _check()
 
@@ -607,22 +601,20 @@ func get_world_to_screen_ex(position: native.vector3, camera: native.camera3_d, 
     _check()
     return value
 
-## Compatibility spelling; prefer get_world_to_screen_2d.
 ## Get the screen space position for a 2d camera world space position.
 ## @param position Position in world coordinates to project onto the screen.
 ## @param camera Camera value used by this operation.
 ## @return The computed vector2 value.
-func get_world_to_screen2_d(position: native.vector2, camera: native.camera2_d) -> native.vector2:
+func get_world_to_screen_2d(position: native.vector2, camera: native.camera2_d) -> native.vector2:
     var value = native.get_world_to_screen2_d(position, camera)
     _check()
     return value
 
-## Compatibility spelling; prefer get_screen_to_world_2d.
 ## Get the world space position for a 2d camera screen space position.
 ## @param position Screen-space position in pixels.
 ## @param camera Camera value used by this operation.
 ## @return The computed vector2 value.
-func get_screen_to_world2_d(position: native.vector2, camera: native.camera2_d) -> native.vector2:
+func get_screen_to_world_2d(position: native.vector2, camera: native.camera2_d) -> native.vector2:
     var value = native.get_screen_to_world2_d(position, camera)
     _check()
     return value
@@ -635,11 +627,10 @@ func get_camera_matrix(camera: native.camera3_d) -> native.matrix:
     _check()
     return value
 
-## Compatibility spelling; prefer get_camera_matrix_2d.
 ## Get camera 2d transform matrix.
 ## @param camera Camera value used by this operation.
 ## @return The computed matrix value.
-func get_camera_matrix2_d(camera: native.camera2_d) -> native.matrix:
+func get_camera_matrix_2d(camera: native.camera2_d) -> native.matrix:
     var value = native.get_camera_matrix2_d(camera)
     _check()
     return value
@@ -1777,41 +1768,37 @@ func set_text_line_spacing(spacing: i32):
     native.set_text_line_spacing(spacing)
     _check()
 
-## Compatibility spelling; prefer draw_line_3d.
 ## Draw a line in 3D world space.
 ## @param start_pos Starting position.
 ## @param end_pos Ending position.
 ## @param color_value Color including its alpha channel.
-func draw_line3_d(start_pos: native.vector3, end_pos: native.vector3, color_value: native.color):
+func draw_line_3d(start_pos: native.vector3, end_pos: native.vector3, color_value: native.color):
     native.draw_line3_d(start_pos, end_pos, color_value)
     _check()
 
-## Compatibility spelling; prefer draw_point_3d.
 ## Draw a point in 3D space, actually a small line.
 ## @param position Position in world coordinates.
 ## @param color_value Color including its alpha channel.
-func draw_point3_d(position: native.vector3, color_value: native.color):
+func draw_point_3d(position: native.vector3, color_value: native.color):
     native.draw_point3_d(position, color_value)
     _check()
 
-## Compatibility spelling; prefer draw_circle_3d.
 ## Draw a circle in 3D world space.
 ## @param center Center in world coordinates.
 ## @param radius Radius in world units.
 ## @param rotation_axis Axis of rotation in world coordinates.
 ## @param rotation_angle Rotation angle in degrees.
 ## @param color_value Color including its alpha channel.
-func draw_circle3_d(center: native.vector3, radius: f32, rotation_axis: native.vector3, rotation_angle: f32, color_value: native.color):
+func draw_circle_3d(center: native.vector3, radius: f32, rotation_axis: native.vector3, rotation_angle: f32, color_value: native.color):
     native.draw_circle3_d(center, radius, rotation_axis, rotation_angle, color_value)
     _check()
 
-## Compatibility spelling; prefer draw_triangle_3d.
 ## Draw a color-filled triangle (vertex in counter-clockwise order!).
 ## @param v1 First vertex.
 ## @param v2 Second vertex.
 ## @param v3 Third vertex.
 ## @param color_value Color including its alpha channel.
-func draw_triangle3_d(v1: native.vector3, v2: native.vector3, v3: native.vector3, color_value: native.color):
+func draw_triangle_3d(v1: native.vector3, v2: native.vector3, v3: native.vector3, color_value: native.color):
     native.draw_triangle3_d(v1, v2, v3, color_value)
     _check()
 
@@ -6471,12 +6458,11 @@ func text_to_float(text: string) -> f32:
     _check()
     return value
 
-## Compatibility spelling; prefer draw_triangle_strip_3d.
 ## Draw a triangle strip defined by points.
 ## @param points Point array, borrowed for this call.
 ## @param point_count Number of points to use from the supplied array.
 ## @param color_value Color including its alpha channel.
-func draw_triangle_strip3_d(points: vector3_array, point_count: i32, color_value: native.color):
+func draw_triangle_strip_3d(points: vector3_array, point_count: i32, color_value: native.color):
     native.draw_triangle_strip3_d(points.owner, point_count, color_value)
     _check()
 
@@ -8450,99 +8436,3 @@ func try_export_wave(wave_value: wave, file_name: string) -> result<bool, load_e
     if export_wave(wave_value, file_name):
         return Ok(true)
     return Err(_load_failure("export_wave", load_error_kind.operation_failed))
-
-# Preferred numeric-unit spellings; original public and native identities remain available.
-
-## Construct a 3D camera; omitted fields use position (0, 0, 1), target (0, 0, 0), up (0, 1, 0), fovy 45 and perspective projection.
-## @param position Camera position in world coordinates.
-## @param target Point in world coordinates toward which the camera looks.
-## @param up Camera up vector.
-## @param fovy Vertical field of view in degrees for perspective, or near-plane height in world units for orthographic projection.
-## @param projection Projection mode selected from camera_perspective or camera_orthographic.
-## @return The exact native 3D camera value; no window or native allocation is required.
-func camera_3d(position: native.vector3 = native.vector3(x = 0, y = 0, z = 1), target: native.vector3 = native.vector3(x = 0, y = 0, z = 0), up: native.vector3 = native.vector3(x = 0, y = 1, z = 0), fovy: f32 = 45, projection: i32 = camera_perspective) -> native.camera3_d:
-    return camera3_d(position, target, up, fovy, projection)
-
-## Construct a 2D camera; omitted offset, target and rotation are zero, and zoom is 1.
-## @param offset Screen-space camera offset in pixels.
-## @param target Target position in 2D world coordinates.
-## @param rotation Rotation for this operation, in degrees for 2D drawing.
-## @param zoom Dimensionless camera zoom factor.
-## @return The exact native 2D camera value; no window or native allocation is required.
-func camera_2d(offset: native.vector2 = native.vector2(x = 0, y = 0), target: native.vector2 = native.vector2(x = 0, y = 0), rotation: f32 = 0, zoom: f32 = 1) -> native.camera2_d:
-    return camera2_d(offset, target, rotation, zoom)
-
-## Begin 2D mode with custom camera (2D).
-## @param camera Camera value used by this operation.
-func begin_mode_2d(camera: native.camera2_d):
-    begin_mode2_d(camera)
-
-## Ends 2D mode with custom camera.
-func end_mode_2d():
-    end_mode2_d()
-
-## Begin 3D mode with custom camera (3D).
-## @param camera Camera value used by this operation.
-func begin_mode_3d(camera: native.camera3_d):
-    begin_mode3_d(camera)
-
-## Ends 3D mode and returns to default 2D orthographic mode.
-func end_mode_3d():
-    end_mode3_d()
-
-## Get the screen space position for a 2d camera world space position.
-## @param position Position in world coordinates to project onto the screen.
-## @param camera Camera value used by this operation.
-## @return The computed vector2 value.
-func get_world_to_screen_2d(position: native.vector2, camera: native.camera2_d) -> native.vector2:
-    return get_world_to_screen2_d(position, camera)
-
-## Get the world space position for a 2d camera screen space position.
-## @param position Screen-space position in pixels.
-## @param camera Camera value used by this operation.
-## @return The computed vector2 value.
-func get_screen_to_world_2d(position: native.vector2, camera: native.camera2_d) -> native.vector2:
-    return get_screen_to_world2_d(position, camera)
-
-## Get camera 2d transform matrix.
-## @param camera Camera value used by this operation.
-## @return The computed matrix value.
-func get_camera_matrix_2d(camera: native.camera2_d) -> native.matrix:
-    return get_camera_matrix2_d(camera)
-
-## Draw a line in 3D world space.
-## @param start_pos Starting position.
-## @param end_pos Ending position.
-## @param color_value Color including its alpha channel.
-func draw_line_3d(start_pos: native.vector3, end_pos: native.vector3, color_value: native.color):
-    draw_line3_d(start_pos, end_pos, color_value)
-
-## Draw a point in 3D space, actually a small line.
-## @param position Position in world coordinates.
-## @param color_value Color including its alpha channel.
-func draw_point_3d(position: native.vector3, color_value: native.color):
-    draw_point3_d(position, color_value)
-
-## Draw a circle in 3D world space.
-## @param center Center in world coordinates.
-## @param radius Radius in world units.
-## @param rotation_axis Axis of rotation in world coordinates.
-## @param rotation_angle Rotation angle in degrees.
-## @param color_value Color including its alpha channel.
-func draw_circle_3d(center: native.vector3, radius: f32, rotation_axis: native.vector3, rotation_angle: f32, color_value: native.color):
-    draw_circle3_d(center, radius, rotation_axis, rotation_angle, color_value)
-
-## Draw a color-filled triangle (vertex in counter-clockwise order!).
-## @param v1 First vertex.
-## @param v2 Second vertex.
-## @param v3 Third vertex.
-## @param color_value Color including its alpha channel.
-func draw_triangle_3d(v1: native.vector3, v2: native.vector3, v3: native.vector3, color_value: native.color):
-    draw_triangle3_d(v1, v2, v3, color_value)
-
-## Draw a triangle strip defined by points.
-## @param points Point array, borrowed for this call.
-## @param point_count Number of points to use from the supplied array.
-## @param color_value Color including its alpha channel.
-func draw_triangle_strip_3d(points: vector3_array, point_count: i32, color_value: native.color):
-    draw_triangle_strip3_d(points, point_count, color_value)

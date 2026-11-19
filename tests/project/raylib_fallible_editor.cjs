@@ -86,8 +86,9 @@ exports.run = async function () {
         const namespace=await until(()=>vscode.commands.executeCommand('vscode.executeCompletionItemProvider',document.uri,document.positionAt(document.getText().length)),
             r=>r?.items.some(i=>(typeof i.label==='string'?i.label:i.label.label)==='camera_3d'),'preferred camera completion');
         const names=new Set(namespace.items.map(i=>typeof i.label==='string'?i.label:i.label.label));
-        assert(['camera_2d','camera_3d','camera2_d','camera3_d','begin_mode_3d','begin_mode3_d','draw_triangle_strip_3d','draw_triangle_strip3_d'].every(n=>names.has(n)));
-        report.checks.push('Preferred numeric-unit names and compatibility functions complete together');
+        assert(['camera_2d','camera_3d','begin_mode_3d','draw_triangle_strip_3d'].every(n=>names.has(n)));
+        assert(['camera2_d','camera3_d','begin_mode3_d','draw_triangle_strip3_d'].every(n=>!names.has(n)));
+        report.checks.push('Only canonical numeric-unit public names complete');
         await replace(good+'    rl.try_load_font_ex(font_size = ');
         editor.selection=new vscode.Selection(document.positionAt(document.getText().length),document.positionAt(document.getText().length));
         await vscode.commands.executeCommand('editor.action.triggerParameterHints');

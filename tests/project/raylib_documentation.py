@@ -24,7 +24,7 @@ def documentation_checks():
         (ROOT / 'verified-packages/raylib/src/raylib.void').read_text())}
     source = (ROOT / 'verified-packages/raylib/src/raylib.void').read_text()
     assert verify_fallible_api(source) == 34
-    aliases = verify_numeric_names(source)
+    numeric_names = verify_numeric_names(source)
     for original, preferred in {
         'Camera2D': 'camera_2d', 'Camera3D': 'camera_3d',
         'BeginMode2D': 'begin_mode_2d', 'DrawTriangleStrip3D': 'draw_triangle_strip_3d',
@@ -34,11 +34,11 @@ def documentation_checks():
         assert snake(original) == preferred, (original, snake(original))
     assert abi_snake('Camera3D') == 'camera3_d'
     assert abi_snake('BeginMode2D') == 'begin_mode2_d'
-    assert len(aliases) == 14
+    assert len(numeric_names) == 14
     for original, changed in [
         ('func camera_2d(', 'func missing_camera_2d('),
-        ('func end_mode_3d():', 'func end_mode_3d(unexpected: i32):'),
-        ('## Compatibility spelling; prefer camera_3d.', '## Old camera constructor.'),
+        ('func end_mode_3d():', 'func end_mode3_d():'),
+        ('func camera_3d(', 'func camera3_d('),
     ]:
         assert original in source
         try:
@@ -46,7 +46,7 @@ def documentation_checks():
         except ValueError:
             pass
         else:
-            raise AssertionError(('accepted broken numeric-unit compatibility', original))
+            raise AssertionError(('accepted missing or retired public name', original))
     for function in functions.values():
         verify_documentation_meanings(function)
     # Reintroduce independent historical template errors in memory. These
@@ -104,7 +104,7 @@ def documentation_checks():
             pass
         else:
             raise AssertionError(('accepted broken fallible documentation', original))
-    print(f'Raylib documentation checks: {len(functions)} public functions, 34 companions, {len(mistakes)} historical and 4 fallible documentation errors; 14 numeric aliases, 8 naming cases and 3 compatibility mutations passed')
+    print(f'Raylib documentation checks: {len(functions)} public functions, 34 companions, {len(mistakes)} historical and 4 fallible documentation errors; 14 canonical numeric names, 8 naming cases and 3 retirement mutations passed')
 
 
 documentation_checks()
@@ -178,7 +178,7 @@ with tempfile.TemporaryDirectory(prefix='VOID raylib documentation ') as scratch
     # Client has no environment override. Only this test process inherits the
     # isolated, explicitly supplied catalog for its server subprocess.
     os.environ['VOID_NATIVE_CATALOG'] = str(catalog)
-    aliases = verify_numeric_names((ROOT / 'verified-packages/raylib/src/raylib.void').read_text())
+    numeric_names = verify_numeric_names((ROOT / 'verified-packages/raylib/src/raylib.void').read_text())
     with Client(server, project, project=True) as client:
         client.request('initialize', {'capabilities': {'textDocument': {
             'publishDiagnostics': {'versionSupport': True},
@@ -253,7 +253,8 @@ with tempfile.TemporaryDirectory(prefix='VOID raylib documentation ') as scratch
         response = query('completion', 'rl.', len('rl.'))
         items = response['items'] if isinstance(response, dict) else response
         labels = {item['label'] for item in items}
-        assert set(aliases) | set(aliases.values()) <= labels, labels
+        assert set(numeric_names.values()) <= labels, labels
+        assert not set(numeric_names) & labels, labels
 
         for call, active, description in [
             ('rl.try_load_image(', 0, 'Path to the file. Relative paths use the process working directory.'),

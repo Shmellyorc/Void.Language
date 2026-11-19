@@ -94,7 +94,7 @@ The ordinary CLI entry is synchronous; async examples use the explicit host abov
 - [G77 fallible raylib loaders](projects/G77_FALLIBLE_RAYLIB_LOADERS.md):
   typed resource results, accurate failure categories, cleanup, source docs and native/editor evidence.
 - [Raylib public API and naming corrections](projects/RAYLIB_PUBLIC_API_DOCUMENTATION.md):
-  ordered source docs, compatible `2d`/`3d` names and partial camera construction.
+  ordered source docs, canonical-only `2d`/`3d` names and partial value construction.
 
 - [G69 VOID file icons and corrected qualification](projects/G69_VOID_FILE_ICONS.md):
   standard language-icon fallback, theme-owned mappings and preserved original evidence.

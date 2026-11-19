@@ -257,13 +257,13 @@ def generate(clang):
     inventory['complete_binding_semantics']='Legacy exact-C-signature completeness; arbitrary C variadics are not exposed. complete_usable_api includes explicitly identified typed equivalents and lifecycle adapters.'
     inventory['complete_direct_c_abi']=False
     inventory['arbitrary_c_varargs_supported']=False
-    # Source-friendly names are additive; void_name remains the published native
+    # Public names are canonical-only; void_name remains the published native
     # identity consumed by descriptors and existing package tooling.
     for category in ('functions', 'records', 'typedefs'):
         for entry in inventory[category]:
             legacy = entry.get('void_name')
             if legacy and (preferred := canonical_name(legacy)) != legacy:
-                entry.update(public_name=preferred, compatibility_aliases=[legacy])
+                entry.update(public_name=preferred)
     verify_public_api((ROOT / 'src/raylib.void').read_text(), nodes, inventory, snake)
     return {'inventory.json': json.dumps(inventory, indent=2) + '\n',
             'native/raylib_api.h': '\n'.join(declarations) + '\n', 'native/raylib_api.c': '\n'.join(c) + '\n',

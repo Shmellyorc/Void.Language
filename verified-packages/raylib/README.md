@@ -1,50 +1,52 @@
 # raylib for VOID
 
-## Camera construction and numeric-unit names
+## Value construction and public names
 
-Prefer `camera_2d`, `camera_3d`, `begin_mode_2d`, `begin_mode_3d` and
-`draw_line_3d`: numeric units stay together. The complete compatibility list is
-below. The original spellings continue working, including existing named and
-positional calls. Native record names such as `native.camera3_d` are unchanged
-ABI identities; both constructor spellings produce the very same value type.
+The only supported public spellings use numeric units together: `camera_2d`,
+`camera_3d`, `begin_mode_2d`, `end_mode_2d`, `begin_mode_3d`, `end_mode_3d`,
+`get_world_to_screen_2d`, `get_screen_to_world_2d`, `get_camera_matrix_2d`,
+`draw_line_3d`, `draw_point_3d`, `draw_circle_3d`, `draw_triangle_3d` and
+`draw_triangle_strip_3d`. Incorrectly generated public spellings are retired;
+there are no compatibility aliases. Native-only record/binding identifiers stay
+unchanged for ABI purposes and are not additional supported public spellings.
 
-Camera helpers accept just the named fields you want, locally or at global scope:
+Value helpers accept omitted fields wherever a sensible default exists. This
+works in both module-level globals and local variables:
 
 ```void
 use pkg/raylib as rl
 
-var camera = rl.camera_3d(position = rl.vector3(0, 2, 10))
+var camera = rl.camera_3d(position = rl.vector3(y = 2, z = 10))
 var overlay = rl.camera_2d(zoom = 2)
+var placement = rl.transform(scale = rl.vector3(x = 2, y = 2, z = 2))
 
 func main():
-    var view = rl.camera_3d(fovy = 60)
-    print(view.fovy)
+    var tint = rl.color(r = 255)
+    var region = rl.rectangle(width = 64, height = 32)
+    print(tint.a, region.width)
 ```
 
-For 2D cameras, omitted offset/target/rotation are zero and zoom is 1.
-For 3D cameras, omitted position is `(0, 0, 1)`, target `(0, 0, 0)`, up
-`(0, 1, 0)`, fovy 45 degrees and projection `camera_perspective`. Supplying
-every field retains the previous exact behavior. These are plain native values:
-construction needs no window or resource release. Caller-supplied camera values
-still need to suit the intended projection; defaults do not validate a custom
-position equal to its target or a custom degenerate up vector.
-
-| Preferred name | Compatible original spelling |
+| Helper | Omitted fields |
 | --- | --- |
-| `camera_2d` | `camera2_d` |
-| `camera_3d` | `camera3_d` |
-| `begin_mode_2d` | `begin_mode2_d` |
-| `end_mode_2d` | `end_mode2_d` |
-| `begin_mode_3d` | `begin_mode3_d` |
-| `end_mode_3d` | `end_mode3_d` |
-| `get_world_to_screen_2d` | `get_world_to_screen2_d` |
-| `get_screen_to_world_2d` | `get_screen_to_world2_d` |
-| `get_camera_matrix_2d` | `get_camera_matrix2_d` |
-| `draw_line_3d` | `draw_line3_d` |
-| `draw_point_3d` | `draw_point3_d` |
-| `draw_circle_3d` | `draw_circle3_d` |
-| `draw_triangle_3d` | `draw_triangle3_d` |
-| `draw_triangle_strip_3d` | `draw_triangle_strip3_d` |
+| `vector2`, `vector3`, `vector4` | All components zero; a general vector4 is not an identity quaternion |
+| `matrix` | Identity: diagonal one, all other entries zero |
+| `color` | RGB zero, alpha 255 (opaque black) |
+| `rectangle` | Coordinates/extents zero (empty rectangle) |
+| `camera_2d` | Offset/target zero, rotation 0, zoom 1 |
+| `camera_3d` | Position `(0,0,1)`, target zero, up `(0,1,0)`, fovy 45, perspective |
+| `transform` | Translation zero, rotation quaternion `(0,0,0,1)`, scale `(1,1,1)` |
+| `ray` | Origin zero, unit direction `(0,0,-1)` |
+| `ray_collision` | No hit; distance, point and normal zero |
+| `bounding_box` | Both bounds zero (zero-sized box at the origin) |
+| `n_patch_info` | Source rectangle required; borders zero, layout `npatch_nine_patch` |
+| `bone_info` | Fixed-width name required; parent -1 (root) |
+| `vr_device_info`, `vr_stereo_config` | Explicit hardware calibration required |
+| `automation_event` | Explicit frame, event type and type-specific payload required |
+
+These are plain native values, requiring no window or resource release for
+construction. Explicit arguments retain their existing meaning. Custom camera
+vectors, box ordering, dimensions and operation-specific preconditions remain
+the caller's responsibility; omission defaults do not validate arbitrary overrides.
 
 ## Package overview
 

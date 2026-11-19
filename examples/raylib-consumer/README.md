@@ -7,13 +7,12 @@ run `python3 configure.py --rev FULL_LOWERCASE_COMMIT_SHA`, then follow the
 imports `pkg/raylib` from `verified-packages/raylib`; native catalog approval stays
 with the application and operator.
 
-The examples use the preferred numeric-unit spellings, including `camera_3d`
-and `begin_mode_3d`. A camera can specify only its changed fields:
-`rl.camera_3d(position = rl.vector3(0, 0, 10))` uses the standard target,
-up vector, 45-degree field of view and perspective projection. Likewise,
-`rl.camera_2d(zoom = 2)` supplies zero offset/target/rotation. These plain value
-constructors work at global scope too. Original spellings such as `camera3_d`
-remain compatible; see the package guide for the complete mapping and defaults.
+The examples use the only supported numeric-unit spellings, including `camera_3d`
+and `begin_mode_3d`. Partial value construction works locally and at global scope:
+`rl.camera_3d(position = rl.vector3(z = 10))`, `rl.camera_2d(zoom = 2)`,
+`rl.color(r = 255)` and `rl.transform()` use the documented defaults for omitted
+fields. Retired public names are not aliases. See the package guide for all
+value-helper defaults and inputs that still require explicit values.
 
 The default run checks real record ABI, image/PNG allocation, UTF-8/codepoints,
 text arrays, compression/hashes, file results, headless WAV decoding, typed
