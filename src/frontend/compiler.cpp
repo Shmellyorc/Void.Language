@@ -608,11 +608,12 @@ std::string editor_return_type(const Function& f) {
     return label+")";
 }
 std::string editor_signature(const Function& f) {
+    observation::Scope timing(observation::EditorDetail::formatting);
     std::string out=(random_numeric_function(f) && f.token.text.starts_with("_arity_") ? "public" : f.visibility)+std::string(" ");
     if(!f.operator_glyph.empty())out+="operator "+f.operator_glyph;
     else out+=random_public_name(f);
     out+="(";
-    for(unsigned n=0;n<f.parameters.size();++n){if(n)out+=", ";const auto& p=f.parameters[n];out+=p.token.text+": "+ir::type_name(p.type);if(p.default_expression)out+=" = …";}
+    for(unsigned n=0;n<f.parameters.size();++n){if(n)out+=", ";const auto& p=f.parameters[n];out+=p.token.text+": "+ir::type_name(f.generics.empty()?p.type:editor_pattern_type(p.type));if(p.default_expression)out+=" = …";}
     out+=") -> "+editor_return_type(f);
     if (f.symbol.starts_with("/@stdlib/random.void::") && !f.token.text.starts_with("_arity_")) {
         auto name=random_public_name(f);
@@ -2849,6 +2850,7 @@ class Semantics {
     }
     bool editor_cursor(const Expr& e) const {return editor_cursor(e.token);}
     VOID_SEMANTIC_HANDLER void editor_candidates(Expr& e, std::optional<Type> receiver = {}) {
+        observation::Scope timing(observation::EditorDetail::candidates);
         auto& out=diagnostics.editor->result;
         // A broken local context or import must never manufacture authority.
         if (invalid_function || unit.failed_import || (current && current->parse_failed)) {out.candidates.clear();out.signature.clear();out.parameters.clear();throw EditorProbeFound{};}
@@ -2917,7 +2919,7 @@ class Semantics {
                 if(selected.function) {
                     if(t.readonly || !ir::readonly_paths(t).empty()) continue; // Recovered effects are not finalized.
                     if(auto* candidate=add(name,selected.function->result,selected.function->accessor==1?10:2)) {
-                        if(random_numeric_function(*selected.function) || !selected.function->returns.empty())candidate->detail=editor_signature(*selected.function);
+                        candidate->detail=editor_signature(*selected.function);
                         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==selected.function)candidate->documentation=source_documentation(u->source,f.token.offset).text(f.result!=Type::none);
                     }
                 } else {
@@ -2976,7 +2978,7 @@ class Semantics {
                     }
 
                     if (auto* candidate = add(name, result, 3)) {
-                        if(random_numeric_function(function) || !function.returns.empty())candidate->detail=editor_signature(function);
+                        candidate->detail=editor_signature(function);
                         for (const auto& [id, owner] : units) {
                             if (owner->declarations.contains(function.token.text) &&
                                 owner->declarations.at(function.token.text) == &function) {
@@ -5992,6 +5994,32 @@ public:
             virtual_children[""][folded(admission->module().substr(1))].insert(admission->module().substr(1));
         primitives = std::move(admission);
     }
+    std::function<bool()> input_check() const {
+        for(const auto& [id,unit]:units)if(unit->failed_import)return {};
+        std::map<std::string,SourceFile> sources;
+        for(const auto* group:{&units,&parsed})for(const auto& [id,unit]:*group)sources.insert_or_assign(id,unit->source);
+        return [root=root,overlays=overrides,sources=std::move(sources),directories=directories] {
+            if(std::filesystem::canonical(root)!=root)return false;
+            Diagnostics diagnostics;SourceGraph fresh(root,diagnostics,overlays);
+            Unit anchor(SourceFile(path_utf8(root),""),"/");
+            for(const auto& [path,observed]:directories) {
+                const auto& current=fresh.directory_entries(path);
+                if(current.names!=observed.names || current.error!=observed.error)return false;
+            }
+            for(const auto& [id,source]:sources) {
+                Token token{TokenKind::path,id,0};
+                if(standard_module(id)){token.kind=TokenKind::name;token.text=id.substr(9,id.size()-9-5);}
+                const auto [identity,path]=fresh.resolve(anchor,token);
+                const auto overlay=overlays.find(id);
+                const auto current=overlay!=overlays.end() && overlay->second?*overlay->second:read_source(path);
+                if(identity!=id || (overlay==overlays.end() && path_utf8(path)!=source.path()) || current.text()!=source.text())return false;
+                // resolve checks physical aliases against prior module owners.
+                // Retain their identities without parsing/binding a second AST.
+                fresh.units.emplace(id,std::make_unique<Unit>(current,id));
+            }
+            return true;
+        };
+    }
     const project::LockedPackage* package(std::string_view identity) const {
         if (!dependencies || !identity.starts_with(package_source_prefix)) return nullptr;
         const auto found = dependencies->packages().find(source_domain(identity).substr(package_source_prefix.size()));
@@ -7546,7 +7574,7 @@ struct AnalysisAccess {
                 }
                 method_record.declaration_only=!f.native_symbol.empty() || f.c_primitive;
                 method_record.rename_safe=f.operator_glyph.empty() && !f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry" && f.token.text!="$application" && !f.global_initializer;
-                if(!f.operator_glyph.empty() || f.receiver || random_numeric_function(f) || !f.returns.empty())method_record.signature=editor_signature(f);
+                method_record.signature=editor_signature(f);
                 method_record.initialization_contract=f.initialization_contract;
                 method_record.virtual_slot=f.virtual_slot;
                 if(f.overriding) method_record.override_target=f.virtual_slot;
@@ -7761,6 +7789,7 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
         try { return graph.load(anchor, {TokenKind::path, seed, 0}); }
         catch (const CompilationError& failure) { diagnostics.add(failure); diagnostics.finish(); throw; }
     }();
+    if(editor)editor->result.inputs_current=graph.input_check();
     // A disk read is not an atomic filesystem transaction. Re-discover paths and
     // compare exact bytes before accepting this captured graph. Overlays are frozen.
     if (verify_disk) {
@@ -7945,40 +7974,120 @@ std::optional<EditorAssistance> editor_namespace_assistance(const ValidatedAnaly
     const auto& text=source.text();
     const auto line=source.location(cursor).line-1;
     const auto start=source.line_starts().at(line);
-    const auto stop=text.find_first_of("\r\n",cursor);
-    if(stop==std::string::npos)return {};
-    auto first=text.find_first_not_of(" \t",start);
-    if(first==std::string::npos || first==start || first>=cursor)return {};
-    auto dot=text.find('.',first);
-    if(dot==std::string::npos || dot>=cursor)return {};
-    const auto receiver=text.substr(first,dot-first);
-    auto target=found->qualifiers.find(receiver);
-    if(target==found->qualifiers.end())return {};
-    // Limit this lane to a single incomplete, standalone qualified selection.
-    // Strings, comments, type positions, chained values and call arguments
-    // continue to use the parser and binder on the current context.
-    auto name=std::string_view(text).substr(dot+1,stop-dot-1);
-    auto last=name.find_last_not_of(" \t");
-    name=name.substr(0,last==std::string_view::npos?0:last+1);
-    if(dot+1+name.size()<cursor ||
-       name.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")!=std::string_view::npos)return {};
-    const auto& before=found->source.text();
-    if(before.size()<start || before.compare(0,start,text,0,start)!=0)return {};
-    const auto previous_stop=before.find_first_of("\r\n",start);
-    const auto next_line=stop+(text.compare(stop,2,"\r\n")==0?2:1);
-    const bool replaced=previous_stop!=std::string::npos &&
-        before.compare(previous_stop,std::string::npos,text,stop,std::string::npos)==0;
-    const bool inserted=before.compare(start,std::string::npos,text,next_line,std::string::npos)==0;
-    if(!replaced && !inserted)return {};
-    // A per-line comparison alone cannot tell whether the line sits in a
-    // multiline string. Use the actual lexer and require a physical name/dot.
+    const auto newline=text.find_first_of("\r\n",cursor);
+    const auto stop=newline==std::string::npos?text.size():newline;
+    if(!cursor || text.find("_void_editor_cursor_")!=std::string::npos)return {};
+    const auto dot=text.rfind('.',cursor-1);
+    if(dot==std::string::npos || dot<start)return {};
+    auto end=dot+1;
+    while(end<text.size() && (letter(text[end]) || digit(text[end])))++end;
+    if(cursor<dot+1 || cursor>end)return {};
+    const auto name=std::string_view(text).substr(dot+1,end-dot-1);
+    // Use the ordinary lexer and parser to classify this exact selection. A
+    // name in a string/comment, type annotation, import or chained value is not
+    // a namespace expression merely because its text contains an alias and dot.
+    observation::Scope syntax_timing(observation::Phase::lex_parse);
     Diagnostics diagnostics;
     EditorRecovery recovery{module,{}};
     const auto lexed=lex(source,diagnostics,0,std::string::npos,0,false,&recovery);
-    if(diagnostics.failed() || !std::any_of(lexed.begin(),lexed.end(),[&](const auto& token){
+    if(diagnostics.failed())return {};
+    auto physical=std::find_if(lexed.begin(),lexed.end(),[&](const auto& token) {
         return token.offset==dot && token.kind==TokenKind::symbol && token.text==".";
-    }))return {};
-    EditorAssistance out;out.begin=dot+1;out.end=dot+1+name.size();
+    });
+    if(physical==lexed.end() || physical==lexed.begin() || std::prev(physical)->kind!=TokenKind::name)return {};
+    const auto receiver=std::prev(physical)->text;
+    auto target=found->qualifiers.find(receiver);
+    if(target==found->qualifiers.end())return {};
+    for(const auto& declaration:known.declarations())if(declaration.module==module &&
+        declaration.kind!=AnalyzedDeclaration::Kind::import_alias && declaration.source.source &&
+        declaration.source.source->text().substr(declaration.source.begin,declaration.source.end-declaration.source.begin)==receiver)
+        return {}; // Conservative delegation for any possible local shadow.
+    auto repaired=text;
+    repaired.replace(dot+1,end-dot-1,"_void_editor_cursor_");
+    int parentheses=0;
+    for(const auto& token:lexed)if(token.offset>=start && token.offset<stop) {
+        if(token.text=="(")++parentheses;else if(token.text==")")--parentheses;
+    }
+    if(parentheses<0 || parentheses>32)return {};
+    if(parentheses)repaired.insert(stop+std::string_view("_void_editor_cursor_").size()-(end-dot-1),static_cast<std::size_t>(parentheses),')');
+    SourceFile parsed_source(source.path(),std::move(repaired));
+    Unit parsed(parsed_source,module);
+    Diagnostics syntax;
+    Parser parser(parsed_source,syntax,module);parser.parse(parsed);
+    if(syntax.failed())return {};
+    // Body edits do not change an imported namespace's declarations. Compare
+    // actual compiler tokens outside ordinary function bodies, not timestamps
+    // or an ad-hoc import scanner. New imports, types, globals, signatures and
+    // entry declarations delegate to the ordinary project probe.
+    Unit previous(found->source,module);Diagnostics previous_syntax;
+    Parser previous_parser(found->source,previous_syntax,module);previous_parser.parse(previous);
+    if(previous_syntax.failed())return {};
+    auto headers=[](const SourceFile& source,const Parser& parser,const Unit& unit) {
+        std::vector<std::pair<std::size_t,std::size_t>> bodies;
+        for(const auto* functions:{&unit.functions,&unit.generic_functions})for(const auto& function:*functions) {
+            if(function.body.empty() || function.anonymous || function.global_initializer || function.token.text.starts_with("$"))continue;
+            const auto begin=source.line_starts().at(source.location(function.body.front().token.offset).line-1);
+            if(function.source_end>begin)bodies.emplace_back(begin,function.source_end);
+        }
+        std::sort(bodies.begin(),bodies.end());
+        std::vector<std::pair<std::size_t,std::size_t>> ranges;
+        for(const auto& body:bodies) {
+            if(!ranges.empty() && body.first<ranges.back().second)ranges.back().second=std::max(ranges.back().second,body.second);
+            else ranges.push_back(body);
+        }
+        std::vector<std::pair<TokenKind,std::string>> result;
+        for(const auto& token:parser.syntax_tokens()) {
+            const auto next=std::upper_bound(ranges.begin(),ranges.end(),token.offset,[](auto offset,const auto& span){return offset<span.first;});
+            const bool body=next!=ranges.begin() && (token.offset<std::prev(next)->second ||
+                // The lexer supplies a newline at EOF for an unterminated last
+                // line. Like its closing dedent, that token belongs to the body;
+                // it must not turn an ordinary body edit into a header change.
+                ((token.kind==TokenKind::dedent || token.kind==TokenKind::newline) && token.offset==std::prev(next)->second));
+            if(!body)result.emplace_back(token.kind,token.text);
+        }
+        return result;
+    };
+    if(headers(parsed_source,parser,parsed)!=headers(found->source,previous_parser,previous))return {};
+    bool expression=false;
+    for(const auto& function:parsed.functions) {
+        if(function.receiver && function.receiver->token.text==receiver)return {};
+        for(const auto& parameter:function.parameters)if(parameter.token.text==receiver)return {};
+        std::vector<const Statement*> statements;
+        std::vector<const Expr*> expressions;
+        for(const auto& statement:function.body)statements.push_back(&statement);
+        while(!statements.empty()) {
+            const auto& statement=*statements.back();statements.pop_back();
+            if(statement.name==receiver || statement.binder.text==receiver || statement.index_binder.text==receiver)return {};
+            for(const auto& binding:statement.bindings)if(binding.token.text==receiver)return {};
+            for(const auto& field:statement.fields)if(field.text==receiver)return {};
+            if(statement.pattern) {
+                std::vector<const Pattern*> pending{&*statement.pattern};
+                while(!pending.empty()) {
+                    const auto& pattern=*pending.back();pending.pop_back();
+                    if(pattern.kind==Pattern::Kind::capture && pattern.token.text==receiver)return {};
+                    for(const auto& child:pattern.children)pending.push_back(&child);
+                }
+            }
+            for(const auto* part:{statement.expression.get(),statement.index.get(),statement.selection.get(),statement.range_end.get()})if(part)expressions.push_back(part);
+            for(const auto* body:{&statement.body,&statement.otherwise})for(const auto& child:*body)statements.push_back(&child);
+        }
+        while(!expressions.empty()) {
+            const auto& part=*expressions.back();expressions.pop_back();
+            if(part.token.text=="_void_editor_cursor_" && (part.kind==Expr::Kind::field || part.kind==Expr::Kind::method_call) &&
+                !part.parts.empty() && part.parts.front()->kind==Expr::Kind::name && part.parts.front()->token.text==receiver)expression=true;
+            std::vector<const Pattern*> patterns;for(const auto& pattern:part.patterns)patterns.push_back(&pattern);
+            while(!patterns.empty()) {
+                const auto& pattern=*patterns.back();patterns.pop_back();
+                if(pattern.kind==Pattern::Kind::capture && pattern.token.text==receiver)return {};
+                for(const auto& child:pattern.children)patterns.push_back(&child);
+            }
+            for(const auto& child:part.parts)expressions.push_back(child.get());
+        }
+    }
+    if(!expression)return {};
+    syntax_timing.finish();
+    observation::Scope candidates_timing(observation::EditorDetail::candidates);
+    EditorAssistance out;out.begin=dot+1;out.end=end;
     const auto prefix=name.substr(0,cursor-out.begin);
     std::map<std::string,EditorCandidate> candidates;
     auto consider=[&](const AnalyzedDeclaration& d) {
@@ -8008,7 +8117,7 @@ std::optional<EditorAssistance> editor_namespace_assistance(const ValidatedAnaly
         if(out.candidates.size()==2048){out.incomplete=true;break;}
         out.candidates.push_back(std::move(candidate));
     }
-    return out.candidates.empty()?std::nullopt:std::optional(std::move(out));
+    return out;
 }
 EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const SourceOverrides& overrides,const std::string& module,std::size_t cursor,ProjectCapture* project=nullptr,const std::optional<std::string>& project_entry={},bool document=false,const EditorDiscovery* discovery=nullptr) {
     const bool locked_source=project && package_source(module);
@@ -8017,9 +8126,36 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     auto selected=overrides.find(module);
     if(selected!=overrides.end() && !selected->second)return empty;
     SourceFile source=locked_source?project->graph.package_snapshot(module):project?project->recapture_source(module):selected!=overrides.end() && selected->second ? *selected->second : read_source(entry.parent_path()/utf8_path(module).relative_path());
+    if(project)empty.inputs_current=project_probe_inputs(*project);
+    else empty.inputs_current=[entry,overrides,module,source] {
+        const auto root=std::filesystem::canonical(entry.parent_path());
+        Diagnostics diagnostics;SourceGraph fresh(root,diagnostics,overrides);Unit anchor(source,module);
+        const auto [id,path]=fresh.resolve(anchor,{TokenKind::path,module,0});
+        const auto found=overrides.find(module);
+        return id==module && (found!=overrides.end() && found->second?found->second->text():read_source(path).text())==source.text();
+    };
     const auto& text=source.text();
     if(cursor>text.size() || text.find("_void_editor_cursor_")!=std::string::npos) return empty;
-    if(auto imports=import_assistance(entry,overrides,module,source,cursor,project))return *imports;
+    if(auto imports=import_assistance(entry,overrides,module,source,cursor,project)) {
+        // Import completion also depends on directory membership and candidate
+        // path admission. Re-run that metadata-only query, not a semantic bind.
+        imports->inputs_current=[check=project?project_probe_inputs(*project):empty.inputs_current,
+            root=project?std::optional(project->root):std::nullopt,entry,overrides,
+            manifests=project?project->manifest_overlays:ManifestOverrides{},module,source,cursor,expected=*imports] {
+            if(!check())return false;
+            std::unique_ptr<ProjectCapture> fresh;
+            if(root)fresh=std::make_unique<ProjectCapture>(*root,overrides,manifests);
+            const auto current=import_assistance(entry,overrides,module,source,cursor,fresh.get());
+            if(!current || current->candidates.size()!=expected.candidates.size() || current->incomplete!=expected.incomplete ||
+                current->begin!=expected.begin || current->end!=expected.end)return false;
+            for(std::size_t n=0;n<current->candidates.size();++n) {
+                const auto& a=current->candidates[n];const auto& b=expected.candidates[n];
+                if(a.name!=b.name || a.detail!=b.detail || a.kind!=b.kind || a.insert_text!=b.insert_text)return false;
+            }
+            return true;
+        };
+        return *imports;
+    }
     if(locked_source)return empty;
     EditorRecovery token_recovery{module,{}};
     Diagnostics diagnostics;auto tokens=lex(source,diagnostics,0,std::string::npos,0,true,&token_recovery);
@@ -8086,10 +8222,13 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     }
     try {
         if(project && document) {
-            ProjectCapture repaired(project->root,frozen,project->manifest_overlays);
+            ProjectCapture repaired(project->root,frozen,project->manifest_overlays,nullptr,false,false,project->dependencies.get());
             (void)validated_editor_document(repaired,module,&probe,&recovery);
         } else if(project) {
-            auto checked=analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false,discovery,&recovery);
+            // Reuse only derived metadata from this job's admitted capture.
+            // ProjectCapture still rereads and verifies the lock, exact bytes,
+            // catalog selection and file identities through the normal resolver.
+            auto checked=analyze_manifest_project_impl(project->root,project_entry,frozen,project->manifest_overlays,&probe,false,discovery,&recovery,nullptr,project->dependencies.get());
             if(std::any_of(checked.diagnostics.begin(),checked.diagnostics.end(),[](const auto& diagnostic) {
                 return diagnostic.code==Code::project_boundary || diagnostic.code==Code::project_changed;
             }))return {};
@@ -8101,10 +8240,20 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
         std::erase_if(probe.result.candidates,[&](const auto& c){return !c.name.starts_with(prefix);});
         return probe.result;
     } catch(const CompilationError&) {}
+    // Once graph work was attempted, the initial source-only/lexical check
+    // cannot stand in for the inputs read by binding (or a failed load).
+    empty.inputs_current=std::move(probe.result.inputs_current);
     return empty;
 }
 EditorAssistance editor_assistance(const std::filesystem::path& entry,const SourceOverrides& sources,const std::string& module,std::size_t cursor) {
     return editor_assistance_impl(entry,sources,module,cursor);
+}
+bool editor_assistance_inputs_current(const EditorAssistance& result) {
+    observation::Scope timing(observation::EditorDetail::inputs);
+    try {return result.inputs_current && result.inputs_current();}
+    catch(const CompilationError&){return false;}
+    catch(const std::filesystem::filesystem_error&){return false;}
+    catch(const std::invalid_argument&){return false;}
 }
 EditorAssistance project_editor_assistance(const std::filesystem::path& root,const std::optional<std::string>& entry,const SourceOverrides& sources,const ManifestOverrides& manifests,const std::string& module,std::size_t cursor,const EditorDiscovery& discovery) {
     try {ProjectCapture capture(root,sources,manifests);return editor_assistance_impl(root,sources,module,cursor,&capture,entry,false,&discovery);}

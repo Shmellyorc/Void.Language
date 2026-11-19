@@ -1,0 +1,2897 @@
+G76 async freshness correction. Native Linux only. Raw evidence remains at /tmp/void-g76-freshness-j_ii4ckz.
+Terminal trailing blanks normalized in this copy; original failures and logs retained unchanged.
+
+===== before-publication.log =====
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/assistance_publication.py", line 129, in <module>
+    run(args)
+    ~~~^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/assistance_publication.py", line 63, in run
+    with InteractiveClient(args.server, root, project=True, preexec_fn=traceable) as client:
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tools/lsp_client.py", line 23, in __init__
+    self.process = subprocess.Popen(argv,
+                   ~~~~~~~~~~~~~~~~^^^^^^
+                                    stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                    preexec_fn=preexec_fn, cwd=cwd)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 1039, in __init__
+    self._execute_child(args, executable, preexec_fn, close_fds,
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        pass_fds, cwd, env,
+                        ^^^^^^^^^^^^^^^^^^^
+    ...<5 lines>...
+                        gid, gids, uid, umask,
+                        ^^^^^^^^^^^^^^^^^^^^^^
+                        start_new_session, process_group)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/subprocess.py", line 1990, in _execute_child
+    raise child_exception_type(errno_num, err_msg, err_filename)
+PermissionError: [Errno 13] Permission denied: '/tmp/void-g76-freshness-j_ii4ckz/before-debug-voidls'
+
+===== before-publication-v2.log =====
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/assistance_publication.py", line 129, in <module>
+    run(args)
+    ~~~^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/assistance_publication.py", line 104, in run
+    assert 'result' in fresh, fresh
+           ^^^^^^^^^^^^^^^^^
+AssertionError: {'error': {'code': -32801, 'message': 'Project inputs changed during assistance'}, 'id': 5, 'jsonrpc': '2.0'}
+
+===== before-publication-v3.log =====
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/assistance_publication.py", line 133, in <module>
+    run(args)
+    ~~~^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/assistance_publication.py", line 100, in run
+    assert response.get('error', {}).get('code') == -32801, results[-1]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'kind': 'completion', 'state': 'edited', 'response': {'id': 'publication', 'jsonrpc': '2.0', 'result': [{'detail': 'i32', 'documentation': 'Stored field declared by /src/model.void::point.', 'kind': 5, 'label': 'x', 'textEdit': {'newText': 'x', 'range': {'end': {'character': 14, 'line': 5}, 'start': {'character': 13, 'line': 5}}}}]}, 'closed_input': 'public value struct point:\n    public y: i32\n## @param left Input value.\npublic func blend(left: i32) -> i32:\n    return left\n'}
+
+===== focused-debug-first.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start  32: lsp_intellisense
+1/2 Test  #32: lsp_intellisense .................***Failed    2.70 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/intellisense.py", line 220, in <module>
+    run(*(Path(p).resolve() for p in sys.argv[1:3]))
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/intellisense.py", line 175, in run
+    assert not items('lib.'), 'unlocked package documentation was ignored'
+               ~~~~~^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/intellisense.py", line 80, in items
+    result = query('completion', needle)
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/intellisense.py", line 77, in query
+    assert 'result' in result, result
+           ^^^^^^^^^^^^^^^^^^
+AssertionError: {'error': {'code': -32801, 'message': 'Project inputs changed during assistance'}, 'id': 41, 'jsonrpc': '2.0'}
+
+    Start 467: tooling
+2/2 Test #467: tooling ..........................***Failed    0.08 sec
+FAILED: freshness fixture has no signature
+Set VOID_TEST_DIAGNOSTICS_DIR to retain a rerun's full diagnostics.
+
+
+0% tests passed, 2 tests failed out of 2
+
+Total Test time (real) =   2.79 sec
+
+The following tests FAILED:
+	 32 - lsp_intellisense (Failed)
+	467 - tooling (Failed)
+Errors while running CTest
+
+===== focused-debug-second.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start  32: lsp_intellisense
+1/2 Test  #32: lsp_intellisense .................   Passed    3.92 sec
+    Start 467: tooling
+2/2 Test #467: tooling ..........................   Passed    0.69 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   4.64 sec
+
+===== integrated-release.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  36: lsp_enum_recovery
+      Start  34: lsp_editor_recovery
+ 1/53 Test  #36: lsp_enum_recovery ................   Passed    3.54 sec
+      Start 488: lsp_stage10_display
+ 2/53 Test  #34: lsp_editor_recovery ..............***Failed    5.03 sec
+editor recovery: nested members, visibility, UTF-16, tokens, diagnostics, revision, switch and strict CLI passed
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 333, in <module>
+    run_members(*arguments)
+    ~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 238, in run_members
+    run_interactive(server, root, path, good)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 320, in run_interactive
+    assert not labels(client, path, text, '    library.')
+               ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 42, in labels
+    return {item['label'] for item in query(client, 'completion', path, text, needle, after=True)}
+                                      ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 29, in query
+    return request(client, 'textDocument/' + method, params)
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 18, in request
+    assert 'result' in response, response
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'error': {'code': -32801, 'message': 'Project inputs changed during assistance'}, 'id': 25, 'jsonrpc': '2.0'}
+
+      Start 300: lsp_log
+ 3/53 Test #488: lsp_stage10_display ..............   Passed    3.03 sec
+      Start 264: lsp_combined
+ 4/53 Test #264: lsp_combined .....................   Passed    2.13 sec
+      Start  70: http_lsp
+ 5/53 Test #300: lsp_log ..........................   Passed    3.83 sec
+      Start 365: lsp_io
+ 6/53 Test #365: lsp_io ...........................   Passed    1.29 sec
+      Start 107: json_lsp
+ 7/53 Test #107: json_lsp .........................   Passed    1.09 sec
+      Start 368: lsp_io_stack
+ 8/53 Test  #70: http_lsp .........................   Passed    3.14 sec
+      Start 236: lsp_os
+ 9/53 Test #368: lsp_io_stack .....................   Passed    1.20 sec
+      Start 282: text_encoding_semantic_depth
+10/53 Test #282: text_encoding_semantic_depth .....   Passed    0.81 sec
+      Start 258: lsp_const_recovery
+11/53 Test #236: lsp_os ...........................   Passed    1.76 sec
+      Start 280: lsp_text_encoding_stack
+12/53 Test #258: lsp_const_recovery ...............   Passed    0.78 sec
+      Start 277: lsp_text_encoding
+13/53 Test #280: lsp_text_encoding_stack ..........   Passed    0.92 sec
+      Start 246: lsp_random
+14/53 Test #277: lsp_text_encoding ................   Passed    0.83 sec
+      Start  35: lsp_project_root_recovery
+15/53 Test #246: lsp_random .......................   Passed    0.70 sec
+      Start 259: lsp_const_recovery_stack
+16/53 Test  #35: lsp_project_root_recovery ........   Passed    0.77 sec
+      Start  33: lsp_semantic_tokens
+17/53 Test #259: lsp_const_recovery_stack .........   Passed    0.77 sec
+      Start 267: lsp_memory
+18/53 Test  #33: lsp_semantic_tokens ..............   Passed    0.57 sec
+      Start 204: lsp_stage8
+19/53 Test #267: lsp_memory .......................   Passed    0.44 sec
+      Start 214: lsp_math
+20/53 Test #204: lsp_stage8 .......................   Passed    0.46 sec
+      Start  40: lsp_multiple_returns
+21/53 Test #214: lsp_math .........................   Passed    0.42 sec
+      Start  38: lsp_enum_equality
+22/53 Test  #40: lsp_multiple_returns .............   Passed    0.31 sec
+      Start  56: net_sockets_lsp
+23/53 Test  #38: lsp_enum_equality ................   Passed    0.29 sec
+      Start 486: lsp_sprint6
+24/53 Test  #56: net_sockets_lsp ..................   Passed    0.23 sec
+      Start 226: host_capabilities_lsp
+25/53 Test #486: lsp_sprint6 ......................   Passed    0.31 sec
+      Start 202: lsp_protocol
+26/53 Test #226: host_capabilities_lsp ............   Passed    0.43 sec
+      Start  21: project_sessions
+27/53 Test #202: lsp_protocol .....................   Passed    0.40 sec
+      Start  32: lsp_intellisense
+28/53 Test  #21: project_sessions .................   Passed    0.56 sec
+      Start  39: lsp_quick_fixes
+29/53 Test  #39: lsp_quick_fixes ..................   Passed    0.16 sec
+      Start 461: numeric_enum_lsp
+30/53 Test #461: numeric_enum_lsp .................   Passed    0.13 sec
+      Start 307: lsp_collections_stdlib
+31/53 Test #307: lsp_collections_stdlib ...........   Passed    0.24 sec
+      Start 316: lsp_channel
+32/53 Test #316: lsp_channel ......................   Passed    0.20 sec
+      Start 489: lsp_stage10_intelligence
+33/53 Test  #32: lsp_intellisense .................   Passed    1.11 sec
+      Start  77: stage10_tooling
+34/53 Test  #77: stage10_tooling ..................   Passed    0.11 sec
+      Start 490: lsp_stage10_source_formatting
+35/53 Test #489: lsp_stage10_intelligence .........   Passed    0.19 sec
+      Start  69: url_lsp
+36/53 Test  #69: url_lsp ..........................   Passed    0.11 sec
+      Start 452: tooling_demo
+37/53 Test #452: tooling_demo .....................   Passed    0.11 sec
+      Start 255: lsp_binary
+38/53 Test #490: lsp_stage10_source_formatting ....   Passed    0.28 sec
+      Start  31: project_protocol
+39/53 Test #255: lsp_binary .......................   Passed    0.13 sec
+      Start 288: lsp_stage7
+40/53 Test #288: lsp_stage7 .......................   Passed    0.20 sec
+      Start 487: lsp_stage10_fields
+41/53 Test #487: lsp_stage10_fields ...............   Passed    0.10 sec
+      Start 496: lsp_sprint3
+42/53 Test #496: lsp_sprint3 ......................   Passed    0.11 sec
+      Start 445: lsp_async_syntax
+43/53 Test #445: lsp_async_syntax .................   Passed    0.11 sec
+      Start 497: lsp_sprint2
+44/53 Test  #31: project_protocol .................   Passed    0.66 sec
+      Start 492: lsp_sprint4
+45/53 Test #497: lsp_sprint2 ......................   Passed    0.11 sec
+      Start 289: lsp_demo
+46/53 Test #492: lsp_sprint4 ......................   Passed    0.08 sec
+      Start 134: generics_hint_lsp
+47/53 Test #289: lsp_demo .........................   Passed    0.09 sec
+      Start 203: lsp_stage11_globals
+48/53 Test #134: generics_hint_lsp ................   Passed    0.09 sec
+      Start 207: lsp_named_arguments
+49/53 Test #203: lsp_stage11_globals ..............   Passed    0.11 sec
+      Start 454: tooling
+50/53 Test #207: lsp_named_arguments ..............   Passed    0.27 sec
+      Start 206: lsp_documentation
+51/53 Test #206: lsp_documentation ................   Passed    0.21 sec
+      Start 201: lsp_positions
+52/53 Test #201: lsp_positions ....................   Passed    0.00 sec
+53/53 Test #454: tooling ..........................   Passed    0.41 sec
+
+98% tests passed, 1 tests failed out of 53
+
+Total Test time (real) =  20.71 sec
+
+The following tests FAILED:
+	 34 - lsp_editor_recovery (Failed)
+Errors while running CTest
+
+===== integrated-debug.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start  36: lsp_enum_recovery
+      Start 501: lsp_stage10_display
+ 1/53 Test  #36: lsp_enum_recovery ................   Passed   17.28 sec
+      Start 313: lsp_log
+ 2/53 Test #501: lsp_stage10_display ..............   Passed   22.97 sec
+      Start  34: lsp_editor_recovery
+ 3/53 Test  #34: lsp_editor_recovery ..............***Failed   20.82 sec
+editor recovery: nested members, visibility, UTF-16, tokens, diagnostics, revision, switch and strict CLI passed
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 333, in <module>
+    run_members(*arguments)
+    ~~~~~~~~~~~^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 238, in run_members
+    run_interactive(server, root, path, good)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 320, in run_interactive
+    assert not labels(client, path, text, '    library.')
+               ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 42, in labels
+    return {item['label'] for item in query(client, 'completion', path, text, needle, after=True)}
+                                      ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 29, in query
+    return request(client, 'textDocument/' + method, params)
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 18, in request
+    assert 'result' in response, response
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'error': {'code': -32801, 'message': 'Project inputs changed during assistance'}, 'id': 25, 'jsonrpc': '2.0'}
+
+      Start 277: lsp_combined
+ 4/53 Test #313: lsp_log ..........................   Passed   27.78 sec
+      Start  70: http_lsp
+ 5/53 Test #277: lsp_combined .....................   Passed   15.10 sec
+      Start 107: json_lsp
+ 6/53 Test #107: json_lsp .........................   Passed    7.53 sec
+      Start 378: lsp_io
+ 7/53 Test  #70: http_lsp .........................   Passed   23.26 sec
+      Start 381: lsp_io_stack
+ 8/53 Test #378: lsp_io ...........................   Passed    9.34 sec
+      Start 290: lsp_text_encoding
+ 9/53 Test #381: lsp_io_stack .....................   Passed    9.07 sec
+      Start 249: lsp_os
+10/53 Test #290: lsp_text_encoding ................   Passed    5.89 sec
+      Start 293: lsp_text_encoding_stack
+11/53 Test #293: lsp_text_encoding_stack ..........   Passed    5.82 sec
+      Start 271: lsp_const_recovery
+12/53 Test #249: lsp_os ...........................   Passed   12.47 sec
+      Start 259: lsp_random
+13/53 Test #271: lsp_const_recovery ...............   Passed    5.09 sec
+      Start 272: lsp_const_recovery_stack
+14/53 Test #259: lsp_random .......................   Passed    4.61 sec
+      Start  33: lsp_semantic_tokens
+15/53 Test #272: lsp_const_recovery_stack .........   Passed    5.22 sec
+      Start 280: lsp_memory
+16/53 Test  #33: lsp_semantic_tokens ..............   Passed    3.38 sec
+      Start 227: lsp_math
+17/53 Test #227: lsp_math .........................   Passed    2.08 sec
+      Start  32: lsp_intellisense
+18/53 Test #280: lsp_memory .......................   Passed    2.40 sec
+      Start  38: lsp_enum_equality
+19/53 Test  #38: lsp_enum_equality ................   Passed    1.17 sec
+      Start 220: lsp_named_arguments
+20/53 Test #220: lsp_named_arguments ..............   Passed    1.03 sec
+      Start 239: host_capabilities_lsp
+21/53 Test  #32: lsp_intellisense .................   Passed    3.38 sec
+      Start  35: lsp_project_root_recovery
+22/53 Test #239: host_capabilities_lsp ............   Passed    2.75 sec
+      Start  56: net_sockets_lsp
+23/53 Test  #35: lsp_project_root_recovery ........   Passed    2.03 sec
+      Start 295: text_encoding_semantic_depth
+24/53 Test  #56: net_sockets_lsp ..................   Passed    1.20 sec
+      Start 320: lsp_collections_stdlib
+25/53 Test #295: text_encoding_semantic_depth .....   Passed    1.19 sec
+      Start  77: stage10_tooling
+26/53 Test  #77: stage10_tooling ..................   Passed    0.65 sec
+      Start 499: lsp_sprint6
+27/53 Test #320: lsp_collections_stdlib ...........   Passed    1.26 sec
+      Start 503: lsp_stage10_source_formatting
+28/53 Test #499: lsp_sprint6 ......................   Passed    0.79 sec
+      Start  40: lsp_multiple_returns
+29/53 Test  #40: lsp_multiple_returns .............   Passed    0.77 sec
+      Start 502: lsp_stage10_intelligence
+30/53 Test #503: lsp_stage10_source_formatting ....   Passed    1.33 sec
+      Start  21: project_sessions
+31/53 Test #502: lsp_stage10_intelligence .........   Passed    0.80 sec
+      Start  31: project_protocol
+32/53 Test  #21: project_sessions .................   Passed    1.35 sec
+      Start 329: lsp_channel
+33/53 Test #329: lsp_channel ......................   Passed    0.62 sec
+      Start 219: lsp_documentation
+34/53 Test  #31: project_protocol .................   Passed    1.46 sec
+      Start 215: lsp_protocol
+35/53 Test #219: lsp_documentation ................   Passed    0.44 sec
+      Start 217: lsp_stage8
+36/53 Test #215: lsp_protocol .....................   Passed    0.70 sec
+      Start  39: lsp_quick_fixes
+37/53 Test #217: lsp_stage8 .......................   Passed    0.48 sec
+      Start 268: lsp_binary
+38/53 Test  #39: lsp_quick_fixes ..................   Passed    0.35 sec
+      Start 301: lsp_stage7
+39/53 Test #268: lsp_binary .......................   Passed    0.32 sec
+      Start  69: url_lsp
+40/53 Test #301: lsp_stage7 .......................   Passed    0.39 sec
+      Start 474: numeric_enum_lsp
+41/53 Test  #69: url_lsp ..........................   Passed    0.31 sec
+      Start 509: lsp_sprint3
+42/53 Test #474: numeric_enum_lsp .................   Passed    0.16 sec
+      Start 465: tooling_demo
+43/53 Test #509: lsp_sprint3 ......................   Passed    0.21 sec
+      Start 458: lsp_async_syntax
+44/53 Test #465: tooling_demo .....................   Passed    0.13 sec
+      Start 500: lsp_stage10_fields
+45/53 Test #500: lsp_stage10_fields ...............   Passed    0.10 sec
+      Start 510: lsp_sprint2
+46/53 Test #458: lsp_async_syntax .................   Passed    0.18 sec
+      Start 216: lsp_stage11_globals
+47/53 Test #510: lsp_sprint2 ......................   Passed    0.12 sec
+      Start 505: lsp_sprint4
+48/53 Test #216: lsp_stage11_globals ..............   Passed    0.15 sec
+      Start 302: lsp_demo
+49/53 Test #505: lsp_sprint4 ......................   Passed    0.10 sec
+      Start 147: generics_hint_lsp
+50/53 Test #302: lsp_demo .........................   Passed    0.09 sec
+      Start 467: tooling
+51/53 Test #147: generics_hint_lsp ................   Passed    0.10 sec
+      Start 214: lsp_positions
+52/53 Test #214: lsp_positions ....................   Passed    0.01 sec
+53/53 Test #467: tooling ..........................   Passed    0.68 sec
+
+98% tests passed, 1 tests failed out of 53
+
+Total Test time (real) = 113.79 sec
+
+The following tests FAILED:
+	 34 - lsp_editor_recovery (Failed)
+Errors while running CTest
+
+===== final-release.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  34: lsp_editor_recovery
+      Start  36: lsp_enum_recovery
+ 1/53 Test  #36: lsp_enum_recovery ................   Passed    3.31 sec
+      Start 488: lsp_stage10_display
+ 2/53 Test  #34: lsp_editor_recovery ..............   Passed    5.38 sec
+      Start 300: lsp_log
+ 3/53 Test #488: lsp_stage10_display ..............   Passed    3.46 sec
+      Start 264: lsp_combined
+ 4/53 Test #264: lsp_combined .....................   Passed    2.31 sec
+      Start  70: http_lsp
+ 5/53 Test #300: lsp_log ..........................   Passed    4.28 sec
+      Start 365: lsp_io
+ 6/53 Test #365: lsp_io ...........................   Passed    1.35 sec
+      Start 107: json_lsp
+ 7/53 Test #107: json_lsp .........................   Passed    1.15 sec
+      Start 368: lsp_io_stack
+ 8/53 Test  #70: http_lsp .........................   Passed    3.35 sec
+      Start 236: lsp_os
+ 9/53 Test #368: lsp_io_stack .....................   Passed    1.24 sec
+      Start 258: lsp_const_recovery
+10/53 Test #258: lsp_const_recovery ...............   Passed    0.80 sec
+      Start 282: text_encoding_semantic_depth
+11/53 Test #236: lsp_os ...........................   Passed    1.96 sec
+      Start 280: lsp_text_encoding_stack
+12/53 Test #282: text_encoding_semantic_depth .....   Passed    0.94 sec
+      Start 277: lsp_text_encoding
+13/53 Test #280: lsp_text_encoding_stack ..........   Passed    1.08 sec
+      Start 246: lsp_random
+14/53 Test #277: lsp_text_encoding ................   Passed    0.95 sec
+      Start  35: lsp_project_root_recovery
+15/53 Test #246: lsp_random .......................   Passed    0.74 sec
+      Start 259: lsp_const_recovery_stack
+16/53 Test  #35: lsp_project_root_recovery ........   Passed    0.74 sec
+      Start  33: lsp_semantic_tokens
+17/53 Test #259: lsp_const_recovery_stack .........   Passed    0.95 sec
+      Start 267: lsp_memory
+18/53 Test  #33: lsp_semantic_tokens ..............   Passed    0.59 sec
+      Start 214: lsp_math
+19/53 Test #267: lsp_memory .......................   Passed    0.47 sec
+      Start 204: lsp_stage8
+20/53 Test #214: lsp_math .........................   Passed    0.50 sec
+      Start  32: lsp_intellisense
+21/53 Test #204: lsp_stage8 .......................   Passed    0.48 sec
+      Start  40: lsp_multiple_returns
+22/53 Test  #40: lsp_multiple_returns .............   Passed    0.28 sec
+      Start  38: lsp_enum_equality
+23/53 Test  #38: lsp_enum_equality ................   Passed    0.32 sec
+      Start 226: host_capabilities_lsp
+24/53 Test #226: host_capabilities_lsp ............   Passed    0.46 sec
+      Start 486: lsp_sprint6
+25/53 Test  #32: lsp_intellisense .................   Passed    1.36 sec
+      Start  56: net_sockets_lsp
+26/53 Test #486: lsp_sprint6 ......................   Passed    0.35 sec
+      Start 202: lsp_protocol
+27/53 Test  #56: net_sockets_lsp ..................   Passed    0.27 sec
+      Start  21: project_sessions
+28/53 Test #202: lsp_protocol .....................   Passed    0.47 sec
+      Start  39: lsp_quick_fixes
+29/53 Test  #39: lsp_quick_fixes ..................   Passed    0.18 sec
+      Start 461: numeric_enum_lsp
+30/53 Test  #21: project_sessions .................   Passed    0.63 sec
+      Start 307: lsp_collections_stdlib
+31/53 Test #461: numeric_enum_lsp .................   Passed    0.14 sec
+      Start 316: lsp_channel
+32/53 Test #316: lsp_channel ......................   Passed    0.17 sec
+      Start 489: lsp_stage10_intelligence
+33/53 Test #307: lsp_collections_stdlib ...........   Passed    0.32 sec
+      Start 490: lsp_stage10_source_formatting
+34/53 Test #489: lsp_stage10_intelligence .........   Passed    0.21 sec
+      Start  77: stage10_tooling
+35/53 Test  #77: stage10_tooling ..................   Passed    0.11 sec
+      Start  69: url_lsp
+36/53 Test #490: lsp_stage10_source_formatting ....   Passed    0.31 sec
+      Start 255: lsp_binary
+37/53 Test  #69: url_lsp ..........................   Passed    0.14 sec
+      Start 452: tooling_demo
+38/53 Test #255: lsp_binary .......................   Passed    0.15 sec
+      Start  31: project_protocol
+39/53 Test #452: tooling_demo .....................   Passed    0.13 sec
+      Start 288: lsp_stage7
+40/53 Test #288: lsp_stage7 .......................   Passed    0.24 sec
+      Start 487: lsp_stage10_fields
+41/53 Test #487: lsp_stage10_fields ...............   Passed    0.09 sec
+      Start 496: lsp_sprint3
+42/53 Test #496: lsp_sprint3 ......................   Passed    0.13 sec
+      Start 445: lsp_async_syntax
+43/53 Test #445: lsp_async_syntax .................   Passed    0.12 sec
+      Start 497: lsp_sprint2
+44/53 Test  #31: project_protocol .................   Passed    0.76 sec
+      Start 492: lsp_sprint4
+45/53 Test #497: lsp_sprint2 ......................   Passed    0.10 sec
+      Start 289: lsp_demo
+46/53 Test #289: lsp_demo .........................   Passed    0.10 sec
+      Start 207: lsp_named_arguments
+47/53 Test #492: lsp_sprint4 ......................   Passed    0.12 sec
+      Start 134: generics_hint_lsp
+48/53 Test #134: generics_hint_lsp ................   Passed    0.09 sec
+      Start 203: lsp_stage11_globals
+49/53 Test #203: lsp_stage11_globals ..............   Passed    0.11 sec
+      Start 454: tooling
+50/53 Test #207: lsp_named_arguments ..............   Passed    0.26 sec
+      Start 206: lsp_documentation
+51/53 Test #206: lsp_documentation ................   Passed    0.17 sec
+      Start 201: lsp_positions
+52/53 Test #201: lsp_positions ....................   Passed    0.00 sec
+53/53 Test #454: tooling ..........................   Passed    0.37 sec
+
+100% tests passed, 0 tests failed out of 53
+
+Total Test time (real) =  22.43 sec
+
+===== final-debug.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start  34: lsp_editor_recovery
+      Start 313: lsp_log
+ 1/53 Test  #34: lsp_editor_recovery ..............   Passed   23.11 sec
+      Start 501: lsp_stage10_display
+ 2/53 Test #313: lsp_log ..........................   Passed   30.05 sec
+      Start  36: lsp_enum_recovery
+ 3/53 Test #501: lsp_stage10_display ..............   Passed   21.53 sec
+      Start 277: lsp_combined
+ 4/53 Test  #36: lsp_enum_recovery ................   Passed   16.02 sec
+      Start  70: http_lsp
+ 5/53 Test #277: lsp_combined .....................   Passed   15.28 sec
+      Start 378: lsp_io
+ 6/53 Test #378: lsp_io ...........................   Passed    9.20 sec
+      Start 107: json_lsp
+ 7/53 Test  #70: http_lsp .........................   Passed   23.57 sec
+      Start 381: lsp_io_stack
+ 8/53 Test #107: json_lsp .........................   Passed    7.68 sec
+      Start 249: lsp_os
+ 9/53 Test #381: lsp_io_stack .....................   Passed    9.17 sec
+      Start 290: lsp_text_encoding
+10/53 Test #290: lsp_text_encoding ................   Passed    6.23 sec
+      Start 293: lsp_text_encoding_stack
+11/53 Test #249: lsp_os ...........................   Passed   13.70 sec
+      Start 271: lsp_const_recovery
+12/53 Test #293: lsp_text_encoding_stack ..........   Passed    6.18 sec
+      Start 259: lsp_random
+13/53 Test #271: lsp_const_recovery ...............   Passed    5.20 sec
+      Start 272: lsp_const_recovery_stack
+14/53 Test #259: lsp_random .......................   Passed    4.75 sec
+      Start  33: lsp_semantic_tokens
+15/53 Test  #33: lsp_semantic_tokens ..............   Passed    2.95 sec
+      Start 280: lsp_memory
+16/53 Test #272: lsp_const_recovery_stack .........   Passed    5.00 sec
+      Start  32: lsp_intellisense
+17/53 Test #280: lsp_memory .......................   Passed    2.29 sec
+      Start 227: lsp_math
+18/53 Test #227: lsp_math .........................   Passed    2.01 sec
+      Start 239: host_capabilities_lsp
+19/53 Test  #32: lsp_intellisense .................   Passed    3.34 sec
+      Start  38: lsp_enum_equality
+20/53 Test  #38: lsp_enum_equality ................   Passed    1.21 sec
+      Start  35: lsp_project_root_recovery
+21/53 Test #239: host_capabilities_lsp ............   Passed    2.75 sec
+      Start 220: lsp_named_arguments
+22/53 Test #220: lsp_named_arguments ..............   Passed    1.00 sec
+      Start  56: net_sockets_lsp
+23/53 Test  #35: lsp_project_root_recovery ........   Passed    1.99 sec
+      Start 295: text_encoding_semantic_depth
+24/53 Test  #56: net_sockets_lsp ..................   Passed    1.17 sec
+      Start 320: lsp_collections_stdlib
+25/53 Test #295: text_encoding_semantic_depth .....   Passed    1.10 sec
+      Start  77: stage10_tooling
+26/53 Test  #77: stage10_tooling ..................   Passed    0.65 sec
+      Start 499: lsp_sprint6
+27/53 Test #320: lsp_collections_stdlib ...........   Passed    1.23 sec
+      Start 503: lsp_stage10_source_formatting
+28/53 Test #499: lsp_sprint6 ......................   Passed    0.76 sec
+      Start  40: lsp_multiple_returns
+29/53 Test  #40: lsp_multiple_returns .............   Passed    0.74 sec
+      Start  21: project_sessions
+30/53 Test #503: lsp_stage10_source_formatting ....   Passed    1.26 sec
+      Start  31: project_protocol
+31/53 Test  #21: project_sessions .................   Passed    1.38 sec
+      Start 502: lsp_stage10_intelligence
+32/53 Test  #31: project_protocol .................   Passed    1.42 sec
+      Start 329: lsp_channel
+33/53 Test #502: lsp_stage10_intelligence .........   Passed    0.77 sec
+      Start 215: lsp_protocol
+34/53 Test #329: lsp_channel ......................   Passed    0.59 sec
+      Start 219: lsp_documentation
+35/53 Test #219: lsp_documentation ................   Passed    0.44 sec
+      Start 217: lsp_stage8
+36/53 Test #215: lsp_protocol .....................   Passed    0.69 sec
+      Start  39: lsp_quick_fixes
+37/53 Test #217: lsp_stage8 .......................   Passed    0.47 sec
+      Start 268: lsp_binary
+38/53 Test  #39: lsp_quick_fixes ..................   Passed    0.35 sec
+      Start 301: lsp_stage7
+39/53 Test #268: lsp_binary .......................   Passed    0.32 sec
+      Start  69: url_lsp
+40/53 Test #301: lsp_stage7 .......................   Passed    0.35 sec
+      Start 474: numeric_enum_lsp
+41/53 Test #474: numeric_enum_lsp .................   Passed    0.15 sec
+      Start 509: lsp_sprint3
+42/53 Test  #69: url_lsp ..........................   Passed    0.32 sec
+      Start 465: tooling_demo
+43/53 Test #465: tooling_demo .....................   Passed    0.10 sec
+      Start 458: lsp_async_syntax
+44/53 Test #509: lsp_sprint3 ......................   Passed    0.22 sec
+      Start 500: lsp_stage10_fields
+45/53 Test #458: lsp_async_syntax .................   Passed    0.18 sec
+      Start 510: lsp_sprint2
+46/53 Test #500: lsp_stage10_fields ...............   Passed    0.10 sec
+      Start 216: lsp_stage11_globals
+47/53 Test #510: lsp_sprint2 ......................   Passed    0.13 sec
+      Start 505: lsp_sprint4
+48/53 Test #216: lsp_stage11_globals ..............   Passed    0.15 sec
+      Start 302: lsp_demo
+49/53 Test #505: lsp_sprint4 ......................   Passed    0.10 sec
+      Start 147: generics_hint_lsp
+50/53 Test #302: lsp_demo .........................   Passed    0.08 sec
+      Start 467: tooling
+51/53 Test #147: generics_hint_lsp ................   Passed    0.09 sec
+      Start 214: lsp_positions
+52/53 Test #214: lsp_positions ....................   Passed    0.02 sec
+53/53 Test #467: tooling ..........................   Passed    0.73 sec
+
+100% tests passed, 0 tests failed out of 53
+
+Total Test time (real) = 115.49 sec
+
+===== final-strict.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start 294: lsp_log
+      Start 478: lsp_stage10_display
+ 1/50 Test #478: lsp_stage10_display ..............   Passed   23.02 sec
+      Start  36: lsp_enum_recovery
+ 2/50 Test #294: lsp_log ..........................   Passed   24.49 sec
+      Start  34: lsp_editor_recovery
+ 3/50 Test  #36: lsp_enum_recovery ................   Passed   15.46 sec
+      Start 262: lsp_combined
+ 4/50 Test  #34: lsp_editor_recovery ..............   Passed   23.51 sec
+      Start  32: lsp_intellisense
+ 5/50 Test #262: lsp_combined .....................   Passed   11.29 sec
+      Start 107: json_lsp
+ 6/50 Test  #32: lsp_intellisense .................   Passed    5.79 sec
+      Start  70: http_lsp
+ 7/50 Test #107: json_lsp .........................   Passed    6.27 sec
+      Start 358: lsp_io
+ 8/50 Test #358: lsp_io ...........................   Passed    7.21 sec
+      Start 236: lsp_os
+ 9/50 Test  #70: http_lsp .........................   Passed   18.70 sec
+      Start 257: lsp_const_recovery
+10/50 Test #236: lsp_os ...........................   Passed    9.90 sec
+      Start  33: lsp_semantic_tokens
+11/50 Test  #33: lsp_semantic_tokens ..............   Passed    3.16 sec
+      Start 277: text_encoding_semantic_depth
+12/50 Test #257: lsp_const_recovery ...............   Passed    3.98 sec
+      Start 274: lsp_text_encoding
+13/50 Test #277: text_encoding_semantic_depth .....   Passed    3.14 sec
+      Start 246: lsp_random
+14/50 Test #274: lsp_text_encoding ................   Passed    4.63 sec
+      Start  35: lsp_project_root_recovery
+15/50 Test #246: lsp_random .......................   Passed    3.63 sec
+      Start 264: lsp_memory
+16/50 Test  #35: lsp_project_root_recovery ........   Passed    3.77 sec
+      Start 204: lsp_stage8
+17/50 Test #264: lsp_memory .......................   Passed    2.19 sec
+      Start 214: lsp_math
+18/50 Test #214: lsp_math .........................   Passed    2.29 sec
+      Start  38: lsp_enum_equality
+19/50 Test #204: lsp_stage8 .......................   Passed    2.75 sec
+      Start 207: lsp_named_arguments
+20/50 Test #207: lsp_named_arguments ..............   Passed    1.14 sec
+      Start  31: project_protocol
+21/50 Test  #38: lsp_enum_equality ................   Passed    1.39 sec
+      Start  56: net_sockets_lsp
+22/50 Test  #56: net_sockets_lsp ..................   Passed    1.10 sec
+      Start 226: host_capabilities_lsp
+23/50 Test  #31: project_protocol .................   Passed    3.10 sec
+      Start 202: lsp_protocol
+24/50 Test #226: host_capabilities_lsp ............   Passed    2.82 sec
+      Start  40: lsp_multiple_returns
+25/50 Test #202: lsp_protocol .....................   Passed    1.78 sec
+      Start  21: project_sessions
+26/50 Test  #40: lsp_multiple_returns .............   Passed    1.28 sec
+      Start 476: lsp_sprint6
+27/50 Test #476: lsp_sprint6 ......................   Passed    1.09 sec
+      Start  77: stage10_tooling
+28/50 Test  #21: project_sessions .................   Passed    2.23 sec
+      Start 301: lsp_collections_stdlib
+29/50 Test  #77: stage10_tooling ..................   Passed    0.70 sec
+      Start 480: lsp_stage10_source_formatting
+30/50 Test #301: lsp_collections_stdlib ...........   Passed    1.15 sec
+      Start 479: lsp_stage10_intelligence
+31/50 Test #480: lsp_stage10_source_formatting ....   Passed    1.25 sec
+      Start 206: lsp_documentation
+32/50 Test #479: lsp_stage10_intelligence .........   Passed    0.70 sec
+      Start  39: lsp_quick_fixes
+33/50 Test #206: lsp_documentation ................   Passed    0.53 sec
+      Start 310: lsp_channel
+34/50 Test #310: lsp_channel ......................   Passed    0.59 sec
+      Start 444: tooling
+35/50 Test  #39: lsp_quick_fixes ..................   Passed    0.65 sec
+      Start 282: lsp_stage7
+36/50 Test #282: lsp_stage7 .......................   Passed    0.54 sec
+      Start 255: lsp_binary
+37/50 Test #444: tooling ..........................   Passed    0.83 sec
+      Start  69: url_lsp
+38/50 Test #255: lsp_binary .......................   Passed    0.35 sec
+      Start 435: lsp_async_syntax
+39/50 Test #435: lsp_async_syntax .................   Passed    0.19 sec
+      Start 486: lsp_sprint3
+40/50 Test  #69: url_lsp ..........................   Passed    0.36 sec
+      Start 442: tooling_demo
+41/50 Test #442: tooling_demo .....................   Passed    0.18 sec
+      Start 451: numeric_enum_lsp
+42/50 Test #486: lsp_sprint3 ......................   Passed    0.23 sec
+      Start 477: lsp_stage10_fields
+43/50 Test #477: lsp_stage10_fields ...............   Passed    0.13 sec
+      Start 487: lsp_sprint2
+44/50 Test #451: numeric_enum_lsp .................   Passed    0.17 sec
+      Start 283: lsp_demo
+45/50 Test #283: lsp_demo .........................   Passed    0.11 sec
+      Start 203: lsp_stage11_globals
+46/50 Test #487: lsp_sprint2 ......................   Passed    0.15 sec
+      Start 482: lsp_sprint4
+47/50 Test #482: lsp_sprint4 ......................   Passed    0.10 sec
+      Start 134: generics_hint_lsp
+48/50 Test #203: lsp_stage11_globals ..............   Passed    0.19 sec
+      Start 201: lsp_positions
+49/50 Test #201: lsp_positions ....................   Passed    0.03 sec
+50/50 Test #134: generics_hint_lsp ................   Passed    0.12 sec
+
+100% tests passed, 0 tests failed out of 50
+
+Total Test time (real) = 100.22 sec
+
+===== new-import-release.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 32: lsp_intellisense
+1/1 Test #32: lsp_intellisense .................   Passed    1.39 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.40 sec
+
+===== new-import-debug.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start 32: lsp_intellisense
+1/1 Test #32: lsp_intellisense .................   Passed    3.90 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   3.92 sec
+
+===== new-import-strict.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+    Start 32: lsp_intellisense
+1/1 Test #32: lsp_intellisense .................   Passed    6.64 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   6.65 sec
+
+===== final-publication-debug.log =====
+completion unchanged rejected changed inputs and fresh retry succeeded
+completion edited rejected changed inputs and fresh retry succeeded
+completion no-history rejected changed inputs and fresh retry succeeded
+completion closed-target rejected changed inputs and fresh retry succeeded
+signatureHelp unchanged rejected changed inputs and fresh retry succeeded
+signatureHelp edited rejected changed inputs and fresh retry succeeded
+signatureHelp no-history rejected changed inputs and fresh retry succeeded
+
+===== build-first-release.log =====
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project.cpp.o
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project_creation.cpp.o
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/source.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/tooling.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/ir/module.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8207:63: warning: missing field 'prefix' initializer [-Wmissing-field-initializers]
+ 8207 |     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+      |                                                               ^
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8240:17: warning: exception of type 'const SourceReadError &' will be caught by earlier handler [-Wexceptions]
+ 8240 |     catch(const SourceReadError&){return false;}
+      |                 ^
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8238:17: note: for type 'const CompilationError &'
+ 8238 |     catch(const CompilationError&){return false;}
+      |                 ^
+/home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:1122:63: warning: misleading indentation; statement is not part of the previous 'if' [-Wmisleading-indentation]
+ 1122 |                         fail("invalid deterministic release");result=Type::boolean;break;
+      |                                                               ^
+/home/shmellyorc/Documents/Void.Language/src/ir/module.cpp:1120:21: note: previous statement is here
+ 1120 |                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
+      |                     ^
+1 warning generated.
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project_resolution.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project_templates.cpp.o
+2 warnings generated.
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Built target void_native_fixture
+[ 69%] Built target libcurl_static
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[ 92%] Built target void_native_inventory
+[ 92%] Linking CXX static library libvoid_llvm.a
+[ 92%] Built target void_llvm
+[ 92%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_approval.cpp.o
+[ 92%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[ 92%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[ 92%] Built target voidc_objects
+[ 92%] Generating cache-identity-Release.cpp
+[ 92%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[100%] Built target void_runtime
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8207:63: warning: missing field 'prefix' initializer [-Wmissing-field-initializers]
+ 8207 |     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+      |                                                               ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/analysis/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/initialization.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/methods.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/structs.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/frontend/values.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/modules/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/numeric/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/sessions/tests.cpp.o
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tests.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/tests.cpp:174:57: warning: missing field 'cleanup_entry' initializer [-Wmissing-field-initializers]
+  174 |             {vd::ir::Terminator::Kind::return_value,1}}}};
+      |                                                         ^
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:27: warning: loop variable 'source' creates a copy from type 'const std::string' (aka 'const basic_string<char>') [-Wrange-loop-construct]
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |                           ^
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:9: note: use reference type 'const std::string &' (aka 'const basic_string<char> &') to prevent copying
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+      |                           &
+1 warning generated.
+1 warning generated.
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+
+===== build-current-debug.log =====
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_native_inventory
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:27: warning: loop variable 'source' creates a copy from type 'const std::string' (aka 'const basic_string<char>') [-Wrange-loop-construct]
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |                           ^
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:9: note: use reference type 'const std::string &' (aka 'const basic_string<char> &') to prevent copying
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+      |                           &
+1 warning generated.
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+
+===== build-final-release.log =====
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target void_lsp_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_tooling_example
+
+===== build-final-debug.log =====
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target void_lsp_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_tooling_example
+
+===== build-final-strict.log =====
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable void_lsp_tests
+[100%] Built target void_lsp_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_sessions.dir/tests/project/sessions.cpp.o
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_stage10_tooling.dir/tests/stage10/tooling.cpp.o
+[100%] Linking CXX executable void_stage10_tooling
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_tooling_example.dir/examples/tooling.cpp.o
+[100%] Linking CXX executable void_tooling_example
+[100%] Built target void_tooling_example
+
+===== performance.log =====
+warm-after PASS
+warm-before PASS
+uncached-before PASS
+uncached-after PASS
+editor-after PASS
+editor-before PASS
+
+===== final-publication-debug/completion-closed-target/gdb.log =====
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007fb88530ac00 in poll () from /usr/lib/x86_64-linux-gnu/libc.so.6
+Breakpoint 1 at 0x55ad5a0e56e1: file /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp, line 1077.
+[New Thread 0x7fb8851ff6c0 (LWP 3789329)]
+[Thread 0x7fb8851ff6c0 (LWP 3789329) exited]
+#0  (anonymous namespace)::Server::run_idle_work (this=0x7ffd372bd950) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1077
+#1  0x000055ad5a0e1c7d in (anonymous namespace)::run (entry=Python Exception <class 'gdb.error'>: No type named std::filesystem::__cxx11::path::_Cmpt.
+filesystem::path "/tmp/void-g76-freshness-j_ii4ckz/final-publication-debug/completion-closed-target/app", project=true, override=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1425
+#2  0x000055ad5a0de7c9 in main (argc=3, argv=0x7ffd372bed68) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1484
+[Inferior 1 (process 3789309) detached]
+
+===== final-publication-debug/completion-edited/gdb.log =====
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007fa2cb90ac00 in poll () from /usr/lib/x86_64-linux-gnu/libc.so.6
+Breakpoint 1 at 0x563a332636e1: file /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp, line 1077.
+[New Thread 0x7fa2cb7ff6c0 (LWP 3789267)]
+[Thread 0x7fa2cb7ff6c0 (LWP 3789267) exited]
+#0  (anonymous namespace)::Server::run_idle_work (this=0x7ffeb6941710) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1077
+#1  0x0000563a3325fc7d in (anonymous namespace)::run (entry=Python Exception <class 'gdb.error'>: No type named std::filesystem::__cxx11::path::_Cmpt.
+filesystem::path "/tmp/void-g76-freshness-j_ii4ckz/final-publication-debug/completion-edited/app", project=true, override=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1425
+#2  0x0000563a3325c7c9 in main (argc=3, argv=0x7ffeb6942b28) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1484
+[Inferior 1 (process 3789239) detached]
+
+===== final-publication-debug/completion-no-history/gdb.log =====
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007f9c86f0ac00 in poll () from /usr/lib/x86_64-linux-gnu/libc.so.6
+Breakpoint 1 at 0x563f2d1fb6e1: file /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp, line 1077.
+[New Thread 0x7f9c86dff6c0 (LWP 3789303)]
+[Thread 0x7f9c86dff6c0 (LWP 3789303) exited]
+#0  (anonymous namespace)::Server::run_idle_work (this=0x7ffe50e77f00) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1077
+#1  0x0000563f2d1f7c7d in (anonymous namespace)::run (entry=Python Exception <class 'gdb.error'>: No type named std::filesystem::__cxx11::path::_Cmpt.
+filesystem::path "/tmp/void-g76-freshness-j_ii4ckz/final-publication-debug/completion-no-history/app", project=true, override=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1425
+#2  0x0000563f2d1f47c9 in main (argc=3, argv=0x7ffe50e79318) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1484
+[Inferior 1 (process 3789272) detached]
+
+===== final-publication-debug/completion-unchanged/gdb.log =====
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007fe194b0ac00 in poll () from /usr/lib/x86_64-linux-gnu/libc.so.6
+Breakpoint 1 at 0x55821e4ae6e1: file /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp, line 1077.
+[New Thread 0x7fe1949ff6c0 (LWP 3789235)]
+[Thread 0x7fe1949ff6c0 (LWP 3789235) exited]
+#0  (anonymous namespace)::Server::run_idle_work (this=0x7fff1e99b600) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1077
+#1  0x000055821e4aac7d in (anonymous namespace)::run (entry=Python Exception <class 'gdb.error'>: No type named std::filesystem::__cxx11::path::_Cmpt.
+filesystem::path "/tmp/void-g76-freshness-j_ii4ckz/final-publication-debug/completion-unchanged/app", project=true, override=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1425
+#2  0x000055821e4a77c9 in main (argc=3, argv=0x7fff1e99ca18) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1484
+[Inferior 1 (process 3789201) detached]
+
+===== final-publication-debug/signatureHelp-edited/gdb.log =====
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007fe68ab0ac00 in poll () from /usr/lib/x86_64-linux-gnu/libc.so.6
+Breakpoint 1 at 0x55556352c6e1: file /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp, line 1077.
+[New Thread 0x7fe68a9ff6c0 (LWP 3789373)]
+[Thread 0x7fe68a9ff6c0 (LWP 3789373) exited]
+#0  (anonymous namespace)::Server::run_idle_work (this=0x7ffe60b7e130) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1077
+#1  0x0000555563528c7d in (anonymous namespace)::run (entry=Python Exception <class 'gdb.error'>: No type named std::filesystem::__cxx11::path::_Cmpt.
+filesystem::path "/tmp/void-g76-freshness-j_ii4ckz/final-publication-debug/signatureHelp-edited/app", project=true, override=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1425
+#2  0x00005555635257c9 in main (argc=3, argv=0x7ffe60b7f548) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1484
+[Inferior 1 (process 3789357) detached]
+
+===== final-publication-debug/signatureHelp-no-history/gdb.log =====
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007fd8a190ac00 in poll () from /usr/lib/x86_64-linux-gnu/libc.so.6
+Breakpoint 1 at 0x55d1beb1a6e1: file /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp, line 1077.
+[New Thread 0x7fd8a17ff6c0 (LWP 3789397)]
+[Thread 0x7fd8a17ff6c0 (LWP 3789397) exited]
+#0  (anonymous namespace)::Server::run_idle_work (this=0x7ffd62b177d0) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1077
+#1  0x000055d1beb16c7d in (anonymous namespace)::run (entry=Python Exception <class 'gdb.error'>: No type named std::filesystem::__cxx11::path::_Cmpt.
+filesystem::path "/tmp/void-g76-freshness-j_ii4ckz/final-publication-debug/signatureHelp-no-history/app", project=true, override=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1425
+#2  0x000055d1beb137c9 in main (argc=3, argv=0x7ffd62b18be8) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1484
+[Inferior 1 (process 3789377) detached]
+
+===== final-publication-debug/signatureHelp-unchanged/gdb.log =====
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/usr/lib/x86_64-linux-gnu/libthread_db.so.1".
+0x00007f768170ac00 in poll () from /usr/lib/x86_64-linux-gnu/libc.so.6
+Breakpoint 1 at 0x5576d56356e1: file /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp, line 1077.
+[New Thread 0x7f76815ff6c0 (LWP 3789353)]
+[Thread 0x7f76815ff6c0 (LWP 3789353) exited]
+#0  (anonymous namespace)::Server::run_idle_work (this=0x7ffe6c58bab0) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1077
+#1  0x00005576d5631c7d in (anonymous namespace)::run (entry=Python Exception <class 'gdb.error'>: No type named std::filesystem::__cxx11::path::_Cmpt.
+filesystem::path "/tmp/void-g76-freshness-j_ii4ckz/final-publication-debug/signatureHelp-unchanged/app", project=true, override=std::optional [no contained value]) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1425
+#2  0x00005576d562e7c9 in main (argc=3, argv=0x7ffe6c58cec8) at /home/shmellyorc/Documents/Void.Language/src/lsp/main.cpp:1484
+[Inferior 1 (process 3789333) detached]
+
+
+FINAL CORRECTNESS / ROSLYN REVIEW (earlier unfavorable evidence retained above)
+
+===== roslyn-profile-publication-debug.log =====
+completion unchanged rejected changed inputs and fresh retry succeeded
+completion edited rejected changed inputs and fresh retry succeeded
+completion no-history rejected changed inputs and fresh retry succeeded
+completion closed-target rejected changed inputs and fresh retry succeeded
+completion hard-link rejected changed inputs and fresh retry succeeded
+signatureHelp unchanged rejected changed inputs and fresh retry succeeded
+signatureHelp edited rejected changed inputs and fresh retry succeeded
+signatureHelp no-history rejected changed inputs and fresh retry succeeded
+
+===== before-hard-link.log =====
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/assistance_publication.py", line 159, in <module>
+    run(args)
+    ~~~^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/assistance_publication.py", line 119, in run
+    assert response.get('error', {}).get('code') == -32801, results[-1]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'kind': 'completion', 'state': 'hard-link', 'response': {'jsonrpc': '2.0', 'id': 'publication', 'result': [{'detail': 'i32', 'documentation': 'Stored field declared by /src/model.void::point.', 'kind': 5, 'label': 'x', 'textEdit': {'newText': 'x', 'range': {'end': {'character': 14, 'line': 6}, 'start': {'character': 13, 'line': 6}}}}]}, 'closed_input_path': '/tmp/void-g76-freshness-j_ii4ckz/before-hard-link/completion-hard-link/app/src/model.void', 'closed_input': 'public value struct point:\n    public x: i32\npublic value struct other:\n    public y: i32\n## @param left Input value.\npublic func blend(left: i32) -> i32:\n    return left\n'}
+
+===== keyword-probe.log =====
+before {"id": 4, "jsonrpc": "2.0", "result": [{"detail": "keyword", "documentation": "", "kind": 14, "label": "func", "textEdit": {"newText": "func", "range": {"end": {"character": 2, "line": 0}, "start": {"character": 0, "line": 0}}}}]}
+current {"error": {"code": -32801, "message": "Project inputs changed during assistance"}, "id": 4, "jsonrpc": "2.0"}
+
+===== roslyn-package-hardlink-debug.log =====
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/intellisense.py", line 250, in <module>
+    run(*(Path(p).resolve() for p in sys.argv[1:3]))
+    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/intellisense.py", line 192, in run
+    assert response.get('error', {}).get('code') == -32801, response
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'id': 47, 'jsonrpc': '2.0', 'result': []}
+
+===== roslyn-package-hardlink-debug-v2.log =====
+G76: compact metadata, offsets, edited-line tokens, EOF typing, UTF-16 edits, stale versions, disk freshness and cancellation passed
+
+===== guarded-publication-debug.log =====
+completion unchanged rejected changed inputs and fresh retry succeeded
+completion edited rejected changed inputs and fresh retry succeeded
+completion no-history rejected changed inputs and fresh retry succeeded
+completion closed-target rejected changed inputs and fresh retry succeeded
+completion hard-link rejected changed inputs and fresh retry succeeded
+signatureHelp unchanged rejected changed inputs and fresh retry succeeded
+signatureHelp edited rejected changed inputs and fresh retry succeeded
+signatureHelp no-history rejected changed inputs and fresh retry succeeded
+
+===== roslyn-publication-debug.log =====
+completion unchanged rejected changed inputs and fresh retry succeeded
+completion edited rejected changed inputs and fresh retry succeeded
+completion no-history rejected changed inputs and fresh retry succeeded
+completion closed-target rejected changed inputs and fresh retry succeeded
+completion hard-link rejected changed inputs and fresh retry succeeded
+signatureHelp unchanged rejected changed inputs and fresh retry succeeded
+signatureHelp edited rejected changed inputs and fresh retry succeeded
+signatureHelp no-history rejected changed inputs and fresh retry succeeded
+
+===== build-roslyn-release.log =====
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8216:63: warning: missing field 'prefix' initializer [-Wmissing-field-initializers]
+ 8216 |     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+      |                                                               ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_native_fixture
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[ 92%] Built target void_native_inventory
+[ 92%] Linking CXX static library libvoid_llvm.a
+[ 92%] Built target void_llvm
+[ 92%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[ 92%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[ 92%] Built target voidc_objects
+[ 92%] Generating cache-identity-Release.cpp
+[ 92%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Release.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_zone_objects
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable void_lsp_tests
+[100%] Built target void_lsp_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_tooling
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Linking CXX executable void_tooling_example
+[100%] Built target void_tooling_example
+
+===== build-roslyn-debug.log =====
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project_resolution.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8216:63: warning: missing field 'prefix' initializer [-Wmissing-field-initializers]
+ 8216 |     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+      |                                                               ^
+1 warning generated.
+[  0%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[100%] Built target void_native_inventory
+[100%] Linking CXX static library libvoid_llvm.a
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[100%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Debug.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable void_lsp_tests
+[100%] Built target void_lsp_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_tooling
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Linking CXX executable void_tooling_example
+[100%] Built target void_tooling_example
+
+===== build-roslyn-strict.log =====
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/project_resolution.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8216:63: warning: missing field 'prefix' initializer [-Wmissing-field-initializers]
+ 8216 |     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+      |                                                               ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Building CXX object CMakeFiles/voidls.dir/src/lsp/main.cpp.o
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_native_fixture
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Building CXX object CMakeFiles/void_llvm.dir/src/backend/llvm/backend.cpp.o
+[ 92%] Built target void_native_inventory
+[ 92%] Linking CXX static library libvoid_llvm.a
+[ 92%] Built target void_llvm
+[ 92%] Building CXX object CMakeFiles/voidc_objects.dir/src/main.cpp.o
+[ 92%] Building CXX object CMakeFiles/voidc_objects.dir/src/native_build.cpp.o
+[ 92%] Built target voidc_objects
+[ 92%] Generating cache-identity-RelWithDebInfo.cpp
+[ 92%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable void_lsp_tests
+[100%] Built target void_lsp_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_tooling
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Linking CXX executable void_tooling_example
+[100%] Built target void_tooling_example
+
+===== roslyn-focused-release.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  32: lsp_intellisense
+1/6 Test  #32: lsp_intellisense .................   Passed    1.59 sec
+    Start  34: lsp_editor_recovery
+2/6 Test  #34: lsp_editor_recovery ..............   Passed    4.24 sec
+    Start  43: cli_presentation
+3/6 Test  #43: cli_presentation .................   Passed    1.28 sec
+    Start 206: lsp_documentation
+4/6 Test #206: lsp_documentation ................   Passed    0.16 sec
+    Start 207: lsp_named_arguments
+5/6 Test #207: lsp_named_arguments ..............   Passed    0.26 sec
+    Start 454: tooling
+6/6 Test #454: tooling ..........................   Passed    0.35 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =   7.90 sec
+
+===== roslyn-focused-debug.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+    Start  32: lsp_intellisense
+1/6 Test  #32: lsp_intellisense .................   Passed    4.72 sec
+    Start  34: lsp_editor_recovery
+2/6 Test  #34: lsp_editor_recovery ..............   Passed   20.76 sec
+    Start  43: cli_presentation
+3/6 Test  #43: cli_presentation .................   Passed    3.12 sec
+    Start 219: lsp_documentation
+4/6 Test #219: lsp_documentation ................   Passed    0.44 sec
+    Start 220: lsp_named_arguments
+5/6 Test #220: lsp_named_arguments ..............   Passed    1.01 sec
+    Start 467: tooling
+6/6 Test #467: tooling ..........................   Passed    0.66 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  30.72 sec
+
+===== roslyn-focused-strict.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+    Start  32: lsp_intellisense
+1/6 Test  #32: lsp_intellisense .................   Passed    7.74 sec
+    Start  34: lsp_editor_recovery
+2/6 Test  #34: lsp_editor_recovery ..............   Passed   22.64 sec
+    Start  43: cli_presentation
+3/6 Test  #43: cli_presentation .................   Passed    7.16 sec
+    Start 206: lsp_documentation
+4/6 Test #206: lsp_documentation ................   Passed    0.57 sec
+    Start 207: lsp_named_arguments
+5/6 Test #207: lsp_named_arguments ..............   Passed    1.09 sec
+    Start 444: tooling
+6/6 Test #444: tooling ..........................   Passed    0.87 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  40.08 sec
+
+===== roslyn-final-release.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  21: project_sessions
+ 1/54 Test  #21: project_sessions .................   Passed    0.51 sec
+      Start  31: project_protocol
+ 2/54 Test  #31: project_protocol .................   Passed    0.59 sec
+      Start  32: lsp_intellisense
+ 3/54 Test  #32: lsp_intellisense .................   Passed    1.41 sec
+      Start  33: lsp_semantic_tokens
+ 4/54 Test  #33: lsp_semantic_tokens ..............   Passed    0.54 sec
+      Start  34: lsp_editor_recovery
+ 5/54 Test  #34: lsp_editor_recovery ..............   Passed    4.26 sec
+      Start  35: lsp_project_root_recovery
+ 6/54 Test  #35: lsp_project_root_recovery ........   Passed    0.75 sec
+      Start  36: lsp_enum_recovery
+ 7/54 Test  #36: lsp_enum_recovery ................   Passed    2.98 sec
+      Start  38: lsp_enum_equality
+ 8/54 Test  #38: lsp_enum_equality ................   Passed    0.27 sec
+      Start  39: lsp_quick_fixes
+ 9/54 Test  #39: lsp_quick_fixes ..................   Passed    0.18 sec
+      Start  40: lsp_multiple_returns
+10/54 Test  #40: lsp_multiple_returns .............   Passed    0.29 sec
+      Start  43: cli_presentation
+11/54 Test  #43: cli_presentation .................   Passed    1.26 sec
+      Start  56: net_sockets_lsp
+12/54 Test  #56: net_sockets_lsp ..................   Passed    0.22 sec
+      Start  69: url_lsp
+13/54 Test  #69: url_lsp ..........................   Passed    0.12 sec
+      Start  70: http_lsp
+14/54 Test  #70: http_lsp .........................   Passed    2.97 sec
+      Start  77: stage10_tooling
+15/54 Test  #77: stage10_tooling ..................   Passed    0.09 sec
+      Start 107: json_lsp
+16/54 Test #107: json_lsp .........................   Passed    1.08 sec
+      Start 134: generics_hint_lsp
+17/54 Test #134: generics_hint_lsp ................   Passed    0.08 sec
+      Start 201: lsp_positions
+18/54 Test #201: lsp_positions ....................   Passed    0.00 sec
+      Start 202: lsp_protocol
+19/54 Test #202: lsp_protocol .....................   Passed    0.43 sec
+      Start 203: lsp_stage11_globals
+20/54 Test #203: lsp_stage11_globals ..............   Passed    0.10 sec
+      Start 204: lsp_stage8
+21/54 Test #204: lsp_stage8 .......................   Passed    0.43 sec
+      Start 206: lsp_documentation
+22/54 Test #206: lsp_documentation ................   Passed    0.17 sec
+      Start 207: lsp_named_arguments
+23/54 Test #207: lsp_named_arguments ..............   Passed    0.24 sec
+      Start 214: lsp_math
+24/54 Test #214: lsp_math .........................   Passed    0.42 sec
+      Start 226: host_capabilities_lsp
+25/54 Test #226: host_capabilities_lsp ............   Passed    0.43 sec
+      Start 236: lsp_os
+26/54 Test #236: lsp_os ...........................   Passed    1.68 sec
+      Start 246: lsp_random
+27/54 Test #246: lsp_random .......................   Passed    0.66 sec
+      Start 255: lsp_binary
+28/54 Test #255: lsp_binary .......................   Passed    0.13 sec
+      Start 258: lsp_const_recovery
+29/54 Test #258: lsp_const_recovery ...............   Passed    0.83 sec
+      Start 259: lsp_const_recovery_stack
+30/54 Test #259: lsp_const_recovery_stack .........   Passed    0.85 sec
+      Start 264: lsp_combined
+31/54 Test #264: lsp_combined .....................   Passed    2.01 sec
+      Start 267: lsp_memory
+32/54 Test #267: lsp_memory .......................   Passed    0.42 sec
+      Start 277: lsp_text_encoding
+33/54 Test #277: lsp_text_encoding ................   Passed    0.87 sec
+      Start 280: lsp_text_encoding_stack
+34/54 Test #280: lsp_text_encoding_stack ..........   Passed    0.93 sec
+      Start 282: text_encoding_semantic_depth
+35/54 Test #282: text_encoding_semantic_depth .....   Passed    0.87 sec
+      Start 288: lsp_stage7
+36/54 Test #288: lsp_stage7 .......................   Passed    0.19 sec
+      Start 289: lsp_demo
+37/54 Test #289: lsp_demo .........................   Passed    0.08 sec
+      Start 300: lsp_log
+38/54 Test #300: lsp_log ..........................   Passed    3.77 sec
+      Start 307: lsp_collections_stdlib
+39/54 Test #307: lsp_collections_stdlib ...........   Passed    0.25 sec
+      Start 316: lsp_channel
+40/54 Test #316: lsp_channel ......................   Passed    0.15 sec
+      Start 365: lsp_io
+41/54 Test #365: lsp_io ...........................   Passed    1.14 sec
+      Start 368: lsp_io_stack
+42/54 Test #368: lsp_io_stack .....................   Passed    1.18 sec
+      Start 445: lsp_async_syntax
+43/54 Test #445: lsp_async_syntax .................   Passed    0.10 sec
+      Start 452: tooling_demo
+44/54 Test #452: tooling_demo .....................   Passed    0.11 sec
+      Start 454: tooling
+45/54 Test #454: tooling ..........................   Passed    0.22 sec
+      Start 461: numeric_enum_lsp
+46/54 Test #461: numeric_enum_lsp .................   Passed    0.14 sec
+      Start 486: lsp_sprint6
+47/54 Test #486: lsp_sprint6 ......................   Passed    0.31 sec
+      Start 487: lsp_stage10_fields
+48/54 Test #487: lsp_stage10_fields ...............   Passed    0.08 sec
+      Start 488: lsp_stage10_display
+49/54 Test #488: lsp_stage10_display ..............   Passed    2.72 sec
+      Start 489: lsp_stage10_intelligence
+50/54 Test #489: lsp_stage10_intelligence .........   Passed    0.21 sec
+      Start 490: lsp_stage10_source_formatting
+51/54 Test #490: lsp_stage10_source_formatting ....   Passed    0.24 sec
+      Start 492: lsp_sprint4
+52/54 Test #492: lsp_sprint4 ......................   Passed    0.08 sec
+      Start 496: lsp_sprint3
+53/54 Test #496: lsp_sprint3 ......................   Passed    0.10 sec
+      Start 497: lsp_sprint2
+54/54 Test #497: lsp_sprint2 ......................   Passed    0.11 sec
+
+100% tests passed, 0 tests failed out of 54
+
+Total Test time (real) =  40.31 sec
+
+===== roslyn-final-debug.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start  21: project_sessions
+ 1/54 Test  #21: project_sessions .................   Passed    1.41 sec
+      Start  31: project_protocol
+ 2/54 Test  #31: project_protocol .................   Passed    1.46 sec
+      Start  32: lsp_intellisense
+ 3/54 Test  #32: lsp_intellisense .................   Passed    4.58 sec
+      Start  33: lsp_semantic_tokens
+ 4/54 Test  #33: lsp_semantic_tokens ..............   Passed    2.95 sec
+      Start  34: lsp_editor_recovery
+ 5/54 Test  #34: lsp_editor_recovery ..............   Passed   20.51 sec
+      Start  35: lsp_project_root_recovery
+ 6/54 Test  #35: lsp_project_root_recovery ........   Passed    1.98 sec
+      Start  36: lsp_enum_recovery
+ 7/54 Test  #36: lsp_enum_recovery ................   Passed   15.58 sec
+      Start  38: lsp_enum_equality
+ 8/54 Test  #38: lsp_enum_equality ................   Passed    1.22 sec
+      Start  39: lsp_quick_fixes
+ 9/54 Test  #39: lsp_quick_fixes ..................   Passed    0.36 sec
+      Start  40: lsp_multiple_returns
+10/54 Test  #40: lsp_multiple_returns .............   Passed    0.75 sec
+      Start  43: cli_presentation
+11/54 Test  #43: cli_presentation .................   Passed    3.03 sec
+      Start  56: net_sockets_lsp
+12/54 Test  #56: net_sockets_lsp ..................   Passed    1.24 sec
+      Start  69: url_lsp
+13/54 Test  #69: url_lsp ..........................   Passed    0.32 sec
+      Start  70: http_lsp
+14/54 Test  #70: http_lsp .........................   Passed   23.50 sec
+      Start  77: stage10_tooling
+15/54 Test  #77: stage10_tooling ..................   Passed    0.62 sec
+      Start 107: json_lsp
+16/54 Test #107: json_lsp .........................   Passed    7.34 sec
+      Start 147: generics_hint_lsp
+17/54 Test #147: generics_hint_lsp ................   Passed    0.09 sec
+      Start 214: lsp_positions
+18/54 Test #214: lsp_positions ....................   Passed    0.01 sec
+      Start 215: lsp_protocol
+19/54 Test #215: lsp_protocol .....................   Passed    0.72 sec
+      Start 216: lsp_stage11_globals
+20/54 Test #216: lsp_stage11_globals ..............   Passed    0.16 sec
+      Start 217: lsp_stage8
+21/54 Test #217: lsp_stage8 .......................   Passed    0.48 sec
+      Start 219: lsp_documentation
+22/54 Test #219: lsp_documentation ................   Passed    0.46 sec
+      Start 220: lsp_named_arguments
+23/54 Test #220: lsp_named_arguments ..............   Passed    1.01 sec
+      Start 227: lsp_math
+24/54 Test #227: lsp_math .........................   Passed    1.93 sec
+      Start 239: host_capabilities_lsp
+25/54 Test #239: host_capabilities_lsp ............   Passed    2.65 sec
+      Start 249: lsp_os
+26/54 Test #249: lsp_os ...........................   Passed   12.44 sec
+      Start 259: lsp_random
+27/54 Test #259: lsp_random .......................   Passed    4.45 sec
+      Start 268: lsp_binary
+28/54 Test #268: lsp_binary .......................   Passed    0.32 sec
+      Start 271: lsp_const_recovery
+29/54 Test #271: lsp_const_recovery ...............   Passed    4.73 sec
+      Start 272: lsp_const_recovery_stack
+30/54 Test #272: lsp_const_recovery_stack .........   Passed    4.77 sec
+      Start 277: lsp_combined
+31/54 Test #277: lsp_combined .....................   Passed   14.29 sec
+      Start 280: lsp_memory
+32/54 Test #280: lsp_memory .......................   Passed    2.39 sec
+      Start 290: lsp_text_encoding
+33/54 Test #290: lsp_text_encoding ................   Passed    5.83 sec
+      Start 293: lsp_text_encoding_stack
+34/54 Test #293: lsp_text_encoding_stack ..........   Passed    5.75 sec
+      Start 295: text_encoding_semantic_depth
+35/54 Test #295: text_encoding_semantic_depth .....   Passed    1.07 sec
+      Start 301: lsp_stage7
+36/54 Test #301: lsp_stage7 .......................   Passed    0.34 sec
+      Start 302: lsp_demo
+37/54 Test #302: lsp_demo .........................   Passed    0.08 sec
+      Start 313: lsp_log
+38/54 Test #313: lsp_log ..........................   Passed   26.87 sec
+      Start 320: lsp_collections_stdlib
+39/54 Test #320: lsp_collections_stdlib ...........   Passed    1.24 sec
+      Start 329: lsp_channel
+40/54 Test #329: lsp_channel ......................   Passed    0.68 sec
+      Start 378: lsp_io
+41/54 Test #378: lsp_io ...........................   Passed    8.79 sec
+      Start 381: lsp_io_stack
+42/54 Test #381: lsp_io_stack .....................   Passed    8.87 sec
+      Start 458: lsp_async_syntax
+43/54 Test #458: lsp_async_syntax .................   Passed    0.18 sec
+      Start 465: tooling_demo
+44/54 Test #465: tooling_demo .....................   Passed    0.12 sec
+      Start 467: tooling
+45/54 Test #467: tooling ..........................   Passed    0.68 sec
+      Start 474: numeric_enum_lsp
+46/54 Test #474: numeric_enum_lsp .................   Passed    0.16 sec
+      Start 499: lsp_sprint6
+47/54 Test #499: lsp_sprint6 ......................   Passed    0.79 sec
+      Start 500: lsp_stage10_fields
+48/54 Test #500: lsp_stage10_fields ...............   Passed    0.12 sec
+      Start 501: lsp_stage10_display
+49/54 Test #501: lsp_stage10_display ..............   Passed   21.19 sec
+      Start 502: lsp_stage10_intelligence
+50/54 Test #502: lsp_stage10_intelligence .........   Passed    0.78 sec
+      Start 503: lsp_stage10_source_formatting
+51/54 Test #503: lsp_stage10_source_formatting ....   Passed    1.33 sec
+      Start 505: lsp_sprint4
+52/54 Test #505: lsp_sprint4 ......................   Passed    0.09 sec
+      Start 509: lsp_sprint3
+53/54 Test #509: lsp_sprint3 ......................   Passed    0.21 sec
+      Start 510: lsp_sprint2
+54/54 Test #510: lsp_sprint2 ......................   Passed    0.12 sec
+
+100% tests passed, 0 tests failed out of 54
+
+Total Test time (real) = 223.07 sec
+
+===== roslyn-final-strict.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start  21: project_sessions
+ 1/51 Test  #21: project_sessions .................   Passed    2.17 sec
+      Start  31: project_protocol
+ 2/51 Test  #31: project_protocol .................   Passed    2.80 sec
+      Start  32: lsp_intellisense
+ 3/51 Test  #32: lsp_intellisense .................   Passed    7.35 sec
+      Start  33: lsp_semantic_tokens
+ 4/51 Test  #33: lsp_semantic_tokens ..............   Passed    2.98 sec
+      Start  34: lsp_editor_recovery
+ 5/51 Test  #34: lsp_editor_recovery ..............   Passed   22.54 sec
+      Start  35: lsp_project_root_recovery
+ 6/51 Test  #35: lsp_project_root_recovery ........   Passed    3.65 sec
+      Start  36: lsp_enum_recovery
+ 7/51 Test  #36: lsp_enum_recovery ................   Passed   14.36 sec
+      Start  38: lsp_enum_equality
+ 8/51 Test  #38: lsp_enum_equality ................   Passed    1.25 sec
+      Start  39: lsp_quick_fixes
+ 9/51 Test  #39: lsp_quick_fixes ..................   Passed    0.56 sec
+      Start  40: lsp_multiple_returns
+10/51 Test  #40: lsp_multiple_returns .............   Passed    1.19 sec
+      Start  43: cli_presentation
+11/51 Test  #43: cli_presentation .................   Passed    6.61 sec
+      Start  56: net_sockets_lsp
+12/51 Test  #56: net_sockets_lsp ..................   Passed    1.13 sec
+      Start  69: url_lsp
+13/51 Test  #69: url_lsp ..........................   Passed    0.34 sec
+      Start  70: http_lsp
+14/51 Test  #70: http_lsp .........................   Passed   17.54 sec
+      Start  77: stage10_tooling
+15/51 Test  #77: stage10_tooling ..................   Passed    0.69 sec
+      Start 107: json_lsp
+16/51 Test #107: json_lsp .........................   Passed    5.96 sec
+      Start 134: generics_hint_lsp
+17/51 Test #134: generics_hint_lsp ................   Passed    0.12 sec
+      Start 201: lsp_positions
+18/51 Test #201: lsp_positions ....................   Passed    0.02 sec
+      Start 202: lsp_protocol
+19/51 Test #202: lsp_protocol .....................   Passed    1.43 sec
+      Start 203: lsp_stage11_globals
+20/51 Test #203: lsp_stage11_globals ..............   Passed    0.19 sec
+      Start 204: lsp_stage8
+21/51 Test #204: lsp_stage8 .......................   Passed    2.33 sec
+      Start 206: lsp_documentation
+22/51 Test #206: lsp_documentation ................   Passed    0.50 sec
+      Start 207: lsp_named_arguments
+23/51 Test #207: lsp_named_arguments ..............   Passed    1.02 sec
+      Start 214: lsp_math
+24/51 Test #214: lsp_math .........................   Passed    1.82 sec
+      Start 226: host_capabilities_lsp
+25/51 Test #226: host_capabilities_lsp ............   Passed    2.21 sec
+      Start 236: lsp_os
+26/51 Test #236: lsp_os ...........................   Passed    9.21 sec
+      Start 246: lsp_random
+27/51 Test #246: lsp_random .......................   Passed    3.30 sec
+      Start 255: lsp_binary
+28/51 Test #255: lsp_binary .......................   Passed    0.33 sec
+      Start 257: lsp_const_recovery
+29/51 Test #257: lsp_const_recovery ...............   Passed    3.77 sec
+      Start 262: lsp_combined
+30/51 Test #262: lsp_combined .....................   Passed   10.36 sec
+      Start 264: lsp_memory
+31/51 Test #264: lsp_memory .......................   Passed    1.93 sec
+      Start 274: lsp_text_encoding
+32/51 Test #274: lsp_text_encoding ................   Passed    4.31 sec
+      Start 277: text_encoding_semantic_depth
+33/51 Test #277: text_encoding_semantic_depth .....   Passed    2.65 sec
+      Start 282: lsp_stage7
+34/51 Test #282: lsp_stage7 .......................   Passed    0.54 sec
+      Start 283: lsp_demo
+35/51 Test #283: lsp_demo .........................   Passed    0.11 sec
+      Start 294: lsp_log
+36/51 Test #294: lsp_log ..........................   Passed   19.33 sec
+      Start 301: lsp_collections_stdlib
+37/51 Test #301: lsp_collections_stdlib ...........   Passed    1.09 sec
+      Start 310: lsp_channel
+38/51 Test #310: lsp_channel ......................   Passed    0.58 sec
+      Start 358: lsp_io
+39/51 Test #358: lsp_io ...........................   Passed    6.66 sec
+      Start 435: lsp_async_syntax
+40/51 Test #435: lsp_async_syntax .................   Passed    0.20 sec
+      Start 442: tooling_demo
+41/51 Test #442: tooling_demo .....................   Passed    0.16 sec
+      Start 444: tooling
+42/51 Test #444: tooling ..........................   Passed    0.84 sec
+      Start 451: numeric_enum_lsp
+43/51 Test #451: numeric_enum_lsp .................   Passed    0.18 sec
+      Start 476: lsp_sprint6
+44/51 Test #476: lsp_sprint6 ......................   Passed    1.03 sec
+      Start 477: lsp_stage10_fields
+45/51 Test #477: lsp_stage10_fields ...............   Passed    0.12 sec
+      Start 478: lsp_stage10_display
+46/51 Test #478: lsp_stage10_display ..............   Passed   17.44 sec
+      Start 479: lsp_stage10_intelligence
+47/51 Test #479: lsp_stage10_intelligence .........   Passed    0.73 sec
+      Start 480: lsp_stage10_source_formatting
+48/51 Test #480: lsp_stage10_source_formatting ....   Passed    1.14 sec
+      Start 482: lsp_sprint4
+49/51 Test #482: lsp_sprint4 ......................   Passed    0.11 sec
+      Start 486: lsp_sprint3
+50/51 Test #486: lsp_sprint3 ......................   Passed    0.22 sec
+      Start 487: lsp_sprint2
+51/51 Test #487: lsp_sprint2 ......................   Passed    0.15 sec
+
+100% tests passed, 0 tests failed out of 51
+
+Total Test time (real) = 187.28 sec
+
+===== roslyn-native-release.log =====
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "input": "RAYLIB-LICENSE.txt",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "libraylib.so.600",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "libvoid_raylib.so",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "raylib-linux.descriptor",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "void.native.toml",
+      "same_size_and_mtime_tamper": "REJECTED"
+    }
+  ],
+  "observed_running_cancellation": [
+    {
+      "trial": 0,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.09578897152096033,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-0",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 1,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.07018004544079304,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-1",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 2,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.07739895954728127,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-2",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 3,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.09425007738173008,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-3",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 4,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.10190997272729874,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-4",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 5,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.10213896166533232,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-5",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 6,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.18705904949456453,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-6",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 7,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.09258999489247799,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-7",
+        "jsonrpc": "2.0"
+      }
+    }
+  ],
+  "native_execution": "NOT RUN"
+}
+
+===== roslyn-native-debug.log =====
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "input": "RAYLIB-LICENSE.txt",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "libraylib.so.600",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "libvoid_raylib.so",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "raylib-linux.descriptor",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "void.native.toml",
+      "same_size_and_mtime_tamper": "REJECTED"
+    }
+  ],
+  "observed_running_cancellation": [
+    {
+      "trial": 0,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.10811001993715763,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-0",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 1,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.11639890726655722,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-1",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 2,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.10924891103059053,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-2",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 3,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.11250004172325134,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-3",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 4,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.11233903933316469,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-4",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 5,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.11337001342326403,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-5",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 6,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.1390890683978796,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-6",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 7,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.1410690601915121,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-7",
+        "jsonrpc": "2.0"
+      }
+    }
+  ],
+  "native_execution": "NOT RUN"
+}
+
+===== roslyn-native-strict.log =====
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "input": "RAYLIB-LICENSE.txt",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "libraylib.so.600",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "libvoid_raylib.so",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "raylib-linux.descriptor",
+      "same_size_and_mtime_tamper": "REJECTED"
+    },
+    {
+      "input": "void.native.toml",
+      "same_size_and_mtime_tamper": "REJECTED"
+    }
+  ],
+  "observed_running_cancellation": [
+    {
+      "trial": 0,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.16108003910630941,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-0",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 1,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.13281998690217733,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-1",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 2,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.17682998441159725,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-2",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 3,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.12531899847090244,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-3",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 4,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.10737904813140631,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-4",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 5,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.10536995250731707,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-5",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 6,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.11915899813175201,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-6",
+        "jsonrpc": "2.0"
+      }
+    },
+    {
+      "trial": 7,
+      "cancelled_in_flight": true,
+      "reply_ms": 0.233579077757895,
+      "response": {
+        "error": {
+          "code": -32800,
+          "message": "Request cancelled"
+        },
+        "id": "running-7",
+        "jsonrpc": "2.0"
+      }
+    }
+  ],
+  "native_execution": "NOT RUN"
+}
+
+===== roslyn-warm-before-reuse.log =====
+{
+  "warm_call": {
+    "first_request_ms": 59.92017698008567,
+    "median_ms": 20.799626014195383,
+    "p95_ms": 25.785558042116463,
+    "worst_ms": 32.844894914887846
+  },
+  "warm_newline": {
+    "first_request_ms": 40.76265706680715,
+    "median_ms": 20.665096992161125,
+    "p95_ms": 21.88210596796125,
+    "worst_ms": 26.210485957562923
+  },
+  "warm_eof": {
+    "first_request_ms": 43.62838400993496,
+    "median_ms": 20.75978653738275,
+    "p95_ms": 23.83215702138841,
+    "worst_ms": 30.127146979793906
+  },
+  "edited_eof": {
+    "median_ms": 17.907624947838485,
+    "p95_ms": 41.22951498720795,
+    "worst_ms": 47.2682659747079
+  }
+}
+
+===== roslyn-warm-final.log =====
+{
+  "warm_call": {
+    "first_request_ms": 62.374704983085394,
+    "median_ms": 20.807981549296528,
+    "p95_ms": 21.698647062294185,
+    "worst_ms": 22.488852962851524
+  },
+  "warm_newline": {
+    "first_request_ms": 41.691482067108154,
+    "median_ms": 20.93812549719587,
+    "p95_ms": 22.577492985874414,
+    "worst_ms": 36.777375964447856
+  },
+  "warm_eof": {
+    "first_request_ms": 40.83858605008572,
+    "median_ms": 20.939425972756,
+    "p95_ms": 22.63338293414563,
+    "worst_ms": 25.64506803173572
+  },
+  "edited_eof": {
+    "median_ms": 18.382537527941167,
+    "p95_ms": 41.88734095077962,
+    "worst_ms": 69.86113893799484
+  }
+}
+
+===== roslyn-assistance-before-reuse.log =====
+{
+  "warm_completion": {
+    "median_ms": 14.697080478072166,
+    "p95_ms": 15.069368993863463,
+    "worst_ms": 15.166217926889658
+  },
+  "edited_completion": {
+    "median_ms": 203.55203101644292,
+    "p95_ms": 205.36749705206603,
+    "worst_ms": 206.5743519924581
+  },
+  "warm_signatureHelp": {
+    "median_ms": 15.631536021828651,
+    "p95_ms": 15.878165024332702,
+    "worst_ms": 15.990374027751386
+  },
+  "edited_signatureHelp": {
+    "median_ms": 208.43819651054218,
+    "p95_ms": 219.63883901480585,
+    "worst_ms": 228.02719892933965
+  }
+}
+
+===== roslyn-assistance-final.log =====
+{
+  "warm_completion": {
+    "median_ms": 15.727300487924367,
+    "p95_ms": 16.403921996243298,
+    "worst_ms": 16.58041204791516
+  },
+  "edited_completion": {
+    "median_ms": 173.03379846271127,
+    "p95_ms": 183.70515806600451,
+    "worst_ms": 208.97452801000327
+  },
+  "warm_signatureHelp": {
+    "median_ms": 15.087253472302109,
+    "p95_ms": 16.030933940783143,
+    "worst_ms": 16.122713102959096
+  },
+  "edited_signatureHelp": {
+    "median_ms": 177.76889551896602,
+    "p95_ms": 188.67282290011644,
+    "worst_ms": 188.70576401241124
+  }
+}
+
+===== roslyn-editor-final.log =====
+
+DevTools listening on ws://127.0.0.1:36265/devtools/browser/35a33439-7418-4348-bbe8-f96a1220c904
+Warning: 'remote-debugging-port' is not in the list of known options, but still passed to Electron/Chromium.
+[90m[main 2026-11-19T08:47:57.756Z][0m [node-compile-cache] main: packaged cache enabled (status: enabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: /usr/share/code/resources/app/node-compile-cache/main/v24.22.1-x64-60e4fe36)
+[90m[main 2026-11-19T08:47:57.850Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-11-19T08:47:57.996Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-11-19T08:47:57.997Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-11-19T08:47:58.042Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-11-19T08:47:58.043Z][0m update#setState disabled
+[90m[main 2026-11-19T08:47:58.043Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-11-19T08:47:59.424Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AgentHost:renderer] MessagePort acquired, creating client...
+Started local extension host with pid 3815886.
+Started initializing default profile extensions in extensions installation folder. file:///tmp/void-g76-freshness-j_ii4ckz/roslyn-editor-final/extensions
+[91m[main 2026-11-19T08:48:00.211Z][0m [AgentHost:stderr] (node:3815818) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=1ce6b1b4-20e2-4bde-9efa-924fe5c11f38 requestId=1
+[RemoteAgentHostProtocol] Initialized: address=local clientId=1ce6b1b4-20e2-4bde-9efa-924fe5c11f38 durationMs=839
+[AgentHost:renderer] Protocol connection established; clientId=1ce6b1b4-20e2-4bde-9efa-924fe5c11f38
+Completed initializing default profile extensions in extensions installation folder. file:///tmp/void-g76-freshness-j_ii4ckz/roslyn-editor-final/extensions
+Loading development extension at /home/shmellyorc/Documents/Void.Language/editors/vscode
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+Unknown channel: agentHostClientProxy
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/MWU3M2ZiNjgtN2FkMy00ZmQ3LTlmM2ItMTNlMWFmYTY0OGU0" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/MWU3M2ZiNjgtN2FkMy00ZmQ3LTlmM2ItMTNlMWFmYTY0OGU0" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+(node:3815886) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/MWU3M2ZiNjgtN2FkMy00ZmQ3LTlmM2ItMTNlMWFmYTY0OGU0" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/MWU3M2ZiNjgtN2FkMy00ZmQ3LTlmM2ItMTNlMWFmYTY0OGU0" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/MWU3M2ZiNjgtN2FkMy00ZmQ3LTlmM2ItMTNlMWFmYTY0OGU0" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+Settings Sync: Account status changed from uninitialized to unavailable
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+G76 real editor: {"warm_provider":{"median_ms":41.28666899999962,"p95_ms":54.440622000000076,"worst_ms":59.793345000000045,"samples_ms":[43.378823999999895,44.52036799999996,47.590274000000136,54.440622000000076,53.88745399999971,54.58123999999998,47.98255199999994,45.0257359999996,44.77735699999994,41.577283000000534,49.269156000000294,42.83547599999929,45.032946000000265,41.720972000000074,42.145730000000185,42.86133599999994,42.29308899999978,44.21966000000066,39.87921000000006,41.39396300000044,39.47479300000032,39.7322809999996,39.65545099999963,39.62206200000037,40.953935999999885,39.60982100000001,41.04281499999979,41.32885399999941,39.89922000000024,42.21672000000035,40.112678999999844,41.24448399999983,40.442848000000595,43.120804999999564,39.563632000000325,43.23976399999992,41.12935500000003,59.793345000000045,45.05486599999949,37.79935099999966,38.282468000000335,38.351197999999386,38.529836000000614,39.64791200000036,39.44123200000013,38.26431899999989,38.74292500000047,38.818325999999615,38.10634899999968,39.34903300000042]},"rapid_rl_dom":{"median_ms":196.79999995231628,"p95_ms":212.09999990463257,"worst_ms":212.09999990463257,"samples_ms":[212.09999990463257,198.59999990463257,193.90000009536743,192.19999992847443,188.19999992847443,207.79999995231628,195,209]},"rapid_rl_paint":{"median_ms":217.49999994039536,"p95_ms":239.29999995231628,"worst_ms":239.29999995231628,"samples_ms":[236,218.69999992847443,210.70000004768372,211.19999992847443,210.79999995231628,228.79999995231628,216.29999995231628,239.29999995231628]},"assignment_edit_to_provider":{"median_ms":97.23137799999859,"p95_ms":111.97917799999959,"worst_ms":111.97917799999959,"samples_ms":[108.31306500000028,107.18765100000019,100.32923300000039,96.35207199999968,94.2384320000001,97.15012899999965,95.14281699999992,104.88416200000029,97.2905380000011,97.23137799999859,99.7361660000006,93.75350400000025,94.63675999999941,111.97917799999959,91.65917499999887]}}
+[90m[main 2026-11-19T08:48:12.044Z][0m Extension host with pid 3815886 exited with code: 0, signal: unknown.
+Exit code:   0
+
+===== roslyn-editor-before-reuse.log =====
+
+DevTools listening on ws://127.0.0.1:40117/devtools/browser/eaaef150-bff5-4bfc-82fa-6a18b99fe31c
+Warning: 'remote-debugging-port' is not in the list of known options, but still passed to Electron/Chromium.
+[90m[main 2026-11-19T08:49:07.503Z][0m [node-compile-cache] main: packaged cache enabled (status: enabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: /usr/share/code/resources/app/node-compile-cache/main/v24.22.1-x64-60e4fe36)
+[90m[main 2026-11-19T08:49:07.605Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-11-19T08:49:07.684Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-11-19T08:49:07.685Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-11-19T08:49:07.726Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-11-19T08:49:07.727Z][0m update#setState disabled
+[90m[main 2026-11-19T08:49:07.727Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-11-19T08:49:09.017Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AgentHost:renderer] MessagePort acquired, creating client...
+Started local extension host with pid 3816772.
+Started initializing default profile extensions in extensions installation folder. file:///tmp/void-g76-freshness-j_ii4ckz/roslyn-editor-before-reuse/extensions
+[91m[main 2026-11-19T08:49:09.737Z][0m [AgentHost:stderr] (node:3816710) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=90107265-f749-4d7d-9e7b-971e475548ca requestId=1
+[RemoteAgentHostProtocol] Initialized: address=local clientId=90107265-f749-4d7d-9e7b-971e475548ca durationMs=763
+[AgentHost:renderer] Protocol connection established; clientId=90107265-f749-4d7d-9e7b-971e475548ca
+Completed initializing default profile extensions in extensions installation folder. file:///tmp/void-g76-freshness-j_ii4ckz/roslyn-editor-before-reuse/extensions
+Loading development extension at /home/shmellyorc/Documents/Void.Language/editors/vscode
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/N2I1NWNhOTktYTkyOC00MzI0LWJkNWEtMWJjOThlZTdlMTk5" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Unknown channel: agentHostClientProxy
+(node:3816772) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/N2I1NWNhOTktYTkyOC00MzI0LWJkNWEtMWJjOThlZTdlMTk5" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/N2I1NWNhOTktYTkyOC00MzI0LWJkNWEtMWJjOThlZTdlMTk5" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/N2I1NWNhOTktYTkyOC00MzI0LWJkNWEtMWJjOThlZTdlMTk5" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/N2I1NWNhOTktYTkyOC00MzI0LWJkNWEtMWJjOThlZTdlMTk5" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+Settings Sync: Account status changed from uninitialized to unavailable
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+G76 real editor: {"warm_provider":{"median_ms":38.402082000000064,"p95_ms":42.74770600000011,"worst_ms":48.75359800000024,"samples_ms":[40.67991600000005,38.54903600000034,42.744946999999684,42.631116999999904,42.74770600000011,41.38532299999997,42.13602899999978,38.242307999999866,48.75359800000024,40.91028499999993,40.458998000000065,40.618156,39.812500999999884,39.96816899999976,38.24330800000007,39.051944000000276,38.38743700000032,38.207658000000265,38.40373700000009,38.1991079999998,39.425902999999835,38.51469599999973,38.400427000000036,39.284663000000364,44.5399580000003,40.442227,39.22619399999985,39.40630199999987,39.57308099999955,39.74786100000074,37.78038000000015,37.19712299999992,37.41588200000024,37.55039099999976,37.405322000000524,36.929033999999774,36.382596999999805,37.98765899999944,36.954783000000134,37.56147199999941,36.66364499999963,37.27674300000035,36.63326500000039,37.14328300000034,38.42664700000023,37.356032000000596,37.78864000000067,37.62021099999947,38.314838000000236,37.713549999999486]},"rapid_rl_dom":{"median_ms":186.60000002384186,"p95_ms":218.5,"worst_ms":218.5,"samples_ms":[218.5,185.19999992847443,189.30000007152557,182.30000007152557,187.20000004768372,178.79999995231628,187.39999997615814,186]},"rapid_rl_paint":{"median_ms":211.69999998807907,"p95_ms":237.39999997615814,"worst_ms":237.39999997615814,"samples_ms":[237.39999997615814,206.09999990463257,220.30000007152557,208.90000009536743,209.89999997615814,209.10000002384186,213.5,214.39999997615814]},"assignment_edit_to_provider":{"median_ms":90.46250899999905,"p95_ms":107.94761599999947,"worst_ms":107.94761599999947,"samples_ms":[95.5513549999996,90.1341110000003,87.86864200000036,100.79195900000013,87.02503499999966,88.7554170000003,107.94761599999947,92.0109709999997,92.1364510000003,95.27790599999935,88.744517000001,94.86323799999991,88.45105800000056,85.76109099999849,90.46250899999905]}}
+[90m[main 2026-11-19T08:49:20.135Z][0m Extension host with pid 3816772 exited with code: 0, signal: unknown.
+Exit code:   0
+
+===== roslyn-editor-final-repeat.log =====
+
+DevTools listening on ws://127.0.0.1:34931/devtools/browser/0bce3f31-3171-45de-9104-8780c613ccfd
+Warning: 'remote-debugging-port' is not in the list of known options, but still passed to Electron/Chromium.
+[90m[main 2026-11-19T08:49:20.809Z][0m [node-compile-cache] main: packaged cache enabled (status: enabled, configured: /usr/share/code/resources/app/node-compile-cache/main, active: /usr/share/code/resources/app/node-compile-cache/main/v24.22.1-x64-60e4fe36)
+[90m[main 2026-11-19T08:49:20.898Z][0m StorageMainService: creating application shared storage
+[90m[main 2026-11-19T08:49:20.970Z][0m [shared storage] Creating shared storage database at ':memory:' (wasCreated: true)
+[90m[main 2026-11-19T08:49:20.970Z][0m [shared storage] Initializing fallback application storage (path: in-memory)
+[90m[main 2026-11-19T08:49:21.002Z][0m [shared storage] Fallback application storage initialized with 3 items
+[90m[main 2026-11-19T08:49:21.003Z][0m update#setState disabled
+[90m[main 2026-11-19T08:49:21.003Z][0m update#ctor - updates are disabled by the environment
+Via 'product.json#extensionEnabledApiProposals' extension 'github.vscode-pull-request-github' wants API proposal 'agentsWindowActivation' but that proposal DOES NOT EXIST. Likely, the proposal has been finalized (check 'vscode.d.ts') or was abandoned.
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[AgentHost:renderer] Acquiring MessagePort to agent host...
+[90m[main 2026-11-19T08:49:22.320Z][0m AgentHostProcessManager: agent host started
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey=undefined conversationKey=undefined modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AgentHost:renderer] MessagePort acquired, creating client...
+Started local extension host with pid 3817539.
+[91m[main 2026-11-19T08:49:23.016Z][0m [AgentHost:stderr] (node:3817471) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+
+[RemoteAgentHostProtocol] Sending initialize: address=local clientId=2beac1fc-8e2c-465a-bab1-a815fe03f5d6 requestId=1
+Started initializing default profile extensions in extensions installation folder. file:///tmp/void-g76-freshness-j_ii4ckz/roslyn-editor-final-repeat/extensions
+[RemoteAgentHostProtocol] Initialized: address=local clientId=2beac1fc-8e2c-465a-bab1-a815fe03f5d6 durationMs=753
+[AgentHost:renderer] Protocol connection established; clientId=2beac1fc-8e2c-465a-bab1-a815fe03f5d6
+Completed initializing default profile extensions in extensions installation folder. file:///tmp/void-g76-freshness-j_ii4ckz/roslyn-editor-final-repeat/extensions
+Loading development extension at /home/shmellyorc/Documents/Void.Language/editors/vscode
+Unknown channel: agentHostClientByokLm
+Unknown channel: agentHostClientProxy
+Unknown channel: agentHostClientProxy
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/NDBmMTYzNTctYzE0NS00NWYwLTkyNWMtZDdkZDg2OTAyYmUw" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+(node:3817539) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `exe --trace-deprecation ...` to show where the warning was created)
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/NDBmMTYzNTctYzE0NS00NWYwLTkyNWMtZDdkZDg2OTAyYmUw" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[RemoteAgentHost] Reconciling: desired=[], current=[]
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/NDBmMTYzNTctYzE0NS00NWYwLTkyNWMtZDdkZDg2OTAyYmUw" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/NDBmMTYzNTctYzE0NS00NWYwLTkyNWMtZDdkZDg2OTAyYmUw" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[ChatModelSelection] event=no-model-at-toolbar-build surface="workbench" sessionKey="local" conversationKey="vscode-chat-session://local/NDBmMTYzNTctYzE0NS00NWYwLTkyNWMtZDdkZDg2OTAyYmUw" modelTarget=undefined storageKey="chat.currentLanguageModel.panel" widgetViewKind="view"
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+Settings Sync: Account status changed from uninitialized to unavailable
+[AgentHost] No signed-in session resolved for resource: https://api.github.com
+[AgentHost] No signed-in session resolved for resource: https://api.github.com/repos
+[AccountPolicyGate] apply: state=inactive, reason=undefined, isRestricted=false
+G76 real editor: {"warm_provider":{"median_ms":38.90728900000022,"p95_ms":46.36887900000056,"worst_ms":62.69433200000003,"samples_ms":[40.63966699999992,43.048975000000155,41.34584300000006,42.82739500000025,42.8370060000002,41.301354000000174,40.3025889999999,40.65136600000005,40.17357799999991,41.094854999999825,39.17288299999973,37.81060000000025,38.26706699999977,38.383518000000095,37.45406099999991,37.44580199999973,36.747535000000425,36.54593599999998,37.40698199999997,37.149722999999994,37.86667999999963,38.146638000000166,37.31853200000023,38.56594599999971,40.12026900000001,62.69433200000003,38.01187900000059,39.83708000000024,40.02755900000011,38.393567000000075,38.72443600000042,38.85959400000047,38.53159700000015,38.3177569999998,39.311133000000154,38.811845000000176,38.10591899999963,38.786465000000135,38.05091799999991,38.46708699999999,39.268113000000085,38.95498399999997,39.39413299999978,46.36887900000056,48.06216099999983,40.650036,39.439462000000276,39.16475300000002,39.4056129999999,38.518866000000344]},"rapid_rl_dom":{"median_ms":184.94999998807907,"p95_ms":222.20000004768372,"worst_ms":222.20000004768372,"samples_ms":[222.20000004768372,193,192,186.29999995231628,182.89999997615814,181.30000007152557,181.29999995231628,183.60000002384186]},"rapid_rl_paint":{"median_ms":212.69999998807907,"p95_ms":239.89999997615814,"worst_ms":239.89999997615814,"samples_ms":[239.89999997615814,218.89999997615814,223.80000007152557,213.69999992847443,210.20000004768372,207.30000007152557,209.89999997615814,211.70000004768372]},"assignment_edit_to_provider":{"median_ms":93.22492600000078,"p95_ms":109.9198060000017,"worst_ms":109.9198060000017,"samples_ms":[104.28551299999981,93.22492600000078,96.5265100000006,90.66430800000035,94.50247000000036,87.38752300000033,91.21063499999946,91.39803500000016,109.9198060000017,90.65930799999842,97.66908499999954,93.7517229999994,107.12677900000017,89.58511299999918,88.29056900000069]}}
+[90m[main 2026-11-19T08:49:33.885Z][0m Extension host with pid 3817539 exited with code: 0, signal: unknown.
+Exit code:   0
+
+===== roslyn-profile-final.log =====
+{
+  "warm_completion": {
+    "median_ms": 15.717234928160906,
+    "p95_ms": 17.3754480201751,
+    "worst_ms": 17.3754480201751
+  },
+  "edited_completion": {
+    "median_ms": 173.30262705218047,
+    "p95_ms": 174.4852300034836,
+    "worst_ms": 174.4852300034836
+  },
+  "warm_signatureHelp": {
+    "median_ms": 16.100423992611468,
+    "p95_ms": 16.276032896712422,
+    "worst_ms": 16.276032896712422
+  },
+  "edited_signatureHelp": {
+    "median_ms": 188.08698607608676,
+    "p95_ms": 197.69469008315355,
+    "worst_ms": 197.69469008315355
+  }
+}
+
+===== roslyn-profile-warm-final.log =====
+{
+  "warm_call": {
+    "first_request_ms": 59.49050700291991,
+    "median_ms": 20.236148440744728,
+    "p95_ms": 21.089319023303688,
+    "worst_ms": 21.37678791768849
+  },
+  "warm_newline": {
+    "first_request_ms": 39.12420407868922,
+    "median_ms": 20.302468561567366,
+    "p95_ms": 20.728641073219478,
+    "worst_ms": 20.947510958649218
+  },
+  "warm_eof": {
+    "first_request_ms": 39.43243296816945,
+    "median_ms": 20.449387549888343,
+    "p95_ms": 20.794680924154818,
+    "worst_ms": 20.817021024413407
+  },
+  "edited_eof": {
+    "median_ms": 17.236697487533092,
+    "p95_ms": 39.049034006893635,
+    "worst_ms": 39.57809193525463
+  }
+}

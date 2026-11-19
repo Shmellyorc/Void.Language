@@ -11,10 +11,17 @@ namespace vd { class CPrimitiveAdmission; }
 namespace vd::project {
 using DependencyEdges = std::map<std::string, std::string, std::less<>>;
 using PackageSources = std::map<std::string, std::string, std::less<>>;
+// Exact ordered digest inputs, owned by a verified analysis. A missing value
+// denotes a nested-project boundary; it is distinct from an empty file.
+struct EditorPackageInputs {
+    std::map<std::string,std::optional<std::string>> files;
+    std::string digest;
+};
 struct LockedPackage {
     std::string locator, entry;
     DependencyEdges dependencies;
     PackageSources sources; // Package-relative paths and exact verified bytes.
+    std::shared_ptr<const EditorPackageInputs> editor_inputs = {};
 };
 class LockedDependencies {
     std::string identity_;
@@ -23,9 +30,10 @@ class LockedDependencies {
     std::map<std::string, LockedPackage, std::less<>> packages_;
     std::shared_ptr<const CPrimitiveAdmission> native_;
     std::vector<NativeArtifact> native_link_inputs_;
+    std::shared_ptr<const std::map<std::string,std::string>> editor_native_inputs_;
     LockedDependencies() = default;
     friend std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
-        const std::filesystem::path&, const Manifest&, bool);
+        const std::filesystem::path&, const Manifest&, bool, const LockedDependencies*);
 public:
     const auto& identity() const { return identity_; }
     const auto& native_catalog_identity() const { return native_catalog_identity_; }
@@ -34,11 +42,16 @@ public:
     const auto& packages() const { return packages_; }
     const auto& native() const { return native_; }
     const auto& native_link_inputs() const { return native_link_inputs_; }
+    const auto& editor_native_inputs() const { return editor_native_inputs_; }
 };
 // Verify against the effective root manifest. Only the compiler's first capture
 // needs to retain the bytes. A recapture can verify the entire plan without them.
 std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
     const std::filesystem::path&, const Manifest&, bool retain_sources = true);
+// Editor-only reuse hint. All filesystem and byte inputs are still recaptured.
+std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
+    const std::filesystem::path&, const Manifest&, bool retain_sources,
+    const LockedDependencies* editor_reuse);
 
 enum class ResolveMode { create, refresh, locked };
 enum class ResolveResult { no_dependencies, verified, created, refreshed };

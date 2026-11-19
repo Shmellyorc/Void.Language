@@ -23,6 +23,11 @@ inline constexpr std::array<std::string_view, static_cast<unsigned>(Phase::count
     "native_object_emission", "jit_materialization", "cache_lookup", "cache_store",
     "toolchain_validation", "native_link_driver", "publication", "package_assembly"
 };
+// Optional editor details are separate from the versioned CLI phase schema.
+enum class EditorDetail : unsigned { inputs, candidates, formatting, publication, count };
+inline constexpr std::array<std::string_view, static_cast<unsigned>(EditorDetail::count)> editor_names{
+    "input_freshness", "candidates", "formatting", "response_publication"
+};
 struct Record {
     Clock::duration duration{};
     std::uint64_t count = 0;
@@ -32,6 +37,7 @@ struct Record {
 };
 struct Sink {
     std::array<Record, names.size()> records{};
+    std::array<Record, editor_names.size()> editor_records{};
     bool detailed = false;
     // Only the CLI installs this noexcept callback; compiler libraries default
     // to no sink. There is no output ownership or terminal logic in the phases.
@@ -52,28 +58,34 @@ public:
 };
 class Scope {
     Sink* sink;
-    Phase phase;
+    Record* record = nullptr;
     int exceptions = 0;
     bool failed = false;
 public:
-    explicit Scope(Phase value) noexcept : sink(active), phase(value) {
+    explicit Scope(Phase value) noexcept : sink(active) {
         if (!sink) return;
-        if (sink->enter) sink->enter(phase, sink->context);
+        if (sink->enter) sink->enter(value, sink->context);
         if (sink->detailed) {
-            auto& record = sink->records[static_cast<unsigned>(phase)];
-            if (record.depth++ == 0) record.start = Clock::now();
+            record = &sink->records[static_cast<unsigned>(value)];
+            if (record->depth++ == 0) record->start = Clock::now();
+            exceptions = std::uncaught_exceptions();
+        }
+    }
+    explicit Scope(EditorDetail value) noexcept : sink(active) {
+        if (sink && sink->detailed) {
+            record = &sink->editor_records[static_cast<unsigned>(value)];
+            if (record->depth++ == 0) record->start = Clock::now();
             exceptions = std::uncaught_exceptions();
         }
     }
     void fail() noexcept { failed = true; }
     void finish() noexcept {
         if (!sink) return;
-        if (sink->detailed) {
-            auto& record = sink->records[static_cast<unsigned>(phase)];
-            record.partial |= failed || std::uncaught_exceptions() > exceptions;
-            if (--record.depth == 0) {
-                record.duration += Clock::now() - record.start;
-                ++record.count;
+        if (record) {
+            record->partial |= failed || std::uncaught_exceptions() > exceptions;
+            if (--record->depth == 0) {
+                record->duration += Clock::now() - record->start;
+                ++record->count;
             }
         }
         sink = nullptr;

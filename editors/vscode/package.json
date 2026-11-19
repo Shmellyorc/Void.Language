@@ -225,7 +225,7 @@
     "typecheck": "tsc --noEmit",
     "compile": "tsc && node build.cjs",
     "build": "npm run typecheck && npm run compile",
-    "test": "npm run build && node --test out/test/config.test.js out/test/debugBuildReceipt.test.js",
+    "test": "npm run build && node --test out/test/config.test.js out/test/debugBuildReceipt.test.js out/test/diagnosticVersions.test.js",
     "test:host": "node out/test/runHost.js",
     "package": "npm run build && vsce package --no-dependencies --allow-missing-repository --out dist/void-language-0.1.2.vsix",
     "vscode:prepublish": "npm run build"

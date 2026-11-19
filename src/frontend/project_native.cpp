@@ -247,7 +247,9 @@ ProjectFiles prepare_native_package(const ProjectFiles& files,const NativeRequir
             {prefix+"NOTICE.txt",notice},{prefix+"void.native.toml",catalog}};
 }
 
-SelectedNative select_managed_native(const Manifest& manifest, const fs::path& project_root) {
+SelectedNative select_managed_native(const Manifest& manifest, const fs::path& project_root,
+    const CPrimitiveAdmission::Owner& editor_reuse,std::string_view catalog_identity,
+    const std::map<std::string,std::string>* verified_inputs) {
     const auto& requirement = *manifest.native_requirement();
     constexpr auto target=managed_native_target();
     if (target.empty()) throw std::runtime_error("Managed native providers are unsupported on this host.");
@@ -307,23 +309,43 @@ SelectedNative select_managed_native(const Manifest& manifest, const fs::path& p
     }
     if (!names.empty()) throw std::runtime_error("Missing managed native artifact: " + *names.begin());
 
-    const auto descriptor = verified_file(directory, plan.descriptor);
+    const auto identity=native_hash(catalog_bytes);
+    const bool reuse_inputs=editor_reuse && verified_inputs && identity==catalog_identity &&
+        editor_reuse->dynamic_root()==directory;
+    std::map<std::string,std::string> observed;
+    auto verify_input=[&](const NativeArtifact& file,bool image=false) -> const std::string& {
+        auto bytes=read_project_input(directory/utf8_path(file.name),static_cast<std::size_t>(file.size));
+        const auto old=reuse_inputs?verified_inputs->find(file.name):std::map<std::string,std::string>::const_iterator{};
+        const bool exact=reuse_inputs && old!=verified_inputs->end() && old->second==bytes;
+        if(bytes.size()!=file.size || (!exact && native_hash(bytes)!=file.sha256))
+            throw std::runtime_error("Managed native artifact identity mismatch: "+file.name);
+        if(image && !exact)verify_image(bytes,file.name,plan.target=="x86_64-pc-windows-msvc");
+        return observed.emplace(file.name,std::move(bytes)).first->second;
+    };
+    const auto& descriptor = verify_input(plan.descriptor);
     const bool windows = target == "x86_64-pc-windows-msvc";
     for (const auto& file : plan.runtime) {
         if (windows ? !file.name.ends_with(".dll") : file.name.find(".so") == file.name.npos)
             throw std::runtime_error("Invalid managed native runtime filename: " + file.name);
-        verify_image(verified_file(directory, file), file.name, windows);
+        (void)verify_input(file,true);
     }
     for (const auto* role : {&plan.link, &plan.notices})
-        for (const auto& file : *role) (void)verified_file(directory, file);
+        for (const auto& file : *role) (void)verify_input(file);
     std::vector<DynamicClosure::Payload> payload;
     for (const auto* role : {&plan.runtime, &plan.notices})
         for (const auto& file : *role) payload.push_back({file.name, file.sha256, file.size});
-    auto admission = CPrimitiveAdmission::admit_conventional(descriptor, directory, plan.library, plan.adapter, payload);
+    // Reuse immutable parsing only after the existing catalog, descriptor,
+    // artifact hashes, image checks and exact directory admission above pass.
+    // This editor-local hint never grants execution or skips file verification.
+    auto admission = editor_reuse && identity==catalog_identity &&
+        editor_reuse->dynamic_root()==directory && editor_reuse->descriptor()==descriptor
+        ? editor_reuse
+        : CPrimitiveAdmission::admit_conventional(descriptor, directory, plan.library, plan.adapter, payload);
     if (admission->provider() != plan.id || admission->target() != plan.target || admission->abi_revision() != plan.abi)
         throw std::runtime_error("Managed native descriptor does not match the approved provider, target or ABI.");
 
-    return {std::move(plan), std::move(admission), native_hash(catalog_bytes)};
+    return {std::move(plan), std::move(admission), identity,
+        std::make_shared<const std::map<std::string,std::string>>(std::move(observed))};
 }
 
 std::map<std::string, std::string> read_managed_payload(const CPrimitiveAdmission& native) {

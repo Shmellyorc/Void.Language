@@ -11,6 +11,7 @@ struct SelectedNative {
     NativeCatalog artifacts;
     CPrimitiveAdmission::Owner admission;
     std::string catalog_identity;
+    std::shared_ptr<const std::map<std::string,std::string>> input_bytes = {};
 };
 const NativeRequirement& verified_raylib_requirement();
 inline constexpr std::string_view verified_raylib_catalog = ".void/native";
@@ -18,7 +19,9 @@ inline constexpr std::string_view native_build_recipe = "native/void.build.toml"
 SemanticVersion parse_native_build_recipe(std::string_view);
 ProjectFiles prepare_native_package(const ProjectFiles&, const NativeRequirement&,
                                     const std::filesystem::path& clang, bool sanitize);
-SelectedNative select_managed_native(const Manifest&, const std::filesystem::path& project_root);
+SelectedNative select_managed_native(const Manifest&, const std::filesystem::path& project_root,
+    const CPrimitiveAdmission::Owner& editor_reuse = {}, std::string_view catalog_identity = {},
+    const std::map<std::string,std::string>* verified_inputs = nullptr);
 std::map<std::string, std::string> read_managed_payload(const CPrimitiveAdmission&);
 std::map<std::string, std::string> read_managed_link_inputs(const CPrimitiveAdmission&,
                                                           const std::vector<NativeArtifact>&);

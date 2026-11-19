@@ -91,6 +91,7 @@ struct Package {
     std::optional<GitDependency> git;
     Edges edges;
     PackageSources sources;
+    std::shared_ptr<const EditorPackageInputs> editor_inputs;
     std::size_t height = 0;
     std::string first_chain;
     SourceSpan first_span;
@@ -152,6 +153,7 @@ class Resolver {
     bool retain_sources;
     bool inspect_views;
     const std::vector<GitPin>* fetch;
+    const LockedDependencies* editor_reuse;
     using Directory = std::map<std::string, std::set<std::string>>;
     std::map<fs::path, Directory> directories;
     std::map<std::string, Package> packages;
@@ -380,7 +382,8 @@ class Resolver {
             tree.emplace(std::move(relative), directory);
         }
     }
-    std::string tree_digest(const std::string& locator, const Manifest& manifest, PackageSources& sources) {
+    std::string tree_digest(const std::string& locator, const Manifest& manifest, PackageSources& sources,
+        std::shared_ptr<const EditorPackageInputs>& cache) {
         const auto path = root / utf8_path(locator);
         Tree tree;
         inventory(path, "", 0, tree);
@@ -389,22 +392,39 @@ class Resolver {
             fail(Code::project_entry, "Package entry is unavailable or crosses a nested project boundary: " + *manifest.package_entry());
         Digest digest;
         digest.field("void-package-tree-v1");
+        std::shared_ptr<const EditorPackageInputs> previous;
+        if(editor_reuse)if(auto found=editor_reuse->packages().find(manifest.package()->id);
+            found!=editor_reuse->packages().end() && found->second.locator==locator)previous=found->second.editor_inputs;
+        const bool remember=retain_sources || bool(previous);
+        auto observed=remember?std::make_shared<EditorPackageInputs>():nullptr;
+        bool same=previous && previous->files.size()==tree.size();
         std::size_t bytes = 0;
         for (const auto& [name, is_boundary] : tree) {
-            digest.field(is_boundary ? "boundary" : "file");
-            digest.field(name);
-            if (is_boundary) continue;
+            if(!remember){digest.field(is_boundary ? "boundary" : "file");digest.field(name);}
+            if (is_boundary) {
+                if(observed)observed->files.emplace(name,std::nullopt);
+                if(same){auto old=previous->files.find(name);same=old!=previous->files.end() && !old->second;}
+                continue;
+            }
             auto contents = input(path / utf8_path(name), std::min(package_bytes - bytes, total_bytes - hashed_bytes));
             if (name == manifest_name && contents != manifest.source().text())
                 fail(Code::project_changed, "Dependency manifest changed during resolution; retry.");
             bytes += contents.size();
             hashed_bytes += contents.size();
-            digest.field(contents);
+            if(observed)observed->files.emplace(name,contents);
+            else digest.field(contents);
+            if(same){auto old=previous->files.find(name);same=old!=previous->files.end() && old->second && *old->second==contents;}
             if (retain_sources && name.ends_with(".void")) sources.emplace(name, std::move(contents));
         }
         if (!tree.contains(std::string(manifest_name)))
             fail(Code::project_changed, "Dependency manifest disappeared during resolution; retry.");
-        return digest.finish();
+        if(same){cache=previous;return previous->digest;}
+        if(observed)for(const auto& [name,contents]:observed->files) {
+            digest.field(contents?"file":"boundary");digest.field(name);if(contents)digest.field(*contents);
+        }
+        auto result=digest.finish();
+        if(observed){observed->digest=result;cache=std::move(observed);}
+        return result;
     }
 
     std::size_t resolve_edges(const Manifest& manifest, const std::string& declaring, Edges& edges, std::size_t depth) {
@@ -444,7 +464,7 @@ class Resolver {
                     node.git = GitDependency{*pin, relative_to(physical, snapshots.at(*pin).tree)};
                 node.version = package.version.text();
                 node.manifest_digest = sha256(selected.source().text());
-                node.tree_digest = tree_digest(locator, selected, node.sources);
+                node.tree_digest = tree_digest(locator, selected, node.sources,node.editor_inputs);
                 node.first_chain = chain();
                 node.first_span = trace.back().span("path");
                 active.insert(locator);
@@ -461,8 +481,8 @@ class Resolver {
 
 public:
     explicit Resolver(const fs::path& selected_root, const Manifest* manifest = nullptr, bool keep = false,
-                      const std::vector<GitPin>* authorized_pins = nullptr,bool views=true)
-        : root(selected_root), effective_root(manifest), retain_sources(keep), inspect_views(views), fetch(authorized_pins) {}
+                      const std::vector<GitPin>* authorized_pins = nullptr,bool views=true,const LockedDependencies* reuse=nullptr)
+        : root(selected_root), effective_root(manifest), retain_sources(keep), inspect_views(views), fetch(authorized_pins),editor_reuse(reuse) {}
 
     std::size_t publish(const CreationRoot& admitted) const {
         for (const auto& pin : pending) publish_git_snapshot(admitted, pin, snapshots.at(pin));
@@ -475,7 +495,7 @@ public:
             auto entry = *manifests.at(package.path)->package_entry();
             auto locator=managed_locators.contains(id)?managed_locators.at(id):std::move(package.path);
             result.emplace(id, LockedPackage{std::move(locator), std::move(entry),
-                std::move(package.edges), std::move(package.sources)});
+                std::move(package.edges), std::move(package.sources),std::move(package.editor_inputs)});
         }
         return result;
     }
@@ -485,7 +505,9 @@ public:
         if (!fetch && manifest.native_requirement()) {
             const auto& requirement = *manifest.native_requirement();
             try {
-                native = select_managed_native(manifest, root);
+                native = select_managed_native(manifest, root,editor_reuse?editor_reuse->native():CPrimitiveAdmission::Owner{},
+                    editor_reuse?editor_reuse->native_catalog_identity():std::string{},
+                    editor_reuse && editor_reuse->editor_native_inputs()?editor_reuse->editor_native_inputs().get():nullptr);
             } catch (const std::invalid_argument& error) {
                 native_selection_failed(manifest, requirement, error.what());
             } catch (const std::runtime_error& error) {
@@ -701,7 +723,7 @@ void require_outside_user_package_store(const fs::path& path) {
 }
 
 std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
-    const fs::path& requested, const Manifest& manifest, bool retain_sources) {
+    const fs::path& requested, const Manifest& manifest, bool retain_sources,const LockedDependencies* editor_reuse) {
     observation::Scope timing(observation::Phase::dependency_verification);
     require_no_package_edit(requested);
     if (manifest.dependencies().empty() && !manifest.native_requirement()) return {};
@@ -709,7 +731,7 @@ std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
     const auto previous = read_dependency_lock(root.path);
     if (!previous) missing_lock();
     require_lock_shape(*previous);
-    Resolver resolver(root.path, &manifest, retain_sources);
+    Resolver resolver(root.path, &manifest, retain_sources,nullptr,true,editor_reuse);
     if (resolver.capture().lock != *previous) stale_lock();
     if (inspect_creation_root(root.path).identity != root.identity || read_dependency_lock(root.path) != previous)
         throw std::runtime_error("Project root or dependency lock changed during verification; retry.");
@@ -722,8 +744,14 @@ std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
         plan->native_catalog_identity_ = std::move(native->catalog_identity);
         plan->root_identity_ = root.identity;
         plan->native_link_inputs_ = std::move(native->artifacts.link);
+        plan->editor_native_inputs_ = std::move(native->input_bytes);
     }
     return plan;
+}
+
+std::shared_ptr<const LockedDependencies> verify_locked_dependencies(
+    const fs::path& requested,const Manifest& manifest,bool retain_sources) {
+    return verify_locked_dependencies(requested,manifest,retain_sources,nullptr);
 }
 
 ResolveResult resolve_dependencies(const fs::path& requested, ResolveMode mode) {

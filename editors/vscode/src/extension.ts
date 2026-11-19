@@ -11,6 +11,7 @@ import {DebugBuildReceipts} from './debugBuildReceipt';
 import {plainStatusCapability} from './config';
 import {libraryCommands} from './libraryManagement';
 import {createProtocolTrace, DiagnosticLog} from './editorLog';
+import {versionedDiagnostics} from './versionedDiagnostics';
 
 let manager: ServerManager | undefined;
 let creation: CreationWorkflow | undefined;
@@ -420,33 +421,29 @@ class ServerManager {
         };
         this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(project.root, project.manifestMode ? '**/*' : '**/*.void'));
         const clientOptions: LanguageClientOptions = {
-            initializationOptions: {voidGuardedFixes: true, voidInteractivePresentation: true},
+            initializationOptions: {voidGuardedFixes: true, voidInteractivePresentation: true, voidIncrementalSync: true},
             documentSelector: [selector, ...(project.manifestMode ? [{scheme: 'file', pattern: {baseUri: vscode.Uri.file(project.root).toString(), pattern: '**/void.project.toml'}}] : [])],
             synchronize: {fileEvents: this.watcher},
-            middleware: {handleDiagnostics: (uri, diagnostics, next) => {
-                if (this.client !== client) return;
-                next(uri, diagnostics);
-                this.diagnostics.update(uri, diagnostics);
-            }, provideDefinition: async (document, position, token, next) => {
-                const epoch = this.epoch; const result = await next(document, position, token);
-                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
+            middleware: {provideDefinition: async (document, position, token, next) => {
+                const epoch = this.epoch, version = document.version; const result = await next(document, position, token);
+                return !token.isCancellationRequested && !document.isClosed && document.version === version && this.client === client && epoch === this.epoch ? result : null;
             }, provideHover: async (document, position, token, next) => {
-                const epoch = this.epoch; const result = await next(document, position, token);
-                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
+                const epoch = this.epoch, version = document.version; const result = await next(document, position, token);
+                return !token.isCancellationRequested && !document.isClosed && document.version === version && this.client === client && epoch === this.epoch ? result : null;
             }, provideCompletionItem: async (document, position, context, token, next) => {
                 const epoch = this.epoch, version = document.version;
                 const result = await next(document, position, context, token);
                 return !token.isCancellationRequested && !document.isClosed && document.version === version &&
                     this.client === client && epoch === this.epoch ? result : null;
             }, provideReferences: async (document, position, context, token, next) => {
-                const epoch = this.epoch; const result = await next(document, position, context, token);
-                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
+                const epoch = this.epoch, version = document.version; const result = await next(document, position, context, token);
+                return !token.isCancellationRequested && !document.isClosed && document.version === version && this.client === client && epoch === this.epoch ? result : null;
             }, provideSignatureHelp: async (document, position, context, token, next) => {
-                const epoch = this.epoch; const result = await next(document, position, context, token);
-                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
+                const epoch = this.epoch, version = document.version; const result = await next(document, position, context, token);
+                return !token.isCancellationRequested && !document.isClosed && document.version === version && this.client === client && epoch === this.epoch ? result : null;
             }, provideDocumentSymbols: async (document, token, next) => {
-                const epoch = this.epoch; const result = await next(document, token);
-                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
+                const epoch = this.epoch, version = document.version; const result = await next(document, token);
+                return !token.isCancellationRequested && !document.isClosed && document.version === version && this.client === client && epoch === this.epoch ? result : null;
             }, provideDocumentSemanticTokens: async (document, token, next) => {
                 const epoch = this.epoch;
                 const version = document.version;
@@ -457,8 +454,8 @@ class ServerManager {
                 const epoch = this.epoch; const result = await next(query, token);
                 return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
             }, prepareRename: async (document, position, token, next) => {
-                const epoch = this.epoch; const result = await next(document, position, token);
-                return !token.isCancellationRequested && this.client === client && epoch === this.epoch ? result : null;
+                const epoch = this.epoch, version = document.version; const result = await next(document, position, token);
+                return !token.isCancellationRequested && !document.isClosed && document.version === version && this.client === client && epoch === this.epoch ? result : null;
             }, provideRenameEdits: async (document, position, newName, token, next) => {
                 const epoch = this.epoch;
                 const before = new Map(vscode.workspace.textDocuments.map(d => [d.uri.toString(), {document:d, version:d.version}]));
@@ -503,6 +500,8 @@ class ServerManager {
         };
         const client = new LanguageClient('void', 'VOID', serverOptions, clientOptions);
         this.client = client; this.project = project;
+        versionedDiagnostics(client, () => this.client === client && !this.disposed,
+            (uri, diagnostics) => this.diagnostics.update(uri, diagnostics));
         const changed = () => { ++this.epoch; };
         this.watcher.onDidCreate(changed); this.watcher.onDidChange(changed); this.watcher.onDidDelete(changed);
         if (project.manifestMode) client.onNotification('void/projectState', (state: {schema?: number; mode?: string; root?: string; selectionRevision?: string; entry?: string|null; status?: string; kind?: string}) => {

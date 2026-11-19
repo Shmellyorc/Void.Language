@@ -55,6 +55,26 @@ rename require ordinary validated analysis. Broken imports, ambiguous project
 selection and edits that leave a receiver or binding unresolved can withhold
 assistance until the source is repaired.
 
+### Readable and responsive IntelliSense
+
+Callable completion details include compact parameter and return types, for
+example `fade(color_value: color, alpha: f32) -> color`. Hover and completion
+documentation retain the authored descriptions. Short type names are editor
+presentation; source navigation and compiler bindings retain canonical identities.
+Parameter help highlights the compiler-selected argument, including named calls.
+The existing documented-parameter rules below still apply.
+
+The VS Code extension negotiates incremental UTF-16 document updates and filters
+late responses and diagnostics against the current document. Unchanged namespace
+declarations can be reused during body edits, with current source, project and
+dependency inputs verified before reuse. Expensive assistance runs separately
+from protocol input, so cancellation and newer edits remain responsive. Existing
+complete tokens before an edit keep their coloring while new analysis runs.
+
+Cold opens, declaration/import changes and uncertain receiver contexts can need
+fresh analysis. See the [G76 measurements and qualification](projects/G76_INTELLISENSE.md)
+for separate server, provider and rendered-editor evidence and platform limits.
+
 ### Enum member completion
 
 Type `process_type.` in an expression, a return statement or a `match` arm.

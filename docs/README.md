@@ -91,6 +91,8 @@ The ordinary CLI entry is synchronous; async examples use the explicit host abov
 
 ## Engineering documentation
 
+- [G76 IntelliSense implementation and qualification](projects/G76_INTELLISENSE.md):
+  readable signatures, versioned assistance, incremental reuse and measured editor responsiveness.
 - [Worktree management](WORKTREE_MANAGEMENT.md): standard linked-worktree
   location, ownership, preservation, Git relocation and retirement procedures.
 - [G75 CLI experience implementation and qualification](projects/G75_CLI_EXPERIENCE_IMPLEMENTATION.md):

@@ -179,6 +179,10 @@ class ProjectAnalysis {
     std::shared_ptr<const ValidatedAnalysis> program_, semantic_;
     std::map<std::string, SourceFile> discovery_, execution_;
     std::string selection_key_, context_key_;
+    std::map<std::string,std::vector<std::string>> editor_listings_;
+    std::map<std::string,bool> editor_boundaries_;
+    bool editor_automatic_ = false;
+    std::shared_ptr<const project::LockedDependencies> editor_dependencies_;
     ProjectAnalysis() = default;
 public:
     const auto& root() const { return root_; }
@@ -191,6 +195,10 @@ public:
     const auto& selection_key() const { return selection_key_; }
     const auto& context_key() const { return context_key_; } // Includes locked inputs, excludes root source and manifest trivia.
 };
+// Re-admit current filesystem/locked inputs without parsing or binding. Only
+// the named document may differ; its exact bytes/context are checked by callers.
+bool editor_project_inputs_current(const ProjectAnalysis&, const SourceOverrides&,
+    const ManifestOverrides&, const EditorDiscovery&, std::string_view changed_document = {});
 struct ProjectAnalysisResult {
     std::shared_ptr<const ProjectAnalysis> project;
     std::vector<Diagnostic> diagnostics;
@@ -244,6 +252,9 @@ struct EditorAssistance {
     std::vector<std::string> parameters;
     unsigned active_parameter = 0;
     std::size_t begin = 0, end = 0;
+    // Owned observations from this probe, including its frozen overlays. This
+    // grants no compilation/execution authority and never refers to parser ASTs.
+    std::function<bool()> inputs_current;
 };
 // Cheap probe against an already verified namespace. Unknown context delegates
 // to the ordinary compiler probe.
@@ -256,6 +267,7 @@ bool valid_editor_identifier(const std::string&);
 EditorAssistance project_editor_assistance(const std::filesystem::path&,const std::optional<std::string>&,const SourceOverrides&,const ManifestOverrides&,const std::string&,std::size_t,const EditorDiscovery& = {});
 EditorAssistance document_editor_assistance(const std::filesystem::path& context, const SourceOverrides&,
     const std::string& module, std::size_t cursor, const ManifestOverrides* manifests = nullptr);
+bool editor_assistance_inputs_current(const EditorAssistance&);
 std::optional<std::string> format_source(const SourceFile&, bool insert_spaces = true);
 // One source pipeline shared by checking, JIT and AOT. Errors contain rendered
 // source diagnostics and are raised before invoking any backend.

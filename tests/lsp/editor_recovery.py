@@ -86,7 +86,7 @@ def run(server, compiler):
             recovered = roles(client, main, BROKEN, legend)
             assert recovered == initial - {(14, 'is_running', 'property')}, (initial, recovered)
             hover = query(client, 'hover', main, BROKEN, 'game =')
-            assert hover['contents']['value'] == 'game: /app.void::app', hover
+            assert hover['contents']['value'] == 'game: app', hover
             definition = query(client, 'definition', main, BROKEN, 'app()')
             assert definition['uri'] == app.as_uri(), definition
             assert request(client, 'textDocument/formatting', {'textDocument': {'uri': main.as_uri()},
@@ -317,7 +317,11 @@ def run_interactive(server, root, path, original):
             text = valid.replace('    local.x -= 1', '    library.')
             client.notify('textDocument/didChange', {'textDocument': {'uri': path.as_uri(), 'version': version + 2},
                           'contentChanges': [{'text': text}]})
-            assert not labels(client, path, text, '    library.')
+            offset = text.index('    library.') + len('    library.')
+            before = text[:offset]
+            response, _ = client.request('textDocument/completion', {'textDocument': {'uri': path.as_uri()},
+                'position': {'line': before.count('\n'), 'character': len(before.rsplit('\n', 1)[-1])}})
+            assert response.get('error', {}).get('code') == -32801, 'changed locked inputs must be rejected'
         finally:
             installed.write_bytes(original)
         client.notify('workspace/didChangeWatchedFiles', {'changes': [{'uri': installed.as_uri(), 'type': 2}]})

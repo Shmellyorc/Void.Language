@@ -3,6 +3,7 @@
 #include "void/project_creation.hpp"
 #include "void/numeric.hpp"
 #include "void/path.hpp"
+#include "void/compiler_observation.hpp"
 #include <bit>
 #include <array>
 #include <llvm/Support/JSON.h>
@@ -18,7 +19,10 @@
 #include <chrono>
 #include <functional>
 #include <future>
+#include <deque>
 #include <cerrno>
+#include <cstdlib>
+#include <mutex>
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
@@ -147,9 +151,18 @@ bool bounded_json(const std::string& text) {
     return true; // Resource guard only. LLVM JSON performs all syntax validation.
 }
 void send(j::Value value) {
+    vd::observation::Scope timing(vd::observation::EditorDetail::publication);
     std::string body; llvm::raw_string_ostream out(body); out<<value;
     std::cout<<"Content-Length: "<<body.size()<<"\r\n\r\n"<<body<<std::flush;
     if(!std::cout) throw FramingError("Protocol output disconnected");
+}
+void send_result(const j::Value& id,const std::string& result) {
+    vd::observation::Scope timing(vd::observation::EditorDetail::publication);
+    // Result bytes came from LLVM's JSON serializer for this exact snapshot.
+    std::string prefix;llvm::raw_string_ostream out(prefix);out<<id;
+    prefix="{\"jsonrpc\":\"2.0\",\"id\":"+prefix+",\"result\":";
+    std::cout<<"Content-Length: "<<prefix.size()+result.size()+1<<"\r\n\r\n"<<prefix<<result<<'}'<<std::flush;
+    if(!std::cout)throw FramingError("Protocol output disconnected");
 }
 void error(const j::Value& id,int code,const std::string& message) {
     send(j::Object{{"jsonrpc","2.0"},{"id",id},{"error",j::Object{{"code",code},{"message",message}}}});
@@ -202,6 +215,64 @@ j::Object project_summary(const fs::path& root,const vd::ProjectAnalysisResult& 
         {"discoveryCount",static_cast<std::int64_t>(state?state->discovery.size():0)},{"executionCount",static_cast<std::int64_t>(state?state->execution.size():0)},
         {"diagnosticCount",static_cast<std::int64_t>(result.diagnostics.size())},{"diagnostics",std::move(errors)}};
 }
+// Presentation alone shortens nominal names. Canonical identities, bindings,
+// diagnostics, edit targets and compiler type/compatibility contracts stay intact.
+std::string display_text(std::string text,bool compact=false) {
+    std::size_t at=0;
+    while((at=text.find('/',at))!=std::string::npos) {
+        const auto end=text.find(".void::",at);
+        if(end!=std::string::npos && text.find_first_of(" \t\r\n<>,()[]{}",at)>=end) {
+            text.erase(at,end+7-at);
+        } else ++at;
+    }
+    if(compact) {
+        std::string summary;
+        for(std::size_t begin=0;begin<text.size();) {
+            const auto end=text.find('\n',begin);
+            auto line=text.substr(begin,end==std::string::npos?std::string::npos:end-begin);
+            if(line.starts_with("public "))line.erase(0,7);
+            const bool metadata=line.starts_with("Effects:") || line.starts_with("Declared by ") || line=="Selected specializations:";
+            if(!line.empty() && !metadata && (summary.empty() || (line.find('(')!=std::string::npos && line.find(')')!=std::string::npos))) {
+                if(!summary.empty())summary+=" | ";
+                summary+=line;
+            }
+            if(end==std::string::npos)break;
+            begin=end+1;
+        }
+        text=std::move(summary);
+    }
+    return text;
+}
+// Opt-in, stderr-only developer profiling; never part of protocol responses.
+struct QueryProfile {
+    bool enabled=std::getenv("VOID_LSP_PROFILE") && std::string_view(std::getenv("VOID_LSP_PROFILE"))=="1";
+    vd::observation::Sink sink;
+    vd::observation::Binding binding{enabled?&sink:vd::observation::active};
+    std::string method;
+    std::chrono::steady_clock::time_point start=enabled?std::chrono::steady_clock::now():std::chrono::steady_clock::time_point{};
+    static void emit(const std::string& line) {
+        static std::mutex mutex;
+        std::lock_guard lock(mutex);std::cerr<<line<<std::flush;
+    }
+    explicit QueryProfile(std::string name):method(std::move(name)){
+        sink.detailed=enabled;
+        if(enabled)emit("VOID_LSP_PROFILE_BEGIN "+method+"\n");
+    }
+    ~QueryProfile() {
+        if(!enabled)return;
+        j::Object phases;
+        for(std::size_t i=0;i<sink.records.size();++i)if(sink.records[i].count)
+            phases[std::string(vd::observation::names[i])]=j::Object{{"us",vd::observation::microseconds(sink.records[i].duration)},
+                {"count",static_cast<std::int64_t>(sink.records[i].count)}};
+        for(std::size_t i=0;i<sink.editor_records.size();++i)if(sink.editor_records[i].count)
+            phases[std::string(vd::observation::editor_names[i])]=j::Object{{"us",vd::observation::microseconds(sink.editor_records[i].duration)},
+                {"count",static_cast<std::int64_t>(sink.editor_records[i].count)}};
+        std::string line;llvm::raw_string_ostream stream(line);
+        stream<<j::Value(j::Object{{"method",method},{"us",vd::observation::microseconds(std::chrono::steady_clock::now()-start)},
+            {"inclusivePhases",std::move(phases)}});
+        emit("VOID_LSP_PROFILE "+line+"\n");
+    }
+};
 class Server {
     enum class State { initial, waiting, ready, shutdown } state=State::initial;
     struct Document { std::int64_t version; std::string uri; std::optional<vd::SourceFile> source; };
@@ -214,17 +285,44 @@ class Server {
     bool dirty=false;
     std::int64_t process_id=0;
     std::set<std::string> cancellations;
-    bool related_information=false, diagnostic_versions=false, rename_edits=false, signature_plaintext=false;
+    bool related_information=false, diagnostic_versions=false, rename_edits=false, signature_plaintext=false, signature_offsets=false;
     bool guarded_fixes=false;
     bool semantic_full=false, semantic_refresh=false, semantic_requested=false;
     bool semantic_refresh_pending=false, semantic_refresh_needed=false;
-    bool interactive=false, catalog_current=false;
+    bool interactive=false, catalog_current=false, incremental_sync=false;
     using Clock=std::chrono::steady_clock;
     Clock::time_point analyze_after{};
     std::future<std::shared_ptr<const vd::SessionAnalysis>> worker;
     struct DisplayTokens {vd::SourceFile source; std::vector<vd::SemanticToken> tokens;};
     std::map<std::string,DisplayTokens> displayed;
+    struct ProbeCache {
+        vd::ProjectSnapshot snapshot;
+        std::string module;
+        std::size_t offset;
+        vd::EditorAssistance result;
+        std::shared_ptr<const vd::SessionAnalysis> basis;
+        std::string encoded;
+    };
+    std::array<std::optional<ProbeCache>,2> probes;
+    struct AssistanceJob {
+        j::Value id;
+        std::string method,module;
+        vd::SourceFile source;
+        std::size_t offset;
+        vd::ProjectSnapshot snapshot;
+        std::function<vd::EditorAssistance()> compute;
+        std::future<vd::EditorAssistance> work;
+        bool answered=false;
+    };
+    std::deque<AssistanceJob> assistance_jobs;
+    std::optional<j::Value> handling_id;
+    bool deferred_response=false;
+    std::optional<std::string> prepared_response;
     void changed() {
+        for(auto& probe:probes)probe.reset();
+        for(auto& job:assistance_jobs)if(!job.answered && !job.snapshot.same_revision(session.select())) {
+            error(job.id,-32801,"Document or project changed during assistance");job.answered=true;
+        }
         dirty=true;
         analyze_after=Clock::now()+std::chrono::milliseconds(65);
     }
@@ -243,7 +341,6 @@ class Server {
         std::size_t tail=0;
         while(tail<maximum && before[before.size()-1-tail]==after[after.size()-1-tail])++tail;
         const auto& lines=cached.source.line_starts();
-        const auto prefix_line=*std::prev(std::upper_bound(lines.begin(),lines.end(),head));
         auto suffix_line=std::lower_bound(lines.begin(),lines.end(),before.size()-tail);
         auto suffix=suffix_line==lines.end()?before.size():*suffix_line;
         // Never reuse part of a changed line, or a line joined by a newline deletion.
@@ -254,7 +351,15 @@ class Server {
             suffix=*suffix_line;
         }
         std::erase_if(cached.tokens,[&](auto& token) {
-            if(token.end<=prefix_line)return false;
+            // Unchanged complete tokens before the edit keep their semantic
+            // role even on the edited line. Do not color a partial identifier
+            // after a name has been extended at the edit boundary.
+            if(token.end<=head) {
+                const auto c=head<after.size()?static_cast<unsigned char>(after[head]):0;
+                const bool extends_name=token.end==head && (c=='_' || (c>='a' && c<='z') ||
+                    (c>='A' && c<='Z') || (c>='0' && c<='9') || c>=128);
+                if(!extends_name)return false;
+            }
             if(token.begin<suffix)return true;
             token.begin=after.size()-(before.size()-token.begin);
             token.end=after.size()-(before.size()-token.end);
@@ -339,7 +444,14 @@ class Server {
             [](const auto& d){return d.code==vd::DiagnosticCode::project_changed || d.code==vd::DiagnosticCode::project_boundary;});
         if(!result->project_root_available() || rejected_dependency || session.requires_reselection()) {
             displayed.clear();
-            catalog_current=false;
+            // A local syntax error has no accepted executable selection. It
+            // need not discard a verified namespace catalog: every reuse below
+            // re-admits inputs and proves the unchanged surrounding source.
+            if(!result->project_root_available() || rejected_dependency ||
+               (result->project() && result->project()->project && !session.matches_selection(*result->project()->project)) ||
+               std::any_of(result->result().diagnostics.begin(),result->result().diagnostics.end(),[](const auto& d) {
+                   return d.code==vd::DiagnosticCode::import_path || d.code==vd::DiagnosticCode::import_read;
+               }))catalog_current=false;
         }
         std::map<std::string,j::Array> groups;
         std::map<std::string,std::string> package_uris;
@@ -536,7 +648,7 @@ class Server {
         case K::interface_type:return 11;case K::value_field:case K::managed_field:return 8;case K::type_parameter:return 26;default:return 13;}
     }
     static std::string describe(const vd::AnalyzedDeclaration& d) {
-        if(!d.signature.empty())return d.signature;
+        if(!d.signature.empty())return display_text(d.signature);
         if(d.identity.ends_with("::$module"))return "module "+d.module;
         auto label=name_of(d);using K=vd::AnalyzedDeclaration::Kind;
         if(d.kind==K::function || d.kind==K::receiver_method || d.kind==K::initializer || d.kind==K::interface_requirement){
@@ -556,7 +668,7 @@ class Server {
                 label+=" = "+std::to_string(std::bit_cast<std::int64_t>(bits));
             }else label+=" = "+std::to_string(bits);
         }
-        return label;
+        return display_text(std::move(label));
     }
     const vd::SourceFile* source_in(const vd::ValidatedAnalysis& program,const std::string& id) const {
         for(const auto& m:program.modules())if(m.identity==id)return &m.source;return nullptr;
@@ -614,6 +726,57 @@ class Server {
             catch(const std::exception&){return false;}
         }
         return true;
+    }
+    j::Value assistance_result(const std::string& method,const std::string& module,
+        const vd::SourceFile* source,const vd::EditorAssistance& assistance) const {
+        vd::observation::Scope timing(vd::observation::EditorDetail::formatting);
+        if(method=="textDocument/signatureHelp") {
+            if(assistance.signature.empty())return nullptr;
+            const bool no_parameters=assistance.multiple_return_signature && assistance.parameters.empty();
+            if(!no_parameters && assistance.active_parameter>=assistance.parameters.size())return nullptr;
+            if(!assistance.constructor_signature && !assistance.multiple_return_signature &&
+               (assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty()))return nullptr;
+            const auto signature=display_text(assistance.signature,true);
+            std::size_t parameter_at=signature.find('(')+1;
+            j::Array parameters;for(std::size_t n=0;n<assistance.parameters.size();++n) {
+                auto label=display_text(assistance.parameters[n],true);
+                j::Object parameter{{"label",label}};
+                if(signature_offsets)if(const auto begin=signature.find(label,parameter_at);begin!=std::string::npos) {
+                    parameter_at=begin+label.size();
+                    auto units=[&](std::size_t bytes){return Positions(vd::SourceFile("<signature>",signature.substr(0,bytes))).position(bytes)->character;};
+                    parameter["label"]=j::Array{units(begin),units(parameter_at)};
+                }
+                if(n==assistance.active_parameter && n<assistance.parameter_documentation.size() && !assistance.parameter_documentation[n].empty()) {
+                    if(signature_plaintext)parameter["documentation"]=j::Object{{"kind","plaintext"},{"value",assistance.parameter_documentation[n]}};
+                    else parameter["documentation"]=assistance.parameter_documentation[n];
+                }
+                parameters.push_back(std::move(parameter));
+            }
+            j::Object help{{"signatures",j::Array{j::Object{{"label",signature},{"parameters",std::move(parameters)}}}},{"activeSignature",0}};
+            if(!no_parameters)help["activeParameter"]=assistance.active_parameter;
+            return help;
+        }
+        j::Array items;
+        if(!assistance.candidates.empty()) {
+            const j::Value edit_range=range({std::make_shared<const vd::SourceFile>(*source),module,assistance.begin,assistance.end});
+            for(const auto& c:assistance.candidates)items.push_back(j::Object{{"label",c.name},{"kind",c.kind},{"detail",display_text(c.detail,true)},{"documentation",c.documentation},
+                {"textEdit",j::Object{{"range",edit_range},{"newText",c.insert_text.empty()?c.name:c.insert_text}}}});
+        }
+        if(assistance.import_context || assistance.incomplete)return j::Object{{"isIncomplete",assistance.incomplete},{"items",std::move(items)}};
+        return items;
+    }
+    bool probe_inputs_current(const std::shared_ptr<const vd::SessionAnalysis>& known,
+        const vd::ProjectSnapshot& snapshot,const std::string& module) const {
+        if(!known)return false;
+        if(manifest_mode)return known->project() && known->project()->project &&
+            vd::editor_project_inputs_current(*known->project()->project,snapshot.overrides(),snapshot.manifests(),snapshot.discovery(),module);
+        return known->semantic_analysis() && disk_current(*known->semantic_analysis(),true);
+    }
+    void remember_probe(const std::string& method,const std::string& module,std::size_t offset,
+        const vd::SourceFile& source,const vd::ProjectSnapshot& snapshot,const vd::EditorAssistance& result,
+        std::shared_ptr<const vd::SessionAnalysis> basis) {
+        std::string encoded;llvm::raw_string_ostream stream(encoded);stream<<assistance_result(method,module,&source,result);
+        probes[method=="textDocument/signatureHelp"?1:0]=ProbeCache{snapshot,module,offset,result,std::move(basis),std::move(encoded)};
     }
     j::Value editor_query(const std::string& method,const j::Object& params) {
         auto current=session.current_analysis();
@@ -686,13 +849,31 @@ class Server {
         if(method=="textDocument/completion" || method=="textDocument/signatureHelp") {
             auto overlays=snapshot.overrides();
             if(module.starts_with("/@stdlib/"))return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
-            if(program)for(const auto& m:program->modules())if(!read_only_source(m.identity))overlays.insert_or_assign(m.identity,m.source);
             if(vd::package_source(module)) {
                 if(!current || !current->semantic_analysis() || !disk_current(*current->semantic_analysis()))
                     return method=="textDocument/completion"?j::Value(j::Array{}):j::Value(nullptr);
             } else overlays.insert_or_assign(module,*source); // Position conversion and probe share exact bytes.
             std::optional<vd::EditorAssistance> cached;
-            if(interactive && catalog_current && method=="textDocument/completion" && !read_only_source(module)) {
+            auto basis=current && current->semantic_analysis()?current:catalog_current?session.last_success():nullptr;
+            auto inputs_current=[&](const std::shared_ptr<const vd::SessionAnalysis>& known) {
+                return probe_inputs_current(known,snapshot,module);
+            };
+            auto& memo=probes[method=="textDocument/signatureHelp"?1:0];
+            if(interactive && memo && memo->snapshot.same_revision(snapshot) && memo->module==module && memo->offset==*offset) {
+                const bool current_inputs=memo->result.inputs_current?
+                    vd::editor_assistance_inputs_current(memo->result):inputs_current(memo->basis);
+                if(!current_inputs) {
+                    session.refresh();context_changed();
+                    error(*handling_id,-32801,"Project inputs changed; assistance is being refreshed");
+                    deferred_response=true;return nullptr;
+                }
+                // A cached read performs one complete fresh input capture. It
+                // does not re-run validation a second time while serializing
+                // the same immutable result. The outer root guard still runs.
+                prepared_response=memo->encoded;
+                return nullptr;
+            }
+            if(interactive && catalog_current && method=="textDocument/completion" && open.contains(module) && !read_only_source(module)) {
                 if(const auto& last=session.last_success();last && last->semantic_analysis()) {
                     const auto& known=*last->semantic_analysis();
                     const bool other_changes=std::any_of(overlays.begin(),overlays.end(),[&](const auto& change) {
@@ -700,38 +881,42 @@ class Server {
                         const auto* previous=source_in(known,change.first);
                         return !change.second || !previous || previous->text()!=change.second->text();
                     });
-                    if(!other_changes)cached=vd::editor_namespace_assistance(known,*source,module,*offset);
+                    if(!cached && !other_changes && inputs_current(last))cached=vd::editor_namespace_assistance(known,*source,module,*offset);
                 }
+            }
+            if(interactive && !cached) {
+                if(assistance_jobs.size()>=64) {
+                    error(*handling_id,-32802,"Assistance queue is full; retry the current document");
+                } else {
+                    const auto compute=[context,overlays=std::move(overlays),snapshot,module,offset=*offset,
+                        closed_source=open.contains(module)?std::optional<vd::SourceFile>{}:std::optional(*source),
+                        document,manifest=manifest_mode,requested=requested_root,entry=entry_path]() {
+                        QueryProfile profile("assistance/analysis");
+                        auto result=document?vd::document_editor_assistance(context,overlays,module,offset,manifest?&snapshot.manifests():nullptr)
+                            :manifest?vd::project_editor_assistance(requested,snapshot.entry_override(),overlays,snapshot.manifests(),module,offset,snapshot.discovery())
+                            :vd::editor_assistance(entry,overlays,module,offset);
+                        // The probe's repaired overlay freezes its coordinates.
+                        // A closed target still belongs to disk, not that overlay.
+                        if(closed_source)result.inputs_current=[check=std::move(result.inputs_current),closed_source] {
+                            return check && check() && vd::read_source(vd::utf8_path(closed_source->path())).text()==closed_source->text();
+                        };
+                        return result;
+                    };
+                    assistance_jobs.push_back(AssistanceJob{*handling_id,method,module,*source,*offset,snapshot,compute,{},false});
+                }
+                deferred_response=true;
+                return nullptr;
             }
             auto assistance=cached?std::move(*cached):document?vd::document_editor_assistance(context,overlays,module,*offset,manifest_mode?&snapshot.manifests():nullptr)
                 :manifest_mode?vd::project_editor_assistance(requested_root,snapshot.entry_override(),overlays,snapshot.manifests(),module,*offset,snapshot.discovery())
                 :vd::editor_assistance(entry_path,overlays,module,*offset);
-            if(method=="textDocument/signatureHelp") {
-                if(assistance.signature.empty())return nullptr;
-                const bool no_parameters=assistance.multiple_return_signature && assistance.parameters.empty();
-                if(!no_parameters && assistance.active_parameter>=assistance.parameters.size())return nullptr;
-                if(!assistance.constructor_signature && !assistance.multiple_return_signature &&
-                   (assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty()))return nullptr;
-                j::Array parameters;for(std::size_t n=0;n<assistance.parameters.size();++n) {
-                    j::Object parameter{{"label",assistance.parameters[n]}};
-                    if(n==assistance.active_parameter && n<assistance.parameter_documentation.size() && !assistance.parameter_documentation[n].empty()) {
-                        if(signature_plaintext)parameter["documentation"]=j::Object{{"kind","plaintext"},{"value",assistance.parameter_documentation[n]}};
-                        else parameter["documentation"]=assistance.parameter_documentation[n];
-                    }
-                    parameters.push_back(std::move(parameter));
-                }
-                j::Object help{{"signatures",j::Array{j::Object{{"label",assistance.signature},{"parameters",std::move(parameters)}}}},{"activeSignature",0}};
-                if(!no_parameters)help["activeParameter"]=assistance.active_parameter;
-                return help;
+            const auto* original=basis && basis->semantic_analysis()?source_in(*basis->semantic_analysis(),module):nullptr;
+            if(interactive && basis && open.contains(module) && (cached || (original && original->text()==source->text())))
+                remember_probe(method,module,*offset,*source,snapshot,assistance,basis);
+            if(interactive && memo && memo->snapshot.same_revision(snapshot) && memo->module==module && memo->offset==*offset) {
+                prepared_response=memo->encoded;return nullptr;
             }
-            j::Array items;
-            if(!assistance.candidates.empty()) {
-                const j::Value edit_range=range({std::make_shared<const vd::SourceFile>(*source),module,assistance.begin,assistance.end});
-                for(const auto& c:assistance.candidates)items.push_back(j::Object{{"label",c.name},{"kind",c.kind},{"detail",c.detail},{"documentation",c.documentation},
-                    {"textEdit",j::Object{{"range",edit_range},{"newText",c.insert_text.empty()?c.name:c.insert_text}}}});
-            }
-            if(assistance.import_context || assistance.incomplete)return j::Object{{"isIncomplete",assistance.incomplete},{"items",std::move(items)}};
-            return items;
+            return assistance_result(method,module,source,assistance);
         }
         if(!index || (document && method!="textDocument/hover"))return nullptr;
         auto definitions=index->definitions_at(module,*offset);
@@ -829,8 +1014,29 @@ class Server {
                 text=overrides.at(id)?overrides.at(id)->text():std::string{};
                 for(const auto& event:*changes) {
                     const auto& change=object(&event);
-                    if(change.get("range") || change.get("rangeLength")) throw std::invalid_argument("Incremental document changes are unsupported");
-                    text=string(change,"text");
+                    if(auto selection=change.getObject("range")) {
+                        if(!incremental_sync)throw std::invalid_argument("Incremental document changes were not negotiated");
+                        Positions positions(vd::SourceFile(id,text));
+                        auto at=[&](llvm::StringRef key) {
+                            const auto& point=object(selection->get(key));
+                            return positions.offset({static_cast<std::uint32_t>(integer(point.get("line"),0)),
+                                static_cast<std::uint32_t>(integer(point.get("character"),0))});
+                        };
+                        const auto begin=at("start"),end=at("end");
+                        if(!begin || !end || *begin>*end)throw std::invalid_argument("Invalid UTF-16 edit range");
+                        if(auto length=change.get("rangeLength")) {
+                            std::size_t units=0;
+                            for(auto n=*begin;n<*end;++n) {
+                                const auto c=static_cast<unsigned char>(text[n]);
+                                if((c&0xc0)!=0x80)units+=c>=0xf0?2:1;
+                            }
+                            if(static_cast<std::size_t>(integer(length,0))!=units)throw std::invalid_argument("UTF-16 rangeLength does not match edit range");
+                        }
+                        text.replace(*begin,*end-*begin,string(change,"text"));
+                    } else {
+                        if(change.get("range") || change.get("rangeLength"))throw std::invalid_argument("Expected a valid edit range");
+                        text=string(change,"text");
+                    }
                 }
                 session.replace(id,next(id),std::move(text)); found->second.version=version;
                 found->second.source=(manifest_mode && id.ends_with("/void.project.toml")?session.select().manifests():session.select().overrides()).at(id);
@@ -848,13 +1054,46 @@ public:
     }
     void end_batch(){cancellations.clear();}
     bool pending() const {return dirty;}
+    void retire_assistance(const std::string& reason) {
+        for(auto& job:assistance_jobs)if(!job.answered){error(job.id,-32800,reason);job.answered=true;}
+    }
     void flush() {if(dirty)analyze();}
     bool interactive_loop() const {return interactive && state==State::ready;}
-    bool idle_work() const {return dirty || worker.valid();}
+    bool idle_work() const {return dirty || worker.valid() || !assistance_jobs.empty();}
     void run_idle_work() {
+        while(!assistance_jobs.empty()) {
+            auto& job=assistance_jobs.front();
+            if(!job.work.valid()) {
+                if(job.answered){assistance_jobs.pop_front();continue;}
+                if(!session.select().same_revision(job.snapshot)) {
+                    error(job.id,-32801,"Document or project changed before assistance");
+                    assistance_jobs.pop_front();continue;
+                }
+                job.work=std::async(std::launch::async,std::move(job.compute));
+            }
+            if(job.work.wait_for(std::chrono::seconds(0))!=std::future_status::ready)break;
+            auto result=job.work.get();
+            QueryProfile profile("assistance/publication");
+            if(!job.answered && state==State::ready) {
+                if(!session.select().same_revision(job.snapshot) || !session.project_root_current())
+                    error(job.id,-32801,"Document or project changed during assistance");
+                else {
+                    // Validate the inputs owned by this job, including probes
+                    // for edited documents or with no historical analysis.
+                    if(!vd::editor_assistance_inputs_current(result)) {
+                        error(job.id,-32801,"Project inputs changed during assistance");job.answered=true;
+                        session.refresh();context_changed();
+                        assistance_jobs.pop_front();continue;
+                    }
+                    remember_probe(job.method,job.module,job.offset,job.source,job.snapshot,result,{});
+                    send_result(job.id,probes[job.method=="textDocument/signatureHelp"?1:0]->encoded);
+                }
+            }
+            assistance_jobs.pop_front();
+        }
         if(worker.valid() && worker.wait_for(std::chrono::seconds(0))==std::future_status::ready)
             publish(worker.get());
-        if(dirty && !worker.valid() && Clock::now()>=analyze_after)
+        if(dirty && !worker.valid() && assistance_jobs.empty() && Clock::now()>=analyze_after)
             worker=std::async(std::launch::async,[snapshot=session.select()] {
                 return vd::ToolingSession::analyze(snapshot,true);
             });
@@ -876,6 +1115,9 @@ public:
         auto o=message.getAsObject();
         if(!o) { error(nullptr,-32600,"Invalid JSON-RPC request"); return {}; }
         auto id=o->get("id"); bool valid_id=false;
+        handling_id=id?std::optional<j::Value>(*id):std::nullopt;
+        deferred_response=false;
+        prepared_response.reset();
         if(id) {
             try { if(!id->getAsString()) (void)integer(id); valid_id=true; }
             catch(const std::invalid_argument&) {}
@@ -916,8 +1158,11 @@ public:
                 const auto& caps=object(params.get("capabilities"));
                 if(auto pid=params.get("processId");pid && !pid->getAsNull())process_id=integer(pid,1);
                 if(auto td=caps.getObject("textDocument")) {
-                    if(auto help=td->getObject("signatureHelp"))if(auto info=help->getObject("signatureInformation"))if(auto formats=info->getArray("documentationFormat"))
-                        for(const auto& format:*formats)if(format.getAsString()=="plaintext")signature_plaintext=true;
+                    if(auto help=td->getObject("signatureHelp"))if(auto info=help->getObject("signatureInformation")) {
+                        if(auto parameter=info->getObject("parameterInformation"))signature_offsets=parameter->getBoolean("labelOffsetSupport").value_or(false);
+                        if(auto formats=info->getArray("documentationFormat"))
+                            for(const auto& format:*formats)if(format.getAsString()=="plaintext")signature_plaintext=true;
+                    }
                     if(auto symbols=td->getObject("documentSymbol"))hierarchical_symbols=symbols->getBoolean("hierarchicalDocumentSymbolSupport").value_or(false);
                     if(auto tokens=td->getObject("semanticTokens")) {
                         auto requests=tokens->getObject("requests");
@@ -938,9 +1183,10 @@ public:
                 if(auto options=params.getObject("initializationOptions")) {
                     guarded_fixes=manifest_mode && options->getBoolean("voidGuardedFixes").value_or(false);
                     interactive=semantic_refresh && options->getBoolean("voidInteractivePresentation").value_or(false);
+                    incremental_sync=options->getBoolean("voidIncrementalSync").value_or(false);
                 }
                 state=State::waiting;
-                j::Object capabilities{{"positionEncoding","utf-16"},{"textDocumentSync",j::Object{{"openClose",true},{"change",1},{"save",j::Object{{"includeText",false}}}}},
+                j::Object capabilities{{"positionEncoding","utf-16"},{"textDocumentSync",j::Object{{"openClose",true},{"change",incremental_sync?2:1},{"save",j::Object{{"includeText",false}}}}},
                         {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/",":"}}}},
                         {"signatureHelpProvider",j::Object{{"triggerCharacters",j::Array{"(",","}}}},{"documentSymbolProvider",true},{"workspaceSymbolProvider",true},
                         {"documentFormattingProvider",true},{"renameProvider",rename_edits ? j::Value(j::Object{{"prepareProvider",true}}):j::Value(false)},
@@ -965,6 +1211,7 @@ public:
             if(name=="shutdown") {
                 if(!id) { fail(-32600,"Shutdown requires a request ID"); return {}; }
                 if(auto p=o->get("params"); p && !p->getAsNull()) throw std::invalid_argument("Shutdown has no parameters");
+                retire_assistance("Server shutting down");
                 state=State::shutdown;dirty=false; send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",nullptr}}); return {};
             }
             if(name=="textDocument/didOpen" || name=="textDocument/didChange" || name=="textDocument/didClose") {
@@ -972,12 +1219,17 @@ public:
                 synchronize(name,object(o->get("params"))); return {};
             }
             auto editor_result=[&](auto work,j::Value empty) {
+                QueryProfile profile(name);
                 const auto& params=object(o->get("params"));
                 if(observe_project_root()) {
                     auto result=work(params);
                     if(observe_project_root())empty=std::move(result);
+                    else prepared_response.reset();
                 }
-                send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(empty)}});
+                if(!deferred_response) {
+                    if(prepared_response)send_result(*id,*prepared_response);
+                    else send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",std::move(empty)}});
+                }
             };
             if(name=="textDocument/semanticTokens/full") {
                 if(!id){fail(-32600,"Semantic tokens require a request");return {};}
@@ -1079,6 +1331,9 @@ public:
                 if(id){fail(-32600,"Cancellation requires a notification");return {};}
                 auto cancelled=object(o->get("params")).get("id");if(!cancelled)throw std::invalid_argument("Missing cancelled request ID");
                 if(!cancelled->getAsString())(void)integer(cancelled);
+                for(auto& job:assistance_jobs)if(!job.answered && job.id==*cancelled) {
+                    error(job.id,-32800,"Request cancelled");job.answered=true;
+                }
                 return {}; // Unknown/completed requests are never remembered for future ID reuse.
             }
             if(name=="$/setTrace")return {};
@@ -1208,7 +1463,7 @@ int run(const fs::path& entry,bool project=false,const std::optional<std::string
         }
         server.end_batch();
         if(framing_failure){if(!server.parent_alive())return server.eof();error(nullptr,-32700,"Invalid protocol framing");return 2;}
-        if(eof){server.flush();return server.eof();}
+        if(eof){server.retire_assistance("Client input closed");server.flush();return server.eof();}
     }
 }
 }

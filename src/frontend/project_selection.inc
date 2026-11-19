@@ -40,7 +40,7 @@ struct ProjectCapture {
     Diagnostics diagnostics;
     SourceGraph graph;
     Unit from;
-    ProjectCapture(const project_fs::path& requested,const SourceOverrides& o,const ManifestOverrides& m,const ProjectCapture* previous=nullptr,bool inventory_only=false,bool imports_only=false)
+    ProjectCapture(const project_fs::path& requested,const SourceOverrides& o,const ManifestOverrides& m,const ProjectCapture* previous=nullptr,bool inventory_only=false,bool imports_only=false,const project::LockedDependencies* editor_reuse=nullptr)
       :root(admit_root(requested)),overlays(bounded_overlays(o)),manifest_overlays(m),original(previous),anchor(path_utf8(root/"void.project.toml"),""),graph(root,diagnostics,overlays),from(anchor,"/") {
         observation::Scope timing(observation::Phase::project_capture);
         changed(original && root!=original->root);
@@ -86,7 +86,7 @@ struct ProjectCapture {
         }
         if (!imports_only && (!manifest->dependencies().empty() || manifest->native_requirement())) {
             try {
-                dependencies = project::verify_locked_dependencies(root, *manifest, !original);
+                dependencies = project::verify_locked_dependencies(root, *manifest, !original,editor_reuse);
             } catch (const std::runtime_error& failure) {
                 project_failure(anchor, Code::project_changed, failure.what(),
                     "Verify the package inputs with voidc resolve and refresh the lock explicitly after intentional changes.");
@@ -358,6 +358,34 @@ std::string project_context_key(const ProjectCapture& capture,const std::string&
     if(capture.dependencies){field("locked-dependency-plan-v1");field(capture.dependencies->identity());}
     return result;
 }
+// A probe may stop binding by throwing EditorProbeFound. Retain observations
+// before that unwind, rather than borrowing a historical successful analysis.
+std::function<bool()> project_probe_inputs(const ProjectCapture& capture) {
+    for(const auto& [id,unit]:capture.graph.units)if(unit->failed_import)return {};
+    auto sources=capture.sources;
+    for(const auto* group:{&capture.graph.units,&capture.graph.parsed})for(const auto& [id,unit]:*group)
+        if(!package_source(id))sources.insert_or_assign(id,unit->source);
+    return [root=capture.root,overlays=capture.overlays,manifests=capture.manifest_overlays,
+            manifest=capture.manifest->source().text(),context=project_context_key(capture,""),
+            dependencies=capture.dependencies,native=capture.native,sources=std::move(sources),
+            discovery=capture.disk_discovery,listings=capture.listings,boundaries=capture.boundaries] {
+        ProjectCapture fresh(root,overlays,manifests,nullptr,false,false,dependencies.get());
+        if(fresh.manifest->source().text()!=manifest || project_context_key(fresh,"")!=context ||
+           bool(fresh.native)!=bool(native) || (native && fresh.native->descriptor()!=native->descriptor()))return false;
+        for(const auto& [id,source]:discovery) {
+            const auto [identity,path]=fresh.graph.resolve(fresh.from,{TokenKind::path,id,0});
+            if(identity!=id || path_utf8(path)!=source.path() || read_source(path).text()!=source.text())return false;
+        }
+        for(const auto& [id,source]:sources)if(!package_source(id)) {
+            const auto current=fresh.recapture_source(id);
+            if(current.path()!=source.path() || current.text()!=source.text())return false;
+            fresh.graph.units.emplace(id,std::make_unique<Unit>(current,id));
+        }
+        for(const auto& [id,names]:listings)if(fresh.directory(id)!=names)return false;
+        for(const auto& [id,present]:boundaries)if(fresh.boundary(id)!=present)return false;
+        return true;
+    };
+}
 }
 class EditorProjectRoot {
     using Path = std::filesystem::path;
@@ -464,6 +492,10 @@ struct ProjectAnalysisAccess {
         for(const auto& [id,unit]:capture.graph.units)result->execution_.emplace(id,unit->source);
         result->selection_key_=project_snapshot_key(capture,entry,automatic);
         result->context_key_=project_context_key(capture,entry);
+        result->editor_listings_=capture.listings;
+        result->editor_boundaries_=capture.boundaries;
+        result->editor_automatic_=automatic;
+        result->editor_dependencies_=capture.dependencies;
         if(!entry.empty()) {
             result->entry_=capture.root/utf8_path(entry).relative_path();
             const auto& project = capture.manifest->project();
@@ -476,7 +508,42 @@ struct ProjectAnalysisAccess {
         }
         return result;
     }
+    static bool editor_current(const ProjectAnalysis& known,const SourceOverrides& sources,
+        const ManifestOverrides& manifests,const EditorDiscovery& discovery,std::string_view edited) {
+        try {
+            ProjectCapture fresh(known.root_,sources,manifests,nullptr,false,false,known.editor_dependencies_.get());
+            const auto entry=known.entry_?"/"+path_utf8(known.entry_->lexically_relative(known.root_)):std::string{};
+            if(fresh.root!=known.root_ || fresh.manifest->source().text()!=known.manifest_->source().text() ||
+                project_context_key(fresh,entry)!=known.context_key_)return false;
+            if(known.editor_automatic_) {
+                fresh.editor_discovery=&discovery;
+                const auto inventory=fresh.inventory();
+                fresh.editor_discovery=nullptr;
+                if(inventory.size()!=known.discovery_.size())return false;
+                for(const auto& [id,source]:known.discovery_) {
+                    if(!inventory.contains(id))return false;
+                    if(id!=edited && fresh.discovery_source(id).text()!=source.text())return false;
+                }
+            }
+            for(const auto& [id,source]:known.execution_) {
+                if(package_source(id))continue; // Constructor verifies the entire locked tree.
+                const auto& current=fresh.recapture_source(id);
+                if(id!=edited && current.text()!=source.text())return false;
+                fresh.graph.units.emplace(id,std::make_unique<Unit>(current,id));
+            }
+            for(const auto& [id,names]:known.editor_listings_)if(fresh.directory(id)!=names)return false;
+            for(const auto& [id,present]:known.editor_boundaries_)if(fresh.boundary(id)!=present)return false;
+            return true;
+        } catch(const CompilationError&) {return false;}
+          catch(const std::filesystem::filesystem_error&) {return false;}
+          catch(const std::invalid_argument&) {return false;}
+    }
 };
+bool editor_project_inputs_current(const ProjectAnalysis& known,const SourceOverrides& sources,
+    const ManifestOverrides& manifests,const EditorDiscovery& discovery,std::string_view edited) {
+    observation::Scope timing(observation::EditorDetail::inputs);
+    return ProjectAnalysisAccess::editor_current(known,sources,manifests,discovery,edited);
+}
 void require_manifest_identity(const std::string& id) {
     if(id.empty() || id.front()!='/' || package_source(id) || path_utf8(utf8_path(id).filename())!="void.project.toml")throw std::invalid_argument("Expected exact root-relative void.project.toml identity.");
     for(const auto& part:utf8_path(id).relative_path())if(part=="." || part==".." || !portable_path_component(path_utf8(part)))throw std::invalid_argument("Invalid manifest overlay identity.");
@@ -487,7 +554,7 @@ bool project_manifest_present(const std::filesystem::path& root) {
     return false;
 }
 using ManagedNativeApproval = std::function<std::filesystem::path(const ManagedNativeApprovalSubject&)>;
-ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native,const EditorDiscovery* editor_discovery=nullptr,EditorRecovery* recovery=nullptr,const ManagedNativeApproval* approve=nullptr) {
+ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path& root,const std::optional<std::string>& entry_override,const SourceOverrides& sources,const ManifestOverrides& manifests,EditorProbe* editor,bool authorize_native,const EditorDiscovery* editor_discovery=nullptr,EditorRecovery* recovery=nullptr,const ManagedNativeApproval* approve=nullptr,const project::LockedDependencies* editor_reuse=nullptr) {
     ProjectAnalysisResult result;
     std::unique_ptr<ProjectCapture> owned;
     std::set<std::string> seeds;std::string entry;bool automatic=false,complete=false;
@@ -516,7 +583,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
         result.state=std::move(state);
     };
     try {
-        owned=std::make_unique<ProjectCapture>(root,sources,manifests);auto& capture=*owned;result.manifest=capture.manifest;capture.diagnostics.editor=editor;capture.diagnostics.recovery=recovery;
+        owned=std::make_unique<ProjectCapture>(root,sources,manifests,nullptr,false,false,editor_reuse);auto& capture=*owned;result.manifest=capture.manifest;capture.diagnostics.editor=editor;capture.diagnostics.recovery=recovery;
         const bool library=capture.manifest->kind()==project::Kind::library;
         if(library && entry_override)project_failure(capture.anchor,Code::project_entry,"A library project cannot select an application entry.");
         auto explicit_entry=entry_override?entry_override:capture.manifest->entry();
@@ -526,6 +593,7 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
             seeds=capture.inventory();
             complete=true;
             for(const auto& id:seeds)capture.graph.parse(capture.from,{TokenKind::path,id,0});
+            if(editor)editor->result.inputs_current=project_probe_inputs(capture);
             capture.diagnostics.finish_parse();
             if(!library) {
                 std::vector<std::pair<Unit*,const Function*>> candidates;
@@ -557,8 +625,10 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
             try {require_module_identity(entry);}
             catch(const std::invalid_argument&) {project_failure(capture.manifest->source(),Code::project_path,"Explicit entry must be a canonical portable manifest-relative .void path.","Use an exact relative path without ., .., drive prefixes or reserved components; no fallback is attempted.");}
         }
+        if(editor)editor->result.inputs_current={};
         if(library)for(const auto& id:seeds)capture.graph.load(capture.from,{TokenKind::path,id,0});
         else capture.graph.load(capture.from,{TokenKind::path,entry,0});
+        if(editor)editor->result.inputs_current=project_probe_inputs(capture);
         capture.diagnostics.finish_parse();
         std::shared_ptr<Unit> library_scope;
         if(library) {library_scope=std::make_shared<Unit>(capture.manifest->source(),"");validate_graph(capture.graph.units,"",capture.diagnostics,library_scope.get());}
@@ -636,6 +706,7 @@ static std::shared_ptr<const ValidatedAnalysis> validated_editor_document(Projec
     capture.diagnostics.editor=editor;
     capture.diagnostics.recovery=recovery;
     capture.graph.load(capture.from,{TokenKind::path,id,0});
+    if(editor)editor->result.inputs_current=project_probe_inputs(capture);
     capture.diagnostics.finish_parse();
     validate_graph(capture.graph.units,id,capture.diagnostics);
     ProjectCapture fresh(capture.root,capture.overlays,capture.manifest_overlays,&capture);

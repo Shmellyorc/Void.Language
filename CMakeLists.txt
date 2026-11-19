@@ -547,6 +547,9 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/project/protocol.py" "$<TARGET_FILE:voidls>"
     "@VOID_TEST_OUTPUT@/project-protocol-evidence.json")
   set_tests_properties(project_protocol PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_intellisense COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/intellisense.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
+  set_tests_properties(lsp_intellisense PROPERTIES TIMEOUT 180)
   add_test(NAME lsp_semantic_tokens COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/semantic_tokens.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_semantic_tokens PROPERTIES TIMEOUT 180)

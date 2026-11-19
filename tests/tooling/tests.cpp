@@ -223,6 +223,66 @@ void editor_metadata(const fs::path& root) {
     check(!vd::format_source({"bad.void","\tfunc entry(:\n"}),"formatter accepted invalid lexical source");
 }
 
+void namespace_reuse(const fs::path& root) {
+    write(root/"leaf.void","public func read() -> i32:\n    return 7\n");
+    const std::string header="use \"./leaf.void\" as lib\nfunc main():\n";
+    write(root/"main.void",header+"    var value = lib.read()\n");
+    auto program=analyze(root);
+    for(const std::string body:{"    lib.","    lib.\n","    var value = lib.",
+                               "    print(lib.","    var value = 1\n    lib.re"}) {
+        const auto source=header+body;const auto cursor=source.rfind("lib.")+4+(body.ends_with("re")?2:0);
+        const auto reuse=vd::editor_namespace_assistance(*program,{"/main.void",source},"/main.void",cursor);
+        check(reuse && std::any_of(reuse->candidates.begin(),reuse->candidates.end(),[](const auto& c){return c.name=="read";}),"body/EOF edit unnecessarily discarded verified namespace analysis");
+    }
+    for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+            header+"    var text = \"lib.\"",header+"    # lib.",
+            "use \"./leaf.void\" as lib\nfunc changed():\n    lib.",
+            "use \"./other.void\" as lib\nfunc main():\n    lib.",header+"    var value: lib."}) {
+        const auto cursor=source.rfind("lib.")+4;
+        check(!vd::editor_namespace_assistance(*program,{"/main.void",source},"/main.void",cursor),"changed header/shadow/non-expression reused namespace analysis");
+    }
+}
+
+void assistance_inputs(const fs::path& root) {
+    for(bool project:{false,true}) {
+        const auto directory=root/(project?"manifest":"legacy");
+        if(project)write(directory/"void.project.toml","schema=1\n[project]\nid='org.test.freshness'\nname='Freshness'\nversion='0.1.0'\nkind='application'\n[application]\nid='org.test.freshness.app'\n[sources]\nroots=['.']\n");
+        const auto model=directory/"model.void";
+        const std::string definitions="public value struct point:\n    public x: i32\n## @param left Original value.\npublic func blend(left: i32) -> i32:\n    return left\n";
+        write(model,definitions);
+        const auto twin=directory/"twin.void";write(twin,definitions);
+        const std::string text="use \"./model.void\" as model\nuse \"./twin.void\" as twin\nfunc main() -> i32:\n    var p = model.point()\n    var value = model.blend(1)\n    return p.x\n";
+        write(directory/"main.void",text);
+        auto probe=[&](std::size_t offset,bool signature=false) {
+            // No validated historical analysis is supplied, and the overlay
+            // differs from disk. The returned proof must own these bytes.
+            vd::SourceOverrides overlays{{"/main.void",vd::SourceFile("owned overlay",signature?text.substr(0,offset):text+"# unsaved revision\n")}};
+            return project?vd::project_editor_assistance(directory,{},overlays,{},"/main.void",offset)
+                          :vd::editor_assistance(directory/"main.void",overlays,"/main.void",offset);
+        };
+        auto members=probe(text.find("return p.")+9);
+        auto signature=probe(text.find("model.blend(")+12,true);
+        check(std::any_of(members.candidates.begin(),members.candidates.end(),[](const auto& c){return c.name=="x";}),"freshness fixture has no original field");
+        check(!signature.signature.empty(),"freshness fixture has no signature");
+        check(vd::editor_assistance_inputs_current(members) && vd::editor_assistance_inputs_current(signature),"unchanged owned probe inputs rejected");
+        const auto stamp=fs::last_write_time(model);
+        auto changed=definitions;changed.replace(changed.find("public x:"),9,"public y:");
+        write(model,changed);fs::last_write_time(model,stamp);
+        check(!vd::editor_assistance_inputs_current(members) && !vd::editor_assistance_inputs_current(signature),"same-size/same-time dependency mutation accepted");
+        auto fresh=probe(text.find("return p.")+9);
+        check(std::any_of(fresh.candidates.begin(),fresh.candidates.end(),[](const auto& c){return c.name=="y";}) && vd::editor_assistance_inputs_current(fresh),"fresh probe did not recover changed inputs");
+        write(model,definitions);fs::last_write_time(model,stamp);
+        check(vd::editor_assistance_inputs_current(members),"restored exact inputs unnecessarily rejected");
+        const auto baseline=project?vd::analyze_editor_project(directory,{}, {},{},{}):vd::ProjectAnalysisResult{};
+        if(project)check(bool(baseline.project),"alias fixture baseline must be valid");
+        fs::remove(twin);fs::create_hard_link(model,twin);
+        check(!vd::editor_assistance_inputs_current(members),"identical bytes hid conflicting hard-link module identities");
+        if(project)check(!vd::editor_project_inputs_current(*baseline.project,{}, {},{}),"namespace input reuse hid hard-link aliases");
+        fs::remove(twin);write(twin,definitions);
+        check(vd::editor_assistance_inputs_current(members),"restored distinct module identities rejected");
+    }
+}
+
 void discovery(const fs::path& root) {
     fs::remove_all(root);fs::create_directories(root);
     auto library=fs::absolute(root/"standard");auto project=fs::absolute(root/"project");
@@ -374,4 +434,4 @@ void documentation_tests(const fs::path& root) {
 }
 
 }
-void tooling_tests(const fs::path& output) { borrowed_lifetimes(); documentation_tests(output/"documentation"); discovery(output/"discovery"); queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }
+void tooling_tests(const fs::path& output) { borrowed_lifetimes(); documentation_tests(output/"documentation"); namespace_reuse(output/"namespace-reuse"); assistance_inputs(output/"assistance-inputs"); discovery(output/"discovery"); queries(output/"queries"); planning(output/"planning"); cycles(output/"cycles"); containment(output/"containment"); editor_metadata(output/"editor"); }

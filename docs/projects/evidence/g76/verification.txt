@@ -1,0 +1,1691 @@
+G76 original and final evidence; native Linux only. Original raw directories retained.
+Terminal trailing blanks normalized in this textual copy; raw logs remain unchanged.
+
+===== focused-first.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  34: lsp_editor_recovery
+    Start 488: lsp_stage10_display
+1/7 Test  #34: lsp_editor_recovery ..............***Failed    0.47 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 332, in <module>
+    run(*arguments)
+    ~~~^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/editor_recovery.py", line 89, in run
+    assert hover['contents']['value'] == 'game: /app.void::app', hover
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'contents': {'kind': 'plaintext', 'value': 'game: app'}, 'range': {'end': {'character': 12, 'line': 8}, 'start': {'character': 8, 'line': 8}}}
+
+    Start  35: lsp_project_root_recovery
+2/7 Test  #35: lsp_project_root_recovery ........   Passed    0.89 sec
+    Start 207: lsp_named_arguments
+3/7 Test #207: lsp_named_arguments ..............***Failed    0.11 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/named_arguments.py", line 99, in <module>
+    items, _ = complete(call + suffix)
+               ~~~~~~~~^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/named_arguments.py", line 83, in complete
+    assert 'result' in response, response
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'error': {'code': -32602, 'message': 'VOID IR: missing array element'}, 'id': 4, 'jsonrpc': '2.0'}
+
+    Start 206: lsp_documentation
+4/7 Test #206: lsp_documentation ................***Failed    0.11 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py", line 84, in <module>
+    check('documentation' not in signature,signature)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/lsp/documentation.py", line 17, in check
+    assert value, message
+           ^^^^^
+AssertionError: {'documentation': 'Save plain_name <value> é😀.\nMention @param inline inside ordinary prose.\n\nReturns: Saved value.', 'label': 'save(name: string, middle: i32 = …, last: i32 = …) -> i32', 'parameters': [{'documentation': {'kind': 'plaintext', 'value': 'Name payload é😀.'}, 'label': 'name: string'}, {'label': 'middle: i32 = …'}, {'label': 'last: i32 = …'}]}
+
+    Start  31: project_protocol
+5/7 Test  #31: project_protocol .................   Passed    0.61 sec
+    Start  32: lsp_intellisense
+6/7 Test #488: lsp_stage10_display ..............   Passed    2.95 sec
+7/7 Test  #32: lsp_intellisense .................   Passed    0.94 sec
+
+57% tests passed, 3 tests failed out of 7
+
+Total Test time (real) =   3.15 sec
+
+The following tests FAILED:
+	 34 - lsp_editor_recovery (Failed)
+	206 - lsp_documentation (Failed)
+	207 - lsp_named_arguments (Failed)
+Errors while running CTest
+
+===== focused-second.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  34: lsp_editor_recovery
+    Start 206: lsp_documentation
+1/7 Test #206: lsp_documentation ................   Passed    0.21 sec
+    Start 207: lsp_named_arguments
+2/7 Test #207: lsp_named_arguments ..............   Passed    0.22 sec
+    Start 488: lsp_stage10_display
+3/7 Test #488: lsp_stage10_display ..............   Passed    2.74 sec
+    Start  32: lsp_intellisense
+4/7 Test  #32: lsp_intellisense .................   Passed    1.08 sec
+    Start  35: lsp_project_root_recovery
+5/7 Test  #34: lsp_editor_recovery ..............   Passed    4.49 sec
+    Start  31: project_protocol
+6/7 Test  #35: lsp_project_root_recovery ........   Passed    0.82 sec
+7/7 Test  #31: project_protocol .................   Passed    0.69 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =   5.19 sec
+
+===== focused-overloads.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start 246: lsp_random
+    Start 489: lsp_stage10_intelligence
+1/3 Test #489: lsp_stage10_intelligence .........   Passed    0.20 sec
+    Start  32: lsp_intellisense
+2/3 Test #246: lsp_random .......................   Passed    0.66 sec
+3/3 Test  #32: lsp_intellisense .................   Passed    1.13 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   1.35 sec
+
+===== focused-eof.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+    Start  32: lsp_intellisense
+1/2 Test  #32: lsp_intellisense .................   Passed    1.64 sec
+    Start 454: tooling
+2/2 Test #454: tooling ..........................   Passed    0.38 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   2.03 sec
+
+===== release-gates.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  36: lsp_enum_recovery
+      Start  34: lsp_editor_recovery
+ 1/54 Test  #36: lsp_enum_recovery ................   Passed    2.67 sec
+      Start 488: lsp_stage10_display
+ 2/54 Test  #34: lsp_editor_recovery ..............   Passed    4.05 sec
+      Start 300: lsp_log
+ 3/54 Test #488: lsp_stage10_display ..............   Passed    2.58 sec
+      Start 499: source_cli
+ 4/54 Test #300: lsp_log ..........................   Passed    3.54 sec
+      Start 264: lsp_combined
+ 5/54 Test #499: source_cli .......................   Passed    3.49 sec
+      Start  32: lsp_intellisense
+ 6/54 Test #264: lsp_combined .....................   Passed    1.94 sec
+      Start 365: lsp_io
+ 7/54 Test  #32: lsp_intellisense .................   Passed    0.94 sec
+      Start 107: json_lsp
+ 8/54 Test #107: json_lsp .........................   Passed    0.94 sec
+      Start  70: http_lsp
+ 9/54 Test #365: lsp_io ...........................   Passed    1.12 sec
+      Start 368: lsp_io_stack
+10/54 Test #368: lsp_io_stack .....................   Passed    1.10 sec
+      Start 236: lsp_os
+11/54 Test #236: lsp_os ...........................   Passed    1.61 sec
+      Start 282: text_encoding_semantic_depth
+12/54 Test  #70: http_lsp .........................   Passed    2.91 sec
+      Start 258: lsp_const_recovery
+13/54 Test #282: text_encoding_semantic_depth .....   Passed    0.77 sec
+      Start 280: lsp_text_encoding_stack
+14/54 Test #258: lsp_const_recovery ...............   Passed    0.71 sec
+      Start 277: lsp_text_encoding
+15/54 Test #280: lsp_text_encoding_stack ..........   Passed    0.80 sec
+      Start  35: lsp_project_root_recovery
+16/54 Test #277: lsp_text_encoding ................   Passed    0.75 sec
+      Start 246: lsp_random
+17/54 Test #246: lsp_random .......................***Failed    0.28 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/lsp.py", line 91, in <module>
+    check('maximum' in names['rand_i32']['detail'] and 'lower' in names['rand_i32']['detail'],names['rand_i32'])
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/random/lsp.py", line 16, in check
+    assert value,message
+           ^^^^^
+AssertionError: {'detail': 'rand_i32() -> i32', 'documentation': 'Draw i32 from the shared Runtime default; first needed draw initializes from OS entropy.\nDirect calls support zero arguments, maximum for [0, maximum), or lower/upper for [lower, upper).\nZero arguments cover the entire integer domain.\n\nReturns: Sample; invalid arguments or entropy failures raise checked Runtime failure.', 'kind': 3, 'label': 'rand_i32', 'textEdit': {'newText': 'rand_i32', 'range': {'end': {'character': 19, 'line': 2}, 'start': {'character': 19, 'line': 2}}}}
+
+      Start 259: lsp_const_recovery_stack
+18/54 Test  #35: lsp_project_root_recovery ........   Passed    0.64 sec
+      Start  33: lsp_semantic_tokens
+19/54 Test #259: lsp_const_recovery_stack .........   Passed    0.70 sec
+      Start 207: lsp_named_arguments
+20/54 Test  #33: lsp_semantic_tokens ..............   Passed    0.52 sec
+      Start 267: lsp_memory
+21/54 Test #207: lsp_named_arguments ..............   Passed    0.23 sec
+      Start 204: lsp_stage8
+22/54 Test #267: lsp_memory .......................   Passed    0.38 sec
+      Start  38: lsp_enum_equality
+23/54 Test #204: lsp_stage8 .......................   Passed    0.40 sec
+      Start  40: lsp_multiple_returns
+24/54 Test  #38: lsp_enum_equality ................   Passed    0.26 sec
+      Start 214: lsp_math
+25/54 Test  #40: lsp_multiple_returns .............   Passed    0.27 sec
+      Start  56: net_sockets_lsp
+26/54 Test  #56: net_sockets_lsp ..................   Passed    0.23 sec
+      Start 486: lsp_sprint6
+27/54 Test #214: lsp_math .........................   Passed    0.41 sec
+      Start 226: host_capabilities_lsp
+28/54 Test #486: lsp_sprint6 ......................   Passed    0.30 sec
+      Start 202: lsp_protocol
+29/54 Test #226: host_capabilities_lsp ............   Passed    0.41 sec
+      Start  21: project_sessions
+30/54 Test #202: lsp_protocol .....................   Passed    0.37 sec
+      Start  39: lsp_quick_fixes
+31/54 Test  #39: lsp_quick_fixes ..................   Passed    0.16 sec
+      Start 206: lsp_documentation
+32/54 Test  #21: project_sessions .................   Passed    0.51 sec
+      Start 461: numeric_enum_lsp
+33/54 Test #206: lsp_documentation ................   Passed    0.16 sec
+      Start 307: lsp_collections_stdlib
+34/54 Test #461: numeric_enum_lsp .................   Passed    0.12 sec
+      Start 489: lsp_stage10_intelligence
+35/54 Test #489: lsp_stage10_intelligence .........***Failed    0.11 sec
+Traceback (most recent call last):
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py", line 106, in <module>
+    check('+' in items and 'box<i32>' in items['+']['detail'] and 'box<i64>' in items['+']['detail'] and 'other' in items['+']['detail'] and '%' not in items,items)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/shmellyorc/Documents/Void.Language/tests/stage10/lsp_intelligence.py", line 12, in check
+    assert value, message
+           ^^^^^
+AssertionError: {'+': {'detail': 'Selected specializations:', 'documentation': 'Exact sum of two boxes.', 'kind': 24, 'label': '+', 'textEdit': {'newText': '+', 'range': {'end': {'character': 17, 'line': 16}, 'start': {'character': 16, 'line': 16}}}}}
+
+      Start 316: lsp_channel
+36/54 Test #307: lsp_collections_stdlib ...........   Passed    0.24 sec
+      Start 454: tooling
+37/54 Test #316: lsp_channel ......................   Passed    0.15 sec
+      Start  77: stage10_tooling
+38/54 Test  #77: stage10_tooling ..................   Passed    0.12 sec
+      Start  69: url_lsp
+39/54 Test  #69: url_lsp ..........................   Passed    0.11 sec
+      Start 490: lsp_stage10_source_formatting
+40/54 Test #454: tooling ..........................   Passed    0.37 sec
+      Start 452: tooling_demo
+41/54 Test #452: tooling_demo .....................   Passed    0.10 sec
+      Start 255: lsp_binary
+42/54 Test #490: lsp_stage10_source_formatting ....   Passed    0.22 sec
+      Start 288: lsp_stage7
+43/54 Test #255: lsp_binary .......................   Passed    0.12 sec
+      Start 487: lsp_stage10_fields
+44/54 Test #487: lsp_stage10_fields ...............   Passed    0.08 sec
+      Start  31: project_protocol
+45/54 Test #288: lsp_stage7 .......................   Passed    0.17 sec
+      Start 496: lsp_sprint3
+46/54 Test #496: lsp_sprint3 ......................   Passed    0.10 sec
+      Start 445: lsp_async_syntax
+47/54 Test #445: lsp_async_syntax .................   Passed    0.09 sec
+      Start 497: lsp_sprint2
+48/54 Test #497: lsp_sprint2 ......................   Passed    0.08 sec
+      Start 492: lsp_sprint4
+49/54 Test #492: lsp_sprint4 ......................   Passed    0.07 sec
+      Start 289: lsp_demo
+50/54 Test #289: lsp_demo .........................   Passed    0.07 sec
+      Start 134: generics_hint_lsp
+51/54 Test  #31: project_protocol .................   Passed    0.56 sec
+      Start 203: lsp_stage11_globals
+52/54 Test #134: generics_hint_lsp ................   Passed    0.08 sec
+      Start 201: lsp_positions
+53/54 Test #201: lsp_positions ....................   Passed    0.00 sec
+54/54 Test #203: lsp_stage11_globals ..............   Passed    0.10 sec
+
+96% tests passed, 2 tests failed out of 54
+
+Total Test time (real) =  19.67 sec
+
+The following tests FAILED:
+	246 - lsp_random (Failed)
+	489 - lsp_stage10_intelligence (Failed)
+Errors while running CTest
+
+===== final-release-gates.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  13: project_simple_packages
+      Start 468: project_managed_native_callbacks
+ 1/72 Test #468: project_managed_native_callbacks .......   Passed    6.26 sec
+      Start   8: project_package_native
+ 2/72 Test  #13: project_simple_packages ................   Passed   10.67 sec
+      Start   7: project_application_package
+ 3/72 Test   #8: project_package_native .................   Passed    9.14 sec
+      Start   6: project_managed_native
+ 4/72 Test   #7: project_application_package ............   Passed   11.07 sec
+      Start 465: project_native_import
+ 5/72 Test   #6: project_managed_native .................   Passed    8.71 sec
+      Start  36: lsp_enum_recovery
+ 6/72 Test #465: project_native_import ..................   Passed    3.31 sec
+      Start  34: lsp_editor_recovery
+ 7/72 Test  #36: lsp_enum_recovery ......................   Passed    2.93 sec
+      Start 156: allocation_elimination
+ 8/72 Test #156: allocation_elimination .................   Passed    1.99 sec
+      Start 488: lsp_stage10_display
+ 9/72 Test  #34: lsp_editor_recovery ....................   Passed    4.52 sec
+      Start 300: lsp_log
+10/72 Test #488: lsp_stage10_display ....................   Passed    3.08 sec
+      Start 499: source_cli
+11/72 Test #300: lsp_log ................................   Passed    3.98 sec
+      Start  30: project_native_debug_info
+12/72 Test  #30: project_native_debug_info ..............   Passed    1.37 sec
+      Start 264: lsp_combined
+13/72 Test #499: source_cli .............................   Passed    3.92 sec
+      Start 365: lsp_io
+14/72 Test #264: lsp_combined ...........................   Passed    2.25 sec
+      Start   5: project_packages
+15/72 Test #365: lsp_io .................................   Passed    1.31 sec
+      Start  70: http_lsp
+16/72 Test   #5: project_packages .......................   Passed    2.57 sec
+      Start 107: json_lsp
+17/72 Test  #70: http_lsp ...............................   Passed    3.28 sec
+      Start 466: project_mixed_native
+18/72 Test #107: json_lsp ...............................   Passed    1.16 sec
+      Start 368: lsp_io_stack
+19/72 Test #466: project_mixed_native ...................   Passed    1.09 sec
+      Start 236: lsp_os
+20/72 Test #368: lsp_io_stack ...........................   Passed    1.35 sec
+      Start 282: text_encoding_semantic_depth
+21/72 Test #282: text_encoding_semantic_depth ...........   Passed    0.83 sec
+      Start 258: lsp_const_recovery
+22/72 Test #236: lsp_os .................................   Passed    1.88 sec
+      Start 280: lsp_text_encoding_stack
+23/72 Test #258: lsp_const_recovery .....................   Passed    0.86 sec
+      Start 277: lsp_text_encoding
+24/72 Test #280: lsp_text_encoding_stack ................   Passed    0.95 sec
+      Start 246: lsp_random
+25/72 Test #277: lsp_text_encoding ......................   Passed    1.02 sec
+      Start  35: lsp_project_root_recovery
+26/72 Test #246: lsp_random .............................   Passed    0.74 sec
+      Start 259: lsp_const_recovery_stack
+27/72 Test  #35: lsp_project_root_recovery ..............   Passed    0.74 sec
+      Start  10: project_managed_native_resolution
+28/72 Test #259: lsp_const_recovery_stack ...............   Passed    0.81 sec
+      Start  33: lsp_semantic_tokens
+29/72 Test  #33: lsp_semantic_tokens ....................   Passed    0.62 sec
+      Start  32: lsp_intellisense
+30/72 Test  #10: project_managed_native_resolution ......   Passed    1.18 sec
+      Start 207: lsp_named_arguments
+31/72 Test #207: lsp_named_arguments ....................   Passed    0.28 sec
+      Start 267: lsp_memory
+32/72 Test #267: lsp_memory .............................   Passed    0.41 sec
+      Start 204: lsp_stage8
+33/72 Test  #32: lsp_intellisense .......................   Passed    1.16 sec
+      Start 214: lsp_math
+34/72 Test #204: lsp_stage8 .............................   Passed    0.45 sec
+      Start  18: project_manifest_legacy
+35/72 Test #214: lsp_math ...............................   Passed    0.44 sec
+      Start  38: lsp_enum_equality
+36/72 Test  #38: lsp_enum_equality ......................   Passed    0.27 sec
+      Start  40: lsp_multiple_returns
+37/72 Test  #40: lsp_multiple_returns ...................   Passed    0.28 sec
+      Start  56: net_sockets_lsp
+38/72 Test  #56: net_sockets_lsp ........................   Passed    0.22 sec
+      Start 486: lsp_sprint6
+39/72 Test  #18: project_manifest_legacy ................   Passed    1.13 sec
+      Start 226: host_capabilities_lsp
+40/72 Test #486: lsp_sprint6 ............................   Passed    0.29 sec
+      Start 202: lsp_protocol
+41/72 Test #226: host_capabilities_lsp ..................   Passed    0.45 sec
+      Start  21: project_sessions
+42/72 Test #202: lsp_protocol ...........................   Passed    0.42 sec
+      Start  39: lsp_quick_fixes
+43/72 Test  #39: lsp_quick_fixes ........................   Passed    0.18 sec
+      Start 206: lsp_documentation
+44/72 Test  #21: project_sessions .......................   Passed    0.54 sec
+      Start 461: numeric_enum_lsp
+45/72 Test #206: lsp_documentation ......................   Passed    0.17 sec
+      Start 307: lsp_collections_stdlib
+46/72 Test #461: numeric_enum_lsp .......................   Passed    0.14 sec
+      Start 489: lsp_stage10_intelligence
+47/72 Test #307: lsp_collections_stdlib .................   Passed    0.24 sec
+      Start 316: lsp_channel
+48/72 Test #489: lsp_stage10_intelligence ...............   Passed    0.22 sec
+      Start  77: stage10_tooling
+49/72 Test  #77: stage10_tooling ........................   Passed    0.13 sec
+      Start  69: url_lsp
+50/72 Test #316: lsp_channel ............................   Passed    0.26 sec
+      Start 490: lsp_stage10_source_formatting
+51/72 Test  #69: url_lsp ................................   Passed    0.13 sec
+      Start 452: tooling_demo
+52/72 Test #452: tooling_demo ...........................   Passed    0.11 sec
+      Start 255: lsp_binary
+53/72 Test #490: lsp_stage10_source_formatting ..........   Passed    0.25 sec
+      Start 288: lsp_stage7
+54/72 Test #255: lsp_binary .............................   Passed    0.15 sec
+      Start 487: lsp_stage10_fields
+55/72 Test #487: lsp_stage10_fields .....................   Passed    0.09 sec
+      Start  31: project_protocol
+56/72 Test #288: lsp_stage7 .............................   Passed    0.20 sec
+      Start 496: lsp_sprint3
+57/72 Test #496: lsp_sprint3 ............................   Passed    0.11 sec
+      Start 445: lsp_async_syntax
+58/72 Test #445: lsp_async_syntax .......................   Passed    0.11 sec
+      Start 497: lsp_sprint2
+59/72 Test #497: lsp_sprint2 ............................   Passed    0.09 sec
+      Start 492: lsp_sprint4
+60/72 Test #492: lsp_sprint4 ............................   Passed    0.09 sec
+      Start 289: lsp_demo
+61/72 Test #289: lsp_demo ...............................   Passed    0.08 sec
+      Start 134: generics_hint_lsp
+62/72 Test #134: generics_hint_lsp ......................   Passed    0.10 sec
+      Start 158: allocation_elimination_aot_optimized
+63/72 Test #158: allocation_elimination_aot_optimized ...   Passed    0.04 sec
+      Start 203: lsp_stage11_globals
+64/72 Test  #31: project_protocol .......................   Passed    0.63 sec
+      Start 157: allocation_elimination_aot_normal
+65/72 Test #157: allocation_elimination_aot_normal ......   Passed    0.04 sec
+      Start  17: project_manifest_no_authority
+66/72 Test #203: lsp_stage11_globals ....................   Passed    0.11 sec
+      Start  19: project_manifest_provenance
+67/72 Test  #19: project_manifest_provenance ............   Passed    0.04 sec
+      Start 454: tooling
+68/72 Test  #17: project_manifest_no_authority ..........   Passed    0.13 sec
+      Start   2: project_manifest
+69/72 Test   #2: project_manifest .......................   Passed    0.05 sec
+      Start 201: lsp_positions
+70/72 Test #201: lsp_positions ..........................   Passed    0.01 sec
+      Start   1: project_manifest_header
+71/72 Test   #1: project_manifest_header ................   Passed    0.00 sec
+72/72 Test #454: tooling ................................   Passed    0.37 sec
+
+100% tests passed, 0 tests failed out of 72
+
+Total Test time (real) =  52.27 sec
+
+===== refreshed-release-gates.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-release
+      Start  12: project_git_https
+      Start  11: project_git_dependencies
+ 1/15 Test  #11: project_git_dependencies ...............   Passed    3.68 sec
+      Start 156: allocation_elimination
+ 2/15 Test #156: allocation_elimination .................   Passed    1.78 sec
+      Start  28: project_discovery_cli
+ 3/15 Test  #12: project_git_https ......................   Passed    7.93 sec
+      Start   5: project_packages
+ 4/15 Test  #28: project_discovery_cli ..................   Passed    3.82 sec
+      Start  20: project_selection
+ 5/15 Test   #5: project_packages .......................   Passed    2.57 sec
+      Start   3: project_dependencies
+ 6/15 Test   #3: project_dependencies ...................   Passed    1.38 sec
+      Start  29: project_profiles
+ 7/15 Test  #20: project_selection ......................   Passed    2.90 sec
+      Start   4: project_dependency_explain
+ 8/15 Test   #4: project_dependency_explain .............   Passed    0.45 sec
+      Start  41: project_nested_cli
+ 9/15 Test  #41: project_nested_cli .....................   Passed    0.42 sec
+      Start 452: tooling_demo
+10/15 Test #452: tooling_demo ...........................   Passed    0.13 sec
+      Start 158: allocation_elimination_aot_optimized
+11/15 Test #158: allocation_elimination_aot_optimized ...   Passed    0.04 sec
+      Start 157: allocation_elimination_aot_normal
+12/15 Test #157: allocation_elimination_aot_normal ......   Passed    0.04 sec
+      Start   2: project_manifest
+13/15 Test   #2: project_manifest .......................   Passed    0.08 sec
+      Start   1: project_manifest_header
+14/15 Test   #1: project_manifest_header ................   Passed    0.00 sec
+15/15 Test  #29: project_profiles .......................   Passed    1.70 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Total Test time (real) =  13.61 sec
+
+===== final-debug-gates.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start   7: project_application_package
+      Start   8: project_package_native
+ 1/72 Test   #8: project_package_native .................   Passed   38.52 sec
+      Start 481: project_managed_native_callbacks
+ 2/72 Test   #7: project_application_package ............   Passed   52.04 sec
+      Start  36: lsp_enum_recovery
+ 3/72 Test #481: project_managed_native_callbacks .......   Passed   23.67 sec
+      Start 501: lsp_stage10_display
+ 4/72 Test  #36: lsp_enum_recovery ......................   Passed   15.87 sec
+      Start  34: lsp_editor_recovery
+ 5/72 Test #501: lsp_stage10_display ....................   Passed   21.63 sec
+      Start 313: lsp_log
+ 6/72 Test  #34: lsp_editor_recovery ....................   Passed   20.63 sec
+      Start  13: project_simple_packages
+ 7/72 Test #313: lsp_log ................................   Passed   27.76 sec
+      Start   6: project_managed_native
+ 8/72 Test  #13: project_simple_packages ................   Passed   30.58 sec
+      Start 277: lsp_combined
+ 9/72 Test #277: lsp_combined ...........................   Passed   14.95 sec
+      Start 169: allocation_elimination
+10/72 Test #169: allocation_elimination .................   Passed    7.11 sec
+      Start 107: json_lsp
+11/72 Test   #6: project_managed_native .................   Passed   36.89 sec
+      Start 378: lsp_io
+12/72 Test #107: json_lsp ...............................   Passed    7.78 sec
+      Start  70: http_lsp
+13/72 Test #378: lsp_io .................................   Passed    9.02 sec
+      Start 381: lsp_io_stack
+14/72 Test #381: lsp_io_stack ...........................   Passed    8.89 sec
+      Start 478: project_native_import
+15/72 Test  #70: http_lsp ...............................   Passed   23.77 sec
+      Start 290: lsp_text_encoding
+16/72 Test #478: project_native_import ..................   Passed    7.25 sec
+      Start 293: lsp_text_encoding_stack
+17/72 Test #290: lsp_text_encoding ......................   Passed    6.73 sec
+      Start 249: lsp_os
+18/72 Test #293: lsp_text_encoding_stack ................   Passed    6.61 sec
+      Start 271: lsp_const_recovery
+19/72 Test #271: lsp_const_recovery .....................   Passed    5.56 sec
+      Start  32: lsp_intellisense
+20/72 Test  #32: lsp_intellisense .......................   Passed    3.37 sec
+      Start 259: lsp_random
+21/72 Test #249: lsp_os .................................   Passed   13.65 sec
+      Start 272: lsp_const_recovery_stack
+22/72 Test #259: lsp_random .............................   Passed    4.62 sec
+      Start  30: project_native_debug_info
+23/72 Test  #30: project_native_debug_info ..............   Passed    2.99 sec
+      Start  33: lsp_semantic_tokens
+24/72 Test #272: lsp_const_recovery_stack ...............   Passed    5.00 sec
+      Start 280: lsp_memory
+25/72 Test  #33: lsp_semantic_tokens ....................   Passed    3.21 sec
+      Start 227: lsp_math
+26/72 Test #280: lsp_memory .............................   Passed    2.52 sec
+      Start 512: source_cli
+27/72 Test #227: lsp_math ...............................   Passed    2.62 sec
+      Start  38: lsp_enum_equality
+28/72 Test  #38: lsp_enum_equality ......................   Passed    1.27 sec
+      Start 220: lsp_named_arguments
+29/72 Test #220: lsp_named_arguments ....................   Passed    1.00 sec
+      Start   5: project_packages
+30/72 Test #512: source_cli .............................   Passed    4.62 sec
+      Start  35: lsp_project_root_recovery
+31/72 Test  #35: lsp_project_root_recovery ..............   Passed    1.97 sec
+      Start  56: net_sockets_lsp
+32/72 Test  #56: net_sockets_lsp ........................   Passed    1.22 sec
+      Start 239: host_capabilities_lsp
+33/72 Test   #5: project_packages .......................   Passed    6.34 sec
+      Start 479: project_mixed_native
+34/72 Test #239: host_capabilities_lsp ..................   Passed    2.69 sec
+      Start 295: text_encoding_semantic_depth
+35/72 Test #295: text_encoding_semantic_depth ...........   Passed    1.12 sec
+      Start  18: project_manifest_legacy
+36/72 Test #479: project_mixed_native ...................   Passed    2.01 sec
+      Start 320: lsp_collections_stdlib
+37/72 Test #320: lsp_collections_stdlib .................   Passed    1.31 sec
+      Start  77: stage10_tooling
+38/72 Test  #77: stage10_tooling ........................   Passed    0.64 sec
+      Start 499: lsp_sprint6
+39/72 Test #499: lsp_sprint6 ............................   Passed    0.81 sec
+      Start 503: lsp_stage10_source_formatting
+40/72 Test  #18: project_manifest_legacy ................   Passed    4.98 sec
+      Start  40: lsp_multiple_returns
+41/72 Test #503: lsp_stage10_source_formatting ..........   Passed    1.42 sec
+      Start 502: lsp_stage10_intelligence
+42/72 Test #502: lsp_stage10_intelligence ...............   Passed    0.74 sec
+      Start  21: project_sessions
+43/72 Test  #40: lsp_multiple_returns ...................   Passed    0.76 sec
+      Start  31: project_protocol
+44/72 Test  #21: project_sessions .......................   Passed    1.36 sec
+      Start 329: lsp_channel
+45/72 Test  #31: project_protocol .......................   Passed    1.50 sec
+      Start 219: lsp_documentation
+46/72 Test #219: lsp_documentation ......................   Passed    0.42 sec
+      Start 215: lsp_protocol
+47/72 Test #329: lsp_channel ............................   Passed    0.60 sec
+      Start  10: project_managed_native_resolution
+48/72 Test #215: lsp_protocol ...........................   Passed    0.68 sec
+      Start 217: lsp_stage8
+49/72 Test #217: lsp_stage8 .............................   Passed    0.46 sec
+      Start 171: allocation_elimination_aot_optimized
+50/72 Test #171: allocation_elimination_aot_optimized ...   Passed    0.28 sec
+      Start 170: allocation_elimination_aot_normal
+51/72 Test #170: allocation_elimination_aot_normal ......   Passed    0.28 sec
+      Start 467: tooling
+52/72 Test #467: tooling ................................   Passed    0.61 sec
+      Start  39: lsp_quick_fixes
+53/72 Test  #39: lsp_quick_fixes ........................   Passed    0.34 sec
+      Start 268: lsp_binary
+54/72 Test  #10: project_managed_native_resolution ......   Passed    2.71 sec
+      Start 301: lsp_stage7
+55/72 Test #268: lsp_binary .............................   Passed    0.33 sec
+      Start  69: url_lsp
+56/72 Test #301: lsp_stage7 .............................   Passed    0.35 sec
+      Start 474: numeric_enum_lsp
+57/72 Test #474: numeric_enum_lsp .......................   Passed    0.16 sec
+      Start 465: tooling_demo
+58/72 Test  #69: url_lsp ................................   Passed    0.31 sec
+      Start 509: lsp_sprint3
+59/72 Test #465: tooling_demo ...........................   Passed    0.11 sec
+      Start  17: project_manifest_no_authority
+60/72 Test #509: lsp_sprint3 ............................   Passed    0.21 sec
+      Start 458: lsp_async_syntax
+61/72 Test #458: lsp_async_syntax .......................   Passed    0.17 sec
+      Start 500: lsp_stage10_fields
+62/72 Test #500: lsp_stage10_fields .....................   Passed    0.10 sec
+      Start   2: project_manifest
+63/72 Test  #17: project_manifest_no_authority ..........   Passed    0.69 sec
+      Start 510: lsp_sprint2
+64/72 Test #510: lsp_sprint2 ............................   Passed    0.12 sec
+      Start 302: lsp_demo
+65/72 Test #302: lsp_demo ...............................   Passed    0.09 sec
+      Start 505: lsp_sprint4
+66/72 Test #505: lsp_sprint4 ............................   Passed    0.09 sec
+      Start 216: lsp_stage11_globals
+67/72 Test   #2: project_manifest .......................   Passed    0.62 sec
+      Start 147: generics_hint_lsp
+68/72 Test #147: generics_hint_lsp ......................   Passed    0.11 sec
+      Start 214: lsp_positions
+69/72 Test #214: lsp_positions ..........................   Passed    0.01 sec
+      Start  19: project_manifest_provenance
+70/72 Test #216: lsp_stage11_globals ....................   Passed    0.18 sec
+      Start   1: project_manifest_header
+71/72 Test   #1: project_manifest_header ................   Passed    0.00 sec
+72/72 Test  #19: project_manifest_provenance ............   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 72
+
+Total Test time (real) = 224.65 sec
+
+===== refreshed-debug-gates.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug
+      Start  12: project_git_https
+      Start  28: project_discovery_cli
+ 1/15 Test  #28: project_discovery_cli ..................   Passed   10.86 sec
+      Start 169: allocation_elimination
+ 2/15 Test #169: allocation_elimination .................   Passed    6.82 sec
+      Start  11: project_git_dependencies
+ 3/15 Test  #12: project_git_https ......................   Passed   18.00 sec
+      Start  20: project_selection
+ 4/15 Test  #11: project_git_dependencies ...............   Passed    9.74 sec
+      Start   5: project_packages
+ 5/15 Test   #5: project_packages .......................   Passed    6.54 sec
+      Start  41: project_nested_cli
+ 6/15 Test  #41: project_nested_cli .....................   Passed    0.82 sec
+      Start  29: project_profiles
+ 7/15 Test  #29: project_profiles .......................   Passed    3.72 sec
+      Start   3: project_dependencies
+ 8/15 Test   #3: project_dependencies ...................   Passed    2.38 sec
+      Start 171: allocation_elimination_aot_optimized
+ 9/15 Test #171: allocation_elimination_aot_optimized ...   Passed    0.28 sec
+      Start 170: allocation_elimination_aot_normal
+10/15 Test #170: allocation_elimination_aot_normal ......   Passed    0.27 sec
+      Start   4: project_dependency_explain
+11/15 Test   #4: project_dependency_explain .............   Passed    0.87 sec
+      Start 465: tooling_demo
+12/15 Test #465: tooling_demo ...........................   Passed    0.15 sec
+      Start   2: project_manifest
+13/15 Test   #2: project_manifest .......................   Passed    0.65 sec
+      Start   1: project_manifest_header
+14/15 Test   #1: project_manifest_header ................   Passed    0.00 sec
+15/15 Test  #20: project_selection ......................   Passed   27.70 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Total Test time (real) =  45.71 sec
+
+===== final-strict-gates.log =====
+Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-strict
+      Start   8: project_package_native
+      Start  13: project_simple_packages
+ 1/77 Test   #8: project_package_native .................   Passed   47.01 sec
+      Start 458: project_managed_native_callbacks
+ 2/77 Test  #13: project_simple_packages ................   Passed   63.15 sec
+      Start   7: project_application_package
+ 3/77 Test #458: project_managed_native_callbacks .......   Passed   27.24 sec
+      Start  28: project_discovery_cli
+ 4/77 Test  #28: project_discovery_cli ..................   Passed   20.07 sec
+      Start   6: project_managed_native
+ 5/77 Test   #7: project_application_package ............   Passed   56.07 sec
+      Start  12: project_git_https
+ 6/77 Test   #6: project_managed_native .................   Passed   44.50 sec
+      Start  36: lsp_enum_recovery
+ 7/77 Test  #12: project_git_https ......................   Passed   31.66 sec
+      Start 294: lsp_log
+ 8/77 Test  #36: lsp_enum_recovery ......................   Passed   14.56 sec
+      Start 478: lsp_stage10_display
+ 9/77 Test #294: lsp_log ................................   Passed   20.71 sec
+      Start  11: project_git_dependencies
+10/77 Test #478: lsp_stage10_display ....................   Passed   19.13 sec
+      Start  34: lsp_editor_recovery
+11/77 Test  #11: project_git_dependencies ...............   Passed   18.84 sec
+      Start 455: project_native_import
+12/77 Test  #34: lsp_editor_recovery ....................   Passed   23.11 sec
+      Start 156: allocation_elimination
+13/77 Test #156: allocation_elimination .................   Passed    6.08 sec
+      Start  32: lsp_intellisense
+14/77 Test #455: project_native_import ..................   Passed   11.46 sec
+      Start 489: source_cli
+15/77 Test  #32: lsp_intellisense .......................   Passed    5.78 sec
+      Start 107: json_lsp
+16/77 Test #107: json_lsp ...............................   Passed    6.35 sec
+      Start 262: lsp_combined
+17/77 Test #489: source_cli .............................   Passed   17.08 sec
+      Start  30: project_native_debug_info
+18/77 Test #262: lsp_combined ...........................   Passed   10.40 sec
+      Start 358: lsp_io
+19/77 Test  #30: project_native_debug_info ..............   Passed    7.08 sec
+      Start  70: http_lsp
+20/77 Test #358: lsp_io .................................   Passed    6.61 sec
+      Start 236: lsp_os
+21/77 Test #236: lsp_os .................................   Passed    9.70 sec
+      Start 257: lsp_const_recovery
+22/77 Test  #70: http_lsp ...............................   Passed   18.11 sec
+      Start  33: lsp_semantic_tokens
+23/77 Test #257: lsp_const_recovery .....................   Passed    3.96 sec
+      Start 277: text_encoding_semantic_depth
+24/77 Test #277: text_encoding_semantic_depth ...........   Passed    2.68 sec
+      Start   5: project_packages
+25/77 Test  #33: lsp_semantic_tokens ....................   Passed    3.07 sec
+      Start 246: lsp_random
+26/77 Test #246: lsp_random .............................   Passed    3.31 sec
+      Start 274: lsp_text_encoding
+27/77 Test #274: lsp_text_encoding ......................   Passed    4.42 sec
+      Start  35: lsp_project_root_recovery
+28/77 Test  #35: lsp_project_root_recovery ..............   Passed    3.63 sec
+      Start  20: project_selection
+29/77 Test   #5: project_packages .......................   Passed   11.73 sec
+      Start  41: project_nested_cli
+30/77 Test  #41: project_nested_cli .....................   Passed    1.66 sec
+      Start 456: project_mixed_native
+31/77 Test #456: project_mixed_native ...................   Passed    3.55 sec
+      Start 264: lsp_memory
+32/77 Test #264: lsp_memory .............................   Passed    1.99 sec
+      Start 204: lsp_stage8
+33/77 Test  #20: project_selection ......................   Passed    9.35 sec
+      Start  29: project_profiles
+34/77 Test #204: lsp_stage8 .............................   Passed    2.29 sec
+      Start  38: lsp_enum_equality
+35/77 Test  #38: lsp_enum_equality ......................   Passed    1.32 sec
+      Start  10: project_managed_native_resolution
+36/77 Test  #29: project_profiles .......................   Passed    7.83 sec
+      Start 207: lsp_named_arguments
+37/77 Test  #10: project_managed_native_resolution ......   Passed    6.60 sec
+      Start 214: lsp_math
+38/77 Test #207: lsp_named_arguments ....................   Passed    1.10 sec
+      Start  18: project_manifest_legacy
+39/77 Test #214: lsp_math ...............................   Passed    1.83 sec
+      Start  31: project_protocol
+40/77 Test  #31: project_protocol .......................   Passed    2.86 sec
+      Start  56: net_sockets_lsp
+41/77 Test  #56: net_sockets_lsp ........................   Passed    1.03 sec
+      Start   3: project_dependencies
+42/77 Test  #18: project_manifest_legacy ................   Passed    5.59 sec
+      Start 202: lsp_protocol
+43/77 Test #202: lsp_protocol ...........................   Passed    1.52 sec
+      Start 226: host_capabilities_lsp
+44/77 Test #226: host_capabilities_lsp ..................   Passed    2.32 sec
+      Start  77: stage10_tooling
+45/77 Test  #77: stage10_tooling ........................   Passed    0.72 sec
+      Start  40: lsp_multiple_returns
+46/77 Test   #3: project_dependencies ...................   Passed    5.34 sec
+      Start 476: lsp_sprint6
+47/77 Test  #40: lsp_multiple_returns ...................   Passed    1.22 sec
+      Start  21: project_sessions
+48/77 Test #476: lsp_sprint6 ............................   Passed    1.01 sec
+      Start 301: lsp_collections_stdlib
+49/77 Test #301: lsp_collections_stdlib .................   Passed    1.17 sec
+      Start 479: lsp_stage10_intelligence
+50/77 Test #479: lsp_stage10_intelligence ...............   Passed    0.80 sec
+      Start 480: lsp_stage10_source_formatting
+51/77 Test  #21: project_sessions .......................   Passed    2.24 sec
+      Start   4: project_dependency_explain
+52/77 Test #480: lsp_stage10_source_formatting ..........   Passed    1.19 sec
+      Start 206: lsp_documentation
+53/77 Test #206: lsp_documentation ......................   Passed    0.52 sec
+      Start  39: lsp_quick_fixes
+54/77 Test   #4: project_dependency_explain .............   Passed    2.07 sec
+      Start 310: lsp_channel
+55/77 Test  #39: lsp_quick_fixes ........................   Passed    0.63 sec
+      Start 444: tooling
+56/77 Test #310: lsp_channel ............................   Passed    0.59 sec
+      Start 282: lsp_stage7
+57/77 Test #444: tooling ................................   Passed    0.86 sec
+      Start 158: allocation_elimination_aot_optimized
+58/77 Test #282: lsp_stage7 .............................   Passed    0.53 sec
+      Start 255: lsp_binary
+59/77 Test #158: allocation_elimination_aot_optimized ...   Passed    0.22 sec
+      Start  69: url_lsp
+60/77 Test #255: lsp_binary .............................   Passed    0.33 sec
+      Start 157: allocation_elimination_aot_normal
+61/77 Test  #69: url_lsp ................................   Passed    0.32 sec
+      Start 435: lsp_async_syntax
+62/77 Test #157: allocation_elimination_aot_normal ......   Passed    0.21 sec
+      Start 486: lsp_sprint3
+63/77 Test #435: lsp_async_syntax .......................   Passed    0.21 sec
+      Start 442: tooling_demo
+64/77 Test #486: lsp_sprint3 ............................   Passed    0.21 sec
+      Start 451: numeric_enum_lsp
+65/77 Test #442: tooling_demo ...........................   Passed    0.20 sec
+      Start 477: lsp_stage10_fields
+66/77 Test #451: numeric_enum_lsp .......................   Passed    0.18 sec
+      Start 487: lsp_sprint2
+67/77 Test #477: lsp_stage10_fields .....................   Passed    0.13 sec
+      Start 283: lsp_demo
+68/77 Test #487: lsp_sprint2 ............................   Passed    0.13 sec
+      Start 203: lsp_stage11_globals
+69/77 Test #283: lsp_demo ...............................   Passed    0.11 sec
+      Start 482: lsp_sprint4
+70/77 Test #482: lsp_sprint4 ............................   Passed    0.10 sec
+      Start  17: project_manifest_no_authority
+71/77 Test #203: lsp_stage11_globals ....................   Passed    0.19 sec
+      Start 134: generics_hint_lsp
+72/77 Test #134: generics_hint_lsp ......................   Passed    0.12 sec
+      Start   2: project_manifest
+73/77 Test  #17: project_manifest_no_authority ..........   Passed    0.36 sec
+      Start 201: lsp_positions
+74/77 Test #201: lsp_positions ..........................   Passed    0.02 sec
+      Start  19: project_manifest_provenance
+75/77 Test   #2: project_manifest .......................   Passed    0.23 sec
+      Start   1: project_manifest_header
+76/77 Test   #1: project_manifest_header ................   Passed    0.02 sec
+77/77 Test  #19: project_manifest_provenance ............   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 77
+
+Total Test time (real) = 295.33 sec
+
+===== extension-tests.log =====
+
+> void-language@0.1.2 test
+> npm run build && node --test out/test/config.test.js out/test/debugBuildReceipt.test.js out/test/diagnosticVersions.test.js
+
+
+> void-language@0.1.2 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.2 typecheck
+> tsc --noEmit
+
+
+> void-language@0.1.2 compile
+> tsc && node build.cjs
+
+✔ editor download reaps failed extractors before retry, preserving failure (148.207213ms)
+✔ editor download keeps non-retry errors and does not start more attempts (0.580417ms)
+✔ literal workspace paths, spaces, no shell expansion (0.384447ms)
+✔ Windows paths are literal, drive/root boundaries preserved (0.642107ms)
+✖ validate executable and deterministic canonical project selection (77.072926ms)
+✔ VSIX README links resolve without a repository-relative base (2.513067ms)
+✔ presentation covers approved keyword colors and block indentation (4.572816ms)
+✔ manifest projects preserve nullable entries and reject unsupported older servers (82.911105ms)
+✔ actual-child receipts reject host synthetic success and stale/concurrent selections (1.657561ms)
+✔ abandoned launches are superseded without transferring their task or success (0.355558ms)
+✔ capability negotiation adds no status flag for old/invalid compilers (32.053988ms)
+✔ diagnostics require the reported version, same document and latest notification (1.254114ms)
+✔ unversioned older servers retain conversion-time edit protection (0.383678ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 12
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 430.13602
+
+✖ failing tests:
+
+test at out/test/config.test.js:100:22
+✖ validate executable and deterministic canonical project selection (77.072926ms)
+  Error: VOID project preflight failed. Automatic/manifest selection requires a matching voidProjectProtocol 1 server; no legacy downgrade was attempted. Error: Command failed: /tmp/VOID config space 8R136c/voidls --discover-project /tmp/VOID config space 8R136c /tmp/VOID config space 8R136c/single.void
+  voidls: Usage: voidls --entry <project entry.void>
+
+      at resolveProject (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/config.js:137:15)
+      at async TestContext.<anonymous> (/home/shmellyorc/Documents/Void.Language/editors/vscode/out/test/config.test.js:129:26)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+===== extension-final.log =====
+
+> void-language@0.1.2 test
+> npm run build && node --test out/test/config.test.js out/test/debugBuildReceipt.test.js out/test/diagnosticVersions.test.js
+
+
+> void-language@0.1.2 build
+> npm run typecheck && npm run compile
+
+
+> void-language@0.1.2 typecheck
+> tsc --noEmit
+
+
+> void-language@0.1.2 compile
+> tsc && node build.cjs
+
+✔ editor download reaps failed extractors before retry, preserving failure (183.51311ms)
+✔ editor download keeps non-retry errors and does not start more attempts (0.875763ms)
+✔ literal workspace paths, spaces, no shell expansion (0.542086ms)
+✔ Windows paths are literal, drive/root boundaries preserved (0.805694ms)
+✔ validate executable and deterministic canonical project selection (49.552191ms)
+✔ VSIX README links resolve without a repository-relative base (1.743667ms)
+✔ presentation covers approved keyword colors and block indentation (4.879974ms)
+✔ manifest projects preserve nullable entries and reject unsupported older servers (54.852973ms)
+✔ actual-child receipts reject host synthetic success and stale/concurrent selections (2.68947ms)
+✔ abandoned launches are superseded without transferring their task or success (0.576746ms)
+✔ capability negotiation adds no status flag for old/invalid compilers (42.70787ms)
+✔ diagnostics require the reported version, same document and latest notification (2.010936ms)
+✔ unversioned older servers retain conversion-time edit protection (0.536526ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 428.723452
+
+===== build-eof-debug.log =====
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[  0%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8157:63: warning: missing field 'prefix' initializer [-Wmissing-field-initializers]
+ 8157 |     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+      |                                                               ^
+1 warning generated.
+[  0%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_native_inventory
+[100%] Built target voidc_objects
+[100%] Generating cache-identity-Debug.cpp
+[100%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-Debug.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:34: error: deduced conflicting types ('basic_string<char, std::char_traits<char>, std::allocator<char>>' vs 'const char *') for initializer list element type
+  237 |     for(const std::string source:{header+"    var lib = 1\n    lib.",
+      |                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  238 |             header+"    var text = \"lib.\"",header+"    # lib.",
+  239 |             "use \"./leaf.void\" as lib\nfunc changed():\n    lib.",
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+gmake[3]: *** [CMakeFiles/void_tests.dir/build.make:93: CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o] Error 1
+gmake[2]: *** [CMakeFiles/Makefile2:24289: CMakeFiles/void_tests.dir/all] Error 2
+gmake[1]: *** [CMakeFiles/Makefile2:24296: CMakeFiles/void_tests.dir/rule] Error 2
+gmake: *** [Makefile:8448: void_tests] Error 2
+
+===== build-final-debug.log =====
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_native_inventory
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 16%] Built target void_native_fixture
+[ 75%] Built target libcurl_static
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:27: warning: loop variable 'source' creates a copy from type 'const std::string' (aka 'const basic_string<char>') [-Wrange-loop-construct]
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |                           ^
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:9: note: use reference type 'const std::string &' (aka 'const basic_string<char> &') to prevent copying
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+      |                           &
+1 warning generated.
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable void_lsp_tests
+[100%] Built target void_lsp_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_tooling
+[100%] Built target void_stage10_tooling
+
+===== build-final-release.log =====
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_native_fixture
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[ 92%] Built target void_native_inventory
+[ 92%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_zone_objects
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:27: warning: loop variable 'source' creates a copy from type 'const std::string' (aka 'const basic_string<char>') [-Wrange-loop-construct]
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |                           ^
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:9: note: use reference type 'const std::string &' (aka 'const basic_string<char> &') to prevent copying
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+      |                           &
+1 warning generated.
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable void_lsp_tests
+[100%] Built target void_lsp_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_tooling
+[100%] Built target void_stage10_tooling
+
+===== build-eof-strict.log =====
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o
+/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8157:63: warning: missing field 'prefix' initializer [-Wmissing-field-initializers]
+ 8157 |     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+      |                                                               ^
+1 warning generated.
+[100%] Linking CXX static library libvoid_core.a
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable voidls
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_native_fixture
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[ 92%] Built target void_native_inventory
+[ 92%] Built target voidc_objects
+[ 92%] Generating cache-identity-RelWithDebInfo.cpp
+[ 92%] Building CXX object CMakeFiles/void_cache_identity.dir/cache-identity-RelWithDebInfo.cpp.o
+[100%] Linking CXX static library libvoid_cache_identity.a
+[100%] Built target void_cache_identity
+[100%] Linking CXX executable voidc
+[100%] Built target voidc
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_tests.dir/tests/tooling/tests.cpp.o
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:27: warning: loop variable 'source' creates a copy from type 'const std::string' (aka 'const basic_string<char>') [-Wrange-loop-construct]
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |                           ^
+/home/shmellyorc/Documents/Void.Language/tests/tooling/tests.cpp:237:9: note: use reference type 'const std::string &' (aka 'const basic_string<char> &') to prevent copying
+  237 |     for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+      |                           &
+1 warning generated.
+[100%] Linking CXX executable void_tests
+[100%] Built target void_tests
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Linking CXX executable void_lsp_tests
+[100%] Built target void_lsp_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_project_sessions
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Linking CXX executable void_stage10_tooling
+[100%] Built target void_stage10_tooling
+
+===== build-integrated-release.log =====
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 64%] Built target libcurl_static
+[ 64%] Built target void_application_objects
+[ 64%] Built target void_managed_test_abi
+[ 71%] Built target void_core
+[ 85%] Built target void_runtime
+[ 85%] Built target void_llvm
+[ 92%] Building CXX object CMakeFiles/void_allocation_elimination_tests.dir/tests/allocation_elimination/tests.cpp.o
+[ 92%] Linking CXX executable void_allocation_elimination_tests
+[ 92%] Built target void_allocation_elimination_tests
+[ 92%] Generating elision-terminator_escape-normal.o
+[ 92%] Generating elision-across_edge-normal.o
+[ 92%] Generating elision-alias-normal.o
+[ 92%] Generating elision-direct-normal.o
+[ 92%] Generating elision-effects-normal.o
+[100%] Generating elision-escape-normal.o
+[100%] Generating elision-init-normal.o
+[100%] Generating elision-local-normal.o
+[100%] Generating elision-numeric-normal.o
+[100%] Generating elision-reference-normal.o
+[100%] Generating elision-survives_allocation-normal.o
+[100%] Linking CXX executable void_allocation_elimination_aot_normal
+[100%] Built target void_allocation_elimination_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_application_objects
+[ 69%] Built target void_managed_test_abi
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[100%] Built target void_allocation_elimination_tests
+[100%] Generating elision-across_edge-optimized.o
+[100%] Generating elision-terminator_escape-optimized.o
+[100%] Generating elision-alias-optimized.o
+[100%] Generating elision-direct-optimized.o
+[100%] Generating elision-effects-optimized.o
+[100%] Generating elision-escape-optimized.o
+[100%] Generating elision-init-optimized.o
+[100%] Generating elision-local-optimized.o
+[100%] Generating elision-numeric-optimized.o
+[100%] Generating elision-reference-optimized.o
+[100%] Generating elision-survives_allocation-optimized.o
+[100%] Linking CXX executable void_allocation_elimination_aot_optimized
+[100%] Built target void_allocation_elimination_aot_optimized
+[  0%] Built target void_application_objects
+[  7%] Built target void_format_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_zone_objects
+[ 69%] Built target void_native_fixture
+[ 69%] Built target void_managed_test_abi
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[100%] Built target void_allocation_elimination_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_zone_objects
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_g5_reload.dir/tests/ffi/callback_reload.cpp.o
+[100%] Linking CXX executable void_g5_reload
+[100%] Built target void_g5_reload
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target void_lsp_tests
+[100%] Built target void_project_header
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_project_manifest.dir/tests/project/manifest.cpp.o
+[100%] Linking CXX executable void_project_manifest
+[100%] Built target void_project_manifest
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_packages_ir.dir/tests/project/packages_ir.cpp.o
+[100%] Linking CXX executable void_project_packages_ir
+[100%] Built target void_project_packages_ir
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  8%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_native_fixture
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[ 92%] Built target void_native_inventory
+[ 92%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_tooling_example.dir/examples/tooling.cpp.o
+[100%] Linking CXX executable void_tooling_example
+[100%] Built target void_tooling_example
+
+===== build-integrated-debug.log =====
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_application_objects
+[ 69%] Built target void_managed_test_abi
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[ 92%] Building CXX object CMakeFiles/void_allocation_elimination_tests.dir/tests/allocation_elimination/tests.cpp.o
+[ 92%] Linking CXX executable void_allocation_elimination_tests
+[ 92%] Built target void_allocation_elimination_tests
+[ 92%] Generating elision-across_edge-normal.o
+[ 92%] Generating elision-terminator_escape-normal.o
+[ 92%] Generating elision-alias-normal.o
+[ 92%] Generating elision-direct-normal.o
+[ 92%] Generating elision-effects-normal.o
+[ 92%] Generating elision-escape-normal.o
+[ 92%] Generating elision-local-normal.o
+[ 92%] Generating elision-init-normal.o
+[ 92%] Generating elision-numeric-normal.o
+[ 92%] Generating elision-reference-normal.o
+[ 92%] Generating elision-survives_allocation-normal.o
+[ 92%] Linking CXX executable void_allocation_elimination_aot_normal
+[100%] Built target void_allocation_elimination_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_application_objects
+[ 75%] Built target void_managed_test_abi
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_allocation_elimination_tests
+[100%] Generating elision-terminator_escape-optimized.o
+[100%] Generating elision-across_edge-optimized.o
+[100%] Generating elision-alias-optimized.o
+[100%] Generating elision-direct-optimized.o
+[100%] Generating elision-effects-optimized.o
+[100%] Generating elision-escape-optimized.o
+[100%] Generating elision-init-optimized.o
+[100%] Generating elision-local-optimized.o
+[100%] Generating elision-numeric-optimized.o
+[100%] Generating elision-reference-optimized.o
+[100%] Generating elision-survives_allocation-optimized.o
+[100%] Linking CXX executable void_allocation_elimination_aot_optimized
+[100%] Built target void_allocation_elimination_aot_optimized
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target void_managed_test_abi
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_allocation_elimination_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_g5_reload.dir/tests/ffi/callback_reload.cpp.o
+[100%] Linking CXX executable void_g5_reload
+[100%] Built target void_g5_reload
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target void_lsp_tests
+Built target void_project_header
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_project_manifest.dir/tests/project/manifest.cpp.o
+[100%] Linking CXX executable void_project_manifest
+[100%] Built target void_project_manifest
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_packages_ir.dir/tests/project/packages_ir.cpp.o
+[100%] Linking CXX executable void_project_packages_ir
+[100%] Built target void_project_packages_ir
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_native_inventory
+[100%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target voidls
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_tooling_example.dir/examples/tooling.cpp.o
+[100%] Linking CXX executable void_tooling_example
+[100%] Built target void_tooling_example
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_project_selection.dir/tests/project/selection.cpp.o
+[100%] Linking CXX executable void_project_selection
+[100%] Built target void_project_selection
+
+===== build-integrated-strict.log =====
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  7%] Built target void_zone_objects
+[ 64%] Built target libcurl_static
+[ 64%] Built target void_application_objects
+[ 64%] Built target void_managed_test_abi
+[ 71%] Built target void_core
+[ 85%] Built target void_runtime
+[ 85%] Built target void_llvm
+[ 92%] Building CXX object CMakeFiles/void_allocation_elimination_tests.dir/tests/allocation_elimination/tests.cpp.o
+[ 92%] Linking CXX executable void_allocation_elimination_tests
+[ 92%] Built target void_allocation_elimination_tests
+[ 92%] Generating elision-terminator_escape-normal.o
+[ 92%] Generating elision-across_edge-normal.o
+[ 92%] Generating elision-alias-normal.o
+[ 92%] Generating elision-direct-normal.o
+[ 92%] Generating elision-effects-normal.o
+[100%] Generating elision-escape-normal.o
+[100%] Generating elision-local-normal.o
+[100%] Generating elision-init-normal.o
+[100%] Generating elision-numeric-normal.o
+[100%] Generating elision-reference-normal.o
+[100%] Generating elision-survives_allocation-normal.o
+[100%] Linking CXX executable void_allocation_elimination_aot_normal
+[100%] Built target void_allocation_elimination_aot_normal
+[  0%] Built target void_native_fixture
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_application_objects
+[ 69%] Built target void_managed_test_abi
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[100%] Built target void_allocation_elimination_tests
+[100%] Generating elision-across_edge-optimized.o
+[100%] Generating elision-terminator_escape-optimized.o
+[100%] Generating elision-alias-optimized.o
+[100%] Generating elision-direct-optimized.o
+[100%] Generating elision-effects-optimized.o
+[100%] Generating elision-escape-optimized.o
+[100%] Generating elision-init-optimized.o
+[100%] Generating elision-local-optimized.o
+[100%] Generating elision-numeric-optimized.o
+[100%] Generating elision-reference-optimized.o
+[100%] Generating elision-survives_allocation-optimized.o
+[100%] Linking CXX executable void_allocation_elimination_aot_optimized
+[100%] Built target void_allocation_elimination_aot_optimized
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_native_fixture
+[ 69%] Built target void_managed_test_abi
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[100%] Built target void_allocation_elimination_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_zone_objects
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_g5_reload.dir/tests/ffi/callback_reload.cpp.o
+[100%] Linking CXX executable void_g5_reload
+[100%] Built target void_g5_reload
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target void_lsp_tests
+[100%] Built target void_project_header
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_project_manifest.dir/tests/project/manifest.cpp.o
+[100%] Linking CXX executable void_project_manifest
+[100%] Built target void_project_manifest
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Building CXX object CMakeFiles/void_project_packages_ir.dir/tests/project/packages_ir.cpp.o
+[100%] Linking CXX executable void_project_packages_ir
+[100%] Built target void_project_packages_ir
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_project_sessions
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_stage10_tooling
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 75%] Built target libcurl_static
+[ 75%] Built target void_native_fixture
+[ 75%] Built target native_fixture
+[ 83%] Built target void_core
+[100%] Built target void_runtime
+[100%] Built target void_llvm
+[100%] Built target void_tests
+[  0%] Built target void_application_objects
+[  0%] Built target void_format_objects
+[  0%] Built target void_zone_objects
+[ 69%] Built target libcurl_static
+[ 69%] Built target void_native_fixture
+[ 76%] Built target void_core
+[ 92%] Built target void_runtime
+[ 92%] Built target void_llvm
+[ 92%] Built target void_native_inventory
+[ 92%] Built target voidc_objects
+[100%] Built target void_cache_identity
+[100%] Built target voidc
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Built target void_lsp
+[100%] Built target voidls
+[  0%] Built target void_format_objects
+[  0%] Built target void_application_objects
+[  0%] Built target void_zone_objects
+[100%] Built target void_core
+[100%] Building CXX object CMakeFiles/void_tooling_example.dir/examples/tooling.cpp.o
+[100%] Linking CXX executable void_tooling_example
+[100%] Built target void_tooling_example
+
+===== profile-before-eof-fix-stderr.log =====
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":12629},"project_capture":{"count":2,"us":15529},"source_loading":{"count":3,"us":66}},"method":"textDocument/completion","us":68754}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13831},"project_capture":{"count":2,"us":16833},"source_loading":{"count":3,"us":66}},"method":"textDocument/completion","us":17319}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":11746},"project_capture":{"count":2,"us":14627},"source_loading":{"count":3,"us":63}},"method":"textDocument/completion","us":15063}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":11593},"project_capture":{"count":2,"us":14420},"source_loading":{"count":3,"us":72}},"method":"textDocument/completion","us":36407}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":11783},"project_capture":{"count":2,"us":14766},"source_loading":{"count":3,"us":71}},"method":"textDocument/completion","us":15262}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":12016},"project_capture":{"count":2,"us":14695},"source_loading":{"count":3,"us":70}},"method":"textDocument/completion","us":15164}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":12526},"project_capture":{"count":2,"us":15344},"source_loading":{"count":3,"us":65}},"method":"textDocument/completion","us":15887}
+VOID_LSP_PROFILE_BEGIN assistance/analysis
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":2,"us":71747},"lex_parse":{"count":5,"us":38383},"project_capture":{"count":3,"us":76827},"semantic_analysis":{"count":1,"us":40012},"source_loading":{"count":4,"us":87}},"method":"assistance/analysis","us":167737}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":11630},"project_capture":{"count":2,"us":14479},"source_loading":{"count":3,"us":73}},"method":"textDocument/completion","us":15117}
+VOID_LSP_PROFILE_BEGIN assistance/analysis
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":2,"us":65704},"lex_parse":{"count":5,"us":26317},"project_capture":{"count":3,"us":70760},"semantic_analysis":{"count":1,"us":36110},"source_loading":{"count":4,"us":95}},"method":"assistance/analysis","us":145477}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":11973},"project_capture":{"count":2,"us":14885},"source_loading":{"count":3,"us":76}},"method":"textDocument/completion","us":15502}
+VOID_LSP_PROFILE_BEGIN assistance/analysis
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":2,"us":65921},"lex_parse":{"count":5,"us":25772},"project_capture":{"count":3,"us":71174},"semantic_analysis":{"count":1,"us":40392},"source_loading":{"count":4,"us":82}},"method":"assistance/analysis","us":149503}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13291},"project_capture":{"count":2,"us":16266},"source_loading":{"count":3,"us":71}},"method":"textDocument/completion","us":16801}
+VOID_LSP_PROFILE_BEGIN assistance/analysis
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":2,"us":69045},"lex_parse":{"count":5,"us":26899},"project_capture":{"count":3,"us":75082},"semantic_analysis":{"count":1,"us":36351},"source_loading":{"count":4,"us":83}},"method":"assistance/analysis","us":150766}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":11606},"project_capture":{"count":2,"us":14236},"source_loading":{"count":3,"us":64}},"method":"textDocument/completion","us":14749}
+VOID_LSP_PROFILE_BEGIN assistance/analysis
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":2,"us":71589},"lex_parse":{"count":5,"us":39474},"project_capture":{"count":3,"us":76700},"semantic_analysis":{"count":1,"us":43236},"source_loading":{"count":4,"us":81}},"method":"assistance/analysis","us":172323}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13021},"project_capture":{"count":2,"us":15892},"source_loading":{"count":3,"us":79}},"method":"textDocument/completion","us":16459}
+VOID_LSP_PROFILE_BEGIN assistance/analysis
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":2,"us":67560},"lex_parse":{"count":5,"us":32295},"project_capture":{"count":3,"us":72940},"semantic_analysis":{"count":1,"us":42818},"source_loading":{"count":4,"us":88}},"method":"assistance/analysis","us":163306}
+
+===== profile-after-eof-fix-stderr.log =====
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":12742},"project_capture":{"count":2,"us":15635},"source_loading":{"count":3,"us":69}},"method":"textDocument/completion","us":56882}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13655},"project_capture":{"count":2,"us":16551},"source_loading":{"count":3,"us":65}},"method":"textDocument/completion","us":17034}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13122},"project_capture":{"count":2,"us":15932},"source_loading":{"count":3,"us":76}},"method":"textDocument/completion","us":16435}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":15050},"project_capture":{"count":2,"us":18096},"source_loading":{"count":3,"us":72}},"method":"textDocument/completion","us":43452}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":15167},"project_capture":{"count":2,"us":18100},"source_loading":{"count":3,"us":82}},"method":"textDocument/completion","us":18724}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13367},"project_capture":{"count":2,"us":16343},"source_loading":{"count":3,"us":67}},"method":"textDocument/completion","us":16841}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":14390},"project_capture":{"count":2,"us":17277},"source_loading":{"count":3,"us":79}},"method":"textDocument/completion","us":42867}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13699},"project_capture":{"count":2,"us":16621},"source_loading":{"count":3,"us":74}},"method":"textDocument/completion","us":17114}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13991},"project_capture":{"count":2,"us":16841},"source_loading":{"count":3,"us":90}},"method":"textDocument/completion","us":17389}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13945},"project_capture":{"count":2,"us":16919},"source_loading":{"count":3,"us":84}},"method":"textDocument/completion","us":45174}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":13923},"project_capture":{"count":2,"us":16890},"source_loading":{"count":3,"us":79}},"method":"textDocument/completion","us":41126}
+VOID_LSP_PROFILE_BEGIN textDocument/completion
+VOID_LSP_PROFILE {"inclusivePhases":{"dependency_verification":{"count":1,"us":14445},"project_capture":{"count":2,"us":17359},"source_loading":{"count":3,"us":77}},"method":"textDocument/completion","us":41429}
+
+===== Original object comparison O0 =====
+--- baseline
+
++++ candidate
+
+@@ -124,10 +124,10 @@
+
+  0080 6172792d 70726f6a 65637405 00000030  ary-project....0
+  0090 2e312e30                             .1.0
+ Contents of section .rodata.str1.1..Lvd.application.provenance.v1:
+- 0000 64636462 34623666 65646364 32333039  dcdb4b6fedcd2309
+- 0010 37623633 66313361 36643739 62633937  7b63f13a6d79bc97
+- 0020 63346231 38393437 65326339 33333730  c4b18947e2c93370
+- 0030 36393836 39323432 31663963 35623735  698692421f9c5b75
++ 0000 33663030 63373534 65373131 64646337  3f00c754e711ddc7
++ 0010 63356638 38393830 37373063 65656635  c5f88980770ceef5
++ 0020 34626466 61656161 63643862 32663236  4bdfaeaacd8b2f26
++ 0030 62336261 62323132 62633961 63663133  b3bab212bc9acf13
+  0040 00                                   .
+ Contents of section .eh_frame:
+  0000 14000000 00000000 017a5200 01781001  .........zR..x..
+===== Original object comparison O2 =====
+--- baseline
+
++++ candidate
+
+@@ -75,10 +75,10 @@
+
+  0080 6172792d 70726f6a 65637405 00000030  ary-project....0
+  0090 2e312e30                             .1.0
+ Contents of section .rodata.str1.1..Lvd.application.provenance.v1:
+- 0000 35613935 30613739 66643665 63633665  5a950a79fd6ecc6e
+- 0010 65353336 62356462 38303465 34626238  e536b5db804e4bb8
+- 0020 64386137 34306138 65386438 35306439  d8a740a8e8d850d9
+- 0030 33396134 31646331 62353534 36633866  39a41dc1b5546c8f
++ 0000 63613861 32336636 33613236 66366638  ca8a23f63a26f6f8
++ 0010 32326538 63356164 65616461 66616366  22e8c5adeadafacf
++ 0020 63333136 37613263 34326339 61366532  c3167a2c42c9a6e2
++ 0030 63653937 37633636 64363432 34306433  ce977c66d64240d3
+  0040 00                                   .
+ Contents of section .symtab:
+  0000 00000000 00000000 00000000 00000000  ................
