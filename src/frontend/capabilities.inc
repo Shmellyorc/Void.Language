@@ -193,6 +193,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 ReferenceFacts child;
                 if(p.kind==K::list){child=ir::field_facts(p.type,facts,ir::array_element_path);if(p.rest && n+1==p.children.size()){auto leaves=child;child=ir::reference_facts(p.children[n].type);for(const auto& [path,fact]:leaves){auto nested=path;nested.insert(nested.begin(),ir::array_element_path);child[nested].join(fact);}}}
                 else if(p.kind==K::dictionary)child=ir::field_facts(ir::array_element(p.type),ir::field_facts(p.type,facts,ir::array_element_path),1);
+                else if(p.nullable && ir::nullable_value(p.type))child=ir::field_facts(p.type,facts,1);
                 else if(p.nullable || p.rest)child=facts;
                 else child=ir::field_facts(p.type,facts,p.indexes[n]);
                 pattern(p.children[n],child);
@@ -282,6 +283,9 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if(e.target!="$array.count" && e.target!="$dict.count" && !e.target.starts_with("$text."))view=ir::field_facts(e.parts[0]->type,base,e.slot);
             }); else if (e.kind==K::conversion) {
                 view=expression(*e.parts[0]);
+                if(e.op=="$nullable_lift")view=ir::replaced_facts(ir::reference_facts(e.type),1,view);
+                else if(e.op=="$nullable_try")view=ir::replaced_facts(ir::reference_facts(e.type),1,ir::nullable_value(e.parts[0]->type)?ir::field_facts(e.parts[0]->type,view,1):view);
+                else if(e.op=="$nullable_unwrap")view=ir::field_facts(e.parts[0]->type,view,1);
                 if(e.op=="interface")for(const auto& [id,root]:units)if(root->member_catalog) {
                     for(const auto& binding:root->member_catalog->interface_bindings)if(binding.key==e.target && ir::binding_requires_readonly(binding))view[{}].readonly=true;
                     break;

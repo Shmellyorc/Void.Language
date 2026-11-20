@@ -145,6 +145,10 @@ std::string array_identity(Type element, std::optional<std::uint64_t> extent) {
     const auto key=std::to_string(static_cast<unsigned>(element.kind))+":"+Type::key(element)+(element.nullable ? "?" : "");
     return "$array:"+std::to_string(key.size())+":"+key+":"+(extent ? std::to_string(*extent) : "growable");
 }
+bool nullable_value(Type t) {return t.kind==Type::aggregate && t.definition && t.definition->nullable_value;}
+bool nullable_type(Type t) {return t.nullable || nullable_value(t);}
+Type nullable_payload(Type t) {if(nullable_value(t))return field_type(t,1);t.nullable=false;return t;}
+std::string nullable_identity(Type t) {return "$nullable:"+array_identity(t,{});}
 bool multiple_return_type(const Type& type) {
     return type.kind==Type::aggregate && type.definition && type.definition->identity.starts_with("$returns:");
 }
@@ -239,7 +243,7 @@ bool async_boundary_safe(Type root) {
     while(!pending.empty()){auto t=pending.back();pending.pop_back();if(t.construction || t.kind==Type::prepared_receiver)return false;if(!t.definition || !seen.insert(t.definition.get()).second)continue;if(t.definition->callable || t.definition->native_resource)return false;if(t.definition->element)pending.push_back(*t.definition->element);for(const auto& field:t.definition->fields)pending.push_back(field.type);}
     return true;
 }
-bool requires_initialization(Type t){return !t.nullable && (t.kind==Type::numeric_enum || console::endpoint_type(t) || reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
+bool requires_initialization(Type t){return !nullable_type(t) && (t.kind==Type::numeric_enum || console::endpoint_type(t) || reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
 bool reference_value(Type t) { return t.kind==Type::managed_ref || t.kind==Type::interface_ref; }
 Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     if (!d) return;
@@ -447,8 +451,13 @@ std::string capability_key(Type type) {
     return result;
 }
 std::string reference_path_name(Type type,const ReferencePath& path) {
-    std::string result=array_type(type) ? type_name(type) : type.definition ? (type.definition->display_name.empty()?type.definition->name:type.definition->display_name) : type_name(type);
+    const bool nullable=nullable_type(type);
+    auto logical=nullable?nullable_payload(type):type;
+    std::string result=collection_type(logical) ? type_name(logical) : logical.definition ? (logical.definition->display_name.empty()?logical.definition->name:logical.definition->display_name) : type_name(logical);
+    if(nullable)result+='?';
     for (auto field:path) {
+        // The private presence wrapper is not a source field selection.
+        if(nullable_value(type) && field==1){type=field_type(type,field);continue;}
         if(collection_type(type) && field==array_element_path)result+="[]";else result+='.'+type.definition->fields.at(field).name;
         type=field_type(type,field);
     }
@@ -463,6 +472,8 @@ std::string construction_name(const std::string& symbol,const std::vector<unsign
 }
 std::string type_name(Type t) {
     if (t.construction) { t.construction=false; return "construction view " + type_name(t); }
+    if(nullable_value(t))return type_name(nullable_payload(t))+"?";
+    if(t.nullable && !reference_value(t) && !(t.definition && t.definition->callable)){t.nullable=false;return type_name(t)+"?";}
     if(t.definition && !t.definition->display_name.empty())return std::string(t.readonly?"readonly ":"")+t.definition->display_name+(t.nullable?"?":"");
     if(t.kind==Type::interface_ref && t.definition) return std::string(t.readonly ? "readonly " : "")+t.definition->identity+(t.nullable ? "?" : "");
     if(t.kind==Type::prepared_receiver && t.definition) return "prepared receiver "+t.definition->identity;
@@ -605,6 +616,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             auto t=pending[n];
             if(t.definition && t.kind!=Type::numeric_enum && (t.definition->enum_backing || t.definition->enum_flags || !t.definition->numeric_members.empty()))
                 fail("numeric enum used with a non-enum type");
+            if(t.definition && t.kind!=Type::aggregate && (t.definition->nullable_value || t.definition->identity.starts_with("$nullable:")))
+                fail("nullable storage used with a non-sum type");
             if(t.definition && t.kind!=Type::aggregate && (t.definition->option_type || t.definition->identity.starts_with("$option:")))
                 fail("canonical option used with a non-sum type");
             if(t.kind==Type::dictionary) {
@@ -709,6 +722,20 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 if(t.kind!=Type::aggregate || d->managed || d->interface_type || !d->cases.empty() || d->result_type || d->fields.size()!=2 || Type(d->fields[0].type)!=Type::u64 || Type(d->fields[1].type).kind!=Type::managed_ref || !d->fields[1].type.nullable || !d->call_result || !d->base.expired())fail("invalid function value shape");
                 pending.push_back(*d->call_result);for(const auto& parameter:d->call_parameters){if(Type(parameter)==Type::none)fail("no-result function parameter");pending.push_back(parameter);}
             }
+            if(d->nullable_value) {
+                if(t.nullable || t.kind!=Type::aggregate || d->managed || d->interface_type || d->callable ||
+                   d->result_type || d->option_type || d->native_resource || !d->native_provider.empty() || d->custom_equality || d->task_result || d->call_result ||
+                   !d->call_parameters.empty() || !d->module_identity.empty() || !d->base.expired() ||
+                   d->visibility!="private" || d->fields.size()!=2 || d->cases.size()!=2 ||
+                   d->fields[0].name!="$tag" || Type(d->fields[0].type)!=Type::i32 || d->fields[1].name!="$value" ||
+                   d->cases[0].name!="$null" || d->cases[0].count!=0 || d->cases[1].name!="Ok" || d->cases[1].count!=1 ||
+                   nullable_type(d->fields[1].type) || reference_value(d->fields[1].type) ||
+                   Type(d->fields[1].type)==Type::none || multiple_return_type(d->fields[1].type) ||
+                   (Type(d->fields[1].type).definition && Type(d->fields[1].type).definition->callable) ||
+                   d->name!=d->identity || d->identity!=nullable_identity(d->fields[1].type))fail("invalid nullable value storage");
+                for(const auto& field:d->fields)if(field.owner!=d->identity || field.readonly || field.using_field || field.event ||
+                   field.type.readonly || !field.type.readonly_references.empty())fail("invalid nullable value field");
+            } else if(d->identity.starts_with("$nullable:"))fail("forged nullable value identity");
             if(d->option_type) {
                 if(t.kind!=Type::aggregate || d->managed || d->callable || d->result_type || d->native_resource ||
                    d->task_result || d->call_result || !d->call_parameters.empty() || !d->module_identity.empty() ||
@@ -717,13 +744,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                    d->fields[0].name!="$tag" || d->fields[1].name!="$some")
                     fail("invalid canonical option shape");
                 auto payload=Type(d->fields[1].type);
-                if((!numeric::integer(payload) && payload.kind!=Type::numeric_enum) ||
-                   payload.nullable || payload.readonly || !payload.readonly_references.empty() ||
+                if(payload==Type::none || payload.construction || multiple_return_type(payload) ||
+                   payload.readonly || !payload.readonly_references.empty() ||
                    d->identity!=option_identity(payload) || d->name!=d->identity)
                     fail("invalid canonical option identity");
                 for(const auto& field:d->fields)
                     if(field.owner!=d->identity || field.visibility!="public" || field.using_field || field.event ||
-                       field.readonly || field.type.readonly || field.type.nullable || !field.type.readonly_references.empty())
+                       field.readonly || field.type.readonly || !field.type.readonly_references.empty())
                         fail("invalid canonical option field");
             } else if(d->identity.starts_with("$option:"))fail("forged canonical option identity");
             if(d->result_type && d->cases.empty())fail("result type has no variants");
@@ -737,7 +764,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
             const bool callable_environment=d->identity=="$void::$environment";
             if(callable_environment && (!d->managed || !d->fields.empty() || !d->base.expired() || !d->module_identity.empty() || d->name!="$environment" || d->visibility!="private"))fail("invalid shared callable environment base");
-            if(!m.interface_requirements.empty() && !returns && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
+            if(!m.interface_requirements.empty() && !returns && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->nullable_value && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
@@ -1766,7 +1793,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         }
     }
     if(m.async_root){auto entry=functions.find(m.entry_symbol);if(entry!=functions.end() && entry->second->worker)fail("worker cannot be a root adapter");if(entry==functions.end() || !entry->second->asynchronous || entry->second->parameters!=std::vector<Type>{Type::i32} || entry->second->result!=Type::i32)fail("invalid explicit async root adapter signature");}
-    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !key.starts_with("$returns:") && !definition->result_type && !definition->option_type && !definition->callable) fail("incomplete nominal universe for structural interfaces");
+    if(!m.interface_requirements.empty()) for(const auto& [key,definition]:definitions) if(!catalog_definitions.contains(definition) && !dictionary_entries.contains(definition) && !key.starts_with("$returns:") && !definition->result_type && !definition->option_type && !definition->nullable_value && !definition->callable) fail("incomplete nominal universe for structural interfaces");
     std::map<std::string,ReferenceEffects> worker_effects;
     auto* inferred=verified_effects?verified_effects:&worker_effects;
     validate_reference_capabilities(m,qualified_types,inferred);

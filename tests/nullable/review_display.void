@@ -1,0 +1,41 @@
+struct node:
+    value: i32
+value struct point:
+    x: i32
+func (p point) string() -> string:
+    return "point({p.x})"
+enum notice:
+    empty
+    data(value: string)
+func main() -> i32:
+    var zero: i32? = 0
+    var absent: string? = null
+    var flag: bool? = false
+    var empty: string? = ""
+    var values: [i32?] = [null, 0, 7]
+    var dictionary: {i32: string?} = {1: null, 2: ""}
+    var optional_items: [string]? = []
+    var required_items: [string] = []
+    var object: node? = null
+    if string(zero) != "0" or string(absent) != "null" or string(flag) != "false" or string(empty) != "":
+        return 1
+    if string(values) != "[null, 0, 7]" or string(dictionary) != "{{1: null, 2: }}":
+        return 2
+    if string(optional_items) != string(required_items) or string(optional_items) != "[]" or string(object) != "null":
+        return 3
+    if "{zero}|{absent}|{flag}|{empty}|{values}" != "0|null|false||[null, 0, 7]":
+        return 4
+    var success: result<i32?, string> = Ok(null)
+    var failure: result<i32?, string> = Err("problem")
+    if string(success) != "Ok(null)" or string(failure) != "Err(problem)":
+        return 5
+    if not (format(zero, ">4") is Ok("   0")) or not (format(absent, ">6") is Ok("  null")):
+        return 6
+    var position: point? = point(x = 4)
+    var notification: notice? = notice.data("ok")
+    if string(position) != "point(4)" or string(notification) != string(notice.data("ok")):
+        return 7
+    print(zero, absent, flag)
+    print(values)
+    print("{zero}|{absent}|{flag}|{empty}|{optional_items}")
+    return 0

@@ -569,6 +569,18 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/enums/lsp.py" "$<TARGET_FILE:voidls>"
     "${CMAKE_CURRENT_BINARY_DIR}/g78-enum-lsp-results.json")
   set_tests_properties(lsp_enum_completeness PROPERTIES TIMEOUT 180)
+  add_test(NAME nullable_review_corrections COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/nullable/corrections.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g79-review-corrections-results.json")
+  set_tests_properties(nullable_review_corrections PROPERTIES TIMEOUT 180)
+  add_test(NAME nullable_completeness COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/nullable/completeness.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g79-nullable-results.json")
+  set_tests_properties(nullable_completeness PROPERTIES TIMEOUT 300)
+  add_test(NAME lsp_nullable_completeness COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/nullable/lsp.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g79-nullable-lsp-results.json")
+  set_tests_properties(lsp_nullable_completeness PROPERTIES TIMEOUT 180)
   add_test(NAME enum_review_corrections COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/enums/corrections.py" "$<TARGET_FILE:voidc>"
     "${CMAKE_CURRENT_BINARY_DIR}/g78-corrections-results.json")
@@ -1976,6 +1988,10 @@ if(BUILD_TESTING)
     add_test(NAME numeric_loops_aot_${mode} COMMAND void_numeric_loops_aot_${mode})
     set_tests_properties(numeric_loops_aot_${mode} PROPERTIES TIMEOUT 120)
   endforeach()
+  add_executable(void_nullable_ownership tests/nullable/ownership.cpp)
+  target_link_libraries(void_nullable_ownership PRIVATE void_llvm void_runtime)
+  add_test(NAME nullable_ownership COMMAND void_nullable_ownership)
+  set_tests_properties(nullable_ownership PROPERTIES TIMEOUT 180)
   add_executable(void_numeric_enum_ir tests/numeric/enums_ir.cpp)
   target_link_libraries(void_numeric_enum_ir PRIVATE void_llvm void_runtime)
   add_test(NAME numeric_enum_ir COMMAND void_numeric_enum_ir)

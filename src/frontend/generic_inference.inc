@@ -38,6 +38,7 @@ std::vector<Type> infer_arguments(Unit& owner,const std::vector<GenericParameter
     auto parameter=[&](Type pattern){return pattern.kind==Type::unresolved && std::any_of(parameters.begin(),parameters.end(),[&](const auto& p){return p.token.text==pattern.definition->name;});};
     std::function<void(Type,Type)> match=[&](Type pattern,Type actual) {
         if(actual==error_type || actual==Type::null_value)return;
+        if(pattern.nullable){pattern.nullable=false;match(pattern,ir::nullable_type(actual)?ir::nullable_payload(actual):actual);return;}
         if(parameter(pattern)) {
             actual=ir::with_readonly_paths(actual,{});actual.readonly=false;
             auto [found,inserted]=inferred.emplace(pattern.definition->name,actual);

@@ -1,0 +1,23 @@
+## Read a nullable health value with an explicit fallback.
+## @param health Optional health; zero is a present value.
+## @param fallback Value used only when health is null.
+## @return Present health or fallback.
+func health_or(health: i32?, fallback: i32 = 100) -> i32:
+    if health is Ok(var present):
+        return present
+    return fallback
+
+## Demonstrate absence, presence and checked extraction.
+## @return Zero on successful demonstration.
+func main() -> i32:
+    var health: i32? = null
+    var nickname: string? = "Boss"
+    var items: [string]? = []
+    print(health_or(health))
+    health = 0
+    print(health_or(health))
+    if (nickname as? string) is Some(var text):
+        print(text)
+    if items is Ok(var inventory):
+        print(inventory.count)
+    return 0

@@ -468,12 +468,18 @@ class Server {
             if(vd::package_source(id) && d.primary.source)
                 package_uris[id]=vd::lsp::file_uri(vd::utf8_path(d.primary.source->path()));
             auto message=d.description;
+            // Keep canonical compiler records intact; nullable and readonly
+            // errors use source-facing names in primary and related messages.
+            const bool readable=d.code==vd::DiagnosticCode::readonly ||
+                (d.code==vd::DiagnosticCode::type_mismatch &&
+                 (d.expected_type.find('?')!=std::string::npos || d.received_type.find('?')!=std::string::npos));
+            if(readable)message=display_text(std::move(message));
             if(!d.hint.empty()) message+="\nHint: "+d.hint;
             j::Object diagnostic{{"range",range(d.primary)},{"severity",d.severity==vd::Severity::error ? 1 : d.severity==vd::Severity::warning ? 2 : 3},
                 {"code",vd::diagnostic_code(d.code)},{"source","VOID"},{"message",message}};
             if(related_information && !d.related.empty()) {
                 j::Array related;
-                for(const auto& r:d.related) related.push_back(j::Object{{"location",location(r.span)},{"message",r.description}});
+                for(const auto& r:d.related) related.push_back(j::Object{{"location",location(r.span)},{"message",readable?display_text(r.description):r.description}});
                 diagnostic["relatedInformation"]=std::move(related);
             }
             groups[id].push_back(std::move(diagnostic));

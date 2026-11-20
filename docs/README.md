@@ -20,7 +20,7 @@ holds in historical records do not govern current work.
   [inheritance](INHERITANCE.md), [receiver methods](RECEIVER_METHODS.md), [properties](PROPERTIES.md).
 - [Fixed arrays](FIXED_ARRAYS.md), [growable arrays](GROWABLE_ARRAYS.md),
   [array operations](ARRAY_OPERATIONS.md), [dictionaries](DICTIONARIES.md),
-  [generics](GENERICS.md), [interfaces](INTERFACES.md), [advanced language](ADVANCED_LANGUAGE.md).
+  [generics](GENERICS.md), [nullable types](NULLABLE_TYPES.md), [interfaces](INTERFACES.md), [advanced language](ADVANCED_LANGUAGE.md).
 - [Async/Tasks](ASYNC.md), [native libraries](NATIVE_LIBRARIES.md),
   [GC Runtime](GC_RUNTIME.md), [runtime globals](RUNTIME_GLOBALS.md),
   [cache policy](compiler-health/stabilization/CACHE.md), [diagnostics](DIAGNOSTICS.md),

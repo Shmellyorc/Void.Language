@@ -807,3 +807,10 @@ specialization order. Generated equality/metadata helpers are hidden implementat
 do not create phantom source declarations or coloring. Contextual `flags` coloring
 only applies before `enum`; existing identifiers named `flags` remain valid.
 See [enums](ENUMS.md) and [qualification](projects/G78_ENUM_COMPLETENESS.md).
+
+### Nullable type presentation (G79)
+
+Hover, completion details and signatures retain explicit nullable spelling,
+including `i32?`, `string?`, `[string]?` and `player?`. Generic declarations remain
+symbolic (`t?`); concrete calls show concrete nullable signatures. Private nullable
+storage names are not members or public symbols. See [nullable types](NULLABLE_TYPES.md).

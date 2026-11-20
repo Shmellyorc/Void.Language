@@ -61,13 +61,16 @@ Function& collection_display_adapter(Type type,const Token& site) {
             auto& invalid=condition(body,binary("or",binary("<",name(selected),number(0,Type::i32)),binary(">=",name(selected),number(t.definition->cases.size(),Type::i32))));expression(invalid.body,call("$collection_invalid"));
             for(unsigned c=0;c<t.definition->cases.size();++c){const auto& variant=t.definition->cases[c];
                 auto& arm=condition(body,binary("==",name(selected),number(c,Type::i32)));auto& opened=condition(arm.body,binary("==",name(position),number(0)));
-                const auto label=t.definition->result_type?variant.name:t.definition->identity+"."+variant.name;
-                append(opened.body,text(label+(variant.count?"(":"")));assign(opened.body,top(cursor),number(1));
+                // Nullable storage is transparent: absence prints null and a
+                // present value uses the payload's ordinary display path.
+                const bool nullable=ir::nullable_value(t);
+                const auto label=nullable?(c==0?std::string("null"):std::string{}):t.definition->result_type?variant.name:t.definition->identity+"."+variant.name;
+                append(opened.body,text(label+(variant.count && !nullable?"(":"")));assign(opened.body,top(cursor),number(1));
                 Body* pending=&opened.otherwise;
                 for(unsigned field=0;field<variant.count;++field){auto& payload=condition(*pending,binary("==",name(position),number(field+1)));if(field)append(payload.body,text(", "));
                     assign(payload.body,top(cursor),number(field+2));push(payload.body,ir::field_type(t,variant.begin+field),call("$collection_payload",name(owner),number(variant.begin+field,Type::i32)));pending=&payload.otherwise;
                 }
-                if(variant.count)append(*pending,text(")"));for(auto key:{owners,cursor,std::string("$work")})expression(*pending,method(key,"remove_at",last(key)));
+                if(variant.count && !nullable)append(*pending,text(")"));for(auto key:{owners,cursor,std::string("$work")})expression(*pending,method(key,"remove_at",last(key)));
             }
             Statement again(Statement::Kind::continued,site);body.push_back(std::move(again));continue;
         }

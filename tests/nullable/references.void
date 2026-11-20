@@ -1,0 +1,40 @@
+struct player:
+    health: i32
+interface living:
+    func read() -> i32
+func (p player) read() -> i32:
+    return p.health
+## Identity callable used to test existing nullable function values.
+## @param value Supplied integer.
+## @return Original value.
+func identity(value: i32) -> i32:
+    return value
+func main() -> i32:
+    var actor: player? = null
+    var callback: (func(i32) -> i32)? = null
+    if actor != null or callback != null:
+        return 1
+    actor = player(health = 8)
+    callback = identity
+    var view: living? = actor as living?
+    if (actor as? player) is Some(var p):
+        if p.health != 8:
+            return 2
+    else:
+        return 3
+    if (view as? living) is Some(var v):
+        if v.read() != 8:
+            return 4
+    else:
+        return 5
+    if (callback as? func(i32) -> i32) is Some(var call):
+        if call(3) != 3:
+            return 6
+    else:
+        return 7
+    actor = null
+    callback = null
+    view = null
+    if not ((actor as? player) is None) or not ((view as? living) is None) or not ((callback as? func(i32) -> i32) is None):
+        return 8
+    return 0

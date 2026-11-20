@@ -48,6 +48,10 @@
             }
             jump(yes);return;
         case K::constructor: {
+            if(p.nullable && ir::nullable_value(p.type)) {
+                test(emit({ir::Op::equal,extract(load(source),0,token),constant(Type::i32,{1,{}},token)},token));
+                ir::Instruction get{ir::Op::sum_get,load(source)};get.immediate=1;child(p.children[0],emit(get,token));jump(yes);return;
+            }
             if(p.nullable) {
                 auto nulltype=p.type;nulltype.nullable=true;test(emit({ir::Op::not_equal,load(source),constant(nulltype,{0,{}},token)},token));
                 ir::Instruction convert{ir::Op::convert,load(source)};convert.type=p.children[0].type;child(p.children[0],emit(convert,token));jump(yes);return;

@@ -2,7 +2,7 @@
 // Their implementations are ordinary typed expressions/functions, not reflection
 // objects or a second enum representation.
 bool enum_value_type(Type t) const {
-    return t.kind==Type::numeric_enum || (t.kind==Type::aggregate && t.definition && !t.definition->cases.empty() && !t.definition->result_type && !t.definition->option_type);
+    return t.kind==Type::numeric_enum || (t.kind==Type::aggregate && t.definition && !t.definition->cases.empty() && !t.definition->result_type && !t.definition->option_type && !t.definition->nullable_value);
 }
 Function enum_api_signature(Type t,const Token& site,const std::string& operation) {
     Function target;target.token=site;target.symbol="$enum.api::"+Type::key(t)+"::"+operation;

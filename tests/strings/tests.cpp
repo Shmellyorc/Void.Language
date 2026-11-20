@@ -27,7 +27,8 @@ void language() {
     // the unterminated triple above preserves malformed-literal rejection.
     run(entry+"    var text = \"\"\"multiline\"\"\"\n    if text == \"multiline\":\n        return v\n    return 0\n",10);
     for(char control:{'\0','\t','\x7f'}) reject(entry+"    var text = \"a"+control+"b\"\n    return v\n");
-    reject(entry+"    var text: string?\n    return v\n");
+    // G79 admits explicit nullable strings; required-string null rejection above stays intact.
+    run(entry+"    var text: string?\n    if text == null:\n        text = \"\"\n    if text == null or text as string != \"\":\n        return -1\n    return v\n",10);
     reject(entry+"    var text = \"a\"\n    text -= \"b\"\n    return v\n");
     reject(entry+"    const text = \"a\"\n    text += \"b\"\n    return v\n");
     reject("struct box:\n    text: string\n"+entry+"    const b = box()\n    b.text = \"changed\"\n    return v\n");

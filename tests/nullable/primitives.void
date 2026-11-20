@@ -1,0 +1,120 @@
+func main() -> i32:
+    var value_i8: i8?
+    if value_i8 != null:
+        return 1
+    value_i8 = -128
+    if value_i8 == null or value_i8 as i8 != -128:
+        return 11
+    if value_i8 is Ok(var extracted_i8):
+        if extracted_i8 != -128:
+            return 21
+    else:
+        return 31
+    var value_i16: i16?
+    if value_i16 != null:
+        return 2
+    value_i16 = -32768
+    if value_i16 == null or value_i16 as i16 != -32768:
+        return 12
+    if value_i16 is Ok(var extracted_i16):
+        if extracted_i16 != -32768:
+            return 22
+    else:
+        return 32
+    var value_i32: i32?
+    if value_i32 != null:
+        return 3
+    value_i32 = -2147483648
+    if value_i32 == null or value_i32 as i32 != -2147483648:
+        return 13
+    if value_i32 is Ok(var extracted_i32):
+        if extracted_i32 != -2147483648:
+            return 23
+    else:
+        return 33
+    var value_i64: i64?
+    if value_i64 != null:
+        return 4
+    value_i64 = -9223372036854775808
+    if value_i64 == null or value_i64 as i64 != -9223372036854775808:
+        return 14
+    if value_i64 is Ok(var extracted_i64):
+        if extracted_i64 != -9223372036854775808:
+            return 24
+    else:
+        return 34
+    var value_u8: u8?
+    if value_u8 != null:
+        return 5
+    value_u8 = 255
+    if value_u8 == null or value_u8 as u8 != 255:
+        return 15
+    if value_u8 is Ok(var extracted_u8):
+        if extracted_u8 != 255:
+            return 25
+    else:
+        return 35
+    var value_u16: u16?
+    if value_u16 != null:
+        return 6
+    value_u16 = 65535
+    if value_u16 == null or value_u16 as u16 != 65535:
+        return 16
+    if value_u16 is Ok(var extracted_u16):
+        if extracted_u16 != 65535:
+            return 26
+    else:
+        return 36
+    var value_u32: u32?
+    if value_u32 != null:
+        return 7
+    value_u32 = 4294967295
+    if value_u32 == null or value_u32 as u32 != 4294967295:
+        return 17
+    if value_u32 is Ok(var extracted_u32):
+        if extracted_u32 != 4294967295:
+            return 27
+    else:
+        return 37
+    var value_u64: u64?
+    if value_u64 != null:
+        return 8
+    value_u64 = 18446744073709551615
+    if value_u64 == null or value_u64 as u64 != 18446744073709551615:
+        return 18
+    if value_u64 is Ok(var extracted_u64):
+        if extracted_u64 != 18446744073709551615:
+            return 28
+    else:
+        return 38
+    var value_f32: f32?
+    if value_f32 != null:
+        return 9
+    value_f32 = 0.5f
+    if value_f32 == null or value_f32 as f32 != 0.5f:
+        return 19
+    if value_f32 is Ok(var extracted_f32):
+        if extracted_f32 != 0.5f:
+            return 29
+    else:
+        return 39
+    var value_f64: f64?
+    if value_f64 != null:
+        return 10
+    value_f64 = 0.5d
+    if value_f64 == null or value_f64 as f64 != 0.5d:
+        return 20
+    if value_f64 is Ok(var extracted_f64):
+        if extracted_f64 != 0.5d:
+            return 30
+    else:
+        return 40
+    var zero: f32 = 0
+    var nan: f32? = zero / zero
+    if nan == null or nan == nan:
+        return 41
+    var negative_zero: f32? = -zero
+    var positive_zero: f32? = zero
+    if negative_zero != positive_zero:
+        return 42
+    return 0

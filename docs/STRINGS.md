@@ -148,11 +148,11 @@ physical line boundary. The existing editor grammar colors string/type/escape
 regions while keeping # and keywords inside strings as text. The accepted VOID1001
 malformed-byte diagnostic correction remains documented in DIAGNOSTICS.md.
 
-## Deferred approved direction
+## Historical Phase 22 boundary
 
-LANGUAGE_BIBLE.md Section 8.1 records approved future scalar indexing returning
-one-scalar strings, scalar `.length`, UTF-8 `.byte_length`, nullable strings in
-principle and automatic interpolation. None is implemented in Phase 22. Index
+The original Phase 22 scope did not include scalar indexing, `.length`,
+`.byte_length`, interpolation or nullable strings. Later text/formatting guides
+supersede those original boundaries; G79 implements explicit `string?`. Index
 error behavior, slicing and ordering semantics remain open. Printing, formatting,
 multiline trimming, grapheme APIs, collections/builders, native binding syntax,
 interning and public string ABI remain deferred.
@@ -177,3 +177,10 @@ structural conformance, generic specialization, capabilities and checked failure
 rules remain authoritative. Both conditional branches type-check. Formatting and
 numeric/bool/custom string conversion remain deferred. Approval and implementation
 are separate from local acceptance, Wrench review and the final hosted lock.
+
+## Explicit nullable strings
+
+G79 implements `string?` with a separate presence tag. Null remains distinct
+from `""`; ordinary `string` stays non-nullable. Extract or use `Ok(var text)`
+before string operations. See [nullable types](NULLABLE_TYPES.md). The earlier
+Phase 22 nullable-string deferral is superseded by G79.

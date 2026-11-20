@@ -36,7 +36,8 @@ declared discriminant. Constant evaluation follows the same rules as execution.
 The result is the canonical tagged sum `option<T>`, with `Some(value)` for success
 and `None` for failure. In expressions the constructors use the expected canonical
 option type. In patterns they use the subject type. Slice 6 supports fixed-width
-integer and numeric-backed enum payloads. Ordinary name lookup still resolves a
+integer and numeric-backed enum conversions. G79 extends `option<T>` payloads and
+adds same-payload nullable `as?` extraction; see [nullable types](NULLABLE_TYPES.md). Ordinary name lookup still resolves a
 user-declared `option` where visible. That declaration has its own nominal
 identity, and the compiler-generated type of an `as?` expression remains canonical.
 
@@ -219,7 +220,7 @@ VOID fixtures execute without Python. Handwritten floating cases include roundin
 per operation and a multiply/subtract whose result would change if fused.
 WORK_LOG.md records actual toolchains, commands, results and repeat stress.
 
-Deferred: exponent/base/separator literal syntax, float remainder, nullable casts,
+Deferred: exponent/base/separator literal syntax, float remainder, lifted nullable arithmetic,
 platform-sized aliases, arbitrary public native ABIs, numeric formatting/hashing,
 user-defined conversions and foreign floating-environment management. Recommended
 next phase: validated analysis/dependency APIs and precise compatibility metadata,

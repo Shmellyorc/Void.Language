@@ -122,8 +122,6 @@ for(auto& [id,u]:units) {
         if(!generic && found->name=="option") {
             if(found->arguments.size()!=1)error(owner->source,found->token,Code::argument_count,"option<T> requires exactly one payload type.");
             auto payload=resolve_type(found->arguments.front(),*owner,root,units,site);
-            if(!numeric::integer(payload) && payload.kind!=Type::numeric_enum)
-                error(owner->source,found->token,Code::unsupported_type,"option<T> requires an integer or numeric enum payload.");
             return found->resolved=owner->make_option(payload);
         }
         if(!generic || generic->generics.empty())error(owner->source,found->token,Code::unsupported_type,"Type '"+found->name+"' is not a generic struct.");

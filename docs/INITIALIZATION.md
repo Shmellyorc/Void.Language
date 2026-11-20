@@ -182,3 +182,7 @@ suites remain; total is 24. Obsolete init-declaration rejection became positive
 execution; direct lifecycle rejection and check/run/emit output protection remain.
 WORK_LOG.md records full matrices, stack/stress and real editor verification,
 including what still needs hosted Windows/macOS execution.
+
+G79 nullable value/collection locals and omitted fields default to null without
+constructing an underlying payload. Required non-nullable initialization remains
+unchanged. See [nullable types](NULLABLE_TYPES.md).

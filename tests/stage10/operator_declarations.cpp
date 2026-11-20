@@ -52,7 +52,7 @@ int main(int argc,char** argv){try{
     accept(owner+declaration("+","const left: point, const amount: i32")+declaration("+","const amount: i32, const left: point")+declaration("+","const left: point, const amount: i64"));
     accept(owner+declaration("%","const left: point, const right: f64","f64","        return right\n"));
     reject("value struct box<t>:\n    value: t\n    operator +(const left: box<t>?) -> i32:\n        return 0\n","nullable");
-    reject("value struct box<t>:\n    value: t\n    operator +(const left: box<t>) -> box<t>?:\n        return left\n","nullable");
+    accept("value struct box<t>:\n    value: t\n    operator +(const left: box<t>) -> box<t>?:\n        return left\n");
     for(const auto& visibility:{"public ","internal ","private "}){
         auto visible=accept(owner+declaration("+","const left: point","i32","        return left.x\n",visibility));
         for(const auto& f:visible->lower().functions)if(!f.operator_glyph.empty())check(f.visibility==std::string(visibility).substr(0,std::string(visibility).size()-1),"visibility lost");

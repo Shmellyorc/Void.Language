@@ -422,3 +422,14 @@ Slice 3 assigns **VOID5012** to an owned warning for a selected project profile
 requesting unsupported profile-controlled `debug_info="line"` or `"full"`. It does
 not reject the schema or change existing emitter behavior; `none` is quiet. Explicit
 settings span their exact TOML value; schema defaults use an EOF insertion span.
+
+### Explicit nullable values (G79)
+
+Null in a required type or extraction to a different payload type uses VOID2001.
+Member access and built-in arithmetic require an extracted value. Checked null
+extraction uses the existing source-located runtime failure (application exit 1);
+an evaluated constant extraction diagnoses at compile time. Nullable payload
+readonly mutations remain VOID2007. Editor nullable mismatch and readonly messages shorten
+nominal paths for readability, including related information. Nullable readonly
+paths omit private presence storage (for example, `carrier?.child`). Compiler type
+identities, diagnostic codes and source spans remain unchanged. See [nullable types](NULLABLE_TYPES.md).

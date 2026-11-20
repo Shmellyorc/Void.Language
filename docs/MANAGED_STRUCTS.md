@@ -49,7 +49,8 @@ introduced. Every construction has distinct identity, including empty objects.
 expected nullable type. A `t` can be assigned to `t?`; `(reference as t)` checks a
 same-nominal nullable reference before use and reports a source runtime failure
 for null. Nullable field/method access requires explicit unwrap. There are no
-implicit nullable dereferences, unrelated reference casts or nullable primitives.
+implicit nullable dereferences or unrelated reference casts. G79 extends explicit
+nullability to ordinary value and collection types; see [nullable types](NULLABLE_TYPES.md).
 
 Types without custom init use named-field construction. Supplied expressions run once in source order. Omitted numeric/bool fields
 use established safe/pure declared defaults; nested value fields use the existing
@@ -179,8 +180,8 @@ methods/self-types, readonly edit diagnostics and repaired/stale navigation.
 Editor presentation adds the implemented `null` literal and managed indentation.
 Colors and extension lifecycle are unchanged. WORK_LOG.md records actual runs.
 
-Still deferred: managed compile-time allocations; broader
-nullable patterns/flow narrowing; managed FFI; weak refs/finalizers/deinit;
+Historical Phase 16 deferrals (later feature guides supersede implemented families):
+managed compile-time allocations; broader flow narrowing; managed FFI; weak refs/finalizers/deinit;
 inheritance/interfaces/generics; strings/collections; async/thread APIs; production
 collector tuning. Managed debug metadata currently describes opaque reference
 pointers, rather than a rich object inspector. Phase 15 callback-provider quiescence

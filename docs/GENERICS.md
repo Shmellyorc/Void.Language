@@ -99,9 +99,11 @@ expansion uses the existing diagnostic/resource model: dependency depth 128 and
 parser, type-layout and IR limits. Infinite inline value ownership remains
 invalid; managed/growable indirection uses the existing rules.
 
-General `t?`, higher-kinded parameters, generic interfaces, method-specific generic
+G79 implements general `t?` and nullable concrete arguments through the same
+specialization/inference machinery; see [nullable types](NULLABLE_TYPES.md).
+Higher-kinded parameters, generic interfaces, method-specific generic
 virtuals/initializers, variance, operator/comparable contracts and specialization
-sharing optimizations remain outside this foundation. An already nullable managed
+sharing optimizations remain outside this foundation. Any supported nullable
 type can be supplied as `t`. Ordinary named/default method arguments use the Stage 8 Sprint 2 shared binder. Method-specific generic selection currently requires a
 direct receiver declaration; owner-parameter methods become ordinary concrete
 methods and use the established inheritance/composition paths. Later source

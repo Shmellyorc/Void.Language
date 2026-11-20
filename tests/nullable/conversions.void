@@ -1,0 +1,97 @@
+## Preserve presence through a generic nullable parameter.
+## @param value Optional payload.
+## @return The same nullable payload.
+func keep<t>(value: t?) -> t?:
+    return value
+## Lift an ordinary payload through a generic result.
+## @param value Required payload.
+## @return A present nullable payload.
+func lift<t>(value: t) -> t?:
+    return value
+value struct point:
+    x: i32
+value struct capsule<t>:
+    value: t
+    operator +(const left: capsule<t>) -> capsule<t>?:
+        return left
+    operator +(const left: capsule<t>, const right: [t]?) -> i32:
+        if right is Ok(var items):
+            return items.count as i32
+        return 0
+    operator +(const left: capsule<t>, const right: [t]) -> i32:
+        return right.count as i32 + 10
+var calls: i32 = 0
+## Produce one optional score and count the call.
+## @return A present five.
+func read_once() -> i32?:
+    calls++
+    return 5
+func main() -> i32:
+    var absent: string? = null
+    var text: string? = ""
+    if not ((absent as? string) is None):
+        return 1
+    if (text as? string) is Some(var value):
+        if value != "":
+            return 2
+    else:
+        return 3
+    var health: i32? = 0
+    if (health as? i32) is Some(var number):
+        if number != 0:
+            return 4
+    else:
+        return 5
+    var nullable = keep(health)
+    if nullable as i32 != 0 or keep<i32>(null) != null or lift(7) as i32 != 7:
+        return 6
+    var list: [i32]? = []
+    if (list as? [i32]) is Some(var items):
+        if items.count != 0:
+            return 7
+    else:
+        return 8
+    var flag: bool? = false
+    if not ((flag as? bool) is Some(false)):
+        return 9
+    var value: point? = point(x = 5)
+    if (value as? point) is Some(var p):
+        if p.x != 5:
+            return 10
+    else:
+        return 11
+    var fixed: [i32, 2]? = [1, 2]
+    var copy = fixed
+    var extracted = copy as [i32, 2]
+    extracted[0] = 8
+    if (fixed as [i32, 2])[0] != 1:
+        return 12
+    var sum: result<i32?, string>? = Ok(null)
+    if sum is Ok(Ok(null)):
+        pass
+    else:
+        return 13
+    var wrapped: option<i32?> = Some(null)
+    if not (wrapped is Some(null)):
+        return 14
+    var deep: capsule<[i32?]>? = capsule<[i32?]>(value = [null, 0])
+    if deep is Ok(var present):
+        if present.value[0] != null or present.value[1] as i32 != 0:
+            return 15
+    else:
+        return 16
+    var operand = capsule<i32>(value = 7)
+    var nullable_result = +operand
+    if (nullable_result as capsule<i32>).value != 7:
+        return 17
+    var optional_items: [i32]? = [1, 2]
+    var required_items: [i32] = [1, 2]
+    if operand + optional_items != 2 or operand + required_items != 12:
+        return 18
+    if read_once() as i32 != 5 or calls != 1:
+        return 19
+    if not ((read_once() as? i32) is Some(5)) or calls != 2:
+        return 20
+    if read_once() == null or calls != 3:
+        return 21
+    return 0

@@ -439,7 +439,8 @@ scalar/i64 length and byte_length, owned scalar indexing with negative indexes
 and checked bounds failures, and owned UTF-8 byte conversion with string-error
 results. See [the current contract](STAGE8_TEXT_COLLECTIONS.md) for engineering
 and [local acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md). The original Phase 22/future wording below is historical;
-nullable strings, graphemes, slicing and interpolation remain future work.
+nullable strings are implemented by G79; later string/formatting guides govern
+other implemented text features.
 
 **APPROVED DESIGN, NOT YET IMPLEMENTED.** The following decisions do not expand
 Phase 22. Its approved foundation contract is S1-S8 in STRINGS_PROPOSAL.md;
@@ -472,9 +473,9 @@ are 3 and 6 respectively. Whether byte_length is implemented directly on the typ
 or through standard-library machinery remains an implementation decision. Neither
 length API is part of Phase 22. Grapheme counting is separate future functionality.
 
-Ordinary string remains non-nullable with empty-string default. Future `string?`
-support is approved in principle under the existing nullable-type philosophy.
-Phase 22 rejects both `var text: string = null` and `var optional: string?`.
+Ordinary string remains non-nullable with empty-string default. G79 implements
+`string?` with explicit presence distinct from the empty string. `var text: string = null`
+remains rejected; `var optional: string?` defaults to null. See [nullable types](NULLABLE_TYPES.md).
 Further conversion/equality/unwrapping interactions are not invented by this
 approval and require review where existing contracts do not settle them.
 
@@ -1581,6 +1582,14 @@ Additional failure during defer:
 
 ## 29. `result`, `Ok`, `Err`, `?`, and nullable patterns [AGREED]
 
+**Implemented G79:** explicit `T?` supports numeric primitives, bool, strings, value
+structs, enums and collections alongside existing nullable references/interfaces/
+callables. Non-nullable types remain the default. `T` lifts to the same `T?`; null
+needs nullable context. `Ok(var payload)` matches presence; `as T` checks extraction
+and `as? T` returns canonical `option<T>`. Null is distinct from zero, false, empty
+strings and empty collections. Readonly authority and ordinary copying/GC rules
+remain intact. See [nullable types](NULLABLE_TYPES.md) for the complete contract.
+
 Recoverable operations return `result<t, e>`, with `Ok(value)` for success and `Err(error)` for failure. `?` unwraps a successful result or propagates its error (running registered cleanup along the way).
 
 ```python
@@ -1619,10 +1628,10 @@ Use proper error types, including enums with cases such as `not_found`, `permiss
 
 ## 30. Type casts, checks, and parsing [AGREED]
 
-**Implemented clarification:** Phase 6 defines the numeric `as` conversion matrix, floating truncation/rounding, invalid-value failures, range checking and optimization-independent behavior. Phase 16+ separately implements bounded checked managed reference conversions/upcasts in its approved nominal/interface source family. Project Slice 6 implements the integer and numeric-backed enum `as?` family in [Numeric types and contextual literals](NUMERIC_TYPES.md#numeric-backed-enums-and-fallible-casts). Other fallible conversions, downcasts, foreign conversions and richer type patterns remain open.
+**Implemented clarification:** Phase 6 defines the numeric `as` conversion matrix, floating truncation/rounding, invalid-value failures, range checking and optimization-independent behavior. Phase 16+ separately implements bounded checked managed reference conversions/upcasts in its approved nominal/interface source family. Project Slice 6 implements the integer and numeric-backed enum `as?` family in [Numeric types and contextual literals](NUMERIC_TYPES.md#numeric-backed-enums-and-fallible-casts). G79 adds same-payload nullable extraction to canonical `option<T>`. Other fallible conversions, downcasts, foreign conversions and richer type patterns remain open.
 
 - `value as type` is an explicit checked conversion; when allowed but invalid at runtime, report a VOID runtime error.
-- `value as? type` checks an integer against the target integer range and, for a numeric-backed enum, its declared discriminants. The result is canonical `option<type>` containing `Some(value)` or `None`. This supersedes the older nullable-cast proposal for the implemented family.
+- `value as? type` checks an integer against the target integer range and, for a numeric-backed enum, its declared discriminants. The result is canonical `option<type>` containing `Some(value)` or `None`. G79 also supports safe nullable extraction to the same payload type. This supersedes the older nullable-cast proposal for the implemented family.
 - `value is type` / `value is type(binding)` checks types and narrows them through the pattern system.
 - Parse strings using `parse<t>(text)`, returning a `result`, rather than magically casting strings to numbers.
 - Compatible numeric literals adapt to expected parameter/field types.
@@ -1649,7 +1658,7 @@ match parse<i32>(age):
 # var bad = age as i32  # Compile error: parsing is not casting
 ```
 
-Floating-to-integer `as` truncates toward zero and reports a runtime error for out-of-range values, `NaN`, and infinity. The earlier floating-to-integer `as?` sketch was part of the nullable proposal. Fallible floating-point and reference conversions, along with user-defined conversion operators, remain deferred.
+Floating-to-integer `as` truncates toward zero and reports a runtime error for out-of-range values, `NaN`, and infinity. The earlier floating-to-integer `as?` sketch was part of the nullable proposal. G79 adds safe same-type nullable reference extraction. General fallible floating-point/reference conversions and user-defined conversion operators remain deferred.
 
 ## 31. Generics and constraints [AGREED]
 
@@ -3191,7 +3200,7 @@ This section matters especially when an AI assistant inherits this file without 
 17. **Numeric conversion policy:** [IMPLEMENTED CORE: Phase 6 numeric behavior and project Slice 6 fallible integer casts] `NUMERIC_TYPES.md` specifies contextual literals, wrapping integer overflow, signed/unsigned arithmetic, IEEE NaN/signed-zero comparisons and checked numeric `as`. Project Slice 6 adds canonical `option<T>` for integer-to-integer and integer-to-numeric-enum `as?`. Float hashing and total ordering, platform-sized aliases and additional conversions remain future design.
 18. **UTF-8 semantics:** [IMPLEMENTED CORE: Phase 22 UTF-8 foundation; future indexing/slicing open] S1-S8 approve the strict UTF-8 foundation with exact bytes,
     no normalization and embedded NUL. Section 8.1 approves future scalar indexing,
-    scalar length, byte_length and nullable strings in principle, outside Phase 22.
+    scalar length and byte_length; G79 implements explicit nullable strings.
     Index errors, slicing, grapheme APIs, ordering, formatting grammar and broader
     native binding policy remain open.
 19. **Panic and defer:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Applicable cleanup continues after failure while preserving the primary diagnostic and bounded additional errors; native process corruption cannot guarantee cleanup.

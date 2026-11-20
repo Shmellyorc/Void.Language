@@ -1,0 +1,56 @@
+value struct pair:
+    left: string
+    right: string
+const text: string? = "abcdefghijklmnopqrstuvwxyz0123456789"
+const safe = text as? string
+const absent: string? = null
+const absent_safe = absent as? string
+const aggregate: pair? = pair(left = "left-left-left-left-left-left-left-left", right = "right-right-right-right-right-right-right-right")
+const aggregate_safe = aggregate as? pair
+const absent_aggregate: pair? = null
+const absent_aggregate_safe = absent_aggregate as? pair
+const array: [string, 2]? = ["abcdefghijklmnopqrstuvwxyz0123456789", "right-right-right-right-right-right-right-right"]
+const array_safe = array as? [string, 2]
+const absent_array: [string, 2]? = null
+const absent_array_safe = absent_array as? [string, 2]
+const flag: bool? = false
+const flag_safe = flag as? bool
+const zero: i32? = 0
+const zero_safe = zero as? i32
+const empty: string? = ""
+const empty_safe = empty as? string
+const nested: option<string?> = Some(null)
+func main() -> i32:
+    if safe is Some(var value):
+        if value != "abcdefghijklmnopqrstuvwxyz0123456789":
+            return 1
+    else:
+        return 2
+    if not (absent_safe is None) or not (absent_aggregate_safe is None) or not (absent_array_safe is None):
+        return 3
+    if aggregate_safe is Some(var value):
+        if value.left != "left-left-left-left-left-left-left-left" or value.right != "right-right-right-right-right-right-right-right":
+            return 4
+    else:
+        return 5
+    if array_safe is Some(var values):
+        if values[0] != "abcdefghijklmnopqrstuvwxyz0123456789" or values[1] != "right-right-right-right-right-right-right-right":
+            return 6
+    else:
+        return 7
+    if not (flag_safe is Some(false)) or not (zero_safe is Some(0)) or not (empty_safe is Some("")) or not (nested is Some(null)):
+        return 8
+    var runtime_text = text
+    var runtime_aggregate = aggregate
+    if (runtime_text as? string) is Some(var value):
+        if value != text as string:
+            return 9
+    else:
+        return 10
+    if (runtime_aggregate as? pair) is Some(var value):
+        if value.left != (aggregate as pair).left or value.right != (aggregate as pair).right:
+            return 11
+    else:
+        return 12
+    print("constants preserved")
+    return 0

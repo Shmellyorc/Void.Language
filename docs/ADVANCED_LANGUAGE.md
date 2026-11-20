@@ -269,3 +269,8 @@ programs in `examples/patterns` and `examples/advanced`: normal/O2 JIT, independ
 linked AOT, 2 MiB fixed captures, collection/closure cycles, failure injection,
 transactional publication, scope cleanup, callback identities, generics and reload.
 Existing semantic-depth tests also cover nested closure/defer recovery on 1 MiB.
+
+G79 extends nullable `Ok(pattern)` presence matching to scalar, string, value, enum
+and collection payloads. Null arms, checked `as` extraction and fallible `as?`
+extraction preserve the existing pattern/option/result distinctions. See
+[nullable types](NULLABLE_TYPES.md).

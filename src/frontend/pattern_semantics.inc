@@ -58,7 +58,7 @@
         if(type.definition && !type.definition->cases.empty())complete|=covered.size()==type.definition->cases.size();
         if(type==Type::boolean)complete|=scalar_cases.size()==2;
         if(type.kind==Type::numeric_enum && !type.definition->enum_flags)complete|=scalar_cases.size()==type.definition->numeric_members.size();
-        if(type.nullable)complete|=present && absent;
+        if(ir::nullable_type(type))complete|=present && absent;
         if(!complete)diagnostics.warn(source,token,Code::incomplete_match,"Match may leave values unmatched.");return complete;
     }
     void check_pattern(Pattern& p,Type type) {
@@ -114,9 +114,9 @@
                 auto expression=value(p);p.children.clear();p.values.push_back(std::move(expression));p.kind=K::value;expect(this->expression(*p.values[0],type),type,p.token);if(!ir::pattern_comparable(type))error(source,p.token,Code::type_mismatch,"Use explicit collection patterns.");return;
             }
 
-            if((p.spelling=="Ok" || p.spelling=="Err") && type.nullable && (ir::reference_value(type) || (type.definition && type.definition->callable))) {
+            if((p.spelling=="Ok" || p.spelling=="Err") && ir::nullable_type(type)) {
                 if(p.spelling=="Err" || p.children.size()!=1)error(source,p.token,Code::type_mismatch,"Nullable presence uses Ok(pattern); Err is a result variant.");
-                p.nullable=true;(void)result_editor_target(type,0,p.variant_token);auto present=type;present.nullable=false;check_pattern(p.children[0],present);return;
+                p.nullable=true;(void)result_editor_target(type,0,p.variant_token);auto present=ir::nullable_payload(type);check_pattern(p.children[0],present);return;
             }
             if(!p.derived_case && enum_value_type(type)) {
                 if(auto [owner,structure]=pattern_enum_declaration(p,type,p.spelling);structure) {

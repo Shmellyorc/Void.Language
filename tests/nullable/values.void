@@ -1,0 +1,122 @@
+value struct branch:
+    children: [branch?]
+value struct point:
+    x: i32
+    y: i32
+struct player:
+    health: i32
+value struct record:
+    score: i32?
+    text: string?
+    point: point?
+    owner: player?
+    items: [string]?
+enum status:
+    empty
+    data(value: string)
+enum number(u8):
+    first = 7
+flags enum permission:
+    read
+    write
+value struct box<t>:
+    value: t?
+enum message<t>:
+    empty
+    data(value: t?)
+var global_score: i32? = null
+var global_text: string? = "Boss"
+var global_record = record()
+const missing: i32? = null
+const zero: i32? = 0
+const is_missing = missing == null
+const is_present = zero != null
+const extracted = zero as i32
+## Return a nullable value without losing presence.
+## @param value Supplied nullable score.
+## @return The same value or null.
+func identity<t>(value: t) -> t:
+    return value
+## Select a present nullable payload or a fallback.
+## @param value Optional score.
+## @param fallback Value used when absent.
+## @return Present score or fallback.
+func score(value: i32?, fallback: i32 = 9) -> i32:
+    if value is Ok(var present):
+        return present
+    return fallback
+func main() -> i32:
+    var health: i32? = null
+    var flag: bool? = false
+    var text: string? = ""
+    if health != null or flag == null or text == null:
+        return 1
+    health = 0
+    if health == null or health as i32 != 0 or flag as bool or text as string != "":
+        return 2
+    if not is_missing or not is_present or extracted != 0 or score(null) != 9 or score(0) != 0:
+        return 3
+    var location: point? = point(x = 2)
+    if location is Ok(var p):
+        p.x = 4
+        if (location as point).x != 2:
+            return 4
+    else:
+        return 5
+    var names: [string]? = []
+    var fixed: [i32, 2]? = [0, 1]
+    var map: {string: i32}? = {"health": 7}
+    if names == null or (names as [string]).count != 0 or (fixed as [i32, 2])[1] != 1 or (map as {string: i32})["health"] != 7:
+        return 6
+    var states: [status?] = [null, status.data("ok"), status.empty]
+    var n: number? = number.first
+    var flags: permission? = permission.read | permission.write
+    if states[0] != null or (states[1] as status).name != "data" or (n as number).value != 7 or not (flags as permission).has(permission.write):
+        return 7
+    var wrapped = box<i32>(value = 8)
+    var nested = box<string?>(value = "yes")
+    if wrapped.value as i32 != 8 or nested.value as string != "yes" or identity<i32?>(null) != null or identity(health) as i32 != 0:
+        return 8
+    if global_score != null or global_text as string != "Boss" or global_record.score != null or global_record.point != null:
+        return 9
+    global_score = 3
+    global_record.score = 5
+    var slots: [i32?, 3]
+    if slots[0] != null or slots[2] != null:
+        return 10
+    slots[1] = 0
+    match slots[1]:
+        null:
+            return 11
+        Ok(var value):
+            if value != 0:
+                return 12
+    var decimal_value: f64? = 0.5d
+    var small: u8? = 255
+    if decimal_value as f64 != 0.5d or small as u8 != 255:
+        return 13
+    var shared: [i32]? = [1]
+    var alias = shared
+    var list = alias as [i32]
+    list.push(2)
+    if (shared as [i32]).count != 2:
+        return 14
+    var ordinary: status? = status.data("ok")
+    if ordinary != states[1]:
+        return 15
+    var keyed: {i32?: string} = {null: "absent", 0: "zero", 7: "seven"}
+    if keyed[null] != "absent" or keyed[0] != "zero" or small != 255:
+        return 16
+    var envelope: message<i32>? = message<i32>.data(null)
+    if not (envelope is Ok(message<i32>.data(null))):
+        return 17
+    var absent_point: point?
+    var absent_list: [string]?
+    if absent_point != null or absent_list != null:
+        return 18
+    var root = branch()
+    var children = root.children
+    children.push(root)
+    if (children[0] as branch).children.count != 1:
+        return 19
+    return 0

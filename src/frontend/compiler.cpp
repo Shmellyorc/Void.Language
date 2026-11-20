@@ -595,7 +595,7 @@ bool random_numeric_function(const Function& f) {
 Type editor_pattern_type(Type raw) {
     if(raw.kind!=Type::unresolved && !ir::collection_type(raw) && !(raw.definition && (raw.definition->result_type || raw.definition->callable)))return raw;
     auto name=std::make_shared<ir::ValueType>();name->name=raw.definition->name;name->identity=name->name;
-    return Type(name,Type::unresolved);
+    Type type(name,Type::unresolved);type.nullable=raw.nullable;return type;
 }
 std::string editor_return_type(const Function& f) {
     if(f.returns.empty())return ir::type_name(f.generics.empty()?f.result:editor_pattern_type(f.result));
@@ -804,6 +804,8 @@ struct Unit {
     std::map<std::string,AnalyzedDeclaration> builtins;
     std::function<Type(Type,Type)> make_result;
     std::function<Type(Type)> make_option;
+    std::function<Type(Type)> make_nullable;
+    std::map<std::string,Type> nullable_types; // Resolved annotations remain available to immutable tooling.
     std::function<Type(Type,const Token&)> resolve_callable;
     std::function<Type(const std::vector<Type>&,Type)> make_callable;
     std::function<Type(Type)> make_task;
@@ -875,8 +877,7 @@ class Parser {
     Type grouped_type_end(Type value) {
         need(")");
         if(accept("?")) {
-            if(!ir::reference_value(value) && !(value.definition && value.definition->callable))
-                error(source,tokens[p-1],Code::unsupported_type,"Only references and function values can be nullable.");
+            if(value.nullable)error(source,tokens[p-1],Code::unsupported_type,"A nullable type cannot have a second ? suffix.");
             value.nullable=true;
         }
         return value;
@@ -1013,17 +1014,17 @@ class Parser {
     }
     VOID_SEMANTIC_HANDLER Type dictionary_type() {
         auto token=take();auto key=type();need(":");auto value=type();auto close=need("}");
-        if(at("?"))error(source,take(),Code::unsupported_type,"Nullable dictionaries are deferred.");
+        const bool nullable=accept("?");
         auto d=std::make_shared<ir::ValueType>();d->name=d->identity=source.text().substr(token.offset,close.offset+1-token.offset);
-        arrays.push_back({token,value,d,{}});arrays.back().key=key;return Type(d,Type::dictionary);
+        arrays.push_back({token,value,d,{}});arrays.back().key=key;Type result(d,Type::dictionary);result.nullable=nullable;return result;
     }
     VOID_SEMANTIC_HANDLER Type array_type() {
         auto token=take();auto element=type();std::unique_ptr<Expr> extent;
         if(accept(",")) extent=expression();
         auto close=need("]");
-        if(at("?")) error(source,take(),Code::unsupported_type,"Nullable arrays are deferred.");
+        const bool nullable=accept("?");
         auto d=std::make_shared<ir::ValueType>();d->name=source.text().substr(token.offset,close.offset+1-token.offset);d->identity=d->name;
-        Type result(d,extent ? Type::fixed_array : Type::growable_array);
+        Type result(d,extent ? Type::fixed_array : Type::growable_array);result.nullable=nullable;
         arrays.push_back({token,element,d,std::move(extent)});return result;
     }
     VOID_SEMANTIC_HANDLER Type named_type() {
@@ -1032,20 +1033,18 @@ class Parser {
             {"u8",Type::u8},{"u16",Type::u16},{"u32",Type::u32},{"u64",Type::u64},
             {"f32",Type::f32},{"f64",Type::f64},{"bool",Type::boolean},{"string",Type::string}};
         auto found = types.find(peek().text);
-        if (found != types.end()) { type_uses.push_back({take(),found->second,{}}); if (at("?")) error(source,take(),Code::unsupported_type,"Only managed references can be nullable in this phase."); return found->second; }
+        if (found != types.end()) {auto result=found->second;type_uses.push_back({take(),result,{}});result.nullable=accept("?");return result;}
         if (peek().kind != TokenKind::name || reserved.contains(peek().text)) error(source,peek(),Code::unsupported_type,"Unsupported type '" + peek().text + "'.","Use a numeric type, bool, string or a visible value/managed struct.");
         auto token = name();
         std::string spelling = token.text;
         auto reference_token = token;
         if (accept(".")) { reference_token = name(); spelling += "." + reference_token.text; }
         if(spelling==token.text && substitutions.contains(spelling)) {
-            if(at("?"))error(source,take(),Code::unsupported_type,"Nullable generic parameters are not implemented.");
-            return substitutions.at(spelling);
+            auto result=substitutions.at(spelling);if(accept("?"))result.nullable=true;return result;
         }
         auto d = std::make_shared<ir::ValueType>(); d->name = spelling; d->identity = spelling; d->source_offset = token.offset;
         if(at("<")){applications.push_back({reference_token,spelling,d,type_arguments()});d->name=source.text().substr(token.offset,tokens[p-1].offset+1-token.offset);}
         Type result(d,Type::unresolved); result.nullable = accept("?");
-        if(result.nullable && generic_names.contains(spelling))error(source,reference_token,Code::unsupported_type,"Nullable generic parameters are not implemented.");
         type_uses.push_back({reference_token,result,reference_token.offset==token.offset?std::optional<Token>{}:token});
         return result;
     }
@@ -1053,7 +1052,7 @@ class Parser {
         Depth guard(depth,source,peek());
         if(accept("("))return grouped_type_end(type());
         if(at("func"))return function_type();
-        if(at("result"))return result_type();
+        if(at("result")){auto result=result_type();result.nullable=accept("?");return result;}
         if(at("{"))return dictionary_type();
         if(at("["))return array_type();
         return named_type();
@@ -1725,6 +1724,15 @@ VOID_SEMANTIC_HANDLER void editor_type_candidates(const Type& t,Unit& unit,Unit&
     throw EditorProbeFound{};
 }
 Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std::unique_ptr<Unit>>& units, const Token& token) {
+    if(t.nullable && !ir::reference_value(t) && !(t.definition && t.definition->callable)) {
+        t.nullable=false;auto payload=resolve_type(t,unit,root,units,token);
+        if(ir::nullable_type(payload))return payload;
+        if(ir::reference_value(payload) || (payload.definition && payload.definition->callable)){payload.nullable=true;return payload;}
+        const auto key=ir::nullable_identity(payload)+"|"+ir::capability_key(payload);
+        if(auto found=unit.nullable_types.find(key);found!=unit.nullable_types.end())return found->second;
+        if(!unit.make_nullable)throw std::logic_error("Nullable annotation was not resolved during validation");
+        return unit.nullable_types.emplace(key,unit.make_nullable(payload)).first->second;
+    }
     if(root.editor && unit.identity==root.editor->module && t.kind==Type::unresolved && t.definition->name.ends_with("_void_editor_cursor_") &&
         t.definition->source_offset+t.definition->name.size()-std::string_view("_void_editor_cursor_").size()==root.editor->offset)
         editor_type_candidates(t,unit,root,units,token);
@@ -1974,7 +1982,7 @@ class Semantics {
     }
     Member member(Type t,const Token& token,bool calling = false) {
         if (t==error_type) throw Poison{};
-        if (t.nullable) error(source,token,calling ? Code::receiver : Code::type_mismatch,"Unwrap a nullable reference before member access.","Use a checked as conversion to its non-nullable type.");
+        if (ir::nullable_type(t)) error(source,token,calling ? Code::receiver : Code::type_mismatch,"Unwrap a nullable reference before member access.","Use a checked as conversion to its non-nullable type.");
         if(t.kind==Type::interface_ref) {
             if(auto* requirement=direct_method(t,token)) {if(!accessible(*requirement)) error(source,token,Code::visibility,"Interface requirement is not accessible; import its original interface module.");return Member{{},requirement};}
             error(source,token,calling ? Code::unknown_method : Code::unknown_identifier,"Interface views expose only their declared method requirements.");
@@ -2781,7 +2789,7 @@ class Semantics {
             return {};
         }
         if (e.kind == K::conversion) {
-            if(e.token.text!="as?" || !e.type_arguments.empty())return e.type;
+            if(e.token.text!="as?" || !e.type_arguments.empty())return resolve_type(e.type,unit,root,units,e.token);
             return fallible_anchor(e);
         }
         if (e.kind == K::global) return e.type;
@@ -2824,6 +2832,13 @@ class Semantics {
         e.type=target;e.type.readonly=from.readonly || ir::binding_requires_readonly(binding);e.parts.push_back(std::move(operand));return e.type;
     }
     VOID_SEMANTIC_HANDLER Type contextual_conversion(Expr& e, Type type, const std::optional<Type>& expected) {
+        if(expected && ir::nullable_value(*expected) && type!=error_type && !ir::nullable_value(type)) {
+            auto payload=ir::nullable_payload(*expected);
+            type=contextual_conversion(e,type,payload);expect(type,payload,e.token);
+            auto operand=std::make_unique<Expr>(std::move(e));
+            e=Expr(Expr::Kind::conversion,operand->token);e.op="$nullable_lift";e.implicit=true;
+            e.type=ir::with_field_type(*expected,1,type);e.parts.push_back(std::move(operand));return e.type;
+        }
         if(expected && expected->kind==Type::interface_ref && type!=error_type && type.kind!=Type::interface_ref) return interface_conversion(e,type,*expected);
         if(expected && type!=error_type && expected->definition && expected->definition->callable && type.definition && !type.definition->callable && !type.nullable && (type.kind==Type::aggregate || type.kind==Type::managed_ref || type.kind==Type::interface_ref)){
             return bind_method(e,Token{TokenKind::name,"call",e.token.offset},*expected);
@@ -2835,6 +2850,11 @@ class Semantics {
         }
         return type;
     }
+    VOID_SEMANTIC_HANDLER Type nullable_expression(Expr& e,Type expected) {
+        const auto known=anchor(e);
+        const bool nullable_context=e.token.text=="null" || e.kind==Expr::Kind::choice || e.kind==Expr::Kind::match || (known && ir::nullable_type(*known));
+        return expression_impl(e,nullable_context?expected:ir::nullable_payload(expected));
+    }
     Type expression(Expr& e, std::optional<Type> expected = {}, bool destructuring = false) {
         struct RestoreBindings {
             bool& flag;
@@ -2844,7 +2864,7 @@ class Semantics {
         try {
             Depth guard(diagnostics.semantic_depth(), source, e.token, 256);
             auto outer_bindings=pattern_bindings;if(e.kind!=Expr::Kind::test)pattern_bindings=false;
-            auto type = expression_impl(e, expected);pattern_bindings=outer_bindings;
+            auto type = expected && ir::nullable_value(*expected)?nullable_expression(e,*expected):expression_impl(e,expected);pattern_bindings=outer_bindings;
             if(ir::multiple_return_type(type) && (!destructuring ||
                (e.kind!=Expr::Kind::call && e.kind!=Expr::Kind::method_call)))
                 error(source,e.token,Code::invalid_value,"A multiple-return call requires a destructuring declaration.");
@@ -2907,7 +2927,7 @@ class Semantics {
                 for(auto& [name,candidate]:candidates)out.candidates.push_back(std::move(candidate));
                 throw EditorProbeFound{};
             }
-            if(t.nullable || !t.definition || (t.definition->native_resource && !console::session_type(t)) || t.definition->callable || !t.definition->cases.empty()) throw EditorProbeFound{};
+            if(ir::nullable_type(t) || !t.definition || (t.definition->native_resource && !console::session_type(t)) || t.definition->callable || !t.definition->cases.empty()) throw EditorProbeFound{};
             std::set<std::string> names;
             for(const auto& [id,u]:units) {
                 for(const auto& structure:u->structures) for(const auto& f:structure.definition->fields) names.insert(f.name);
@@ -3225,11 +3245,11 @@ class Semantics {
         e.kind=Expr::Kind::sum;e.slot=tag;return e.type=type;
     }
     Function result_editor_target(Type type,unsigned tag,Token token) {
-        Function target;target.token=token;target.symbol=std::string(type.nullable?"$nullable::":"$result::")+Type::key(type)+"|"+ir::capability_key(type)+"::"+(tag?"Err":"Ok");target.result=type;
-        auto payload=type;if(type.nullable)payload.nullable=false;else payload=ir::field_type(type,tag?2:1);
+        Function target;target.token=token;target.symbol=std::string(ir::nullable_type(type)?"$nullable::":"$result::")+Type::key(type)+"|"+ir::capability_key(type)+"::"+(tag?"Err":"Ok");target.result=type;
+        auto payload=ir::nullable_type(type)?ir::nullable_payload(type):ir::field_type(type,tag?2:1);
         target.parameters.push_back({Token{TokenKind::name,tag?"error":"value",token.offset},payload});
-        builtin_record(target,type.nullable?"Matches a present nullable value and exposes its non-null payload.":tag?"The error variant of result; contains the failure payload.":"The success variant of result; contains the successful value. Ok(null) is successful.");
-        unit.builtins.at(target.symbol).documentation.parameters.push_back({tag?"error":"value",type.nullable?"The present non-null value.":tag?"The error carried by Err.":"The successful value carried by Ok.",{}});
+        builtin_record(target,ir::nullable_type(type)?"Matches a present nullable value and exposes its non-null payload.":tag?"The error variant of result; contains the failure payload.":"The success variant of result; contains the successful value. Ok(null) is successful.");
+        unit.builtins.at(target.symbol).documentation.parameters.push_back({tag?"error":"value",ir::nullable_type(type)?"The present non-null value.":tag?"The error carried by Err.":"The successful value carried by Ok.",{}});
         return target;
     }
     // Keep the result signature's Function temporary out of the recursive
@@ -3476,8 +3496,9 @@ class Semantics {
     }
     VOID_SEMANTIC_HANDLER Type literal_expression(Expr& e, const std::optional<Type>& expected) {
         if (e.token.text == "null") {
+            if(expected && ir::nullable_value(*expected)){e.kind=Expr::Kind::sum;e.slot=0;return e.type=*expected;}
             if(expected && expected->definition && expected->definition->callable && expected->nullable){e.kind=Expr::Kind::function_null;return e.type=*expected;}
-            if (!expected || !ir::reference_value(*expected) || !expected->nullable) error(source,e.token,Code::type_mismatch,"null requires a nullable managed-reference context.","Use a type annotation such as node?.");
+            if (!expected || !ir::reference_value(*expected) || !expected->nullable) error(source,e.token,Code::type_mismatch,"null requires a nullable type context.","Use an explicit T? type annotation.");
             return e.type = *expected;
         }
         if (e.literal_text.empty()) return e.type;
@@ -3563,7 +3584,7 @@ class Semantics {
         if(base.event)error(source,e.token,Code::invalid_value,"Event subscription storage is private.");
         if(t.kind==Type::string && (e.token.text=="length" || e.token.text=="byte_length"))return text_property(e);
         if(ir::collection_type(t) && e.token.text=="count") {if(t.kind==Type::dictionary && !current)error(source,e.token,Code::constant_call,"Dictionary count requires runtime evaluation.");e.target=t.kind==Type::dictionary?"$dict.count":"$array.count";return e.type=Type::i64;}
-        if (t.nullable) error(source,e.token,Code::type_mismatch,"Unwrap the nullable reference before field access.");
+        if (ir::nullable_type(t)) error(source,e.token,Code::type_mismatch,"Unwrap the nullable value before field access.");
         if (t.kind != Type::aggregate && t.kind != Type::managed_ref && t.kind!=Type::interface_ref) error(source,e.token,Code::type_mismatch,"Field access requires a struct or interface.");
         if(t.kind==Type::interface_ref && !direct_method(t,e.token))error(source,e.token,Code::type_mismatch,"Field access requires a struct; interface views expose only declared methods.");
         if(t.definition->callable)error(source,e.token,Code::type_mismatch,"Function values are invoked directly; their representation is private.");
@@ -4034,8 +4055,7 @@ class Semantics {
     }
     VOID_SEMANTIC_HANDLER std::optional<Type> fallible_anchor(const Expr& e) {
         auto target=resolve_type(e.type,unit,root,units,e.token);
-        if(numeric::integer(target) || target.kind==Type::numeric_enum)return unit.make_option(target);
-        return {};
+        return unit.make_option(target);
     }
     VOID_SEMANTIC_HANDLER Type fallible_conversion(Expr& e) {
         if(!e.type_arguments.empty())return e.type;
@@ -4050,6 +4070,11 @@ class Semantics {
             if(from==Type::none)error(source,operand.token,Code::integer_range,"Fallible conversion literal is outside the fixed-width integer domain.");
         } else from=expression(operand);
         if(from==error_type)return error_type;
+        if(ir::nullable_type(from)) {
+            auto payload=ir::nullable_payload(from);expect(payload,destination,e.token);
+            e.op="$nullable_try";e.type_arguments.push_back(destination);
+            return e.type=ir::with_field_type(unit.make_option(destination),1,payload);
+        }
         if(from.kind==Type::numeric_enum && numeric::integer(destination)) {
             auto original=std::move(e.parts[0]);auto extraction=std::make_unique<Expr>(Expr::Kind::conversion,e.token);
             extraction->token.text="as";extraction->type=*from.definition->enum_backing;extraction->op="$enum_value";
@@ -4065,13 +4090,23 @@ class Semantics {
         using K = Expr::Kind;
         Type target = e.type = resolve_type(e.type,unit,root,units,e.token);
         auto& operand = *e.parts[0];
+        if(ir::nullable_value(target)) {
+            auto from=expression(operand,target);expect(from,target,e.token);e.op="identity";return e.type=from;
+        }
+        std::optional<Type> analyzed;
+        if(operand.kind!=K::literal || operand.literal_text.empty()) {
+            auto from=expression(operand,operand.token.text=="null" && target.nullable?std::optional<Type>(target):std::nullopt);
+            if(from==error_type)return error_type;
+            if(ir::nullable_value(from)){auto payload=ir::nullable_payload(from);expect(payload,target,e.token);e.op="$nullable_unwrap";return e.type=payload;}
+            analyzed=from;
+        }
         if(target.kind==Type::numeric_enum) {
             if(operand.kind==K::literal && !operand.literal_text.empty() && !decimal(operand)) {
                 Type selected=Type::none;
                 for(auto candidate:{Type::i32,Type::i64,Type::u64})try {operand.value=numeric::literal(operand.literal_text,candidate);operand.type=selected=candidate;operand.literal_text.clear();break;}catch(const std::invalid_argument&){}
                 if(selected==Type::none)error(source,operand.token,Code::integer_range,"Enum conversion literal is outside the integer domain.");
             }
-            if(!numeric::integer(expression(operand)))error(source,e.token,Code::numeric_conversion,"A numeric enum cast requires an integer source; distinct enums do not convert implicitly.");
+            if(!numeric::integer(analyzed?*analyzed:expression(operand)))error(source,e.token,Code::numeric_conversion,"A numeric enum cast requires an integer source; distinct enums do not convert implicitly.");
             return target;
         }
         if (operand.kind == K::literal && !operand.literal_text.empty() && !anchor(operand)) {
@@ -4092,7 +4127,7 @@ class Semantics {
                 operand.type = target; operand.literal_text.clear(); return target;
             }
         }
-        auto from = expression(operand,operand.token.text=="null" && (target.kind==Type::interface_ref || (target.definition && target.definition->callable)) && target.nullable ? std::optional<Type>(target) : std::nullopt);
+        auto from = analyzed?*analyzed:expression(operand,operand.token.text=="null" && (target.kind==Type::interface_ref || (target.definition && target.definition->callable)) && target.nullable ? std::optional<Type>(target) : std::nullopt);
         if (from == error_type) return error_type;
         if(from.definition && target.definition && from.definition->callable && target.definition->callable && Type::key(from)==Type::key(target))return e.type=target;
         if(target.kind==Type::interface_ref && from.kind!=Type::interface_ref) {
@@ -4199,7 +4234,9 @@ class Semantics {
         // ordinary defaults type operands before selection; nominal conversions
         // are reserved for builtin fallback after exact custom lookup fails.
         auto context=logical?std::optional<Type>(Type::boolean):left_hint && numeric::number(*left_hint)?left_hint:right_hint && numeric::number(*right_hint)?right_hint:!left_hint && !right_hint && expected && numeric::number(*expected)?expected:std::optional<Type>(decimal(e)?Type::f32:Type::i32);
-        auto null_context=[&](const Expr& part,const std::optional<Type>& opposite)->std::optional<Type>{if(part.token.text=="null" && opposite && (ir::reference_value(*opposite) || (opposite->definition && opposite->definition->callable))){auto type=*opposite;type.nullable=true;return type;}return context;};
+        if(left_hint && ir::nullable_value(*left_hint) && numeric::number(ir::nullable_payload(*left_hint)))context=ir::nullable_payload(*left_hint);
+        else if(right_hint && ir::nullable_value(*right_hint) && numeric::number(ir::nullable_payload(*right_hint)))context=ir::nullable_payload(*right_hint);
+        auto null_context=[&](const Expr& part,const std::optional<Type>& opposite)->std::optional<Type>{if(part.token.text=="null" && opposite && (ir::nullable_type(*opposite) || ir::reference_value(*opposite) || (opposite->definition && opposite->definition->callable))){auto type=*opposite;if(!ir::nullable_value(type))type.nullable=true;return type;}return context;};
         auto left=expression(*e.parts[0],null_context(*e.parts[0],right_hint));
         bool previous=suppress_zero;
         if(e.parts[0]->kind==K::literal && ((e.op=="and" && !e.parts[0]->value) || (e.op=="or" && e.parts[0]->value)))suppress_zero=true;
@@ -4218,6 +4255,15 @@ class Semantics {
             if(left==error_type || right==error_type)return error_type;
         }
         if(operator_expression(e,{left,right}))return e.type;
+        if(ir::nullable_value(left) || ir::nullable_value(right)) {
+            if(e.op!="==" && e.op!="!=")error(source,e.token,Code::numeric_operator,"Unwrap nullable values before applying this operator.");
+            auto nullable=ir::nullable_value(left)?left:right;
+            left=contextual_conversion(*e.parts[0],left,nullable);right=contextual_conversion(*e.parts[1],right,nullable);expect(right,left,e.token);
+            if((e.parts[0]->kind==K::sum && e.parts[0]->slot==0) || (e.parts[1]->kind==K::sum && e.parts[1]->slot==0)) {
+                e.op=e.op=="=="?"$nullable_null_equal":"$nullable_null_unequal";return e.type=Type::boolean;
+            }
+            return enum_equality(e,left);
+        }
         auto builtin_context=left_hint?left_hint:right_hint?right_hint:expected && numeric::number(*expected)?expected:context;
         if(builtin_context && (ir::reference_value(*builtin_context) || (builtin_context->definition && builtin_context->definition->callable)) && (e.op=="==" || e.op=="!="))builtin_context->nullable=true;
         left=contextual_conversion(*e.parts[0],left,builtin_context);right=contextual_conversion(*e.parts[1],right,builtin_context);
@@ -4269,6 +4315,7 @@ class Semantics {
                 try { expect(t, *s.annotation, s.expression ? s.expression->token : s.token); if (t!=error_type) t=*s.annotation; }
                 catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; }
             }
+            if(!s.expression && ir::nullable_value(t)){s.expression=std::make_unique<Expr>(Expr::Kind::sum,s.token);s.expression->type=t;s.expression->slot=0;}
             if(!s.expression && t.definition && t.definition->callable) {
                 if(!t.nullable)error(source,s.token,Code::initializer,"A non-nullable function value requires an initializer.");
                 s.expression=std::make_unique<Expr>(Expr::Kind::function_null,s.token);s.expression->type=t;
@@ -4633,13 +4680,14 @@ public:
         if(t.kind==Type::growable_array || t.kind==Type::dictionary)return false;
         if(t.kind==Type::fixed_array)return *t.definition->extent && needs_array_recipe(ir::array_element(t));
         if(t.kind!=Type::aggregate || t.definition->callable)return false;
-        if(t.definition->result_type || t.definition->option_type)return false;
+        if(t.definition->result_type || t.definition->option_type || t.definition->nullable_value)return false;
         auto [owner,structure]=owned_structure(t);if(structure->initializer)return true;
         for(const auto& field:t.definition->fields)if(needs_array_recipe(field.type))return true;
         return false;
     }
     std::unique_ptr<Expr> array_recipe(Type t,const Token& token,bool runtime,Unit& access) {
         auto e=std::make_unique<Expr>(Expr::Kind::literal,token);e->type=t;
+        if(ir::nullable_value(t)){e->kind=Expr::Kind::sum;e->slot=0;return e;}
         if(t.kind==Type::growable_array || t.kind==Type::dictionary)return e;
         if(t.kind==Type::fixed_array) {
             if(!*t.definition->extent){e->aggregate_value.repeat=0;return e;}
@@ -4660,6 +4708,7 @@ public:
         if(ir::reference_value(element) && !element.nullable)error(source,token,Code::initializer,"A nonempty array of required references needs a complete literal.");
         if(ir::collection_type(element)) value.fields.push_back(array_default(element,token));
         else if(element.kind==Type::aggregate) {
+            if(ir::nullable_value(element)){ir::ConstantValue absent;absent.fields.resize(2);value.fields.push_back(std::move(absent));return value;}
             if(element.definition->callable){if(!element.nullable)error(source,token,Code::initializer,"A nonempty array of functions requires complete values.");value.fields.emplace_back();return value;}
             if(!element.definition->cases.empty())error(source,token,Code::initializer,"Enum/result elements require explicit variants.");
             auto [owner,structure]=owned_structure(element);defaults(*owner,*structure);
@@ -4677,6 +4726,7 @@ public:
         if(ir::collection_type(t)) {
             return array_default(t,field.token);
         }
+        if(ir::nullable_value(t)){ir::ConstantValue absent;absent.fields.resize(2);return absent;}
         if (t.kind != Type::aggregate) return {};
         if(t.definition->callable)return {};
         if(!t.definition->cases.empty())return {};
@@ -5671,6 +5721,24 @@ class Lowering {
         });
         case K::conversion: return frontend_case([&]() -> unsigned {
             auto value = expression(*e.parts[0]);
+            if(e.op=="$nullable_try") {
+                auto from=e.parts[0]->type;auto saved=snapshot(value,from,e.token);
+                auto present=ir::nullable_value(from)?emit({ir::Op::equal,extract(value,0,e.token),constant(Type::i32,{1,{}},e.token)},e.token):emit({ir::Op::not_equal,value,constant(from,{},e.token)},e.token);
+                auto result=static_cast<unsigned>(output.locals.size());output.locals.push_back(e.type);
+                auto yes=block(),no=block(),done=block();terminate({ir::Terminator::Kind::branch,present,yes,no});
+                current=no;ir::Instruction absent{ir::Op::sum};absent.type=e.type;emit({ir::Op::store,result,emit(absent,e.token)},e.token);jump(done);
+                current=yes;ir::Instruction get{ir::nullable_value(from)?ir::Op::sum_get:ir::Op::convert,emit({ir::Op::load,saved},e.token)};get.immediate=ir::nullable_value(from)?1:0;get.type=ir::nullable_payload(from);
+                ir::Instruction some{ir::Op::sum};some.type=e.type;some.immediate=1;some.arguments={emit(get,e.token)};emit({ir::Op::store,result,emit(some,e.token)},e.token);jump(done);
+                current=done;return emit({ir::Op::load,result},e.token);
+            }
+            if(e.op=="$nullable_lift"){ir::Instruction packed{ir::Op::sum};packed.type=e.type;packed.immediate=1;packed.arguments={value};return emit(packed,e.token);}
+            if(e.op=="$nullable_unwrap") {
+                auto saved=snapshot(value,e.parts[0]->type,e.token);auto yes=block(),no=block();
+                auto tag=extract(emit({ir::Op::load,saved},e.token),0,e.token);
+                terminate({ir::Terminator::Kind::branch,emit({ir::Op::equal,tag,constant(Type::i32,{1,{}},e.token)},e.token),yes,no});
+                current=no;ir::Instruction fail{ir::Op::panic};fail.callee="Null value in checked conversion";emit(fail,e.token);terminate({ir::Terminator::Kind::unreachable});
+                current=yes;ir::Instruction get{ir::Op::sum_get,emit({ir::Op::load,saved},e.token)};get.immediate=1;return emit(get,e.token);
+            }
             if(e.token.text=="as?") {ir::Instruction i{ir::Op::try_convert,value};i.type=expression_type(e);return emit(i,e.token);}
             if(e.op=="identity" && expression_type(e)==expression_type(*e.parts[0])) return value; ir::Instruction i{e.op=="interface" ? ir::Op::interface_pack : e.op=="upcast" ? (expression_type(e).construction ? ir::Op::stage_prefix : ir::Op::upcast) : ir::Op::convert,value}; i.type = expression_type(e);i.callee=e.target; return emit(i,e.token);
         });
@@ -5692,6 +5760,10 @@ class Lowering {
                 current = merge; return emit({ir::Op::load, slot}, e.token);
             }
             auto right = expression(*e.parts[1]); left = emit({ir::Op::load, slot}, e.token);
+            if(e.op.starts_with("$nullable_null_")) {
+                auto equal=emit({ir::Op::equal,extract(left,0,e.token),extract(right,0,e.token)},e.token);
+                return e.op=="$nullable_null_unequal"?emit({ir::Op::logical_not,equal},e.token):equal;
+            }
             if(e.parts[0]->type==Type::string) {
                 auto equal=emit({e.op=="+" ? ir::Op::string_concat : ir::Op::string_equal,left,right},e.token);
                 return e.op=="!=" ? emit({ir::Op::logical_not,equal},e.token) : equal;
@@ -6408,6 +6480,20 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
         try {return {e.token.text=="abs"?numeric::absolute(values.at(0),e.type):numeric::clamp(values.at(0),values.at(1),values.at(2),e.type),{}};}
         catch(const std::invalid_argument& failure){error(source,e.token,Code::numeric_conversion,failure.what());}
     }
+    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_try") {
+        // Keep the owning input alive while copying into independent output
+        // storage. Assigning an input from its own child destroys that child.
+        const auto input=constant_value(source,*e.parts[0]);
+        const bool wrapped=ir::nullable_value(e.parts[0]->type);
+        const bool present=wrapped?input.fields.at(0).bits:input.bits || !input.text.empty();
+        ir::ConstantValue value;value.fields.resize(2);
+        if(present){value.fields[0].bits=1;value.fields[1]=wrapped?input.fields.at(1):input;}
+        return value;
+    }
+    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_lift") {ir::ConstantValue value;value.fields.resize(2);value.fields[0].bits=1;value.fields[1]=constant_value(source,*e.parts[0]);return value;}
+    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_unwrap") {auto value=constant_value(source,*e.parts[0]);if(!value.fields.at(0).bits)error(source,e.token,Code::numeric_conversion,"Null value in checked conversion");return value.fields.at(1);}
+    if(e.kind==Expr::Kind::conversion && e.op=="identity" && e.type==e.parts[0]->type)return constant_value(source,*e.parts[0]);
+    if(e.kind==Expr::Kind::binary && e.op.starts_with("$nullable_null_")){bool equal=constant_value(source,*e.parts[0]).fields.at(0).bits==constant_value(source,*e.parts[1]).fields.at(0).bits;return {e.op=="$nullable_null_equal"?equal:!equal,{}};}
     if(e.kind==Expr::Kind::choice)return constant_value(source,*e.parts[constant_value(source,*e.parts[0]).bits?1:2]);
     if(e.kind==Expr::Kind::sum) {
         ir::ConstantValue result;result.fields.resize(e.type.definition->fields.size());result.fields[0].bits=e.slot;
@@ -6649,6 +6735,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         }
     root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));
     std::function<void(Unit&,Function&)> prepare_function;
+    std::function<void(Type,const Token&)> prepare_inline;
     bool headers_ready=false;
     std::function<void(Unit&,Structure&)> layout;
     std::function<void(Unit&,Structure&)> defaults;
@@ -6728,10 +6815,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 syntax.resolved=owner->make_dictionary(key,element);syntax.state=2;auto result=syntax.resolved;result.readonly=raw.readonly;return result;
             }
             auto extent=array_extent(*owner,syntax);
-            if(extent && element.kind==Type::aggregate) for(auto& [child_id,child_owner]:units) for(auto& child:child_owner->structures)
-                if(child.definition==element.definition) {
-                    layout(*child_owner,child);
-                }
+            if(extent && (element.kind==Type::aggregate || element.kind==Type::fixed_array))prepare_inline(element,syntax.token);
 
             // Fixed ownership remains finite; growable edges have pointer-sized storage.
             ir::CompactValueShape shape;
@@ -6826,18 +6910,34 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     };
     std::map<std::string,Type> canonical_options;
     auto make_option=[&](Type payload) {
-        payload.readonly=false;
+        auto authority=payload;payload=ir::with_readonly_paths(payload,{});payload.readonly=false;
         const auto key=ir::option_identity(payload);
-        if(auto found=canonical_options.find(key);found!=canonical_options.end())return found->second;
+        if(auto found=canonical_options.find(key);found!=canonical_options.end())return ir::with_field_type(found->second,1,authority);
         auto d=std::make_shared<ir::ValueType>();
         d->identity=d->name=key;d->display_name="option<"+ir::type_name(payload)+">";d->option_type=true;
         d->cases={{"None",1,0},{"Some",1,1}};
         d->fields={{"$tag",Type::i32,key},{"$some",payload,key}};
         d->self=d;d->arena=arena;arena->definitions.push_back(d);
         auto type=Type(d);canonical_options.emplace(key,type);root.synthetic_types.push_back(type);
-        return type;
+        return ir::with_field_type(type,1,authority);
     };
     for(auto& [id,u]:units)u->make_option=make_option;
+    std::map<std::string,Type> canonical_nullables;
+    auto make_nullable=[&](Type payload) {
+        if(ir::nullable_type(payload))return payload;
+        if(ir::reference_value(payload) || (payload.definition && payload.definition->callable)){payload.nullable=true;return payload;}
+        auto authority=payload;payload=ir::with_readonly_paths(payload,{});payload.readonly=false;
+        const auto key=ir::nullable_identity(payload);
+        auto found=canonical_nullables.find(key);
+        if(found==canonical_nullables.end()) {
+            auto d=std::make_shared<ir::ValueType>();d->identity=d->name=key;d->visibility="private";d->nullable_value=true;
+            d->cases={{"$null",1,0},{"Ok",1,1}};d->fields={{"$tag",Type::i32,key},{"$value",payload,key}};
+            d->self=d;d->arena=arena;arena->definitions.push_back(d);auto type=Type(d);
+            found=canonical_nullables.emplace(key,type).first;root.synthetic_types.push_back(type);
+        }
+        return ir::with_field_type(found->second,1,authority);
+    };
+    for(auto& [id,u]:units)u->make_nullable=make_nullable;
 
     for(auto& [id,u]:units)u->resolve_result=[&,owner=u.get()](Type raw,const Token& token)->Type {
         auto found=std::find_if(owner->results.begin(),owner->results.end(),[&](const auto& syntax){return syntax.definition==raw.definition;});
@@ -6846,6 +6946,20 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         Depth guard(diagnostics.semantic_depth(),owner->source,token,128);
         auto success=resolve_type(found->success,*owner,root,units,token),failure=resolve_type(found->failure,*owner,root,units,token);
         return found->resolved=make_result(success,failure);
+    };
+    // Follow physical inline edges only. Growable/managed indirection remains
+    // a valid recursion boundary, including nullable elements behind a list.
+    prepare_inline=[&](Type root_type,const Token& token) {
+        std::vector<Type> pending{root_type};std::set<const ir::ValueType*> seen;
+        while(!pending.empty()) {
+            auto type=pending.back();pending.pop_back();
+            if(type.kind==Type::fixed_array){pending.push_back(ir::array_element(type));continue;}
+            if(type.kind!=Type::aggregate || !type.definition || type.definition->callable || !seen.insert(type.definition.get()).second)continue;
+            bool owned=false;
+            for(auto& [id,owner]:units)for(auto& child:owner->structures)if(child.definition==type.definition){layout(*owner,child);owned=true;}
+            if(!owned)for(const auto& field:type.definition->fields)pending.push_back(field.type);
+            if(seen.size()>65536)error(root.source,token,Code::limit,"Inline value dependency work exhausted.");
+        }
     };
     layout = [&](Unit& owner, Structure& structure) {
         if (structure.definition->interface_type) {structure.layout_state=2;return;}
@@ -6884,7 +6998,13 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 }
                 if (field.using_field && ((t.kind!=Type::aggregate && t.kind!=Type::managed_ref) || t.nullable || (t.definition && (t.definition->callable || !t.definition->cases.empty()))))
                     error(owner.source,field.token,Code::unsupported_type,"A using field requires a non-nullable nominal struct type.","Use an ordinary field for primitives or nullable references.");
+                if(t.kind==Type::aggregate && t.definition && (t.definition->nullable_value || t.definition->option_type || t.definition->result_type))prepare_inline(t,field.token);
                 std::size_t expanded = 1;
+                if(ir::nullable_value(t)) {
+                    const auto shape=ir::compact_value_shape(t);
+                    expanded=shape.template_nodes;structure.layout_depth=std::max(structure.layout_depth,shape.depth+1);
+                    if(structure.layout_depth>128)error(owner.source,field.token,Code::nesting,"Physical layout depth limit exceeded.");
+                }
                 if(t.kind==Type::fixed_array) {
                     const auto shape=ir::compact_value_shape(t);
                     expanded=shape.template_nodes;structure.layout_depth=std::max(structure.layout_depth,shape.depth+1);
@@ -7201,7 +7321,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     diagnostics.finish();
     (void)string_pool(units);
     for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
-    for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
+    for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->make_nullable={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry,
                       std::shared_ptr<const project::LockedDependencies> dependencies) {
@@ -7394,7 +7514,7 @@ struct AnalysisAccess {
         std::map<std::string,std::string> owner_names;
         for(const auto& [id,u]:*graph)for(const auto& structure:u->structures)owner_names.emplace(structure.definition->identity,ir::type_name(Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate)));
         std::map<std::string,std::string> signatures;
-        for(const auto& [id,u]:*graph)for(const auto& f:u->functions)if(!f.operator_glyph.empty() || f.receiver || random_numeric_function(f) || !f.returns.empty())signatures.emplace(f.symbol,editor_signature(f));
+        for(const auto& [id,u]:*graph)for(const auto& f:u->functions)if(!f.operator_glyph.empty() || f.receiver || random_numeric_function(f) || !f.returns.empty() || !f.generic_origin.empty())signatures.emplace(f.symbol,editor_signature(f));
         // Hook calls already selected in ordinary display adapter bodies supply
         // navigation. No editor-side method lookup or runtime hook search.
         for(const auto& [id,u]:*graph)for(const auto& structure:u->structures)if(structure.generic_origin && !structure.case_tokens.empty()) {

@@ -71,6 +71,7 @@ struct ValueType {
     std::vector<SumCase> cases = {}; // Disjoint, zero-inactive payload fields; field zero is the tag.
     bool result_type = false;
     bool option_type = false;
+    bool nullable_value = false; // Private tagged storage for non-reference T?.
     std::optional<Type::Kind> enum_backing;
     bool enum_flags = false;
     std::vector<NumericMember> numeric_members;
@@ -115,6 +116,10 @@ std::string capability_key(Type type);
 std::string reference_path_name(Type type,const ReferencePath& path);
 std::string type_name(Type type);
 std::string option_identity(Type payload);
+bool nullable_value(Type);
+bool nullable_type(Type);
+Type nullable_payload(Type);
+std::string nullable_identity(Type);
 bool multiple_return_type(const Type&);
 std::string multiple_return_identity(const std::vector<ValueField>&);
 std::string numeric_enum_layout(Type type);
