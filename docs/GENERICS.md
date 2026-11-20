@@ -16,7 +16,10 @@ Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRA
 G78 also specializes tagged and numeric/flags enum declarations through the same
 machinery, including payload inference, matching and collections. See [enums](ENUMS.md).
 
-Generic functions, managed structs, value structs and enums use lowercase parameters:
+G82 extends the same specialization machinery to structural interfaces. See
+[generic interfaces](INTERFACES.md#generic-interfaces-g82).
+
+Generic functions, managed structs, value structs, enums and interfaces use lowercase parameters:
 
 ```typescript
 func identity<t>(value: t) -> t:
@@ -66,6 +69,34 @@ may use additional operations supported by the concrete type. Existing readonly
 and receiver-effect checks still apply to every concrete call; constraints do not
 provide mutable authority.
 
+## Specialized interface parameters and constraints
+
+```typescript
+interface reader<t>:
+    func read() -> t
+
+func inspect<t>(const input: reader<t>) -> t:
+    return input.read()
+
+func read<t, s: reader<t>>(seed: t, const input: s) -> t:
+    return input.read()
+```
+
+`inspect(view)` infers `t` from an already typed `reader<i32>` view. Use
+`inspect<i32>(concrete_provider)` when passing a structurally conforming managed
+object directly: inference does not search arbitrary concrete methods to guess
+interface arguments. `read(0, provider)` infers both arguments from its ordinary
+parameters, then checks `provider` against `reader<i32>`. A constraint alone does
+not infer an otherwise unbound parameter.
+
+Generic interface and struct parameters may have specialized interface constraints,
+including nested arguments and self-referential structural constraints. Generic
+struct methods may use owner parameters in
+method-specific constraints. Constraints retain the owner's access context and
+existing exact signatures; they do not grant erased value boxing or mutable
+access. Invalid constraints and unused malformed requirement headers diagnose
+through the normal frontend.
+
 ## Representation and lifetime
 
 Each original declaration owns its concrete instances within the existing
@@ -96,12 +127,15 @@ reload policy.
 There is no fixed type-parameter count or array-byte ceiling. Pathological
 expansion uses the existing diagnostic/resource model: dependency depth 128 and
 8,388,608 characters of specialization identity work per compilation, plus normal
-parser, type-layout and IR limits. Infinite inline value ownership remains
+parser, type-layout and IR limits. Generic interface requirement graphs are
+prepared iteratively through the existing declaration lists; expanding graphs
+receive the same depth diagnostic without growing the native stack per interface.
+Infinite inline value ownership remains
 invalid; managed/growable indirection uses the existing rules.
 
 G79 implements general `t?` and nullable concrete arguments through the same
 specialization/inference machinery; see [nullable types](NULLABLE_TYPES.md).
-Higher-kinded parameters, generic interfaces, method-specific generic
+Higher-kinded parameters, method-specific generic
 virtuals/initializers, variance, operator/comparable contracts and specialization
 sharing optimizations remain outside this foundation. Any supported nullable
 type can be supplied as `t`. Ordinary named/default method arguments use the Stage 8 Sprint 2 shared binder. Method-specific generic selection currently requires a

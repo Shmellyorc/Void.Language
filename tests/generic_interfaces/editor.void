@@ -1,0 +1,37 @@
+use "./api.void" as api
+
+## Reads and updates values of one selected type.
+interface channel<t>:
+    ## Reads the latest value.
+    ## @return The current value.
+    func read() -> t
+    ## Replaces the latest value.
+    ## @param value The new value.
+    func write(value: t)
+
+struct cell:
+    value: i32
+func (self cell) read() -> i32:
+    return self.value
+func (self cell) write(value: i32):
+    self.value = value
+
+## Uses a concrete specialization without losing source navigation.
+## @param current The channel to edit.
+## @return The resulting value.
+func exchange(current: channel<i32>) -> i32:
+    var replacement = 8
+    current.write(replacement)
+    return current.read()
+
+func main():
+    var current: channel<i32> = cell(value = 7)
+    print(exchange(current))
+    const words: api.reader<string> = api.source<string>(value = "ready")
+    print(words.read())
+
+## Produces a pair without erasing its component type.
+interface pair_reader<t>:
+    ## Reads both components.
+    ## @return The two selected values.
+    func read_pair() -> (first: t, second: t)

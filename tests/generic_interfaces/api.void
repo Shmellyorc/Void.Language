@@ -1,0 +1,38 @@
+## Reads a value of the selected type through structural dispatch.
+interface reader<t>:
+    ## Reads the current value.
+    ## @return The value supplied by this reader.
+    func read() -> t
+
+## Transforms an input into an independently selected output type.
+interface transform<input, output>:
+    ## Transforms one input.
+    ## @param value The input to transform without mutable authority.
+    ## @return The transformed output.
+    func apply(const value: input) -> output
+
+## Holds a payload in an inline generic value.
+value struct box<t>:
+    value: t
+
+## Supplies a value through a managed generic provider.
+struct source<t>:
+    value: t
+
+## Reads the stored value.
+## @return The provider's current payload.
+func (self source<t>) read() -> t:
+    return self.value
+
+## Reads through an already selected interface specialization.
+## @param value The reader to query.
+## @return The selected reader's payload.
+func read<t>(const value: reader<t>) -> t:
+    return value.read()
+
+## Checks a dependent structural constraint without boxing its argument.
+## @param seed The type inference anchor.
+## @param value The structurally conforming provider.
+## @return The provider's value.
+func constrained<t, s: reader<t>>(seed: t, const value: s) -> t:
+    return value.read()

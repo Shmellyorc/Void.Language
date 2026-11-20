@@ -1,0 +1,43 @@
+## Reads one value through a specialized witness.
+interface reader<t>:
+    ## Reads the current payload.
+    ## @return The stored payload.
+    func read() -> t
+
+## Holds one managed payload and a nullable back edge.
+struct cell:
+    n: i32
+    cycle: reader<i32>?
+
+## Reads the cell payload.
+## @return The stored integer.
+func (c cell) read() -> i32:
+    return c.n
+
+## Holds an interface in an inline aggregate with a distinct specialization.
+value struct packet:
+    view: reader<i32>
+    label: reader<string>
+
+struct text_cell:
+    text: string
+func (c text_cell) read() -> string:
+    return c.text
+
+## Exercises nullable views, callbacks, allocation pressure and managed cycles.
+## @param value The value to carry through dispatch.
+## @return The carried integer.
+func entry(value: i32) -> i32:
+    var c = cell(n = value)
+    c.cycle = c
+    var nullable: reader<i32>? = c
+    var view = nullable as reader<i32>
+    var callback: func() -> i32 = view.read
+    var held = packet(view = view, label = text_cell(text = "alive"))
+    for i in 0..<100:
+        var temporary = cell(n = i)
+        c.cycle = temporary
+    c.cycle = c
+    if held.label.read() != "alive":
+        return -1
+    return callback() + held.view.read()

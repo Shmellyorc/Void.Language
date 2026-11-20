@@ -1,0 +1,100 @@
+use "./api.void" as api
+
+struct integer_source:
+    value: i32
+func (self integer_source) read() -> i32:
+    return self.value
+
+struct number_base:
+    value: i32
+virtual func (self number_base) read() -> i32:
+    return self.value
+struct number_child extends number_base:
+    extra: i32
+override func (self number_child) read() -> i32:
+    return super.read() + self.extra
+
+value struct inline_source:
+    value: i32
+func (self inline_source) read() -> i32:
+    return self.value
+struct promoted_source:
+    using inline_source
+
+struct formatter:
+    prefix: string
+func (self formatter) apply(const value: i32) -> string:
+    return self.prefix
+
+value struct holder<t, s: api.reader<t>>:
+    seed: t
+    provider: s
+
+interface pair_reader<t>:
+    func read_pair() -> (first: t, second: t)
+struct pair_source<t>:
+    first: t
+    second: t
+func (self pair_source<t>) read_pair() -> (first: t, second: t):
+    return self.first, self.second
+
+struct consumer<t>:
+    seed: t
+func (self consumer<t>) get<s: api.reader<t>>(const value: s) -> t:
+    return value.read()
+
+## Runs imported specialization, inference, dispatch and identity examples.
+## @return Zero when every expected value is preserved.
+func main() -> i32:
+    var integers = integer_source(value = 7)
+    const first: api.reader<i32> = integers
+    const second: api.reader<i32> = integers
+    if first != second or first.read() != 7:
+        return 1
+    const text: api.reader<string> = api.source<string>(value = "seven")
+    if api.read(text) != "seven" or api.read<i32>(integers) != 7:
+        return 2
+    const nested: api.reader<api.box<i32>> = api.source<api.box<i32>>(value = api.box(value = 9))
+    if nested.read().value != 9:
+        return 3
+    var receiver = consumer(seed = 7)
+    if receiver.get(integers) != 7:
+        return 12
+    if api.constrained(7, inline_source(value = 7)) != 7:
+        return 13
+    const maybe: api.reader<i32?> = api.source<i32?>(value = null)
+    const zero: api.reader<i32?> = api.source<i32?>(value = 0)
+    if maybe.read() != null or zero.read() == null:
+        return 14
+    const elements: api.reader<[string]> = api.source(value = ["one", "two"])
+    if elements.read()[1] != "two":
+        return 15
+    var pair: pair_reader<i32> = pair_source(first = 3, second = 4)
+    var left, right = pair.read_pair()
+    if left != 3 or right != 4:
+        return 16
+    var held = holder(seed = 7, provider = integers)
+    if api.constrained(7, integers) != 7 or held.provider.read() != 7:
+        return 4
+    var view: api.reader<i32>? = null
+    if view != null:
+        return 5
+    view = integers
+    var unwrapped = view as api.reader<i32>
+    var callback: func() -> i32 = unwrapped.read
+    if callback() != 7:
+        return 6
+    var list: [api.reader<i32>] = [integers, promoted_source(inline_source = inline_source(value = 11))]
+    if list[1].read() != 11:
+        return 7
+    var child = number_child(value = 4, extra = 2)
+    var inherited: api.reader<i32> = child
+    if inherited.read() != 6:
+        return 8
+    const output: api.transform<i32, string> = formatter(prefix = "ok")
+    if output.apply(42) != "ok":
+        return 9
+    if not (integer_source has api.reader<i32>):
+        return 10
+    print("generic interfaces preserved")
+    return 0

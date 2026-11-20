@@ -27,6 +27,7 @@ shared. Current API guides determine behavior; proposals record design history.
 | Area | Current engineering record |
 | --- | --- |
 | Project/library/native workflow | [Milestone register](roadmap/MILESTONE_REGISTER.md), [library authoring](LOCAL_LIBRARIES.md), [G25](projects/G25_NATIVE_HEADER_IMPORTER.md), [G26](projects/G26_PACKAGE_MAINTENANCE.md), [G27](projects/G27_LIBRARY_AUTHORING.md) |
+| Generic structural interfaces | [G82 candidate and local qualification](projects/G82_GENERIC_INTERFACES.md), [interface contract](INTERFACES.md#generic-interfaces-g82); independent integration review pending |
 | Language/compiler and entry semantics | [Source compiler](SOURCE_COMPILER.md), [CLI](CLI.md), [language guide](LANGUAGE_BIBLE.md) |
 | LLVM migration | [Compatibility](llvm23/COMPATIBILITY.md), [acceptance](llvm23/ACCEPTANCE.md); historical hosted checkpoint is distinct from this repair |
 | HTTP | [Current engineering](net/http/CURRENT_ENGINEERING.md), [accepted hosted scope](net/http/ACCEPTANCE.md) |

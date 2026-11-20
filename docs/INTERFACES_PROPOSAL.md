@@ -2,6 +2,8 @@
 > below retain their scope. Earlier toolchain pins and activation gates are
 > superseded; current operations require [LLVM/Clang/LLD 23.1.4](SOURCE_COMPILER.md#active-toolchain).
 > The delivered contract is linked from the [documentation index](README.md).
+> G82 supersedes the historical generic-interface exclusion below; see the
+> [implemented generic interface contract](INTERFACES.md#generic-interfaces-g82).
 
 # Phase 21: structural interfaces
 

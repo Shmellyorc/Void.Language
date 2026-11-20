@@ -1,17 +1,6 @@
 // Only dependent type/body checks wait for instantiation. Names, declaration
 // structure and constraint declarations are checked even for unused templates.
 for(auto& [id,u]:units) {
-    auto parameters=[&](const auto& declaration) {
-        std::set<std::string> names;
-        for(const auto& p:declaration.generics) {
-            names.insert(p.token.text);
-            if(p.constraint) {
-                auto type=resolve_type(*p.constraint,*u,root,units,p.token);
-                if(type.kind!=Type::interface_ref || type.nullable)error(u->source,p.token,Code::unsupported_type,"A generic constraint must name a non-nullable accessible interface.");
-            }
-        }
-        return names;
-    };
     std::function<void(Type,const Token&,const std::set<std::string>&)> type=[&](Type raw,const Token& token,const auto& names) {
         if(raw.kind==Type::none)return;
         if(raw.kind==Type::unresolved && names.contains(raw.definition->name)) {
@@ -38,13 +27,28 @@ for(auto& [id,u]:units) {
                 type(application->arguments.front(),application->token,names);
                 return;
             }
-            if(!declaration || declaration->generics.empty())error(u->source,application->token,Code::unsupported_type,"Type '"+application->name+"' is not a generic struct.");
+            if(!declaration || declaration->generics.empty())error(u->source,application->token,Code::unsupported_type,"Type '"+application->name+"' is not a generic type.");
             if(application->arguments.size()!=declaration->generics.size())error(u->source,application->token,Code::argument_count,"Incorrect number of generic type arguments.");
             for(auto argument:application->arguments)type(argument,application->token,names);
         } else (void)resolve_type(raw,*u,root,units,token);
     };
+    auto parameter_constraints=[&](const auto& declaration,const std::set<std::string>& names) {
+        for(const auto& p:declaration.generics)if(p.constraint) {
+            type(*p.constraint,p.token,names);
+            bool interface=false;
+            auto application=std::find_if(u->applications.begin(),u->applications.end(),[&](const auto& a){return a.definition==p.constraint->definition;});
+            if(application!=u->applications.end()) {
+                auto selected=structure_lookup(*u,root,units,application->name,application->token);
+                interface=selected.second && selected.second->definition->interface_type;
+            } else interface=resolve_type(*p.constraint,*u,root,units,p.token).kind==Type::interface_ref;
+            if(!interface || p.constraint->nullable)error(u->source,p.token,Code::unsupported_type,"A generic constraint must name a non-nullable accessible interface.");
+        }
+    };
+    auto parameters=[](const auto& declaration) {
+        std::set<std::string> names;for(const auto& p:declaration.generics)names.insert(p.token.text);return names;
+    };
     for(auto& s:u->generic_structures)try {
-        auto names=parameters(s);std::set<std::string> fields;
+        auto names=parameters(s);parameter_constraints(s,names);std::set<std::string> fields;
         if(s.base_type)type(*s.base_type,s.base_token,names);
         for(const auto& f:s.static_fields) {
             if(!fields.insert(f.name).second)error(u->source,f.token,Code::duplicate,"Duplicate generic static field.");
@@ -53,6 +57,31 @@ for(auto& [id,u]:units) {
         for(const auto& f:s.fields) {
             if(!fields.insert(f.name).second)error(u->source,f.token,Code::duplicate,"Duplicate generic field '"+f.name+"'.");
             type(*f.annotation,f.token,names);
+        }
+        auto requirement_visibility=[&](Type raw,const Token& token) {
+            if(raw.kind==Type::unresolved && names.contains(raw.definition->name))return;
+            if(ir::nullable_value(raw))raw=ir::nullable_payload(raw);
+            auto definition=raw.definition;
+            if(raw.kind==Type::unresolved) {
+                auto application=std::find_if(u->applications.begin(),u->applications.end(),[&](const auto& a){return a.definition==raw.definition;});
+                if(application!=u->applications.end()) {
+                    auto selected=structure_lookup(*u,root,units,application->name,application->token);
+                    if(selected.second)definition=selected.second->definition;
+                } else {auto resolved=resolve_type(raw,*u,root,units,token);if(ir::nullable_value(resolved))resolved=ir::nullable_payload(resolved);definition=resolved.definition;}
+            }
+            if(definition && ((s.visibility=="public" && definition->visibility!="public") ||
+                              (s.visibility=="internal" && definition->visibility=="private")))
+                error(u->source,token,Code::visibility,"An interface requirement cannot expose a less-visible type.");
+        };
+        std::set<std::string> requirements;
+        for(auto& requirement:s.requirements) {
+            if(!requirements.insert(requirement.token.text).second)error(u->source,requirement.token,Code::duplicate,"Duplicate interface requirement.");
+            for(const auto& parameter:requirement.parameters){type(parameter.type,parameter.token,names);requirement_visibility(parameter.type,parameter.token);}
+            type(requirement.result,requirement.token,names);
+            if(requirement.returns.empty())requirement_visibility(requirement.result,requirement.token);
+            for(const auto& component:requirement.returns){type(component.type,component.site,names);requirement_visibility(component.type,component.site);}
+            Semantics semantics(*u,units,root,evaluate,diagnostics,defaults);
+            semantics.validate_header_names(requirement);semantics.validate_parameter_structure(requirement);
         }
         std::function<std::string(Type)> operand_key=[&](Type raw) {
             Depth guard(diagnostics.semantic_depth(),u->source,s.token,128);
@@ -107,6 +136,7 @@ for(auto& [id,u]:units) {
                 for(auto& s:u->structures)if(s.definition==resolved_receiver.definition)owner=&s;
                 if(!owner)error(u->source,receiver->token,Code::receiver,"Methods must be declared in their receiver's owning module.");
             }
+            if(owner->definition->interface_type)error(u->source,receiver->token,Code::receiver,"Interfaces declare requirements, not receiver or static implementations.");
             if(f.receiver && !f.generics.empty() && owner->generics.empty())semantics.validate_generic_receiver(Type(owner->definition,owner->definition->managed?Type::managed_ref:Type::aggregate),f.token);
             f.symbol=owner->definition->identity+(f.static_owner?"::static::":"::method::")+f.token.text;
             if(!methods.insert(owner->definition->identity+"::member::"+f.token.text).second || u->methods.contains(owner->definition->identity+"::method::"+f.token.text) || u->static_methods.contains(owner->definition->identity+"::static::"+f.token.text))error(u->source,f.token,Code::duplicate,"Static and instance methods cannot share a name.");
@@ -115,6 +145,7 @@ for(auto& [id,u]:units) {
             for(const auto& field:owner->fields)if(field.name==f.token.text)error(u->source,f.token,Code::duplicate,"Method conflicts with a stored field.");
             if(!f.generics.empty() && (f.token.text=="init" || f.virtual_method || f.overriding))error(u->source,f.token,Code::unsupported_type,"Initializers and virtual methods cannot introduce method-specific type parameters.");
         }
+        parameter_constraints(f,names);
         for(const auto& p:f.parameters) {
             type(p.type,p.token,names);
         }

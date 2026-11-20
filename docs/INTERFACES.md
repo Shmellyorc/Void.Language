@@ -66,6 +66,55 @@ through inline value components: mutating calls borrow original embedded storage
 Value structs may contain interface leaves, including nullable leaves, and copy
 the pair while preserving target identity and independent scalar storage.
 
+## Generic interfaces (G82)
+
+Interfaces use the established lowercase generic declaration syntax:
+
+```typescript
+interface reader<t>:
+    func read() -> t
+
+struct number_source:
+    value: i32
+
+func (self number_source) read() -> i32:
+    return self.value
+
+func inspect(const input: reader<i32>) -> i32:
+    return input.read()
+```
+
+`reader<i32>` and `reader<string>` have distinct nominal identities and substituted
+requirements. Repeated uses of the same declaration and exact arguments reuse one
+closed specialization; matching layouts do not make different arguments identical.
+Nested applications and imported interfaces retain their original declaration
+owner. Every runtime interface reference is closed; bare `reader` is not a type.
+Specializations are invariant, and unrelated interface views do not implicitly
+convert even when their requirements happen to match.
+
+Structural conformance runs after substitution and retains the rules above:
+exact parameter order/types/const/nullability/results, accessible original methods,
+ancestry and one-hop composition, with ambiguity diagnosed before signatures.
+Generic managed providers work through their existing specialized methods.
+File-private methods may supply a view in their owning module, but cannot establish
+conformance at an unauthorized import site. An authorized factory may return the
+public specialized view instead.
+
+Specialized interfaces work in parameters, results, fields, supported collections,
+nullable views and bound callbacks. They reuse the original object/witness pair,
+object identity, precise GC roots, conservative effects and generation leases.
+They add no Runtime allocation or dispatch representation. Requirements remain
+bodyless and cannot introduce their own method type parameters. Interface
+inheritance, defaults, variance, standalone value erasure and new dynamic casts
+remain deferred.
+
+[Generic inference and constraints](GENERICS.md#specialized-interface-parameters-and-constraints)
+explain explicit/inferred calls and dependent constraints. Run
+`voidc run examples/interfaces/generic.void --no-cache` for a complete example.
+Compiler-owned editor metadata retains symbolic declarations (`reader<t>`) and
+concrete call types (`reader<i32>`), including requirement navigation, references,
+completion, signatures and interface semantic classification.
+
 ## Readonly and construction
 
 P3/RV capabilities remain compile-time facts, not runtime permissions or freezing.
@@ -169,7 +218,7 @@ and existing interface references through the same member selection and exact
 signature checks. Constraints do not add runtime erasure; see GENERICS.md.
 
 Deferred: standalone value/interface representation, boxing, interface inheritance,
-generic interfaces/Self, defaults/bodies, overloads, dynamic type tests, downcasts/width casts,
+Self, defaults/bodies, overloads, dynamic type tests, downcasts/width casts,
 managed/interface FFI, open-world providers, transitive using, finalizers and runtime
 permission systems. Root homes can retain dead values until function return, as in
 the existing GC foundation; this phase does not add a liveness optimizer.

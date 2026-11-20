@@ -835,7 +835,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             fail("invalid interface requirement ownership");
         if(!requirements.emplace(requirement.name,&requirement).second || !names.emplace(requirement.name,Signature{requirement.parameters,requirement.result,true}).second) fail("duplicate interface requirement");
         for(auto t:requirement.parameters) {valid_type(t);if(t==Type::none || t.construction || t.kind==Type::prepared_receiver) fail("invalid interface requirement parameter");}
-        auto less_visible=[&](Type t) { return t.definition &&
+        auto less_visible=[&](Type t) { if(nullable_value(t))t=nullable_payload(t);return t.definition &&
             ((requirement.visibility=="public" && t.definition->visibility!="public") ||
              (requirement.visibility=="internal" && t.definition->visibility=="private")); };
         for(auto t:requirement.parameters) if(less_visible(t)) fail("interface requirement exposes a less-visible parameter type");

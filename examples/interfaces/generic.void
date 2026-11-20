@@ -1,0 +1,38 @@
+## Reads a payload through its exact concrete interface specialization.
+interface reader<t>:
+    ## Reads the current payload.
+    ## @return The value supplied by the reader.
+    func read() -> t
+
+## Stores a payload in a managed object.
+struct source<t>:
+    value: t
+
+## Reads the stored value without changing the source.
+## @return The current payload.
+func (self source<t>) read() -> t:
+    return self.value
+
+## Reads an already selected specialization; its argument anchors inference.
+## @param input The reader to query without mutable authority.
+## @return The reader's payload.
+func inspect<t>(const input: reader<t>) -> t:
+    return input.read()
+
+## Requires the existing structural reader contract without boxing the provider.
+## @param seed An anchor for the payload type.
+## @param input The concrete provider satisfying reader<t>.
+## @return The concrete provider's payload.
+func constrained<t, s: reader<t>>(seed: t, const input: s) -> t:
+    return input.read()
+
+## Shows distinct interface specializations and nullable lifting.
+func main():
+    var integers = source(value = 42)
+    const numbers: reader<i32> = integers
+    const words: reader<string> = source(value = "hello")
+    print(inspect(numbers))
+    print(inspect(words))
+    print(constrained(0, integers))
+    var optional: reader<i32>? = integers
+    print((optional as reader<i32>).read())

@@ -523,7 +523,7 @@ struct ConstructionContext {
     std::map<unsigned,unsigned> aliases;
     std::map<const Expr*,std::set<unsigned>> calls;
 };
-struct GenericParameter { Token token; std::optional<Type> constraint; };
+struct GenericParameter { Token token; std::optional<Type> constraint; std::vector<Token> constraint_syntax; };
 struct ReturnComponent { Token site; std::optional<Token> name; Type type; };
 struct Function {
     struct Capture {unsigned outer_slot;Type cell;Token token;bool snapshot=false;};
@@ -601,13 +601,14 @@ Type editor_pattern_type(Type raw) {
     auto name=std::make_shared<ir::ValueType>();name->name=raw.definition->name;name->identity=name->name;
     Type type(name,Type::unresolved);type.nullable=raw.nullable;return type;
 }
-std::string editor_return_type(const Function& f) {
-    if(f.returns.empty())return ir::type_name(f.generics.empty()?f.result:editor_pattern_type(f.result));
+std::string editor_return_type(const Function& f,bool symbolic=false) {
+    const bool pattern=symbolic || !f.generics.empty();
+    if(f.returns.empty())return ir::type_name(pattern?editor_pattern_type(f.result):f.result);
     std::string label="(";
     for(const auto& component:f.returns) {
         if(label.size()>1)label+=", ";
         if(component.name)label+=component.name->text+": ";
-        label+=ir::type_name(f.generics.empty()?component.type:editor_pattern_type(component.type));
+        label+=ir::type_name(pattern?editor_pattern_type(component.type):component.type);
     }
     return label+")";
 }
@@ -700,7 +701,7 @@ struct Structure {
     unsigned layout_state = 0, default_state = 0, layout_depth = 1;
     std::size_t expanded_fields = 0;
     Function* initializer = nullptr;
-    std::list<Function> operators;
+    std::list<Function> operators, requirements;
 };
 static_assert(!std::is_copy_constructible_v<Pattern> && !std::is_copy_assignable_v<Pattern>);
 static_assert(std::is_move_constructible_v<Pattern> && std::is_move_assignable_v<Pattern>);
@@ -988,8 +989,21 @@ class Parser {
         do {
             auto token=name();
             if(!generic_names.insert(token.text).second)error(source,token,Code::duplicate,"Duplicate generic type parameter '"+token.text+"'.");
-            std::optional<Type> constraint;if(accept(":"))constraint=type();
-            result.push_back({token,constraint});
+            std::optional<Type> constraint;std::vector<Token> syntax;
+            if(accept(":")) {
+                auto begin=p;const auto uses=type_uses.size(),applications_before=applications.size(),arrays_before=arrays.size(),functions_before=function_types.size(),results_before=results.size();
+                constraint=type();syntax.assign(tokens.begin()+begin,tokens.begin()+p);
+                if(instantiating) {
+                    // Constraints are bound by specialization before reparsing
+                    // the body. Do not publish a second, unbound annotation copy.
+                    type_uses.resize(uses);
+                    while(applications.size()>applications_before)applications.pop_back();
+                    while(arrays.size()>arrays_before)arrays.pop_back();
+                    while(function_types.size()>functions_before)function_types.pop_back();
+                    while(results.size()>results_before)results.pop_back();
+                }
+            }
+            result.push_back({token,constraint,std::move(syntax)});
         }while(accept(","));
         need(">");return result;
     }
@@ -1431,6 +1445,13 @@ public:
         tokens.push_back({TokenKind::end,"<end of file>",tokens.empty()?0:tokens.back().offset});
     }
     const auto& syntax_tokens() const { return tokens; }
+    Type parse_type(Unit& unit) {
+        auto result=type();need("<end of file>");
+        unit.type_uses.insert(unit.type_uses.end(),std::make_move_iterator(type_uses.begin()),std::make_move_iterator(type_uses.end()));
+        unit.function_types.splice(unit.function_types.end(),function_types);unit.results.splice(unit.results.end(),results);
+        unit.arrays.splice(unit.arrays.end(),arrays);unit.applications.splice(unit.applications.end(),applications);
+        return result;
+    }
     void parse(Unit& unit) {
         recover_editor=diagnostics.recovery && diagnostics.recovery->module==unit.identity;
         auto before = diagnostics.size();
@@ -1557,7 +1578,7 @@ public:
             }
             if (accept("interface")) {
                 Structure structure; structure.token=name(); structure.visibility=f.visibility;
-                structure.definition=std::make_shared<ir::ValueType>(); structure.definition->name=structure.token.text; structure.definition->interface_type=true;
+                structure.definition=std::make_shared<ir::ValueType>(); structure.definition->name=structure.token.text; structure.definition->interface_type=true;structure.generics=generic_parameters();
                 need(":");newline();need("<indent>");unsigned count=0;
                 while(!at("<dedent>") && !at("<end of file>")) {
                     if(peek().text=="async")error(source,peek(),Code::unsupported_type,"Async interface methods require a reviewed calling and dispatch contract.");
@@ -1565,12 +1586,15 @@ public:
                     requirement.visibility=f.visibility;requirement.file_private=f.file_private;
                     requirement.token=at("string")?take():name();
                     if(requirement.token.text=="init" || requirement.token.text=="deinit") error(source,requirement.token,Code::initializer_deferred,"Lifecycle methods are not interface requirements.");
-                    auto unresolved=std::make_shared<ir::ValueType>();unresolved->name=structure.token.text;unresolved->source_offset=structure.token.offset;
-                    requirement.receiver=Parameter{structure.token,Type(unresolved,Type::unresolved)};
-                    parameters(requirement,false);newline();unit.functions.push_back(std::move(requirement));++count;
+                    requirement.receiver=Parameter{structure.token,Type(structure.definition,Type::interface_ref)};
+                    parameters(requirement,false);newline();structure.requirements.push_back(std::move(requirement));++count;
                 }
                 if(!count) error(source,structure.token,Code::syntax,"An interface requires at least one method; marker interfaces are deferred.");
-                need("<dedent>");structure.source_end=peek().offset;unit.structures.push_back(std::move(structure));continue;
+                need("<dedent>");structure.source_end=peek().offset;
+                if(!instantiating && !structure.generics.empty()) {
+                    template_syntax(structure);structure.syntax.assign(tokens.begin()+start,tokens.begin()+p);unit.generic_structures.push_back(std::move(structure));
+                } else {structure.generics.clear();unit.functions.splice(unit.functions.end(),structure.requirements);unit.structures.push_back(std::move(structure));}
+                continue;
             }
             bool value_declaration = at("value") && peek(1).text=="struct"; if(value_declaration)take();
             if (value_declaration || at("struct")) {
@@ -1699,7 +1723,10 @@ public:
         if(!instantiating) {
             for(const auto& f:unit.functions)if(!f.anonymous && f.token.text!="$application")validate_documentation(source,f,diagnostics);
             for(const auto& f:unit.generic_functions)validate_documentation(source,f,diagnostics);
-            for(const auto& structure:unit.generic_structures)for(const auto& f:structure.operators)validate_documentation(source,f,diagnostics);
+            for(const auto& structure:unit.generic_structures) {
+                for(const auto& f:structure.operators)validate_documentation(source,f,diagnostics);
+                for(const auto& f:structure.requirements)validate_documentation(source,f,diagnostics);
+            }
         }
         unit.parse_failed |= diagnostics.size() != before;
         unit.type_uses = std::move(type_uses);
@@ -4698,7 +4725,7 @@ public:
     }
     void validate_header_names(Function& f) {
         current=&f;scopes={{}};
-        if(f.receiver)declare(f.receiver->token,f.receiver->type);
+        if(f.receiver && !f.interface_requirement)declare(f.receiver->token,f.receiver->type);
         for(const auto& p:f.parameters)declare(p.token,p.type,p.type.readonly);
         f.locals.clear();f.editor_bindings.clear();current=nullptr;scopes.clear();
     }
@@ -7112,6 +7139,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     prepare_function = [&](Unit& owner,Function& f) {
         auto* unit=&owner;
         if(f.prepared)return;f.prepared=true;
+        Diagnostics::Context header_context(diagnostics,f.instantiation_context,std::max(f.specialization_depth,diagnostics.current_specialization_depth()));
         auto resolve = [&](Type& t, const Token& token) {
             try { t = resolve_type(t,*unit,root,units,token); }
             catch (const CompilationError& failure) { diagnostics.add(failure); t = error_type; f.parse_failed = true; }
@@ -7180,6 +7208,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                     error(unit->source,f.token,Code::duplicate,"Method name conflicts with field '" + f.token.text + "'.");
                 if(f.interface_requirement) {
                     auto check=[&](Type type,const Token& site) {
+                        if(ir::nullable_value(type))type=ir::nullable_payload(type);
                         if(type.definition && ((f.visibility=="public" && type.definition->visibility!="public") ||
                                                (f.visibility=="internal" && type.definition->visibility=="private")))
                             error(unit->source,site,Code::visibility,"An interface requirement cannot expose a less-visible type.");
@@ -7274,8 +7303,20 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     root.prepare_relationships=[](Type,Type,const SourceFile&,const Token&){};
     validate_inheritance(units,root,diagnostics);
     root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));
+    root.prepare_relationships=[&](Type left,Type right,const SourceFile& source,const Token& token) {
+        const bool preparing=preparing_generic_interfaces;
+        complete_generic_interface_headers();
+        // A field/default/extent may query another interface while its enclosing
+        // generic signature is being prepared. Complete that dependency first;
+        // querying the unfinished signature itself retains the existing cycle diagnostic.
+        if(preparing)for(auto type:{left,right})if(type.kind==Type::interface_ref)
+            for(const auto& [id,module]:units)for(const auto& f:module->functions)
+                if(f.interface_requirement && f.receiver->type.definition==type.definition &&
+                   std::none_of(root.member_catalog->interface_requirements.begin(),root.member_catalog->interface_requirements.end(),[&](const auto& header){return header.name==f.symbol;}))
+                    error(source,token,Code::constant_cycle,"Cyclic dependency between has and declaration headers.");
+    };
 #include "generic_declarations.inc"
-    for(auto& check:pending_generic_constraints)check();
+    complete_generic_constraints();
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
         try { defaults(*unit,structure); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -7424,6 +7465,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     diagnostics.finish();
     (void)string_pool(units);
     for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
+    root.prepare_relationships=[](Type,Type,const SourceFile&,const Token&){};
     for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->make_nullable={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry,

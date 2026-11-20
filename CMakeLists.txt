@@ -569,6 +569,14 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/enums/lsp.py" "$<TARGET_FILE:voidls>"
     "${CMAKE_CURRENT_BINARY_DIR}/g78-enum-lsp-results.json")
   set_tests_properties(lsp_enum_completeness PROPERTIES TIMEOUT 180)
+  add_test(NAME generic_interfaces_source COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/generic_interfaces/source.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g82-generic-interfaces-results.json")
+  set_tests_properties(generic_interfaces_source PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_generic_interfaces COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/generic_interfaces/lsp.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g82-generic-interfaces-lsp-results.json")
+  set_tests_properties(lsp_generic_interfaces PROPERTIES TIMEOUT 180)
   add_test(NAME static_members_imported_owners COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/static_members/imported_owners.py" "$<TARGET_FILE:voidc>"
     "${CMAKE_CURRENT_BINARY_DIR}/g81-imported-owners-results.json")

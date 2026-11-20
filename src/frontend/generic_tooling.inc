@@ -26,13 +26,18 @@ for(const auto& s:unit->generic_structures) {
     for(const auto& p:s.generics){if(!names.empty())spelling+=", ";spelling+=p.token.text;names.emplace(p.token.text,key+"::type::"+p.token.text);}spelling+=">";
     auto symbolic=std::make_shared<ir::ValueType>();symbolic->name=spelling;symbolic->identity=key;
     const auto symbolic_type=Type(symbolic,Type::unresolved);
-    AnalyzedDeclaration type_record{s.definition->managed?AnalyzedDeclaration::Kind::managed_structure:AnalyzedDeclaration::Kind::value_structure,key,id,s.visibility,location(s.token),{},symbolic_type,{},{},id};
+    AnalyzedDeclaration type_record{s.definition->interface_type?AnalyzedDeclaration::Kind::interface_type:s.definition->managed?AnalyzedDeclaration::Kind::managed_structure:AnalyzedDeclaration::Kind::value_structure,key,id,s.visibility,location(s.token),{},symbolic_type,{},{},id};
     const bool enumeration=!s.case_tokens.empty();
     if(enumeration) {
         type_record.generic_template=true;
         type_record.editor_symbol_kind=10;
         type_record.signature=std::string(s.definition->enum_flags?"flags enum ":"enum ")+spelling;
         if(s.definition->enum_backing)type_record.signature+="("+ir::type_name(*s.definition->enum_backing)+")";
+    }
+    if(s.definition->interface_type) {
+        type_record.generic_template=true;type_record.editor_symbol_kind=11;
+        type_record.signature="interface "+spelling;
+        if(s.source_end>s.token.offset){auto r=location(s.token);r.end=s.source_end;type_record.extent=r;}
     }
     declaration(std::move(type_record),false);
     parameter_records(s.generics,key);
@@ -87,6 +92,20 @@ for(const auto& s:unit->generic_structures) {
         record.signature+=") -> "+ir::type_name(record.type)+"\nDeclared by "+spelling+"\nEffects: checked per concrete specialization";
         for(unsigned n=0;n<f.parameters.size();++n)record.written_parameters.push_back({f.parameters[n].token.text,operands[n],location(f.parameters[n].token)});
         declaration(std::move(record));
+    }
+    for(const auto& f:s.requirements) {
+        const auto identity=key+"::method::"+f.token.text;std::vector<Type> parameters;
+        AnalyzedDeclaration record{AnalyzedDeclaration::Kind::interface_requirement,identity,id,s.visibility,location(f.token),{},editor_pattern_type(f.result),{},{},key};
+        record.generic_template=true;record.editor_symbol_kind=6;record.receiver=symbolic_type;
+        record.signature=f.token.text+"(";
+        for(unsigned n=0;n<f.parameters.size();++n) {
+            const auto& p=f.parameters[n];auto type=editor_pattern_type(p.type);parameters.push_back(type);
+            if(n)record.signature+=", ";record.signature+=std::string(p.type.readonly?"const ":"")+p.token.text+": "+ir::type_name(type);
+            record.written_parameters.push_back({p.token.text,type,location(p.token)});
+            declaration({AnalyzedDeclaration::Kind::parameter,identity+"::parameter::"+p.token.text,id,"local",location(p.token),{},type,{},{},identity},false);
+        }
+        record.parameters=std::move(parameters);record.signature+=") -> "+editor_return_type(f,true);
+        declaration(std::move(record),false);
     }
     type_references(s.type_uses,names,key);
 }

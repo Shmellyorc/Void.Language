@@ -6,6 +6,7 @@
 #include <cstring>
 #include <algorithm>
 #include <future>
+#include <set>
 #include <iostream>
 using namespace managed_test;
 namespace {
@@ -22,6 +23,42 @@ void rejects(const std::string& text,const std::string& fragment) {
 void run(const std::string& text,int expected) {
     auto program=analyze(text);vd::Jit jit;
     for(bool opt:{false,true}) require(jit.compile(*program,opt)->invoke(10)==expected,"interface source execution");
+}
+void generic_interfaces(const std::filesystem::path& root) {
+    const auto text=vd::read_source(root/"tests/generic_interfaces/lifecycle.void").text();
+    auto before=analyze(text);const auto module=before->lower();
+    std::set<std::string> identities;
+    for(auto type:module.nominal_types)if(type.kind==vd::ir::Type::interface_ref) {
+        identities.insert(vd::ir::Type::key(type));
+        require(type.definition->fields.empty(),"generic interface acquired storage");
+    }
+    require(identities.size()==2 && module.interface_requirements.size()==2,"generic interface specializations did not retain distinct requirements");
+    for(const auto& binding:module.interface_bindings)require(identities.contains(vd::ir::Type::key(binding.interface)),"witness used unresolved generic identity");
+    auto changed=text;changed.replace(changed.find("return c.n"),10,"return c.n + 1");auto after=analyze(changed);
+    require(vd::plan_invalidation(*before,{},after.get()).source_compatibility==vd::SourceCompatibility::exact_match,"generic interface body reload required a restart");
+    auto signature=text;signature.replace(signature.find("func read() -> t"),16,"func read(extra: i32) -> t");
+    // An incompatible requirement must fail closed, even before a generation can publish.
+    require(!vd::analyze_source({"/interfaces.void",signature}).succeeded(),"changed generic requirements accepted old providers");
+    vd::Jit jit;
+    for(bool opt:{false,true}) {
+        auto runtime=std::make_shared<vd::Runtime>(1);auto code=jit.compile(module,module.entry_symbol,opt,{},runtime);
+        auto independent=jit.compile(*before,opt);
+        require(code->runtime_owner()!=independent->runtime_owner(),"generic witness Runtime isolation lost");
+        for(bool forced:{false,true}) {
+            Probe p;p.inspect_roots=true;p.collect_before=forced;
+            {Observe observe(p);require(code->invoke(7)==14,"generic interface callback/aggregate dispatch");}
+            require(p.roots_valid && p.frames.empty() && p.constructions>=102,("generic interface precise GC handoff roots="+std::to_string(p.roots_valid)+" frames="+std::to_string(p.frames.size())+" constructions="+std::to_string(p.constructions)).c_str());
+            vd::Runtime::Attachment a(*runtime);vd::Runtime::Managed m(*runtime);runtime->collect();require(runtime->snapshot().objects==0,"generic interface cycle retained objects");
+        }
+        vd::ReloadSlot slot(code);auto retained=code;
+        require(jit.replace(slot,*after,opt) && slot.invoke(7)==16 && retained->invoke(7)==14,"generic interface generation lease/body dispatch");
+        require(independent->invoke(7)==14,"independent Runtime affected by replacement");
+        Probe failure;failure.inspect_roots=true;failure.fail_construction=3;failure.fail_allocation=0;bool failed=false;
+        {Observe observe(failure);try{code->invoke(7);}catch(const std::exception&){failed=true;}}
+        require(failed && failure.roots_valid && failure.frames.empty(),"generic interface allocation failure cleanup");
+        {vd::Runtime::Attachment a(*runtime);vd::Runtime::Managed m(*runtime);runtime->collect();require(runtime->snapshot().objects==0,"generic interface failure retained cycle");}
+        require(code->invoke(7)==14,"generic interface failure recovery");
+    }
 }
 void diagnostics() {
     rejects("interface bad:\n    func init()\n","Lifecycle");
@@ -238,6 +275,7 @@ int main(int argc,char** argv) {
             work();
             std::cerr<<"interfaces: "<<name<<" passed"<<std::endl;
         };
+        phase("generic_interfaces",[&]{generic_interfaces(argv[1]);});
         phase("diagnostics",[&]{diagnostics();});phase("programs",[&]{programs();});
         phase("independent_ir",[&]{independent_ir();});phase("admission",[&]{admission();});
         phase("tooling_and_imports",[&]{tooling_and_imports(argv[1]);});

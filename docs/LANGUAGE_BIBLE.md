@@ -782,7 +782,7 @@ A using field retains ordinary defaults, stored-field constructor labels and dec
 
 ## 13. Interfaces [AGREED; PHASE 21 BOUNDED IMPLEMENTATION]
 
-**Implemented clarification (Phase 21):** `INTERFACES.md` records owner-approved IF1–IF8: structural conformance of completed managed objects, exact method requirements, original managed identity, two-word managed-backed views, static-binding-aware method dispatch, readonly effect checking, precise GC roots and JIT/AOT support. No `implements` keyword is needed. Value boxing/erasure, interface inheritance/default bodies, dynamic tests and richer conversions remain explicitly deferred. Phase 24 adds compile-time generic constraints without changing managed-backed erasure. The old label OPEN applies to those *extensions*, not the working managed-backed interface contract.
+**Implemented clarification (Phase 21):** `INTERFACES.md` records owner-approved IF1–IF8: structural conformance of completed managed objects, exact method requirements, original managed identity, two-word managed-backed views, static-binding-aware method dispatch, readonly effect checking, precise GC roots and JIT/AOT support. No `implements` keyword is needed. Value boxing/erasure, interface inheritance/default bodies, dynamic tests and richer conversions remain explicitly deferred. Phase 24 adds compile-time generic constraints; G82 adds closed generic interfaces and dependent specialized constraints without changing managed-backed erasure. The old label OPEN applies to those *extensions*, not the working managed-backed interface contract.
 
 Interfaces specify required behavior and provide polymorphism without forcing inheritance chains. **Conformance is structural:** a struct satisfies an interface when its accessible method set fulfills the interface's requirements, including unambiguous methods promoted through `using`. No mandatory `implements` keyword is required. An interface injects no storage and does not automatically supply implementations.
 
@@ -835,8 +835,14 @@ complete. Receivers are selected and rooted before arguments. Witnesses contain 
 JIT pointers, generation leases or runtime permission tags.
 
 INTERFACES.md defines the implemented boundary and WORK_LOG.md records verification.
-Generic constraints, interface inheritance, default bodies, overloads, Self, value
-interface representation, public managed FFI and richer conversions remain OPEN or
+Generic interfaces such as `reader<t>` specialize through the existing native
+generic machinery. `reader<i32>` and `reader<string>` are invariant, nominally
+distinct views with exact substituted requirements. Generic parameters can use
+constraints such as `s: reader<t>` once the ordinary arguments establish `t`.
+See [generic interface contracts](INTERFACES.md#generic-interfaces-g82) and the
+[runnable example](../examples/interfaces/generic.void). Interface inheritance,
+default bodies, overloads, Self, value interface representation, public managed
+FFI and richer conversions remain OPEN or
 deferred; no implicit boxing or mandatory implements keyword is introduced.
 
 ## 14. Ordinary functions and receiver methods [AGREED]
