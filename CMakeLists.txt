@@ -98,7 +98,7 @@ target_compile_definitions(void_zone_objects PRIVATE
 target_link_libraries(void_zone_objects PRIVATE void_options)
 add_library(void_application_objects OBJECT src/application_metadata.cpp src/project_identity.cpp src/dynamic_closure.cpp)
 target_link_libraries(void_application_objects PRIVATE void_options)
-add_library(void_core src/frontend/project.cpp src/frontend/project_creation.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
+add_library(void_core src/frontend/conditional.cpp src/frontend/project.cpp src/frontend/project_creation.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
 target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
 target_sources(void_core PRIVATE src/ir/c_primitive.cpp)
 find_program(VOID_GIT_EXECUTABLE NAMES git DOC "Trusted Git executable for explicit D3 acquisition")
@@ -1320,6 +1320,38 @@ if(BUILD_TESTING)
     "@VOID_TEST_OUTPUT@/custom-iteration-lsp.json")
   set_tests_properties(custom_iteration_source PROPERTIES TIMEOUT 300)
   set_tests_properties(lsp_custom_iteration PROPERTIES TIMEOUT 180)
+  add_executable(void_conditional_tests tests/conditional/tests.cpp)
+  target_link_libraries(void_conditional_tests PRIVATE void_core)
+  add_test(NAME conditional_configuration COMMAND void_conditional_tests)
+  void_add_output_test(conditional_source "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/conditional/source.py" "$<TARGET_FILE:voidc>"
+    "@VOID_TEST_OUTPUT@/conditional-source.json")
+  void_add_output_test(lsp_conditional "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/conditional/lsp.py" "$<TARGET_FILE:voidls>"
+    "@VOID_TEST_OUTPUT@/conditional-lsp.json")
+  set_tests_properties(conditional_configuration PROPERTIES TIMEOUT 60)
+  set_tests_properties(conditional_source PROPERTIES TIMEOUT 600)
+  void_add_output_test(conditional_corrections "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/conditional/corrections.py" "$<TARGET_FILE:voidc>"
+    "@VOID_TEST_OUTPUT@/conditional-corrections.json")
+  set_tests_properties(conditional_corrections PROPERTIES TIMEOUT 300)
+  set_tests_properties(lsp_conditional PROPERTIES TIMEOUT 180)
+  add_test(NAME conditional_async COMMAND void_io_runner --async "${PROJECT_SOURCE_DIR}/tests/conditional/async.void")
+  set_tests_properties(conditional_async PROPERTIES TIMEOUT 180)
+  foreach(mode normal optimized)
+    set(conditional_async_object "${CMAKE_CURRENT_BINARY_DIR}/conditional-async-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${conditional_async_object}"
+      COMMAND void_io_runner --emit-async "${PROJECT_SOURCE_DIR}/tests/conditional/async.void" "${conditional_async_object}" "${mode}"
+      DEPENDS void_io_runner "${PROJECT_SOURCE_DIR}/tests/conditional/async.void" VERBATIM)
+    set_source_files_properties("${conditional_async_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_conditional_async_${mode} tests/async/aot.cpp "${conditional_async_object}")
+    target_link_libraries(void_conditional_async_${mode} PRIVATE void_runtime)
+    add_test(NAME conditional_async_aot_${mode} COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/async/advanced/aot.py" "$<TARGET_FILE:void_io_runner>"
+      "$<TARGET_FILE:void_conditional_async_${mode}>" "${PROJECT_SOURCE_DIR}/tests/conditional/async.void"
+      "${conditional_async_object}" "${mode}" --emit-async)
+    set_tests_properties(conditional_async_aot_${mode} PROPERTIES TIMEOUT 180)
+  endforeach()
   add_executable(void_custom_iteration_tests tests/custom_iteration/tests.cpp
     tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_custom_iteration_tests PRIVATE void_llvm)

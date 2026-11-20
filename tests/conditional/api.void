@@ -1,0 +1,8 @@
+compile if feature.extra:
+    public func value() -> i32:
+        return 61
+    public func extra():
+        print("extra")
+compile else:
+    public func value() -> i32:
+        return 67

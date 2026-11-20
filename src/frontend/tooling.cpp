@@ -167,6 +167,9 @@ std::vector<SemanticToken> ToolingIndex::semantic_tokens(const std::string& modu
         (void)key;
         if(!candidate.conflict && (tokens.empty() || tokens.back().end<=candidate.token.begin))tokens.push_back(candidate.token);
     }
+    for(const auto& source:analysis_->modules())if(source.identity==module)for(const auto& region:source.conditional_regions)
+        if(region.begin<region.end)tokens.push_back({region.begin,region.end,region.directive?K::keyword:K::comment,region.directive?0u:SemanticToken::inactive});
+    std::sort(tokens.begin(),tokens.end(),[](const auto& a,const auto& b){return a.begin<b.begin;});
     return tokens;
 }
 
@@ -226,7 +229,7 @@ InvalidationPlan plan_invalidation(const ValidatedAnalysis& before,const std::ve
             auto next=fresh.modules.find(id);
             if(next==fresh.modules.end()) { changed.insert(id); removed.insert(id); namespace_changes.insert(id); }
             else {
-                if(module->source.text()!=next->second->source.text()) changed.insert(id);
+                if(module->source.text()!=next->second->source.text() || module->conditions.key()!=next->second->conditions.key()) changed.insert(id);
                 if(module->imports!=next->second->imports) { plan.graph_changed=true; changed.insert(id); namespace_changes.insert(id); }
             }
         }

@@ -22,6 +22,7 @@ struct LockedPackage {
     DependencyEdges dependencies;
     PackageSources sources; // Package-relative paths and exact verified bytes.
     std::shared_ptr<const EditorPackageInputs> editor_inputs = {};
+    std::map<std::string,bool> conditions;
 };
 class LockedDependencies {
     std::string identity_;

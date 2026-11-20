@@ -105,6 +105,7 @@ class Manifest {
     std::map<std::string, NativeLibrary> native_;
     std::optional<NativeRequirement> native_requirement_;
     Sources sources_;
+    std::map<std::string,bool> conditions_;
     Profile debug_ = {Optimization::none, DebugInfo::none};
     Profile release_ = {Optimization::O2, DebugInfo::none};
     std::map<std::string, Field> fields_;
@@ -122,6 +123,7 @@ public:
     const auto& dependencies() const { return dependencies_; }
     const auto& native() const { return native_; }
     const auto& native_requirement() const { return native_requirement_; }
+    const auto& conditions() const { return conditions_; }
     const Sources& sources() const { return sources_; }
     const Profile& debug() const { return debug_; }
     const Profile& release() const { return release_; }

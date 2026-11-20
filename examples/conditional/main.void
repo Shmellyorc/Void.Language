@@ -1,0 +1,22 @@
+compile if target_os == "windows":
+    func platform_name() -> string:
+        return "Windows"
+compile else if target_os == "macos":
+    func platform_name() -> string:
+        return "macOS"
+compile else:
+    func platform_name() -> string:
+        return "Linux"
+
+compile if feature.tracing:
+    func trace():
+        print("Tracing enabled")
+
+func main():
+    print(platform_name())
+    compile if feature.tracing:
+        trace()
+    compile if target_arch == "aarch64":
+        print("ARM64")
+    compile else:
+        print("x86-64")

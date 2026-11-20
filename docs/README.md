@@ -1,5 +1,7 @@
 # VOID documentation
 
+- [G87 conditional compilation: syntax, project conditions and local qualification](projects/G87_CONDITIONAL_COMPILATION.md)
+
 Current operations use **LLVM/Clang/LLD 23.1.4 exclusively**. Start with the
 [toolchain requirements](SOURCE_COMPILER.md#active-toolchain). Earlier-version commands and dated
 holds in historical records do not govern current work.

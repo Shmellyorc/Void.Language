@@ -1,4 +1,5 @@
 #include "void/project.hpp"
+#include "void/conditional.hpp"
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "void/utf8.hpp"
@@ -729,7 +730,17 @@ public:
             paths(*sources, "exclude", manifest_->sources_.exclude, false);
         }
         if (auto* build = table(root, "build")) {
-            fields(*build, "build", {"debug", "release"});
+            fields(*build, "build", {"debug", "release", "conditions"});
+            if(auto* conditions=table(*build,"conditions")) {
+                if(conditions->size()>128)fail(Code::limit,span(conditions->source()),"Build condition limit of 128 exceeded.","Reduce the number of declared conditions.");
+                for(const auto& [key,value]:*conditions) {
+                    const auto name=std::string(key.str());
+                    manifest_->fields_.emplace("build.conditions."+name,Field{span(key.source()),span(value.source())});
+                    if(!valid_build_condition_name(name))fail(Code::project_field,span(key.source()),"Invalid build condition name.","Use 1–64 lowercase ASCII letters, digits or _, starting with a letter or _.");
+                    else if(auto enabled=value.value_exact<bool>())manifest_->conditions_.emplace(name,*enabled);
+                    else fail(Code::project_field,span(value.source()),"Build condition requires a boolean.","Use true or false; conditions cannot contain nested tables or expressions.");
+                }
+            }
             profile(*build, "debug", manifest_->debug_);
             profile(*build, "release", manifest_->release_);
         }

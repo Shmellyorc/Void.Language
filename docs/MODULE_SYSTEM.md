@@ -1,5 +1,23 @@
 # Module system and multi-file native compilation
 
+## Conditional imports and ownership (G87)
+
+`compile if` regions are selected in the shared lexer before both manifest entry
+inventory and execution-import discovery. An excluded import performs no VFS lookup,
+requires no source file, grants no visibility and contributes no dependency edge or
+initializer. Selected imports retain existing exact-case resolution, source identity,
+package boundaries, visibility and native admission. Conditional declarations keep
+the enclosing module/type ownership and introduce no extra scope. Conflicting selected
+declarations still use ordinary duplicate diagnostics.
+
+`[build.conditions]` belongs to the owning manifest. Project-local sources share the
+project map; a locked source package retains its own validated map, independently of
+the consumer, and standard modules do not inherit consumer features. Manifest-declared
+package/native dependencies still require their ordinary lock/admission verification.
+Source selection does not make manifest dependency declarations optional. Package
+condition changes require the existing explicit lock refresh. See [G87](projects/G87_CONDITIONAL_COMPILATION.md).
+
+
 Slice 2 locally implements the manifest-selected D/E contract through the existing
 SourceGraph and Parser. A manifest fixes VFS `/`; the selected source still owns
 application root declarations. Libraries check with a declarationless root scope.

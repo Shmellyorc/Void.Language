@@ -6,8 +6,8 @@
 namespace vd {
 struct SemanticToken {
     enum class Kind { namespace_, type, structure, interface_, enumeration, type_parameter,
-                      parameter, variable, property, enum_member, event, function, method, operator_, count };
-    enum Modifier : unsigned { declaration = 1, definition = 2, readonly = 4, static_ = 8, default_library = 16 };
+                      parameter, variable, property, enum_member, event, function, method, operator_, comment, keyword, count };
+    enum Modifier : unsigned { declaration = 1, definition = 2, readonly = 4, static_ = 8, default_library = 16, inactive = 32 };
     std::size_t begin, end;
     Kind kind;
     unsigned modifiers;

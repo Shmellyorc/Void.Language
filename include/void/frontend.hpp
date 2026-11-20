@@ -3,13 +3,14 @@
 #include "void/native_binding.hpp"
 #include "void/diagnostic.hpp"
 #include "void/project.hpp"
+#include "void/conditional.hpp"
 #include <filesystem>
 #include <functional>
 #include <optional>
 #include <map>
 #include <set>
 namespace vd {
-std::string inspect_native_provider(const SourceFile&);
+std::string inspect_native_provider(const SourceFile&, const BuildConditions&);
 // Parse relevant project sources and resolve local imports with the compiler's
 // source graph. This metadata result cannot authorize native code or lowering.
 std::set<std::string> inspect_project_imports(const std::filesystem::path&,
@@ -20,6 +21,8 @@ struct AnalyzedModule {
     SourceFile source;
     std::vector<std::string> imports;
     std::map<std::string,std::string> qualifiers;
+    BuildConditions conditions = native_build_conditions();
+    std::vector<ConditionalRegion> conditional_regions;
 };
 struct AnalyzedParameter {
     std::string name; ir::Type type; SourceSpan source;

@@ -77,6 +77,7 @@ struct ProjectCapture {
         if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
         manifest=std::move(parsed.manifest);
         anchor=manifest->source();from.source=anchor;
+        graph.conditions.features=manifest->conditions();
         graph.imports_only=imports_only;
         if(!imports_only)try {project::require_no_package_edit(root);}
         catch(const std::runtime_error& failure) {project_failure(anchor,Code::project_changed,failure.what());}
@@ -322,7 +323,7 @@ struct ProjectCapture {
 std::string project_snapshot_key(const ProjectCapture& capture,const std::string& entry,bool automatic) {
     llvm::SHA256 hash;
     auto field=[&](std::string_view s){auto length=std::to_string(s.size())+":";hash.update(llvm::StringRef(length));hash.update(llvm::StringRef(s.data(),s.size()));};
-    field("void-project-selection-v1");field(path_utf8(capture.root));field(capture.manifest->source().text());field(entry);field(automatic?"automatic":"explicit");
+    field("void-project-selection-v2");field(capture.graph.conditions.key());field(path_utf8(capture.root));field(capture.manifest->source().text());field(entry);field(automatic?"automatic":"explicit");
     if(capture.native)field(capture.native->dynamic()->bytes());
     if(capture.dependencies){field("locked-dependency-plan-v1");field(capture.dependencies->identity());}
     // An overlay outside E must leave the ordinary selection key unchanged.

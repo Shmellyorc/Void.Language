@@ -1,5 +1,42 @@
 # voidc command reference
 
+## Conditional build configuration (G87)
+
+Use explicit booleans in the selected project's `void.project.toml`:
+
+```toml
+[build.conditions]
+tracing = true
+experimental = false
+```
+
+Test them in source with `compile if feature.tracing:`. Names contain 1–64 lowercase
+ASCII letters, digits or `_`, starting with a letter or `_`; at most 128 conditions
+are permitted. Unknown names, nonbooleans, duplicate keys, nested condition tables
+and malformed names diagnose at the manifest/source location. Conditions apply
+identically to Debug and Release, check/run/build/emit and the language server.
+Change the manifest explicitly to change the configuration; there is no environment
+lookup, implicit profile feature, feature CLI override or source-defined symbol.
+A standalone explicit file has target predicates and boolean literals, with no
+project feature map. Use manifest project mode for features.
+
+```sh
+build/llvm23-debug/voidc check --project examples/conditional
+build/llvm23-debug/voidc run --project examples/conditional --profile debug --no-cache
+build/llvm23-debug/voidc build --project examples/conditional --profile release -o /tmp/void-conditional
+/tmp/void-conditional
+```
+
+Set `tracing = false` and repeat to exclude its declaration and call. No dependency
+resolution is needed for this example. Declared package/native dependencies retain
+existing lock and admission requirements even when an import is excluded; source
+selection is not a dependency acquisition or permission mechanism. Each locked
+package uses its own manifest conditions, without consumer overrides or feature
+unification. Configuration changes invalidate caches/reload compatibility. Current
+native modes use the backend target; no cross-compilation option is introduced.
+See [G87](projects/G87_CONDITIONAL_COMPILATION.md).
+
+
 ## Project creation (Slice 5)
 
 ```text

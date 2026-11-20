@@ -138,3 +138,13 @@ including after relocation. An explicit absolute `VOID_STDLIB_ROOT` override win
 otherwise the configured source root is only a fallback when no installed tree
 is present. Installed sources permit navigation without rename/format
 or project overlay authority. [Stage 8 discovery contract](https://github.com/Shmellyorc/Void.Language/blob/main/docs/STAGE8_DISCOVERY.md)
+
+## Conditional compilation (G87)
+
+`compile if` regions use the active project's `[build.conditions]` and compiler
+target. Unsaved manifest edits refresh the same compiler-owned analysis. Completion,
+hover and navigation include selected declarations; inactive lines have semantic
+token `comment` with modifier `inactive`, while directive lines use `keyword`.
+Themes can customize `comment.inactive`. Incomplete conditions produce diagnostics
+and remain editable. Formatting a file with conditional directives currently returns
+no edits to preserve all branches. See [G87](../../docs/projects/G87_CONDITIONAL_COMPILATION.md).

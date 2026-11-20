@@ -1,0 +1,58 @@
+compile if true:
+    # A managed cursor can safely retain its receiver through async advancement.
+    struct cursor<t>:
+        values: [t]
+        position: i64
+        backwards: bool
+    
+    async func identity<t>(value: t) -> t:
+        return value
+    
+    async func (self cursor<t>) next() -> option<t>:
+        if self.position < 0 or self.position >= self.values.count:
+            return None
+        var value = await identity(self.values[self.position])
+        if self.backwards:
+            self.position -= 1
+        else:
+            self.position += 1
+        return Some(value)
+    
+    func (self cursor<t>) index() -> i64:
+        if self.backwards:
+            return self.position + 1
+        return self.position - 1
+    
+    struct sequence<t>:
+        values: [t]
+    
+    func (self sequence<t>) async_iterator() -> cursor<t>:
+        return cursor<t>(values = self.values)
+    
+    func (self sequence<t>) reverse_async_iterator() -> cursor<t>:
+        return cursor<t>(values = self.values, position = self.values.count - 1, backwards = true)
+    
+    # A structural constraint describes the synchronous acquisition contract.
+    interface iterable<t>:
+        func async_iterator() -> cursor<t>
+    
+    async func collect<t, c: iterable<t>>(seed: t, input: c) -> [t]:
+        var output: [t] = []
+        for await value in input:
+            output.push(value)
+        return output
+compile else:
+    async func impossible() -> missing:
+        return unavailable
+
+async func entry(value: i32) -> i32:
+    var total = 0
+    compile if target_arch == "x86_64" or target_arch == "aarch64":
+        for await item in sequence(values = [1, 2, 4]):
+            compile if true:
+                total += item
+            compile else:
+                missing()
+    compile else:
+        return unavailable
+    return total

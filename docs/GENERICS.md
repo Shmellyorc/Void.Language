@@ -1,5 +1,16 @@
 # Native generics (Phase 24)
 
+## Conditional generic declarations and bodies (G87)
+
+`compile if` selects source once for the immutable target and owning-project
+configuration, before generic declaration capture or specialization. Excluded types,
+methods, interface requirements and body statements never enter generic syntax or
+semantic lookup. Every specialization sees that same selected template. Predicates
+cannot inspect generic parameters, ordinary values or `has`; those retain ordinary
+language semantics. Changing conditions requires recompilation and a Runtime restart,
+including when selected types retain their written names. See [G87](projects/G87_CONDITIONAL_COMPILATION.md).
+
+
 ## Generic async composition — G86
 
 Async functions and concrete managed generic receiver methods specialize through

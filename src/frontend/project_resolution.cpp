@@ -493,9 +493,10 @@ public:
         std::map<std::string, LockedPackage, std::less<>> result;
         for (auto& [id, package] : packages) {
             auto entry = *manifests.at(package.path)->package_entry();
+            auto conditions=manifests.at(package.path)->conditions();
             auto locator=managed_locators.contains(id)?managed_locators.at(id):std::move(package.path);
             result.emplace(id, LockedPackage{std::move(locator), std::move(entry),
-                std::move(package.edges), std::move(package.sources),std::move(package.editor_inputs)});
+                std::move(package.edges), std::move(package.sources),std::move(package.editor_inputs),std::move(conditions)});
         }
         return result;
     }
@@ -840,12 +841,17 @@ ProjectFiles local_source_files(const fs::path& source) {
     };
     walk(source,"",0);return files;
 }
-void report_native_sources(const ProjectFiles& files,MaintenanceReport& report,const std::string& alias) {
+void report_native_sources(const ProjectFiles& files,const Manifest& owner,MaintenanceReport& report,const std::string& alias) {
     // Preparation belongs to the existing package. This is advice, never a
     // native requirement or approval inferred from an untrusted README.
     std::set<std::string> providers;
+    auto conditions=native_build_conditions();conditions.features=owner.conditions();
     for(const auto& [name,bytes]:files)if(name.ends_with(".void") && bytes.find("native")!=std::string::npos) {
-        auto provider=inspect_native_provider(SourceFile(name,bytes));
+        bool nested=false;
+        for(auto parent=utf8_path(name).parent_path();!parent.empty();parent=parent.parent_path())
+            if(files.contains(path_utf8(parent/manifest_name))){nested=true;break;}
+        if(nested)continue; // A nested manifest is a different source owner.
+        auto provider=inspect_native_provider(SourceFile(name,bytes),conditions);
         if(!provider.empty())providers.insert(std::move(provider));
     }
     for(const auto& provider:providers)report.advice.push_back(alias+": source declares native provider '"+provider+"'; read its README and existing preparation instructions. Select the matching approved D4 catalog explicitly before execution. No native binaries were prepared or approved.");
@@ -858,7 +864,10 @@ std::map<std::string,ProjectFiles> missing_git_views(const CreationRoot& root,co
         auto snapshot=read_git_snapshot(git_snapshot_path(root.path,dependency.git->pin),dependency.git->pin);
         if(!snapshot)throw std::runtime_error("Missing verified Git snapshot; run voidc deps fetch with the declared immutable pin.");
         auto files=package_view(*snapshot,dependency.git->subdir);
-        report_native_sources(files,report,alias);
+        const auto declaration=files.find(std::string(manifest_name));
+        if(declaration==files.end())throw std::runtime_error("Git package has no exact void.project.toml at the selected subdir.");
+        const auto selected=maintenance_manifest(snapshot->tree/utf8_path(dependency.git->subdir)/manifest_name,declaration->second);
+        report_native_sources(files,*selected,report,alias);
         if(!view_present(root.path,alias))additions.emplace(alias,std::move(files));
         else {
             auto actual=read_package_directory(root.path/"libs"/utf8_path(alias));
@@ -962,7 +971,7 @@ static MaintenanceReport add_dependency_impl(const fs::path& requested, AddOptio
             path="libs/"+options.alias;
             install_local=true;
         }
-    } else report_native_sources(files,report,options.alias);
+    } else report_native_sources(files,*selected,report,options.alias);
     if(registered) {
         files=*registered;
         if(!options.git) {

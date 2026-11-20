@@ -23,7 +23,7 @@ enum class DiagnosticCode {
     project_identity = 5004, project_version = 5005, project_path = 5006,
     project_duplicate = 5007, project_reserved = 5008,
     project_boundary = 5009, project_entry = 5010, project_changed = 5011,
-    project_debug_info = 5012, limit = 9001
+    project_debug_info = 5012, conditional = 5101, limit = 9001
 };
 struct SourceSpan {
     std::shared_ptr<const SourceFile> source;

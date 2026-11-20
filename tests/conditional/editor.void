@@ -1,0 +1,9 @@
+use "./api.void" as api
+func main():
+    print(api.value())
+    compile if feature.extra:
+        api.extra()
+    compile else:
+        print("disabled")
+    compile if false:
+        excluded $ invalid "

@@ -1,5 +1,71 @@
 # VOID 2.0: Language Bible and Compiler Architecture
 
+## Conditional compilation (G87)
+
+Multiline calls retain both closing-parenthesis styles and existing named arguments:
+
+```void
+print(
+    "hello")
+print(
+    "hello"
+)
+```
+
+Spaces within parentheses are continuation formatting, including when a complete
+call is excluded by a conditional region. Existing parenthesized arithmetic,
+conditions and return expressions retain the same rule; declaration/type/generic
+headers keep their existing grammar. This adds no compact single-line `if` syntax.
+
+`compile if predicate:`, `compile else if predicate:` and `compile else:` select
+indented source regions before parsing declarations or resolving imports. The
+selected body belongs to its enclosing scope; the directive introduces no scope.
+Use this for target-specific declarations and implementations. Ordinary `if`,
+including a constant `has` condition, continues to check both branches.
+
+```void
+compile if target_os == "windows":
+    func platform_name() -> string:
+        return "Windows"
+compile else:
+    func platform_name() -> string:
+        return "Other"
+
+compile if feature.tracing:
+    func trace():
+        print("Tracing enabled")
+```
+
+Declare `tracing = true` or `false` in `[build.conditions]` of
+`void.project.toml`. An undeclared condition is an error. Compiler-owned
+`target_os` values are `"windows"`, `"linux"`, `"macos"`; `target_arch` values
+are `"x86_64"`, `"aarch64"`. Predicates accept `==` / `!=` target comparisons,
+`feature.name`, `true`, `false`, `not`, `and`, `or` and parentheses. Precedence is
+`not`, then `and`, then `or`; all operands are validated. No expression evaluation,
+text substitution, source definitions or environment-derived feature flags occur.
+
+Each directive occupies one physical line, ends with `:` and may have a trailing
+`#` comment. Its nonempty body is indented normally; dedenting ends the region.
+Alternatives align with the matching `compile if`. Nesting is limited to 64 regions;
+predicates are limited to 64 nested unary/group expressions and 512 atoms. Directives
+are allowed at source-region boundaries in existing declaration and statement
+scopes, including struct/interface/enum members and generic bodies. They cannot
+splice tokens, expressions or ordinary argument continuations.
+
+All source remains valid UTF-8. Excluded regions retain well-formed directive
+conditions, nesting and branch indentation; ordinary excluded lines are opaque
+and need not lex or parse as VOID. A first-token `compile` on an excluded physical
+line is always structural, even between unmatched quote characters in excluded
+text. In active source, strings (including multiline strings) and `#` comments
+retain their existing lexical rules. All directive conditions are validated even
+inside excluded parents and after an earlier branch has matched. Inactive regions
+contribute no declarations, imports, initializers, specializations or generated code.
+
+See the [G87 design and evidence](projects/G87_CONDITIONAL_COMPILATION.md),
+[project configuration](CLI.md#conditional-build-configuration-g87) and
+[runnable example](../examples/conditional/main.void).
+
+
 **Current project/package implementation:** manifest-selected entry, Runtime/OS
 identity, CLI/editor integration, application/library creation, local and immutable
 Git dependency maintenance, approved native providers and application packaging

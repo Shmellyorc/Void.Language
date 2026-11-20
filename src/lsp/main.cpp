@@ -40,8 +40,8 @@ bool read_only_source(std::string_view id) {
 }
 using vd::lsp::Positions;
 constexpr std::array semantic_types{"namespace", "type", "struct", "interface", "enum", "typeParameter",
-    "parameter", "variable", "property", "enumMember", "event", "function", "method", "operator"};
-constexpr std::array semantic_modifiers{"declaration", "definition", "readonly", "static", "defaultLibrary"};
+    "parameter", "variable", "property", "enumMember", "event", "function", "method", "operator", "comment", "keyword"};
+constexpr std::array semantic_modifiers{"declaration", "definition", "readonly", "static", "defaultLibrary", "inactive"};
 static_assert(semantic_types.size()==static_cast<std::size_t>(vd::SemanticToken::Kind::count));
 constexpr char semantic_refresh_id[]="void/semanticTokens/refresh";
 constexpr std::size_t max_body=8*1024*1024, max_header=8192;

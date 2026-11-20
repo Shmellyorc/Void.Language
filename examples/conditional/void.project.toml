@@ -1,0 +1,10 @@
+schema = 1
+[project]
+id = "org.void.examples.conditional"
+name = "Conditional compilation"
+version = "1.0.0"
+kind = "application"
+[application]
+id = "org.void.examples.conditional.app"
+[build.conditions]
+tracing = true

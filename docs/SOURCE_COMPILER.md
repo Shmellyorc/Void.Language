@@ -1,5 +1,63 @@
 # Source compiler and engineering build guide
 
+## Conditional source selection (G87)
+
+Multiline calls retain both closing-parenthesis styles and existing named arguments:
+
+```void
+print(
+    "hello")
+print(
+    "hello"
+)
+```
+
+Spaces within parentheses are continuation formatting, including when a complete
+call is excluded by a conditional region. Existing parenthesized arithmetic,
+conditions and return expressions retain the same rule; declaration/type/generic
+headers keep their existing grammar. This adds no compact single-line `if` syntax.
+
+The shared lexer consumes `compile if` / `compile else if` / `compile else`
+regions using immutable target and owning-project conditions. It discards directive
+and inactive lines before the existing parser, import graph, entry discovery,
+semantic validation and typed IR. Selected lines subtract only directive-body
+indentation from their logical indentation; original source bytes, spans, UTF-16
+positions and module identities remain unchanged. Active multiline string scanning
+continues through the existing string lexer. Excluded source caches balanced
+parenthesis/collection-literal and multiline-string extents without producing
+AST, imports or diagnostics. This preserves cosmetic continuation indentation
+when the ordinary lexer does not visit an excluded call. The framing stack is
+bounded; excess inactive nesting is counted without recursive parsing. Directive
+lines retain structural recognition and malformed opaque text can still recover.
+Provider-advice inspection receives the validated owning package configuration;
+nested project boundaries are excluded from that owner's source inventory.
+
+The native configuration uses LLVM's default target triple, matching the existing
+native LLVM backend. Darwin/macOS and ARM64 spellings normalize to `macos` and
+`aarch64`. Native initialization verifies that LLVM default and ORC process target OS/architecture agree, rejecting a mismatched SDK. Current CLI/JIT/AOT modes remain native-target-only; no independent
+frontend target switch can select an ABI the backend does not emit. Target mapping
+unit tests simulate triples as metadata tests and do not qualify cross-target
+execution. Project conditions are schema-validated `[build.conditions]` booleans;
+locked packages carry their own manifest map and standard modules have no consumer
+features. Provider descriptor admission and exact declaration inventory still apply.
+
+Each module's normalized configuration joins its compatibility contract. A condition
+change requires a Runtime restart, even when exported signatures remain identical.
+The project snapshot/cache key includes target conditions and exact manifest bytes;
+package lock identity includes package manifests. Existing source/import dependency
+and cache checks remain authoritative. Editor manifest overlays trigger fresh selection
+without requiring project reselection solely for a feature change. Stale results
+remain subject to the existing snapshot admission checks.
+
+The compiler emits original-source directive and inactive-region metadata. Tooling
+indexes only selected declarations and references, and marks inactive lines with
+semantic token `comment` plus `inactive`; directive lines use `keyword`. Completion
+recovery uses the same conditions and returns no candidates from inactive regions.
+The formatter returns no edits for a file containing conditional directives, preserving
+both configurations' authored indentation. See the [G87 report](projects/G87_CONDITIONAL_COMPILATION.md)
+for grammar, resource bounds, tests and platform limits.
+
+
 The compiler-library [manifest parser](../include/void/project.hpp) and
 `analyze_manifest_project(root, entry_override, sources, manifests)` in
 [frontend.hpp](../include/void/frontend.hpp) provide owning immutable project

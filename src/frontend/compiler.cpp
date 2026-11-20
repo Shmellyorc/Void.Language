@@ -1,5 +1,6 @@
 #include "void/compiler_observation.hpp"
 #include "void/frontend.hpp"
+#include "void/conditional.hpp"
 #include "void/c_primitive.hpp"
 #include "void/path.hpp"
 #include "void/project_creation.hpp"
@@ -218,7 +219,7 @@ public:
 };
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
-const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
+const std::set<std::string> reserved = {"compile", "func", "var", "return", "if", "else", "for", "break", "continue", "pass",
     "static", "operator", "async", "await", "spawn", "event", "defer", "with", "enum", "has", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
 #include "strings.inc"
 struct Indentation {
@@ -238,8 +239,10 @@ Indentation indentation_at(std::string_view text, std::size_t start) {
     }
     return result;
 }
-std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin=0, std::size_t end=std::string::npos, unsigned interpolation_depth=0,bool expand_interpolation=true,EditorRecovery* recovery=nullptr) {
+#include "conditional.inc"
+std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin=0, std::size_t end=std::string::npos, unsigned interpolation_depth=0,bool expand_interpolation=true,EditorRecovery* recovery=nullptr,const BuildConditions* configuration=nullptr,std::vector<ConditionalRegion>* regions=nullptr) {
     const auto& text = source.text();
+    ConditionalSelection selection(source,diagnostics,configuration?*configuration:native_build_conditions(),regions);
     std::vector<Token> tokens;
     struct IndentLevel {std::size_t width; char style;};
     std::vector<IndentLevel> indents{{0, 0}};
@@ -254,8 +257,13 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
         try {
         if (beginning) {
             const auto start = p;
-            const auto prefix = indentation_at(text, start);
+            auto prefix = indentation_at(text, start);
             p = prefix.end;
+            if(!begin && !selection.line(start,prefix,braces!=0)) {
+                while(p<end && text[p]!='\r' && text[p]!='\n')++p;
+                if(p<end && text[p++]=='\r' && p<end && text[p]=='\n')++p;
+                continue;
+            }
             const bool blank = p == text.size() || text[p] == '#' || text[p] == '\r' || text[p] == '\n';
             if (!blank && !braces && !literal_blocks.empty()) {
                 const auto block = literal_blocks.back();
@@ -299,7 +307,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
             if(braces && tokens.size()>line_tokens && tokens.back().text==":"){
                 for(auto n=line_tokens;n<tokens.size();++n)if(tokens[n].text=="match" || tokens[n].text=="if" || (tokens[n].text=="func" && n+1<tokens.size() && tokens[n+1].text=="(")){
                     auto line=tokens[n].offset;while(line && text[line-1]!='\n' && text[line-1]!='\r')--line;
-                    const auto prefix=indentation_at(text,line);
+                    auto prefix=indentation_at(text,line);prefix.width=selection.width(prefix.width);
                     if(prefix.mixed!=std::string::npos || (prefix.width && indents.back().width && prefix.style!=indents.back().style))
                         error(source,{TokenKind::symbol,"",prefix.mixed==std::string::npos?line:prefix.mixed},Code::indentation,"Inconsistent tabs and spaces in an enclosing block.","Match the indentation style of the enclosing block.");
                     literal_blocks.push_back({braces,indents.size(),prefix.width,tokens[n].text=="if"});indents.push_back({prefix.width,prefix.style});braces=0;break;
@@ -400,6 +408,7 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
             beginning = false;
         }
     }
+    if(!begin)selection.finish();
     if (!tokens.empty() && tokens.back().kind != TokenKind::newline) emit(TokenKind::newline, "<newline>", p);
     while (indents.size() > 1) { indents.pop_back(); emit(TokenKind::dedent, "<dedent>", p); }
     emit(TokenKind::end, "<end of file>", p);
@@ -796,6 +805,8 @@ std::string import_alias(const Import& import) {
 struct Unit {
     CPrimitiveAdmission::Owner c_primitives;
     std::string c_provider;
+    BuildConditions conditions=native_build_conditions();
+    std::vector<ConditionalRegion> conditional_regions;
     EditorProbe* editor=nullptr;
     std::function<void(Type,Type,const SourceFile&,const Token&)> prepare_relationships;
     SourceFile source;
@@ -853,6 +864,8 @@ const Function* application_entry(const Unit& unit) {
     return !f->receiver && f->parameters.empty() && f->generics.empty() && !f->asynchronous && (f->result==Type::none || f->result==Type::i32) ? f : nullptr;
 }
 class Parser {
+    BuildConditions conditions;
+    std::vector<ConditionalRegion> conditional_regions;
     const SourceFile& source;
     std::vector<Token> tokens;
     std::size_t p = 0;
@@ -1457,8 +1470,8 @@ class Parser {
         Statement s(Statement::Kind::expression, peek()); s.expression = expression(); newline(); return s;
     }
 public:
-    explicit Parser(const SourceFile& s, Diagnostics& d, std::string_view module = {})
-        : source(s), tokens(lex(s,d,0,std::string::npos,0,true,d.recovery && d.recovery->module==module?d.recovery:nullptr)), diagnostics(d) {}
+    explicit Parser(const SourceFile& s, Diagnostics& d, std::string_view module = {},const BuildConditions& configuration=native_build_conditions())
+        : conditions(configuration),source(s), tokens(lex(s,d,0,std::string::npos,0,true,d.recovery && d.recovery->module==module?d.recovery:nullptr,&conditions,&conditional_regions)), diagnostics(d) {}
     Parser(const SourceFile& s,Diagnostics& d,std::vector<Token> syntax,std::map<std::string,Type> bindings)
         :source(s),tokens(std::move(syntax)),diagnostics(d),substitutions(std::move(bindings)),instantiating(true) {
         tokens.push_back({TokenKind::end,"<end of file>",tokens.empty()?0:tokens.back().offset});
@@ -1472,6 +1485,7 @@ public:
         return result;
     }
     void parse(Unit& unit) {
+        unit.conditions=conditions;unit.conditional_regions=conditional_regions;
         recover_editor=diagnostics.recovery && diagnostics.recovery->module==unit.identity;
         auto before = diagnostics.size();
         Function application; application.token={TokenKind::name,"$application",0}; application.result=Type::i32; application.visibility="private";
@@ -6418,6 +6432,13 @@ public:
     std::function<void(const std::filesystem::path&,const std::string&,bool)> admit;
     std::function<SourceFile(const std::filesystem::path&,const std::string&)> reader;
     const project::LockedDependencies* dependencies = nullptr;
+    BuildConditions conditions=native_build_conditions();
+    BuildConditions conditions_for(const std::string& id) const {
+        auto result=conditions;
+        if(standard_module(id))result.features.clear();
+        else if(dependencies && package_source(id))result.features=package(id)->conditions;
+        return result;
+    }
     bool imports_only = false; // Metadata inspection grants no native or lowering authority.
     explicit SourceGraph(std::filesystem::path project_root, Diagnostics& d, const SourceOverrides& o,const NativeProject* bindings=nullptr,
                          CPrimitiveAdmission::Owner c_primitives = {})
@@ -6637,7 +6658,7 @@ public:
         diagnostics.bind(result->source, id);
         auto before = diagnostics.size();
         { observation::Scope timing(observation::Phase::lex_parse);
-          Parser(result->source, diagnostics,id).parse(*result); }
+          Parser(result->source, diagnostics,id,conditions_for(id)).parse(*result); }
         result->parse_failed |= diagnostics.size() != before;
         if(id==console::source_module)for(auto& structure:result->structures)if(structure.token.text=="terminal_session"){structure.definition->native_resource=true;structure.definition->native_provider="void.console.v1";}
         if(imports_only)return *result;
@@ -7951,7 +7972,8 @@ struct AnalysisAccess {
 
         };
         for (const auto& [id, unit] : *graph) {
-            AnalyzedModule module{id,unit->source,{},{}};
+            AnalyzedModule module{id,unit->source,{},{},unit->conditions,unit->conditional_regions};
+            field(result->contract_,unit->conditions.key());
             for(const auto& [alias,targets]:unit->qualifiers)
                 if(targets.size()==1)module.qualifiers.emplace(alias,targets.front()->identity);
             field(result->contract_,"module"); field(result->contract_,id);
@@ -8446,10 +8468,10 @@ AnalysisResult analyze_project(const std::filesystem::path& entry, const SourceO
     catch (const CompilationError& failure) { return {{}, failure.diagnostics()}; }
 }
 #include "project_selection.inc"
-std::string inspect_native_provider(const SourceFile& source) {
+std::string inspect_native_provider(const SourceFile& source,const BuildConditions& conditions) {
     Diagnostics diagnostics;
     Unit unit(source,"/candidate.void");
-    Parser(source,diagnostics).parse(unit);
+    Parser(source,diagnostics,unit.identity,conditions).parse(unit);
     diagnostics.finish();
     return unit.c_provider;
 }
@@ -8591,7 +8613,7 @@ std::optional<EditorAssistance> editor_namespace_assistance(const ValidatedAnaly
     observation::Scope syntax_timing(observation::Phase::lex_parse);
     Diagnostics diagnostics;
     EditorRecovery recovery{module,{}};
-    const auto lexed=lex(source,diagnostics,0,std::string::npos,0,false,&recovery);
+    const auto lexed=lex(source,diagnostics,0,std::string::npos,0,false,&recovery,&found->conditions);
     if(diagnostics.failed())return {};
     auto physical=std::find_if(lexed.begin(),lexed.end(),[&](const auto& token) {
         return token.offset==dot && token.kind==TokenKind::symbol && token.text==".";
@@ -8615,14 +8637,14 @@ std::optional<EditorAssistance> editor_namespace_assistance(const ValidatedAnaly
     SourceFile parsed_source(source.path(),std::move(repaired));
     Unit parsed(parsed_source,module);
     Diagnostics syntax;
-    Parser parser(parsed_source,syntax,module);parser.parse(parsed);
+    Parser parser(parsed_source,syntax,module,found->conditions);parser.parse(parsed);
     if(syntax.failed())return {};
     // Body edits do not change an imported namespace's declarations. Compare
     // actual compiler tokens outside ordinary function bodies, not timestamps
     // or an ad-hoc import scanner. New imports, types, globals, signatures and
     // entry declarations delegate to the ordinary project probe.
     Unit previous(found->source,module);Diagnostics previous_syntax;
-    Parser previous_parser(found->source,previous_syntax,module);previous_parser.parse(previous);
+    Parser previous_parser(found->source,previous_syntax,module,found->conditions);previous_parser.parse(previous);
     if(previous_syntax.failed())return {};
     auto headers=[](const SourceFile& source,const Parser& parser,const Unit& unit) {
         std::vector<std::pair<std::size_t,std::size_t>> bodies;
@@ -8738,6 +8760,17 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     };
     const auto& text=source.text();
     if(cursor>text.size() || text.find("_void_editor_cursor_")!=std::string::npos) return empty;
+    const auto conditions=project?project->graph.conditions_for(module):native_build_conditions();
+    if(text.find("compile")!=std::string::npos) {
+        std::vector<ConditionalRegion> conditional_regions;
+        Diagnostics selection_diagnostics;EditorRecovery selection_recovery{module,{}};
+        (void)lex(source,selection_diagnostics,0,std::string::npos,0,false,&selection_recovery,&conditions,&conditional_regions);
+        for(const auto& region:conditional_regions)if(region.begin<=cursor && cursor<=region.end)return empty;
+        try {selection_diagnostics.finish();}
+        catch(const CompilationError& failure) {
+            if(std::any_of(failure.diagnostics().begin(),failure.diagnostics().end(),[](const auto& d){return d.code==Code::conditional;}))return empty;
+        }
+    }
     if(auto imports=import_assistance(entry,overrides,module,source,cursor,project)) {
         // Import completion also depends on directory membership and candidate
         // path admission. Re-run that metadata-only query, not a semantic bind.
@@ -8760,7 +8793,7 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     }
     if(locked_source)return empty;
     EditorRecovery token_recovery{module,{}};
-    Diagnostics diagnostics;auto tokens=lex(source,diagnostics,0,std::string::npos,0,true,&token_recovery);
+    Diagnostics diagnostics;auto tokens=lex(source,diagnostics,0,std::string::npos,0,true,&token_recovery,&conditions);
     if(diagnostics.failed()) return empty;
     std::size_t begin=cursor,end=cursor;
     bool format_context=false,operator_context=false;
@@ -8796,7 +8829,7 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     // Repair physical delimiters only; interpolation lowering adds synthetic
     // parentheses at expression offsets that are not source characters.
     EditorRecovery physical_recovery{module,{}};
-    Diagnostics physical_diagnostics;auto physical=lex(source,physical_diagnostics,0,std::string::npos,0,false,&physical_recovery);
+    Diagnostics physical_diagnostics;auto physical=lex(source,physical_diagnostics,0,std::string::npos,0,false,&physical_recovery,&conditions);
     if(physical_diagnostics.failed())return empty;
     int parentheses=0;
     for(const auto& t:physical)if(t.offset>=line && t.offset<begin){if(t.text=="(")++parentheses;else if(t.text==")")--parentheses;}
@@ -8875,7 +8908,7 @@ std::optional<std::string> format_source(const SourceFile& source, bool insert_s
     // Parse with the ordinary compiler before proposing edits. This is local
     // syntax validation, never import discovery or a second semantic resolver.
     Diagnostics diagnostics;Parser parser(source,diagnostics);Unit parsed(source,source.path());parser.parse(parsed);
-    if(diagnostics.failed())return {};
+    if(diagnostics.failed() || !parsed.conditional_regions.empty())return {};
     auto tokens=lex(source,diagnostics,0,std::string::npos,0,false);
     if(diagnostics.failed())return {};
     const auto& text=source.text();
