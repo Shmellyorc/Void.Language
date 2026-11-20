@@ -132,6 +132,10 @@ test('presentation covers approved keyword colors and block indentation', async 
     const keywords = grammar.patterns.filter((p:{name?:string}) => p.name === 'keyword.control.void')
         .map((p:{match:string}) => new RegExp(p.match));
     assert(keywords.length > 0);
+    const flags = keywords.find((rule: RegExp) => rule.test('flags enum'));
+    assert(flags && flags.test('flags enum access') && !flags.test('flags') && !flags.test('flags_value'));
+    const bitwise: RegExp[] = grammar.patterns.filter((p:{name?:string}) => p.name === 'keyword.operator.void').map((p:{match:string}) => new RegExp(p.match));
+    for (const symbol of ['&', '|', '^', '~', '&=', '|=', '^=']) assert(bitwise.some(rule => rule.test(symbol)), symbol);
     const highlighted = (text:string) => keywords.some((rule:RegExp) => rule.test(text));
     for (const word of ['func','property','enum','is','match', 'has','defer','with','event','async','await','spawn','return','pass','const','for','break','continue','as','and','or','not','in','reverse','struct','value struct'])
         assert(highlighted(word), `Missing keyword highlighting: ${word}`);

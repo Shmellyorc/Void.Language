@@ -1,5 +1,11 @@
 # G18 · Context-aware enum comparison diagnostics
 
+Historical G18 evidence. G78 supersedes the blanket tagged-enum rejection below
+with active-payload equality. Unsupported payloads still diagnose at the source
+operator; see [current enum contracts](../ENUMS.md). Original G18 failures and
+qualification remain unchanged as historical evidence.
+
+
 12 November 2026 · Baseline `35406a00aee892def5a0a7555c5beeae6fe284b3` · **IN PROGRESS pending independent Golden Wrench review.**
 
 ## Original failure

@@ -1366,10 +1366,14 @@ func handle_event(e: game_event):
 
 Missing cases warn rather than block compilation for statement matches. Value-producing matches warn at compile time and raise a runtime match error if actually unmatched. The precise enum representation and payload ABI are implementation matters.
 
-Ordinary tagged enums have no built-in `==` or `!=`. Use case patterns with
-`is` and `match`, or declare an applicable equality operator when the type
-needs its own equality rule. Numeric-backed enums of the same type support
-built-in equality. [Enum comparison examples](ADVANCED_LANGUAGE.md#enum-case-tests-and-imports)
+Ordinary tagged enums support `==` and `!=` by matching cases and comparing
+active payloads using their actual equality operations. Unsupported payload
+equality diagnoses; explicit operators retain precedence. Generic enum payloads,
+eligible enum dictionary keys, checked numeric extraction and `flags enum` are
+implemented in G78. Flags support typed bitwise combinations, including unnamed
+values; ordinary numeric enums retain declared-discriminant checks.
+See [enums and flags](ENUMS.md) for construction, conversions, name/value APIs,
+flag helpers, precedence and ownership contracts. `is`/`match` remain unchanged.
 
 ## 26. Iteration: `for`, optional index/key, and `reverse` [AGREED]
 
@@ -1469,7 +1473,7 @@ for:
 
 ### 27.1 Assignment operators and increments
 
-`+=`, `-=`, `*=`, `/=`, `%=` are supported. `++` and `--` are supported **only as postfix standalone statements**; there is no prefix form or expression-value result.
+`+=`, `-=`, `*=`, `/=`, `%=` are supported. G78 adds `&=`, `|=`, `^=` for exact integer and flags types. `++` and `--` are supported **only as postfix standalone statements**; there is no prefix form or expression-value result.
 
 ```python
 var score = 0

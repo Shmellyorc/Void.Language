@@ -1,0 +1,24 @@
+flags enum access(u8):
+    none = 0
+    read = 1
+    write = 2
+    both = read | write
+
+enum choice:
+    empty
+    full(data: i32)
+const title = access.read.name
+const known = access.both.is_defined()
+func main() -> i32:
+    var mask = access.read.with(access.write)
+    if not mask.has(access.read) or not mask.has_any(access.write) or mask.without(access.read) != access.write:
+        return 1
+    if mask.toggled(access.write) != access.read or mask.value != 3 or mask.name != "both" or not known or title != "read":
+        return 2
+    if choice.full(3).name != "full" or (7 as access).name != "7" or (7 as access).is_defined():
+        return 3
+    var declared = access.values()
+    if declared.count != 4 or declared[3] != access.both:
+        return 4
+    print("metadata passed")
+    return 0

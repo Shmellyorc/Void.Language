@@ -565,6 +565,22 @@ if(BUILD_TESTING)
   add_test(NAME lsp_enum_recovery COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/enum_recovery.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_enum_recovery PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_enum_completeness COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/enums/lsp.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g78-enum-lsp-results.json")
+  set_tests_properties(lsp_enum_completeness PROPERTIES TIMEOUT 180)
+  add_test(NAME enum_review_corrections COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/enums/corrections.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g78-corrections-results.json")
+  set_tests_properties(enum_review_corrections PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_enum_review_corrections COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/enums/corrections_lsp.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g78-corrections-lsp-results.json")
+  set_tests_properties(lsp_enum_review_corrections PROPERTIES TIMEOUT 180)
+  add_test(NAME enum_completeness COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/enums/completeness.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g78-enum-results.json")
+  set_tests_properties(enum_completeness PROPERTIES TIMEOUT 300)
   add_test(NAME enum_equality_diagnostics COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/frontend/enum_equality.py" "$<TARGET_FILE:voidc>")
   set_tests_properties(enum_equality_diagnostics PROPERTIES TIMEOUT 180)

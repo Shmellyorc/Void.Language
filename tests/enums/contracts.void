@@ -1,0 +1,78 @@
+## An ordinary enum compares its active case and payloads.
+enum value<t>:
+    ## No payload is present.
+    empty
+    ## A concrete generic payload.
+    ## @param data Value retained by this case.
+    item(data: t)
+
+## Flags use an explicit backing width and accept unnamed combinations.
+flags enum permission(u8):
+    none = 0
+    read
+    write
+    read_write = read | write
+    execute
+
+## Sparse ordinary discriminants retain checked conversion semantics.
+enum level(i8):
+    low = -2
+    high = 7
+
+enum sparse_key:
+    empty
+    numeric(data: level)
+
+const equality = value<i32>.item(2) == value<i32>.item(2)
+const inequality = value<i32>.empty != value<i32>.item(2)
+const complement = ~permission.none
+const has_read = permission.read_write.has(permission.read)
+const unknown_name = (9 as permission).name
+const low_value = level.low.value
+var calls: i32 = 0
+
+## Produce a payload while counting evaluation.
+## @param data Payload to return.
+## @return One constructed enum value.
+func counted(data: i32) -> value<i32>:
+    calls += 1
+    return value.item(data)
+
+## Exercise equality, flags, conversions and collection copies.
+## @return Zero when every contract holds.
+func main() -> i32:
+    if not equality or not inequality or not has_read or low_value != -2 or unknown_name != "9":
+        return 1
+    if counted(2) != counted(2) or calls != 2:
+        return 2
+    var inferred = value.item(4)
+    if inferred != value<i32>.item(4):
+        return 3
+    var bits = permission.read | permission.write
+    bits ^= permission.execute
+    bits &= ~permission.write
+    bits |= permission.write
+    if bits.value != 7 or complement.value != 255 or not bits.has(permission.none) or bits.has_any(permission.none):
+        return 4
+    if (bits as i32) != 7 or not ((bits as? i8) is Some(7)):
+        return 5
+    if not ((6 as? level) is None) or not ((-2 as? level) is Some(level.low)):
+        return 6
+    var sparse: {sparse_key: i32} = {sparse_key.empty: 1, sparse_key.numeric(level.low): 2}
+    if sparse[sparse_key.empty] != 1 or sparse[sparse_key.numeric(level.low)] != 2 or sparse_key.empty == sparse_key.numeric(level.low):
+        return 10
+    var keys: {value<i32>: string} = {value<i32>.empty: "empty", value.item(4): "four"}
+    var copy = keys
+    copy[value.item(4)] = "changed"
+    if keys[value.item(4)] != "changed" or copy[value.item(4)] != "changed":
+        return 7
+    var numeric: {permission: i32} = {bits: 7, permission.none: 0}
+    if numeric[7 as permission] != 7:
+        return 8
+    var octet: u8 = 255
+    octet &= 7
+    octet ^= 3
+    octet |= 8
+    if octet != 12 or ~octet != 243:
+        return 9
+    return 0

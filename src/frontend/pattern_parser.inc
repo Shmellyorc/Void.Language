@@ -37,7 +37,12 @@
                     else result.enum_type_use.reset();
                 }
                 if(at("<"))result.type_arguments=type_arguments();
+                while(accept(".")) {
+                    auto receiver=result.variant_token;result.variant_token=name();result.spelling+="."+result.variant_token.text;
+                    if(++components<=3)result.enum_type_use=std::make_unique<TypeUse>(TypeUse{std::move(receiver),Type::none,components==3?std::optional<Token>{result.token}:std::nullopt});
+                }
                 if(!accept("("))return result;
+                result.invocation=true;
                 if(!at(")"))do {
                     Token field{TokenKind::name,"",peek().offset};
                     if(peek(1).text=="="){field=name();need("=");}

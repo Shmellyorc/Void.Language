@@ -100,6 +100,55 @@ void malformed() {
     bad.nominal_types.emplace_back(forged);
     rejects(bad,"invalid canonical option identity");
 }
+void tagged_gc() {
+    auto program=analysis(R"(enum key:
+    empty
+    name(text: string)
+    object(value: node)
+struct node:
+    value: i32
+func entry(input: i32) -> i32:
+    var held = node(value = input)
+    var keys: {key: i32} = {key.empty: 1, key.name("stable"): 7, key.object(held): 9}
+    for i in 0..<512:
+        var temporary: {key: string} = {key.name(string(i)): "discard"}
+        var same = key.object(held)
+        if same != key.object(held):
+            return 1
+    held.value += 1
+    return keys[key.name("stable")] + keys[key.object(held)] + keys[key.empty]
+)");
+    for(bool optimize:{false,true}) {
+        auto runtime=std::make_shared<vd::Runtime>(16);
+        vd::Jit jit;auto code=jit.compile(program->lower(),"entry",optimize,{},runtime);
+        check(code->invoke(4)==17,"enum dictionary payload ownership/equality");
+        vd::Runtime::Attachment attached(*runtime);vd::Runtime::Managed managed(*runtime);
+        check(runtime->collect()==vd::Runtime::Collection::completed && !runtime->snapshot().objects,"enum dictionary key/root leak");
+    }
+}
+void flags_ir() {
+    const auto valid=analysis(R"(flags enum mask(u8):
+    none = 0
+    read
+func bits(input: mask) -> mask:
+    return ~input | mask.read
+)")->lower();
+    validate(valid);
+    auto bad=valid;
+    bool changed=false;
+    for(auto& f:bad.functions)for(auto& b:f.blocks)for(auto& i:b.instructions)if(i.op==Op::bit_not) {
+        i.immediate=1;changed=true;
+    }
+    check(changed,"missing flags complement IR");
+    rejects(bad,"invalid integer/flags bitwise");
+    bad=valid;
+    for(auto& f:bad.functions)for(auto& b:f.blocks)for(auto& i:b.instructions)if(i.op==Op::bit_not)i.b=1;
+    rejects(bad,"invalid integer/flags bitwise");
+    bad=valid;
+    for(auto& f:bad.functions)for(auto& b:f.blocks)for(auto& i:b.instructions)if(i.op==Op::constant && i.type.kind==Type::numeric_enum)i.immediate=256;
+    rejects(bad,"undeclared numeric enum constant");
+}
+
 #include "enum_storage.inc"
 void literal_source_types() {
     const auto module=analysis(R"(func probe():
@@ -151,6 +200,8 @@ void reload_and_gc() {
 int main() {
     try {
         malformed();
+        flags_ir();
+        tagged_gc();
         storage_audit();
         literal_source_types();
         reload_and_gc();

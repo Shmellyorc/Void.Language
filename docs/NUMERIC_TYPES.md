@@ -40,11 +40,14 @@ integer and numeric-backed enum payloads. Ordinary name lookup still resolves a
 user-declared `option` where visible. That declaration has its own nominal
 identity, and the compiler-generated type of an `as?` expression remains canonical.
 
-Existing `as` conversion and RuntimeFailure behavior remain in effect. Slice 6
-defers enum-to-integer extraction, enum arithmetic, automatic numbering, aliases,
-C ABI contracts, additional fallible conversion categories and `??`. The older
-nullable-cast proposal has been superseded for this conversion family.
-Local qualification is recorded in the [Slice 6 report](projects/SLICE6.md).
+G78 adds checked integer-to-enum `as`, enum-to-integer `as`/`as?`, and exact
+backing extraction through `.value`. Ordinary enum casts still require declared
+discriminants; flags accept every backing-width bit pattern. Direct conversions
+between unrelated enums remain rejected. Integer and flags bitwise operations
+are width-preserving. Enum arithmetic, ordinary automatic numbering, aliases,
+additional fallible categories and `??` remain outside this slice.
+See [enums and flags](ENUMS.md) and [G78 evidence](projects/G78_ENUM_COMPLETENESS.md).
+The older nullable-cast proposal remains superseded for this conversion family.
 
 ## Existing numeric contract
 

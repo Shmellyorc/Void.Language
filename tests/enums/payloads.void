@@ -1,0 +1,43 @@
+value struct digit:
+    number: i32
+    operator ==(const left: digit, const right: digit) -> bool:
+        return left.number % 10 == right.number % 10
+
+enum notice:
+    empty
+    text(value: string)
+    number(value: i32)
+    custom(value: digit)
+
+enum key:
+    empty
+    text(value: string)
+    number(value: i32)
+enum floating:
+    real(data: f32)
+struct node:
+    number: i32
+enum reference:
+    empty
+    object(data: node)
+func main() -> i32:
+    if notice.number(2) == notice.number(3) or notice.number(2) == notice.empty:
+        return 1
+    if notice.text("test") != notice.text("test") or notice.custom(digit(number = 2)) != notice.custom(digit(number = 12)):
+        return 2
+    var values: {key: i32} = {key.empty: 3, key.text("foo"): 4, key.text(""): 5, key.number(0): 6}
+    if values[key.text("foo")] != 4 or values[key.empty] != 3 or values[key.number(0)] != 6:
+        return 3
+    var zero: f32 = 0
+    var nan = zero / zero
+    if floating.real(nan) == floating.real(nan) or floating.real(zero) != floating.real(-zero):
+        return 4
+    var held = node(number = 3)
+    var alias = held
+    if reference.object(held) != reference.object(alias) or reference.object(held) == reference.object(node(number = 3)):
+        return 5
+    var objects: {reference: i32} = {reference.object(held): 4, reference.empty: 1}
+    held.number = 9
+    if objects[reference.object(alias)] != 4:
+        return 6
+    return 0

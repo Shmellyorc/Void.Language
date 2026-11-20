@@ -1015,6 +1015,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         return std::pair{wide,valid};
     };
     auto enum_membership=[&](ir::Type enumeration,llvm::Value* value,bool wide) {
+        if(enumeration.definition->enum_flags)return static_cast<llvm::Value*>(b.getTrue());
         auto backing=ir::Type(*enumeration.definition->enum_backing);
         llvm::Value* valid=b.getFalse();
         for(const auto& member:enumeration.definition->numeric_members) {
@@ -2907,6 +2908,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     else if (numeric::floating(instruction.type)) v = llvm::ConstantFP::get(context,llvm::APFloat(instruction.type == ir::Type::f32 ? llvm::APFloat::IEEEsingle() : llvm::APFloat::IEEEdouble(),llvm::APInt(numeric::width(instruction.type),static_cast<std::uint64_t>(instruction.immediate))));
                     else v = llvm::ConstantInt::get(type(instruction.type),instruction.immediate,true);
                     break;
+                case Op::bit_and: v=b.CreateAnd(values[instruction.a],values[instruction.b]);break;
+                case Op::bit_or: v=b.CreateOr(values[instruction.a],values[instruction.b]);break;
+                case Op::bit_xor: v=b.CreateXor(values[instruction.a],values[instruction.b]);break;
+                case Op::bit_not: v=b.CreateNot(values[instruction.a]);break;
                 case Op::negate: v = values[instruction.a]->getType()->isFloatingPointTy() ? b.CreateFNeg(values[instruction.a]) : b.CreateNeg(values[instruction.a]); break;
                 case Op::upcast: case Op::stage_prefix: v=values[instruction.a]; break;
                 case Op::math: {
@@ -2983,6 +2988,14 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 }
                 case Op::convert: {
                     auto* a = values[instruction.a]; auto from = operand_type(instruction.a), to = instruction.type;
+                    if(from.kind==ir::Type::numeric_enum || to.kind==ir::Type::numeric_enum) {
+                        auto source=from.kind==ir::Type::numeric_enum?ir::Type(*from.definition->enum_backing):from;
+                        auto destination=to.kind==ir::Type::numeric_enum?ir::Type(*to.definition->enum_backing):to;
+                        auto [wide,valid]=checked_integer(a,source,destination);
+                        if(to.kind==ir::Type::numeric_enum)valid=b.CreateAnd(valid,enum_membership(to,wide,true));
+                        fail_if(b.CreateNot(valid),"Checked enum/integer conversion is out of range or undeclared");
+                        v=b.CreateTrunc(wide,type(destination));break;
+                    }
                     if(from.definition && from.definition->callable){if(!to.nullable)fail_if(b.CreateICmpEQ(b.CreateExtractValue(a,0),b.getInt64(0)),"Null function value in checked conversion");v=a;break;}
                     if(ir::reference_value(from)) {
                         if(!to.nullable) fail_if(b.CreateIsNull(from.kind==ir::Type::interface_ref ? b.CreateExtractValue(a,0) : a),from.kind==ir::Type::interface_ref ? "Null interface reference in checked conversion" : "Null managed reference in checked conversion");

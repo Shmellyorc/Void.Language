@@ -116,8 +116,8 @@ bool dictionary_key_supported(Type root) {
     if(dictionary_equality_owner(root))return false;
     std::set<const ValueType*> active;std::map<const ValueType*,bool> memo;std::size_t work=0;
     std::function<bool(Type)> visit=[&](Type t){
-        if(numeric::integer(t) || t==Type::boolean || t==Type::string || t.kind==Type::managed_ref)return true;
-        if(t.kind!=Type::aggregate || !t.definition || (!t.definition->cases.empty() || t.definition->callable) || active.size()>=128 || ++work>65536)return false;
+        if(numeric::integer(t) || t.kind==Type::numeric_enum || t==Type::boolean || t==Type::string || t.kind==Type::managed_ref)return true;
+        if(t.kind!=Type::aggregate || !t.definition || t.definition->callable || t.definition->result_type || t.definition->option_type || active.size()>=128 || ++work>65536)return false;
         if(auto found=memo.find(t.definition.get());found!=memo.end())return found->second;
         if(!active.insert(t.definition.get()).second)return false;
         for(const auto& field:t.definition->fields)if(!visit(field.type))return false;active.erase(t.definition.get());memo.emplace(t.definition.get(),true);return true;
@@ -272,13 +272,15 @@ Type Type::nominal(std::shared_ptr<const ValueType> d) {
 }
 std::string option_identity(Type payload) {return "$option:"+array_identity(payload,{});}
 bool numeric_enum_member(Type t,std::uint64_t bits) {
+    if(t.kind==Type::numeric_enum && t.definition && t.definition->enum_flags) {const auto width=numeric::width(*t.definition->enum_backing);return width==64 || !(bits>>width);}
     return t.kind==Type::numeric_enum && t.definition &&
         std::any_of(t.definition->numeric_members.begin(),t.definition->numeric_members.end(),
                     [&](const auto& member){return member.bits==bits;});
 }
+bool bitwise_type(Type t) {return numeric::integer(t) || (t.kind==Type::numeric_enum && t.definition && t.definition->enum_flags);}
 std::string numeric_enum_layout(Type t) {
     if(t.kind!=Type::numeric_enum)return {};
-    std::string layout=type_name(*t.definition->enum_backing)+":";
+    std::string layout=(t.definition->enum_flags?"flags:":std::string{})+type_name(*t.definition->enum_backing)+":";
     for(const auto& member:t.definition->numeric_members)
         layout+=std::to_string(member.name.size())+":"+member.name+"="+std::to_string(member.bits)+";";
     return layout;
@@ -601,7 +603,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         std::vector<Type> pending{root};
         for (std::size_t n=0;n<pending.size();++n) {
             auto t=pending[n];
-            if(t.definition && t.kind!=Type::numeric_enum && (t.definition->enum_backing || !t.definition->numeric_members.empty()))
+            if(t.definition && t.kind!=Type::numeric_enum && (t.definition->enum_backing || t.definition->enum_flags || !t.definition->numeric_members.empty()))
                 fail("numeric enum used with a non-enum type");
             if(t.definition && t.kind!=Type::aggregate && (t.definition->option_type || t.definition->identity.starts_with("$option:")))
                 fail("canonical option used with a non-sum type");
@@ -1530,7 +1532,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (reference_value(i.type) && !i.type.nullable) fail("null literal requires a nullable reference type");
                     valid_type(i.type);
                     if(i.type.kind==Type::numeric_enum && !numeric_enum_member(i.type,std::bit_cast<std::uint64_t>(i.immediate)))
-                        fail("undeclared numeric enum constant");
+                        fail("undeclared numeric enum constant: "+Type::key(i.type)+" bits="+std::to_string(std::bit_cast<std::uint64_t>(i.immediate))+" flags="+std::to_string(i.type.definition->enum_flags));
                     result = i.type; break;
                 case Op::add: case Op::subtract: case Op::multiply: case Op::divide: case Op::remainder:
                     result = operand(i.a);
@@ -1607,8 +1609,14 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     result=i.type;break;
                 case Op::convert:
                     valid_type(i.type);
-                    if (!((operand(i.a).definition && i.type.definition && operand(i.a).definition->callable && i.type.definition->callable && Type::key(operand(i.a))==Type::key(i.type)) || (reference_value(operand(i.a)) && !operand(i.a).construction && i.type.kind==operand(i.a).kind && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)))) fail("invalid conversion");
+                    if (!((operand(i.a).definition && i.type.definition && operand(i.a).definition->callable && i.type.definition->callable && Type::key(operand(i.a))==Type::key(i.type)) || (reference_value(operand(i.a)) && !operand(i.a).construction && i.type.kind==operand(i.a).kind && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)) || (operand(i.a).kind==Type::numeric_enum && numeric::integer(i.type)) || (numeric::integer(operand(i.a)) && i.type.kind==Type::numeric_enum))) fail("invalid conversion");
                     result = i.type; break;
+                case Op::bit_and: case Op::bit_or: case Op::bit_xor: case Op::bit_not:
+                    result=operand(i.a);
+                    if(!(numeric::integer(result) || (result.kind==Type::numeric_enum && result.definition->enum_flags)) ||
+                       (i.op!=Op::bit_not && result!=operand(i.b)) || (i.op==Op::bit_not && i.b) || i.immediate || i.array_repeat || !i.arguments.empty() || !i.callee.empty() || i.receiver || i.initialization)
+                        fail("invalid integer/flags bitwise operation");
+                    break;
                 case Op::negate:
                     result = operand(i.a); if (!numeric::number(result)) fail("non-numeric negation"); break;
                 case Op::logical_not: expect(i.a, Type::boolean); result = Type::boolean; break;

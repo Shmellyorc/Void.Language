@@ -167,3 +167,5 @@ consolidating; link to history rather than copying old status into every guide.
 The root README remains protected and requires separate explicit authorization.
 Boss controls Git and hosted acceptance. See [Wrench](WRENCH_CLANKER.md) for the
 shared workflow; old sprint gates do not create fresh authorization requirements.
+
+- [Enums and flags](ENUMS.md): equality, keys, generic payloads, conversions and typed flags.

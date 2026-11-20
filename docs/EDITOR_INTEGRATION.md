@@ -794,3 +794,16 @@ Official references: [language client architecture](https://code.visualstudio.co
 [extension-host tests and CLI](https://code.visualstudio.com/api/working-with-extensions/testing-extension),
 [Workspace Trust](https://code.visualstudio.com/api/extension-guides/workspace-trust),
 [pinned Node LTS release](https://nodejs.org/en/blog/release/v24.19.0).
+
+### G78 enum assistance
+
+Flags enum declarations and generic cases retain compiler symbol identities.
+Completion, hover and parameter help describe `.name`, numeric `.value`,
+`is_defined()`, eligible `Enum.values()` and typed flag helpers, including `mask`
+parameter documentation. Generic enum templates and members retain enum symbol/token kinds even before
+instantiation. Declaration hover uses symbolic parameters such as `t`; concrete
+case uses and parameter help retain their actual payload types, independent of
+specialization order. Generated equality/metadata helpers are hidden implementation details and
+do not create phantom source declarations or coloring. Contextual `flags` coloring
+only applies before `enum`; existing identifiers named `flags` remain valid.
+See [enums](ENUMS.md) and [qualification](projects/G78_ENUM_COMPLETENESS.md).

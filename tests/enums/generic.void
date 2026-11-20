@@ -1,0 +1,28 @@
+enum code<t>(u8):
+    ok = 3
+flags enum feature<t>:
+    first
+    second
+enum item<t>:
+    empty
+    value(data: t)
+func extract<t>(input: item<t>, fallback: t) -> t:
+    match input:
+        item.value(var data):
+            return data
+        item.empty:
+            return fallback
+func main() -> i32:
+    if code<i32>.ok.value != 3 or (feature<i32>.first | feature<i32>.second).value != 3:
+        return 8
+    var a = item<i32>.value(7)
+    var b = item<i32>.value(7)
+    var records: {item<string>: i32} = {item<string>.value("key"): 4}
+    var list: [item<i32>] = [a, b, item<i32>.empty]
+    if a != b or extract(list[0], 2) != 7 or records[item<string>.value("key")] != 4:
+        return 1
+    match a:
+        item<i32>.value(var data):
+            return data - 7
+        _:
+            return 2

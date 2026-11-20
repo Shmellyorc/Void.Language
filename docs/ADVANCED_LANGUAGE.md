@@ -72,8 +72,9 @@ still require the correct subpatterns. [Editor behavior](EDITOR_INTEGRATION.md#e
 ### Enum case tests and imports
 
 Use `is` to test one enum case and `match` to dispatch across cases.
-Ordinary tagged enums, including payload-free `console.key`, have no
-built-in `==` or `!=` comparison. An enum pattern can also bind a case's payload.
+Ordinary tagged enums, including payload-free `console.key`, also support
+`==`/`!=` when their payloads support equality. An enum pattern can bind a case's
+payload; see [enums and flags](ENUMS.md).
 
 ```void
 use console
@@ -99,8 +100,8 @@ leaves the match itself incomplete and can still produce warning `VOID2021`.
 Built-in `==` and `!=` support compatible numeric and Boolean operands, string
 contents, managed reference identity, and values of the same numeric-backed enum
 type. A nominal type can also supply an applicable `operator ==`. An ordinary
-tagged enum stores a case and any associated payload. It has no built-in rule
-for equality of that data, even if all its cases are payload-free.
+tagged enum compares its case and active payloads using their actual equality
+operations. Unsupported payload comparisons diagnose.
 
 Use `not (pressed is console.key.up)` to exclude the `up` case. To compare two
 runtime enum values, decide which cases and payloads count as equal. This
@@ -252,8 +253,8 @@ handlers and enters ordinary function cleanup. Handlers have no result.
 
 Module-time pattern execution and bound receiver allocation are not supported;
 named function constants are supported. Result success/error types must be existing
-value types; no new unit/void syntax is introduced. Generic enum declarations,
-custom collection equality/hash, arbitrary native callback/managed FFI and async
+value types; no new unit/void syntax is introduced. Generic enum declarations are implemented by G78.
+Custom collection equality/hash, arbitrary native callback/managed FFI and async
 remain outside this implementation. Stage 5 caching was delivered separately and
 is hosted-locked at CI #70; automatic watching remains future work. Callback
 signatures cannot discard returned readonly reference authority.

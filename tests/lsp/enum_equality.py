@@ -18,25 +18,26 @@ id="org.example.enum.app"
 [sources]
 roots=["src"]
 """
-SOURCE = """use console
+DECLARATION = "enum key:\n    up\n    down\n    data(items: [i32])\n"
+SOURCE = DECLARATION + """
 func main() -> i32:
-    var pressed = console.key.up
-    if "雪😀" == "雪😀" and pressed is console.key.up:
+    var pressed = key.up
+    if "雪😀" == "雪😀" and pressed is key.up:
         return 0
     return 1
 """
 BAD_CASE = SOURCE.replace("pressed is", "pressed ==")
-BAD_VALUES = SOURCE.replace("pressed is console.key.up", "pressed == pressed")
+BAD_VALUES = SOURCE.replace("pressed is key.up", "pressed == pressed")
 BAD_NEGATED = SOURCE.replace("pressed is", "pressed !=")
-MATCHED = """use console
+MATCHED = DECLARATION + """
 func main() -> i32:
-    match console.key.up:
-        console.key.up:
+    match key.up:
+        key.up:
             return 0
         _:
             return 1
 """
-ERROR = "Tagged enum values do not support built-in '==' or '!='."
+ERROR = "Collection equality is not implemented; use an element predicate."
 CASE = "Use 'is' to test this enum case, or 'match' to handle multiple cases."
 NEGATED_CASE = "Use a negated 'is' test to exclude this enum case, or 'match' to handle multiple cases."
 MATCH = "Use 'match' to inspect the cases and compare any payloads explicitly."
@@ -62,10 +63,11 @@ def expect(notes, uri, version, diagnostics):
 
 
 def diagnostic(text, operator, hint):
-    line = text.splitlines()[3]
+    number = next(n for n, line in enumerate(text.splitlines()) if "pressed " + operator in line)
+    line = text.splitlines()[number]
     start = len(line[:line.index("pressed " + operator) + len("pressed ")].encode("utf-16-le")) // 2
-    return {"range": {"start": {"line": 3, "character": start}, "end": {"line": 3, "character": start + 2}},
-            "severity": 1, "code": "VOID2016", "source": "VOID", "message": ERROR + "\nHint: " + hint}
+    return {"range": {"start": {"line": number, "character": start}, "end": {"line": number, "character": start + 2}},
+            "severity": 1, "code": "VOID2016", "source": "VOID", "message": ERROR}
 
 
 def select(client, entry, status):

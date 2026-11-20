@@ -13,7 +13,10 @@ receiver and specialization protections remain. See
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
-Generic functions, managed structs and value structs use lowercase parameters:
+G78 also specializes tagged and numeric/flags enum declarations through the same
+machinery, including payload inference, matching and collections. See [enums](ENUMS.md).
+
+Generic functions, managed structs, value structs and enums use lowercase parameters:
 
 ```typescript
 func identity<t>(value: t) -> t:

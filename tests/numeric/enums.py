@@ -260,7 +260,6 @@ try:
             ("float cast", "func main():\n    var x = 1.0 as? i32\n", "as? requires an integer"),
             ("bool cast", "func main():\n    var x = true as? i32\n", "as? requires an integer"),
             ("tagged cast", "enum tag:\n    idle\nfunc main():\n    var x = 1 as? tag\n", "as? requires an integer"),
-            ("enum extraction", prefix + "func main():\n    var x = mode.idle as? u8\n", "as? requires an integer"),
             ("unrelated enums", prefix + "enum other(u8):\n    idle = 1\nfunc main():\n    var x: mode = other.idle\n", "Type mismatch"),
             ("enum arithmetic", prefix + "func main():\n    var x = mode.idle + mode.idle\n", "Type mismatch"),
             ("implicit conversion", prefix + "func main():\n    var x: mode = 1\n", "Type mismatch"),

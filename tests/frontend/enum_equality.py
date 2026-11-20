@@ -45,12 +45,7 @@ def reject(path, source, target, code, message, hint=None):
 
 
 result = invoke("check", adventure / "main.void")
-assert result.returncode == 1 and not result.stdout, result
-assert diagnostics(result.stderr) == [
-    ("game.void", line, col, ENUM, "VOID2016")
-    for line, col in [(27, 28), (29, 33), (31, 33), (33, 33), (35, 33), (37, 33)]
-], result.stderr
-assert re.findall(r"^    Hint: (.+)$", result.stderr, re.M) == [CASE] * 6, result.stderr
+assert result.returncode == 0 and not result.stderr, result
 
 with TemporaryDirectory(prefix="VOID enum diagnostics ") as directory:
     root = Path(directory)
@@ -70,7 +65,9 @@ func probe(left: api.notice, right: api.notice) -> bool:
         ("left != api.notice.done(7)", "!=", MATCH),
         ("api.notice.idle == right", "==", MATCH),
     ):
-        reject(source, prefix + expression + "\n", target, "VOID2016", ENUM, hint)
+        source.write_text(prefix + expression + "\n", encoding="utf-8")
+        result = invoke("check", source)
+        assert result.returncode == 0 and not result.stderr, result
     reject(source, prefix + "left == 7\n", "==", "VOID2001",
            "Type mismatch: expected /events.void::notice, received i32.")
     reject(source, '''use "./events.void" as api
@@ -87,16 +84,9 @@ func probe(left: point, right: point) -> bool:
     for declaration in ("option<i32>", "result<i32, string>"):
         reject(source, f"func probe(left: {declaration}, right: {declaration}) -> bool:\n    return left != right\n",
                "!=", "VOID2016", STRUCT)
-    generic = reject(source, '''use console
-func compare<t>(left: t, right: t) -> bool:
-    return left == right
-func main() -> i32:
-    if compare<console.key>(console.key.up, console.key.down):
-        return 1
-    return 0
-''', "==", "VOID2016", ENUM, MATCH)
-    assert re.search(r"Generic specialization requested here\. at .+[/\\]probe\.void:5:8$", generic, re.M), generic
-    assert re.search(r"Generic declaration\. at .+[/\\]probe\.void:2:6$", generic, re.M), generic
+    source.write_text('use console\nfunc compare<t>(left: t, right: t) -> bool:\n    return left == right\nfunc main() -> i32:\n    if compare<console.key>(console.key.up, console.key.down):\n        return 1\n    return 0\n')
+    result = invoke("run", source, "--no-cache")
+    assert result.returncode == 0 and not result.stderr, result
     reject(source, '''enum bag:
     present(items: [i32])
 func probe(left: bag, right: bag) -> bool:
@@ -157,4 +147,4 @@ func main() -> i32:
         checked = invoke(*command)
         assert checked.returncode == 0 and not checked.stderr, checked
 
-print("Six Adventure operators, contextual hints, exact positions, and valid equality/pattern execution passed")
+print("Derived enum comparisons, nominal/unsupported diagnostics, custom operators and existing patterns passed")

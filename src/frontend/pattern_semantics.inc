@@ -1,3 +1,24 @@
+    // Resolve a source enum path before classifying it as a whole-type or case
+    // pattern. Generic arguments never disappear when the path denotes a case.
+    std::pair<Unit*,Structure*> pattern_enum_declaration(Pattern& p,Type subject,const std::string& spelling) {
+        auto [owner,structure]=structure_lookup(unit,root,units,spelling,p.token);
+        if(!structure || (structure->definition->cases.empty() && !structure->definition->enum_backing))return {};
+        if(!structure->generics.empty()) {
+            auto* generic=structure;
+            if(!p.type_arguments.empty()) {
+                std::vector<Type> arguments;
+                for(auto argument:p.type_arguments)arguments.push_back(resolve_type(argument,unit,root,units,p.token));
+                structure=&unit.specialize_structure(unit,*owner,*generic,arguments,p.token);
+            } else {
+                for(auto& candidate:owner->structures)
+                    if(candidate.generic_origin==generic && candidate.definition==subject.definition){structure=&candidate;break;}
+                if(structure==generic)error(source,p.token,Code::type_mismatch,"This enum pattern needs a matching concrete specialization or explicit type arguments.");
+            }
+        } else if(!p.type_arguments.empty())error(source,p.token,Code::unsupported_type,"This enum pattern type is not generic.");
+        if(structure->definition!=subject.definition)error(source,p.token,Code::type_mismatch,"Enum pattern has a different nominal type.");
+        if(p.enum_type_use)p.enum_type_use->type=subject;
+        return {owner,structure};
+    }
     void condition(Expr& e) {
         if(e.kind==Expr::Kind::binary && (e.op=="and" || e.op=="or")) {
             const bool isolated=e.op=="or";
@@ -36,7 +57,7 @@
         });
         if(type.definition && !type.definition->cases.empty())complete|=covered.size()==type.definition->cases.size();
         if(type==Type::boolean)complete|=scalar_cases.size()==2;
-        if(type.kind==Type::numeric_enum)complete|=scalar_cases.size()==type.definition->numeric_members.size();
+        if(type.kind==Type::numeric_enum && !type.definition->enum_flags)complete|=scalar_cases.size()==type.definition->numeric_members.size();
         if(type.nullable)complete|=present && absent;
         if(!complete)diagnostics.warn(source,token,Code::incomplete_match,"Match may leave values unmatched.");return complete;
     }
@@ -48,7 +69,7 @@
         case K::capture:p.slot=declare(p.token,type);return;
         case K::value:{
             auto& value=*p.values.front();
-            if(value.kind==Expr::Kind::field && (p.editor_incomplete_arm || editor_cursor(value))) {
+            if(value.kind==Expr::Kind::field && (p.editor_incomplete_arm || editor_cursor(value) || (type.definition && (!type.definition->cases.empty() || type.kind==Type::numeric_enum)))) {
                 if(auto selected=enum_expression(value,false,&type)) {
                     expect(*selected,type,p.token);
                     return;
@@ -97,15 +118,21 @@
                 if(p.spelling=="Err" || p.children.size()!=1)error(source,p.token,Code::type_mismatch,"Nullable presence uses Ok(pattern); Err is a result variant.");
                 p.nullable=true;(void)result_editor_target(type,0,p.variant_token);auto present=type;present.nullable=false;check_pattern(p.children[0],present);return;
             }
-            if(type.definition && !type.definition->cases.empty() && p.spelling.substr(p.spelling.rfind('.')==std::string::npos?0:p.spelling.rfind('.')+1)==type.definition->name){
-                auto [owner,structure]=structure_lookup(unit,root,units,p.spelling,p.token);if(structure && structure->definition==type.definition){if(p.children.size()>1)error(source,p.token,Code::type_mismatch,"A whole enum type pattern accepts one pattern.");if(p.children.empty()){p.kind=K::wildcard;return;}auto inner=std::move(p.children[0]);p=std::move(inner);check_pattern(p,type);return;}
+            if(!p.derived_case && enum_value_type(type)) {
+                if(auto [owner,structure]=pattern_enum_declaration(p,type,p.spelling);structure) {
+                    (void)owner;
+                    if(p.children.size()>1 || (!p.fields.empty() && !p.fields.front().text.empty()))
+                        error(source,p.token,Code::type_mismatch,"A whole enum type pattern accepts one positional pattern.");
+                    if(p.children.empty()){p.kind=K::wildcard;return;}
+                    auto inner=std::move(p.children.front());p=std::move(inner);check_pattern(p,type);return;
+                }
             }
             if(type.definition && !type.definition->cases.empty()) {
                 const auto& cases=type.definition->cases;std::string variant=p.spelling;
-                if(!type.definition->result_type && !type.definition->option_type) {
+                if(!p.derived_case && !type.definition->result_type && !type.definition->option_type) {
                     const auto dot=variant.rfind('.');
                     if(dot==std::string::npos)error(source,p.token,Code::type_mismatch,"Enum patterns require type.variant spelling.");
-                    auto [owner,structure]=structure_lookup(unit,root,units,variant.substr(0,dot),p.token);
+                    auto [owner,structure]=pattern_enum_declaration(p,type,variant.substr(0,dot));
                     if(editor_cursor(p.variant_token)) {
                         if(structure && structure->definition==type.definition)editor_enum_candidates(*owner,*structure,p.variant_token);
                         throw EditorProbeFound{};
@@ -123,12 +150,17 @@
                 for(unsigned n=0;n<p.children.size();++n){if(!p.fields[n].text.empty())error(source,p.fields[n],Code::syntax,"Variant patterns use positional payloads.");p.indexes.push_back(selected->begin+n);check_pattern(p.children[n],ir::field_type(type,selected->begin+n));}return;
             }
             if(type.kind==Type::numeric_enum) {
-                auto [owner,structure]=structure_lookup(unit,root,units,p.spelling,p.token);
-                if(!structure || structure->definition!=type.definition || p.children.size()>1 ||
-                   (!p.children.empty() && !p.fields.front().text.empty()))
-                    error(source,p.token,Code::type_mismatch,"Numeric enum patterns require a member or an exact whole-value type.");
-                if(p.children.empty()){p.kind=K::wildcard;return;}
-                auto inner=std::move(p.children.front());p=std::move(inner);check_pattern(p,type);return;
+                const auto dot=p.spelling.rfind('.');
+                auto selected=dot==std::string::npos?std::pair<Unit*,Structure*>{}:pattern_enum_declaration(p,type,p.spelling.substr(0,dot));
+                if(!selected.second)error(source,p.token,Code::type_mismatch,"Numeric enum patterns require a member or an exact whole-value type.");
+                if(editor_cursor(p.variant_token))editor_enum_candidates(*selected.first,*selected.second,p.variant_token);
+                if(p.invocation)error(source,p.variant_token,Code::not_callable,"Numeric enum member patterns are values; omit parentheses.");
+                const auto name=p.spelling.substr(dot+1);const auto& members=type.definition->numeric_members;
+                auto member=std::find_if(members.begin(),members.end(),[&](const auto& m){return m.name==name;});
+                if(member==members.end())error(source,p.variant_token,Code::unknown_identifier,"Unknown numeric enum member '"+name+"'.");
+                auto value=std::make_unique<Expr>(Expr::Kind::literal,p.variant_token);
+                value->type=type;value->value=member->bits;value->target=type.definition->identity+"::variant::"+name;
+                value->enum_type_use=std::move(p.enum_type_use);p.values.push_back(std::move(value));p.kind=K::value;return;
             }
             auto resolved=p.annotated_type?resolve_type(p.narrowed,unit,root,units,p.token):Type(Type::none);
             if(p.annotated_type && (numeric::number(resolved) || resolved==Type::boolean || resolved==Type::string)){

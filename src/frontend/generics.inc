@@ -107,7 +107,7 @@ for(auto& [id,u]:units) {
         if(headers_ready) {
             for(auto* f:methods)prepare_function(owner,*f);
             validate_inheritance(units,root,diagnostics);
-            root.member_catalog->nominal_types.emplace_back(concrete.definition,concrete.definition->managed?Type::managed_ref:Type::aggregate);
+            root.member_catalog->nominal_types.push_back(Type::nominal(concrete.definition));
             for(auto* f:methods)root.member_catalog->functions.push_back(member_header(owner,*f));
             defaults(owner,concrete);
             for(auto* f:methods) {Semantics semantics(owner,units,root,evaluate,diagnostics,defaults);semantics.parameter_defaults(*f);semantics.initializer_fields(*f);}
@@ -129,6 +129,6 @@ for(auto& [id,u]:units) {
         if(!generic || generic->generics.empty())error(owner->source,found->token,Code::unsupported_type,"Type '"+found->name+"' is not a generic struct.");
         std::vector<Type> arguments;for(auto argument:found->arguments)arguments.push_back(resolve_type(argument,*owner,root,units,site));
         auto& concrete=owner->specialize_structure(*owner,*declaration_owner,*generic,arguments,site);
-        return found->resolved=Type(concrete.definition,concrete.definition->managed?Type::managed_ref:Type::aggregate);
+        return found->resolved=Type::nominal(concrete.definition);
     };
 }

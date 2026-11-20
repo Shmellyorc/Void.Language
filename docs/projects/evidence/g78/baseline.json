@@ -1,0 +1,42 @@
+{
+  "baseline": "2376e123026e5dd17b9743b6a7b6af2b0a1fd94f",
+  "compiler": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+  "compiler_sha256": "53fe08bb8a04937e4dcb64e7584a4860e8f4c507fb5eef921f6699dc43790226",
+  "probes": [
+    {
+      "case": "equality",
+      "source": "enum choice:\n    empty\n    value(number: i32)\nfunc main() -> i32:\n    if choice.value(3) == choice.value(3):\n        return 0\n    return 1\n",
+      "code": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-g78-484t4_vc/equality-baseline.void:5:24: error: Tagged enum values do not support built-in '==' or '!='.\n    code: VOID2016\n\n 5 |     if choice.value(3) == choice.value(3):\n   |                        ^^\n    Module: /equality-baseline.void\n    Hint: Use 'match' to inspect the cases and compare any payloads explicitly.\n\n"
+    },
+    {
+      "case": "keys",
+      "source": "enum mode(u8):\n    first = 1\nfunc main() -> i32:\n    var values: {mode: i32} = {mode.first: 7}\n    return values[mode.first] - 7\n",
+      "code": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-g78-484t4_vc/keys-baseline.void:4:17: error: Unsupported dictionary key type.\n    code: VOID1103\n\n 4 |     var values: {mode: i32} = {mode.first: 7}\n   |                 ^\n    Module: /keys-baseline.void\n\n/tmp/void-g78-484t4_vc/keys-baseline.void:5:12: error: Unknown identifier 'values'.\n    code: VOID2002\n\n 5 |     return values[mode.first] - 7\n   |            ^^^^^^\n    Module: /keys-baseline.void\n    Hint: Declare it with var before use.\n\n"
+    },
+    {
+      "case": "conversions",
+      "source": "enum mode(u8):\n    first = 1\nfunc main() -> i32:\n    return (mode.first as i32) - 1\n",
+      "code": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-g78-484t4_vc/conversions-baseline.void:4:24: error: Numeric as requires numeric source and destination types.\n    code: VOID2015\n\n 4 |     return (mode.first as i32) - 1\n   |                        ^^\n    Module: /conversions-baseline.void\n\n"
+    },
+    {
+      "case": "flags",
+      "source": "flags enum access(u8):\n    read = 1\n    write = 2\nfunc main() -> i32:\n    var both = access.read | access.write\n    return 0\n",
+      "code": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-g78-484t4_vc/flags-baseline.void:1:7: error: Expected end of statement, found 'enum'.\n    code: VOID1101\n\n 1 | flags enum access(u8):\n   |       ^^^^\n    Module: /flags-baseline.void\n    Hint: Put each statement on its own line; postfix ++/-- cannot be used as values.\n\n/tmp/void-g78-484t4_vc/flags-baseline.void:4:6: error: Executable top-level statements compete with main().\n    code: VOID4001\n\n 4 | func main() -> i32:\n   |      ^^^^\n    Module: /flags-baseline.void\n\n/tmp/void-g78-484t4_vc/flags-baseline.void:5:28: error: Unexpected character in source.\n    code: VOID1003\n\n 5 |     var both = access.read | access.write\n   |                            ^\n    Module: /flags-baseline.void\n    Hint: Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.\n\n"
+    },
+    {
+      "case": "generic",
+      "source": "enum item<t>:\n    empty\n    value(data: t)\nfunc main() -> i32:\n    var held = item<i32>.value(3)\n    return 0\n",
+      "code": 1,
+      "stdout": "",
+      "stderr": "/tmp/void-g78-484t4_vc/generic-baseline.void:1:10: error: Expected ':', found '<'.\n    code: VOID1101\n\n 1 | enum item<t>:\n   |          ^\n    Module: /generic-baseline.void\n\n/tmp/void-g78-484t4_vc/generic-baseline.void:5:21: error: Expected an expression, found 'i32'.\n    code: VOID1101\n\n 5 |     var held = item<i32>.value(3)\n   |                     ^^^\n    Module: /generic-baseline.void\n\n"
+    }
+  ]
+}

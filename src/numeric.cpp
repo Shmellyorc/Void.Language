@@ -36,6 +36,7 @@ bool supports(ir::Op op, Type t) {
     switch (op) {
     case Op::equal: case Op::not_equal: return number(t) || t == Type::boolean;
     case Op::remainder: return integer(t);
+    case Op::bit_and: case Op::bit_or: case Op::bit_xor: case Op::bit_not: return integer(t);
     case Op::add: case Op::subtract: case Op::multiply: case Op::divide:
     case Op::less: case Op::less_equal: case Op::greater: case Op::greater_equal:
     case Op::negate: return number(t);
@@ -142,6 +143,9 @@ std::uint64_t binary(ir::Op op, std::uint64_t x, std::uint64_t y, Type t) {
     llvm::APInt a(width(t),x), b(width(t),y);
     bool sign = signed_integer(t);
     switch(op) {
+    case Op::bit_and: return (a&b).getZExtValue();
+    case Op::bit_or: return (a|b).getZExtValue();
+    case Op::bit_xor: return (a^b).getZExtValue();
     case Op::add: return (a+b).getZExtValue();
     case Op::subtract: return (a-b).getZExtValue();
     case Op::multiply: return (a*b).getZExtValue();

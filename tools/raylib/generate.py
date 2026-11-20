@@ -286,7 +286,7 @@ def main():
     inventory = json.loads((TOOLS / 'inventory.json').read_text())
     source = (ROOT / 'src/raylib.void').read_text()
     names = set(re.findall(r'^func (\w+)', source, re.M))
-    missing = [n['name'] for n in inventory['functions'] if n['void_name'] not in names]
+    missing = [n['name'] for n in inventory['functions'] if n.get('public_name', n['void_name']) not in names]
     if missing: raise SystemExit('Missing physical public API: ' + ', '.join(missing))
     print('Pinned raylib header inventory and generated outputs verified' if args.check else 'Generated pinned raylib inventory and supported bindings')
     if args.require_complete:

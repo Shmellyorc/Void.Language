@@ -1,0 +1,29 @@
+## A response carrying an explicitly typed value when available.
+enum response<t>:
+    ## No response has arrived.
+    missing
+    ## An available response.
+    ## @param value The response payload.
+    data(value: t)
+
+## Permissions that can be combined without losing their enum identity.
+flags enum permission(u8):
+    ## No permission bits.
+    none = 0
+    ## Permission to read.
+    read
+    ## Permission to write.
+    write
+    ## The declared combination of read and write.
+    read_write = read | write
+
+## Demonstrate inferred payloads, enum keys and immutable flag manipulation.
+## @return Zero after displaying the response case and permission label.
+func main() -> i32:
+    var result = response.data("Ready")
+    var allowed = permission.read.with(permission.write)
+    var labels: {permission: string} = {permission.read_write: "read and write"}
+    if result == response<string>.data("Ready") and allowed.has(permission.read_write):
+        print(result.name)
+        print(labels[allowed])
+    return 0

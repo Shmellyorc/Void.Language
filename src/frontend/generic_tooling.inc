@@ -25,11 +25,46 @@ for(const auto& s:unit->generic_structures) {
     std::string spelling=s.token.text+"<";
     for(const auto& p:s.generics){if(!names.empty())spelling+=", ";spelling+=p.token.text;names.emplace(p.token.text,key+"::type::"+p.token.text);}spelling+=">";
     auto symbolic=std::make_shared<ir::ValueType>();symbolic->name=spelling;symbolic->identity=key;
-    declaration({s.definition->managed?AnalyzedDeclaration::Kind::managed_structure:AnalyzedDeclaration::Kind::value_structure,key,id,s.visibility,location(s.token),{},Type(symbolic,Type::unresolved),{},{},id},false);
+    const auto symbolic_type=Type(symbolic,Type::unresolved);
+    AnalyzedDeclaration type_record{s.definition->managed?AnalyzedDeclaration::Kind::managed_structure:AnalyzedDeclaration::Kind::value_structure,key,id,s.visibility,location(s.token),{},symbolic_type,{},{},id};
+    const bool enumeration=!s.case_tokens.empty();
+    if(enumeration) {
+        type_record.generic_template=true;
+        type_record.editor_symbol_kind=10;
+        type_record.signature=std::string(s.definition->enum_flags?"flags enum ":"enum ")+spelling;
+        if(s.definition->enum_backing)type_record.signature+="("+ir::type_name(*s.definition->enum_backing)+")";
+    }
+    declaration(std::move(type_record),false);
     parameter_records(s.generics,key);
-    for(const auto& f:s.fields){
+    for(const auto& f:s.fields)if(!enumeration){
         AnalyzedDeclaration record{s.definition->managed?AnalyzedDeclaration::Kind::managed_field:AnalyzedDeclaration::Kind::value_field,key+"::field::"+f.name,id,f.visibility,location(f.token),{},editor_pattern_type(*f.annotation),f.constant_syntax,{},key};
         record.readonly=f.readonly;declaration(std::move(record),false);
+    }
+    // Template declarations own symbolic case signatures. Concrete references
+    // supply their selected signatures without replacing these source records.
+    for(unsigned n=0;n<s.definition->numeric_members.size();++n) {
+        const auto& member=s.definition->numeric_members[n];
+        const auto value=numeric::integer_text(member.bits,*s.definition->enum_backing);
+        AnalyzedDeclaration record{AnalyzedDeclaration::Kind::module_constant,key+"::variant::"+member.name,id,s.visibility,location(s.case_tokens[n]),{},symbolic_type,value,member.bits,key};
+        record.generic_template=true;record.editor_symbol_kind=22;
+        record.signature=spelling+"."+member.name+" = "+value+" ("+ir::type_name(*s.definition->enum_backing)+")";
+        declaration(std::move(record),false);
+    }
+    for(unsigned n=0;n<s.definition->cases.size();++n) {
+        const auto& variant=s.definition->cases[n];std::vector<Type> parameters;
+        for(unsigned k=0;k<variant.count;++k)parameters.push_back(editor_pattern_type(*s.fields[variant.begin+k].annotation));
+        const auto identity=key+"::variant::"+variant.name;
+        AnalyzedDeclaration record{variant.count?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,identity,id,s.visibility,location(s.case_tokens[n]),parameters,symbolic_type,{},{},key};
+        record.generic_template=true;record.editor_symbol_kind=22;record.signature=variant.name;
+        if(variant.count)record.signature+='(';
+        for(unsigned k=0;k<variant.count;++k) {
+            const auto& member=s.fields[variant.begin+k];
+            if(k)record.signature+=", ";record.signature+=member.token.text+": "+ir::type_name(parameters[k]);
+            record.written_parameters.push_back({member.token.text,parameters[k],location(member.token)});
+            declaration({AnalyzedDeclaration::Kind::parameter,identity+"::parameter::"+member.token.text,id,"local",location(member.token),{},parameters[k],{},{},identity},false);
+        }
+        if(variant.count)record.signature+=')';record.signature+=" -> "+spelling;
+        declaration(std::move(record),false);
     }
     if(!s.operators.empty()) {
         field(result->contract_,"generic-operator-owner");field(result->contract_,key);field(result->contract_,s.visibility);

@@ -373,14 +373,12 @@ and the boundary against native process corruption or forced termination.
 
 ### Tagged enum equality
 
-`VOID2016` identifies unsupported built-in `==` and `!=` at the operator when
-both operands have the same ordinary tagged enum type. An explicit payload-free
-case on the right receives guidance for `is`, or a negated `is` for `!=`.
-Comparisons with arbitrary enum expressions or payload arguments receive
-guidance for `match` and explicit payload comparisons. The CLI and language
-server use the same hint. An incompatible operand still receives the existing
-type error, and unrelated value structs retain their own equality diagnostic.
-[Enum case tests and imports](ADVANCED_LANGUAGE.md#enum-case-tests-and-imports)
+G78 derives ordinary tagged enum `==`/`!=` from active payload operations.
+Unavailable payload equality retains `VOID2016` at the requesting operator and
+the underlying payload explanation. Incompatible nominal operands retain the
+existing type mismatch diagnostic. Unrelated value structs and canonical
+option/result retain their prior unsupported equality diagnostic. `is` and
+`match` remain available for case tests and extraction; see [enums](ENUMS.md).
 
 ## Stage 8 Sprint 6 — 21 October 2026
 
