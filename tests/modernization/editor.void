@@ -1,0 +1,12 @@
+use pkg/raylib as rl
+use io as io
+
+func main():
+    var mask = rl.config_flags.window_hidden
+    rl.set_config_flags(mask)
+    rl.set_exit_key(rl.keyboard_key.escape)
+    var provider_key: i32 = 302
+    var held = rl.is_key_down_code(provider_key)
+    var selected = rl.keyboard_key.escape
+    var mode = io.open_mode.create_new
+    print(selected.name, mode.name, held)

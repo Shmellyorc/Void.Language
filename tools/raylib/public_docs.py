@@ -193,13 +193,23 @@ FALLIBLE_RESOURCES = {
 FALLIBLE_WRITES = ('save_file_data', 'save_file_text', 'export_image', 'export_wave')
 
 
+# Raw-code companions preserve the provider domain beyond named KeyboardKey cases.
+KEY_CODE_OPERATIONS = ('is_key_pressed', 'is_key_pressed_repeat', 'is_key_down',
+                       'is_key_released', 'is_key_up', 'set_exit_key', 'get_key_name')
+
+
 def verify_fallible_api(source):
     functions = {f['name']: f for f in public_functions(source)}
     expected = {operation: typ for typ, names in FALLIBLE_RESOURCES.items() for operation in names}
     expected.update((name, 'bool') for name in FALLIBLE_WRITES)
     companions = {'try_' + name for name in expected}
-    if len(functions) != 791 or len(functions.keys() - companions) != 757:
-        raise ValueError('Keep 757 base functions with canonical names and the 34 G77 companions')
+    raw_keys = {name + '_code' for name in KEY_CODE_OPERATIONS}
+    if len(functions) != 798 or len(functions.keys() - companions - raw_keys) != 757:
+        raise ValueError('Keep 757 base functions, 34 fallible companions and 7 raw keyboard-code operations')
+    for name in KEY_CODE_OPERATIONS:
+        raw = functions.get(name + '_code')
+        if not raw or raw['parameters'] != [('key', 'i32')] or raw['result'] != functions[name]['result']:
+            raise ValueError(name + '_code: retain the raw i32 provider contract and named result type')
     for operation, typ in expected.items():
         name = 'try_' + operation
         function = functions.get(name)

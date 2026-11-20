@@ -144,7 +144,7 @@ func run(mode: i32) -> i32:
                         var character: result<string, string> = Ok(pressed.character)
                         print([character])
             Err(var reason):
-                print("mode", reason.kind)
+                print("mode", reason.kind.name)
     return mode
 func work(count: i32) -> i32:
     if make_date(2024, 2, 29) is Ok(var day):

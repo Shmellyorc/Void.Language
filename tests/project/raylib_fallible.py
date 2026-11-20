@@ -22,7 +22,7 @@ use os
 use convert as conversion
 
 func headless() -> i32:
-    rl.set_trace_log_level(rl.log_warning)
+    rl.set_trace_log_level(rl.trace_log_level.warning)
     if rl.try_load_image("missing-image.png") is Err(var failed):
         if failed.operation != "load_image" or not (failed.kind is rl.load_error_kind.acquisition_failed):
             return 1
@@ -49,7 +49,7 @@ func headless() -> i32:
         if reloaded.height != 4:
             return 9
         rl.unload_image(reloaded)
-    var raw = conversion.unwrap(rl.try_load_image_raw("sample.rgba", 4, 4, rl.pixelformat_uncompressed_r8g8b8a8, 0))
+    var raw = conversion.unwrap(rl.try_load_image_raw("sample.rgba", 4, 4, rl.pixel_format.uncompressed_r8g8b8a8, 0))
     rl.unload_image(raw)
     var animation = conversion.unwrap(rl.try_load_image_anim("sample.gif"))
     rl.unload_image(animation)
@@ -102,8 +102,8 @@ func headless() -> i32:
     return 0
 
 func graphics() -> i32:
-    rl.set_trace_log_level(rl.log_warning)
-    rl.set_config_flags(rl.flag_window_hidden as u32)
+    rl.set_trace_log_level(rl.trace_log_level.warning)
+    rl.set_config_flags(rl.config_flags.window_hidden)
     var window_owner = rl.init_window(64, 64, "VOID G77 resource loaders") as rl.window
     defer rl.close_window(window_owner)
     for at in 0..8:
@@ -140,7 +140,7 @@ func graphics() -> i32:
         var texture_file = conversion.unwrap(rl.try_load_texture("sample.png"))
         rl.unload_texture(texture_file)
         var cube_image = rl.gen_image_color(4, 24, rl.white()) as rl.image
-        var cube = conversion.unwrap(rl.try_load_texture_cubemap(cube_image, rl.cubemap_layout_line_vertical))
+        var cube = conversion.unwrap(rl.try_load_texture_cubemap(cube_image, rl.cubemap_layout.line_vertical))
         rl.unload_texture(cube)
         rl.unload_image(cube_image)
         var screen = conversion.unwrap(rl.try_load_image_from_screen())
@@ -167,7 +167,7 @@ func graphics() -> i32:
     return 0
 
 func audio() -> i32:
-    rl.set_trace_log_level(rl.log_warning)
+    rl.set_trace_log_level(rl.trace_log_level.warning)
     var device = rl.init_audio_device() as rl.audio_device
     defer rl.close_audio_device(device)
     for at in 0..8:

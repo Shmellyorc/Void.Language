@@ -74,24 +74,38 @@ value struct capture_options:
     ## Milliseconds from successful launch until exit and captured EOF.
     timeout_ms: i64
 
+## Why bounded capture stopped; an Ok capture_result can still report a non-complete outcome.
 enum capture_end(u8):
+    ## The direct child was reaped and every captured pipe reached EOF.
     complete = 0
+    ## An output budget was exceeded; retained prefixes remain bounded.
     output_limit = 1
+    ## The capture deadline expired; cleanup retains direct-child authority.
     deadline = 2
+    ## Native pipe or observation work failed.
     io_failure = 3
+    ## Runtime shutdown interrupted admitted synchronous capture.
     cancelled = 4
 
 ## Owned binary prefixes and termination evidence from a launched direct child.
 value struct capture_result:
+    ## Termination category, independently of the child exit status.
     outcome: capture_end
     ## True if the child's own exit was observed before abort cleanup.
     exited: bool
+    ## Observed exit information; meaningful only when exited is true.
     status: exit_status
+    ## True only after EOF on a captured stdout pipe; false for inherited stdout.
     stdout_complete: bool
+    ## True only after EOF on a captured stderr pipe; false for inherited stderr.
     stderr_complete: bool
+    ## Owned retained stdout prefix; decode UTF-8 explicitly if required.
     stdout: [u8]
+    ## Owned retained stderr prefix; decode UTF-8 explicitly if required.
     stderr: [u8]
+    ## Original primary native I/O diagnostic when present.
     os_code: i64
+    ## Separate native close, termination or reap failure.
     cleanup_code: i64
 
 private value struct _capture_reply:
@@ -111,14 +125,8 @@ private func _capture_value(operation: string, reply: _capture_reply) -> result<
     if reply.launch_kind != 0:
         return Err(system_error.make(operation, reply.launch_kind, reply.os_code))
     var outcome = capture_end.complete
-    if reply.reason == 1:
-        outcome = capture_end.output_limit
-    else if reply.reason == 2:
-        outcome = capture_end.deadline
-    else if reply.reason == 3:
-        outcome = capture_end.io_failure
-    else if reply.reason == 4:
-        outcome = capture_end.cancelled
+    if reply.reason as? capture_end is Some(var decoded):
+        outcome = decoded
     var status = exit_status(code = reply.code, signaled = reply.signal != 0, signal = reply.signal)
     return Ok(capture_result(outcome = outcome, exited = reply.exited, status = status,
         stdout_complete = reply.stdout_complete, stderr_complete = reply.stderr_complete,
@@ -138,6 +146,12 @@ func capture(executable: string, const arguments: [string], const environment: [
 
 ## Capture on a bounded native worker while the owner activation can run other work.
 ## Cancellation follows task semantics and drains the direct child before retiring.
+## @param executable Absolute native executable path; no shell or PATH search.
+## @param arguments Literal arguments excluding argv[0], copied for launch.
+## @param environment Complete NAME=value environment; an empty list inherits no entries.
+## @param cwd Absolute native working directory.
+## @param options Explicit per-stream/total byte limits and capture deadline.
+## @return Err for setup/launch failure, or Ok with bounded output and separate termination/exit evidence.
 async func capture_async(executable: string, const arguments: [string], const environment: [string], cwd: string, options: capture_options) -> result<capture_result, system_error.error>:
     var reply = await _host_capture_async(executable, arguments, environment, cwd,
         options.stdout_limit, options.stderr_limit, options.total_limit, options.timeout_ms)

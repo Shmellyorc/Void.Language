@@ -13,10 +13,10 @@ value struct record:
 
 func expect_failure<t>(attempt: result<t, json.error>, kind: json.error_kind, code: i32, offset: i64, pointer: string, detail: string = "") -> bool:
     if attempt is Err(var failure):
-        if "{failure.kind}" == "{kind}" and failure.code == code and failure.offset == offset and failure.path == pointer:
+        if failure.kind == kind and failure.code == code and failure.offset == offset and failure.path == pointer:
             if detail == "" or failure.message == detail:
                 return true
-        print("unexpected error {failure.kind} {failure.code}@{failure.offset}:{failure.path} {failure.message}")
+        print("unexpected error {failure.kind.name} {failure.code}@{failure.offset}:{failure.path} {failure.message}")
         return false
     print("expected error {code}@{offset}:{pointer}, received a value")
     return false
@@ -155,5 +155,5 @@ func main() -> i32:
         Ok(var status):
             return status
         Err(var failure):
-            print("unexpected error {failure.kind} {failure.code}@{failure.offset}:{failure.path} {failure.message}")
+            print("unexpected error {failure.kind.name} {failure.code}@{failure.offset}:{failure.path} {failure.message}")
             return 4

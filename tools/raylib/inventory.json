@@ -11455,87 +11455,88 @@
         {
           "name": "FLAG_VSYNC_HINT",
           "value": 64,
-          "void_name": "flag_vsync_hint"
+          "void_name": "config_flags.vsync_hint"
         },
         {
           "name": "FLAG_FULLSCREEN_MODE",
           "value": 2,
-          "void_name": "flag_fullscreen_mode"
+          "void_name": "config_flags.fullscreen_mode"
         },
         {
           "name": "FLAG_WINDOW_RESIZABLE",
           "value": 4,
-          "void_name": "flag_window_resizable"
+          "void_name": "config_flags.window_resizable"
         },
         {
           "name": "FLAG_WINDOW_UNDECORATED",
           "value": 8,
-          "void_name": "flag_window_undecorated"
+          "void_name": "config_flags.window_undecorated"
         },
         {
           "name": "FLAG_WINDOW_HIDDEN",
           "value": 128,
-          "void_name": "flag_window_hidden"
+          "void_name": "config_flags.window_hidden"
         },
         {
           "name": "FLAG_WINDOW_MINIMIZED",
           "value": 512,
-          "void_name": "flag_window_minimized"
+          "void_name": "config_flags.window_minimized"
         },
         {
           "name": "FLAG_WINDOW_MAXIMIZED",
           "value": 1024,
-          "void_name": "flag_window_maximized"
+          "void_name": "config_flags.window_maximized"
         },
         {
           "name": "FLAG_WINDOW_UNFOCUSED",
           "value": 2048,
-          "void_name": "flag_window_unfocused"
+          "void_name": "config_flags.window_unfocused"
         },
         {
           "name": "FLAG_WINDOW_TOPMOST",
           "value": 4096,
-          "void_name": "flag_window_topmost"
+          "void_name": "config_flags.window_topmost"
         },
         {
           "name": "FLAG_WINDOW_ALWAYS_RUN",
           "value": 256,
-          "void_name": "flag_window_always_run"
+          "void_name": "config_flags.window_always_run"
         },
         {
           "name": "FLAG_WINDOW_TRANSPARENT",
           "value": 16,
-          "void_name": "flag_window_transparent"
+          "void_name": "config_flags.window_transparent"
         },
         {
           "name": "FLAG_WINDOW_HIGHDPI",
           "value": 8192,
-          "void_name": "flag_window_highdpi"
+          "void_name": "config_flags.window_highdpi"
         },
         {
           "name": "FLAG_WINDOW_MOUSE_PASSTHROUGH",
           "value": 16384,
-          "void_name": "flag_window_mouse_passthrough"
+          "void_name": "config_flags.window_mouse_passthrough"
         },
         {
           "name": "FLAG_BORDERLESS_WINDOWED_MODE",
           "value": 32768,
-          "void_name": "flag_borderless_windowed_mode"
+          "void_name": "config_flags.borderless_windowed_mode"
         },
         {
           "name": "FLAG_MSAA_4X_HINT",
           "value": 32,
-          "void_name": "flag_msaa_4x_hint"
+          "void_name": "config_flags.msaa_4x_hint"
         },
         {
           "name": "FLAG_INTERLACED_HINT",
           "value": 65536,
-          "void_name": "flag_interlaced_hint"
+          "void_name": "config_flags.interlaced_hint"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "config_flags",
+      "implementation": "typed source flags enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -11546,47 +11547,48 @@
         {
           "name": "LOG_ALL",
           "value": 0,
-          "void_name": "log_all"
+          "void_name": "trace_log_level.all"
         },
         {
           "name": "LOG_TRACE",
           "value": 1,
-          "void_name": "log_trace"
+          "void_name": "trace_log_level.trace"
         },
         {
           "name": "LOG_DEBUG",
           "value": 2,
-          "void_name": "log_debug"
+          "void_name": "trace_log_level.debug"
         },
         {
           "name": "LOG_INFO",
           "value": 3,
-          "void_name": "log_info"
+          "void_name": "trace_log_level.info"
         },
         {
           "name": "LOG_WARNING",
           "value": 4,
-          "void_name": "log_warning"
+          "void_name": "trace_log_level.warning"
         },
         {
           "name": "LOG_ERROR",
           "value": 5,
-          "void_name": "log_error"
+          "void_name": "trace_log_level.error"
         },
         {
           "name": "LOG_FATAL",
           "value": 6,
-          "void_name": "log_fatal"
+          "void_name": "trace_log_level.fatal"
         },
         {
           "name": "LOG_NONE",
           "value": 7,
-          "void_name": "log_none"
+          "void_name": "trace_log_level.none"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "trace_log_level",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -11597,557 +11599,558 @@
         {
           "name": "KEY_NULL",
           "value": 0,
-          "void_name": "key_null"
+          "void_name": "keyboard_key.none"
         },
         {
           "name": "KEY_APOSTROPHE",
           "value": 39,
-          "void_name": "key_apostrophe"
+          "void_name": "keyboard_key.apostrophe"
         },
         {
           "name": "KEY_COMMA",
           "value": 44,
-          "void_name": "key_comma"
+          "void_name": "keyboard_key.comma"
         },
         {
           "name": "KEY_MINUS",
           "value": 45,
-          "void_name": "key_minus"
+          "void_name": "keyboard_key.minus"
         },
         {
           "name": "KEY_PERIOD",
           "value": 46,
-          "void_name": "key_period"
+          "void_name": "keyboard_key.period"
         },
         {
           "name": "KEY_SLASH",
           "value": 47,
-          "void_name": "key_slash"
+          "void_name": "keyboard_key.slash"
         },
         {
           "name": "KEY_ZERO",
           "value": 48,
-          "void_name": "key_zero"
+          "void_name": "keyboard_key.zero"
         },
         {
           "name": "KEY_ONE",
           "value": 49,
-          "void_name": "key_one"
+          "void_name": "keyboard_key.one"
         },
         {
           "name": "KEY_TWO",
           "value": 50,
-          "void_name": "key_two"
+          "void_name": "keyboard_key.two"
         },
         {
           "name": "KEY_THREE",
           "value": 51,
-          "void_name": "key_three"
+          "void_name": "keyboard_key.three"
         },
         {
           "name": "KEY_FOUR",
           "value": 52,
-          "void_name": "key_four"
+          "void_name": "keyboard_key.four"
         },
         {
           "name": "KEY_FIVE",
           "value": 53,
-          "void_name": "key_five"
+          "void_name": "keyboard_key.five"
         },
         {
           "name": "KEY_SIX",
           "value": 54,
-          "void_name": "key_six"
+          "void_name": "keyboard_key.six"
         },
         {
           "name": "KEY_SEVEN",
           "value": 55,
-          "void_name": "key_seven"
+          "void_name": "keyboard_key.seven"
         },
         {
           "name": "KEY_EIGHT",
           "value": 56,
-          "void_name": "key_eight"
+          "void_name": "keyboard_key.eight"
         },
         {
           "name": "KEY_NINE",
           "value": 57,
-          "void_name": "key_nine"
+          "void_name": "keyboard_key.nine"
         },
         {
           "name": "KEY_SEMICOLON",
           "value": 59,
-          "void_name": "key_semicolon"
+          "void_name": "keyboard_key.semicolon"
         },
         {
           "name": "KEY_EQUAL",
           "value": 61,
-          "void_name": "key_equal"
+          "void_name": "keyboard_key.equal"
         },
         {
           "name": "KEY_A",
           "value": 65,
-          "void_name": "key_a"
+          "void_name": "keyboard_key.a"
         },
         {
           "name": "KEY_B",
           "value": 66,
-          "void_name": "key_b"
+          "void_name": "keyboard_key.b"
         },
         {
           "name": "KEY_C",
           "value": 67,
-          "void_name": "key_c"
+          "void_name": "keyboard_key.c"
         },
         {
           "name": "KEY_D",
           "value": 68,
-          "void_name": "key_d"
+          "void_name": "keyboard_key.d"
         },
         {
           "name": "KEY_E",
           "value": 69,
-          "void_name": "key_e"
+          "void_name": "keyboard_key.e"
         },
         {
           "name": "KEY_F",
           "value": 70,
-          "void_name": "key_f"
+          "void_name": "keyboard_key.f"
         },
         {
           "name": "KEY_G",
           "value": 71,
-          "void_name": "key_g"
+          "void_name": "keyboard_key.g"
         },
         {
           "name": "KEY_H",
           "value": 72,
-          "void_name": "key_h"
+          "void_name": "keyboard_key.h"
         },
         {
           "name": "KEY_I",
           "value": 73,
-          "void_name": "key_i"
+          "void_name": "keyboard_key.i"
         },
         {
           "name": "KEY_J",
           "value": 74,
-          "void_name": "key_j"
+          "void_name": "keyboard_key.j"
         },
         {
           "name": "KEY_K",
           "value": 75,
-          "void_name": "key_k"
+          "void_name": "keyboard_key.k"
         },
         {
           "name": "KEY_L",
           "value": 76,
-          "void_name": "key_l"
+          "void_name": "keyboard_key.l"
         },
         {
           "name": "KEY_M",
           "value": 77,
-          "void_name": "key_m"
+          "void_name": "keyboard_key.m"
         },
         {
           "name": "KEY_N",
           "value": 78,
-          "void_name": "key_n"
+          "void_name": "keyboard_key.n"
         },
         {
           "name": "KEY_O",
           "value": 79,
-          "void_name": "key_o"
+          "void_name": "keyboard_key.o"
         },
         {
           "name": "KEY_P",
           "value": 80,
-          "void_name": "key_p"
+          "void_name": "keyboard_key.p"
         },
         {
           "name": "KEY_Q",
           "value": 81,
-          "void_name": "key_q"
+          "void_name": "keyboard_key.q"
         },
         {
           "name": "KEY_R",
           "value": 82,
-          "void_name": "key_r"
+          "void_name": "keyboard_key.r"
         },
         {
           "name": "KEY_S",
           "value": 83,
-          "void_name": "key_s"
+          "void_name": "keyboard_key.s"
         },
         {
           "name": "KEY_T",
           "value": 84,
-          "void_name": "key_t"
+          "void_name": "keyboard_key.t"
         },
         {
           "name": "KEY_U",
           "value": 85,
-          "void_name": "key_u"
+          "void_name": "keyboard_key.u"
         },
         {
           "name": "KEY_V",
           "value": 86,
-          "void_name": "key_v"
+          "void_name": "keyboard_key.v"
         },
         {
           "name": "KEY_W",
           "value": 87,
-          "void_name": "key_w"
+          "void_name": "keyboard_key.w"
         },
         {
           "name": "KEY_X",
           "value": 88,
-          "void_name": "key_x"
+          "void_name": "keyboard_key.x"
         },
         {
           "name": "KEY_Y",
           "value": 89,
-          "void_name": "key_y"
+          "void_name": "keyboard_key.y"
         },
         {
           "name": "KEY_Z",
           "value": 90,
-          "void_name": "key_z"
+          "void_name": "keyboard_key.z"
         },
         {
           "name": "KEY_LEFT_BRACKET",
           "value": 91,
-          "void_name": "key_left_bracket"
+          "void_name": "keyboard_key.left_bracket"
         },
         {
           "name": "KEY_BACKSLASH",
           "value": 92,
-          "void_name": "key_backslash"
+          "void_name": "keyboard_key.backslash"
         },
         {
           "name": "KEY_RIGHT_BRACKET",
           "value": 93,
-          "void_name": "key_right_bracket"
+          "void_name": "keyboard_key.right_bracket"
         },
         {
           "name": "KEY_GRAVE",
           "value": 96,
-          "void_name": "key_grave"
+          "void_name": "keyboard_key.grave"
         },
         {
           "name": "KEY_SPACE",
           "value": 32,
-          "void_name": "key_space"
+          "void_name": "keyboard_key.space"
         },
         {
           "name": "KEY_ESCAPE",
           "value": 256,
-          "void_name": "key_escape"
+          "void_name": "keyboard_key.escape"
         },
         {
           "name": "KEY_ENTER",
           "value": 257,
-          "void_name": "key_enter"
+          "void_name": "keyboard_key.enter"
         },
         {
           "name": "KEY_TAB",
           "value": 258,
-          "void_name": "key_tab"
+          "void_name": "keyboard_key.tab"
         },
         {
           "name": "KEY_BACKSPACE",
           "value": 259,
-          "void_name": "key_backspace"
+          "void_name": "keyboard_key.backspace"
         },
         {
           "name": "KEY_INSERT",
           "value": 260,
-          "void_name": "key_insert"
+          "void_name": "keyboard_key.insert"
         },
         {
           "name": "KEY_DELETE",
           "value": 261,
-          "void_name": "key_delete"
+          "void_name": "keyboard_key.delete"
         },
         {
           "name": "KEY_RIGHT",
           "value": 262,
-          "void_name": "key_right"
+          "void_name": "keyboard_key.right"
         },
         {
           "name": "KEY_LEFT",
           "value": 263,
-          "void_name": "key_left"
+          "void_name": "keyboard_key.left"
         },
         {
           "name": "KEY_DOWN",
           "value": 264,
-          "void_name": "key_down"
+          "void_name": "keyboard_key.down"
         },
         {
           "name": "KEY_UP",
           "value": 265,
-          "void_name": "key_up"
+          "void_name": "keyboard_key.up"
         },
         {
           "name": "KEY_PAGE_UP",
           "value": 266,
-          "void_name": "key_page_up"
+          "void_name": "keyboard_key.page_up"
         },
         {
           "name": "KEY_PAGE_DOWN",
           "value": 267,
-          "void_name": "key_page_down"
+          "void_name": "keyboard_key.page_down"
         },
         {
           "name": "KEY_HOME",
           "value": 268,
-          "void_name": "key_home"
+          "void_name": "keyboard_key.home"
         },
         {
           "name": "KEY_END",
           "value": 269,
-          "void_name": "key_end"
+          "void_name": "keyboard_key.end"
         },
         {
           "name": "KEY_CAPS_LOCK",
           "value": 280,
-          "void_name": "key_caps_lock"
+          "void_name": "keyboard_key.caps_lock"
         },
         {
           "name": "KEY_SCROLL_LOCK",
           "value": 281,
-          "void_name": "key_scroll_lock"
+          "void_name": "keyboard_key.scroll_lock"
         },
         {
           "name": "KEY_NUM_LOCK",
           "value": 282,
-          "void_name": "key_num_lock"
+          "void_name": "keyboard_key.num_lock"
         },
         {
           "name": "KEY_PRINT_SCREEN",
           "value": 283,
-          "void_name": "key_print_screen"
+          "void_name": "keyboard_key.print_screen"
         },
         {
           "name": "KEY_PAUSE",
           "value": 284,
-          "void_name": "key_pause"
+          "void_name": "keyboard_key.pause"
         },
         {
           "name": "KEY_F1",
           "value": 290,
-          "void_name": "key_f1"
+          "void_name": "keyboard_key.f1"
         },
         {
           "name": "KEY_F2",
           "value": 291,
-          "void_name": "key_f2"
+          "void_name": "keyboard_key.f2"
         },
         {
           "name": "KEY_F3",
           "value": 292,
-          "void_name": "key_f3"
+          "void_name": "keyboard_key.f3"
         },
         {
           "name": "KEY_F4",
           "value": 293,
-          "void_name": "key_f4"
+          "void_name": "keyboard_key.f4"
         },
         {
           "name": "KEY_F5",
           "value": 294,
-          "void_name": "key_f5"
+          "void_name": "keyboard_key.f5"
         },
         {
           "name": "KEY_F6",
           "value": 295,
-          "void_name": "key_f6"
+          "void_name": "keyboard_key.f6"
         },
         {
           "name": "KEY_F7",
           "value": 296,
-          "void_name": "key_f7"
+          "void_name": "keyboard_key.f7"
         },
         {
           "name": "KEY_F8",
           "value": 297,
-          "void_name": "key_f8"
+          "void_name": "keyboard_key.f8"
         },
         {
           "name": "KEY_F9",
           "value": 298,
-          "void_name": "key_f9"
+          "void_name": "keyboard_key.f9"
         },
         {
           "name": "KEY_F10",
           "value": 299,
-          "void_name": "key_f10"
+          "void_name": "keyboard_key.f10"
         },
         {
           "name": "KEY_F11",
           "value": 300,
-          "void_name": "key_f11"
+          "void_name": "keyboard_key.f11"
         },
         {
           "name": "KEY_F12",
           "value": 301,
-          "void_name": "key_f12"
+          "void_name": "keyboard_key.f12"
         },
         {
           "name": "KEY_LEFT_SHIFT",
           "value": 340,
-          "void_name": "key_left_shift"
+          "void_name": "keyboard_key.left_shift"
         },
         {
           "name": "KEY_LEFT_CONTROL",
           "value": 341,
-          "void_name": "key_left_control"
+          "void_name": "keyboard_key.left_control"
         },
         {
           "name": "KEY_LEFT_ALT",
           "value": 342,
-          "void_name": "key_left_alt"
+          "void_name": "keyboard_key.left_alt"
         },
         {
           "name": "KEY_LEFT_SUPER",
           "value": 343,
-          "void_name": "key_left_super"
+          "void_name": "keyboard_key.left_super"
         },
         {
           "name": "KEY_RIGHT_SHIFT",
           "value": 344,
-          "void_name": "key_right_shift"
+          "void_name": "keyboard_key.right_shift"
         },
         {
           "name": "KEY_RIGHT_CONTROL",
           "value": 345,
-          "void_name": "key_right_control"
+          "void_name": "keyboard_key.right_control"
         },
         {
           "name": "KEY_RIGHT_ALT",
           "value": 346,
-          "void_name": "key_right_alt"
+          "void_name": "keyboard_key.right_alt"
         },
         {
           "name": "KEY_RIGHT_SUPER",
           "value": 347,
-          "void_name": "key_right_super"
+          "void_name": "keyboard_key.right_super"
         },
         {
           "name": "KEY_KB_MENU",
           "value": 348,
-          "void_name": "key_kb_menu"
+          "void_name": "keyboard_key.kb_menu"
         },
         {
           "name": "KEY_KP_0",
           "value": 320,
-          "void_name": "key_kp_0"
+          "void_name": "keyboard_key.kp_0"
         },
         {
           "name": "KEY_KP_1",
           "value": 321,
-          "void_name": "key_kp_1"
+          "void_name": "keyboard_key.kp_1"
         },
         {
           "name": "KEY_KP_2",
           "value": 322,
-          "void_name": "key_kp_2"
+          "void_name": "keyboard_key.kp_2"
         },
         {
           "name": "KEY_KP_3",
           "value": 323,
-          "void_name": "key_kp_3"
+          "void_name": "keyboard_key.kp_3"
         },
         {
           "name": "KEY_KP_4",
           "value": 324,
-          "void_name": "key_kp_4"
+          "void_name": "keyboard_key.kp_4"
         },
         {
           "name": "KEY_KP_5",
           "value": 325,
-          "void_name": "key_kp_5"
+          "void_name": "keyboard_key.kp_5"
         },
         {
           "name": "KEY_KP_6",
           "value": 326,
-          "void_name": "key_kp_6"
+          "void_name": "keyboard_key.kp_6"
         },
         {
           "name": "KEY_KP_7",
           "value": 327,
-          "void_name": "key_kp_7"
+          "void_name": "keyboard_key.kp_7"
         },
         {
           "name": "KEY_KP_8",
           "value": 328,
-          "void_name": "key_kp_8"
+          "void_name": "keyboard_key.kp_8"
         },
         {
           "name": "KEY_KP_9",
           "value": 329,
-          "void_name": "key_kp_9"
+          "void_name": "keyboard_key.kp_9"
         },
         {
           "name": "KEY_KP_DECIMAL",
           "value": 330,
-          "void_name": "key_kp_decimal"
+          "void_name": "keyboard_key.kp_decimal"
         },
         {
           "name": "KEY_KP_DIVIDE",
           "value": 331,
-          "void_name": "key_kp_divide"
+          "void_name": "keyboard_key.kp_divide"
         },
         {
           "name": "KEY_KP_MULTIPLY",
           "value": 332,
-          "void_name": "key_kp_multiply"
+          "void_name": "keyboard_key.kp_multiply"
         },
         {
           "name": "KEY_KP_SUBTRACT",
           "value": 333,
-          "void_name": "key_kp_subtract"
+          "void_name": "keyboard_key.kp_subtract"
         },
         {
           "name": "KEY_KP_ADD",
           "value": 334,
-          "void_name": "key_kp_add"
+          "void_name": "keyboard_key.kp_add"
         },
         {
           "name": "KEY_KP_ENTER",
           "value": 335,
-          "void_name": "key_kp_enter"
+          "void_name": "keyboard_key.kp_enter"
         },
         {
           "name": "KEY_KP_EQUAL",
           "value": 336,
-          "void_name": "key_kp_equal"
+          "void_name": "keyboard_key.kp_equal"
         },
         {
           "name": "KEY_BACK",
           "value": 4,
-          "void_name": "key_back"
+          "void_name": "keyboard_key.back"
         },
         {
           "name": "KEY_MENU",
           "value": 5,
-          "void_name": "key_menu"
+          "void_name": "keyboard_key.menu"
         },
         {
           "name": "KEY_VOLUME_UP",
           "value": 24,
-          "void_name": "key_volume_up"
+          "void_name": "keyboard_key.volume_up"
         },
         {
           "name": "KEY_VOLUME_DOWN",
           "value": 25,
-          "void_name": "key_volume_down"
+          "void_name": "keyboard_key.volume_down"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "keyboard_key",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12158,42 +12161,43 @@
         {
           "name": "MOUSE_BUTTON_LEFT",
           "value": 0,
-          "void_name": "mouse_button_left"
+          "void_name": "mouse_button.left"
         },
         {
           "name": "MOUSE_BUTTON_RIGHT",
           "value": 1,
-          "void_name": "mouse_button_right"
+          "void_name": "mouse_button.right"
         },
         {
           "name": "MOUSE_BUTTON_MIDDLE",
           "value": 2,
-          "void_name": "mouse_button_middle"
+          "void_name": "mouse_button.middle"
         },
         {
           "name": "MOUSE_BUTTON_SIDE",
           "value": 3,
-          "void_name": "mouse_button_side"
+          "void_name": "mouse_button.side"
         },
         {
           "name": "MOUSE_BUTTON_EXTRA",
           "value": 4,
-          "void_name": "mouse_button_extra"
+          "void_name": "mouse_button.extra"
         },
         {
           "name": "MOUSE_BUTTON_FORWARD",
           "value": 5,
-          "void_name": "mouse_button_forward"
+          "void_name": "mouse_button.forward"
         },
         {
           "name": "MOUSE_BUTTON_BACK",
           "value": 6,
-          "void_name": "mouse_button_back"
+          "void_name": "mouse_button.back"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "mouse_button",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12204,62 +12208,63 @@
         {
           "name": "MOUSE_CURSOR_DEFAULT",
           "value": 0,
-          "void_name": "mouse_cursor_default"
+          "void_name": "mouse_cursor.default"
         },
         {
           "name": "MOUSE_CURSOR_ARROW",
           "value": 1,
-          "void_name": "mouse_cursor_arrow"
+          "void_name": "mouse_cursor.arrow"
         },
         {
           "name": "MOUSE_CURSOR_IBEAM",
           "value": 2,
-          "void_name": "mouse_cursor_ibeam"
+          "void_name": "mouse_cursor.ibeam"
         },
         {
           "name": "MOUSE_CURSOR_CROSSHAIR",
           "value": 3,
-          "void_name": "mouse_cursor_crosshair"
+          "void_name": "mouse_cursor.crosshair"
         },
         {
           "name": "MOUSE_CURSOR_POINTING_HAND",
           "value": 4,
-          "void_name": "mouse_cursor_pointing_hand"
+          "void_name": "mouse_cursor.pointing_hand"
         },
         {
           "name": "MOUSE_CURSOR_RESIZE_EW",
           "value": 5,
-          "void_name": "mouse_cursor_resize_ew"
+          "void_name": "mouse_cursor.resize_ew"
         },
         {
           "name": "MOUSE_CURSOR_RESIZE_NS",
           "value": 6,
-          "void_name": "mouse_cursor_resize_ns"
+          "void_name": "mouse_cursor.resize_ns"
         },
         {
           "name": "MOUSE_CURSOR_RESIZE_NWSE",
           "value": 7,
-          "void_name": "mouse_cursor_resize_nwse"
+          "void_name": "mouse_cursor.resize_nwse"
         },
         {
           "name": "MOUSE_CURSOR_RESIZE_NESW",
           "value": 8,
-          "void_name": "mouse_cursor_resize_nesw"
+          "void_name": "mouse_cursor.resize_nesw"
         },
         {
           "name": "MOUSE_CURSOR_RESIZE_ALL",
           "value": 9,
-          "void_name": "mouse_cursor_resize_all"
+          "void_name": "mouse_cursor.resize_all"
         },
         {
           "name": "MOUSE_CURSOR_NOT_ALLOWED",
           "value": 10,
-          "void_name": "mouse_cursor_not_allowed"
+          "void_name": "mouse_cursor.not_allowed"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "mouse_cursor",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12270,97 +12275,98 @@
         {
           "name": "GAMEPAD_BUTTON_UNKNOWN",
           "value": 0,
-          "void_name": "gamepad_button_unknown"
+          "void_name": "gamepad_button.unknown"
         },
         {
           "name": "GAMEPAD_BUTTON_LEFT_FACE_UP",
           "value": 1,
-          "void_name": "gamepad_button_left_face_up"
+          "void_name": "gamepad_button.left_face_up"
         },
         {
           "name": "GAMEPAD_BUTTON_LEFT_FACE_RIGHT",
           "value": 2,
-          "void_name": "gamepad_button_left_face_right"
+          "void_name": "gamepad_button.left_face_right"
         },
         {
           "name": "GAMEPAD_BUTTON_LEFT_FACE_DOWN",
           "value": 3,
-          "void_name": "gamepad_button_left_face_down"
+          "void_name": "gamepad_button.left_face_down"
         },
         {
           "name": "GAMEPAD_BUTTON_LEFT_FACE_LEFT",
           "value": 4,
-          "void_name": "gamepad_button_left_face_left"
+          "void_name": "gamepad_button.left_face_left"
         },
         {
           "name": "GAMEPAD_BUTTON_RIGHT_FACE_UP",
           "value": 5,
-          "void_name": "gamepad_button_right_face_up"
+          "void_name": "gamepad_button.right_face_up"
         },
         {
           "name": "GAMEPAD_BUTTON_RIGHT_FACE_RIGHT",
           "value": 6,
-          "void_name": "gamepad_button_right_face_right"
+          "void_name": "gamepad_button.right_face_right"
         },
         {
           "name": "GAMEPAD_BUTTON_RIGHT_FACE_DOWN",
           "value": 7,
-          "void_name": "gamepad_button_right_face_down"
+          "void_name": "gamepad_button.right_face_down"
         },
         {
           "name": "GAMEPAD_BUTTON_RIGHT_FACE_LEFT",
           "value": 8,
-          "void_name": "gamepad_button_right_face_left"
+          "void_name": "gamepad_button.right_face_left"
         },
         {
           "name": "GAMEPAD_BUTTON_LEFT_TRIGGER_1",
           "value": 9,
-          "void_name": "gamepad_button_left_trigger_1"
+          "void_name": "gamepad_button.left_trigger_1"
         },
         {
           "name": "GAMEPAD_BUTTON_LEFT_TRIGGER_2",
           "value": 10,
-          "void_name": "gamepad_button_left_trigger_2"
+          "void_name": "gamepad_button.left_trigger_2"
         },
         {
           "name": "GAMEPAD_BUTTON_RIGHT_TRIGGER_1",
           "value": 11,
-          "void_name": "gamepad_button_right_trigger_1"
+          "void_name": "gamepad_button.right_trigger_1"
         },
         {
           "name": "GAMEPAD_BUTTON_RIGHT_TRIGGER_2",
           "value": 12,
-          "void_name": "gamepad_button_right_trigger_2"
+          "void_name": "gamepad_button.right_trigger_2"
         },
         {
           "name": "GAMEPAD_BUTTON_MIDDLE_LEFT",
           "value": 13,
-          "void_name": "gamepad_button_middle_left"
+          "void_name": "gamepad_button.middle_left"
         },
         {
           "name": "GAMEPAD_BUTTON_MIDDLE",
           "value": 14,
-          "void_name": "gamepad_button_middle"
+          "void_name": "gamepad_button.middle"
         },
         {
           "name": "GAMEPAD_BUTTON_MIDDLE_RIGHT",
           "value": 15,
-          "void_name": "gamepad_button_middle_right"
+          "void_name": "gamepad_button.middle_right"
         },
         {
           "name": "GAMEPAD_BUTTON_LEFT_THUMB",
           "value": 16,
-          "void_name": "gamepad_button_left_thumb"
+          "void_name": "gamepad_button.left_thumb"
         },
         {
           "name": "GAMEPAD_BUTTON_RIGHT_THUMB",
           "value": 17,
-          "void_name": "gamepad_button_right_thumb"
+          "void_name": "gamepad_button.right_thumb"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "gamepad_button",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12371,37 +12377,38 @@
         {
           "name": "GAMEPAD_AXIS_LEFT_X",
           "value": 0,
-          "void_name": "gamepad_axis_left_x"
+          "void_name": "gamepad_axis.left_x"
         },
         {
           "name": "GAMEPAD_AXIS_LEFT_Y",
           "value": 1,
-          "void_name": "gamepad_axis_left_y"
+          "void_name": "gamepad_axis.left_y"
         },
         {
           "name": "GAMEPAD_AXIS_RIGHT_X",
           "value": 2,
-          "void_name": "gamepad_axis_right_x"
+          "void_name": "gamepad_axis.right_x"
         },
         {
           "name": "GAMEPAD_AXIS_RIGHT_Y",
           "value": 3,
-          "void_name": "gamepad_axis_right_y"
+          "void_name": "gamepad_axis.right_y"
         },
         {
           "name": "GAMEPAD_AXIS_LEFT_TRIGGER",
           "value": 4,
-          "void_name": "gamepad_axis_left_trigger"
+          "void_name": "gamepad_axis.left_trigger"
         },
         {
           "name": "GAMEPAD_AXIS_RIGHT_TRIGGER",
           "value": 5,
-          "void_name": "gamepad_axis_right_trigger"
+          "void_name": "gamepad_axis.right_trigger"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "gamepad_axis",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12412,62 +12419,63 @@
         {
           "name": "MATERIAL_MAP_ALBEDO",
           "value": 0,
-          "void_name": "material_map_albedo"
+          "void_name": "material_map_index.albedo"
         },
         {
           "name": "MATERIAL_MAP_METALNESS",
           "value": 1,
-          "void_name": "material_map_metalness"
+          "void_name": "material_map_index.metalness"
         },
         {
           "name": "MATERIAL_MAP_NORMAL",
           "value": 2,
-          "void_name": "material_map_normal"
+          "void_name": "material_map_index.normal"
         },
         {
           "name": "MATERIAL_MAP_ROUGHNESS",
           "value": 3,
-          "void_name": "material_map_roughness"
+          "void_name": "material_map_index.roughness"
         },
         {
           "name": "MATERIAL_MAP_OCCLUSION",
           "value": 4,
-          "void_name": "material_map_occlusion"
+          "void_name": "material_map_index.occlusion"
         },
         {
           "name": "MATERIAL_MAP_EMISSION",
           "value": 5,
-          "void_name": "material_map_emission"
+          "void_name": "material_map_index.emission"
         },
         {
           "name": "MATERIAL_MAP_HEIGHT",
           "value": 6,
-          "void_name": "material_map_height"
+          "void_name": "material_map_index.height"
         },
         {
           "name": "MATERIAL_MAP_CUBEMAP",
           "value": 7,
-          "void_name": "material_map_cubemap"
+          "void_name": "material_map_index.cubemap"
         },
         {
           "name": "MATERIAL_MAP_IRRADIANCE",
           "value": 8,
-          "void_name": "material_map_irradiance"
+          "void_name": "material_map_index.irradiance"
         },
         {
           "name": "MATERIAL_MAP_PREFILTER",
           "value": 9,
-          "void_name": "material_map_prefilter"
+          "void_name": "material_map_index.prefilter"
         },
         {
           "name": "MATERIAL_MAP_BRDF",
           "value": 10,
-          "void_name": "material_map_brdf"
+          "void_name": "material_map_index.brdf"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "material_map_index",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12478,157 +12486,158 @@
         {
           "name": "SHADER_LOC_VERTEX_POSITION",
           "value": 0,
-          "void_name": "shader_loc_vertex_position"
+          "void_name": "shader_location_index.vertex_position"
         },
         {
           "name": "SHADER_LOC_VERTEX_TEXCOORD01",
           "value": 1,
-          "void_name": "shader_loc_vertex_texcoord01"
+          "void_name": "shader_location_index.vertex_texcoord01"
         },
         {
           "name": "SHADER_LOC_VERTEX_TEXCOORD02",
           "value": 2,
-          "void_name": "shader_loc_vertex_texcoord02"
+          "void_name": "shader_location_index.vertex_texcoord02"
         },
         {
           "name": "SHADER_LOC_VERTEX_NORMAL",
           "value": 3,
-          "void_name": "shader_loc_vertex_normal"
+          "void_name": "shader_location_index.vertex_normal"
         },
         {
           "name": "SHADER_LOC_VERTEX_TANGENT",
           "value": 4,
-          "void_name": "shader_loc_vertex_tangent"
+          "void_name": "shader_location_index.vertex_tangent"
         },
         {
           "name": "SHADER_LOC_VERTEX_COLOR",
           "value": 5,
-          "void_name": "shader_loc_vertex_color"
+          "void_name": "shader_location_index.vertex_color"
         },
         {
           "name": "SHADER_LOC_MATRIX_MVP",
           "value": 6,
-          "void_name": "shader_loc_matrix_mvp"
+          "void_name": "shader_location_index.matrix_mvp"
         },
         {
           "name": "SHADER_LOC_MATRIX_VIEW",
           "value": 7,
-          "void_name": "shader_loc_matrix_view"
+          "void_name": "shader_location_index.matrix_view"
         },
         {
           "name": "SHADER_LOC_MATRIX_PROJECTION",
           "value": 8,
-          "void_name": "shader_loc_matrix_projection"
+          "void_name": "shader_location_index.matrix_projection"
         },
         {
           "name": "SHADER_LOC_MATRIX_MODEL",
           "value": 9,
-          "void_name": "shader_loc_matrix_model"
+          "void_name": "shader_location_index.matrix_model"
         },
         {
           "name": "SHADER_LOC_MATRIX_NORMAL",
           "value": 10,
-          "void_name": "shader_loc_matrix_normal"
+          "void_name": "shader_location_index.matrix_normal"
         },
         {
           "name": "SHADER_LOC_VECTOR_VIEW",
           "value": 11,
-          "void_name": "shader_loc_vector_view"
+          "void_name": "shader_location_index.vector_view"
         },
         {
           "name": "SHADER_LOC_COLOR_DIFFUSE",
           "value": 12,
-          "void_name": "shader_loc_color_diffuse"
+          "void_name": "shader_location_index.color_diffuse"
         },
         {
           "name": "SHADER_LOC_COLOR_SPECULAR",
           "value": 13,
-          "void_name": "shader_loc_color_specular"
+          "void_name": "shader_location_index.color_specular"
         },
         {
           "name": "SHADER_LOC_COLOR_AMBIENT",
           "value": 14,
-          "void_name": "shader_loc_color_ambient"
+          "void_name": "shader_location_index.color_ambient"
         },
         {
           "name": "SHADER_LOC_MAP_ALBEDO",
           "value": 15,
-          "void_name": "shader_loc_map_albedo"
+          "void_name": "shader_location_index.map_albedo"
         },
         {
           "name": "SHADER_LOC_MAP_METALNESS",
           "value": 16,
-          "void_name": "shader_loc_map_metalness"
+          "void_name": "shader_location_index.map_metalness"
         },
         {
           "name": "SHADER_LOC_MAP_NORMAL",
           "value": 17,
-          "void_name": "shader_loc_map_normal"
+          "void_name": "shader_location_index.map_normal"
         },
         {
           "name": "SHADER_LOC_MAP_ROUGHNESS",
           "value": 18,
-          "void_name": "shader_loc_map_roughness"
+          "void_name": "shader_location_index.map_roughness"
         },
         {
           "name": "SHADER_LOC_MAP_OCCLUSION",
           "value": 19,
-          "void_name": "shader_loc_map_occlusion"
+          "void_name": "shader_location_index.map_occlusion"
         },
         {
           "name": "SHADER_LOC_MAP_EMISSION",
           "value": 20,
-          "void_name": "shader_loc_map_emission"
+          "void_name": "shader_location_index.map_emission"
         },
         {
           "name": "SHADER_LOC_MAP_HEIGHT",
           "value": 21,
-          "void_name": "shader_loc_map_height"
+          "void_name": "shader_location_index.map_height"
         },
         {
           "name": "SHADER_LOC_MAP_CUBEMAP",
           "value": 22,
-          "void_name": "shader_loc_map_cubemap"
+          "void_name": "shader_location_index.map_cubemap"
         },
         {
           "name": "SHADER_LOC_MAP_IRRADIANCE",
           "value": 23,
-          "void_name": "shader_loc_map_irradiance"
+          "void_name": "shader_location_index.map_irradiance"
         },
         {
           "name": "SHADER_LOC_MAP_PREFILTER",
           "value": 24,
-          "void_name": "shader_loc_map_prefilter"
+          "void_name": "shader_location_index.map_prefilter"
         },
         {
           "name": "SHADER_LOC_MAP_BRDF",
           "value": 25,
-          "void_name": "shader_loc_map_brdf"
+          "void_name": "shader_location_index.map_brdf"
         },
         {
           "name": "SHADER_LOC_VERTEX_BONEIDS",
           "value": 26,
-          "void_name": "shader_loc_vertex_boneids"
+          "void_name": "shader_location_index.vertex_boneids"
         },
         {
           "name": "SHADER_LOC_VERTEX_BONEWEIGHTS",
           "value": 27,
-          "void_name": "shader_loc_vertex_boneweights"
+          "void_name": "shader_location_index.vertex_boneweights"
         },
         {
           "name": "SHADER_LOC_MATRIX_BONETRANSFORMS",
           "value": 28,
-          "void_name": "shader_loc_matrix_bonetransforms"
+          "void_name": "shader_location_index.matrix_bonetransforms"
         },
         {
           "name": "SHADER_LOC_VERTEX_INSTANCETRANSFORM",
           "value": 29,
-          "void_name": "shader_loc_vertex_instancetransform"
+          "void_name": "shader_location_index.vertex_instancetransform"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "shader_location_index",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12639,72 +12648,73 @@
         {
           "name": "SHADER_UNIFORM_FLOAT",
           "value": 0,
-          "void_name": "shader_uniform_float"
+          "void_name": "shader_uniform_type.float"
         },
         {
           "name": "SHADER_UNIFORM_VEC2",
           "value": 1,
-          "void_name": "shader_uniform_vec2"
+          "void_name": "shader_uniform_type.vec2"
         },
         {
           "name": "SHADER_UNIFORM_VEC3",
           "value": 2,
-          "void_name": "shader_uniform_vec3"
+          "void_name": "shader_uniform_type.vec3"
         },
         {
           "name": "SHADER_UNIFORM_VEC4",
           "value": 3,
-          "void_name": "shader_uniform_vec4"
+          "void_name": "shader_uniform_type.vec4"
         },
         {
           "name": "SHADER_UNIFORM_INT",
           "value": 4,
-          "void_name": "shader_uniform_int"
+          "void_name": "shader_uniform_type.int"
         },
         {
           "name": "SHADER_UNIFORM_IVEC2",
           "value": 5,
-          "void_name": "shader_uniform_ivec2"
+          "void_name": "shader_uniform_type.ivec2"
         },
         {
           "name": "SHADER_UNIFORM_IVEC3",
           "value": 6,
-          "void_name": "shader_uniform_ivec3"
+          "void_name": "shader_uniform_type.ivec3"
         },
         {
           "name": "SHADER_UNIFORM_IVEC4",
           "value": 7,
-          "void_name": "shader_uniform_ivec4"
+          "void_name": "shader_uniform_type.ivec4"
         },
         {
           "name": "SHADER_UNIFORM_UINT",
           "value": 8,
-          "void_name": "shader_uniform_uint"
+          "void_name": "shader_uniform_type.uint"
         },
         {
           "name": "SHADER_UNIFORM_UIVEC2",
           "value": 9,
-          "void_name": "shader_uniform_uivec2"
+          "void_name": "shader_uniform_type.uivec2"
         },
         {
           "name": "SHADER_UNIFORM_UIVEC3",
           "value": 10,
-          "void_name": "shader_uniform_uivec3"
+          "void_name": "shader_uniform_type.uivec3"
         },
         {
           "name": "SHADER_UNIFORM_UIVEC4",
           "value": 11,
-          "void_name": "shader_uniform_uivec4"
+          "void_name": "shader_uniform_type.uivec4"
         },
         {
           "name": "SHADER_UNIFORM_SAMPLER2D",
           "value": 12,
-          "void_name": "shader_uniform_sampler2d"
+          "void_name": "shader_uniform_type.sampler2d"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "shader_uniform_type",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12715,27 +12725,28 @@
         {
           "name": "SHADER_ATTRIB_FLOAT",
           "value": 0,
-          "void_name": "shader_attrib_float"
+          "void_name": "shader_attribute_type.float"
         },
         {
           "name": "SHADER_ATTRIB_VEC2",
           "value": 1,
-          "void_name": "shader_attrib_vec2"
+          "void_name": "shader_attribute_type.vec2"
         },
         {
           "name": "SHADER_ATTRIB_VEC3",
           "value": 2,
-          "void_name": "shader_attrib_vec3"
+          "void_name": "shader_attribute_type.vec3"
         },
         {
           "name": "SHADER_ATTRIB_VEC4",
           "value": 3,
-          "void_name": "shader_attrib_vec4"
+          "void_name": "shader_attribute_type.vec4"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "shader_attribute_type",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12746,127 +12757,128 @@
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_GRAYSCALE",
           "value": 1,
-          "void_name": "pixelformat_uncompressed_grayscale"
+          "void_name": "pixel_format.uncompressed_grayscale"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA",
           "value": 2,
-          "void_name": "pixelformat_uncompressed_gray_alpha"
+          "void_name": "pixel_format.uncompressed_gray_alpha"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R5G6B5",
           "value": 3,
-          "void_name": "pixelformat_uncompressed_r5g6b5"
+          "void_name": "pixel_format.uncompressed_r5g6b5"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R8G8B8",
           "value": 4,
-          "void_name": "pixelformat_uncompressed_r8g8b8"
+          "void_name": "pixel_format.uncompressed_r8g8b8"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R5G5B5A1",
           "value": 5,
-          "void_name": "pixelformat_uncompressed_r5g5b5a1"
+          "void_name": "pixel_format.uncompressed_r5g5b5a1"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R4G4B4A4",
           "value": 6,
-          "void_name": "pixelformat_uncompressed_r4g4b4a4"
+          "void_name": "pixel_format.uncompressed_r4g4b4a4"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R8G8B8A8",
           "value": 7,
-          "void_name": "pixelformat_uncompressed_r8g8b8a8"
+          "void_name": "pixel_format.uncompressed_r8g8b8a8"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R32",
           "value": 8,
-          "void_name": "pixelformat_uncompressed_r32"
+          "void_name": "pixel_format.uncompressed_r32"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R32G32B32",
           "value": 9,
-          "void_name": "pixelformat_uncompressed_r32g32b32"
+          "void_name": "pixel_format.uncompressed_r32g32b32"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R32G32B32A32",
           "value": 10,
-          "void_name": "pixelformat_uncompressed_r32g32b32a32"
+          "void_name": "pixel_format.uncompressed_r32g32b32a32"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R16",
           "value": 11,
-          "void_name": "pixelformat_uncompressed_r16"
+          "void_name": "pixel_format.uncompressed_r16"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R16G16B16",
           "value": 12,
-          "void_name": "pixelformat_uncompressed_r16g16b16"
+          "void_name": "pixel_format.uncompressed_r16g16b16"
         },
         {
           "name": "PIXELFORMAT_UNCOMPRESSED_R16G16B16A16",
           "value": 13,
-          "void_name": "pixelformat_uncompressed_r16g16b16a16"
+          "void_name": "pixel_format.uncompressed_r16g16b16a16"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_DXT1_RGB",
           "value": 14,
-          "void_name": "pixelformat_compressed_dxt1_rgb"
+          "void_name": "pixel_format.compressed_dxt1_rgb"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_DXT1_RGBA",
           "value": 15,
-          "void_name": "pixelformat_compressed_dxt1_rgba"
+          "void_name": "pixel_format.compressed_dxt1_rgba"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_DXT3_RGBA",
           "value": 16,
-          "void_name": "pixelformat_compressed_dxt3_rgba"
+          "void_name": "pixel_format.compressed_dxt3_rgba"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_DXT5_RGBA",
           "value": 17,
-          "void_name": "pixelformat_compressed_dxt5_rgba"
+          "void_name": "pixel_format.compressed_dxt5_rgba"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_ETC1_RGB",
           "value": 18,
-          "void_name": "pixelformat_compressed_etc1_rgb"
+          "void_name": "pixel_format.compressed_etc1_rgb"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_ETC2_RGB",
           "value": 19,
-          "void_name": "pixelformat_compressed_etc2_rgb"
+          "void_name": "pixel_format.compressed_etc2_rgb"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA",
           "value": 20,
-          "void_name": "pixelformat_compressed_etc2_eac_rgba"
+          "void_name": "pixel_format.compressed_etc2_eac_rgba"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_PVRT_RGB",
           "value": 21,
-          "void_name": "pixelformat_compressed_pvrt_rgb"
+          "void_name": "pixel_format.compressed_pvrt_rgb"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_PVRT_RGBA",
           "value": 22,
-          "void_name": "pixelformat_compressed_pvrt_rgba"
+          "void_name": "pixel_format.compressed_pvrt_rgba"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA",
           "value": 23,
-          "void_name": "pixelformat_compressed_astc_4x4_rgba"
+          "void_name": "pixel_format.compressed_astc_4x4_rgba"
         },
         {
           "name": "PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA",
           "value": 24,
-          "void_name": "pixelformat_compressed_astc_8x8_rgba"
+          "void_name": "pixel_format.compressed_astc_8x8_rgba"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "pixel_format",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12877,37 +12889,38 @@
         {
           "name": "TEXTURE_FILTER_POINT",
           "value": 0,
-          "void_name": "texture_filter_point"
+          "void_name": "texture_filter.point"
         },
         {
           "name": "TEXTURE_FILTER_BILINEAR",
           "value": 1,
-          "void_name": "texture_filter_bilinear"
+          "void_name": "texture_filter.bilinear"
         },
         {
           "name": "TEXTURE_FILTER_TRILINEAR",
           "value": 2,
-          "void_name": "texture_filter_trilinear"
+          "void_name": "texture_filter.trilinear"
         },
         {
           "name": "TEXTURE_FILTER_ANISOTROPIC_4X",
           "value": 3,
-          "void_name": "texture_filter_anisotropic_4x"
+          "void_name": "texture_filter.anisotropic_4x"
         },
         {
           "name": "TEXTURE_FILTER_ANISOTROPIC_8X",
           "value": 4,
-          "void_name": "texture_filter_anisotropic_8x"
+          "void_name": "texture_filter.anisotropic_8x"
         },
         {
           "name": "TEXTURE_FILTER_ANISOTROPIC_16X",
           "value": 5,
-          "void_name": "texture_filter_anisotropic_16x"
+          "void_name": "texture_filter.anisotropic_16x"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "texture_filter",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12918,27 +12931,28 @@
         {
           "name": "TEXTURE_WRAP_REPEAT",
           "value": 0,
-          "void_name": "texture_wrap_repeat"
+          "void_name": "texture_wrap.repeat"
         },
         {
           "name": "TEXTURE_WRAP_CLAMP",
           "value": 1,
-          "void_name": "texture_wrap_clamp"
+          "void_name": "texture_wrap.clamp"
         },
         {
           "name": "TEXTURE_WRAP_MIRROR_REPEAT",
           "value": 2,
-          "void_name": "texture_wrap_mirror_repeat"
+          "void_name": "texture_wrap.mirror_repeat"
         },
         {
           "name": "TEXTURE_WRAP_MIRROR_CLAMP",
           "value": 3,
-          "void_name": "texture_wrap_mirror_clamp"
+          "void_name": "texture_wrap.mirror_clamp"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "texture_wrap",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12949,32 +12963,33 @@
         {
           "name": "CUBEMAP_LAYOUT_AUTO_DETECT",
           "value": 0,
-          "void_name": "cubemap_layout_auto_detect"
+          "void_name": "cubemap_layout.auto_detect"
         },
         {
           "name": "CUBEMAP_LAYOUT_LINE_VERTICAL",
           "value": 1,
-          "void_name": "cubemap_layout_line_vertical"
+          "void_name": "cubemap_layout.line_vertical"
         },
         {
           "name": "CUBEMAP_LAYOUT_LINE_HORIZONTAL",
           "value": 2,
-          "void_name": "cubemap_layout_line_horizontal"
+          "void_name": "cubemap_layout.line_horizontal"
         },
         {
           "name": "CUBEMAP_LAYOUT_CROSS_THREE_BY_FOUR",
           "value": 3,
-          "void_name": "cubemap_layout_cross_three_by_four"
+          "void_name": "cubemap_layout.cross_three_by_four"
         },
         {
           "name": "CUBEMAP_LAYOUT_CROSS_FOUR_BY_THREE",
           "value": 4,
-          "void_name": "cubemap_layout_cross_four_by_three"
+          "void_name": "cubemap_layout.cross_four_by_three"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "cubemap_layout",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -12985,22 +13000,23 @@
         {
           "name": "FONT_DEFAULT",
           "value": 0,
-          "void_name": "font_default"
+          "void_name": "font_type.default"
         },
         {
           "name": "FONT_BITMAP",
           "value": 1,
-          "void_name": "font_bitmap"
+          "void_name": "font_type.bitmap"
         },
         {
           "name": "FONT_SDF",
           "value": 2,
-          "void_name": "font_sdf"
+          "void_name": "font_type.sdf"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "font_type",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -13011,47 +13027,48 @@
         {
           "name": "BLEND_ALPHA",
           "value": 0,
-          "void_name": "blend_alpha"
+          "void_name": "blend_mode.alpha"
         },
         {
           "name": "BLEND_ADDITIVE",
           "value": 1,
-          "void_name": "blend_additive"
+          "void_name": "blend_mode.additive"
         },
         {
           "name": "BLEND_MULTIPLIED",
           "value": 2,
-          "void_name": "blend_multiplied"
+          "void_name": "blend_mode.multiplied"
         },
         {
           "name": "BLEND_ADD_COLORS",
           "value": 3,
-          "void_name": "blend_add_colors"
+          "void_name": "blend_mode.add_colors"
         },
         {
           "name": "BLEND_SUBTRACT_COLORS",
           "value": 4,
-          "void_name": "blend_subtract_colors"
+          "void_name": "blend_mode.subtract_colors"
         },
         {
           "name": "BLEND_ALPHA_PREMULTIPLY",
           "value": 5,
-          "void_name": "blend_alpha_premultiply"
+          "void_name": "blend_mode.alpha_premultiply"
         },
         {
           "name": "BLEND_CUSTOM",
           "value": 6,
-          "void_name": "blend_custom"
+          "void_name": "blend_mode.custom"
         },
         {
           "name": "BLEND_CUSTOM_SEPARATE",
           "value": 7,
-          "void_name": "blend_custom_separate"
+          "void_name": "blend_mode.custom_separate"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "blend_mode",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -13062,62 +13079,63 @@
         {
           "name": "GESTURE_NONE",
           "value": 0,
-          "void_name": "gesture_none"
+          "void_name": "gesture_flags.none"
         },
         {
           "name": "GESTURE_TAP",
           "value": 1,
-          "void_name": "gesture_tap"
+          "void_name": "gesture_flags.tap"
         },
         {
           "name": "GESTURE_DOUBLETAP",
           "value": 2,
-          "void_name": "gesture_doubletap"
+          "void_name": "gesture_flags.doubletap"
         },
         {
           "name": "GESTURE_HOLD",
           "value": 4,
-          "void_name": "gesture_hold"
+          "void_name": "gesture_flags.hold"
         },
         {
           "name": "GESTURE_DRAG",
           "value": 8,
-          "void_name": "gesture_drag"
+          "void_name": "gesture_flags.drag"
         },
         {
           "name": "GESTURE_SWIPE_RIGHT",
           "value": 16,
-          "void_name": "gesture_swipe_right"
+          "void_name": "gesture_flags.swipe_right"
         },
         {
           "name": "GESTURE_SWIPE_LEFT",
           "value": 32,
-          "void_name": "gesture_swipe_left"
+          "void_name": "gesture_flags.swipe_left"
         },
         {
           "name": "GESTURE_SWIPE_UP",
           "value": 64,
-          "void_name": "gesture_swipe_up"
+          "void_name": "gesture_flags.swipe_up"
         },
         {
           "name": "GESTURE_SWIPE_DOWN",
           "value": 128,
-          "void_name": "gesture_swipe_down"
+          "void_name": "gesture_flags.swipe_down"
         },
         {
           "name": "GESTURE_PINCH_IN",
           "value": 256,
-          "void_name": "gesture_pinch_in"
+          "void_name": "gesture_flags.pinch_in"
         },
         {
           "name": "GESTURE_PINCH_OUT",
           "value": 512,
-          "void_name": "gesture_pinch_out"
+          "void_name": "gesture_flags.pinch_out"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "gesture_flags",
+      "implementation": "typed source flags enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -13128,32 +13146,33 @@
         {
           "name": "CAMERA_CUSTOM",
           "value": 0,
-          "void_name": "camera_custom"
+          "void_name": "camera_mode.custom"
         },
         {
           "name": "CAMERA_FREE",
           "value": 1,
-          "void_name": "camera_free"
+          "void_name": "camera_mode.free"
         },
         {
           "name": "CAMERA_ORBITAL",
           "value": 2,
-          "void_name": "camera_orbital"
+          "void_name": "camera_mode.orbital"
         },
         {
           "name": "CAMERA_FIRST_PERSON",
           "value": 3,
-          "void_name": "camera_first_person"
+          "void_name": "camera_mode.first_person"
         },
         {
           "name": "CAMERA_THIRD_PERSON",
           "value": 4,
-          "void_name": "camera_third_person"
+          "void_name": "camera_mode.third_person"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "camera_mode",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -13164,17 +13183,18 @@
         {
           "name": "CAMERA_PERSPECTIVE",
           "value": 0,
-          "void_name": "camera_perspective"
+          "void_name": "camera_projection.perspective"
         },
         {
           "name": "CAMERA_ORTHOGRAPHIC",
           "value": 1,
-          "void_name": "camera_orthographic"
+          "void_name": "camera_projection.orthographic"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "camera_projection",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     },
@@ -13185,22 +13205,23 @@
         {
           "name": "NPATCH_NINE_PATCH",
           "value": 0,
-          "void_name": "npatch_nine_patch"
+          "void_name": "n_patch_layout.nine_patch"
         },
         {
           "name": "NPATCH_THREE_PATCH_VERTICAL",
           "value": 1,
-          "void_name": "npatch_three_patch_vertical"
+          "void_name": "n_patch_layout.three_patch_vertical"
         },
         {
           "name": "NPATCH_THREE_PATCH_HORIZONTAL",
           "value": 2,
-          "void_name": "npatch_three_patch_horizontal"
+          "void_name": "n_patch_layout.three_patch_horizontal"
         }
       ],
       "native_abi": "C int constants; bitmask values preserved",
       "ownership": "value",
-      "implementation": "generated i32 constants",
+      "void_name": "n_patch_layout",
+      "implementation": "typed source numeric enum",
       "compile_verification": "native/raylib_parity.h",
       "test_coverage": "all enumerator value assertions"
     }
@@ -13601,7 +13622,7 @@
       "c_declaration": "typedef enum {\n    FLAG_VSYNC_HINT         = 0x00000040,   // Set to try enabling V-Sync on GPU\n    FLAG_FULLSCREEN_MODE    = 0x00000002,   // Set to run program in fullscreen\n    FLAG_WINDOW_RESIZABLE   = 0x00000004,   // Set to allow resizable window\n    FLAG_WINDOW_UNDECORATED = 0x00000008,   // Set to disable window decoration (frame and buttons)\n    FLAG_WINDOW_HIDDEN      = 0x00000080,   // Set to hide window\n    FLAG_WINDOW_MINIMIZED   = 0x00000200,   // Set to minimize window (iconify)\n    FLAG_WINDOW_MAXIMIZED   = 0x00000400,   // Set to maximize window (expanded to monitor)\n    FLAG_WINDOW_UNFOCUSED   = 0x00000800,   // Set to window non focused\n    FLAG_WINDOW_TOPMOST     = 0x00001000,   // Set to window always on top\n    FLAG_WINDOW_ALWAYS_RUN  = 0x00000100,   // Set to allow windows running while minimized\n    FLAG_WINDOW_TRANSPARENT = 0x00000010,   // Set to allow transparent framebuffer\n    FLAG_WINDOW_HIGHDPI     = 0x00002000,   // Set to support HighDPI\n    FLAG_WINDOW_MOUSE_PASSTHROUGH = 0x00004000, // Set to support mouse passthrough, only supported when FLAG_WINDOW_UNDECORATED\n    FLAG_BORDERLESS_WINDOWED_MODE = 0x00008000, // Set to run program in borderless windowed mode\n    FLAG_MSAA_4X_HINT       = 0x00000020,   // Set to try enabling MSAA 4X\n    FLAG_INTERLACED_HINT    = 0x00010000    // Set to try enabling interlaced video format (for V3D)\n} ConfigFlags;",
       "native_abi": "enum ConfigFlags",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13610,7 +13631,7 @@
       "c_declaration": "typedef enum {\n    LOG_ALL = 0,        // Display all logs\n    LOG_TRACE,          // Trace logging, intended for internal use only\n    LOG_DEBUG,          // Debug logging, used for internal debugging, it should be disabled on release builds\n    LOG_INFO,           // Info logging, used for program execution info\n    LOG_WARNING,        // Warning logging, used on recoverable failures\n    LOG_ERROR,          // Error logging, used on unrecoverable failures\n    LOG_FATAL,          // Fatal logging, used to abort program: exit(EXIT_FAILURE)\n    LOG_NONE            // Disable logging\n} TraceLogLevel;",
       "native_abi": "enum TraceLogLevel",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13619,7 +13640,7 @@
       "c_declaration": "typedef enum {\n    KEY_NULL            = 0,        // Key: NULL, used for no key pressed\n    // Alphanumeric keys\n    KEY_APOSTROPHE      = 39,       // Key: '\n    KEY_COMMA           = 44,       // Key: ,\n    KEY_MINUS           = 45,       // Key: -\n    KEY_PERIOD          = 46,       // Key: .\n    KEY_SLASH           = 47,       // Key: /\n    KEY_ZERO            = 48,       // Key: 0\n    KEY_ONE             = 49,       // Key: 1\n    KEY_TWO             = 50,       // Key: 2\n    KEY_THREE           = 51,       // Key: 3\n    KEY_FOUR            = 52,       // Key: 4\n    KEY_FIVE            = 53,       // Key: 5\n    KEY_SIX             = 54,       // Key: 6\n    KEY_SEVEN           = 55,       // Key: 7\n    KEY_EIGHT           = 56,       // Key: 8\n    KEY_NINE            = 57,       // Key: 9\n    KEY_SEMICOLON       = 59,       // Key: ;\n    KEY_EQUAL           = 61,       // Key: =\n    KEY_A               = 65,       // Key: A | a\n    KEY_B               = 66,       // Key: B | b\n    KEY_C               = 67,       // Key: C | c\n    KEY_D               = 68,       // Key: D | d\n    KEY_E               = 69,       // Key: E | e\n    KEY_F               = 70,       // Key: F | f\n    KEY_G               = 71,       // Key: G | g\n    KEY_H               = 72,       // Key: H | h\n    KEY_I               = 73,       // Key: I | i\n    KEY_J               = 74,       // Key: J | j\n    KEY_K               = 75,       // Key: K | k\n    KEY_L               = 76,       // Key: L | l\n    KEY_M               = 77,       // Key: M | m\n    KEY_N               = 78,       // Key: N | n\n    KEY_O               = 79,       // Key: O | o\n    KEY_P               = 80,       // Key: P | p\n    KEY_Q               = 81,       // Key: Q | q\n    KEY_R               = 82,       // Key: R | r\n    KEY_S               = 83,       // Key: S | s\n    KEY_T               = 84,       // Key: T | t\n    KEY_U               = 85,       // Key: U | u\n    KEY_V               = 86,       // Key: V | v\n    KEY_W               = 87,       // Key: W | w\n    KEY_X               = 88,       // Key: X | x\n    KEY_Y               = 89,       // Key: Y | y\n    KEY_Z               = 90,       // Key: Z | z\n    KEY_LEFT_BRACKET    = 91,       // Key: [\n    KEY_BACKSLASH       = 92,       // Key: '\\'\n    KEY_RIGHT_BRACKET   = 93,       // Key: ]\n    KEY_GRAVE           = 96,       // Key: `\n    // Function keys\n    KEY_SPACE           = 32,       // Key: Space\n    KEY_ESCAPE          = 256,      // Key: Esc\n    KEY_ENTER           = 257,      // Key: Enter\n    KEY_TAB             = 258,      // Key: Tab\n    KEY_BACKSPACE       = 259,      // Key: Backspace\n    KEY_INSERT          = 260,      // Key: Ins\n    KEY_DELETE          = 261,      // Key: Del\n    KEY_RIGHT           = 262,      // Key: Cursor right\n    KEY_LEFT            = 263,      // Key: Cursor left\n    KEY_DOWN            = 264,      // Key: Cursor down\n    KEY_UP              = 265,      // Key: Cursor up\n    KEY_PAGE_UP         = 266,      // Key: Page up\n    KEY_PAGE_DOWN       = 267,      // Key: Page down\n    KEY_HOME            = 268,      // Key: Home\n    KEY_END             = 269,      // Key: End\n    KEY_CAPS_LOCK       = 280,      // Key: Caps lock\n    KEY_SCROLL_LOCK     = 281,      // Key: Scroll down\n    KEY_NUM_LOCK        = 282,      // Key: Num lock\n    KEY_PRINT_SCREEN    = 283,      // Key: Print screen\n    KEY_PAUSE           = 284,      // Key: Pause\n    KEY_F1              = 290,      // Key: F1\n    KEY_F2              = 291,      // Key: F2\n    KEY_F3              = 292,      // Key: F3\n    KEY_F4              = 293,      // Key: F4\n    KEY_F5              = 294,      // Key: F5\n    KEY_F6              = 295,      // Key: F6\n    KEY_F7              = 296,      // Key: F7\n    KEY_F8              = 297,      // Key: F8\n    KEY_F9              = 298,      // Key: F9\n    KEY_F10             = 299,      // Key: F10\n    KEY_F11             = 300,      // Key: F11\n    KEY_F12             = 301,      // Key: F12\n    KEY_LEFT_SHIFT      = 340,      // Key: Shift left\n    KEY_LEFT_CONTROL    = 341,      // Key: Control left\n    KEY_LEFT_ALT        = 342,      // Key: Alt left\n    KEY_LEFT_SUPER      = 343,      // Key: Super left\n    KEY_RIGHT_SHIFT     = 344,      // Key: Shift right\n    KEY_RIGHT_CONTROL   = 345,      // Key: Control right\n    KEY_RIGHT_ALT       = 346,      // Key: Alt right\n    KEY_RIGHT_SUPER     = 347,      // Key: Super right\n    KEY_KB_MENU         = 348,      // Key: KB menu\n    // Keypad keys\n    KEY_KP_0            = 320,      // Key: Keypad 0\n    KEY_KP_1            = 321,      // Key: Keypad 1\n    KEY_KP_2            = 322,      // Key: Keypad 2\n    KEY_KP_3            = 323,      // Key: Keypad 3\n    KEY_KP_4            = 324,      // Key: Keypad 4\n    KEY_KP_5            = 325,      // Key: Keypad 5\n    KEY_KP_6            = 326,      // Key: Keypad 6\n    KEY_KP_7            = 327,      // Key: Keypad 7\n    KEY_KP_8            = 328,      // Key: Keypad 8\n    KEY_KP_9            = 329,      // Key: Keypad 9\n    KEY_KP_DECIMAL      = 330,      // Key: Keypad .\n    KEY_KP_DIVIDE       = 331,      // Key: Keypad /\n    KEY_KP_MULTIPLY     = 332,      // Key: Keypad *\n    KEY_KP_SUBTRACT     = 333,      // Key: Keypad -\n    KEY_KP_ADD          = 334,      // Key: Keypad +\n    KEY_KP_ENTER        = 335,      // Key: Keypad Enter\n    KEY_KP_EQUAL        = 336,      // Key: Keypad =\n    // Android key buttons\n    KEY_BACK            = 4,        // Key: Android back button\n    KEY_MENU            = 5,        // Key: Android menu button\n    KEY_VOLUME_UP       = 24,       // Key: Android volume up button\n    KEY_VOLUME_DOWN     = 25        // Key: Android volume down button\n} KeyboardKey;",
       "native_abi": "enum KeyboardKey",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13628,7 +13649,7 @@
       "c_declaration": "typedef enum {\n    MOUSE_BUTTON_LEFT    = 0,       // Mouse button left\n    MOUSE_BUTTON_RIGHT   = 1,       // Mouse button right\n    MOUSE_BUTTON_MIDDLE  = 2,       // Mouse button middle (pressed wheel)\n    MOUSE_BUTTON_SIDE    = 3,       // Mouse button side (advanced mouse device)\n    MOUSE_BUTTON_EXTRA   = 4,       // Mouse button extra (advanced mouse device)\n    MOUSE_BUTTON_FORWARD = 5,       // Mouse button forward (advanced mouse device)\n    MOUSE_BUTTON_BACK    = 6,       // Mouse button back (advanced mouse device)\n} MouseButton;",
       "native_abi": "enum MouseButton",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13637,7 +13658,7 @@
       "c_declaration": "typedef enum {\n    MOUSE_CURSOR_DEFAULT       = 0,     // Default pointer shape\n    MOUSE_CURSOR_ARROW         = 1,     // Arrow shape\n    MOUSE_CURSOR_IBEAM         = 2,     // Text writing cursor shape\n    MOUSE_CURSOR_CROSSHAIR     = 3,     // Cross shape\n    MOUSE_CURSOR_POINTING_HAND = 4,     // Pointing hand cursor\n    MOUSE_CURSOR_RESIZE_EW     = 5,     // Horizontal resize/move arrow shape\n    MOUSE_CURSOR_RESIZE_NS     = 6,     // Vertical resize/move arrow shape\n    MOUSE_CURSOR_RESIZE_NWSE   = 7,     // Top-left to bottom-right diagonal resize/move arrow shape\n    MOUSE_CURSOR_RESIZE_NESW   = 8,     // The top-right to bottom-left diagonal resize/move arrow shape\n    MOUSE_CURSOR_RESIZE_ALL    = 9,     // The omnidirectional resize/move cursor shape\n    MOUSE_CURSOR_NOT_ALLOWED   = 10     // The operation-not-allowed shape\n} MouseCursor;",
       "native_abi": "enum MouseCursor",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13646,7 +13667,7 @@
       "c_declaration": "typedef enum {\n    GAMEPAD_BUTTON_UNKNOWN = 0,         // Unknown button, for error checking\n    GAMEPAD_BUTTON_LEFT_FACE_UP,        // Gamepad left DPAD up button\n    GAMEPAD_BUTTON_LEFT_FACE_RIGHT,     // Gamepad left DPAD right button\n    GAMEPAD_BUTTON_LEFT_FACE_DOWN,      // Gamepad left DPAD down button\n    GAMEPAD_BUTTON_LEFT_FACE_LEFT,      // Gamepad left DPAD left button\n    GAMEPAD_BUTTON_RIGHT_FACE_UP,       // Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)\n    GAMEPAD_BUTTON_RIGHT_FACE_RIGHT,    // Gamepad right button right (i.e. PS3: Circle, Xbox: B)\n    GAMEPAD_BUTTON_RIGHT_FACE_DOWN,     // Gamepad right button down (i.e. PS3: Cross, Xbox: A)\n    GAMEPAD_BUTTON_RIGHT_FACE_LEFT,     // Gamepad right button left (i.e. PS3: Square, Xbox: X)\n    GAMEPAD_BUTTON_LEFT_TRIGGER_1,      // Gamepad top/back trigger left (first), it could be a trailing button\n    GAMEPAD_BUTTON_LEFT_TRIGGER_2,      // Gamepad top/back trigger left (second), it could be a trailing button\n    GAMEPAD_BUTTON_RIGHT_TRIGGER_1,     // Gamepad top/back trigger right (first), it could be a trailing button\n    GAMEPAD_BUTTON_RIGHT_TRIGGER_2,     // Gamepad top/back trigger right (second), it could be a trailing button\n    GAMEPAD_BUTTON_MIDDLE_LEFT,         // Gamepad center buttons, left one (i.e. PS3: Select)\n    GAMEPAD_BUTTON_MIDDLE,              // Gamepad center buttons, middle one (i.e. PS3: PS, Xbox: XBOX)\n    GAMEPAD_BUTTON_MIDDLE_RIGHT,        // Gamepad center buttons, right one (i.e. PS3: Start)\n    GAMEPAD_BUTTON_LEFT_THUMB,          // Gamepad joystick pressed button left\n    GAMEPAD_BUTTON_RIGHT_THUMB          // Gamepad joystick pressed button right\n} GamepadButton;",
       "native_abi": "enum GamepadButton",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13655,7 +13676,7 @@
       "c_declaration": "typedef enum {\n    GAMEPAD_AXIS_LEFT_X        = 0,     // Gamepad left stick X axis\n    GAMEPAD_AXIS_LEFT_Y        = 1,     // Gamepad left stick Y axis\n    GAMEPAD_AXIS_RIGHT_X       = 2,     // Gamepad right stick X axis\n    GAMEPAD_AXIS_RIGHT_Y       = 3,     // Gamepad right stick Y axis\n    GAMEPAD_AXIS_LEFT_TRIGGER  = 4,     // Gamepad back trigger left, pressure level: [1..-1]\n    GAMEPAD_AXIS_RIGHT_TRIGGER = 5      // Gamepad back trigger right, pressure level: [1..-1]\n} GamepadAxis;",
       "native_abi": "enum GamepadAxis",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13664,7 +13685,7 @@
       "c_declaration": "typedef enum {\n    MATERIAL_MAP_ALBEDO = 0,        // Albedo material (same as: MATERIAL_MAP_DIFFUSE)\n    MATERIAL_MAP_METALNESS,         // Metalness material (same as: MATERIAL_MAP_SPECULAR)\n    MATERIAL_MAP_NORMAL,            // Normal material\n    MATERIAL_MAP_ROUGHNESS,         // Roughness material\n    MATERIAL_MAP_OCCLUSION,         // Ambient occlusion material\n    MATERIAL_MAP_EMISSION,          // Emission material\n    MATERIAL_MAP_HEIGHT,            // Heightmap material\n    MATERIAL_MAP_CUBEMAP,           // Cubemap material (NOTE: Uses GL_TEXTURE_CUBE_MAP)\n    MATERIAL_MAP_IRRADIANCE,        // Irradiance material (NOTE: Uses GL_TEXTURE_CUBE_MAP)\n    MATERIAL_MAP_PREFILTER,         // Prefilter material (NOTE: Uses GL_TEXTURE_CUBE_MAP)\n    MATERIAL_MAP_BRDF               // Brdf material\n} MaterialMapIndex;",
       "native_abi": "enum MaterialMapIndex",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13673,7 +13694,7 @@
       "c_declaration": "typedef enum {\n    SHADER_LOC_VERTEX_POSITION = 0, // Shader location: vertex attribute: position\n    SHADER_LOC_VERTEX_TEXCOORD01,   // Shader location: vertex attribute: texcoord01\n    SHADER_LOC_VERTEX_TEXCOORD02,   // Shader location: vertex attribute: texcoord02\n    SHADER_LOC_VERTEX_NORMAL,       // Shader location: vertex attribute: normal\n    SHADER_LOC_VERTEX_TANGENT,      // Shader location: vertex attribute: tangent\n    SHADER_LOC_VERTEX_COLOR,        // Shader location: vertex attribute: color\n    SHADER_LOC_MATRIX_MVP,          // Shader location: matrix uniform: model-view-projection\n    SHADER_LOC_MATRIX_VIEW,         // Shader location: matrix uniform: view (camera transform)\n    SHADER_LOC_MATRIX_PROJECTION,   // Shader location: matrix uniform: projection\n    SHADER_LOC_MATRIX_MODEL,        // Shader location: matrix uniform: model (transform)\n    SHADER_LOC_MATRIX_NORMAL,       // Shader location: matrix uniform: normal\n    SHADER_LOC_VECTOR_VIEW,         // Shader location: vector uniform: view\n    SHADER_LOC_COLOR_DIFFUSE,       // Shader location: vector uniform: diffuse color\n    SHADER_LOC_COLOR_SPECULAR,      // Shader location: vector uniform: specular color\n    SHADER_LOC_COLOR_AMBIENT,       // Shader location: vector uniform: ambient color\n    SHADER_LOC_MAP_ALBEDO,          // Shader location: sampler2d texture: albedo (same as: SHADER_LOC_MAP_DIFFUSE)\n    SHADER_LOC_MAP_METALNESS,       // Shader location: sampler2d texture: metalness (same as: SHADER_LOC_MAP_SPECULAR)\n    SHADER_LOC_MAP_NORMAL,          // Shader location: sampler2d texture: normal\n    SHADER_LOC_MAP_ROUGHNESS,       // Shader location: sampler2d texture: roughness\n    SHADER_LOC_MAP_OCCLUSION,       // Shader location: sampler2d texture: occlusion\n    SHADER_LOC_MAP_EMISSION,        // Shader location: sampler2d texture: emission\n    SHADER_LOC_MAP_HEIGHT,          // Shader location: sampler2d texture: heightmap\n    SHADER_LOC_MAP_CUBEMAP,         // Shader location: samplerCube texture: cubemap\n    SHADER_LOC_MAP_IRRADIANCE,      // Shader location: samplerCube texture: irradiance\n    SHADER_LOC_MAP_PREFILTER,       // Shader location: samplerCube texture: prefilter\n    SHADER_LOC_MAP_BRDF,            // Shader location: sampler2d texture: brdf\n    SHADER_LOC_VERTEX_BONEIDS,      // Shader location: vertex attribute: bone indices\n    SHADER_LOC_VERTEX_BONEWEIGHTS,  // Shader location: vertex attribute: bone weights\n    SHADER_LOC_MATRIX_BONETRANSFORMS, // Shader location: matrix attribute: bone transforms (animation)\n    SHADER_LOC_VERTEX_INSTANCETRANSFORM // Shader location: vertex attribute: instance transforms\n} ShaderLocationIndex;",
       "native_abi": "enum ShaderLocationIndex",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13682,7 +13703,7 @@
       "c_declaration": "typedef enum {\n    SHADER_UNIFORM_FLOAT = 0,       // Shader uniform type: float\n    SHADER_UNIFORM_VEC2,            // Shader uniform type: vec2 (2 float)\n    SHADER_UNIFORM_VEC3,            // Shader uniform type: vec3 (3 float)\n    SHADER_UNIFORM_VEC4,            // Shader uniform type: vec4 (4 float)\n    SHADER_UNIFORM_INT,             // Shader uniform type: int\n    SHADER_UNIFORM_IVEC2,           // Shader uniform type: ivec2 (2 int)\n    SHADER_UNIFORM_IVEC3,           // Shader uniform type: ivec3 (3 int)\n    SHADER_UNIFORM_IVEC4,           // Shader uniform type: ivec4 (4 int)\n    SHADER_UNIFORM_UINT,            // Shader uniform type: unsigned int\n    SHADER_UNIFORM_UIVEC2,          // Shader uniform type: uivec2 (2 unsigned int)\n    SHADER_UNIFORM_UIVEC3,          // Shader uniform type: uivec3 (3 unsigned int)\n    SHADER_UNIFORM_UIVEC4,          // Shader uniform type: uivec4 (4 unsigned int)\n    SHADER_UNIFORM_SAMPLER2D        // Shader uniform type: sampler2d\n} ShaderUniformDataType;",
       "native_abi": "enum ShaderUniformDataType",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13691,7 +13712,7 @@
       "c_declaration": "typedef enum {\n    SHADER_ATTRIB_FLOAT = 0,        // Shader attribute type: float\n    SHADER_ATTRIB_VEC2,             // Shader attribute type: vec2 (2 float)\n    SHADER_ATTRIB_VEC3,             // Shader attribute type: vec3 (3 float)\n    SHADER_ATTRIB_VEC4              // Shader attribute type: vec4 (4 float)\n} ShaderAttributeDataType;",
       "native_abi": "enum ShaderAttributeDataType",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13700,7 +13721,7 @@
       "c_declaration": "typedef enum {\n    PIXELFORMAT_UNCOMPRESSED_GRAYSCALE = 1, // 8 bit per pixel (no alpha)\n    PIXELFORMAT_UNCOMPRESSED_GRAY_ALPHA,    // 8*2 bpp (2 channels)\n    PIXELFORMAT_UNCOMPRESSED_R5G6B5,        // 16 bpp\n    PIXELFORMAT_UNCOMPRESSED_R8G8B8,        // 24 bpp\n    PIXELFORMAT_UNCOMPRESSED_R5G5B5A1,      // 16 bpp (1 bit alpha)\n    PIXELFORMAT_UNCOMPRESSED_R4G4B4A4,      // 16 bpp (4 bit alpha)\n    PIXELFORMAT_UNCOMPRESSED_R8G8B8A8,      // 32 bpp\n    PIXELFORMAT_UNCOMPRESSED_R32,           // 32 bpp (1 channel - float)\n    PIXELFORMAT_UNCOMPRESSED_R32G32B32,     // 32*3 bpp (3 channels - float)\n    PIXELFORMAT_UNCOMPRESSED_R32G32B32A32,  // 32*4 bpp (4 channels - float)\n    PIXELFORMAT_UNCOMPRESSED_R16,           // 16 bpp (1 channel - half float)\n    PIXELFORMAT_UNCOMPRESSED_R16G16B16,     // 16*3 bpp (3 channels - half float)\n    PIXELFORMAT_UNCOMPRESSED_R16G16B16A16,  // 16*4 bpp (4 channels - half float)\n    PIXELFORMAT_COMPRESSED_DXT1_RGB,        // 4 bpp (no alpha)\n    PIXELFORMAT_COMPRESSED_DXT1_RGBA,       // 4 bpp (1 bit alpha)\n    PIXELFORMAT_COMPRESSED_DXT3_RGBA,       // 8 bpp\n    PIXELFORMAT_COMPRESSED_DXT5_RGBA,       // 8 bpp\n    PIXELFORMAT_COMPRESSED_ETC1_RGB,        // 4 bpp\n    PIXELFORMAT_COMPRESSED_ETC2_RGB,        // 4 bpp\n    PIXELFORMAT_COMPRESSED_ETC2_EAC_RGBA,   // 8 bpp\n    PIXELFORMAT_COMPRESSED_PVRT_RGB,        // 4 bpp\n    PIXELFORMAT_COMPRESSED_PVRT_RGBA,       // 4 bpp\n    PIXELFORMAT_COMPRESSED_ASTC_4x4_RGBA,   // 8 bpp\n    PIXELFORMAT_COMPRESSED_ASTC_8x8_RGBA    // 2 bpp\n} PixelFormat;",
       "native_abi": "enum PixelFormat",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13709,7 +13730,7 @@
       "c_declaration": "typedef enum {\n    TEXTURE_FILTER_POINT = 0,               // No filter, pixel approximation\n    TEXTURE_FILTER_BILINEAR,                // Linear filtering\n    TEXTURE_FILTER_TRILINEAR,               // Trilinear filtering (linear with mipmaps)\n    TEXTURE_FILTER_ANISOTROPIC_4X,          // Anisotropic filtering 4x\n    TEXTURE_FILTER_ANISOTROPIC_8X,          // Anisotropic filtering 8x\n    TEXTURE_FILTER_ANISOTROPIC_16X,         // Anisotropic filtering 16x\n} TextureFilter;",
       "native_abi": "enum TextureFilter",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13718,7 +13739,7 @@
       "c_declaration": "typedef enum {\n    TEXTURE_WRAP_REPEAT = 0,                // Repeats texture in tiled mode\n    TEXTURE_WRAP_CLAMP,                     // Clamps texture to edge pixel in tiled mode\n    TEXTURE_WRAP_MIRROR_REPEAT,             // Mirrors and repeats the texture in tiled mode\n    TEXTURE_WRAP_MIRROR_CLAMP               // Mirrors and clamps to border the texture in tiled mode\n} TextureWrap;",
       "native_abi": "enum TextureWrap",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13727,7 +13748,7 @@
       "c_declaration": "typedef enum {\n    CUBEMAP_LAYOUT_AUTO_DETECT = 0,         // Automatically detect layout type\n    CUBEMAP_LAYOUT_LINE_VERTICAL,           // Layout is defined by a vertical line with faces\n    CUBEMAP_LAYOUT_LINE_HORIZONTAL,         // Layout is defined by a horizontal line with faces\n    CUBEMAP_LAYOUT_CROSS_THREE_BY_FOUR,     // Layout is defined by a 3x4 cross with cubemap faces\n    CUBEMAP_LAYOUT_CROSS_FOUR_BY_THREE     // Layout is defined by a 4x3 cross with cubemap faces\n} CubemapLayout;",
       "native_abi": "enum CubemapLayout",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13736,7 +13757,7 @@
       "c_declaration": "typedef enum {\n    FONT_DEFAULT = 0,               // Default font generation, anti-aliased\n    FONT_BITMAP,                    // Bitmap font generation, no anti-aliasing\n    FONT_SDF                        // SDF font generation, requires external shader\n} FontType;",
       "native_abi": "enum FontType",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13745,7 +13766,7 @@
       "c_declaration": "typedef enum {\n    BLEND_ALPHA = 0,                // Blend textures considering alpha (default)\n    BLEND_ADDITIVE,                 // Blend textures adding colors\n    BLEND_MULTIPLIED,               // Blend textures multiplying colors\n    BLEND_ADD_COLORS,               // Blend textures adding colors (alternative)\n    BLEND_SUBTRACT_COLORS,          // Blend textures subtracting colors (alternative)\n    BLEND_ALPHA_PREMULTIPLY,        // Blend premultiplied textures considering alpha\n    BLEND_CUSTOM,                   // Blend textures using custom src/dst factors (use rlSetBlendFactors())\n    BLEND_CUSTOM_SEPARATE           // Blend textures using custom rgb/alpha separate src/dst factors (use rlSetBlendFactorsSeparate())\n} BlendMode;",
       "native_abi": "enum BlendMode",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13754,7 +13775,7 @@
       "c_declaration": "typedef enum {\n    GESTURE_NONE        = 0,        // No gesture\n    GESTURE_TAP         = 1,        // Tap gesture\n    GESTURE_DOUBLETAP   = 2,        // Double tap gesture\n    GESTURE_HOLD        = 4,        // Hold gesture\n    GESTURE_DRAG        = 8,        // Drag gesture\n    GESTURE_SWIPE_RIGHT = 16,       // Swipe right gesture\n    GESTURE_SWIPE_LEFT  = 32,       // Swipe left gesture\n    GESTURE_SWIPE_UP    = 64,       // Swipe up gesture\n    GESTURE_SWIPE_DOWN  = 128,      // Swipe down gesture\n    GESTURE_PINCH_IN    = 256,      // Pinch in gesture\n    GESTURE_PINCH_OUT   = 512       // Pinch out gesture\n} Gesture;",
       "native_abi": "enum Gesture",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13763,7 +13784,7 @@
       "c_declaration": "typedef enum {\n    CAMERA_CUSTOM = 0,              // Camera custom, controlled by user (UpdateCamera() does nothing)\n    CAMERA_FREE,                    // Camera free mode\n    CAMERA_ORBITAL,                 // Camera orbital, around target, zoom supported\n    CAMERA_FIRST_PERSON,            // Camera first person\n    CAMERA_THIRD_PERSON             // Camera third person\n} CameraMode;",
       "native_abi": "enum CameraMode",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13772,7 +13793,7 @@
       "c_declaration": "typedef enum {\n    CAMERA_PERSPECTIVE = 0,         // Perspective projection\n    CAMERA_ORTHOGRAPHIC             // Orthographic projection\n} CameraProjection;",
       "native_abi": "enum CameraProjection",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },
@@ -13781,7 +13802,7 @@
       "c_declaration": "typedef enum {\n    NPATCH_NINE_PATCH = 0,          // Npatch layout: 3x3 tiles\n    NPATCH_THREE_PATCH_VERTICAL,    // Npatch layout: 1x3 tiles\n    NPATCH_THREE_PATCH_HORIZONTAL   // Npatch layout: 3x1 tiles\n} NPatchLayout;",
       "native_abi": "enum NPatchLayout",
       "void_name": null,
-      "implementation": "enumerator constants",
+      "implementation": "typed source enum; explicit primitive native conversions",
       "compile_verification": "Clang AST; native/raylib_parity.h",
       "test_coverage": "inventory parity"
     },

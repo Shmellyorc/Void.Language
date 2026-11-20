@@ -79,6 +79,10 @@ private func _flag(value: bool) -> i64:
     return 0
 
 ## Resolve a hostname and connect using sequential candidate fallback.
+## @param host Numeric literal or ASCII hostname for sequential candidate connection.
+## @param port Host-order destination port.
+## @param options Connection family, positive overall/per-candidate deadlines and no-delay policy.
+## @return Ok with a new owned stream, or Err with candidate/peer evidence. Close explicitly or use with.
 func connect(host: string, port: u16, options: connect_options = connect_options()) -> result<stream, net_error.error>:
     var owned = stream()
     var reply = _net_connect(owned, host, port as i64, address._family_code(options.family), options.timeout_ms,
@@ -88,6 +92,10 @@ func connect(host: string, port: u16, options: connect_options = connect_options
     return Ok(owned)
 
 ## Resolve a hostname and connect using sequential candidate fallback. Uses external native completion.
+## @param host Numeric literal or ASCII hostname for sequential candidate connection.
+## @param port Host-order destination port.
+## @param options Connection family, positive overall/per-candidate deadlines and no-delay policy.
+## @return Ok with a new owned stream, or Err with candidate/peer evidence. Close explicitly or use with.
 async func connect_async(host: string, port: u16, options: connect_options = connect_options()) -> result<stream, net_error.error>:
     var owned = stream()
     var reply = await _net_connect_async(owned, host, port as i64, address._family_code(options.family), options.timeout_ms,
@@ -97,6 +105,9 @@ async func connect_async(host: string, port: u16, options: connect_options = con
     return Ok(owned)
 
 ## Connect directly to a numeric endpoint.
+## @param remote Explicit numeric destination; UDP requires the bound family.
+## @param options Connection family, positive overall/per-candidate deadlines and no-delay policy.
+## @return Ok with a new owned stream, or a checked failure. Close explicitly or use with.
 func connect_endpoint(remote: address.endpoint, options: connect_options = connect_options()) -> result<stream, net_error.error>:
     var owned = stream()
     var reply = _net_connect(owned, address.format_ip(remote.ip), remote.port as i64, address._family_code(options.family), options.timeout_ms,
@@ -106,6 +117,9 @@ func connect_endpoint(remote: address.endpoint, options: connect_options = conne
     return Ok(owned)
 
 ## Connect directly to a numeric endpoint. Uses external native completion.
+## @param remote Explicit numeric destination; UDP requires the bound family.
+## @param options Connection family, positive overall/per-candidate deadlines and no-delay policy.
+## @return Ok with a new owned stream, or a checked failure. Close explicitly or use with.
 async func connect_endpoint_async(remote: address.endpoint, options: connect_options = connect_options()) -> result<stream, net_error.error>:
     var owned = stream()
     var reply = await _net_connect_async(owned, address.format_ip(remote.ip), remote.port as i64, address._family_code(options.family), options.timeout_ms,
@@ -115,6 +129,9 @@ async func connect_endpoint_async(remote: address.endpoint, options: connect_opt
     return Ok(owned)
 
 ## Bind and listen on an explicit numeric endpoint.
+## @param local Explicit numeric bind address; port zero requests an ephemeral port.
+## @param options Native backlog from 1 through 4096 and accepted-stream no-delay policy.
+## @return Ok with a new owned listener, or a checked failure. Accepted streams have independent lifetimes.
 func listen(local: address.endpoint, options: listen_options = listen_options()) -> result<listener, net_error.error>:
     var owned = listener()
     var reply = _net_listen(owned, address.format_ip(local.ip), local.port as i64, options.backlog as i64, _flag(options.no_delay))
@@ -123,6 +140,9 @@ func listen(local: address.endpoint, options: listen_options = listen_options())
     return Ok(owned)
 
 ## Bind and listen on an explicit numeric endpoint. Uses external native completion.
+## @param local Explicit numeric bind address; port zero requests an ephemeral port.
+## @param options Native backlog from 1 through 4096 and accepted-stream no-delay policy.
+## @return Ok with a new owned listener, or a checked failure. Accepted streams have independent lifetimes.
 async func listen_async(local: address.endpoint, options: listen_options = listen_options()) -> result<listener, net_error.error>:
     var owned = listener()
     var reply = await _net_listen_async(owned, address.format_ip(local.ip), local.port as i64, options.backlog as i64, _flag(options.no_delay))
@@ -131,6 +151,8 @@ async func listen_async(local: address.endpoint, options: listen_options = liste
     return Ok(owned)
 
 ## Accept a connection with its own lifetime.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with a separately owned stream, or a checked failure; the listener remains owned.
 func (self listener) accept(timeout_ms: i64 = 0) -> result<stream, net_error.error>:
     var owned = stream()
     var reply = _net_accept(self, owned, timeout_ms)
@@ -139,6 +161,8 @@ func (self listener) accept(timeout_ms: i64 = 0) -> result<stream, net_error.err
     return Ok(owned)
 
 ## Accept a connection with its own lifetime. Uses external native completion.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with a separately owned stream, or a checked failure; the listener remains owned.
 async func (self listener) accept_async(timeout_ms: i64 = 0) -> result<stream, net_error.error>:
     var owned = stream()
     var reply = await _net_accept_async(self, owned, timeout_ms)
@@ -147,69 +171,92 @@ async func (self listener) accept_async(timeout_ms: i64 = 0) -> result<stream, n
     return Ok(owned)
 
 ## Read up to the requested byte count or observe EOF.
+## @param max_count Positive maximum chunk size, bounded to 4 MiB.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with owned bytes and an explicit EOF flag, or a checked failure. TCP resets are errors.
 func (self stream) read_bytes(max_count: i64 = 65536, timeout_ms: i64 = 30000) -> result<chunk, net_error.error>:
     var reply = _net_read(self, max_count, timeout_ms)
     return _chunk("tcp.read_bytes", reply)
 
 ## Read up to the requested byte count or observe EOF. Uses external native completion.
+## @param max_count Positive maximum chunk size, bounded to 4 MiB.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with owned bytes and an explicit EOF flag, or a checked failure. TCP resets are errors.
 async func (self stream) read_bytes_async(max_count: i64 = 65536, timeout_ms: i64 = 30000) -> result<chunk, net_error.error>:
     var reply = await _net_read_async(self, max_count, timeout_ms)
     return _chunk("tcp.read_bytes_async", reply)
 
 ## Write the complete snapshot or report the locally accepted prefix.
+## @param bytes Readonly bytes snapshotted for this operation; empty UDP payloads are valid.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with the complete local byte count, or Err with exact accepted-prefix progress; peer delivery is not guaranteed.
 func (self stream) write_bytes(const bytes: [u8], timeout_ms: i64 = 30000) -> result<i64, net_error.error>:
     var reply = _net_write(self, bytes, timeout_ms)
     return _count("tcp.write_bytes", reply)
 
 ## Write the complete snapshot or report the locally accepted prefix. Uses external native completion.
+## @param bytes Readonly bytes snapshotted for this operation; empty UDP payloads are valid.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with the complete local byte count, or Err with exact accepted-prefix progress; peer delivery is not guaranteed.
 async func (self stream) write_bytes_async(const bytes: [u8], timeout_ms: i64 = 30000) -> result<i64, net_error.error>:
     var reply = await _net_write_async(self, bytes, timeout_ms)
     return _count("tcp.write_bytes_async", reply)
 
 ## Close the write direction while preserving reads.
+## @return Ok after idempotent half-close, or a checked failure; receiving remains available.
 func (self stream) shutdown_write() -> result<bool, net_error.error>:
     var reply = _net_shutdown(self)
     return _bool("tcp.shutdown_write", reply)
 
 ## Close the write direction while preserving reads. Uses external native completion.
+## @return Ok after idempotent half-close, or a checked failure; receiving remains available.
 async func (self stream) shutdown_write_async() -> result<bool, net_error.error>:
     var reply = await _net_shutdown_async(self)
     return _bool("tcp.shutdown_write_async", reply)
 
 ## Close the owned stream and wake pending operations.
+## @return Ok after closure, including repeated close, or a checked failure such as a reserved close.
 func (self stream) close() -> result<bool, net_error.error>:
     var reply = _net_close_stream(self)
     return _bool("tcp.close", reply)
 
 ## Close the owned stream and wake pending operations. Uses external native completion.
+## @return Ok after closure, including repeated close, or a checked failure such as a reserved close.
 async func (self stream) close_async() -> result<bool, net_error.error>:
     var reply = await _net_close_stream_async(self)
     return _bool("tcp.close_async", reply)
 
 ## Close the listener and wake its pending accept.
+## @return Ok after closure, including repeated close, or a checked failure such as a reserved close.
 func (self listener) close() -> result<bool, net_error.error>:
     var reply = _net_close_listener(self)
     return _bool("tcp.close", reply)
 
 ## Close the listener and wake its pending accept. Uses external native completion.
+## @return Ok after closure, including repeated close, or a checked failure such as a reserved close.
 async func (self listener) close_async() -> result<bool, net_error.error>:
     var reply = await _net_close_listener_async(self)
     return _bool("tcp.close_async", reply)
 
 ## Report the bound address and port.
+## @return Ok with an owned local address/port snapshot, or a checked failure.
 func (self listener) local_endpoint() -> result<address.endpoint, net_error.error>:
     return _endpoint("tcp.local_endpoint", _net_listener_local(self))
 
 ## Report the stream's local address and port.
+## @return Ok with an owned local address/port snapshot, or a checked failure.
 func (self stream) local_endpoint() -> result<address.endpoint, net_error.error>:
     return _endpoint("tcp.local_endpoint", _net_stream_local(self))
 
 ## Report the connected peer.
+## @return Ok with the connected peer endpoint, or a checked failure.
 func (self stream) remote_endpoint() -> result<address.endpoint, net_error.error>:
     return _endpoint("tcp.remote_endpoint", _net_stream_remote(self))
 
+## Release this owned socket through Runtime scope cleanup; aliases share closure.
 func (self stream) deinit():
     _net_cleanup_stream(self)
 
+## Release this owned socket through Runtime scope cleanup; aliases share closure.
 func (self listener) deinit():
     _net_cleanup_listener(self)

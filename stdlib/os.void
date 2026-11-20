@@ -4,30 +4,30 @@ use io
 
 
 ## Portable categories of recoverable environment and location failures.
-enum error_kind:
+enum error_kind(i64):
     ## The requested environment variable is absent.
-    not_found
+    not_found = 1
 
     ## An OS query input or application argument snapshot violates its contract.
-    invalid_argument
+    invalid_argument = 2
 
     ## A configured directory is relative or violates host path rules.
-    invalid_path
+    invalid_path = 3
 
     ## Native text cannot be represented losslessly as UTF-8.
-    invalid_utf8
+    invalid_utf8 = 4
 
     ## The native discovery service denied access.
-    permission_denied
+    permission_denied = 5
 
     ## The current location, image or bundle classification is unavailable.
-    unavailable
+    unavailable = 6
 
     ## This host explicitly does not support the requested facility.
-    unsupported
+    unsupported = 7
 
     ## Another native discovery failure occurred.
-    system_failure
+    system_failure = 8
 
 
 ## Managed OS discovery failure, distinct from io.error despite their shared base.
@@ -53,24 +53,9 @@ private value struct _reply:
 
 
 private func _kind(code: i64) -> error_kind:
-    if code == 1:
-        return error_kind.not_found
-    if code == 2:
-        return error_kind.invalid_argument
-    if code == 3:
-        return error_kind.invalid_path
-    if code == 4:
-        return error_kind.invalid_utf8
-    if code == 5:
-        return error_kind.permission_denied
-    if code == 6:
-        return error_kind.unavailable
-    if code == 7:
-        return error_kind.unsupported
-    if code == 8:
-        return error_kind.system_failure
+    if code as? error_kind is Some(var decoded):
+        return decoded
     return error_kind.system_failure
-
 
 private func _description(code: i64) -> string:
     if code == 1:

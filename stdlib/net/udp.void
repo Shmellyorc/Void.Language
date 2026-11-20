@@ -47,6 +47,8 @@ private func _packet(operation: string, reply: _network_reply) -> result<datagra
     return Ok(datagram(bytes = reply.bytes, peer = address._endpoint(reply.text, reply.port)))
 
 ## Bind one explicit numeric UDP endpoint.
+## @param local Explicit numeric bind address; port zero requests an ephemeral port.
+## @return Ok with a new owned unicast socket, or a checked failure. Close explicitly or use with.
 func bind(local: address.endpoint) -> result<socket, net_error.error>:
     var owned = socket()
     var reply = _net_bind(owned, address.format_ip(local.ip), local.port as i64)
@@ -55,6 +57,8 @@ func bind(local: address.endpoint) -> result<socket, net_error.error>:
     return Ok(owned)
 
 ## Bind one explicit numeric UDP endpoint. Uses external native completion.
+## @param local Explicit numeric bind address; port zero requests an ephemeral port.
+## @return Ok with a new owned unicast socket, or a checked failure. Close explicitly or use with.
 async func bind_async(local: address.endpoint) -> result<socket, net_error.error>:
     var owned = socket()
     var reply = await _net_bind_async(owned, address.format_ip(local.ip), local.port as i64)
@@ -63,41 +67,59 @@ async func bind_async(local: address.endpoint) -> result<socket, net_error.error
     return Ok(owned)
 
 ## Send one datagram, including an empty datagram.
+## @param bytes Readonly bytes snapshotted for this operation; empty UDP payloads are valid.
+## @param remote Explicit numeric destination; UDP requires the bound family.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with the locally accepted datagram size, or a checked failure; delivery is not guaranteed.
 func (self socket) send_to(const bytes: [u8], remote: address.endpoint, timeout_ms: i64 = 30000) -> result<i64, net_error.error>:
     var reply = _net_send(self, bytes, address.format_ip(remote.ip), remote.port as i64, timeout_ms)
     return _count("udp.send_to", reply)
 
 ## Send one datagram, including an empty datagram. Uses external native completion.
+## @param bytes Readonly bytes snapshotted for this operation; empty UDP payloads are valid.
+## @param remote Explicit numeric destination; UDP requires the bound family.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with the locally accepted datagram size, or a checked failure; delivery is not guaranteed.
 async func (self socket) send_to_async(const bytes: [u8], remote: address.endpoint, timeout_ms: i64 = 30000) -> result<i64, net_error.error>:
     var reply = await _net_send_async(self, bytes, address.format_ip(remote.ip), remote.port as i64, timeout_ms)
     return _count("udp.send_to_async", reply)
 
 ## Consume one datagram and report an oversized message as a checked error.
+## @param max_count Maximum retained bytes; oversized UDP messages are discarded and reported as consumed errors.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with one complete owned datagram and sender, or Err with consumption/size evidence.
 func (self socket) receive_from(max_count: i64 = 65527, timeout_ms: i64 = 30000) -> result<datagram, net_error.error>:
     var reply = _net_receive(self, max_count, timeout_ms)
     return _packet("udp.receive_from", reply)
 
 ## Consume one datagram and report an oversized message as a checked error. Uses external native completion.
+## @param max_count Maximum retained bytes; oversized UDP messages are discarded and reported as consumed errors.
+## @param timeout_ms Monotonic deadline in milliseconds, up to 24 hours; zero waits indefinitely.
+## @return Ok with one complete owned datagram and sender, or Err with consumption/size evidence.
 async func (self socket) receive_from_async(max_count: i64 = 65527, timeout_ms: i64 = 30000) -> result<datagram, net_error.error>:
     var reply = await _net_receive_async(self, max_count, timeout_ms)
     return _packet("udp.receive_from_async", reply)
 
 ## Close the owned UDP socket and wake pending operations.
+## @return Ok after closure, including repeated close, or a checked failure such as a reserved close.
 func (self socket) close() -> result<bool, net_error.error>:
     var reply = _net_close_udp(self)
     return _bool("udp.close", reply)
 
 ## Close the owned UDP socket and wake pending operations. Uses external native completion.
+## @return Ok after closure, including repeated close, or a checked failure such as a reserved close.
 async func (self socket) close_async() -> result<bool, net_error.error>:
     var reply = await _net_close_udp_async(self)
     return _bool("udp.close_async", reply)
 
 ## Report the bound address and port.
+## @return Ok with an owned local address/port snapshot, or a checked failure.
 func (self socket) local_endpoint() -> result<address.endpoint, net_error.error>:
     var reply = _net_udp_local(self)
     if reply.kind != 0:
         return Err(_error("udp.local_endpoint", reply))
     return Ok(address._endpoint(reply.text, reply.port))
 
+## Release this owned socket through Runtime scope cleanup; aliases share closure.
 func (self socket) deinit():
     _net_cleanup_udp(self)

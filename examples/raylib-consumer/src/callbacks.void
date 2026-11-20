@@ -39,7 +39,7 @@ func (self callback_state) save_text(name: string, text: string) -> bool:
     return name != "reject"
 
 func headless() -> i32:
-    rl.set_trace_log_level(rl.log_all)
+    rl.set_trace_log_level(rl.trace_log_level.all)
     if conversion.unwrap(rl.text_format(42, "0000")) != "0042":
         return 201
     if conversion.unwrap(rl.text_format(true)) != "true" or conversion.unwrap(rl.text_format("typed")) != "typed":
@@ -50,12 +50,12 @@ func headless() -> i32:
         return 215
     var first = callback_state(calls = 0, last_name = "", last_text = "", saved = [])
     var old_log = rl.set_trace_log_callback(first.log)
-    rl.trace_log(rl.log_warning, "typed %s %n é🎮")
+    rl.trace_log(rl.trace_log_level.warning, "typed %s %n é🎮")
     if first.calls != 1 or first.last_text != "typed %s %n é🎮":
         return 203
     var second = callback_state(calls = 0, last_name = "", last_text = "", saved = [])
     var new_log = rl.set_trace_log_callback(second.log)
-    rl.trace_log(rl.log_warning, "replacement")
+    rl.trace_log(rl.trace_log_level.warning, "replacement")
     if first.calls != 1 or second.calls != 1 or rl.callback_active(old_log):
         return 204
     if rl.callback_close(old_log) != 0 or not rl.callback_active(new_log):
@@ -179,11 +179,11 @@ func forbidden_generate(frames: u32, channels: u32, sample_size: u32) -> [u8]:
 func failure(mode: string) -> i32:
     if mode == "failure":
         var owner = rl.set_trace_log_callback(fail_log)
-        rl.trace_log(rl.log_warning, "managed failure")
+        rl.trace_log(rl.trace_log_level.warning, "managed failure")
         return 230
     if mode == "self-close":
         self_registration = rl.set_trace_log_callback(close_self)
-        rl.trace_log(rl.log_warning, "self close")
+        rl.trace_log(rl.trace_log_level.warning, "self close")
         return 231
     if mode == "global-audio":
         var capture = callback_state(calls=0, last_name="", last_text="", saved=[])
@@ -243,7 +243,7 @@ func implicit() -> i32:
     var owner = rl.set_trace_log_callback(capture.log)
     for index in 0..<1024:
         var pressure = callback_state(calls=index as i32, last_name="", last_text="", saved=[])
-    rl.trace_log(rl.log_warning, "capture survives")
+    rl.trace_log(rl.trace_log_level.warning, "capture survives")
     if capture.calls != 1:
         return 240
     print("RAYLIB final callback implicit shutdown passed")

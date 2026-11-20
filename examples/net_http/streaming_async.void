@@ -30,5 +30,5 @@ async func entry(input: i32) -> i32:
             print("Streamed {count} bytes")
             return 0
         else if stream_result is Err(var failure):
-            print("HTTP {failure.kind}, phase {failure.phase}")
+            print("HTTP {failure.kind.name}, phase {failure.phase.name}")
     return 1

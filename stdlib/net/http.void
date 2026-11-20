@@ -4,139 +4,139 @@ use io
 use text as textlib
 
 ## Portable categories of recoverable HTTP preparation, transport and file failures.
-enum error_kind:
+enum error_kind(i64):
     ## An argument, range, method or configuration is invalid.
-    invalid_argument
+    invalid_argument = 1
     ## Shared URL preparation failed; inspect url_cause.
-    invalid_url
+    invalid_url = 2
     ## A name/value or transport-owned header violates the field contract.
-    invalid_header
+    invalid_header = 3
     ## Text, charset or representation decoding is invalid or unsupported.
-    invalid_encoding
+    invalid_encoding = 4
     ## The selected backend feature is unavailable.
-    unsupported
+    unsupported = 5
     ## The resource is closed or the operation was cancelled.
-    closed
+    closed = 6
     ## A conflicting operation or finite admission slot is unavailable.
-    busy
+    busy = 7
     ## A byte, metadata, cookie, TLS-input or native budget would be exceeded.
-    limit_exceeded
+    limit_exceeded = 8
     ## Native asynchronous resolution failed.
-    resolve_failed
+    resolve_failed = 9
     ## The endpoint connection failed.
-    connect_failed
+    connect_failed = 10
     ## TLS chain or hostname verification failed.
-    tls_verification
+    tls_verification = 11
     ## Another TLS handshake/identity operation failed.
-    tls_failure
+    tls_failure = 12
     ## Proxy negotiation or authentication failed.
-    proxy_failed
+    proxy_failed = 13
     ## The indicated phase or total deadline expired.
-    timeout
+    timeout = 14
     ## Response framing or stream metadata is invalid.
-    protocol_error
+    protocol_error = 15
     ## Origin, downgrade or credential policy denied a redirect.
-    redirect_denied
+    redirect_denied = 16
     ## The redirect hop limit was exceeded.
-    redirect_limit
+    redirect_limit = 17
     ## A consumed stream/file would need to be replayed.
-    body_not_replayable
+    body_not_replayable = 18
     ## A final response or redirect stopped the original producer.
-    upload_stopped
+    upload_stopped = 19
     ## Declared response/file bytes ended early.
-    unexpected_eof
+    unexpected_eof = 20
     ## The borrowed file operation failed; inspect io_cause.
-    io_failure
+    io_failure = 21
     ## A status/convenience check rejected the response while retaining metadata.
-    http_status
+    http_status = 22
     ## Another native transport operation failed.
-    transport_failure
+    transport_failure = 23
 
 
 ## Stage of the primary failure; failure or cancellation does not imply remote rollback.
-enum failure_phase:
+enum failure_phase(i64):
     ## Input validation or owned snapshot construction.
-    prepare
+    prepare = 0
     ## Bounded native admission/registration.
-    queue
+    queue = 1
     ## Native hostname resolution.
-    dns
+    dns = 2
     ## Endpoint connection establishment.
-    connect
+    connect = 3
     ## Proxy connection/tunnel/authentication.
-    proxy
+    proxy = 4
     ## Verified TLS negotiation or identity setup.
-    tls
+    tls = 5
     ## Response/interim headers, redirects or cookies.
-    headers
+    headers = 6
     ## Producer/framing or request bytes sent.
-    upload
+    upload = 7
     ## Response transport or consumer deadline.
-    download
+    download = 8
     ## Incremental representation decoding.
-    decode
+    decode = 9
     ## Borrowed current-cursor file IO.
-    file
+    file = 10
     ## Cancellation, close and native quiescence.
-    cleanup
+    cleanup = 11
 
 
 ## Request protocol policy. Required HTTP/2 checks verified origin ALPN before request bytes.
-enum protocol:
+enum protocol(i64):
     ## Prefer h2 over HTTPS with HTTP/1.1 fallback; plain HTTP uses HTTP/1.1.
-    negotiate
+    negotiate = 0
     ## Use HTTP/1.1 request framing.
-    http1
+    http1 = 1
     ## Require verified HTTPS h2 ALPN before request bytes.
-    http2_required
+    http2_required = 2
 
 
 ## Actual response protocol, independently of the request preference.
-enum http_version:
+enum http_version(i64):
     ## The peer replied using HTTP/1.0.
-    http1_0
+    http1_0 = 0
     ## The peer replied using HTTP/1.1.
-    http1_1
+    http1_1 = 1
     ## Verified origin ALPN selected actual HTTP/2.
-    http2
+    http2 = 2
 
 
 ## Redirect origin/credential policy. HTTPS downgrade is always denied.
-enum redirect_policy:
+enum redirect_policy(i64):
     ## Return Location/status without following.
-    none
+    none = 0
     ## Follow only the same scheme, host and effective port.
-    same_origin
+    same_origin = 1
     ## Permit cross-origin GET/HEAD after dropping caller fields; credentials still forbid migration.
-    safe
+    safe = 2
 
 
 ## Address-family selection for native asynchronous resolution and connection attempts.
-enum ip_family:
+enum ip_family(i64):
     ## Allow native IPv4/IPv6 selection.
-    any
+    any = 0
     ## Use IPv4 only.
-    v4
+    v4 = 1
     ## Use IPv6 only.
-    v6
+    v6 = 2
 
 
 ## Choose bounded incremental gzip/deflate decoding or encoded representation bytes.
-enum content_decoding:
+enum content_decoding(i64):
     ## Advertise and incrementally validate gzip/deflate.
-    decoded
+    decoded = 0
     ## Preserve representation bytes and original headers.
-    raw
+    raw = 1
 
 
 ## Routing policy; ambient proxy configuration is ignored unless explicitly selected.
-enum proxy_mode:
+enum proxy_mode(i64):
     ## Ignore ambient proxy variables.
-    direct
+    direct = 0
     ## Own an environment snapshot at client creation, with CGI-safe HTTP proxy rules.
-    environment
+    environment = 1
     ## Use endpoint/no_proxy without environment fallback.
-    explicit
+    explicit = 2
 
 
 ## Transport-owned origin credentials, permitted only for HTTPS.
@@ -570,138 +570,22 @@ private value struct _options:
 
 
 private func _kind(value: i64) -> error_kind:
-    if value == 1:
-        return error_kind.invalid_argument
-    if value == 2:
-        return error_kind.invalid_url
-    if value == 3:
-        return error_kind.invalid_header
-    if value == 4:
-        return error_kind.invalid_encoding
-    if value == 5:
-        return error_kind.unsupported
-    if value == 6:
-        return error_kind.closed
-    if value == 7:
-        return error_kind.busy
-    if value == 8:
-        return error_kind.limit_exceeded
-    if value == 9:
-        return error_kind.resolve_failed
-    if value == 10:
-        return error_kind.connect_failed
-    if value == 11:
-        return error_kind.tls_verification
-    if value == 12:
-        return error_kind.tls_failure
-    if value == 13:
-        return error_kind.proxy_failed
-    if value == 14:
-        return error_kind.timeout
-    if value == 15:
-        return error_kind.protocol_error
-    if value == 16:
-        return error_kind.redirect_denied
-    if value == 17:
-        return error_kind.redirect_limit
-    if value == 18:
-        return error_kind.body_not_replayable
-    if value == 19:
-        return error_kind.upload_stopped
-    if value == 20:
-        return error_kind.unexpected_eof
-    if value == 21:
-        return error_kind.io_failure
-    if value == 22:
-        return error_kind.http_status
-    if value == 23:
-        return error_kind.transport_failure
+    if value as? error_kind is Some(var decoded):
+        return decoded
     return error_kind.transport_failure
 
-
 private func _phase(value: i64) -> failure_phase:
-    if value == 0:
-        return failure_phase.prepare
-    if value == 1:
-        return failure_phase.queue
-    if value == 2:
-        return failure_phase.dns
-    if value == 3:
-        return failure_phase.connect
-    if value == 4:
-        return failure_phase.proxy
-    if value == 5:
-        return failure_phase.tls
-    if value == 6:
-        return failure_phase.headers
-    if value == 7:
-        return failure_phase.upload
-    if value == 8:
-        return failure_phase.download
-    if value == 9:
-        return failure_phase.decode
-    if value == 10:
-        return failure_phase.file
-    if value == 11:
-        return failure_phase.cleanup
+    if value as? failure_phase is Some(var decoded):
+        return decoded
     return failure_phase.cleanup
-
-
-private func _protocol(value: protocol) -> i64:
-    if value is protocol.negotiate:
-        return 0
-    if value is protocol.http1:
-        return 1
-    if value is protocol.http2_required:
-        return 2
-    return -1
-
-
-private func _ip_family(value: ip_family) -> i64:
-    if value is ip_family.any:
-        return 0
-    if value is ip_family.v4:
-        return 1
-    if value is ip_family.v6:
-        return 2
-    return -1
-
-
-private func _redirect_policy(value: redirect_policy) -> i64:
-    if value is redirect_policy.none:
-        return 0
-    if value is redirect_policy.same_origin:
-        return 1
-    if value is redirect_policy.safe:
-        return 2
-    return -1
-
-
-private func _content_decoding(value: content_decoding) -> i64:
-    if value is content_decoding.decoded:
-        return 0
-    if value is content_decoding.raw:
-        return 1
-    return -1
-
-
-private func _proxy_mode(value: proxy_mode) -> i64:
-    if value is proxy_mode.direct:
-        return 0
-    if value is proxy_mode.environment:
-        return 1
-    if value is proxy_mode.explicit:
-        return 2
-    return -1
-
 
 private func _options_of(value: request_options) -> _options:
     return _options(
-        protocol = _protocol(value.protocol),
-        ip_family = _ip_family(value.ip_family),
-        redirects = _redirect_policy(value.redirects),
+        protocol = value.protocol.value,
+        ip_family = value.ip_family.value,
+        redirects = value.redirects.value,
         max_redirects = value.max_redirects,
-        decoding = _content_decoding(value.decoding),
+        decoding = value.decoding.value,
         max_encoded_bytes = value.max_encoded_bytes,
         max_decoded_bytes = value.max_decoded_bytes,
         max_buffer_bytes = value.max_buffer_bytes,
@@ -715,7 +599,7 @@ private func _options_of(value: request_options) -> _options:
 
 private func _config_of(value: client_options) -> _config:
     var result = _config(cookies = value.cookies, no_proxy = value.proxy.no_proxy,
-        proxy_mode = _proxy_mode(value.proxy.mode), proxy_endpoint = value.proxy.endpoint,
+        proxy_mode = value.proxy.mode.value, proxy_endpoint = value.proxy.endpoint,
         max_active = value.max_active, max_connections = value.max_connections,
         max_per_origin = value.max_per_origin, max_http2_streams = value.max_http2_streams,
         max_idle = value.max_idle, idle_timeout_ms = value.idle_timeout_ms,
@@ -839,42 +723,9 @@ private func _info(reply: _reply) -> response_info:
 
 
 private func _io_kind(value: i64) -> io.error_kind:
-    if value == 1:
-        return io.error_kind.not_found
-    if value == 2:
-        return io.error_kind.permission_denied
-    if value == 3:
-        return io.error_kind.already_exists
-    if value == 4:
-        return io.error_kind.invalid_path
-    if value == 5:
-        return io.error_kind.invalid_mode
-    if value == 6:
-        return io.error_kind.invalid_range
-    if value == 7:
-        return io.error_kind.closed
-    if value == 8:
-        return io.error_kind.busy
-    if value == 9:
-        return io.error_kind.unexpected_eof
-    if value == 10:
-        return io.error_kind.invalid_utf8
-    if value == 11:
-        return io.error_kind.unsupported
-    if value == 12:
-        return io.error_kind.limit_exceeded
-    if value == 13:
-        return io.error_kind.cross_device
-    if value == 14:
-        return io.error_kind.not_directory
-    if value == 15:
-        return io.error_kind.is_directory
-    if value == 16:
-        return io.error_kind.not_empty
-    if value == 17:
-        return io.error_kind.io_failure
+    if value as? io.error_kind is Some(var decoded):
+        return decoded
     return io.error_kind.io_failure
-
 
 private func _error(operation: string, reply: _reply) -> error:
     var domain = ""
@@ -892,14 +743,8 @@ private func _error(operation: string, reply: _reply) -> error:
     var cause: url.error?
     if reply.url_kind != 0:
         var url_kind = url.error_kind.invalid_url
-        if reply.url_kind == 2:
-            url_kind = url.error_kind.invalid_encoding
-        else if reply.url_kind == 3:
-            url_kind = url.error_kind.invalid_utf8
-        else if reply.url_kind == 4:
-            url_kind = url.error_kind.unsupported_scheme
-        else if reply.url_kind == 5:
-            url_kind = url.error_kind.limit_exceeded
+        if reply.url_kind as? url.error_kind is Some(var decoded):
+            url_kind = decoded
         cause = url.error(message = "HTTP URL preparation failed", code = reply.url_kind as i32,
             kind = url_kind, operation = operation, offset = reply.url_offset)
     var io_cause: io.error?
@@ -1361,27 +1206,42 @@ private func _charset(const bytes: [u8]) -> bool:
     return true
 
 
+private flags enum _feature(i64):
+    http1 = 1
+    http2 = 2
+    http3 = 4
+    ipv6 = 8
+    native_trust = 16
+    gzip = 32
+    deflate = 64
+    psl = 128
+    pem = 256
+    pkcs12 = 512
+    windows_store = 1024
+
+
 ## Inspect the exact provider/version and backend capabilities without opening a connection.
 ## @return An initialized immutable capability snapshot.
 func (self capabilities) init():
     var reply = _http_capabilities()
+    var features = reply.features as _feature
     var forms: [string]
-    if (reply.features / 256) % 2 == 1:
+    if features.has(_feature.pem):
         forms.push("pem")
-    if (reply.features / 512) % 2 == 1:
+    if features.has(_feature.pkcs12):
         forms.push("pkcs12")
-    if (reply.features / 1024) % 2 == 1:
+    if features.has(_feature.windows_store):
         forms.push("windows_store")
     self.transport_version = reply.transport
     self.tls_backend = reply.tls
     self.resolver = reply.resolver
     self.idn_provider = reply.idn
-    self.http1 = reply.features % 2 == 1
-    self.http2 = (reply.features / 2) % 2 == 1
-    self.http3 = (reply.features / 4) % 2 == 1
-    self.ipv6 = (reply.features / 8) % 2 == 1
-    self.native_trust = (reply.features / 16) % 2 == 1
-    self.gzip = (reply.features / 32) % 2 == 1
-    self.deflate = (reply.features / 64) % 2 == 1
-    self.psl = (reply.features / 128) % 2 == 1
+    self.http1 = features.has(_feature.http1)
+    self.http2 = features.has(_feature.http2)
+    self.http3 = features.has(_feature.http3)
+    self.ipv6 = features.has(_feature.ipv6)
+    self.native_trust = features.has(_feature.native_trust)
+    self.gzip = features.has(_feature.gzip)
+    self.deflate = features.has(_feature.deflate)
+    self.psl = features.has(_feature.psl)
     self.client_identity_forms = forms

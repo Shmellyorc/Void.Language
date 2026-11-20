@@ -94,7 +94,7 @@ def documentation_checks():
         ('## A requested font or custom shader resolved', '# A requested font or custom shader resolved'),
     ]:
         # Target the public companion section, preserving original coverage.
-        start = source.index('# G77 fallible companions.')
+        start = source.index('# Recoverable resource-loading companions.')
         tail = source[start:]
         assert original in tail, original
         changed = source[:start] + tail.replace(original, replacement, 1)
@@ -222,7 +222,7 @@ with tempfile.TemporaryDirectory(prefix='VOID raylib documentation ') as scratch
             ('rl.get_codepoint_previous(position = ', 1,
              'UTF-8 byte position immediately after the codepoint. A negative value selects the end of the text.'),
             ('rl.set_texture_filter(filter = ', 1,
-             'Texture scaling filter selected from the texture_filter_* constants.'),
+             'Texture scaling filter selected from texture_filter. Uses texture_filter; its exact integer value crosses the native boundary.'),
             ('rl.load_font_from_image(key = ', 1,
              'Image background and transparency color key used to locate glyphs.'),
             ('rl.draw_grid(spacing = ', 1, 'Distance between adjacent grid lines in world units.'),

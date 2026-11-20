@@ -1,0 +1,3771 @@
+# Language Bible before G88 — historical record
+
+This is the complete G87 Bible at accepted commit
+`9b7bbff41ba9a49ebc3d35a01fe77a7b5103ee77`, preserved during G88 consolidation.
+Its proposals, status labels, examples and workshop instructions describe their
+original contexts. They do not override the [canonical specification](LANGUAGE_BIBLE.md),
+current feature contracts or [owner directions](WRENCH_CLANKER.md).
+The text below is unchanged; its links retain their original docs-relative base.
+
+---
+
+# VOID 2.0: Language Bible and Compiler Architecture
+
+## Conditional compilation (G87)
+
+Multiline calls retain both closing-parenthesis styles and existing named arguments:
+
+```void
+print(
+    "hello")
+print(
+    "hello"
+)
+```
+
+Spaces within parentheses are continuation formatting, including when a complete
+call is excluded by a conditional region. Existing parenthesized arithmetic,
+conditions and return expressions retain the same rule; declaration/type/generic
+headers keep their existing grammar. This adds no compact single-line `if` syntax.
+
+`compile if predicate:`, `compile else if predicate:` and `compile else:` select
+indented source regions before parsing declarations or resolving imports. The
+selected body belongs to its enclosing scope; the directive introduces no scope.
+Use this for target-specific declarations and implementations. Ordinary `if`,
+including a constant `has` condition, continues to check both branches.
+
+```void
+compile if target_os == "windows":
+    func platform_name() -> string:
+        return "Windows"
+compile else:
+    func platform_name() -> string:
+        return "Other"
+
+compile if feature.tracing:
+    func trace():
+        print("Tracing enabled")
+```
+
+Declare `tracing = true` or `false` in `[build.conditions]` of
+`void.project.toml`. An undeclared condition is an error. Compiler-owned
+`target_os` values are `"windows"`, `"linux"`, `"macos"`; `target_arch` values
+are `"x86_64"`, `"aarch64"`. Predicates accept `==` / `!=` target comparisons,
+`feature.name`, `true`, `false`, `not`, `and`, `or` and parentheses. Precedence is
+`not`, then `and`, then `or`; all operands are validated. No expression evaluation,
+text substitution, source definitions or environment-derived feature flags occur.
+
+Each directive occupies one physical line, ends with `:` and may have a trailing
+`#` comment. Its nonempty body is indented normally; dedenting ends the region.
+Alternatives align with the matching `compile if`. Nesting is limited to 64 regions;
+predicates are limited to 64 nested unary/group expressions and 512 atoms. Directives
+are allowed at source-region boundaries in existing declaration and statement
+scopes, including struct/interface/enum members and generic bodies. They cannot
+splice tokens, expressions or ordinary argument continuations.
+
+All source remains valid UTF-8. Excluded regions retain well-formed directive
+conditions, nesting and branch indentation; ordinary excluded lines are opaque
+and need not lex or parse as VOID. A first-token `compile` on an excluded physical
+line is always structural, even between unmatched quote characters in excluded
+text. In active source, strings (including multiline strings) and `#` comments
+retain their existing lexical rules. All directive conditions are validated even
+inside excluded parents and after an earlier branch has matched. Inactive regions
+contribute no declarations, imports, initializers, specializations or generated code.
+
+See the [G87 design and evidence](projects/G87_CONDITIONAL_COMPILATION.md),
+[project configuration](CLI.md#conditional-build-configuration-g87) and
+[runnable example](../examples/conditional/main.void).
+
+
+**Current project/package implementation:** manifest-selected entry, Runtime/OS
+identity, CLI/editor integration, application/library creation, local and immutable
+Git dependency maintenance, approved native providers and application packaging
+are delivered within their recorded host limits. See the [CLI](CLI.md),
+[library workflow](LOCAL_LIBRARIES.md), [current status](DEVELOPMENT_STRATEGY.md#current-implementation-status)
+and [G27 qualification](projects/G27_LIBRARY_AUTHORING.md). The Slice 1 and
+proposal-era HOLD below are historical; they do not override these later contracts.
+
+**Phase 1 proposal at `2f667ea3`, implementation HOLD:** the
+[initial project contract](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-manifest-and-identity-model)
+now specifies schema 1, identities, source policy, metadata and acceptance. New
+filename-independent discovery is manifest-selected; bare explicit files and
+manifestless directory discovery retain their implemented behavior. Detailed
+choices await Boss/Golden Wrench approval, not execution from this record.
+
+## Approved project and C interoperability direction, 8 November 2026
+
+The [coordinated architecture roadmap](PROJECT_ARCHITECTURE_ROADMAP.md) records
+Boss and Golden Wrench's next priorities: native `void.project.toml`, independent
+project/application/package identities, SemVer, project-aware OS locations,
+first-file creation and `voidc init`/`new`, checked numeric-backed enum conversion,
+general typed C interoperability and IDE/package/release workflows. Dynamic linking
+is the approved default; static linking is optional. Raylib is the first substantial
+integration target, not a special compiler subsystem.
+
+**Project entry rule:** never require a hardcoded entry filename
+or an `entry` manifest key. Compiler-owned discovery must select exactly one valid
+main in the selected application source graph, in any valid source filename;
+multiple candidates diagnose ambiguity. Preserve explicit entries, standalone and
+top-level execution, and libraries without main. Manifestless automatic discovery
+retains `main.void`. Integer and numeric-enum `as?` now follow the Slice 6 contract.
+The roadmap carries open ABI and resolver decisions. Metadata grants no authority.
+
+## Active toolchain and migration history
+
+Current operations require [LLVM/Clang/LLD **23.1.4**](SOURCE_COMPILER.md#active-toolchain), retaining C++20, the single typed IR
+and shared verified O2/JIT/AOT lowering. [Migration record](llvm23/IMPLEMENTATION.md)
+and [acceptance](llvm23/ACCEPTANCE.md) preserve the original local migration results.
+The later [hosted checkpoint](net/http/ACCEPTANCE.md) supersedes the migration-era
+pending-hosted status for its recorded scope. Earlier LLVM 19 milestone
+descriptions remain historical. No source
+language, ownership, GC, reload or numeric semantic change is authorized.
+
+
+The [Boss-approved generic operator amendment, 28 October 2026](collections/GENERIC_OPERATORS.md)
+permits public operators on exact substituted public nominal owners in concrete
+generic bodies. Ordinary imports, private/internal visibility, readonly authority
+and exact operand matching retain their existing rules. Independent typed IR must
+verify specialization provenance. This supersedes older definition-import wording
+only for the approved generic case; acceptance is tracked with collections.
+
+## Stage 11 runtime globals — Boss authorization, 25 October 2026
+
+Outermost `var` now has the approved shared Runtime-storage semantics described in
+[RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md). Root public/internal globals follow the
+existing direct project-root constant visibility convention; ordinary modules use
+normal imports/aliases/visibility. Globals initialize eagerly before selected entry,
+remain across calls/compatible reload, and start fresh in new applications. Local
+block bindings, fields, module const, deep readonly and value/reference copies keep
+their existing contracts. Earlier runtime-global future/open statements below are
+superseded for this scope. [Engineering evidence and review gate](stage11/IMPLEMENTATION.md)
+remain separate from language authorization; library expansion is outside this mission.
+
+
+**Implementation versus design:** See the [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). This Bible preserves future design as well as implemented contracts; examples are not all executable language features.
+
+**Stage 6 Delivery 4 implemented subset:** Explicit host opt-in to one trusted,
+statically linked C fixture, typed project-local descriptors and ordinary `.void`
+wrappers now use the existing frontend/IR/LLVM/Runtime. Exact-width scalars, owned
+UTF-8 transfers, opaque managed resources and quiescent leased callbacks are
+implemented; see [NATIVE_LIBRARIES.md](NATIVE_LIBRARIES.md). General-purpose native
+syntax/loading and package management remain proposed. Delivery 3 is hosted-locked
+at `62b17c8c`, CI #75; Delivery 4 passed local 131/131 suites in Debug, Release
+and strict sanitizers; owner review and hosted verification remain pending.
+
+**Status:** Living language design and implementation reference. Approved subsets are implemented; later proposals and examples are not all executable.  
+**Design snapshot:** 10 October 2026  
+**Implementation reconciliation:** 16 October 2026. Read the approved phase documents for the exact implemented boundaries; old OPEN/RECOMMENDED labels must not undo later owner decisions.  
+**Purpose:** Preserve the entire VOID 2.0 design discussion so it can be continued accurately in a new chat or used as the foundation for implementation milestones.  
+**Relationship to VOIDC 1.0:** VOID 2.0 is a *new* language design. VOIDC 1.0 pursued C# semantics through a C backend; VOID 2.0 is free to define smaller, independent semantics and is planned around LLVM native code generation.
+
+> **Primary design rule:** Make programming easy, productive, fast, and fun. The compiler and runtime should handle complexity so application developers do not have to.
+
+> **Important:** Code throughout this document is **proposed VOID 2.0 syntax**, not executable code. APIs such as `graphics`, `files`, `tasks`, and `sdl` illustrate planned interfaces, not existing library implementations. Where a detail is unsettled, the document labels it explicitly instead of inventing a decision.
+
+---
+
+## Table of contents
+
+- [Part I. Product goals and non-goals](#part-i-product-goals-and-non-goals)
+- [Part II. Syntax and basic types](#part-ii-syntax-and-basic-types)
+- [Part III. Modules, names, types, and object-oriented code](#part-iii-modules-names-types-and-object-oriented-code)
+- [Part IV. Control flow, patterns, errors, and collections](#part-iv-control-flow-patterns-errors-and-collections)
+- [Part V. Memory, execution, concurrency, and native interoperability](#part-v-memory-execution-concurrency-and-native-interoperability)
+- [Part VI. Tooling, documentation, and diagnostics](#part-vi-tooling-documentation-and-diagnostics)
+- [Part VII. Compiler architecture and LLVM strategy](#part-vii-compiler-architecture-and-llvm-strategy)
+- [Part VIII. Implementation roadmap, prototypes, and audits](#part-viii-implementation-roadmap-prototypes-and-audits)
+- [Part IX. Complete worked examples](#part-ix-complete-worked-examples)
+- [Part X. Decision register and outstanding questions](#part-x-decision-register-and-outstanding-questions)
+- [Part XI. Instructions for future implementation sessions](#part-xi-suggested-rules-for-any-future-assistant-or-implementation-session)
+
+---
+
+## 0. How to use this bible
+
+> **Implementation status precedence (16 October 2026):** This Bible retains the original language design, including proposed features. The relevant approved and implemented contracts in `NUMERIC_TYPES.md`, `VALUE_SEMANTICS.md`, `MODULE_SYSTEM.md`, `INITIALIZATION.md`, `MANAGED_INITIALIZATION.md`, `MANAGED_STRUCTS.md`, `REFERENCE_VALUE_STRUCTS.md`, `RECEIVER_METHODS.md`, `COMPOSITION.md`, `INHERITANCE.md`, `INTERFACES.md`, `STRINGS.md`, and `DIAGNOSTICS.md` supersede older *phase-only* OPEN or deferred statements. Future features are **not deleted or silently approved**. `ARRAYS_PROPOSAL.md` and `WORK_LOG.md` give separate acceptance and implementation status for Phase 23. An approved design direction is not equivalent to working `.void` source behavior.
+
+This file is both a design contract and a future-conversation handoff.
+
+- **AGREED:** Explicitly accepted by the designer during discussion. Treat as intended language behavior unless deliberately revised.
+- **RECOMMENDED:** Architecture or detailed behavior proposed and accepted in broad terms, but still needs proof or precise specification.
+- **OPEN:** Unresolved edge case, API spelling, or implementation tradeoff. Do not silently promote it to a rule.
+- **EXAMPLE:** Illustrative pseudocode in proposed VOID syntax. It must not be represented as implemented behavior.
+
+If an implementation exposes a contradiction between agreed features, prefer a simple, consistent rule and bring the conflict up explicitly before locking it in. Do not quietly introduce special cases.
+
+### 0.1 Quick handoff for a fresh conversation
+
+VOID 2.0 is a proposed, compact, statically typed, garbage-collected, natively compiled language drawing ideas from Python, Go, Lua, PICO-8, GDScript, and useful C# features. It is **not** intended to reproduce C# or become an Odin clone. The developer wants all identifiers in lowercase `snake_case` (with the accepted special patterns `Ok`/`Err`), indentation-based syntax, `func`, receiver methods, `struct` reference objects and `value struct` value types, automatic type inference, simple `var`/readonly `const`, explicit `private`/`internal` and public-by-default, optional properties, method `init()`/`deinit()`, `call()`-callable structs, closures and events, `if`/`else if`/`match`/`is`, `Ok`/`Err`/`result`, `for` for all loops (iteration, Boolean conditions, and unbounded repetition), optional index/key, reverse iteration, `defer` with optional `{ ... }` block, arrays `[]` (growable or fixed-size) and dictionaries `{}`, UTF-8 strings with automatic interpolation, native C libraries through safe bindings, no exposed pointers in ordinary code, and excellent IDE diagnostics. LLVM AOT release builds are planned; LLVM ORC is the leading design for development-mode hot reload of compatible function bodies without restarting. GC is planned as precise, non-moving tracing, initially stop-the-world with thread-local small-object allocation and carefully chosen safepoints. **Compiler/runtime complexity must never be pushed onto ordinary application developers.**
+
+### 0.2 Design versus implementation
+
+The canonical DEVELOPMENT_STRATEGY.md status and feature guides identify executable
+features. Stage 4 is hosted-verified and locked at 483e67e4 / CI #68 (seven
+configurations, 80/80 each); Stage 3 remains locked. Later examples still include
+approved future syntax; they are not an implementation claim.
+
+### 0.3 Stage 4 approved contract (18 October 2026)
+
+**Stage 4 is hosted-verified and LOCKED** at `483e67e407b65674bdc82d44767f29bd83d73ae8`, [CI #68](https://github.com/Shmellyorc/Void.Language/actions/runs/39174408997): seven successful configurations, 80/80 suites each (560/560 total).
+Properties/callable structs are documented in PROPERTIES.md; enums/results/patterns,
+cleanup, functions/closures and events are documented in ADVANCED_LANGUAGE.md.
+WORK_LOG.md records local evidence and remaining boundaries. Older OPEN labels
+below are superseded only as stated by these delivered contracts. The owner approved Stage 5 cache architecture and its first production implementation,
+recorded in STAGE5_CACHE_PROPOSAL.md. The delivered subset is now hosted-locked at
+`4627687b3a18349633715e4294bc915cf74ddd41`, [CI #70](https://github.com/Shmellyorc/Void.Language/actions/runs/39193640484), seven configurations,
+82/82 suites each. Windows persistence bypass and automatic-watching deferral remain.
+STAGE6_PROPOSAL.md is research only; its recommendations do not approve or implement
+the future concurrency/native-library contracts below.
+
+- `result<t,e>` carries `Ok(value)` or `Err(error)`. `?` unwraps success or propagates
+  the exact matching error type. Recoverable errors remain distinct from runtime
+  failures. `Ok` also matches present nullable values, without converting nullable
+  into result; `Ok(null)` can be a successful nullable payload.
+- One pattern model serves `is` and statement/expression `match`: type, value,
+  range, nullable/result, tagged enum payload, struct field, list and dictionary
+  patterns. Dictionaries permit extra keys; list rest copies independently.
+  Bare names compare existing bindings; **`var name` explicitly captures**,
+  including `Ok(var value)` and `..var rest`. Captures have success-only lexical
+  scope and cannot shadow existing bindings. Incomplete matches warn; an unmatched
+  statement does nothing, an unmatched expression raises a source-located runtime
+  failure. Exhaustive matches do not warn.
+- Reached defers register dynamically and run LIFO on function exit, early return
+  and `?`. `with` cleans at scope exit. `deinit` releases external resources,
+  never GC finalization. Initially it is managed-struct-only, no-result; value
+  structs cannot define it. Explicit/deferred `deinit` and `with` share per-object
+  one-shot release state so aliases cannot release twice. Ordinary value copies
+  are unchanged. Fallible acquisition uses explicit result-returning factories,
+  without rewriting `init`. Deferred code permits Ok/Err and locally valid nested
+  break/continue, but no direct return/`?`/await. Preserve the primary runtime
+  failure, attach cleanup failures and continue applicable cleanup.
+- Bible `property`/`get`/`set` syntax executes accessor logic through field access.
+  Getters cannot mutate receivers; missing setters are readonly. Recoverable errors
+  use explicit methods. Preserve receiver selection, evaluation order, deep readonly
+  and value semantics. Accessor body changes can reload; incompatible signatures,
+  type/layout changes require restart.
+- Function types, function values, anonymous functions and escaping closures share
+  captured mutable storage (including value locals), while unrelated ordinary value
+  assignments remain independent copies. Assigning closures shares state. Captures
+  retain reference identity/readonly and precise GC tracing beyond stack lifetime.
+  Reuse stable function identities/dispatch/code leases; incompatible capture layout
+  requires restart and compatible bodies can reload.
+- Events are synchronous, ordered, strong subscriptions. Snapshot subscribers per
+  emission; duplicates are legal; `-=` removes the latest matching identity.
+  Only the owner emits; mutation/nested emission must be safe. Callback identity
+  survives assignment/compatible reload. Handlers have no result and handle
+  recoverable errors internally; runtime panic stops later handlers. No implicit
+  async. Single function fields remain distinct from events.
+- Compatible `call()` structs are callable/callback values using existing method,
+  structural checks, visibility, effects and readonly rules. No arbitrary external
+  C function-pointer ABI promise; preserve native callback/quiescence contracts.
+- Implement necessary enum/function-type foundations through the existing frontend,
+  typed IR, LLVM 23.1.4 lowerer and coordinated Runtime. No second execution engine,
+  collector, type checker or ownership registry. Dictionary `.get()` and list
+  `.pop()` remain deferred until exact signatures/error types are approved.
+- Preserve Stage 3, seven CI jobs, strict sanitizers and 180-minute timeout. Stage 5
+  persistent Debug caching was delivered separately and is hosted-locked at CI #70;
+  automatic watching remains future work. Stages 6–7 remain outside this Stage 4
+  contract. Stage 6 research is not implementation authorization. Owner controls Git and CI.
+
+
+---
+
+# Part I. Product goals and non-goals
+
+## 1. Core principles [AGREED]
+
+1. **Ease of use first.** Simple examples should require very little code; experienced developers should retain powerful types and predictable behavior.
+2. **One consistent set of rules.** Borrow good ideas from other languages without blindly copying their quirks or adding several spellings for the same operation.
+3. **Native speed.** Aim toward Go-like performance, with efficient LLVM-generated machine code, allocation avoidance, fast collections, and GC performance measured with real applications.
+4. **Automatic memory management.** Ordinary developers should not deal with raw pointers, manual frees, `unsafe`, stack/heap placement, or GC scheduling.
+5. **Native interoperability.** C libraries must be usable through typed `.void` wrappers and trusted bindings without forcing users to learn C or deal with separate `cstring` values.
+6. **Live development.** Compatible function implementation changes apply automatically on save. A running program is never forcibly restarted or repeatedly nagged.
+7. **A genuinely useful editor.** Autocomplete, documentation tooltips, parameter help, package discovery, source navigation, and understandable diagnostics are core goals.
+8. **Portable behavior.** The same VOID code should behave consistently across Linux, Windows, and macOS where its dependencies support those platforms.
+9. **KISS and DRY.** Keep compiler responsibilities well separated; no unnecessary duplicate frontends, execution engines, or monolithic runtime feature systems.
+10. **No backend leaks.** Ordinary compile/runtime errors should show `.void` source, not C, LLVM IR, mangled symbols, or linker noise.
+
+## 2. Influences, with a distinct VOID identity
+
+| Influence | Ideas intentionally borrowed | Ideas not automatically copied |
+|---|---|---|
+| Python | Readable indentation, low boilerplate, compact local code | Fully dynamic typing, implicit truthiness, silent typo-declarations |
+| Go | `struct`, receiver `func`, explicit errors, simple concurrency, `defer` | Its complete package/namespace system, pointer syntax, boilerplate error checks |
+| Lua | Concise table/dictionary literals and data-oriented convenience | Using one table representation for *every* type and object |
+| PICO-8 | Tiny game-friendly APIs, rapid creative iteration | Hard limits on program size or a mandatory fantasy-console runtime |
+| GDScript | Clean object/property syntax, accessible editor experience | Forced engine-specific scope or runtime |
+| C# | IntelliSense quality, formatting, useful pattern matching, strong diagnostics | CLR dependency, large language surface, `this`, `new`, `out`, verbose property declarations |
+
+## 3. Deliberately excluded or unnecessary features [AGREED]
+
+- No traditional C-style `for (init; test; step)` loop.
+- No `this`: receiver names handle instance access.
+- No `new`: construct with `player()`.
+- No `void` return annotation: omit the return type for no result.
+- No `namespace` declaration: VFS paths/folders establish internal module identity.
+- No required `out`: use multiple returns, `result`, or pattern bindings.
+- No `switch`/`case`: use `match`.
+- No `nil`: use `null`.
+- No separate user-facing `cstring` type.
+- No `unsafe` or raw pointer arithmetic in ordinary VOID application code.
+- No mandatory `delegate` keyword: functions are values.
+- No compiler-special stack and queue types. Optional library implementations are enough.
+- No built-in manual GC controls required by developers.
+- No automatic program restart following an incompatible hot-reload edit.
+- No C-style `printf` format-string placeholders in regular VOID printing.
+- Do not rush user-defined implicit conversion operators, exotic concurrency models, or complex inheritance machinery without a demonstrated need.
+
+---
+
+# Part II. Syntax and basic types
+
+## 4. General syntax [AGREED]
+
+- Indentation introduces most blocks; use a trailing `:`.
+- `#` starts a normal comment; `##` introduces declaration documentation.
+- No statement-ending semicolons in normal code.
+- Naming: lowercase `snake_case` for variables, functions, methods, structs, interfaces, enums, properties, fields, and type parameters.
+- The special enum-like result constructors/patterns `Ok(...)` and `Err(...)` retain those spellings because the designer explicitly liked them. The canonical result type is shown here as lowercase `result<t, error>`.
+- Boolean operators are `and`, `or`, `not`, with short circuiting. `&&`, `||`, and unary `!` are not part of the normal grammar.
+- Ordinary comparisons use `==`, `!=`, `<`, `<=`, `>`, `>=`.
+- Conditions require Boolean values, not Python-like implicit truthiness.
+
+```python
+const max_health = 100
+
+struct player:
+    name: string
+    health: i32 = max_health
+
+func main():
+    var hero = player(name = "Hero")
+
+    if hero.health > 0 and not hero.name.empty:
+        print("Welcome, {hero.name}!")
+    else:
+        print("Cannot start")
+```
+
+### 4.1 Identifier and source details [OPEN]
+
+**Current compiler boundary:** Identifiers are currently restricted to lowercase ASCII letters, digits and underscores. Tabs in indentation are diagnosed by VOID1002. The future Unicode identifier policy, any broader leading-underscore naming rules, and formatter policy remain open. The old heading describes those remaining extensions, not a lack of working identifier/token rules.
+
+Exact identifier Unicode rules, tab-versus-space policy, allowed leading underscores, formatter behavior, and detailed token grammar need formalization. The standard style remains four-space indentation and lowercase snake case.
+
+## 5. Variables and readonly constants [AGREED]
+
+**Implemented clarification (Phases 4, 16, 18):** Local `const` is a runtime readonly binding, while module `const` is a pure compile-time value and participates in dependency/cycle checking. For managed references, `const` provides a **deep readonly access path**, not a globally frozen object: mutation through that view is a compile error, even after copying it into `var`, casting it, returning it or following nested references. Another independently held mutable alias may still mutate the object. Reference-free value copies have independent writable storage when copied into `var`; readonly authority of embedded managed references is retained in value copies. See `VALUE_SEMANTICS.md`, `MANAGED_STRUCTS.md` (P3) and `REFERENCE_VALUE_STRUCTS.md` (RV1–RV7). No additional global-freezing feature is implied.
+
+`var` creates a mutable variable. `const` creates a readonly binding; assigning a constant's value to a mutable variable does **not** make that variable constant. `=` on an existing variable performs assignment. Redeclaring a visible variable with `var` is a **compile error**.
+
+```python
+const max_health = 100
+
+func main():
+    var health = max_health
+    health -= 25
+    health = max_health   # Valid
+    # max_health = 200   # Compile error
+
+    if health > 50:
+        health = 25       # Valid assignment
+        # var health = 25 # Compile error: shadowing
+
+    print(health)         # 25
+```
+
+`const` may also appear in functions and methods. An immutable collection cannot be mutated through a `const` binding:
+
+```python
+func test():
+    const scores: [i32, 3] = [10, 20, 30]
+    # scores[0] = 50     # Compile error
+
+    const items = ["sword", "potion"]
+    # items.push("bow") # Compile error
+```
+
+**Important semantics to specify precisely [OPEN]:** The user wants `const` to mean readonly *data*. A readonly access path must reject field/element mutations and mutating methods. A referenced mutable object may still change through another mutable alias unless the language adds stronger globally immutable/frozen-object semantics. Also distinguish compile-time-evaluable constants, used for array sizes, from readonly runtime object values. Any source change to a `const` requires manual restart in development mode.
+
+## 6. Numeric types and literals [AGREED]
+
+**Implemented clarification:** Phase 6 implements all ten fixed-width integer/float types, contextual literals, wrapping integer arithmetic, defined division/remainder, IEEE floating behavior and checked numeric `as`. Invalid runtime casts report source-located failures. Project Slice 6 adds integer-to-integer and integer-to-numeric-enum `as?` returning canonical `option<T>`. See [Numeric types and contextual literals](NUMERIC_TYPES.md). Platform-sized aliases, alternative base/exponent/separator literals, hashing and broader conversions remain future scope.
+
+Exact-width types are available: `i8`, `i16`, `i32`, `i64`, unsigned counterparts, `f32`, `f64`, and `bool`. The precise list of platform-sized integer aliases remains open. Unannotated small integral literals normally infer `i32`; unannotated floating literals normally infer `f32`, reflecting the game-development focus.
+
+```python
+var health = 100          # i32
+var speed = 0.5           # f32 by default
+var gravity = 9.81f       # explicit f32
+var precision = 9.81d     # explicit f64
+
+var exact_speed: f32 = 100  # Allowed: integral literal adapts
+var distance: f64 = 0.1    # Literal interpreted in f64 context
+```
+
+Expected types from arguments, fields, and annotations guide unsuffixed literal interpretation:
+
+```python
+func set_speed(speed: f32):
+    print("Speed: {speed}")
+
+set_speed(100)    # No need to write 100.0
+set_speed(0.5)
+```
+
+Explicit conversions that may lose precision need an explicit `as`; implicit conversions of existing variables should not silently discard precision. Overflow, integer literal boundaries, `NaN`, and floating-point rounding details require exact specifications and tests.
+
+G81 implements exact-width integer `&`, `|`, `^`, `~`, `<<`, `>>` and their
+compound assignments. Shift counts are any fixed-width integer, modulo the left
+value's width; signed right shifts extend the sign bit. Counts of zero or a
+multiple of the width leave the value unchanged, and `-1` shifts by width minus
+one. Shifts bind below addition and above bitwise AND, associating left to right.
+No integer promotion, undefined shift behavior, Boolean/float operations or enum
+shifts are introduced. G78 flags retain their nominal bitwise rules. See
+[the exact numeric contract](NUMERIC_TYPES.md#integer-bitwise-and-shifts-g81) and
+[executable packed-data example](../examples/learn/integer_bitwise.void).
+
+## 7. Automatic default initialization [AGREED]
+
+Every safe-language field/variable without an initializer must receive a valid default appropriate to its type. No uninitialized garbage values are observable through safe VOID.
+
+| Type | Default |
+|---|---|
+| Integer | `0` |
+| Floating-point | `0.0` |
+| `bool` | `false` |
+| `string` | `""` |
+| Nullable reference/value `t?` | `null` |
+| Growable list `[t]` | Empty list, independent per instance |
+| Dictionary `{k: v}` | Empty dictionary, independent per instance |
+| `value struct` | Fields recursively initialized |
+| Non-nullable reference/`func()` | Valid initializer required if no intrinsic safe default |
+
+```python
+value struct vector2:
+    x: f32
+    y: f32
+
+struct player:
+    name: string
+    health: i32
+    alive: bool
+    position: vector2
+    inventory: [string]
+    target: player?
+
+var hero = player()
+print(hero.name)         # ""
+print(hero.health)       # 0
+print(hero.alive)        # false
+print(hero.position.x)   # 0.0
+print(hero.inventory.count) # 0
+```
+
+Default values do **not** determine stack versus heap allocation. Object/value semantics and compiler analysis determine storage.
+
+## 8. Strings, interpolation, and formatting [AGREED]
+
+**Implemented clarification (Phase 22):** The S1–S8 foundation in `STRINGS.md` provides immutable, strict UTF-8 strings, escapes, embedded NUL, safe defaults, byte-exact equality, `+`/`+=`, pure templates and GC-rooted managed/value storage. Phase 22 reserved and diagnosed interpolation. Stage 8 Sprint 6 locally verifies the bounded string-only form in STAGE8_ERGONOMICS.md; numeric/bool/custom formatting remains deferred. Stage 8 Sprint 3 implements scalar indexing, scalar/byte lengths and owned UTF-8 conversion; Sprint 6 adds string-only interpolation. Nullable strings, slicing, ordering and general formatting remain deferred. Current contracts and acceptance records determine verification status. Do not treat the complete examples in this section as Phase 22 executable source.
+
+VOID exposes one public `string` type, with UTF-8 as the chosen internal representation. Every ordinary string supports interpolation automatically, with no `$` or `f` prefix. There is no C-style `%s`/`%f` formatting requirement.
+
+```python
+var name = "Hero"
+var health = 75.456
+var score = 42
+var gold = 1250.5
+
+print("Hello, {name}!")
+print("Next score: {score + 1}")
+print("Health: {health:F2}")   # 75.46
+print("Score: {score:D5}")     # 00042
+print("Score: {score:0000}")   # 0042
+print("Gold: {gold:N2}")       # 1,250.50 with invariant formatting
+print("Alive: {health > 0}")
+print("Literal braces: {{name}}") # Literal braces: {name}
+```
+
+Useful formatting forms include `F2`, `D5`, `N2`, `P1`, `X`, custom zero padding (`0000`), alignment (`<12`, `>12`), and escaped literal braces `{{`/`}}`. Use an invariant, portable default; localization should be explicit.
+
+Multiline strings use triple quotes, with predictable indentation trimming:
+
+```python
+var report = """
+    ===== PLAYER =====
+    Name: {name}
+    HP:   {health:F2}
+    Gold: {gold:N2}
+    ==================
+"""
+print(report)
+```
+
+Custom value display can use a method such as `string()`:
+
+```python
+value struct vector2:
+    x: f32
+    y: f32
+
+func (v vector2) string() -> string:
+    return "({v.x}, {v.y})"
+
+print("Position: {vector2(x = 10, y = 20)}")
+```
+
+**Current decisions:** S1-S8 approve strict UTF-8, exact-byte equality without
+normalization and embedded NUL for the Phase 22 foundation. Section 8.1 records
+approved future scalar indexing and length APIs, which are outside Phase 22.
+Slicing, index-out-of-range behavior, ordering and format grammar remain OPEN.
+
+### 8.1 Approved string direction, 14 October 2026
+
+**20 October 2026 superseding contract:** Stage 8 Sprint 3 now has owner-approved
+scalar/i64 length and byte_length, owned scalar indexing with negative indexes
+and checked bounds failures, and owned UTF-8 byte conversion with string-error
+results. See [the current contract](STAGE8_TEXT_COLLECTIONS.md) for engineering
+and [local acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md). The original Phase 22/future wording below is historical;
+nullable strings are implemented by G79; later string/formatting guides govern
+other implemented text features.
+
+**APPROVED DESIGN, NOT YET IMPLEMENTED.** The following decisions do not expand
+Phase 22. Its approved foundation contract is S1-S8 in STRINGS_PROPOSAL.md;
+implementation and verification status belongs in WORK_LOG.md and the string guide.
+
+Ordinary future indexing uses Unicode scalar positions and returns a string with
+exactly one scalar, rather than a UTF-8 byte or a separate character type:
+
+```python
+var text = "test"
+text[0] == "t"
+text[1] == "e"
+text[2] == "s"
+text[3] == "t"
+
+var multibyte = "A🎮B"
+multibyte[0] == "A"
+multibyte[1] == "🎮"
+multibyte[2] == "B"
+```
+
+These examples illustrate future semantics and are not executable Phase 22 code.
+Index-out-of-range behavior remains OPEN. A scalar need not be a complete
+user-perceived character; combining sequences and multi-scalar emoji may need
+separate grapheme-aware APIs. String slicing semantics remain OPEN.
+
+The preferred future public spellings are `text.length` for Unicode scalar count
+and `text.byte_length` for UTF-8 byte count, not length_byte. For `"A🎮B"` these
+are 3 and 6 respectively. Whether byte_length is implemented directly on the type
+or through standard-library machinery remains an implementation decision. Neither
+length API is part of Phase 22. Grapheme counting is separate future functionality.
+
+Ordinary string remains non-nullable with empty-string default. G79 implements
+`string?` with explicit presence distinct from the empty string. `var text: string = null`
+remains rejected; `var optional: string?` defaults to null. See [nullable types](NULLABLE_TYPES.md).
+Further conversion/equality/unwrapping interactions are not invented by this
+approval and require review where existing contracts do not settle them.
+
+Automatic interpolation without f/$ remains agreed, as in `"Hello, {name}!"`.
+Evaluation is deferred from Phase 22; its syntax stays reserved and diagnosed.
+Implicit numeric concatenation such as `"Score: " + 100` remains invalid.
+Ordering is desired future functionality, with comparison semantics OPEN; byte
+ordering, scalar ordering, locale collation and normalization are not selected.
+
+Strict scalar UTF-8, rejection of invalid Unicode scalar escapes and unknown
+escapes, immutable exact bytes without normalization, and embedded NUL independent
+of terminated C boundaries are approved by S1-S8. They are foundation contracts,
+not evidence that future indexing, length, nullable strings or interpolation work.
+
+## 9. Printing [AGREED]
+
+One simple `print()` handles primitive values, strings, interpolated text, and types supporting string conversion. It adds a newline by default, supports multiple arguments separated by spaces, and allows an optional `end` parameter.
+
+```python
+print("Hello")
+print(100)
+print(true)
+print("Score:", 42)
+print("Loading", end = "")
+print("...", end = "")
+print("Done")
+```
+
+No separate `printf`/`println` family is required in ordinary VOID.
+
+---
+
+# Part III. Modules, names, types, and object-oriented code
+
+## 10. Project entry point and VFS imports [AGREED]
+
+**Implemented clarification:** [MODULE_SYSTEM.md](MODULE_SYSTEM.md),
+[STAGE8_DISCOVERY.md](STAGE8_DISCOVERY.md) and
+[LOCAL_LIBRARIES.md](LOCAL_LIBRARIES.md) define the working VFS/import contracts.
+At baseline `7a3e0200`, explicit entry selection wins; automatic discovery selects
+the nearest exact `main.void` within the selected workspace, with a standalone editor
+fallback. There is no recursive search for files containing `main()`. The entry's
+parent establishes the project root and its compile-time project constants.
+The now-implemented [manifest contract](CLI.md) supersedes that baseline for
+project mode: the manifest fixes root/source sets and discovery selects a unique
+supported synchronous main regardless of filename. Explicit-file and
+manifestless compatibility remain; `main.void` is one valid project filename.
+Application mode and selected-entry top-level execution follow the implemented
+Sprint 4 contract; imported executable top-level statements remain forbidden.
+External-package identities and locked source views follow [the dependency contract](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance).
+Stage 11 implements runtime file
+globals with selected-root visibility, ordinary imports and eager startup; see
+[RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md).
+
+```text
+my_game/                    <- virtual project root: /
+├── main.void
+├── base_unit.void
+├── units/
+│   ├── player.void
+│   └── enemy.void
+├── scenes/
+│   ├── town.void
+│   └── battle.void
+└── world/
+    └── map.void
+```
+
+Paths inside VOID source always use `/`, on Windows, Linux, and macOS. The leading `/` refers to the **virtual project root**, not the OS filesystem root. The physical directory name `my_game` is not included.
+
+```python
+use "/units/player.void"        # Root-relative VFS path
+use "./enemy.void"              # Relative to current file
+use "../base_unit.void"         # Relative to current file
+use random                     # Official standard-library source
+use "/world/map.void" as world # Optional alias
+```
+
+Multiple paths to the same physical/module source must resolve to one canonical module identity. Folders provide the compiler's internal qualification, but developers do not write a `namespace` declaration. Directory layout should **not** determine who is allowed to import what. Working project imports cannot escape the selected root. Exact component spelling, portable paths, collision rejection and symlink/redirect/hard-link alias checks apply on every OS. External sources use the implemented explicit dependency/lock contract through `use pkg/ALIAS`; they do not permit arbitrary root escapes or grant native authority.
+
+For example, inside `units/player.void`, both `use "/base_unit.void"` and `use "../base_unit.void"` reference the same module. Internally, `units/player.void` might contain `units.player`, but `Player`-style names are **not** the naming convention. A public `player` type can simply be used as `player` following an import. Conflicting imported simple names require qualification or an alias, never silent selection.
+
+### Project-local libraries [IMPLEMENTED; LOCAL VERIFICATION]
+
+The owner-approved physical `libs/` directory uses reserved unquoted `lib/`:
+`use lib/raylib` selects `/libs/raylib/raylib.void`, while
+`use lib/raylib/graphics as gfx` selects `/libs/raylib/graphics.void`.
+Only the first-level library has the repeated-name entry convention; there is
+no general directory/index fallback. Local and quoted paths to the same file
+share one canonical project module, snapshot and dependency identity.
+
+These are project-owned sources with existing root constants and visibility,
+not external packages. Standard imports remain separate and cannot import local
+libraries. Compiler-owned completion uses actual directories/overlays and the
+same VFS checks. Imported `main()` declarations never control application entry.
+No import grants native binding/linking authority. See [the implementation
+contract](LOCAL_LIBRARIES.md); external packages use the separately implemented
+[dependency contract](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance). Hosted verification is not implied.
+
+### External packages: current contract and historical direction
+
+Local/immutable Git acquisition, explicit `add`/`tidy`, source identities, lock
+verification, library entries and native-provider approval are now implemented
+within [their documented scope](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance). The proposal below preserves
+the earlier direction; its unimplemented-status statements are superseded by
+that contract and [G26/G27](projects/G27_LIBRARY_AUTHORING.md). Public registry,
+production trust and binary delivery remain separate release boundaries.
+
+Boss's future direction is a Git-based package manager with explicit repository
+versions/revisions, reproducible resolution, pinned identities/hashes and a
+lockfile, compatible with `libs/` / `use lib/...`. It must consider target-aware
+native dependencies, platform/architecture compatibility, eventual C integration,
+trust/integrity checks without unrestricted automatic installation scripts, and
+future package discovery/editor support. Today's local imports are project-owned
+sources. The [earlier future boundary](LOCAL_LIBRARIES.md#future-external-package-manager--boss-direction-21-october-2026)
+preserves the original scope. The [8 November project roadmap](PROJECT_ARCHITECTURE_ROADMAP.md)
+now records
+approved manifest/SemVer and dynamic-default C-linkage direction. Exact schema,
+resolver, constraints, trust and native ABI rules remain proposed design, not
+implemented contracts. No external project-package implementation is claimed.
+
+### 10.1 Root constants
+
+```python
+# main.void
+const game_name = "Ghost Hunt"
+const tile_size = 16
+const max_players = 4
+
+func main():
+    print(game_name)
+```
+
+```python
+# units/player.void
+struct player:
+    x: i32 = tile_size * 4
+    name: string
+```
+
+Agreed design: compile-time/project-wide constants from the entry file can be read by other files without repeatedly importing `main.void`. **OPEN:** Exactly which readonly declarations qualify, initialization ordering, how this interacts with external libraries, and how collisions are diagnosed. Avoid creating a hidden cyclic runtime initialization system.
+
+### 10.2 File-level code and scene modules
+
+A `.void` module may contain private functions and top-level instances, rather than requiring every helper function to live inside a struct. The strongest explicitly accepted scene pattern is a **struct holding callback fields wired to private module functions**. An additional proposed feature allowing a module itself to satisfy a scene interface or define `call()` was discussed, but is **not locked as a core language requirement**; do not confuse it with callable structs.
+
+## 11. Visibility and `static` [AGREED]
+
+**Implemented clarification:** Public/internal/file-private ownership and direct-owner imports are enforced for current source declarations. Later phases establish receiver ownership, one-hop composition, managed inheritance, exact virtual overrides and structural interface lookup. G80 implements user-defined static fields and methods under [STATIC_MEMBERS.md](STATIC_MEMBERS.md). Richer protected access remains future work; do not erase approved object semantics because this broader section is incomplete.
+
+- **Public by default.** Omit the `public` keyword in ordinary declarations.
+- `public` may be written explicitly for documentation or library APIs.
+- `private` hides a member from outside its declaring struct; a top-level `private func` is file-private.
+- `internal` means visible throughout the current project or compiled library, **not** just the source folder.
+- `static` belongs to the type, not an instance; it is *not* a visibility modifier.
+- Local variables remain scoped locals regardless of public/internal modifiers.
+
+```python
+struct player:
+    name: string                     # public
+    private health_value: i32 = 100  # struct-private
+    internal experience: i32 = 0     # current module/package project boundary
+    static player_count: i32 = 0     # shared across instances
+
+func (p player) add_experience(amount: i32):
+    p.experience += amount
+
+static func player.create(name: string) -> player:
+    return player(name = name)
+```
+
+`private func enter_town()` at file scope is callable from the same file, including when attached to a public callback. An imported application can call the public callback but cannot import the private function name directly. IDE completions should show only accessible symbols while source navigation inside the defining file still works normally.
+
+**Phase 20 I2, owner approved:** Existing receiver methods retain public/internal/file-private ownership and direct-owner imports. Derived types gain no privileged private access; protected access and field visibility modifiers remain deferred. Virtual declarations are public/internal and overrides retain exact visibility. Public derived types require public bases; internal derived types cannot expose private bases. Broader protected/access design remains OPEN. See INHERITANCE.md.
+
+## 12. Ordinary `struct` and `value struct` [AGREED]
+
+**Implemented clarification (Phases 12, 16, 18–21):** Inline `value struct` copies remain independent; ordinary managed `struct` assignments share object identity. Managed reference leaves retain readonly permissions through copies. Approved `using` composition is stored and one-hop, and approved `extends`, `virtual`, `override`, `super` and structural interfaces work within their documented source boundaries. Generic erasure, transitive promotion, stateless mixins, protected access and other extensions are not implied by these implementations. See the individual phase documents.
+
+The language has **one object-oriented struct family**, with an explicit distinction between reference and value semantics:
+
+The table describes the approved language design, not a compiler feature checklist. Reference/value semantics, construction and readonly capabilities have implemented boundaries documented in `MANAGED_STRUCTS.md`, `MANAGED_INITIALIZATION.md` and `REFERENCE_VALUE_STRUCTS.md`. Phase 20 implements managed inheritance and explicit virtual dispatch within INHERITANCE.md; Phase 21 implements managed-backed structural interface views within INTERFACES.md. Phase 19 implements stored `using` composition and one-hop promotion as documented in `COMPOSITION.md`.
+
+| | `struct` | `value struct` |
+|---|---|---|
+| Semantics | Reference identity | Value/copy semantics |
+| Ordinary managed lifetime | GC | Inline/stack/register where possible, GC-tracked when containing references |
+| Assignment | Two variables may refer to same object | Assignment copies the value |
+| Inheritance | Supported, single base struct | No struct inheritance |
+| Interfaces | Supported | Supported |
+| Methods/properties | Supported | Supported |
+| Appropriate use | Characters, scenes, entities, resources | Position, color, rectangle, compact data |
+
+```python
+struct player:
+    health: i32 = 100
+
+var hero = player()
+var alias = hero
+alias.health = 50
+print(hero.health)   # 50, same reference
+```
+
+```python
+value struct vector2:
+    x: f32
+    y: f32
+
+var a = vector2(x = 10, y = 20)
+var b = a
+b.x = 50
+print(a.x)          # 10, copied value
+```
+
+Initializers and default field values don't force an object onto the stack or heap. The compiler may use stack allocation, registers, inline storage, or allocation elimination whenever it preserves semantics. Ordinary reference structs are managed objects conceptually, regardless of storage optimization.
+
+### 12.1 Inheritance and composition [APPROVED; PHASE 19–20 IMPLEMENTED]
+
+The three relationships have distinct meanings:
+
+| Form | Meaning |
+|---|---|
+| `extends` | I am this type. |
+| `using` | I have this functionality. |
+| `interface` | I support this behavior. |
+
+Ordinary managed `struct` types support **single inheritance** in the approved design. A derived instance can be used as its base type. Multiple inheritance is excluded; `value struct` does not gain struct inheritance.
+
+Virtual dispatch is explicit:
+
+- `virtual func` declares an overridable method.
+- `override func` explicitly overrides an inherited virtual method.
+- `super.method()` calls the parent implementation directly.
+- Ordinary nonvirtual methods do not automatically become virtual.
+
+Approved intended syntax (including the future `string` field):
+
+```yaml
+struct base_user:
+    health: i32
+
+virtual func (u base_user) take_damage(amount: i32):
+    u.health -= amount
+
+struct player extends base_user:
+    name: string
+
+override func (p player) take_damage(amount: i32):
+    super.take_damage(amount)
+```
+
+**Phase 20 I1–I8, owner approved and implemented locally:** Managed-only acyclic single inheritance preserves complete identity on ancestor conversions. Overrides require exact declared signatures, const-parameter qualifications and visibility; no protected access, inherited hiding, overloads or covariance are added. Virtual effects/result capabilities conservatively join the whole validated family. Real members along the static ancestry outrank using promotion; components still promote only directly declared members. Full base-payload prefixes preserve storage and precise tracing. Runtime-owned descriptors contain no code pointers; guarded dispatch belongs to the currently leased generation. Hierarchy/layout/slot/signature/effect/construction changes require restart, while compatible ordinary/override bodies can replace a whole generation. INHERITANCE_PROPOSAL.md records the approval; INHERITANCE.md and WORK_LOG.md distinguish the implemented boundary from verified results.
+
+Initializers are not inherited. Init-free ancestry retains named inherited/own field construction. Any init-bearing ancestor requires each descendant to declare its own init, beginning with explicit `super.init(...)`, including defaultable bases. Prelude arguments cannot access self. Caller/prelude arguments run before oldest-base defaults/body, followed by each child's own defaults/body. One private stage gains managed identity only at final complete commit. Virtual-family calls on unfinished self/aliases, including through helpers or super, are rejected; completed children may dispatch. C1/S1/P3/P4/RV1–RV7 remain binding. See INITIALIZATION.md and INHERITANCE.md.
+
+**Deferred implementation design:** Protected/richer field access, member hiding, covariance, abstract/final, source downcasts/type patterns, implicit constructor chaining and open-world loading require separate review. No arbitrary external managed ABI is promised.
+
+**Composition through `using`:** Multiple named or unnamed `using` fields inside managed and value structs provide Odin/Go-inspired embedding and member promotion. Both forms have ordinary physical storage:
+
+```cpp
+struct player extends base_user:
+    using motion: movement
+    using combat: combat
+    using inventory: inventory
+```
+
+`using motion: movement` stores a field named `motion`. The unnamed shorthand `using movement` stores a field named `movement`, with qualified access through `object.movement`. Both forms promote fields and methods identically; neither is stateless reuse.
+
+```cpp
+struct composed_player:
+    using movement
+    using combat
+
+struct two_motions:
+    using left: movement
+    using right: movement
+```
+
+Duplicate stored names, including two implicit `movement` names or an implicit/explicit collision, diagnose at declaration time. Explicit names distinguish multiple embeddings of the same type, as in `two_motions`.
+
+Members are accessible through their qualified field (for example, `player_value.motion.move(...)`) or an unambiguous promoted name (`player_value.move(...)`). Multiple components may legally define the same member name. An ambiguous promoted access diagnoses **at compile time at the access, not at the containing struct declaration**. Member types, argument signatures and expected result types must never guess the intended component: `x: i32` versus `x: f32` is still ambiguous. Explicit qualification selects the intended component, subject to normal visibility and typing.
+
+**Approved Phase 19 lookup boundary:** Direct fields and owner methods take precedence over promoted members in one member-selection namespace. There is no signature-based or field-versus-method fallback. Initially promotion is one-hop, considering only direct ordinary fields/methods of each using component; nested explicit qualification remains available. Automatic transitive promotion is deferred, not permanently prohibited. Targets are nonnullable nominal managed/value structs; nullable fields retain ordinary explicit checked access without promotion. Methods keep their exact type/module ownership and existing visibility/direct-owner import rules; composition grants no access or transitive method export.
+
+A using field retains ordinary defaults, stored-field constructor labels and declaration-order preparation. Custom-init arguments still bind exclusively to initializer parameters. Promoted names do not become constructor labels; lifecycle methods are not promoted. C1/S1/P4 construction/publication and P3/RV1–RV7 capability rules remain unchanged. `COMPOSITION_PROPOSAL.md` records the owner-approved U1–U7 contract. Phase 19 implements both stored forms and one-hop promotion; `COMPOSITION.md` defines the implemented boundary. Phase 20 implements the inheritance/virtual interactions documented above; Phase 21 implements interface conformance through these original, unambiguous member routes.
+
+`using` is composition, not inheritance. It does not make `player` a subtype of `movement`, `combat` or `inventory`, and grants no implicit conversion to those types. Embedding preserves actual field storage and its existing semantics: inline values copy independently, managed references retain target identity, readonly reference capabilities cannot be laundered, and embedded references remain precisely GC-tracked. Member promotion must preserve these guarantees rather than invent multiple-inheritance semantics.
+
+**Deferred design:** Automatic transitive promotion requires separate design; Phase 21 integrates structural interfaces without changing one-hop selection. Phase 20 adds inherited real-member precedence, inherited using fields and component-identity virtual dispatch while preserving one-hop promotion. Method-only reuse without embedded state remains a separate OPEN question, with no accepted trait/mixin syntax or behavior. The approved Phase 19 contract preserves existing initialization order, C1/S1 construction, P3 deep readonly, P4 complete-object publication and Phase 16–18 reference/value semantics.
+
+**`has` [OWNER-APPROVED; Sprint 6 acceptance tracked separately]:** `has Component` checks nominal `using` composition, including inherited `using` storage. `has Interface` checks structural interface conformance through the existing compiler rules. These checks use compile-time type information, not runtime reflection. `is` retains pattern matching, and `as` retains conversion. `has` grants no implicit conversions, access permissions or readonly bypasses; existing composition, interface, visibility and readonly decisions remain binding.
+
+**21 October 2026 Sprint 6 approved contract:** `Type has Target` uses type operands (qualified/concrete generic types and generic parameters), direct/inherited using storage or existing structural constraints. No recursive component search or value operands. Every conditional branch checks at specialization, without refinement or authority changes. See [the bounded ergonomics contract](STAGE8_ERGONOMICS.md) and its acceptance record for implementation status.
+
+## 13. Interfaces [AGREED; PHASE 21 BOUNDED IMPLEMENTATION]
+
+**Implemented clarification (Phase 21):** `INTERFACES.md` records owner-approved IF1–IF8: structural conformance of completed managed objects, exact method requirements, original managed identity, two-word managed-backed views, static-binding-aware method dispatch, readonly effect checking, precise GC roots and JIT/AOT support. No `implements` keyword is needed. Value boxing/erasure, interface inheritance/default bodies, dynamic tests and richer conversions remain explicitly deferred. Phase 24 adds compile-time generic constraints; G82 adds closed generic interfaces and dependent specialized constraints without changing managed-backed erasure. The old label OPEN applies to those *extensions*, not the working managed-backed interface contract.
+
+Interfaces specify required behavior and provide polymorphism without forcing inheritance chains. **Conformance is structural:** a struct satisfies an interface when its accessible method set fulfills the interface's requirements, including unambiguous methods promoted through `using`. No mandatory `implements` keyword is required. An interface injects no storage and does not automatically supply implementations.
+
+Interface method calls are polymorphic. Phase 21 supports managed-backed views of qualifying managed structs, including inherited and promoted implementations:
+
+```python
+interface damageable:
+    func take_damage(amount: i32)
+
+struct enemy:
+    health: i32 = 50
+
+func (e enemy) take_damage(amount: i32):
+    e.health -= amount
+
+func attack(target: damageable):
+    target.take_damage(10)
+```
+
+The intended type-test distinctions are:
+
+- `player is base_user` can be true through inheritance.
+- `player is movement` is not made true merely by embedding `movement`.
+- `player is movable` can be true through structural interface conformance.
+
+The `is` examples remain future type-test semantics; Phase 21 does not implement
+source type tests. The owner approved IF1–IF8 in INTERFACES_PROPOSAL.md: nonempty
+owner-module interfaces have bodyless `func` requirements with exact ordered types,
+nullability and const qualifications. Conformance uses the converting static managed
+view's accessible original methods; ambiguity diagnoses before signature matching.
+Authorized factories can expose private implementations through accessible interfaces.
+Consumers retain interface-owner imports.
+
+Completed managed references convert contextually or with `as`; nullable lifting
+preserves canonical null. Views contain complete-object identity and a stable,
+code-independent binding witness. Same-interface equality compares object identity;
+Base/Derived bindings can preserve distinct ordinary member selection. Virtual calls
+reuse guarded generation-owned dispatch. Standalone value erasure/boxing, different
+interface conversions/downcasts and dynamic discovery remain deferred. Inline value
+components of managed owners can satisfy requirements by original-storage borrowing;
+reference-containing values can copy interface leaves without copying their targets.
+
+P3/RV readonly authority survives aliases/casts/copies/parameters/returns. Fixed,
+conservative effects are inferred per requirement across eligible providers, with
+explicit argument origins preserved. Unrelated mutating providers can restrict
+readonly calls; independent mutable aliases remain valid. C1/S1/P4 rules remain
+unchanged: safe all-null templates are allowed, nonnullable fields require valid
+values, unfinished self cannot erase/escape, and publication remains once-only and
+complete. Receivers are selected and rooted before arguments. Witnesses contain no
+JIT pointers, generation leases or runtime permission tags.
+
+INTERFACES.md defines the implemented boundary and WORK_LOG.md records verification.
+Generic interfaces such as `reader<t>` specialize through the existing native
+generic machinery. `reader<i32>` and `reader<string>` are invariant, nominally
+distinct views with exact substituted requirements. Generic parameters can use
+constraints such as `s: reader<t>` once the ordinary arguments establish `t`.
+See [generic interface contracts](INTERFACES.md#generic-interfaces-g82) and the
+[runnable example](../examples/interfaces/generic.void). Interface inheritance,
+default bodies, overloads, Self, value interface representation, public managed
+FFI and richer conversions remain OPEN or
+deferred; no implicit boxing or mandatory implements keyword is introduced.
+
+## 14. Ordinary functions and receiver methods [AGREED]
+
+**Stage 8 Sprint 2 superseding direction (20 October 2026):** Boss approved the
+shared ordinary/initializer named/default binding contract, concrete-default
+annotation inference and the four-member compiler-owned numeric prelude. Exact
+rules and current implementation status are in [STAGE8_CALLS_NUMERIC.md](STAGE8_CALLS_NUMERIC.md)
+and [DECISIONS.md](DECISIONS.md). The Phase 13 ordinary-call exclusions below are
+historical. Function-value calls and interface requirement defaults retain their
+existing bounded contracts. Hosted CI is deferred until Stage 8 ends.
+
+
+**Implemented clarification (Phase 13):** Owner-module receiver methods, correct mutable original-storage selection, inferred mutation/effects, left-to-right argument evaluation, conservative readonly checking and shared JIT/AOT lowering are working. Ordinary named/default function argument calls remain outside the supported constructor-argument grammar. Consult `RECEIVER_METHODS.md` for exact source boundaries.
+
+Every function or method starts with `func`. A method has a receiver `(name type)` before the method name. Parameter annotations are **name-first**: `amount: i32`. Return types use `->`. No `this` or `void` keywords.
+
+```python
+func add_numbers(a: i32, b: i32) -> i32:
+    return a + b
+
+struct player:
+    health: i32 = 100
+
+func (p player) take_damage(amount: i32):
+    p.health -= amount
+
+func (p player) is_alive() -> bool:
+    return p.health > 0
+```
+
+Functions can call other functions and methods in any reachable/imported module. An empty `return` is legal in a no-result function, and such functions may simply reach their end.
+
+### 14.1 Defaults and parameter inference
+
+```python
+func move(speed: f32 = 1.0):
+    print("Moving at {speed}")
+
+func calculate(value: f64 = 0.5):
+    print(value)
+
+# Inferred type f32 from default 0.5
+func adjust(speed = 0.5):
+    print(speed)
+```
+
+A parameter without a type or default is **not** silently dynamic. The current recommendation is to require a type unless a default makes the type unambiguous, and revisit generic inference deliberately. Default values and positional/named calls are supported; argument evaluation order must be specified and preserved across native lowering.
+
+### 14.2 Phase 13 value receiver contract [APPROVED, bounded implementation]
+
+For the numeric/Boolean value-struct subset, methods belong to the nominal type's
+owning source module; calls from direct importers and project-root type users
+respect public/internal/file-private visibility. Foreign-type extension methods
+remain deferred. Receiver mutation is inferred from validated writes and transitive
+receiver calls, including cycles. Readonly paths allow only proven non-mutating
+methods. Mutating calls require mutable local/parameter storage or a nested field
+rooted there; non-mutating calls may use temporaries. Ordinary arguments, assignment
+and returns still copy values.
+
+Receiver storage is selected once before arguments; arguments evaluate once left
+to right. The method observes argument effects on that storage. Aggregate arguments
+are copies taken at their own evaluation point. Changed receiver mutation contracts
+require conservative hot-reload restart. See RECEIVER_METHODS.md for the approved
+M1 + I1 implementation boundary. No source pointer/reference syntax is added.
+
+## 15. Multiple return values, not first-class tuples [AGREED]
+
+Inspired by Odin: functions can return multiple distinct values without requiring a tuple object. Parentheses group the return type list. Named components improve IntelliSense.
+
+```python
+func get_position() -> (x: f32, y: f32):
+    return 100, 200
+
+func main():
+    var x, y = get_position()
+    print("Position: {x}, {y}")
+```
+
+Unnamed forms such as `-> (f32, f32)` are valid. Multiple returns are conceptually **not** first-class tuple values; developers use a `struct` or `value struct` for a persistent grouped value.
+
+**G15 contract.** A return list has at least two components and uses either names for every component or types alone. Names are declaration metadata for the corresponding positions. The body evaluates explicitly written return expressions from left to right and checks each against its declared type. A local declaration of the form `var a, b = call()` (or `const a, b = call()`) evaluates the call once and binds every result in order. There is no discard, assignment destructuring, destructuring of ordinary values, or implicit return binding.
+
+Direct, generic, receiver, virtual and interface calls use the internal VOID ABI. It carries the ordered component types in a private, layout-checked aggregate with the existing native return and GC root machinery. Names do not affect ABI identity. Single results retain their current ABI, including parenthesized single type annotations. Function values, anonymous functions, async results, operators and native bindings require separate multiple-return contracts.
+
+## 16. Constructors: `init()` [AGREED / details OPEN]
+
+**Implemented clarification (Phases 14 and 17):** `INITIALIZATION.md` and `MANAGED_INITIALIZATION.md` define and implement one owner-module initializer, positional-prefix/named parameter binding, pure defaults, left-to-right supplied-argument evaluation, required field readiness, nested construction and last-step successful publication for the approved value and managed types. `init()` currently has no result annotation; fallible `result`-returning construction, resource teardown/rollback and richer escaped construction views remain separate OPEN extensions. The old broad heading does not mean ordinary approved `init()` is unresolved.
+
+Most structs need no explicit constructor. A struct call constructs it with safe defaults and optional named fields. When custom logic is required, define a receiver method named `init`.
+
+```python
+struct player:
+    name: string
+    health: i32 = 100
+
+func (p player) init(name: string):
+    p.name = name
+    print("Created {name}")
+
+var hero = player("Hero")
+```
+
+```python
+struct enemy:
+    name: string
+    health: i32
+    damage: i32
+
+func (e enemy) init(name: string, health: i32 = 100, damage: i32 = 10):
+    e.name = name
+    e.health = health
+    e.damage = damage
+
+var boss = enemy("Dragon", health = 500, damage = 50)
+```
+
+Agreed intent:
+
+- Fields receive valid defaults before initializer logic uses them.
+- `init()` runs once during successful construction and cannot be casually called a second time as an ordinary public method.
+- Parent initialization happens once before child-specific initialization. Phase 20 I5 requires explicit `super.init(...)` as the first derived initializer prelude, even when parent arguments are defaultable. Automatic chaining is deferred and requires separate approval; it is not implemented behavior.
+- Start with **one initializer per struct**, using optional/default parameters rather than a forest of constructor overloads.
+- If construction can fail, support `result` and avoid leaking partially initialized objects.
+
+```python
+struct player:
+    name: string
+
+func (p player) init(name: string) -> result<bool, error>:
+    if name == "":
+        return Err(error("Name required"))
+    p.name = name
+    return Ok(true)
+
+match player("Hero"):
+    Ok(hero):
+        print(hero.name)
+    Err(err):
+        print("Creation failed: {err}")
+```
+
+**G84 contract:** A fallible initializer declares `result<bool, e>`; the ordinary
+`player(...)` call produces `result<player, e>`. `Ok(true)` is the completion
+convention; the ordinary `Ok`/`Err` tag determines success, and the successful
+constructor result contains the finished player. There is no general `void`
+payload or second construction operation. `match` and existing `?` handle/propagate
+the result. A fallible base uses the mandatory first `super.init(...)?` prelude
+with an exactly matching error type. Required fields are proved on successful
+exits, failed stages never publish, and existing lexical resource cleanup runs
+without promising rollback of arbitrary effects. See [initialization](INITIALIZATION.md#typed-fallible-initialization-g84)
+and [managed initialization](MANAGED_INITIALIZATION.md#typed-fallible-managed-initialization-g84).
+
+Phase 13 approved receiver methods and initializer groundwork (I1), deferring
+custom execution at that time. Phase 14 now approves C1 in
+INITIALIZATION_PROPOSAL.md, superseding that deferral for supported value structs.
+See INITIALIZATION.md for parameter-only constructor binding, pure defaults,
+recursive nested construction, visibility, successful publication and reload
+contracts. No-init types retain Phase 12 named-field construction. Fallible,
+resource and managed construction remain separate design gates at Phase 14.
+Phase 17 subsequently approved S1 + MI1–MI7 for managed custom initialization:
+private construction views have no parent identity until successful complete commit;
+direct required references need definite assignment before use/normal exit, and
+whole-view helper calls require all fields ready plus proven nonescape. C1 argument/
+default/visibility rules and P3 readonly views remain. Whole-self identity, self-links,
+rebinding and escape inside init are deferred, not permanently prohibited. Effects
+on completed objects are not rolled back if body/final allocation fails. Managed
+nonnullable bindings still require explicit construction. See
+[MANAGED_INITIALIZATION.md](MANAGED_INITIALIZATION.md) for the approved implemented
+boundary; broader fallible/resource behavior remains a separate design gate.
+
+## 17. Predictable resource cleanup: `deinit()`, `with`, and `defer` [AGREED]
+
+`deinit()` is an optional lifecycle method for releasing native or otherwise externally owned resources; it is **not** a GC destructor. The garbage collector reclaims managed memory independently and does not promise automatic `deinit` calls on collection.
+
+```python
+struct texture:
+    private handle: texture_handle?
+
+func (t texture) init(path: string):
+    t.handle = graphics.load_texture(path)
+
+func (t texture) deinit():
+    if t.handle is Ok(handle):
+        graphics.unload_texture(handle)
+        t.handle = null
+```
+
+```python
+with texture("hero.png") as sprite:
+    graphics.draw(sprite, 100, 100)
+# deinit called at scope exit, including early exit
+```
+
+```python
+func draw_player():
+    var sprite = texture("hero.png")
+    defer sprite.deinit()
+    graphics.draw(sprite, 100, 100)
+```
+
+Important rules:
+
+- `with` owns deterministic scope cleanup.
+- `defer` schedules cleanup at function exit.
+- Defers run in reverse registration order, including on `return`, `?` propagation, and language-managed unwind where safe.
+- `deinit` should be effectively one-shot; duplicate native release is not permitted.
+- Ordinary `value struct` copying must not accidentally duplicate owned native-resource release obligations. Restrict such ownership until explicit rules are proven.
+- Async shutdown/waiting belongs in an async `close()`-style method, then `deinit()` releases resources synchronously.
+
+## 18. Properties and accessors [AGREED]
+
+**Hosted-verified implementation (CI #68):** PROPERTIES.md specifies the executable
+getter/setter, readonly, value-copy, nested mutation, generics and reload behavior.
+The remaining delivered Stage 4 features are
+documented in ADVANCED_LANGUAGE.md.
+
+Ordinary fields need no accessors. A `property` adds getter/setter logic with receiver syntax, using normal field-like access at the call site. Omitting `set` makes the property readonly.
+
+```python
+struct player:
+    private health_value: i32 = 100
+    name: string
+
+property (p player) health: i32:
+    get:
+        return p.health_value
+
+    set(value):
+        p.health_value = clamp(value, 0, 100)
+
+var hero = player()
+hero.health = 150
+print(hero.health)  # 100
+```
+
+```python
+struct player:
+    health: i32 = 75
+    max_health: i32 = 100
+
+property (p player) health_percent: f32:
+    get:
+        return p.health / p.max_health * 100.0
+```
+
+Property getter/setter **body** changes should be hot-reloadable; changing property signature or backing-field layout requires manual restart. Accessors use the same source documentation and IntelliSense metadata as methods. Automatic C#-style properties such as `get; private set;` are not planned unless a real need emerges.
+
+## 19. Static fields and methods [IMPLEMENTED — G80]
+
+`static` marks type-level state/behavior and combines with visibility. Managed and
+value structs support inferred or annotated runtime fields and readonly
+`static const` fields. No instance is needed:
+
+```void
+struct game_settings:
+    static max_players: i32 = 4
+    private static debug_mode = false
+
+## Restore shared settings.
+## @return No value; resets the owner's shared debug state.
+static func game_settings.reset():
+    game_settings.debug_mode = false
+```
+
+Methods have no hidden receiver. Named/default arguments, returns, visibility,
+ordinary callable values and generic specialization reuse existing functions.
+Each concrete generic owner gets independent state. Static fields reuse eager
+runtime-global initialization, ownership, GC roots, owner-thread restrictions and
+reload guards. They are runtime state even when readonly; compile-time and
+instance/parameter defaults cannot read them. Type-qualified lookup preserves
+nominal identity and distinguishes instance members. Full syntax, source order,
+private access, async boundaries and limits are in
+[Static members](STATIC_MEMBERS.md); [G80 evidence](projects/G80_STATIC_MEMBERS.md)
+records native platform qualification.
+
+## 20. Callable structs and function-valued members [AGREED]
+
+A struct defining a suitable `call()` method can be invoked using `object(...)`, like a function, without `extends func()`. Such objects can satisfy a compatible `func(...)` callback type.
+
+```python
+struct multiplier:
+    amount: i32 = 2
+
+func (m multiplier) call(value: i32) -> i32:
+    return value * m.amount
+
+var double = multiplier()
+print(double(10))      # 20
+```
+
+The callable method can delegate to private helpers in the same file:
+
+```python
+func (m multiplier) call(value: i32) -> i32:
+    return multiply_value(value, m.amount)
+
+private func multiply_value(value: i32, amount: i32) -> i32:
+    return value * amount
+```
+
+### 20.1 The explicitly wanted scene pattern
+
+```python
+# scenes/town.void
+struct scene:
+    on_enter: func()
+    on_exit: func()
+    on_update: func(f32)
+
+private func enter_town():
+    print("Welcome to town!")
+
+private func exit_town():
+    print("Leaving town!")
+
+private func update_town(dt: f32):
+    print("Updating town: {dt}")
+
+var town = scene(
+    on_enter = enter_town,
+    on_exit = exit_town,
+    on_update = update_town
+)
+```
+
+```python
+# main.void
+use "/scenes/town.void" as town_module
+
+func main():
+    town_module.town.on_enter()
+    town_module.town.on_update(0.5)
+    town_module.town.on_exit()
+```
+
+The functions passed to callback fields are **references**, not invocations: `enter_town`, not `enter_town()`. This pattern was explicitly reinforced by the designer. For callbacks that might be absent, use a nullable function field such as `on_enter: func()?`; non-nullable `func()` fields need valid initializers.
+
+## 21. Function values, anonymous functions, and closures [AGREED]
+
+A `func` can be stored, passed, returned, and invoked. No `delegate` keyword is needed.
+
+```python
+func show_damage(amount: i32):
+    print("Damage: {amount}")
+
+var handler = show_damage
+handler(25)
+
+var on_click = func():
+    print("Button clicked")
+```
+
+Function types reuse the same syntax:
+
+```python
+func run_action(action: func()):
+    action()
+
+func apply_damage(amount: i32, callback: func(i32)):
+    callback(amount)
+```
+
+Closures capture needed local state and keep it alive under GC:
+
+```python
+func make_counter() -> func() -> i32:
+    var count = 0
+
+    return func() -> i32:
+        count++
+        return count
+
+var counter = make_counter()
+print(counter())  # 1
+print(counter())  # 2
+```
+
+Mutable local captures share managed storage with the closure. Unrelated ordinary value copies remain independent. Captured value-method receivers use independent snapshots shared by copies of the closure; managed receivers retain identity. Compatible bodies reload under existing generation leases; capture-layout or authority changes require restart. See ADVANCED_LANGUAGE.md.
+
+## 22. Events [AGREED]
+
+`event` explicitly denotes a zero-or-more-subscriber callback container, starting empty without an initializer. Use `+=` to subscribe, `-=` to unsubscribe, and `.emit(...)` to notify. A normal `func()` field is **one** callable, not an event.
+
+```python
+struct player:
+    health: i32 = 100
+    event on_damage: func(i32)
+
+func (p player) take_damage(amount: i32):
+    p.health -= amount
+    p.on_damage.emit(amount)
+
+private func display_damage(amount: i32):
+    print("Took {amount} damage")
+
+var hero = player()
+hero.on_damage += display_damage
+hero.take_damage(25)
+hero.on_damage -= display_damage
+```
+
+### 22.1 Three distinct declaration kinds
+
+| Code | Meaning |
+|---|---|
+| `event damaged: func(i32)` | Empty multi-subscriber event, connects later |
+| `var handler: func(i32)?` | Optional single callback, initially `null` |
+| `const handler: func(i32) = show_damage` | Immutable reference to one callable |
+
+The earlier idea `const handler: func(i32)` as an automatically created event was **withdrawn** to avoid hidden declaration behavior. Use `event` for that purpose.
+
+Stage 4 implements owner-method emission, ordered strong subscriptions, duplicate callbacks, latest-match removal and a subscriber snapshot per synchronous emission. Nested emissions and changes affect subsequent snapshots; runtime failure stops later handlers. Callback identities survive assignment and compatible reload. GC does not run deterministic unsubscription. File-level events and source concurrency remain future work. See ADVANCED_LANGUAGE.md.
+
+
+---
+
+# Part IV. Control flow, patterns, errors, and collections
+
+## 23. `if`, `else if`, and Boolean logic [AGREED]
+
+**Current boundary:** Statement `if`/`else if`/`else`, Boolean conditions and short-circuit operators are implemented. The expression form yielding a value from branch expressions is still a future language-design item, including compulsory `else` and branch type joining.
+
+No parentheses required around conditions. All conditions must have Boolean type. Use words `and`, `or`, `not`, not C/JavaScript logical glyphs.
+
+```python
+if player.health <= 0:
+    print("Defeated")
+else if player.health < 25:
+    print("Low health")
+else:
+    print("Healthy")
+
+if player.is_alive() and not player.poisoned:
+    player.move(1, 0)
+```
+
+`if` can also be an expression whose chosen branch's final expression is the result:
+
+```python
+var damage = if critical:
+    20
+else:
+    10
+```
+
+**21 October 2026 approved Sprint 6 policy:** Each branch contains one value expression; else is mandatory. Nesting and else-if work. Expected types contextualize both branches; otherwise the first branch anchors existing compatibility. Check both branches, execute one, preserve readonly/copies/identity/roots. See [the contract](STAGE8_ERGONOMICS.md) for the bounded call/interpolation grammar and actual acceptance status.
+
+## 24. `is` patterns and `match` [AGREED]
+
+One pattern system is reused for type tests, value/range checks, struct fields, nullable checks, results, and list/dictionary destructuring.
+
+```python
+if entity is enemy(e):
+    e.attack()
+
+if player.health is 1..25:
+    print("Critical")
+
+if settings is {"sound": true}:
+    print("Sound enabled")
+```
+
+Pattern bindings such as `e` exist only in the branch where the match succeeds. There is no `out` parameter or implicit mutation of an existing variable.
+
+`match` replaces traditional `switch`:
+
+```python
+match enemy:
+    enemy(health = 0):
+        print("Defeated")
+    enemy(health = 1..25):
+        print("Almost defeated")
+    enemy(aggressive = true):
+        print("Attack!")
+    _:
+        print("Ignore")
+```
+
+A `match` can return a value:
+
+```python
+var status = match player.health:
+    0: "Defeated"
+    1..25: "Critical"
+    26..50: "Injured"
+    _: "Healthy"
+```
+
+### 24.1 Incomplete matches: carefully agreed distinction
+
+This was specifically discussed and agreed after revising an earlier suggestion:
+
+| Construct | Compiler diagnostic | If no arm matches at runtime |
+|---|---|---|
+| `match` used as a statement | Warning for missing known cases | Nothing executes |
+| `match` used as an expression | Warning for missing cases | Throws a VOID runtime match error |
+| Exhaustive `match` / `_` default | No missing-case warning | Selected arm executes |
+
+**Do not silently make incomplete match expressions return nullable values.** That was an earlier suggestion and was explicitly superseded. The runtime failure needs the same source-first diagnostic and stack-trace experience as other runtime errors.
+
+### 24.2 List, dictionary, and value patterns
+
+```python
+var items = ["sword", "shield", "potion"]
+
+if items is [first, second, ..rest]:
+    print(first)
+    print(second)
+```
+
+```python
+var settings = {"sound": true, "difficulty": 3}
+if settings is {"sound": true}:
+    print("Sound is on")
+```
+
+These are **RECOMMENDED** features in the agreed pattern family. **OPEN:** Exact destructuring syntax, whether extra dictionary keys are allowed, whether `rest` copies or creates a view, exhaustive analysis when data is dynamic, and the distinction between a value pattern and a binding variable.
+
+## 25. Enums: simple and data-carrying [AGREED]
+
+Enums can represent plain alternatives or tagged variants with attached values. Variant payloads are matched using the same pattern syntax, not a separate switch language.
+
+```python
+enum direction:
+    up
+    down
+    left
+    right
+
+var facing = direction.up
+
+match facing:
+    direction.up:
+        print("Up")
+    direction.down:
+        print("Down")
+    _:
+        print("Other")
+```
+
+```python
+enum game_event:
+    player_joined(name: string)
+    enemy_damaged(amount: i32)
+    item_collected(item: string)
+    game_over
+
+func handle_event(e: game_event):
+    match e:
+        game_event.player_joined(name):
+            print("Welcome, {name}!")
+        game_event.enemy_damaged(amount):
+            print("Damage: {amount}")
+        game_event.item_collected(item):
+            print("Collected {item}")
+        game_event.game_over:
+            print("Game over")
+```
+
+Missing cases warn rather than block compilation for statement matches. Value-producing matches warn at compile time and raise a runtime match error if actually unmatched. The precise enum representation and payload ABI are implementation matters.
+
+Ordinary tagged enums support `==` and `!=` by matching cases and comparing
+active payloads using their actual equality operations. Unsupported payload
+equality diagnoses; explicit operators retain precedence. Generic enum payloads,
+eligible enum dictionary keys, checked numeric extraction and `flags enum` are
+implemented in G78. Flags support typed bitwise combinations, including unnamed
+values; ordinary numeric enums retain declared-discriminant checks.
+See [enums and flags](ENUMS.md) for construction, conversions, name/value APIs,
+flag helpers, precedence and ownership contracts. `is`/`match` remain unchanged.
+
+## 26. Iteration: `for`, optional index/key, and `reverse` [AGREED]
+
+The collection element is always first; optional metadata comes second. Metadata is the original numeric index for a list and the actual key for a dictionary.
+
+```python
+var items = ["sword", "shield", "potion"]
+
+for item in items:
+    print(item)
+
+for item, index in items:
+    print("{index}: {item}")
+
+for item, index in reverse items:
+    print("{index}: {item}")
+```
+
+A reverse iteration does **not** reorder the collection or allocate a reversed copy. An index during reverse traversal remains the original index.
+
+```python
+var stats = {"health": 100, "damage": 15}
+
+for value, key in stats:
+    print("{key}: {value}")
+
+for value, key in reverse stats:
+    print("{key}: {value}")
+```
+
+Dictionary order is insertion order; reverse traverses the reverse of that order. Updating an existing key leaves its position unchanged, while removing and reinserting places it at the end.
+
+### 26.1 Numeric ranges
+
+Ranges reuse one grammar everywhere:
+
+```python
+for i in 0..10:     # 0 through 10 inclusive
+    print(i)
+
+for i in 0..<10:    # 0 through 9
+    print(i)
+
+for i in 10..0:     # 10 through 0 descending, inclusive
+    print(i)
+
+for i in 10..<0:    # 10 through 1, excluding 0
+    print(i)
+```
+
+Direction follows the endpoint ordering. **Implemented Phase 23:** matching i32/i64 endpoints, equal inclusive singleton
+and exclusive empty ranges, direction from endpoint order, and overflow-safe
+terminal checks. Steps, mixed widths/signedness and non-integral endpoints reject. Plain C-style three-part `for` is intentionally omitted.
+
+## 27. `for`, `break`, `continue`, `return`, `pass` [AGREED]
+
+VOID uses **one loop keyword: `for`**. The separate `while` loop keyword was removed at the designer's request. Use `for` for Boolean-controlled repetition, iterable/range traversal, and unbounded loops. A `for condition:` condition must be `bool` and is checked before each iteration; `for:` has no condition and repeats until control flow exits it.
+
+```python
+func update():
+    for player.health > 0:
+        player.update()
+
+        if player.paused:
+            continue
+
+        if game_over:
+            break
+
+func stop_if_needed():
+    if paused:
+        return
+```
+
+```python
+# Iterate over items or numeric ranges with the same keyword.
+for enemy in enemies:
+    enemy.update()
+
+for i in 0..<10:
+    print(i)
+
+# Unbounded repetition, exited explicitly.
+for:
+    update_world()
+    if should_exit:
+        break
+```
+
+- `for condition:`: repeat as long as a Boolean condition remains true.
+- `for item in iterable:`: iterate a collection or numeric range (see Section 26).
+- `for:`: repeat indefinitely until `break`, `return`, or another exit.
+- `break`: exit the innermost loop.
+- `continue`: begin the next iteration, rechecking a conditional `for` before entering its body again.
+- `return`: exit a no-result function; `return value` returns results.
+- `while` is **not** a VOID loop keyword. A `while condition:` statement should produce a clear source diagnostic suggesting `for condition:`.
+
+### 27.1 Assignment operators and increments
+
+`+=`, `-=`, `*=`, `/=`, `%=` are supported. G78 adds `&=`, `|=`, `^=` for exact integer and flags types. `++` and `--` are supported **only as postfix standalone statements**; there is no prefix form or expression-value result.
+
+```python
+var score = 0
+score++
+score += 25
+score--
+
+# var previous = score++  # Compile error
+# ++score                  # Compile error
+```
+
+This retains convenience without complex C/C++ sequencing semantics.
+
+### 27.2 Intentional placeholder: `pass` [APPROVED, IMPLEMENTED VOID 2.0]
+
+`pass` is an explicit no-op statement for an intentionally unfilled body or a
+placeholder within a larger block. Its exact syntax is `pass` on its own statement
+line, optionally followed by a comment. It is a reserved statement keyword, never
+an expression, value, call or declaration name. It is legal in ordinary statement
+blocks: functions, receiver methods, initializers, conditionals and loops.
+
+It performs no operation and has no special runtime behavior. Execution continues
+with the following statement. Unlike `return`, it does not exit a function; unlike
+`break`, it does not exit a loop; unlike `continue`, it does not advance to the next
+iteration. It does not satisfy a required return path or initialize a required
+field. A no-result function containing only `pass` falls through normally.
+
+```swift
+func update():
+    pass
+
+func check(ready: bool):
+    if ready:
+        pass
+    else:
+        update()
+
+func repeat():
+    var i = 0
+    for i < 10:
+        pass
+        i++ # Executes normally after pass.
+```
+
+Conditional, unbounded, fixed/growable array and i32/i64 range `for` loops are
+implemented. See GROWABLE_ARRAYS.md for traversal, reverse and fail-fast rules.
+An unbounded `for:` containing only `pass` continues indefinitely.
+
+Empty ordinary statement blocks, including comment-only bodies, remain invalid:
+
+```swift
+# Invalid: no indented statement body.
+func missing():
+    # A comment is not a statement.
+
+# Invalid: pass does not provide an i32 return value.
+func missing_result() -> i32:
+    pass
+
+# Invalid: the else path falls through without returning.
+func choose(ready: bool) -> i32:
+    if ready:
+        return 1
+    else:
+        pass
+```
+
+`return pass`, `var value = pass`, `pass()`, `pass 1` and `pass:` are invalid.
+Interface requirements remain bodyless signature declarations (`func update()`);
+adding `:` and a `pass` body is invalid and does not create a default implementation.
+Struct field declarations are not statement blocks; `pass` is not a field or an
+alternative to an interface requirement.
+
+## 28. `defer` and failure handling [AGREED / failure policy RECOMMENDED]
+
+Both a deferred call and an explicit `{ ... }` block are supported, even though most other blocks use indentation:
+
+```python
+func load_game():
+    var file = files.open("save.dat")?
+    defer file.close()
+
+    defer {
+        print("Cleaning up")
+        print("Finished")
+    }
+
+    return file.read()?
+```
+
+Defers are registered when execution reaches them and execute **last registered, first executed**. Within a deferred block, statements execute top to bottom. Defers execute on normal returns, early returns, and `?` error propagation.
+
+A language-managed runtime panic inside a defer should not silently skip remaining deferred operations. The original error remains primary, and cleanup failures appear as additional diagnostics:
+
+```text
+Runtime error: Game loading failed
+  at load_game() src/main.void:12
+
+Additional failure during defer:
+  Cleanup failed
+  at load_game() src/main.void:6
+```
+
+**Important limitation:** Native process corruption, forced termination, or an irrecoverable machine failure cannot guarantee cleanup or a complete stack trace. Stage 4 implements registration-time deferred call arguments, execution-time block captures and LIFO cleanup on return, propagation and language-managed runtime failure. Deferred code cannot directly return or propagate; locally valid loop control is allowed. Cleanup preserves the primary failure, attaches bounded additional failures and continues. Managed-only one-shot deinit and with share the same release state. See ADVANCED_LANGUAGE.md.
+
+## 29. `result`, `Ok`, `Err`, `?`, and nullable patterns [AGREED]
+
+**Implemented G79:** explicit `T?` supports numeric primitives, bool, strings, value
+structs, enums and collections alongside existing nullable references/interfaces/
+callables. Non-nullable types remain the default. `T` lifts to the same `T?`; null
+needs nullable context. `Ok(var payload)` matches presence; `as T` checks extraction
+and `as? T` returns canonical `option<T>`. Null is distinct from zero, false, empty
+strings and empty collections. Readonly authority and ordinary copying/GC rules
+remain intact. See [nullable types](NULLABLE_TYPES.md) for the complete contract.
+
+Recoverable operations return `result<t, e>`, with `Ok(value)` for success and `Err(error)` for failure. `?` unwraps a successful result or propagates its error (running registered cleanup along the way).
+
+```python
+func load_player(path: string) -> result<player, error>:
+    var text = files.read_text(path)?
+    var hero = parse_player(text)?
+    return Ok(hero)
+
+match load_player("save.dat"):
+    Ok(hero):
+        print("Welcome, {hero.name}!")
+    Err(err):
+        print("Load failed: {err}")
+```
+
+`Ok(value)` also serves as a **type-aware pattern** for the presence of a nullable value. It does not make a nullable value into a `result` behind the scenes.
+
+```python
+var maybe_player: player? = find_player("Hero")
+
+if maybe_player is Ok(p):
+    p.heal(20)
+else:
+    print("No player")
+```
+
+```python
+var maybe_items: [string]? = find_inventory()
+if maybe_items is Ok(items) and not items.empty:
+    print("Found {items.count} items")
+```
+
+An empty but present list matches `Ok(items)`; `Ok` checks *presence*, not collection count or truthiness. `Err(...)` is a result-pattern alternative, not a synonym for `null`. `Ok(null)` could be a legitimate `result<t?, e>` success and does **not** imply an error. Nested null/result patterns may therefore need additional checks.
+
+Use proper error types, including enums with cases such as `not_found`, `permission_denied`, and `invalid_format`, rather than only strings. Unexpected programming failures use a language-managed panic/runtime failure path, separate from normal `result` operations.
+
+## 30. Type casts, checks, and parsing [AGREED]
+
+**Implemented clarification:** Phase 6 defines the numeric `as` conversion matrix, floating truncation/rounding, invalid-value failures, range checking and optimization-independent behavior. Phase 16+ separately implements bounded checked managed reference conversions/upcasts in its approved nominal/interface source family. Project Slice 6 implements the integer and numeric-backed enum `as?` family in [Numeric types and contextual literals](NUMERIC_TYPES.md#numeric-backed-enums-and-fallible-casts). G79 adds same-payload nullable extraction to canonical `option<T>`. Other fallible conversions, downcasts, foreign conversions and richer type patterns remain open.
+
+- `value as type` is an explicit checked conversion; when allowed but invalid at runtime, report a VOID runtime error.
+- `value as? type` checks an integer against the target integer range and, for a numeric-backed enum, its declared discriminants. The result is canonical `option<type>` containing `Some(value)` or `None`. G79 also supports safe nullable extraction to the same payload type. This supersedes the older nullable-cast proposal for the implemented family.
+- `value is type` / `value is type(binding)` checks types and narrows them through the pattern system.
+- Parse strings using `parse<t>(text)`, returning a `result`, rather than magically casting strings to numbers.
+- Compatible numeric literals adapt to expected parameter/field types.
+- No C-style `(int)value` casts and no ordinary memory reinterpretation.
+
+```python
+var number = 100
+var speed = number as f32
+var precise = speed as f64
+
+if number as? i8 is Some(var small):
+    print(small)
+```
+
+```python
+var age = "25"
+
+match parse<i32>(age):
+    Ok(value):
+        print("Age: {value}")
+    Err(err):
+        print("Invalid age: {err}")
+
+# var bad = age as i32  # Compile error: parsing is not casting
+```
+
+Floating-to-integer `as` truncates toward zero and reports a runtime error for out-of-range values, `NaN`, and infinity. The earlier floating-to-integer `as?` sketch was part of the nullable proposal. G79 adds safe same-type nullable reference extraction. General fallible floating-point/reference conversions and user-defined conversion operators remain deferred.
+
+## 31. Generics and constraints [AGREED]
+
+`<>` holds generic parameters and arguments. Generic names are lowercase. No arbitrary fixed maximum number of type parameters; a compiler may still place sensible resource safeguards on pathological specializations.
+
+```python
+struct box<t>:
+    value: t
+
+var health = box(value = 100)          # infer box<i32>
+var label = box(value = "Hero")        # infer box<string>
+var explicit = box<f64>(value = 0.5)
+```
+
+```python
+func first<t>(items: [t]) -> t?:
+    if items.empty:
+        return null
+    return items[0]
+
+var names = ["Alice", "Bob"]
+if first(names) is Ok(name):
+    print(name)
+```
+
+```python
+struct pair<a, b>:
+    first: a
+    second: b
+
+var pair_value = pair(first = 100, second = "Hero")
+var nested: [result<player, error>] = []
+```
+
+Generic constraints use interface syntax where necessary:
+
+```python
+func biggest<t: comparable>(a: t, b: t) -> t:
+    if a > b:
+        return a
+    return b
+```
+
+**Implemented clarification (Phase 24, owner-approved):** Native generics use
+compile-time concrete specialization through the existing semantic checker and
+LLVM backend. Syntax and declaration structure are checked immediately; bodies
+are type-checked when specialized. Constraints gate concrete arguments and reuse
+accessible exact interface conformance for value structs, managed structs and
+existing interface references without boxing. Bodies may use other operations
+supported by their concrete types. Owner parameters bind through
+`func (b box<t>) get() -> t:`. Ordinary recursive instances are reused; expanding
+instantiations have deterministic resource diagnostics. See `GENERICS.md` for
+working source, inference, readonly/lifetime rules, tooling and explicit bounds.
+The `t?`, `result`/`Ok` and `comparable` examples above remain illustrative future
+syntax; they are not working feature claims.
+
+**OPEN:** `comparable`/operator contracts, generic variance and more aggressive
+specialization sharing/code-size tradeoffs.
+
+## 32. Lists: growable and fixed-size arrays [AGREED]
+
+**Phase 25 clarification (18 October 2026, owner-approved):** `.insert(index, value)`,
+`.clear()` and independent inclusive/exclusive slices extend the completed Phase
+23/24 arrays. Insertion accepts 0..count and existing negative element offsets;
+its boundary precedes value evaluation and structural RHS changes invalidate the
+selected insertion. Clear retains identity/capacity and changes version only when
+nonempty. Both source kinds slice to fresh growable lists; normalize negative
+endpoints before choosing direction, permit an exclusive end at count and equal
+exclusive boundary empties, reject invalid bounds without clamping, and require
+both endpoints. Receiver/start/end evaluate once left to right; fixed sources
+snapshot before endpoint effects. Embedded readonly/value/reference guarantees
+remain. `.pop()` stays deferred until `result`/`Ok`; checked `remove_at(-1)` remains
+available. See ARRAY_OPERATIONS.md for the complete bounded contract and evidence.
+Older pending/research status paragraphs below are historical.
+
+**Historical implementation and approval boundary (16 October 2026):** Phase 23's A1–A10 approve fixed-array **value snapshots**, growable-list **shared reference identity**, safe checked indexing including negative offsets, readonly capability preservation, initial `.count`, `.push(value)` and `.remove_at(index)` API names, and i32/i64 range goals. The superseding owner decision rejects any arbitrary 64 KiB production source-array/per-function storage ceiling. Stage 2F remains locked; **Stage 3A is also hosted-LOCKED** at `44fc8b6`, CI #58 (run `38982940254`, seven jobs green, 63/63 suites each). It remains a **runtime-only scalar fixed-value proof**, not source-array activation. The subsequent Orders 1–5 and Phase 23 implement source fixed/growable arrays,
+composite/nested elements, ordinary LLVM ABI lowering and production JIT/AOT
+execution. See FIXED_ARRAYS.md, GROWABLE_ARRAYS.md and the latest WORK_LOG.md
+for local validation; earlier hosted proof results remain historical. Slicing, additional APIs and user iterators remain future design. Never convert a documented runtime-only proof into an assertion that source arrays compile today.
+
+**Superseding owner decision, 15 October 2026 [AGREED DESIGN; implementation pending]:**
+Neither `[T, n]` nor `[T]` has an arbitrary 64 KiB source-level size ceiling. VOID
+must support useful large arrays, including megabytes of JSON/text/image/asset data.
+Real count/address-space representability, checked arithmetic and allocation failure
+still apply. An internal stack-safety experiment or analysis-work guard must not
+silently become a universal array-element or payload-size restriction.
+
+Fixed arrays preserve value/snapshot semantics at large sizes; physical placement
+must not expose mutable aliasing in place of a required independent copy. Inline
+storage is an optimization where safe, not a requirement that every fixed-array
+payload fit on a native stack. Investigation may use the existing coordinated GC,
+without a second memory manager; no new representation, numerical cutoff or
+production activation is approved here. Readonly, embedded reference, initialization,
+GC and reload contracts remain unchanged.
+
+The earlier 65,536-byte production per-function policy is superseded. Its research
+fixtures and safety evidence remain valid within their stated scope. Current
+Stage 1 compact frontend/IR shapes and pure default templates supersede the old
+array extent/multiplicity guards for reference-free values. Finite layouts,
+checked representability and actual analysis-work limits remain. Native array
+lowering remains prohibited; large/growable arrays do not yet execute. See
+ARRAYS_PROPOSAL.md A10 and Sections 21-22. Failed/unsupported required functions must
+fail the complete build with a clear diagnostic, never be silently omitted from
+an otherwise successful output. Array indexing remains separate from the approved
+future Unicode scalar indexing of strings.
+
+Only two built-in collection families are required: lists `[]` and dictionaries `{}`. Both are usable without imports. Lists default to growable; specifying a size makes them fixed-length.
+
+```python
+var items = ["sword", "shield", "potion"]
+items.push("bow")
+items.insert(1, "armor")
+items.remove("shield")
+items.remove_at(0)
+
+var scores: [i32, 4] = [10, 20, 30, 40]
+scores[0] = 100    # Allowed: elements mutable
+# scores.push(50)  # Compile error: cannot resize
+```
+
+```python
+const max_players = 4
+
+func calculate_total(const values: [i32, max_players]) -> i32:
+    var total = 0
+    for value in values:
+        total += value
+    return total
+```
+
+`const values: [i32, 4]` is a **readonly fixed-array parameter**, passed without an unnecessary full-array copy when a safe borrow is possible. No public pointer syntax is needed. Both mutable and immutable fixed-size arrays can appear inside methods, functions, or structs.
+
+| Syntax | Meaning |
+|---|---|
+| `[i32]` | Growable, typed list |
+| `[i32, 4]` | Fixed size of four, mutable unless readonly |
+| `[1, 2, 3]` | Inferred growable list |
+| `const x = [1, 2, 3]` | Readonly growable list through `x` |
+| `const x: [i32, 3] = [1, 2, 3]` | Readonly fixed-size list |
+| `[string]?` | Nullable list reference/value, depending on finalized representation |
+
+Fixed-size value arrays can be stored inline where safe. Growable lists use contiguous storage and amortized constant-time push-at-end, subject to actual allocation/growth strategy.
+
+### 32.1 Stack/queue behavior without special compiler collections
+
+The original stack/queue core-type plan was **superseded**. Use list operations or optional `.void` library implementations:
+
+```python
+var history = []
+history.push("move")
+history.push("attack")
+if history.pop() is Ok(action):
+    print("Undo: {action}")
+
+var messages = []
+messages.push("Player joined")
+messages.push("Enemy spawned")
+var first = messages.remove_at(0)
+```
+
+`remove_at(0)` on a contiguous list normally shifts remaining elements and is O(n); a queue implemented as a circular buffer in a library can avoid that for frequent dequeue workloads. Neither `stack` nor `queue` requires a new language primitive.
+
+**API spellings still to finalize:** Earlier examples used both `add` and `push` for append. The user explicitly liked `push`/`pop`; prefer `push`/`pop` in new examples until an API contract is finalized. Supporting both aliases is not automatically agreed because the language favors one obvious way.
+
+### 32.2 Indexing, safe lookup, slicing
+
+```python
+var letters = ["a", "b", "c", "d", "e"]
+print(letters[0])     # a
+print(letters[-1])    # e
+
+var first = letters[0..<3]  # a, b, c
+var middle = letters[1..3]  # b, c, d (inclusive endpoint)
+```
+
+The chosen list slicing behavior creates a **new list**, not a view, initially. The direct `[]` index operator raises a VOID runtime error on invalid access. Stage 8 Sprint 3 approves `.get(index) -> result<t, string>` on both fixed arrays and growable lists; invalid indexes return `Err("index out of range")`. See [the current contract](STAGE8_TEXT_COLLECTIONS.md). The older lookup_error illustration below is historical:
+
+```python
+match letters.get(7):
+    Ok(letter):
+        print(letter)
+    Err(err):
+        print("No item: {err}")
+```
+
+**Resolved in Phase 25:** Both source kinds yield independent growable results; negative bounds and exclusive boundary empties follow ARRAY_OPERATIONS.md. Safe resizable borrows, omitted endpoints and specialized zero-copy views remain OPEN.
+
+## 33. Dictionaries [AGREED]
+
+**Implemented Stage 3 contract, owner-approved 18 October 2026:** DICTIONARIES.md
+specifies actual colon literals/defaults, supported key families, insertion-order
+iteration, checked indexing/upsert, contains/remove/clear/count, readonly authority
+and next-access structural invalidation. Bare identifiers are ordinary key expressions,
+not implicit strings. Dictionaries share identity. Float/collection/interface/custom-
+equality keys remain unsupported. Result-based get/Ok below is future design, not
+implemented syntax. Dictionary hashing belongs to the existing Runtime and does not
+promise stable cross-launch hashes or adversarial-input randomization.
+
+Dictionaries infer key/value types when possible; explicit declaration uses `{key_type: value_type}`. Keys have predictable equality and hashing semantics; insertion order is guaranteed.
+
+```python
+var stats = {
+    "health": 100,
+    "damage": 15,
+    "speed": 4
+}
+
+var scores: {string: i32} = {}
+var switches: {bool: string} = {}
+
+stats["health"] = 75
+stats["defense"] = 10
+stats.remove("speed")
+
+if stats.get("health") is Ok(value):
+    print("Health: {value}")
+
+for value, key in stats:
+    print("{key}: {value}")
+```
+
+Order rules: updating a key doesn't move it; deleting and reinserting a key makes it newest. Reverse iteration traverses the reverse insertion order. `.get()` exposes `Ok`/`Err` so a missing key is distinguishable from a present nullable value that happens to be null.
+
+Earlier examples used Lua-like bare keys `health = 100`, while the later typed-dictionary examples favor explicit string keys `"health": 100`. The Stage 3 owner decision selects colon literals and ordinary identifier expressions. **Resolved for Stage 3:** Bare identifiers reference ordinary local/constant expressions; implicit string keys and `name = value` entries are not supported.
+
+### 33.1 Equality and hashing
+
+**Implemented G83:** Matching fixed arrays and growable lists compare ordered
+contents and length; dictionaries compare logical key/value contents independently
+of insertion order. Element comparisons use supported ordinary equality, including
+nested collections, nullable presence, enums and custom operators. Managed
+references retain identity. Collection equality does not grant key eligibility;
+collection/float/interface/custom-equality key exclusions remain. Structural
+mutation during element callbacks fails through existing checked iteration;
+recursive structural shapes diagnose instead of traversing arbitrary cycles.
+Pure built-in constant comparisons are supported without executing custom hooks.
+See [collection equality and hashing](COLLECTION_EQUALITY.md) for precise contracts.
+
+
+| Key type | Implemented key rule |
+|---|---|
+| `string` | Equality/hash by UTF-8 text content under explicitly defined rules |
+| Integer/bool/enum | Equality/hash by value |
+| `value struct` | Field-based key schema if stored fields are eligible; ordinary source `==` remains a separate capability |
+| Ordinary reference `struct` | Managed identity; field mutation does not change stored key identity |
+
+Equal keys must always hash equally. Developers should not have to configure a lookup strategy simply because a key is `string`, `bool`, or a supported value struct. Hash algorithms, collision handling, resizing, and lookup behavior belong in the runtime/library implementation, not application code.
+
+**Resolved for Stage 3:** Value keys store independent inline field values; later mutation of the original value does not change the stored key. Managed referents contribute identity, not their mutable fields. **OPEN/deferred:** Hashing floating-point keys (`NaN`, signed zero), stable hashes across launches, randomization against hostile input, and opt-in custom key equality. Do not silently promise field-hash behavior when it would violate equality constraints.
+
+## 34. Mutation during iteration [RECOMMENDED / exception OPEN]
+
+Stage 3 dictionaries use the same next-access/completion rule: new keys, successful deletion and nonempty clear are structural; replacement, absent deletion and empty clear are not.
+
+Phase 25 insertion and nonempty clear are structural changes under this rule;
+empty clear is a no-op. Slicing does not structurally mutate its source.
+
+**Current approved Phase 23 direction:** Structural version invalidation is checked at the **next iterator access**, for forward and reverse iteration. A structural mutation followed by `break` requires no further iterator access; other active iterators detect invalidation when they resume. The reverse remove-current exception remains **deferred**, not implemented or guaranteed by the example below. Phase 23 implements this rule, including the completion check and immediate
+return as well as break.
+
+Ordinary `for` iteration does not create a copy. Adding/removing entries while iterating generally raises a clear runtime error (or a compile-time error where statically provable), avoiding skipped elements and invalidated iterators. Mutating fields of existing referenced objects is allowed.
+
+```python
+for e in enemies:
+    e.health -= 10   # Allowed
+
+# Removing while iterating forward is generally rejected:
+# for e in enemies:
+#     enemies.remove(e)
+```
+
+A helper such as `remove_if(predicate)` can remove matching elements safely:
+
+```python
+private func is_dead(e: enemy) -> bool:
+    return e.health <= 0
+
+enemies.remove_if(is_dead)
+```
+
+A proposed special case allows removal of the current element during **reverse** iteration:
+
+```python
+for e, index in reverse enemies:
+    if e.health <= 0:
+        enemies.remove_at(index)
+```
+
+This is convenient for games and can be safe under specific contiguous-list rules, but exact iterator-invalidating semantics are **OPEN**. Avoid locking it in until tests prove the contract for duplicates, nested iterators, and concurrent modification.
+
+## 35. Custom iteration protocol [IMPLEMENTED — G85/G86]
+
+User-defined collections expose ordinary synchronous `iterator()` and, optionally,
+`reverse_iterator()` methods returning concrete non-nullable iterator structs.
+The iterator's `next() -> option<T>` yields `Some(value)` or ends on `None`.
+Indexed loops additionally require `index()`, whose exact return type and
+collection-specific key/position meaning belong to the iterator API.
+
+```void
+var tiles = tile_collection(values = [10, 20, 30])
+for tile, index in reverse tiles:
+    print(tile, index)
+```
+
+The expression and factory run once; `index()` runs only after a successful
+`next()`. Managed state with `deinit()` uses existing scoped cleanup on completion,
+early exit and checked failure; value state keeps ordinary copy semantics.
+Readonly authority, ownership, generics and structural member access apply to all
+protocol calls. No implicit ordinal, reverse copy or erased iterator state is
+introduced. Custom implementations own their mutation
+and concurrency policies; built-in invalidation rules remain unchanged, including
+reverse remove-current.
+
+The [iteration guide](CUSTOM_ITERATION.md) defines the exact contract, lifetime,
+interface integration and limitations. [Runnable examples](../examples/custom_iteration/main.void)
+and [qualification](projects/G85_CUSTOM_ITERATION.md) distinguish implementation
+from independent Golden Wrench acceptance.
+
+G86 adds `for await item, key in source:` and `in reverse source` in async
+functions. The separate synchronous `async_iterator()` / `reverse_async_iterator()`
+factory returns concrete state with a managed `async next() -> option<T>` receiver. Each
+advance is awaited before optional synchronous `index()` and the body. Resource
+state drains outstanding advancement before one-shot `deinit()` on every checked
+exit, including cancellation. Built-in collections and ordinary synchronous loops
+retain their original protocol. Async factories/destructors, async interface
+requirements and value receivers remain deferred. See
+[the complete async iteration contract](CUSTOM_ITERATION.md#async-iteration--g86).
+
+---
+
+# Part V. Memory, execution, concurrency, and native interoperability
+
+## 36. Memory model and object lifetime [AGREED]
+
+**Implemented foundation:** Phase 15 provides the precise nonmoving Heap, compiler-managed roots and coordinated thread/GC safety boundary, extended by Phases 16–22 for supported managed, value, interface and string source types. Performance tuning, advanced collectors, general finalization and arbitrary native callbacks remain separate work. A precise working foundation is not production GC certification.
+
+Developers should not decide manually between stack and heap based on whether fields have default values. **Storage placement is an optimization; object semantics are part of the language contract.**
+
+```python
+struct player:
+    name: string
+    friend: player?
+
+var a = player(name = "Alice")
+var b = player(name = "Bob")
+a.friend = b
+b.friend = a
+```
+
+A tracing GC can eventually reclaim unreachable cycles. A live closure, array, struct, async frame, event handler, or native callback must keep required managed objects reachable. Value structs can contain references; their reference fields need correct GC metadata even if the value struct is inline.
+
+```python
+value struct inventory_entry:
+    name: string
+    owner: player?
+```
+
+The compiler can avoid heap allocation if escape analysis proves nonescaping objects retain their required semantics. This is *not* the same as making ordinary structs value types.
+
+### 36.1 Weak references [RECOMMENDED]
+
+Optional standard-library weak references do not keep their targets alive:
+
+```python
+var cached = weak<player>(hero)
+
+if cached.get() is Ok(p):
+    print("Still alive: {p.name}")
+else:
+    print("No longer available")
+```
+
+**OPEN:** Weak-reference promotion safety, collection timing, and relationship with native callback registrations.
+
+## 37. Chosen GC direction [RECOMMENDED AND ACCEPTED]
+
+Start with a **precise, non-moving tracing mark-sweep GC**, initially using coordinated stop-the-world collections. Design the compiler/runtime interface to permit concurrent marking, generations, or other later refinements without changing ordinary user code.
+
+| Aspect | Initial direction |
+|---|---|
+| Reachability | Precise tracing, including nested composite references |
+| Movement | Non-moving initially; stable object addresses help FFI |
+| Cycles | Collected when unreachable |
+| Small allocations | Per-thread caches / thread-local fast paths |
+| Heap layout | Reusable pages and size classes |
+| Large objects | Separate suitable allocation path |
+| Thread participation | Registered threads and cooperative safepoints |
+| Pauses | Initially stop-the-world, with actual latency measurements |
+| Future collectors | Concurrent and/or generational after evidence |
+| Weak refs | Supported through runtime contract |
+| Resource destruction | `deinit`, `with`, `defer`, separate from GC |
+
+**Performance priority:** (1) avoid unnecessary allocations; (2) make remaining allocations cheap; (3) measure and optimize GC throughput, memory usage, and tail pause latency. Not every loop statement or arithmetic operation should perform a redundant GC poll. But a long-running thread must still eventually cooperate with collection.
+
+### 37.1 Compiler and collector coordination
+
+The compiler must know precisely which locations can hold managed references, including:
+
+- Object fields, value struct fields, array elements, and dictionary entries.
+- Stack and register values at GC safepoints.
+- Closure environments and callback captures.
+- Suspended async/task frames.
+- Thread-local runtime roots, globals, and stable handles held by native code.
+
+LLVM offers GC-related statepoint and stack-map mechanisms, but it does **not** provide VOID's collector algorithm or automatically guarantee all reference-liveness invariants. Verify available LLVM APIs against a chosen, pinned version before implementation. Minimize polling costs without sacrificing correctness. Compiler/runtime access to reference write barriers must be extensible, but only pay for barriers that the chosen GC algorithm actually requires.
+
+### 37.2 Thread-local allocation design [RECOMMENDED]
+
+```text
+Thread A  -> thread-local allocation cache -> shared managed heap
+Thread B  -> thread-local allocation cache -> shared managed heap
+Thread C  -> thread-local allocation cache -> shared managed heap
+```
+
+Most small managed objects should allocate without a global lock or OS allocation on every request. Cache exhaustion uses a slower refill path. Reuse storage freed by collection. Large allocations take a separate path. Avoid claiming that a specific TLAB or size-class scheme is faster until measured.
+
+### 37.3 Game-friendly GC behavior [AGREED GOAL]
+
+GC is **fully automatic by default**. Developers need not sprinkle collection calls throughout their update loops or schedule GC themselves. Frame-time consistency matters as much as average throughput. Early benchmarks must include worst-case and percentile pause times, not only allocations per second.
+
+## 38. Resource ownership and `deinit` [AGREED]
+
+Managed memory and native resources are distinct:
+
+- **GC** manages memory backing ordinary VOID objects.
+- **`deinit()`** releases external resources at deterministic points.
+- **`with`** exits a scope safely and invokes cleanup.
+- **`defer`** schedules cleanup for function exit.
+- Cleanup should be one-shot; duplicate releases are guarded or rejected.
+
+```python
+with graphics.texture("hero.png") as sprite:
+    graphics.draw(sprite, 100, 100)
+```
+
+Never assume an unreachable wrapper automatically releases a file descriptor or GPU resource immediately. Optional finalization, if ever added, cannot substitute for deterministic teardown of important resources.
+
+## 39. Hot reload: user-visible contract [AGREED]
+
+Development builds should watch source files and automatically apply compatible changes when saved:
+
+```python
+func (e enemy) attack(p: player):
+    p.take_damage(10)
+```
+
+Change the implementation to:
+
+```python
+func (e enemy) attack(p: player):
+    p.take_damage(25)
+```
+
+On successful save/recompilation, future calls use the replacement. Existing objects, scenes, events, and game state remain. There is **no automatic restart** and **no repeated restart confirmation dialog**. Invalid code leaves the previous working implementation running and reports normal source-level diagnostics.
+
+| Source change | Development behavior |
+|---|---|
+| Ordinary function body | Reload automatically |
+| Private function body | Reload automatically |
+| Struct method body | Reload automatically |
+| Getter/setter body | Reload automatically |
+| Event handler body | Reload automatically |
+| Callable struct `call()` body | Reload automatically |
+| `const` value | Restart required; running old value remains |
+| Struct field/type layout | Restart required |
+| Method/function signature | Restart required |
+| Generic constraint or incompatible specialization | Restart required |
+| Closure capture environment layout | Restart required |
+| Invalid/incomplete source | Keep last working code active |
+
+An editor can show a quiet, one-time status such as “Restart required: struct layout changed”, but should **never** restart without an explicit developer action. Changes that depend on an incompatible layout or newly changed constants must not be partially reloaded into an older running process.
+
+## 40. Hot reload: internal architecture [RECOMMENDED AND ACCEPTED]
+
+Use LLVM AOT for release and LLVM ORC JIT as the leading design for development. Both share the same compiler frontend, VOID IR, language semantics, and runtime contract.
+
+1. Compiler assigns **stable function identities** independent of current compiled code addresses.
+2. Development-mode calls that must be replaceable go through stable dispatch entries or another reload-safe indirection mechanism.
+3. Changed function bodies are recompiled and fully validated off to the side.
+4. Affected replacements are prepared as one compatible **transaction** when they depend on one another.
+5. At a safe coordination point, future calls switch to the new versions.
+6. Active calls and suspended async operations continue using code/metadata they still need from earlier versions.
+7. Retired code is reclaimed only after the runtime proves no thread, closure, callback trampoline, unwind frame, or suspended task requires it.
+
+### 40.1 Callbacks, events, and native function pointers
+
+A stored callback or event subscription must follow the function's stable identity so hot reloading its body does **not** require re-subscribing it. For callbacks registered with C libraries, stable native trampolines and explicit lifetime management are required. Do not replace a native function pointer while foreign code might be calling it.
+
+### 40.2 Inlining and optimization
+
+Development mode may limit inlining and cross-function optimization at reloadable call boundaries. Release builds can optimize and inline aggressively, and must not pay unnecessary JIT dispatch overhead. Measure the development-mode cost for very frequently called game-update functions rather than assuming it is negligible.
+
+### 40.3 Concurrency and code reclamation
+
+GC and hot reload **share a thread-coordination foundation**, but remain separate subsystems. GC object reachability and executable-code lifetime are separate questions. Old code cannot be unloaded merely because a new dispatch target has been published. Active stack traces, unwind metadata, closures and suspended tasks may still depend on it.
+
+### 40.4 One deliberately restricted first implementation
+
+Start with **function-body replacement only** under identical signatures, compatible reference layouts, and stable captures. Do not attempt struct migration, arbitrary changed-constant propagation, or rewriting suspended async state initially. Transactional replacement should avoid mixed generations among dependent functions.
+
+## 41. Native C interoperability [AGREED]
+
+Normal application code uses safe, documented `.void` APIs. Native representation is hidden behind reusable packages:
+
+```text
+VOID application (.void)
+          |
+          v
+VOID wrapper library (.void)
+          |
+          v
+Trusted native binding metadata and ABI bridge
+          |
+          v
+C library (SDL / raylib / SQLite / ...)
+```
+
+```python
+use "sdl"
+
+func main() -> result<bool, error>:
+    var window = sdl.create_window("My Game", 800, 600)?
+    defer window.deinit()
+
+    for window.is_open:
+        window.update()
+
+    return Ok(true)
+```
+
+The application developer sees a normal `string`, not `cstring`; a managed `window` object, not `SDL_Window*`; and a helpful `result`, not a raw C error code.
+
+### 41.1 Native binding authoring [RECOMMENDED]
+
+Trusted bindings can describe opaque C handles and ABI calls. Example, not finalized grammar:
+
+```python
+native "sdl3":
+    type window_handle: opaque
+
+    extern func create_window(
+        title: string,
+        width: i32,
+        height: i32,
+        flags: u64
+    ) -> window_handle? = "SDL_CreateWindow"
+
+    extern func destroy_window(
+        window: window_handle
+    ) = "SDL_DestroyWindow"
+```
+
+Real SDL declarations and platform-specific types must be verified when producing actual bindings; the above illustrates the wrapper idea. Do not treat the example as an exact existing SDL declaration. A binding author may need access to lower-level restricted primitives or generated glue, but regular VOID developers should not have to write `unsafe` or pointer arithmetic.
+
+### 41.2 One UTF-8 string across the language [AGREED]
+
+Native metadata describes:
+
+- Encoding required by the C API (UTF-8, UTF-16, platform-dependent, etc.).
+- Whether the native function **borrows** a temporary string or **retains** its storage.
+- Whether a native returned buffer is borrowed, transferred, or separately freed.
+- Which native function releases returned/owned resources.
+- Whether embedded NUL is allowed and, if not, what VOID error is produced.
+
+The bridge copies, pins, or retains storage as necessary. Such conversion should be optimized away when a safe direct representation can be used. **No second user-facing string type** is introduced.
+
+### 41.3 Opaque resources, GC, and native callbacks
+
+The GC owns the VOID wrapper; the native library may own the underlying resource until `deinit()`. C callback registrations may retain function pointers and captured VOID references, which must stay alive until unregistered. Calls back into VOID from foreign threads require runtime registration and safe GC state transitions. Incorrect native declarations or buggy C code remain capable of causing process failures, despite safe wrapper APIs.
+
+### 41.4 Packages and cross-platform linking
+
+An import such as `use "sqlite"` illustrates future selection of compatible
+package/native artifacts for the target OS and CPU, including `.dll`, `.so` or
+`.dylib`. The 8 November approved direction is dynamic linking by default, with
+static linking optional; see the [typed C roadmap](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-general-purpose-c-interoperability).
+This illustrative import does not supersede current VFS/source imports or authorize
+native loading. Tooling must diagnose unavailable platform dependencies clearly.
+
+**OPEN:** Package manifest schema, native ownership annotation format, header-import generation, FFI calling conventions, callback exception propagation, dynamic library lifetime, and supported C ABI type mapping. These should be fixed before claiming arbitrary C libraries work automatically.
+
+## 42. Async, tasks, and `spawn` [AGREED]
+
+**Delivery 1 implementation boundary:** [ASYNC.md](ASYNC.md) records native async
+functions, await, heap frames and the explicit owning root adapter. Local Debug,
+Release and strict sanitizer acceptance passed 98/98 each; owner-confirmed CI #73
+subsequently locked Delivery 1 at `34efb761965a5e19841e2fcf2816a5b851e902a7`.
+Delivery 2 is owner-confirmed hosted-accepted at `5d228804be809465ce2c97b7e0b58b89caa718ac`,
+CI #74, seven jobs / 113 suites each (791/791). Delivery 3 implements bounded
+`spawn function(arguments)` with reviewed value-only transfers, owning-executor
+publication and cooperative worker cancellation; local Debug/Release/strict
+acceptance passed 120/120 each (360/360). Hosted verification remains owner-controlled.
+See ASYNC.md for exact restrictions. Library IO, `jobs.spawn`, general shared
+references, native libraries, cancellation recovery and async CLI examples remain
+design. Deliveries 4–5 require separate owner authorization.
+
+The syntax should feel like ordinary functions with only necessary async markers. `async func` indicates suspension capability; `await` retrieves the eventual result. Developers do **not** write explicit `task<t>` returns for ordinary async declarations: the compiler creates the task machinery.
+
+```python
+async func load_player(name: string) -> player:
+    var data = await files.read_text(name)
+    return player(name = data)
+
+async func main():
+    var hero = await load_player("hero.dat")
+    print("Welcome, {hero.name}!")
+```
+
+Calling an async function starts/schedules its asynchronous work according to runtime rules and yields a task-like handle. Multiple operations can be in flight:
+
+```python
+async func main():
+    var player_job = load_player("hero.dat")
+    var enemies_job = load_enemies()
+
+    var hero = await player_job
+    var enemies = await enemies_job
+
+    print("Loaded {enemies.count} enemies")
+```
+
+`spawn` explicitly schedules work, especially a synchronous CPU-bound function, onto the runtime scheduler:
+
+```python
+func calculate_path() -> [vector2]:
+    return find_path()
+
+async func main():
+    var job = spawn calculate_path()
+    var path = await job
+```
+
+`spawn` must **not** imply creating a dedicated OS thread per call. Most jobs can run through a worker pool. Dedicated threads are available through a library when genuinely needed.
+
+### 42.1 `result` and `await`
+
+```python
+async func load_settings() -> result<string, error>:
+    var data = await files.read_text("settings.dat")?
+    return Ok(data)
+```
+
+`await job?` is the supported shorthand for `(await job)?`. Explicit
+`await (job?)` keeps propagation inside the await operand. Postfix chains and
+arithmetic follow the same grouping as the parenthesized form; see
+[ASYNC.md](ASYNC.md#await-and-result-propagation). The file API and `error` type
+in this illustrative example are application dependencies; this syntax sprint
+does not introduce a standard `error` module.
+
+A propagated error still runs registered defers. A task returning `Err(...)` is a normal completed task carrying a failure result, not necessarily a runtime panic. Panics and cancellation have separate rules.
+
+### 42.2 Cancellation [AGREED]
+
+```python
+var job = spawn calculate_world()
+job.cancel()
+```
+
+Cancellation is cooperative, observed at cancellation-aware calls or checkpoints. It must not kill threads or bypass required cleanup. **OPEN:** Cancellation status/result representation, default cancellation propagation across async call graphs, and timing guarantees for long CPU loops.
+
+## 43. Synchronization [AGREED]
+
+Use standard-library `sync` primitives rather than inventing new control-flow keywords:
+
+```python
+use "sync"
+
+struct scoreboard:
+    private score: i32
+    private guard = sync.mutex()
+
+func (s scoreboard) add_score(amount: i32):
+    with s.guard.lock():
+        s.score += amount
+
+func (s scoreboard) get_score() -> i32:
+    with s.guard.lock():
+        return s.score
+```
+
+Optional `sync.atomic<t>` handles well-defined atomic operations. Ordinary mutex guards are not intended to survive `await`; async-aware synchronization must be a deliberate separate library design. Lock acquisition and release integrate with `with`, `defer`, and cleanup. Diagnostics may report detectable deadlocks, but runtime prevention of all deadlocks is not promised.
+
+## 44. Task groups and scene shutdown [AGREED]
+
+Task lifetimes should be structured rather than silently detached. A task group owns children, waits for them, and supports cancellation. Scene cleanup should stop/join its tasks *before* deinitializing resources.
+
+```python
+use "tasks"
+
+private async func load_enemies():
+    await load_enemy_data()
+
+private async func load_music():
+    await load_audio_data()
+
+async func load_game():
+    with tasks.group() as jobs:
+        var enemies = jobs.spawn(load_enemies)
+        var music = jobs.spawn(load_music)
+        await enemies
+        await music
+
+    print("Loaded")
+```
+
+```python
+struct battle_scene:
+    private active = true
+
+async func (s battle_scene) close():
+    await s.stop_tasks()
+    s.deinit()
+```
+
+The task group needs async-aware exit behavior and should not secretly block a worker thread while waiting for children in an async context. A child panic cancels unfinished siblings and is reported with additional failures if necessary. Normal `Err` returns are propagated or handled according to the `result` contract. **OPEN:** Exact task-group API signature, owner lifetime, cancellation join policies and explicit detached-task support.
+
+## 45. Async and hot reload together [RECOMMENDED]
+
+A suspended async function retains any managed objects and compiled code needed for correct resumption. If its function body changes during suspension, existing activations may continue with their old compatible version, while newly invoked activations use the new version. Do not attempt to migrate changed async state-machine layouts automatically. Preserve meaningful asynchronous stack traces in VOID source terms.
+
+---
+
+# Part VI. Tooling, documentation, and diagnostics
+
+## 46. First-class docs in `.void` source [AGREED]
+
+Documentation is written for VOID developers, not in C-like ABI language. Ordinary comments use `#`; declaration docs use `##`, including optional parameter descriptions.
+
+```python
+## Represents a point in world space.
+value struct vector2:
+    ## Horizontal coordinate in pixels.
+    x: f32
+
+    ## Vertical coordinate in pixels.
+    y: f32
+
+## Moves a player to a new location.
+##
+## @param position Destination in world coordinates.
+## @param speed Units per second; default is 1.0.
+func (p player) move_to(position: vector2, speed: f32 = 1.0):
+    p.position = position
+```
+
+The supported documentation is ordinary `##` description text, line-start
+`## @param NAME DESCRIPTION` and `## @return DESCRIPTION`. No rich documentation
+syntax is added. For example:
+
+```void
+## Loads a player's saved name.
+## @param path The location of the save file.
+## @return The player's name or an error.
+func load_name(path: string) -> result<string, error>:
+    ...
+```
+
+Callable hover shows its signature, description and applicable return information.
+Signature help shows only the active parameter's description. Ordinary callable
+popups require a documented active parameter for automatic and manual invocation.
+Constructors show the selected initializer's parameters or accessible construction
+fields even without documentation. Named-argument completion uses those same
+parameters or fields.
+If some explicit parameters have nonempty documentation, missing descriptions warn;
+zero documented parameters do not warn. Unknown/duplicate parameter names warn
+without blocking compilation or execution. The first nonempty duplicate text wins.
+[Compiler contract](DOCUMENTATION_HOVER.md) and
+[implementation evidence](DOCUMENTATION_HOVER_IMPLEMENTATION.md) define the repair.
+
+Docs should be attached to compiler symbols (structs, fields, properties, methods, functions, interfaces, variants, generic parameters, and accessible internal/private elements) so the editor and CLI use the same information. XML, HTML, Markdown lists, code blocks, rich source documentation, a rendering framework and a documentation generator are outside this contract.
+
+### 46.1 IntelliSense and editor behavior [AGREED]
+
+Typing `player.` should list accessible fields, properties, methods, and docs. Typing `player.position.` should know the nested type; typing `player.move_to(` should show signature help and per-parameter descriptions.
+
+Proposed editor features:
+
+- Context-aware completion and type-aware filtering.
+- Hover documentation, parameter help, and generic type information.
+- Go to definition, find references, rename across imported VFS paths.
+- Diagnostics from the same frontend used to compile.
+- Suggested quick fixes when confidence is high.
+- Completion even while a file is temporarily syntactically incomplete.
+- Source navigation through installed `.void` library implementations.
+- Proper filtering by public/private/internal visibility.
+- Active hot-reload/restart-needed status without popup nagging.
+
+**Architecture rule:** The language server uses the compiler's parsing, symbol, type-checking, and diagnostics infrastructure; it must not create a second interpretation of the language.
+
+## 47. Library discovery in the extension [AGREED GOAL]
+
+The editor should provide a searchable package catalog with clear README/docs, compatible platform/architecture, version information, install action, and direct source navigation. A successful install enables a simple `use "package"` statement and immediate completion support, where available.
+
+Example discovery scenario:
+
+1. Developer types `use "sdl"` or searches for `sdl` in the extension.
+2. The extension identifies whether a compatible package and native dependency exist.
+3. It offers a clear install/open documentation action.
+4. The package resolver registers the source/native metadata for the current target.
+5. LSP completion offers documented VOID wrappers, **not** raw C headers unless explicitly exploring a binding package.
+
+The project/package manifests, local and immutable Git source maintenance,
+locks and native-provider verification are implemented; see [the CLI](CLI.md)
+and [library workflow](LOCAL_LIBRARIES.md). The searchable public catalog above
+remains a goal. Public registry/VOIDUP delivery and production trust are not
+established by the implemented source and application-package workflows.
+
+## 48. Unified diagnostics [AGREED]
+
+**Implemented clarification:** `DIAGNOSTICS.md` assigns stable codes (including VOID1001–VOID4001 and VOID9001), owned source snapshots, byte locations, related declarations, bounded recovery and source-facing runtime failure information. Illustrative future codes in examples here do not supersede allocated compiler IDs. New feature families may require **new** codes, not renumbering existing ones.
+
+All diagnostics should be easy to understand regardless of experience level: file/line/column, human-readable problem, diagnostic code, source snippet with precise range, expected/received values where useful, and a practical hint. Runtime failures additionally show a VOID-source stack trace.
+
+### 48.1 Compile-time example
+
+```text
+src/player.void:12:19: error: Cannot assign a string to i32
+    code: VOID2001
+
+  12 | var health: i32 = "hello"
+     |                   ^^^^^^^
+
+     Expected: i32
+     Received: string
+
+     Hint: Use an integer value, or parse a
+           valid numeric string with parse<i32>().
+```
+
+### 48.2 Redeclaration/shadowing example
+
+```text
+src/main.void:5:13: error: Variable 'health' is already declared
+    code: VOID2005
+
+   5 |         var health = 25
+     |             ^^^^^^
+
+     Previously declared at src/main.void:2
+
+     Hint: Remove 'var' if you intended
+           to update the existing variable.
+```
+
+### 48.3 Missing native package example
+
+```text
+src/main.void:1:5: error: Native library not found
+    code: VOID3001
+
+   1 | use "sdl"
+     |     ^^^^^
+
+     Library: SDL3
+     Target:  linux-x64
+
+     Problem:
+       No compatible SDL3 native library was found.
+
+     Hint:
+       Install the missing dependency through
+       VOID's extension or package manager.
+```
+
+Distinguish nonexistent package, unsupported platform, missing native dependency, wrong architecture, incompatible package version, and actual compiler errors. Never collapse them into a cryptic linker failure.
+
+### 48.4 Runtime error with source stack trace
+
+```text
+src/units/player.void:27:26: runtime error: Index out of range
+    code: VOIDR1003
+
+  27 | var item = inventory[5]
+     |                      ^
+
+     Index: 5
+     Valid indices: 0..2
+
+     Hint: Check the collection length before
+           accessing the requested index.
+
+Stack trace:
+  at player.get_item(index: i32)
+     src/units/player.void:27
+
+  at game.update(dt: f32)
+     src/main.void:42
+
+  at main()
+     src/main.void:10
+```
+
+### 48.5 Unmatched expression example
+
+```text
+src/main.void:16:18: runtime error: Match expression had no matching case
+    code: VOIDR1005
+
+  16 | var label = match facing:
+     |             ^^^^^^^^^^^^
+
+     Value: direction.left
+     No matching arm or '_' default exists.
+
+     Hint: Add a matching case or '_' fallback.
+
+Stack trace:
+  at game.get_direction_label()
+     src/main.void:16
+  at main()
+     src/main.void:6
+```
+
+Diagnostic codes above are **illustrative placeholders**, not reserved/implemented IDs. At runtime, report original failure and supplemental defer failures without hiding source locations. Optimized builds should retain or be able to locate enough source information for useful diagnostics; investigate metadata-size tradeoffs. Native corruption may prevent a full stack trace. Optional backend-debug mode can expose LLVM/linker details to compiler developers, but ordinary errors stay in VOID terms.
+
+## 49. Error policy and LSP quick fixes
+
+- Compile errors block invalid source from becoming active code, but do not terminate an already running hot-reload process.
+- Warnings are not errors. A non-exhaustive *statement* `match` warns yet compiles; a non-exhaustive *expression* warns and may fail at runtime if unmatched.
+- Runtime panics are distinct from recoverable `Err` values.
+- Native package resolution failures explain which dependency/target is missing.
+- Give suggestions only when grounded; do not offer changes that silently alter developer intent.
+- Language server and CLI display identical diagnostic meaning and source spans.
+- Use clickable VFS source positions in supported editors, translating them to physical project files under the hood.
+
+---
+
+# Part VII. Compiler architecture and LLVM strategy
+
+## 50. Proposed compiler pipeline [RECOMMENDED]
+
+```text
+             VOID source (.void)
+                     |
+                     v
+          Source manager + VFS resolver
+                     |
+                     v
+             Lexer + Parser
+                     |
+                     v
+          AST + symbol declarations
+                     |
+                     v
+     Name resolution + semantic/type checks
+                     |
+                     v
+           VOID typed intermediate IR
+              /               \
+             v                 v
+      LLVM AOT lowering   LLVM ORC development lowering
+             |                 |
+             v                 v
+       Native executable  Running live application
+              \               /
+               \             /
+                Shared VOID runtime
+    (GC, allocation, strings, tasks, native ABI,
+       runtime diagnostics, code lifetimes)
+```
+
+**One frontend; one language meaning.** Both AOT and JIT lowering consume the same validated, typed IR. The language server also reuses the frontend. Debug/source metadata flows through every stage.
+
+### 50.1 Major module responsibilities
+
+| Subsystem | Owns | Must avoid |
+|---|---|---|
+| Source manager/VFS | Canonical source identity, normalized paths, source spans, import graphs | OS path logic leaking into language semantics |
+| Lexer/parser | Indentation and grammar, tolerant parsing | Defining runtime behavior |
+| Symbols/semantics | Declarations, generics, type inference, scopes, access, match coverage | Emitting native instructions |
+| VOID IR | Typed operations, control flow, managed references, source locations, cleanup edges | Unnecessary duplicate LLVM optimization framework |
+| LLVM lowering | LLVM IR and native object/JIT machine code | Independent reinterpretation of language rules |
+| Managed runtime | Allocation, GC, roots, threads, synchronization, panic metadata | Reading/parsing `.void` source at normal runtime |
+| Standard library | Collections, files, sync APIs, user-facing native wrappers | Compiler-specific hardcoding of routine methods |
+| LSP | Completion, hovers, edits, references, diagnostics | Duplicate language compiler |
+| Development host | Watch files, incremental builds, reload transaction, code retirement | Restarting without user request |
+
+### 50.2 Internal representation: keep it modest
+
+VOID IR should represent only what LLVM cannot infer from higher-level syntax alone:
+
+- Validated typed expressions and values.
+- Explicit branch/control-flow blocks and multiple return values.
+- Object/value layouts and field operations.
+- Function identity and direct versus virtual/callable dispatch.
+- Managed allocation, reference liveness/safepoints, and necessary write barriers.
+- Pattern checks, result propagation, deferred cleanup paths.
+- Exception/panic unwind semantics that remain valid after lowering.
+- Source locations and debug metadata.
+
+**Do not** build a second giant optimizing compiler before LLVM. Perform necessary VOID-specific canonicalization, then let LLVM optimize the machine-level program. Preserve evaluation order and observable side effects precisely.
+
+### 50.3 LLVM as backend, not language definition
+
+LLVM is the leading planned native backend for VOID 2.0. Release mode should generate optimized machine code ahead of time. Development mode should use LLVM ORC for native JIT code and safe replacement. The precise LLVM version, C versus C++ API integration approach, native toolchain/linker requirements, and supported targets remain implementation decisions. Pin a tested version; do not casually track incompatible LLVM APIs.
+
+The exact LLVM binding choices require checking current upstream API/version behavior before implementation. LLVM's GC mechanisms help provide root/reference location data, but don't design and implement VOID's entire tracing collector. ORC's resource tracking helps manage JIT code, but doesn't automatically prove no thread is executing old code.
+
+### 50.4 Alternate backend fallback [REVIEWED, NOT SELECTED]
+
+Source-to-C is a legitimate compiler technique; it was used for VOIDC 1.0. QBE and Cranelift are other native codegen candidates. They may be worth evaluating only if LLVM integration becomes a disproportionate cost. The current design is **LLVM AOT + ORC JIT**, because runtime code replacement is a first-class goal. Do not switch the backend or introduce a second interpreter without a concrete reason.
+
+## 51. Platform independence [AGREED GOAL]
+
+VOID language rules, VFS syntax, numeric operations, string/formatting behavior, GC, result/error handling, and ordinary libraries should be consistent across Windows, Linux, and macOS. Source paths always use `/`. The compiler maps virtual paths to physical OS paths at the filesystem boundary.
+
+Examples:
+
+```text
+VOID VFS path: /units/player.void
+
+Linux:   /home/dev/my_game/units/player.void
+Windows: C:\Games\my_game\units\player.void
+macOS:   /Users/dev/my_game/units/player.void
+```
+
+A proposed CLI might look like:
+
+```bash
+void run .
+void run --live .
+void build .
+void build --release .
+void build --target windows-x64 .
+```
+
+These command spellings are historical proposals. Current commands use
+`voidc --version`, `voidc run --project DIR`, and
+`voidc build --project DIR --profile release`; see [the CLI reference](CLI.md).
+Live mode and cross-target syntax above are not current command promises.
+Cross-compilation still requires supported target toolchains and compatible native libraries. Detect unsupported combinations early and report them in VOID-friendly diagnostics.
+
+## 52. Crosscutting correctness contracts
+
+These requirements bind all subsystems and should be part of the test design, not postponed until late integration:
+
+1. **Evaluation order:** Named, default, positional, native, async, generic, and constructor arguments evaluate in one well-defined order, with side effects preserved.
+2. **Object/reference identity:** Ordinary structs stay reference-semantic; values copy. No optimization changes identity or alias-visible mutations.
+3. **Initialization:** Safe code sees no garbage values; per-instance mutable defaults are not accidentally shared.
+4. **Failure cleanup:** `?`, early return, panic handling, `with`, and `defer` all preserve required cleanup and original error information.
+5. **Concurrency safety:** GC coordination works with native calls, external callback threads, task suspension, and active hot-reload code.
+6. **Source diagnostics:** Maintain exact spans and stack-trace mappings across LLVM optimization, generics, closures, and async lowering.
+7. **Hot-reload compatibility:** Never install code that assumes a changed struct layout, const value, signature, or incompatible closure/async frame.
+8. **Portability:** No source-visible surprises from `\` versus `/`, CRLF versus LF, platform encodings, or native linker diagnostics.
+9. **Runtime/library boundary:** Each component has a documented responsibility; adding a collection method or wrapper should not require inventing a new compiler opcode.
+
+---
+
+# Part VIII. Implementation roadmap, prototypes, and audits
+
+## 53. First: architectural proofs before major implementation [RECOMMENDED]
+
+Rather than designing hundreds of milestones and discovering a broken LLVM/GC/hot-reload assumption too late, build four isolated, measurable feasibility demonstrations.
+
+### Proof A: Native LLVM pipeline
+
+**Build:** A tiny compiled program supporting integers, branch, function call, and source locations.  
+**Verify:** AOT executable works, named functions are callable, debug metadata maps back to proposed `.void` paths, and error paths are not represented only as LLVM failures.  
+**Gate:** Native compile and run on Linux; early Windows run/build check using a reproducible toolchain.
+
+### Proof B: Precise managed references and GC
+
+**Build:** A minimal non-moving collector with accurate roots/field descriptions, allocation, reclamation, and cooperative safepoints.  
+**Verify:** Reachable objects survive optimized native calls and loops, unreachable cycles collect, value structs containing references are traced, native temporary handles are safe, and repeated stress tests do not expose stale roots.  
+**Gate:** Correctness under optimized builds before allocator micro-optimization.
+
+### Proof C: Running native function replacement
+
+**Build:** Two versions of a function with a stable dispatch identity and safe publication of new code.  
+**Verify:** Existing state survives; callbacks keep working; active calls can finish with old code; metadata/code isn't reclaimed prematurely; incompatible changes are rejected without restart.  
+**Gate:** Repeated replacement across threads and callbacks without crashes or stale dispatch.
+
+### Proof D: Native C ABI bridge
+
+**Build:** Call a small known C function, pass and receive UTF-8 text through declared ownership rules, and wrap a resource with `deinit()`.  
+**Verify:** No developer-facing `cstring`, correct lifetime, no double release, clear error on missing library/architecture, and a C callback can reenter VOID safely under chosen runtime rules.  
+**Gate:** Same higher-level source on two operating systems, allowing target-specific native binary packages.
+
+If one proof reveals a constraint, change the implementation approach before building numerous features on top of it. The language contract should remain stable unless the proof reveals a fundamental inconsistency.
+
+## 54. Main implementation stages [RECOMMENDED]
+
+The stages are architectural groupings, **not** preapproved milestone numbers. Some work overlaps, and source metadata plus a minimal language server must start early.
+
+| Stage | Focus | Exit evidence |
+|---|---|---|
+| 1. Frontend foundation | VFS paths, lexer, indentation parser, AST, symbol tables, source spans, diagnostics, basic type inference | Parse/name/type test suite, cross-file imports, early LSP hovers |
+| 2. LLVM native AOT | Scalar types, functions, branches, returns, basic object files, native entry point | Linux/Windows native hello-world and focused ABI tests |
+| 3. Managed memory | Reference structs, value structs, object layouts, allocator, precise roots, GC, safepoints | Correct reachability, cycles, escape/storage tests under optimization |
+| 4. Core runtime/types | UTF-8 strings, interpolation/formatting, arrays, dictionaries, methods, properties, interfaces | Collection, string, initialization, and object-model integration suite |
+| 5. Live code | ORC JIT, watch/compile, dispatch indirection, safe patching, code retirement | Running program survives repeated compatible edits |
+| 6. Advanced language | Closures, events, callable structs, generics, `result`, pattern matching, `defer`, fallible init/deinit | Interoperability between GC/lifetime/error features |
+| 7. Concurrency | Scheduler, threads, tasks, async, cancellation, mutex/atomic, task groups | Threaded GC tests, cancellation cleanup, async hot-reload stress |
+| 8. Tooling/ecosystem | Mature LSP, doc comments, native bindings, package management/discovery, diagnostics | User can install library, navigate source, compile, diagnose and run |
+| 9. Optimization/release | Allocation elimination, native specialization, SIMD, GC tuning, release packaging | Real benchmark comparisons, pause percentile results, target-platform acceptance |
+
+**Ordering refinement:** The IR, GC roots, and reloadable-function identity must be *designed* in Stage 1, and the four architectural proofs should occur early enough that later stages depend on demonstrated contracts. Don't wait until Stage 5 to discover reloadable functions need stable identities. Don't wait until Stage 8 to discover the frontend can't support incremental IDE parsing.
+
+### 54.1 What not to do
+
+- Don't finish the entire parser before testing one native LLVM execution path.
+- Don't build a second independent type checker for the LSP.
+- Don't create a bytecode interpreter solely because live reload sounds like scripting.
+- Don't hardcode every list/dictionary method into the compiler.
+- Don't let public LLVM API types leak into language symbols or documentation.
+- Don't assume non-moving GC eliminates all native lifetime hazards.
+- Don't make every method indirect in release builds merely to support development hot reload.
+- Don't add complex optimization machinery without measurement.
+- Don't postpone Windows testing until another project-ending all-platform audit.
+
+## 55. Suggested milestone discipline [RECOMMENDED]
+
+The previous compiler was developed through focused numbered milestones with strong validation. Reuse the successful process, while avoiding unnecessary repetition of standing rules in every prompt.
+
+Each ordinary milestone should have:
+
+1. One narrow semantic/runtime objective and the precise files/components expected to change.
+2. An explicit contract: what works, what intentionally remains unsupported, and what cannot regress.
+3. Focused positive/negative tests, including exact diagnostics when relevant.
+4. A quick integration smoke suite against already completed compiler/runtime features.
+5. A build/test summary, unresolved risks, and source changes actually made.
+
+At boundary milestones, perform a broader audit covering compiler, runtime, allocator, IR, LSP, hot reload, and native bindings as applicable. Prefer one standing design/testing-rules section per milestone block and shorter milestone-specific followups afterward.
+
+### 55.1 Test matrix that follows from this bible
+
+| Dimension | Representative validation |
+|---|---|
+| Parsing | Indentation, comments/docs, `{}` defer blocks, multiline strings, nested generics |
+| Type checking | Numeric literals, optional parameter types, const borrow, inheritance, pattern narrowing |
+| Module system | VFS root/relative aliases, canonical identity, external imports, case collisions |
+| Control flow | `if` expressions, non-exhaustive match behavior, ranges, reverse iteration, `break`, `continue` |
+| Collections | Fixed versus growable, readonly params, `get`, missing keys, hashing/equality, iteration mutation |
+| Object model | GC reference structs, copied value structs, `init`, `deinit`, interfaces, override checks |
+| Errors | `Ok`/`Err`, `?`, defer ordering, multiple failures, runtime stack traces |
+| Callables | Closures, callback identity, events, callable structs, private function references |
+| GC | Precise roots, cycles, native retention, threads, async captures, allocator contention |
+| Hot reload | Valid body change, invalid syntax, const/layout/signature changes, active calls, callbacks |
+| Native ABI | UTF-8, embedded NUL, retained pointers, native returns, destroy once, callback threads |
+| Tooling | Partial files, completion, docs, diagnostics identity, rename/refactor across VFS |
+| Platforms | Linux, Windows, macOS where supported; debug/release; multiple target architectures |
+
+Use sanitizer/instrumented builds where appropriate, but do not confuse checking the compiler or runtime with checking generated application code. Treat compiler correctness and user-program behavior as two separate test surfaces.
+
+## 56. Performance measurement plan [RECOMMENDED]
+
+Target **Go-like efficiency** as an aspiration, not an unproven guarantee. Compare equivalent workloads and semantics under optimized releases on the same hardware and toolchain configuration. Include optimized C as a lower-level baseline where useful, but do not call it a like-for-like managed-language comparison if it omits bounds checks, GC, or other guarantees.
+
+Measure:
+
+- Scalar arithmetic and loop overhead.
+- Allocation rate and small-object allocation latency.
+- Reference/value struct access, method dispatch and virtual/interface calls.
+- List indexing and growth, dictionary lookup, iterators, reverse iteration.
+- String interpolation/formatting and UTF-8 operations.
+- GC pauses (median, p95, p99, maximum), throughput, fragmentation, heap overhead.
+- Scheduler overhead, sync contention, async suspension/resumption.
+- C ABI string/callback overhead.
+- Development-mode hot reload dispatch versus optimized release dispatch.
+- Compilation latency and total produced executable size.
+
+**Correctness first.** A performance change is acceptable only if it preserves defined language behavior, including errors, GC roots, cleanup, evaluation order, and concurrency. The experience with VOIDC 1.0's redundant safepoints and optimization barriers is a reason to instrument and measure, not a reason to remove GC or make users write unsafe code.
+
+---
+
+# Part IX. Complete worked examples
+
+The examples below intentionally combine features across files. They are **language-design examples**, not currently compiled, and their convenience library functions (`game`, `graphics`, `files`) are illustrative.
+
+## 57. Example project: small game with root constants, scene callbacks, events, and private helpers
+
+```text
+little_town/
+├── main.void
+├── units/
+│   └── player.void
+├── scenes/
+│   └── town.void
+└── resources/
+    └── saved_game.void
+```
+
+### 57.1 `main.void`
+
+```python
+use "/units/player.void" as units
+use "/scenes/town.void" as town_module
+
+## Constants in the entry file are available across this project.
+const game_name = "Little Town"
+const max_health = 100
+const starting_position = 16
+
+private func show_damage(amount: i32):
+    print("Player took {amount} damage!")
+
+func main():
+    var hero = units.player(name = "Hero")
+    hero.on_damage += show_damage
+
+    print("Welcome to {game_name}!")
+    town_module.town.on_enter()
+    town_module.town.on_update(0.5)
+
+    hero.take_damage(25)
+    print("Remaining health: {hero.health:0000}")
+
+    town_module.town.on_exit()
+    hero.on_damage -= show_damage
+```
+
+### 57.2 `units/player.void`
+
+```python
+## A game character with managed reference semantics.
+struct player:
+    name: string
+    private health_value: i32 = max_health
+    position: vector2
+    event on_damage: func(i32)
+
+## Protects the player's health range.
+property (p player) health: i32:
+    get:
+        return p.health_value
+
+    set(value):
+        p.health_value = clamp(value, 0, max_health)
+
+func (p player) init(name: string):
+    p.name = name
+    p.position = vector2(x = starting_position, y = starting_position)
+
+func (p player) take_damage(amount: i32):
+    p.health -= amount
+    p.on_damage.emit(amount)
+
+value struct vector2:
+    x: f32
+    y: f32
+```
+
+### 57.3 `scenes/town.void`
+
+```python
+## A scene exposes a few callbacks; internal logic stays file-private.
+struct scene:
+    on_enter: func()
+    on_exit: func()
+    on_update: func(f32)
+
+var visits = 0
+
+private func enter_town():
+    visits++
+    print("Entering town, visit {visits}")
+
+private func exit_town():
+    print("Leaving town")
+
+private func update_town(dt: f32):
+    print("Updating town by {dt:F2}s")
+
+var town = scene(
+    on_enter = enter_town,
+    on_exit = exit_town,
+    on_update = update_town
+)
+```
+
+This example illustrates:
+
+- `main.void` project-wide constants.
+- Normal `use` paths and aliases.
+- Lowercase `snake_case` everywhere.
+- `struct` plus `value struct`.
+- `init()` and a property with `get`/`set`.
+- A public event with a private function subscriber.
+- Public scene callback fields wired to private file functions.
+- Default float formatting, custom zero padding, and automatic interpolation.
+- No `class`, `new`, `this`, or `namespace`.
+
+**Stage 11 resolution:** `town` may be a runtime module global. Selected-entry
+public/internal globals follow the root-constant visibility convention; ordinary
+module globals follow imports/aliases and initialize eagerly. Private globals
+remain file-private. See [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md). This does not
+approve module-as-scene adapters or change the file-private callback pattern.
+
+## 58. Example: `result` and optional values
+
+```python
+enum file_error:
+    not_found
+    invalid_format
+    permission_denied
+
+struct player:
+    name: string
+    level: i32 = 1
+
+func load_player(path: string) -> result<player, file_error>:
+    var text = files.read_text(path)?
+    return parse_player_data(text)?
+
+func start_game():
+    match load_player("save.dat"):
+        Ok(hero):
+            print("Welcome back, {hero.name}!")
+
+        Err(file_error.not_found):
+            print("Starting a new game")
+
+        Err(err):
+            print("Could not load save: {err}")
+
+    var maybe_player: player? = find_online_player("Hero")
+    if maybe_player is Ok(found):
+        print("Player is online: {found.name}")
+```
+
+`Ok(...)` has a type-directed meaning:
+
+- A `result` matches `Ok` when it succeeded.
+- A nullable value matches `Ok` when non-null.
+- A successful result containing a null value is still a success; inner null checks remain separate.
+
+The placeholder `files.read_text(path)?` and `parse_player_data(text)?` must return compatible error types or have an explicitly defined error conversion. This example illustrates syntax, not an implicit promise that arbitrary error enums auto-convert.
+
+## 59. Example: arrays, dictionaries, readonly parameters, and iteration
+
+```python
+const party_size = 4
+
+func print_party(const names: [string, party_size]):
+    for name, index in names:
+        print("{index}: {name}")
+
+func main():
+    const party: [string, party_size] = [
+        "Hero", "Mage", "Ranger", "Healer"
+    ]
+
+    print_party(party)
+
+    var loot = ["sword", "shield", "potion"]
+    loot.push("key")
+
+    for item, index in reverse loot:
+        print("{index}: {item}")
+
+    var scores: {string: i32} = {
+        "hero": 100,
+        "mage": 75
+    }
+
+    scores["hero"] += 25
+
+    for score, name in scores:
+        print("{name}: {score:0000}")
+
+    if scores.get("hero") is Ok(score):
+        print("Hero has {score} points")
+```
+
+The readonly `names` parameter should not create unnecessary array copies. It has a fixed length determined by a compile-time constant.
+
+## 60. Example: a callable, stateful object
+
+```python
+struct damage_multiplier:
+    amount: i32 = 2
+    private count: i32 = 0
+
+func (m damage_multiplier) call(value: i32) -> i32:
+    m.count++
+    return multiply_value(value, m.amount)
+
+private func multiply_value(value: i32, amount: i32) -> i32:
+    return value * amount
+
+func apply(value: i32, transform: func(i32) -> i32):
+    print("Output: {transform(value)}")
+
+func main():
+    var double = damage_multiplier()
+    apply(10, double)
+    apply(25, double)
+```
+
+A callable struct can carry state and still satisfy a compatible callback signature. Whether method `call` and `func(i32) -> i32` use identical ABI representations is a compiler/runtime concern, not part of the application syntax.
+
+## 61. Example: conditional values, patterns, and incomplete match semantics
+
+```python
+enum direction:
+    up
+    down
+    left
+    right
+
+func direction_label(dir: direction) -> string:
+    return match dir:
+        direction.up: "Up"
+        direction.down: "Down"
+        direction.left: "Left"
+        direction.right: "Right"
+
+func update_direction(dir: direction):
+    match dir:
+        direction.up:
+            print("Up")
+        direction.down:
+            print("Down")
+
+    # Warning: left and right are not handled.
+    # Unmatched values do nothing because this is a statement.
+```
+
+```python
+func label_partial(dir: direction) -> string:
+    return match dir:
+        direction.up: "Up"
+        direction.down: "Down"
+
+    # Compiler warning for left/right.
+    # Runtime VOID match error if left/right actually occurs.
+```
+
+No incomplete expression should silently synthesize `null`. Adding `_` supplies a default; covering all enum cases avoids warning.
+
+## 62. Example: cleanup that survives early errors
+
+```python
+func load_map(path: string) -> result<string, error>:
+    var file = files.open(path)?
+    defer file.close()
+
+    defer {
+        print("Map load cleanup")
+        log_flush()
+    }
+
+    var content = file.read_text()?
+    return Ok(content)
+```
+
+On `Err`, `?` propagates the result while running all registered defers in reverse order. A panic handled by the runtime should also unwind language-managed cleanup where it is safe. A true native process crash cannot guarantee this.
+
+## 63. Example: asynchronous scene loading with a task group
+
+```python
+# Application-provided files API and error type.
+private async func load_world_data() -> result<string, error>:
+    return await files.read_text("world.dat")
+
+private async func load_audio_data() -> result<string, error>:
+    return await files.read_text("audio.dat")
+
+async func load_scene() -> result<bool, error>:
+    with tasks.group() as jobs:
+        var world_job = load_world_data()
+        var audio_job = load_audio_data()
+
+        var world = await world_job?
+        var audio = await audio_job?
+
+        print("World: {world}")
+        print("Audio: {audio}")
+
+    return Ok(true)
+```
+
+**Architecture note:** Ordinary async calls already enqueue tasks in the
+contextual `tasks.group()` scope. `jobs.spawn` remains deferred. The two `await
+job?` expressions use the existing await/result/cleanup machinery. File loading,
+the `error` type and application display dependencies in this example remain
+illustrative; see [ASYNC.md](ASYNC.md) for implemented scheduling restrictions.
+
+## 64. Example: a small game-like style with very little code
+
+```python
+use "game"
+
+const speed = 80
+
+value struct vector2:
+    x: f32
+    y: f32
+
+struct player:
+    position: vector2
+    health: i32 = 100
+
+func (p player) move(dt: f32):
+    if game.btn("left"):
+        p.position.x -= speed * dt
+    if game.btn("right"):
+        p.position.x += speed * dt
+
+var hero = player(position = vector2(x = 64, y = 64))
+
+func update(dt: f32):
+    hero.move(dt)
+
+func draw():
+    game.cls(0)
+    game.spr("player", hero.position.x, hero.position.y)
+    game.text("HP: {hero.health}", 4, 4)
+```
+
+The built-in game API is optional. This is intended to feel PICO-8-like without turning VOID 2.0 into a mandatory fantasy-console runtime.
+
+---
+
+# Part X. Decision register and outstanding questions
+
+## 65. Explicitly accepted language decisions
+
+**Reading note (16 October 2026):** This table records owner-accepted *design intent*, not a blanket claim that every example or future API is currently implemented. Use the status reconciliation below and the actual phase documents to distinguish (1) working source semantics, (2) approved future source semantics, (3) internal runtime proofs, and (4) still-unapproved extensions. No listed feature is removed by this distinction.
+
+| Area | Agreed decision |
+|---|---|
+| Philosophy | Easy and fun, small syntax, powerful functionality, compiler hides complexity |
+| Naming | `snake_case` across all ordinary declarations |
+| Block syntax | Python-like indentation; `defer { ... }` also available |
+| Functions | `func`, receiver methods, no `this` |
+| Placeholder statement | `pass` is an implemented standalone no-op; ordinary bodies remain nonempty and required return paths still apply (Section 27.2) |
+| Scope | `var` declaration explicit, accidental shadowing is compile error |
+| Constants | `const` readonly, usable to initialize/reassign mutable variables, manual restart after source edit |
+| Numeric defaults | `i32` for common ints; `f32` for unsuffixed floating literals; `f` and `d` suffixes |
+| Strings | One UTF-8 `string`, auto interpolation, C#-like formatting and triple-quoted text |
+| Print | One `print()` with optional `end` |
+| Objects | `struct` reference semantics, `value struct` value semantics, no classes needed |
+| OOP | Single managed-struct inheritance via `extends`; explicit `virtual func`/`override func`/`super`; named/unnamed stored `using` composition, direct-member precedence and one-hop unambiguous promotion; ambiguity diagnosed at access without type/signature guessing; structural interfaces without mandatory `implements`; properties |
+| Constructor/lifecycle | `init()`, `deinit()`, `with`, `defer`; GC memory separate from native cleanup |
+| Visibility | Public by default, optional `public`, `private`, `internal`, `static` |
+| Callable values | `func()` fields, anonymous funcs, closures, callable structs with `call()` |
+| Events | `event ...: func(...)`, `+=`, `-=`, `.emit()` |
+| Patterns | `is`, `match`, `Ok`/`Err`, typed captures, ranges and tagged enums |
+| Match omissions | Statement warns/no-op; expression warns/runtime error if unmatched |
+| Errors | `result<t,e>`, `Ok`, `Err`, propagation `?`, panic distinct from errors |
+| Iteration | Only `for`: iterable/range traversal, Boolean condition, or unbounded `for:`; optional index/key, `reverse`, `break`, `continue` |
+| Operators | `and`/`or`/`not`; exact-width integer bitwise/shifts and compound assignments; arithmetic assignments; postfix statement-only `++`/`--` |
+| Generics | `<>`, inference, interface constraints, no arbitrary parameter-count cap |
+| Collections | `[]` growable/fixed arrays, `{}` dictionaries, no compiler-special stack/queue |
+| Defaults | No uninitialized garbage data visible through safe VOID |
+| Paths | Canonical `/` VFS imports, root and relative import styles, no namespace declarations |
+| GC | Automatic, precise non-moving first implementation, low overhead and frame-time focus |
+| Native FFI | C libraries through safe bindings, one public string, no ordinary unsafe pointers |
+| Compilation | LLVM AOT release direction; ORC JIT development hot-reload direction |
+| Hot reload | Function bodies auto-reload when compatible; no automatic restarts |
+| Async | `async func`/`await` with implicit task mechanics, `spawn`, task groups, sync library |
+| Tooling | First-class IntelliSense, docs, source-level compile/runtime diagnostics, stack traces |
+
+## 66. Previously open decisions: implemented boundaries and genuinely unfinished design
+
+This section matters especially when an AI assistant inherits this file without the preceding chat.
+
+**Reconciled 16 October 2026:** The 33 historical topics below are retained in full. Items labeled **IMPLEMENTED CORE** have an owner-approved working compiler contract described elsewhere; only their stated extensions remain open. **RESOLVED** items should no longer be described as undecided. **OPEN EXTENSION** and **FUTURE DESIGN** do not authorize implementation. The per-item original design questions remain as historical context.
+
+1. **`const` and deep immutability:** [IMPLEMENTED CORE: P3/RV deep readonly access, not global freezing] P3/RV implement deep readonly reference **views**, not object-wide freezing: mutation through a `const` reference or any derived copy/view is rejected, while an independent mutable alias still works. Module `const` is pure compile-time, local `const` is runtime readonly. A separate globally-frozen-object feature and any broader borrowing optimization require distinct future approval.
+2. **File/module import identity:** [IMPLEMENTED CORE: local VFS and explicit dependency identity] Local VFS identity and imports normalize in-root `../`, repeated paths, import cycles and exact-case spellings; symlinks/redirected imported components and duplicate hard-link identities are rejected by current policy. Explicit local/immutable Git package identities and locks follow [package maintenance](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance); arbitrary root-escaping imports and unclaimed identity extensions remain outside that contract.
+3. **Exact grammar for module scopes:** [IMPLEMENTED CORE: compile-time root constants/cycle rules; runtime globals open] Public/internal entry-file compile-time root constants, project-wide name collisions and structural constant dependency cycles have implemented deterministic rules. Runtime file-level mutable variables, their initialization order and runtime dependency cycles remain unimplemented and undecided.
+4. **Static syntax:** [IMPLEMENTED — G80] Type-qualified static fields/methods, visibility, generic owner state and runtime lifecycle follow [STATIC_MEMBERS.md](STATIC_MEMBERS.md).
+5. **Object-model boundary:** [IMPLEMENTED CORE: I1–I8 and IF1–IF8 bounded semantics; richer OOP open] Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, dynamic type tests and richer conversions remain deferred; Phase 24 adds compile-time constraints without value erasure; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
+6. **Construction:** [IMPLEMENTED CORE: C1/S1 init; fallible/resource init open] `init()` is implemented for approved value and managed structs: custom-init calls bind constructor arguments solely to init parameters; types without init retain named-field construction; derived initialization uses an explicit `super.init(...)` prelude. Fallible `result`-returning init, native-resource rollback/destruction and richer constructor escape remain future design.
+7. **`value struct` native ownership:** [FUTURE DESIGN: resource-owning value copies] Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.
+8. **Closures:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Shared captured locals, independent captured value receivers, escaping managed environments and capture-layout reload checks; see ADVANCED_LANGUAGE.md.
+9. **Function call grammar:** [IMPLEMENTED CORE: shared constructor/function/method argument binding] Stage 8 Sprint 2 locally verifies an ordered positional prefix plus named arguments and pure compile-time defaults for ordinary functions and methods using the constructor binder. Supplied arguments evaluate exactly once left to right. See [the contract](STAGE8_CALLS_NUMERIC.md) and [local evidence](stage8/SPRINT2_ACCEPTANCE.md). Sprint 6 approves delimiter-aware multiline call arguments while retaining indentation-sensitive function/match/if bodies; see STAGE8_ERGONOMICS.md for implementation evidence.
+10. **Events:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Owner emission, ordered strong snapshots, re-entrancy and stable callback identities; see ADVANCED_LANGUAGE.md.
+11. **Generic implementation:** [IMPLEMENTED FOUNDATION: Phase 24] Concrete specialization, interface constraints, argument inference and bounded recursion use the existing compiler/Runtime; see GENERICS.md. Variance, operator contracts and more aggressive representation/code-size sharing remain open.
+12. **Dictionary grammar:** [FUTURE DESIGN: dictionary literal grammar] Decide whether unquoted `name = value` is allowed alongside `"name": value`. Do not invent silent meaning for bare identifiers.
+13. **Mixed/general collections:** [FUTURE DESIGN: heterogeneous collections] `[]` and `{}` were discussed as general-purpose untyped options, but their dynamic type, boxing, and inference semantics are undecided.
+14. **Array API spelling:** [APPROVED PHASE 23 API: count/push/remove_at; source arrays still gated] Phase 23 A9 approves `.count`, `.push(value)` and `.remove_at(index)` for the first source-array slice; it does not approve an automatic `add` alias. `pop`, search/equality removal, slicing and other methods remain separate future API decisions. Approved names do not establish completed source-array implementation.
+15. **Iteration modification:** [APPROVED DIRECTION: invalidation at next iterator access] Structural mutation invalidates active growable-list iterators when they next access the iterator, in either direction; this is approved design, not completed source-list execution. The special reverse-current-element deletion exception remains deferred, not accepted or tested.
+16. **Pattern forms:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Shared is/match patterns with success-scoped explicit var captures, range/struct/list/rest/dictionary forms; see ADVANCED_LANGUAGE.md.
+17. **Numeric conversion policy:** [IMPLEMENTED CORE: Phase 6 numeric behavior and project Slice 6 fallible integer casts] `NUMERIC_TYPES.md` specifies contextual literals, wrapping integer overflow, signed/unsigned arithmetic, IEEE NaN/signed-zero comparisons and checked numeric `as`. Project Slice 6 adds canonical `option<T>` for integer-to-integer and integer-to-numeric-enum `as?`. Float hashing and total ordering, platform-sized aliases and additional conversions remain future design.
+18. **UTF-8 semantics:** [IMPLEMENTED CORE: Phase 22 UTF-8 foundation; future indexing/slicing open] S1-S8 approve the strict UTF-8 foundation with exact bytes,
+    no normalization and embedded NUL. Section 8.1 approves future scalar indexing,
+    scalar length and byte_length; G79 implements explicit nullable strings.
+    Index errors, slicing, grapheme APIs, ordering, formatting grammar and broader
+    native binding policy remain open.
+19. **Panic and defer:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Applicable cleanup continues after failure while preserving the primary diagnostic and bounded additional errors; native process corruption cannot guarantee cleanup.
+20. **Nullable/`Ok` overloading:** [IMPLEMENTED; HOSTED-LOCKED: Stage 4, CI #68] Ok matches present nullable values or result success according to the subject type; Ok(null) result payloads remain distinct from Err.
+21. **Async API:** [FUTURE DESIGN: async/task source] `async func`, `await`, and `spawn` are agreed; exact scheduling start semantics, task group binding, async `with`, and cancellation observation points remain to specify.
+22. **Hot-reload implementation:** [IMPLEMENTED FOUNDATION: generation leases and native replacement; complete auto-reload open] Compatible-body-only behavior is agreed. The internal JIT generation leases, retained metadata and native replacement proofs already exist; complete automatic source watching, general code retirement, cross-thread publication across all future feature forms and full live product hot reload are still separate design and acceptance concerns.
+23. **GC details:** [IMPLEMENTED FOUNDATION: precise GC/roots; optimization and production acceptance open] The Phase 15 precise non-moving Heap, compiler-managed roots, explicit frame/slot contracts and cooperative collection/rendezvous have implemented proofs; later source phases use them. Production tuning, advanced/concurrent collector strategies, allocation thresholds, liveness optimization and comprehensive barrier/performance certification remain separate work; non-moving is not a permanent language restriction.
+24. **FFI details:** [IMPLEMENTED INTERNAL BRIDGE: source FFI design open] No user-facing pointers/C strings is agreed; trusted native binding grammar, ownership metadata, foreign threads, and callback trampoline semantics are not finished.
+25. **Tooling/packaging:** [IMPLEMENTED CORE: diagnostics/LSP/editor, CLI and scoped packaging] Compiler-owned editor sessions, project commands, explicit package source maintenance/locks, native-provider verification and application packaging follow the current [CLI](CLI.md) and [editor](EDITOR_INTEGRATION.md) contracts. Public registry/discovery, production distribution trust and unclaimed IntelliSense extensions remain future work.
+26. **Module-as-scene adapter:** [UNAPPROVED IDEA: module-as-scene adapter] A module directly satisfying a scene interface and `func call()` at file level was explored, but the user corrected the discussion to favor **struct callback fields wired to private module functions**. Do not implement module-callable semantics as a locked feature without explicit reapproval.
+27. **Empty function bodies — resolved:** [RESOLVED AND IMPLEMENTED: pass] `pass` is the approved, implemented intentional no-op placeholder (Section 27.2). Empty ordinary statement bodies remain invalid; interface requirements remain bodyless.
+28. **Operator overloading:** [APPROVED DESIGN DIRECTION; NOT IMPLEMENTED] Boss approves C#-inspired operator overloading adapted to VOID's simpler design. Optional operator implementations belong **inside their owning struct**, for both `value struct` and managed `struct`, similar in spirit to optional `init` and `deinit`. A type need not implement every operator. Implementation requires a separately authorized future stage; this direction does not authorize Stage 8 implementation or alter its verification.
+
+    **Proposed families:** Arithmetic `+`, `-`, `*`, `/`; equality `==`, `!=`; optional ordering `<`, `>`, `<=`, `>=`. Compound assignment may reuse existing arithmetic and assignment rules where appropriate.
+
+    Use an applicable custom operator when one exists; otherwise preserve supported built-in behavior. If neither an applicable custom nor built-in operator exists, report a compile-time error. Do not invent default arithmetic or comparisons for arbitrary structs.
+
+    Preserve value-struct copies, deep readonly authority, GC safety and existing ownership rules. Preserve managed-reference identity semantics unless explicitly customized through an approved operator contract. Avoid complex C++-style overload resolution and implicit conversion chains. Assignment `=`, Boolean short-circuiting and `is`, `as`, `has` retain their existing rules. Operator declarations must not silently change dictionary equality or hashing.
+
+    **Still OPEN:** Exact declaration grammar; operand and return-type restrictions; resolution and ambiguity rules; whether `!=` derives automatically from `==`; equality/hash consistency for dictionary keys; and which operators apply to which struct families and generic types. These choices are not finalized by this approval.
+29. **Error diagnostics codes:** [RESOLVED CORE: diagnostic IDs allocated; future features add new IDs] Illustrative IDs in earlier examples are not guarantees. `DIAGNOSTICS.md` already assigns stable current IDs including VOID1001–VOID4001 and VOID9001; additional language features require new codes without repurposing assigned IDs.
+30. **Compiler implementation language and LLVM integration:** [RESOLVED: C++20; LLVM 23.1.4 MIGRATION AUTHORIZED] VOID 2.0 uses C++20; Boss authorizes LLVM/Clang/LLD 23.1.4 and a shared LLVM lowering path for ORC JIT and native AOT. The former C versus C++ API tradeoff remains a historical architecture note, not an open implementation-language choice.
+31. **`using` remaining design scope:** [IMPLEMENTED CORE: Phase 19 one-hop using; transitive promotion open] Named `using motion: movement` and unnamed `using movement` (stored name `movement`) are approved directions. Duplicate stored names diagnose at declaration; overlapping promoted member names are legal until ambiguous access. No member/argument/result type disambiguation is allowed. Direct-member precedence, initial one-hop promotion, ordinary stored-field initialization and exact method ownership/imports are approved; Phase 19 implements the owner-approved revised U1–U7 contract; see `COMPOSITION.md`. Automatic transitive promotion remains deferred; Phase 21 integrates structural interfaces without transitive promotion; Phase 20 implements the approved inheritance and component virtual-dispatch interactions. Preserve C1/S1/P3/P4/RV1–RV7, physical storage, identity, readonly capabilities and precise GC; no subtyping or implicit composition conversion. See Section 12.1 and `COMPOSITION_PROPOSAL.md`.
+32. **`has` operator:** [OWNER-APPROVED; see Sprint 6 acceptance] `has Component` checks nominal `using` composition, including inherited `using` storage; `has Interface` checks structural interface conformance through existing compiler rules. `has` uses compile-time type information, not runtime reflection. `is` retains pattern matching and `as` retains conversion. `has` grants no implicit conversions, access permissions or readonly bypasses. Sprint 6 approves type operands and specialization-time checking of both branches, without refinement. See STAGE8_ERGONOMICS.md for the exact grammar, boundaries and actual acceptance. See Section 12.1; existing agreed language decisions remain binding.
+33. **Method-only reuse without embedded state:** [FUTURE DESIGN: stateless/method-only reuse] Separate OPEN future design question. Phase 19 `using` always embeds ordinary stored fields; it introduces no trait/mixin behavior or syntax.
+
+## 67. Resolved changes and corrections from the discussion
+
+**Maintenance reminder:** Treat the reconciled statuses in Section 66 as the current implementation boundary; do not delete original future features from Parts I–IX, assume full language implementation, or widen compiler policy without a new owner decision. For Phase 23 specifically, compare against the latest `ARRAYS_PROPOSAL.md` and `WORK_LOG.md` rather than earlier stack/array research thresholds.
+
+To avoid future context drift, here are ideas explicitly changed or clarified:
+
+- **VOIDC 1.0 versus VOID 2.0:** Do not conflate them. VOIDC 1.0 was intended to preserve C# semantics and GC while transpiling to C; VOID 2.0 is a separate, simpler native language design.
+- **`const handler: func(i32)` as an event:** Proposed briefly, then replaced with explicit `event handler: func(i32)` to avoid context-dependent declaration meaning.
+- **Incomplete `match` expression returning `null`:** Replaced with a compiler warning plus runtime failure if an unmatched value occurs.
+- **Shadowing:** The designer explicitly wants `var health` redeclaration within a nested visible scope to be an error, while `health = 25` is valid.
+- **Stack/queue as core types:** Removed from the minimal built-in collection set. `push`/`pop` and optional libraries suffice.
+- **User-managed `cstring` and exposed `unsafe`:** Rejected for ordinary application code. Trusted bindings still need low-level machinery internally.
+- **`struct` storage based on field initialization:** Explicitly corrected. Reference/value semantics matter; initializer presence does not determine stack/heap placement.
+- **GC `deinit` behavior:** `deinit` is deterministic resource cleanup via explicit scope mechanisms, not a guaranteed GC finalizer.
+- **File as a scene:** The user preferred retaining the straightforward `scene` struct with callback fields referencing private functions. A special compiler-provided file-scene adapter is not confirmed.
+- **Default floating literal `0.5`:** Accepted as `f32` by default, but type context can request `f64`; don't reject everyday unsuffixed decimal literals.
+- **One loop keyword:** Earlier drafts used `while` for Boolean-controlled repetition. The designer explicitly corrected this: all loops use `for` (`for condition:`, `for item in collection:`, or `for:`). `while` is not a language loop keyword.
+- **Full property sugar or constructor overload forests:** Intentionally avoided pending a concrete need.
+
+## 68. Compact vocabulary for continuing the project
+
+**Reference struct:** `struct player` with managed identity and reference semantics.  
+**Value struct:** `value struct vector2` with copy semantics and likely inline storage.  
+**VFS module:** Compiler-managed path identity using `/` relative to the project root.  
+**Readonly:** `const` binding/access view that cannot be mutated through that binding.  
+**Function value:** A `func(...)` callable, anonymous closure, method reference, or compatible callable struct.  
+**Event:** Zero-or-more subscriptions to a declared function signature; `.emit()` notifies subscribers.  
+**Result:** `result<t,e>` carrying `Ok(value)` or `Err(error)`.  
+**Nullable:** `t?` can contain `null`; a non-null value can match `Ok(binding)`.  
+**GC:** Automatic managed-memory tracing, initially precise/non-moving/stop-the-world.  
+**Native binding:** Trusted declaration + ABI bridge wrapping a C library and its ownership/encoding rules.  
+**Hot reload:** Development-mode native function body replacement under a stable identity without application restart.  
+**IR:** VOID's own small typed intermediate representation shared by LLVM AOT/JIT compilation.  
+**LSP:** Language Server Protocol tooling reusing the compiler frontend.
+
+---
+
+# Part XI. Suggested rules for any future assistant or implementation session
+
+1. **Read this entire file before proposing foundational language changes.** Do not infer decisions from a few isolated code snippets.
+2. **Respect decisions labeled AGREED.** If a proposed change conflicts, explain the conflict, tradeoff, and required approval.
+3. **Distinguish design from implementation.** This bible is not proof that a compiler/runtime already exists.
+4. **Keep syntax lowercase snake case**, except explicitly accepted special `Ok`/`Err` patterns.
+5. **Never reintroduce pointers, unsafe syntax, or C strings into normal VOID code** merely to achieve performance or library access.
+6. **Keep the developer experience source-first.** No normal errors expressed in C or LLVM terms.
+7. **Preserve hot-reload semantics:** no automatic restarts; incompatible edits leave the running state unchanged.
+8. **Respect GC semantics:** optimizing allocations does not authorize removing memory safety or manualizing ordinary memory management.
+9. **Do not confuse public-by-default with unrestricted mutable globals.** Scope, access, and root-constant visibility are separate rules.
+10. **Be conservative about invented syntax.** Mark it RECOMMENDED/OPEN until explicitly accepted.
+11. **Maintain cross-platform VFS `/` paths** and test resolver behavior on Windows and Unix-like filesystems.
+12. **Use real evidence for performance and LLVM/runtime claims.** Do not promise Go parity or zero-overhead JIT simply because the backend is LLVM.
+13. **Prefer focused, testable implementation milestones** with cumulative audits over major unchecked rewrites.
+14. **Avoid em dashes** in examples, documentation, drafts and user-facing project text, in keeping with the author's writing preference.
+15. **Ask or report only genuine missing project facts.** Never bluff about compiler behavior, GitHub state, or test results.
+
+## 69. Single-page architecture reminder
+
+```text
+VOID 2.0
+
+Developer goals:
+  Easy to write + easy to read + easy to debug + fun + fast
+
+Syntax:
+  snake_case, func, var, const, struct, value struct,
+  interface, property, if, match, is, for, reverse,
+  result<>, Ok/Err, defer, with, init/deinit,
+  [] growable/fixed, {} dictionary, string interpolation,
+  event, async func, await, spawn
+
+Imports:
+  /project/root.void and ../relative.void
+  Internal folder-based module identities, no namespaces
+
+Memory:
+  Automatic GC, precise non-moving initial collector
+  Thread-local small allocation, inline value storage
+  No ordinary pointers, manual free, unsafe, cstring
+
+Native:
+  Reusable trusted C bindings + VOID wrappers
+  Opaque handles + deinit + native callback trampolines
+
+Compiler:
+  One frontend -> small typed VOID IR -> LLVM
+    AOT release        ORC JIT development
+
+Hot reload:
+  Compatible function bodies automatically replace
+  Const/layout/signature changes require manual restart
+  No auto restart, no popup nagging, old code retained safely
+
+Tooling:
+  Shared frontend/LSP, ## docs, completion, source diagnostics,
+  clickable stack traces, extension package discovery
+
+Implementation strategy:
+  Four early proofs (LLVM, GC, hot reload, C ABI)
+  Then milestone-driven frontend, native code, runtime,
+  managed types, live compile, advanced syntax, concurrency,
+  ecosystem, optimization and cross-platform audits
+```
+
+---
+
+## Closing design statement
+
+**VOID 2.0 should be small on the surface and sophisticated underneath.** A beginner should be able to write a game, access a dictionary, call a native library, and understand a compiler error without knowing memory layouts, C headers, linkers, GC safepoints, or JIT machinery. An experienced developer should still have precise numeric types, generic abstractions, predictable value/reference semantics, native performance, asynchronous concurrency, flexible modules, and reliable IDE tooling.
+
+The next practical activity is **not** to add more language keywords. It is to convert the agreed rules and open items in this bible into a precise language specification, establish a small compiler/frontend skeleton, and complete the four architectural proofs before committing to large-scale implementation.
+
+*End of design bible snapshot.*
+
+## Implementation status addendum: 10 October 2026
+
+The design snapshot above is preserved. The initial compiler foundation now
+historically provided executable LLVM 19.1.7 AOT/JIT architectural proofs, generation leases
+for native function replacement, explicit precise root tracking under LLVM O2,
+and a trusted C ABI fixture. These are experimental implementation mechanisms,
+not completion of the designed language, GC or hot reload system. No `.void`
+source syntax is compiled yet, and no language semantics were changed.
+
+The compiler implementation uses C++20 and the LLVM C++ API. See
+[DECISIONS.md](DECISIONS.md), [WORK_LOG.md](WORK_LOG.md), and
+[KNOWN_ISSUES.md](KNOWN_ISSUES.md) for implementation scope and actual evidence.
+
+
+## Phase 14 custom value initialization
+
+The owner approved Phase 14 C1 in INITIALIZATION_PROPOSAL.md. For the supported
+value-struct subset, constructor arguments bind exclusively to init parameters; no-init
+types retain named fields. Typed positional/named arguments and pure defaults preserve
+supplied source order before recursive field construction and once-only init. Typed
+local defaults execute the same construction; unavailable required-child defaults and
+runtime initialization in pure contexts diagnose. Existing visibility applies; direct
+lifecycle calls are rejected. Initialization bodies and transitive helpers are
+conservative restart contracts. See INITIALIZATION.md for the bounded implementation and
+deferred fallible/resource/managed rules. This supersedes Phase 13 I1 deferral, not the
+unapproved I2 alternative.
+
+
+## Stage 9 approved application workflow — 21 October 2026
+
+Boss approved automatic entry classification for check/run/build/emit and removed
+the public application flag entirely. At baseline, run/build without a path use cwd
+main.void discovery; the [approved replacement](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+will remove filename priority. Explicit .void filenames remain unrestricted.
+Build produces a native
+executable under selected-root/build/entry-stem (Windows: .exe), with an optional
+output override. Legacy precedence/input/printing and application status, return,
+import and conflict semantics below remain unchanged. The compiler owns selection,
+validation and shared LLVM lowering. See [the current contract](STAGE9_APPLICATION_WORKFLOW.md)
+and [local/hosted evidence boundary](stage9/ACCEPTANCE.md). This supersedes only
+Sprint 4's explicit CLI-mode requirement; no package manager or broader FFI follows.
+
+## Stage 8 Sprint 4 approved application entry — 20 October 2026
+
+Boss approved explicit `--app` run/emit, selected-source executable statements or
+zero-argument synchronous main, status without automatic printing, and preserved
+legacy entry precedence. Top-level fallthrough/bare return yields 0; i32 return
+supplies status. Explicit `main() -> i32` requires a return on every reachable
+path. Imported executable statements and competing top-level/main forms reject.
+At that stage top-level vars were body locals. Stage 11 supersedes that rule for
+outermost `var`; block-local bindings retain lexical scope. See
+[the implementation contract](STAGE8_APPLICATION_NATIVE.md) and
+[owner decisions](DECISIONS.md) for exact scope and verification status.
+This supersedes conflicting recommendations in the historical discussion below;
+arbitrary `--entry` function selection remains unimplemented and unapproved here.
+
+## Historical entry-point discussion: 12 October 2026 [SUPERSEDED WHERE NOTED]
+
+This preserves the original developer-simplicity discussion, not a current entry
+requirement. The 8 November [approved filename-independent direction](PROJECT_ARCHITECTURE_ROADMAP.md#proposed-compiler-owned-entry-discovery)
+supersedes its `main.void` default/only-auto-main recommendations. The old discovery
+algorithm remains implemented at baseline; arbitrary entry-function selection below
+is still illustrative and unimplemented. Do not change CLI semantics from this history.
+
+**Shared preference:** A `.void` file is valid without `main()`, `init()` or
+`deinit()`. Ordinary libraries and the future standard library can consist only
+of types, functions and constants. `public` means callable/accessible, **not**
+automatically executed. Importing a file must not run its executable statements.
+
+Preferred entry model to evaluate:
+
+1. A normal executable project defaults to `main.void`. That file may contain
+   either `func main()` or executable top-level statements. The latter are
+   lowered to an internal entry function by the compiler. A project should not
+   require developers to write boilerplate `main()` when the file itself can
+   clearly supply the program body.
+2. An explicitly selected alternate entry file, such as `tools/build_assets.void`,
+   may likewise run top-level statements without defining `main()` or `init()`.
+   This is intended for small tools, scripts, examples and one-off utilities.
+3. An explicitly selected entry function should also be possible, provisionally
+   illustrated by `voidc run tools.void --entry launch`. This is **illustrative
+   CLI syntax**, not a fixed interface. The compiler must not guess which public
+   function to call. Only `main.void` gets automatic `main()` discovery under
+   this proposal; a `main()` in another file is otherwise an ordinary function.
+4. The selected entry file may contain declarations alongside its executable
+   body. An explicit selected entry function and top-level executable statements
+   in the same file would be rejected as competing entry styles, subject to
+   final design approval. The rules for module declarations, constant defaults
+   and file-level instances remain separate from executable statement execution.
+5. An imported file is a library/module in that compilation: declarations do
+   not run on import. Whether importing a file containing top-level executable
+   statements is diagnosed or handled by a more explicit module design remains
+   to be specified; no implicit import-time execution is intended.
+6. `init()` and `deinit()` remain **optional lifecycle methods**, not required
+   program entry or exit hooks. A receiver `init()` participates in object
+   construction only when that object is constructed, as in Phase 14's supported
+   value-struct contract. The future `deinit()` is for explicitly defined
+   resource cleanup, not a GC destructor or automatic file-unload hook. The
+   earlier idea of treating a top-level free `init()` as a non-`main.void` default
+   entry was considered but is **not currently preferred**.
+7. Checking a library file must not require an entry point. Attempting to run
+   a selected file with no executable body or selected entry function should
+   produce a source-facing diagnostic, rather than executing arbitrary exports.
+
+Illustrative future syntax, **not currently executable as written**:
+
+```python
+# main.void: top-level program style
+use "./game.void"
+var session = game()
+session.start()
+```
+
+```python
+# main.void: alternative explicit-function style
+func main():
+    print("Hello from VOID")
+```
+
+```python
+# tools/build_assets.void: explicitly chosen script-style entry
+print("Building assets")
+process_assets()
+```
+
+**Still OPEN before implementation:** Default entry-file discovery and project
+configuration, function signature and arguments, return values/exit codes,
+explicit-entry CLI spelling and visibility, declarations versus executable
+statements at module scope, imported-script diagnostics, interaction with root
+constants and file-level instances, error cleanup, hot-reload compatibility,
+and how to migrate the currently implemented `entry(i32) -> i32` test/CLI
+adapter without breaking existing proof suites. Do not implement this as an
+incidental side effect of the GC/runtime phase. Approve the coherent contract
+in a dedicated executable/project phase.
+
+## Approved Phase 16 clarification: managed readonly views
+
+The owner approved deep readonly reference capabilities (P3) and complete-object
+publication (P4) in MANAGED_STRUCTS_PROPOSAL.md. `const` on a managed reference
+provides a deep readonly view, not object-wide freezing. Copies/casts/returned
+aliases/nested reference access preserve it; copying to `var` cannot restore write
+permission. Independently held mutable aliases remain valid. Reference-free values
+still copy independently. Existing `const parameter: type` syntax accepts readonly
+reference arguments; receiver effects are inferred.
+
+The bounded Phase 16 implementation uses named-field managed construction, direct
+managed `t?` fields/contextual `null`, checked same-nominal `as t` unwrap and explicit
+non-nullable field values. No implicit non-nullable allocation occurs. Complete
+objects alone are published. Custom managed `init` and reference-containing value
+structs are deferred, not prohibited. Existing value `init` semantics are unchanged.
+MANAGED_STRUCTS.md distinguishes working source from this Bible's broader proposals.
+
+## Approved Phase 18 clarification: references inside values
+
+RV1–RV7 in REFERENCE_VALUE_STRUCTS_PROPOSAL.md are owner-approved. Value copies
+retain independent inline storage and embedded managed target identity. Nested
+values may contain nullable/nonnullable managed references; reference edges break
+inline layout recursion. No object clone or source storage-placement distinction
+is introduced.
+
+Readonly authority follows each inline reference leaf. Const bindings/formals give
+deep readonly views; var copies regain writable independent storage without
+regaining authority over readonly referents. Plain value formals require mutable
+reference leaves. Mixed profiles remain distinct, receiver effects are inferred,
+and returned/aliased references retain their authority. Existing binding capacities
+are fixed: readonly carriers cannot be installed into mutable-reference storage,
+including nested managed payloads. Independently held mutable aliases remain valid.
+
+C1 still requires all value fields valid before value init. Nullable leaves default
+null; nonnullable references require supplied complete values and are never silently
+allocated or represented by a zero source default. Required-reference value types
+use explicit no-init construction in this slice. Do not extend S1 unavailable-field
+rules into value initialization. S1's direct managed-field readiness and P4's final
+complete-object commit remain unchanged.
+
+Fresh value initialization infers one conservative reference profile for the whole
+body/result, including const inputs, defaults, helper results and branch joins.
+There are no runtime-dependent permissions or mandatory ownership annotations.
+Pure, init-free all-null templates remain authority-neutral when materialized;
+runtime readonly views and const formal qualification remain readonly even if null.
+Live objects and init execution remain outside compile-time pure expressions.
+
+REFERENCE_VALUE_STRUCTS.md defines the implemented boundary and deferred richer
+initialization/readonly-field policies. This clarification supersedes earlier
+phase-only reference-containing-value deferrals, not the broader language design.
+
+### Phase 23 Stage 3A hosted acceptance, 16 October 2026
+
+**Stage 3A is LOCKED** at `44fc8b686b1e28665455b37a1a825f7ba05e186e`, CI #58 (run `38982940254`): seven hosted jobs succeeded across Ubuntu x64 Debug/Release/Sanitizers, Windows x64 Debug/Release, and macOS ARM64 Debug/Release. Each ran **63/63 CTest suites**, including `gc_buffers`, for **441/441** total. This is a **runtime-only scalar owned fixed-value proof**, not source-array activation. Stage 3B, generated/LLVM array calling conventions, nested owned-child operations and Stage 4 growables remain gated.
+
+Historical pre-hosted/local-only wording in earlier phase sections records the status at those checkpoints. It does not override this later hosted acceptance. The approved future array language behavior and all existing unresolved language-design questions are preserved.
+
+### Phase 23 source arrays and traversal, 17 October 2026
+
+Later source work implements fixed/growable arrays with every existing numeric/bool,
+string, value-struct, managed/nullable/interface and nested-array element kind.
+Fixed children have independent value semantics; growable children share identity.
+Forward/reverse iteration preserves original i64 indexes and existing control flow.
+Matching i32/i64 inclusive/exclusive ranges support both directions and overflow-safe
+boundaries without materialization. Structural list mutation fails at the next
+iterator access, including completion; immediate break/return is allowed.
+FIXED_ARRAYS.md, GROWABLE_ARRAYS.md and WORK_LOG.md contain the current source
+implementation boundary and local evidence, superseding earlier source deferrals.
+Hosted cross-platform acceptance is still owned by the repository owner.
+
+
+## Stage 8 Sprint 5 measured internal lifetime boundary — 20 October 2026
+
+The [async retention contract](STAGE8_ASYNC_RETENTION.md) records internal
+execution-frame retirement after native resume return/acquired worker completion.
+Task/result handles, repeated-await value-copy/identity, errors/cancellation,
+structured cleanup and generation leases retain their established semantics.
+This is not a new public task/ownership API or a constant-memory scheduler;
+native/result records still grow inside a long-lived root. Approval, local
+verification and hosted acceptance remain separate in the linked evidence.
+
+
+### 21 October 2026 — Sprint 6 bounded status correction
+
+The [Sprint 6 contract](STAGE8_ERGONOMICS.md) and acceptance record supersede
+older blanket missing-feature statements for type-level `has`, value-producing
+if, multiline calls and string-only automatic interpolation. Older examples using
+numeric/bool/custom formatting, triple strings, generalized display/conversion,
+recursive composition tests or conditional compilation remain future direction.
+No full-Bible completeness or hosted lock follows from this bounded sprint.
+
+
+## Stage 10 authorization and current field engineering — 22 October 2026
+
+Boss approved the complete Stage 10 contracts, B1–B4 and Wrench amendments.
+Current local engineering adds declaring-owner private/internal/public stored
+fields and const field declarations, deep readonly projections and direct own-init
+replacement (including builtin compounds), with shared selection, independent IR
+checks, compatibility metadata and compiler/LSP support. Existing file-private
+method/property semantics remain unchanged. A const promoted component cannot
+be thawed by conversion to an interface. Focused evidence and remaining acceptance
+are in [the engineering record](stage10/IMPLEMENTATION.md).
+
+The native numeric formatter and embedded pinned rules loader are dependencies,
+not source print/format/time APIs. Complete console/terminal I/O, all display and
+interpolation consumers, validated source temporal values and owner-contained
+operators (including remainder) are not implemented by this checkpoint.
+**Stage 10 is incomplete.** Historical deferrals above are superseded only where
+actual current implementation and evidence establish the feature.
+
+Stage 10 continued integration (22 October 2026): source numeric/bool/string
+`string(value)` and result-returning `format(value, spec)` now share native and
+constant formatting. Typed primitive interpolation, literal specs, triple strings
+and multiline holes are implemented with checked rooted assembly. Composite and
+custom display, temporal values, console and custom operators remain incomplete;
+see `stage10/IMPLEMENTATION.md` for exact focused evidence and remaining work.
+
+### Stage 10 continuing implementation checkpoint (22 October 2026)
+
+Nominal/default/custom display now uses ordinary readonly calls, shared alignment
+and checked interpolation, with per-thread recursion protection and preserved hook
+errors. `use time` provides validated date/time/local/instant/offset/duration/zone/
+zoned factories, component access, checked arithmetic, temporal formatting, explicit
+overlap resolution/gap errors, UTC and monotonic samples/resolution. Pinned IANA
+2026e rules are embedded. Resolution describes native clock granularity, not clock
+accuracy. Source values use private const backing fields and existing result errors.
+These are implemented features under focused acceptance; collection/enum/result
+display, console/terminal and owner operators remain unfinished. The complete
+44-step status and acceptance limits are in `stage10/IMPLEMENTATION.md`.
+
+### Approved future VOID Sections — 22 October 2026
+
+Boss approved `# section Name` and `# endsection` as organizational comments,
+including nested named sections. They follow the existing indentation level and
+never require additional indentation. They may appear at file level, inside
+structs/value structs, functions and other existing scopes; they introduce no
+language scope and change neither runtime behavior nor compiled semantics.
+Future tooling should reuse existing editor/LSP infrastructure for folding,
+outline navigation, minimap section names and scrollbar markers where supported.
+This is documentation of an approved future direction, **not implemented
+functionality**; VOID Sections are outside Stage 10 implementation.

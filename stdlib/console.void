@@ -20,25 +20,25 @@ const stdout = output(_id = 1)
 const stderr = output(_id = 2)
 
 ## Portable categories of recoverable console failures.
-enum io_error_kind:
+enum io_error_kind(i64):
     ## Invalid count, timeout or operation argument.
-    invalid_argument
+    invalid_argument = 1
     ## Input or output violates the strict Unicode boundary.
-    invalid_encoding
+    invalid_encoding = 2
     ## This endpoint does not support the requested operation.
-    unsupported
+    unsupported = 3
     ## The operation cannot currently make progress.
-    would_block
+    would_block = 4
     ## The monotonic wait deadline elapsed.
-    timed_out
+    timed_out = 5
     ## The endpoint or scoped mode is closed.
-    closed
+    closed = 6
     ## The output peer closed its pipe.
-    broken_pipe
+    broken_pipe = 7
     ## The operating system interrupted the operation.
-    interrupted
+    interrupted = 8
     ## Other native I/O failure.
-    io_failure
+    io_failure = 9
 
 ## Managed console failure retaining native progress and cleanup details.
 struct io_error extends core.error:
@@ -91,22 +91,8 @@ private value struct _reply:
 
 private func _error(reply: _reply, operation: string, stream: string) -> io_error:
     var kind = io_error_kind.io_failure
-    if reply.kind == 1:
-        kind = io_error_kind.invalid_argument
-    if reply.kind == 2:
-        kind = io_error_kind.invalid_encoding
-    if reply.kind == 3:
-        kind = io_error_kind.unsupported
-    if reply.kind == 4:
-        kind = io_error_kind.would_block
-    if reply.kind == 5:
-        kind = io_error_kind.timed_out
-    if reply.kind == 6:
-        kind = io_error_kind.closed
-    if reply.kind == 7:
-        kind = io_error_kind.broken_pipe
-    if reply.kind == 8:
-        kind = io_error_kind.interrupted
+    if reply.kind as? io_error_kind is Some(var decoded):
+        kind = decoded
     return io_error(
         operation = operation,
         stream = stream,
@@ -242,93 +228,75 @@ value struct terminal_position:
     const row: i64
 
 ## Approved 16-color terminal palette.
-enum color:
+enum color(i64):
     ## The black terminal color.
-    black
+    black = 0
     ## The red terminal color.
-    red
+    red = 1
     ## The green terminal color.
-    green
+    green = 2
     ## The yellow terminal color.
-    yellow
+    yellow = 3
     ## The blue terminal color.
-    blue
+    blue = 4
     ## The magenta terminal color.
-    magenta
+    magenta = 5
     ## The cyan terminal color.
-    cyan
+    cyan = 6
     ## The white terminal color.
-    white
+    white = 7
     ## The bright black terminal color.
-    bright_black
+    bright_black = 8
     ## The bright red terminal color.
-    bright_red
+    bright_red = 9
     ## The bright green terminal color.
-    bright_green
+    bright_green = 10
     ## The bright yellow terminal color.
-    bright_yellow
+    bright_yellow = 11
     ## The bright blue terminal color.
-    bright_blue
+    bright_blue = 12
     ## The bright magenta terminal color.
-    bright_magenta
+    bright_magenta = 13
     ## The bright cyan terminal color.
-    bright_cyan
+    bright_cyan = 14
     ## The bright white terminal color.
-    bright_white
+    bright_white = 15
 
-private func _color_code(value: color) -> i64:
-    match value:
-        color.black:
-            return 0
-        color.red:
-            return 1
-        color.green:
-            return 2
-        color.yellow:
-            return 3
-        color.blue:
-            return 4
-        color.magenta:
-            return 5
-        color.cyan:
-            return 6
-        color.white:
-            return 7
-        color.bright_black:
-            return 8
-        color.bright_red:
-            return 9
-        color.bright_green:
-            return 10
-        color.bright_yellow:
-            return 11
-        color.bright_blue:
-            return 12
-        color.bright_magenta:
-            return 13
-        color.bright_cyan:
-            return 14
-        color.bright_white:
-            return 15
-    return -1
+private flags enum _capability(i64):
+    text_input = 1
+    text_output = 2
+    key_input = 4
+    input_modes = 8
+    size = 16
+    cursor_position = 32
+    cursor_visibility = 64
+    color = 128
+    clear = 256
+    title = 512
+    bell = 1024
 
-private func _flag(mask: i64, bit: i64) -> bool:
-    return mask / bit % 2 != 0
+private flags enum _key_metadata(i64):
+    shift = 1
+    alt = 2
+    control = 4
+    modifiers_known = 8
+    key_down_known = 16
+    key_down = 32
 
 private func _capabilities(reply: _reply) -> terminal_capabilities:
-    var mask = reply.progress
+    var mask = reply.progress as _capability
     return terminal_capabilities(
-        text_input = _flag(mask, 1),
-        text_output = _flag(mask, 2),
-        key_input = _flag(mask, 4),
-        input_modes = _flag(mask, 8),
-        size = _flag(mask, 16),
-        cursor_position = _flag(mask, 32),
-        cursor_visibility = _flag(mask, 64),
-        color = _flag(mask, 128),
-        clear = _flag(mask, 256),
-        title = _flag(mask, 512),
-        bell = _flag(mask, 1024)
+        text_input = mask.has(_capability.text_input),
+        text_output = mask.has(_capability.text_output),
+        key_input = mask.has(_capability.key_input),
+        input_modes = mask.has(_capability.input_modes),
+        size = mask.has(_capability.size),
+        cursor_position = mask.has(_capability.cursor_position),
+        cursor_visibility = mask.has(_capability.cursor_visibility),
+        color = mask.has(_capability.color),
+        clear = mask.has(_capability.clear),
+        title = mask.has(_capability.title),
+        bell = mask.has(_capability.bell)
     )
 
 ## Snapshot actual standard-input capabilities without opening a terminal.
@@ -383,7 +351,7 @@ func (self output) set_cursor_visible(visible: bool) -> result<bool, io_error>:
 ## @param background Background palette color.
 ## @return True when the operation completes, or a structured I/O failure.
 func (self output) set_color(foreground: color, background: color) -> result<bool, io_error>:
-    return _ack(_console_color(self, _color_code(foreground), _color_code(background)), "set_color", _stream(self))
+    return _ack(_console_color(self, foreground.value, background.value), "set_color", _stream(self))
 
 ## Restore terminal default colors when supported.
 ## @return True when the operation completes, or a structured I/O failure.
@@ -441,63 +409,63 @@ func (self input) begin_mode(echo: bool = true, line_input: bool = true, control
     return Ok(session)
 
 ## Portable keyboard key identity.
-enum key:
+enum key(i64):
     ## A Unicode character, available in key_event.character.
-    character
+    character = 0
     ## The enter key.
-    enter
+    enter = 1
     ## The tab key.
-    tab
+    tab = 2
     ## The backspace key.
-    backspace
+    backspace = 3
     ## The escape key.
-    escape
+    escape = 4
     ## The up key.
-    up
+    up = 5
     ## The down key.
-    down
+    down = 6
     ## The left key.
-    left
+    left = 7
     ## The right key.
-    right
+    right = 8
     ## The home key.
-    home
+    home = 9
     ## The end key.
-    end
+    end = 10
     ## The insert key.
-    insert
+    insert = 11
     ## The Delete key.
-    delete_key
+    delete_key = 12
     ## The page up key.
-    page_up
+    page_up = 13
     ## The page down key.
-    page_down
+    page_down = 14
     ## The f1 key.
-    f1
+    f1 = 15
     ## The f2 key.
-    f2
+    f2 = 16
     ## The f3 key.
-    f3
+    f3 = 17
     ## The f4 key.
-    f4
+    f4 = 18
     ## The f5 key.
-    f5
+    f5 = 19
     ## The f6 key.
-    f6
+    f6 = 20
     ## The f7 key.
-    f7
+    f7 = 21
     ## The f8 key.
-    f8
+    f8 = 22
     ## The f9 key.
-    f9
+    f9 = 23
     ## The f10 key.
-    f10
+    f10 = 24
     ## The f11 key.
-    f11
+    f11 = 25
     ## The f12 key.
-    f12
+    f12 = 26
     ## An unrecognized key sequence, preserved in key_event.bytes.
-    unknown
+    unknown = 27
 
 ## One keyboard event with explicit metadata availability.
 value struct key_event:
@@ -523,62 +491,8 @@ value struct key_event:
     const bytes: [u8]
 
 private func _key(code: i64) -> key:
-    if code == 0:
-        return key.character
-    if code == 1:
-        return key.enter
-    if code == 2:
-        return key.tab
-    if code == 3:
-        return key.backspace
-    if code == 4:
-        return key.escape
-    if code == 5:
-        return key.up
-    if code == 6:
-        return key.down
-    if code == 7:
-        return key.left
-    if code == 8:
-        return key.right
-    if code == 9:
-        return key.home
-    if code == 10:
-        return key.end
-    if code == 11:
-        return key.insert
-    if code == 12:
-        return key.delete_key
-    if code == 13:
-        return key.page_up
-    if code == 14:
-        return key.page_down
-    if code == 15:
-        return key.f1
-    if code == 16:
-        return key.f2
-    if code == 17:
-        return key.f3
-    if code == 18:
-        return key.f4
-    if code == 19:
-        return key.f5
-    if code == 20:
-        return key.f6
-    if code == 21:
-        return key.f7
-    if code == 22:
-        return key.f8
-    if code == 23:
-        return key.f9
-    if code == 24:
-        return key.f10
-    if code == 25:
-        return key.f11
-    if code == 26:
-        return key.f12
-    if code == 27:
-        return key.unknown
+    if code as? key is Some(var decoded):
+        return decoded
     return key.unknown
 
 ## Read one key event through shared input ownership; unsupported redirected input returns Err.
@@ -592,17 +506,18 @@ func (self input) read_key(echo: bool = false, timeout_ms: i64 = -1) -> result<k
     var reply = _console_key(self, flag, timeout_ms)
     if reply.kind != 0:
         return Err(_error(reply, "read_key", "stdin"))
+    var metadata = reply.second as _key_metadata
     return Ok(
         key_event(
             character = reply.text,
             key = _key(reply.first),
-            shift = _flag(reply.second, 1),
-            alt = _flag(reply.second, 2),
-            control = _flag(reply.second, 4),
-            modifiers_known = _flag(reply.second, 8),
-            key_down_known = _flag(reply.second, 16),
-            key_down = _flag(reply.second, 32),
-            repeat_count = reply.second / 256,
+            shift = metadata.has(_key_metadata.shift),
+            alt = metadata.has(_key_metadata.alt),
+            control = metadata.has(_key_metadata.control),
+            modifiers_known = metadata.has(_key_metadata.modifiers_known),
+            key_down_known = metadata.has(_key_metadata.key_down_known),
+            key_down = metadata.has(_key_metadata.key_down),
+            repeat_count = reply.second >> 8,
             bytes = reply.bytes
         )
     )

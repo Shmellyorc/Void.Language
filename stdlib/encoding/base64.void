@@ -150,16 +150,16 @@ func try_encode(const bytes: [u8], selected: alphabet = alphabet.standard, pad: 
         if count > 2:
             third = bytes[cursor + 2] as i64
 
-        output.push(digits[first / 4])
-        output.push(digits[(first % 4) * 16 + second / 16])
+        output.push(digits[first >> 2])
+        output.push(digits[((first & 3) << 4) | (second >> 4)])
 
         if count > 1:
-            output.push(digits[(second % 16) * 4 + third / 64])
+            output.push(digits[((second & 15) << 2) | (third >> 6)])
         else if pad is padding.required:
             output.push(61)
 
         if count > 2:
-            output.push(digits[third % 64])
+            output.push(digits[third & 63])
         else if pad is padding.required:
             output.push(61)
 
@@ -219,21 +219,21 @@ func decode(value: string, selected: alphabet = alphabet.standard, pad: padding 
 
         if available > 2:
             third = _digit(bytes[cursor + 2], selected, cursor + 2)?
-        else if second % 16 != 0:
+        else if (second & 15) != 0:
             return Err(_error(error_kind.noncanonical_bits, cursor + 1))
 
         if available > 3:
             fourth = _digit(bytes[cursor + 3], selected, cursor + 3)?
-        else if available == 3 and third % 4 != 0:
+        else if available == 3 and (third & 3) != 0:
             return Err(_error(error_kind.noncanonical_bits, cursor + 2))
 
-        output.push((first * 4 + second / 16) as u8)
+        output.push(((first << 2) | (second >> 4)) as u8)
 
         if available > 2:
-            output.push(((second % 16) * 16 + third / 4) as u8)
+            output.push((((second & 15) << 4) | (third >> 2)) as u8)
 
         if available > 3:
-            output.push(((third % 4) * 64 + fourth) as u8)
+            output.push((((third & 3) << 6) | fourth) as u8)
 
         cursor += 4
 

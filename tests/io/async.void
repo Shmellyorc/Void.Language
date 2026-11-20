@@ -59,6 +59,6 @@ async func entry(input: i32) -> i32:
         return answer
 
     if outcome is Err(var reason):
-        print("{reason.operation}: {reason.kind}, native={reason.os_code}")
+        print("{reason.operation}: {reason.kind.name}, native={reason.os_code}")
 
     return 99

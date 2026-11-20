@@ -23,13 +23,13 @@ func fetch(target: string) -> i32:
                     print(data.message)
                     return 0
                 else if json_result is Err(var failure):
-                    print("JSON {failure.kind} at byte {failure.offset}")
+                    print("JSON {failure.kind.name} at byte {failure.offset}")
             else if text_result is Err(var failure):
-                print("HTTP text {failure.kind}")
+                print("HTTP text {failure.kind.name}")
         else if response_result is Err(var failure):
-            print("HTTP {failure.kind}, phase {failure.phase}, remote outcome unknown {failure.remote_outcome_unknown}")
+            print("HTTP {failure.kind.name}, phase {failure.phase.name}, remote outcome unknown {failure.remote_outcome_unknown}")
     else if url_result is Err(var failure):
-        print("URL {failure.kind} at byte {failure.offset}")
+        print("URL {failure.kind.name} at byte {failure.offset}")
     return 1
 
 if os.env("VOID_HTTP_URL") is Ok(var target):

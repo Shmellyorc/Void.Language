@@ -1,5 +1,67 @@
 # raylib for VOID
 
+## Typed enums and flags
+
+The 305 provider enum/flag constants now belong to 21 nominal VOID types.
+Use `config_flags.window_hidden | config_flags.window_resizable`,
+`keyboard_key.escape`, `pixel_format.uncompressed_r8g8b8a8`,
+`camera_projection.perspective` and `texture_filter.bilinear`.
+`keyboard_key.none` replaces `key_null`. The old flat numeric aliases are retired.
+Named selector functions take the corresponding enum type; unrelated enums and
+raw integers diagnose. Closed enum conversions use `as?`. Keyboard input also
+exposes raw-code operations because the provider supports keys beyond the named cases.
+
+`config_flags` and `gesture_flags` use `flags enum ...(u32)`, matching the unsigned
+mask arguments. The other numeric enums use `i32`; every discriminant is checked
+against the pinned raylib 6.0 header by Clang and compiled source tests. No VOID
+enum is passed directly as a C enum: wrappers explicitly extract `.value` into the
+unchanged native primitive calls and C records. Native record fields such as camera
+`projection`, patch `layout` and image/texture `pixel_format` remain primitive.
+Compare them with `camera_projection.perspective.value`, for example.
+
+Raw event-query results (`get_key_pressed`, `get_gamepad_button_pressed`,
+`get_gesture_detected`), trace callback levels and shader/array locations remain
+integers to preserve native sentinels, open values and runtime indices. Use `as?`
+when interpreting a raw result as a closed enum. Enum `.name` supplies text;
+`.value` extracts the exact backing integer. Flags preserve unknown bits.
+
+### Raw keyboard codes
+
+Keep `is_key_down(keyboard_key.escape)` and the other named-key calls for enum
+completion and nominal checking. For raw provider codes use `is_key_pressed_code`,
+`is_key_pressed_repeat_code`, `is_key_down_code`, `is_key_released_code`,
+`is_key_up_code`, `set_exit_key_code` and `get_key_name_code`. Each accepts `i32`
+and forwards it unchanged to the same native operation. These are source-level
+operations; the native declarations, ABI and numeric constants are unchanged.
+
+For example, GLFW F13 is `302` and F25 is `314`, although neither is a named
+`KeyboardKey` member in the pinned raylib header. Preserve these values from
+`get_key_pressed()` and pass them directly to the raw-code queries. Converting to
+`keyboard_key` is only appropriate when a named case is required; an unsuccessful
+conversion does not mean the provider code is invalid.
+
+```void
+use pkg/raylib as rl
+
+func main():
+    rl.set_exit_key(rl.keyboard_key.escape)
+    var provider_key: i32 = 302
+    print(rl.is_key_down_code(provider_key))
+    var queued = rl.get_key_pressed()
+    if queued != 0:
+        print(rl.is_key_down_code(queued))
+```
+
+Support depends on the active native backend. Pinned raylib's state queries return
+false for codes <= 0 or >= 512, including `is_key_up_code`; the source wrappers do
+not filter or remap codes. `set_exit_key_code(0)` disables the exit key. Key naming
+requires an initialized keyboard backend and may return null for non-printable or
+unsupported keys; successful names retain the existing byte-buffer close contract.
+
+The [modernization report](../../docs/projects/G88_STDLIB_PACKAGES_MODERNIZATION.md) contains
+the complete type inventory, caller migration and qualification evidence.
+
+
 ## Value construction and public names
 
 The only supported public spellings use numeric units together: `camera_2d`,
@@ -38,7 +100,7 @@ func main():
 | `ray` | Origin zero, unit direction `(0,0,-1)` |
 | `ray_collision` | No hit; distance, point and normal zero |
 | `bounding_box` | Both bounds zero (zero-sized box at the origin) |
-| `n_patch_info` | Source rectangle required; borders zero, layout `npatch_nine_patch` |
+| `n_patch_info` | Source rectangle required; borders zero, layout `n_patch_layout.nine_patch` |
 | `bone_info` | Fixed-width name required; parent -1 (root) |
 | `vr_device_info`, `vr_stereo_config` | Explicit hardware calibration required |
 | `automation_event` | Explicit frame, event type and type-specific payload required |

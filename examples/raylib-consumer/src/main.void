@@ -10,7 +10,7 @@ func main() -> i32:
     var callbacks_status = callbacks.headless()
     if callbacks_status != 0:
         return callbacks_status
-    rl.set_trace_log_level(rl.log_warning)
+    rl.set_trace_log_level(rl.trace_log_level.warning)
     # Headless checks exercise real C calls and nested by-value ABI records.
     var origin = rl.vector2()
     var point = rl.vector2(3, 4)
@@ -29,7 +29,7 @@ func main() -> i32:
     var hit = rl.get_ray_collision_box(ray, bounds)
     if not hit.hit or hit.distance != 9 as f32:
         return 14
-    if rl.key_right != 262 or rl.raylib_version_major != 6:
+    if rl.keyboard_key.right.value != 262 or rl.raylib_version_major != 6:
         return 15
     print("RAYLIB package headless ABI passed")
     var visible = false
@@ -73,9 +73,9 @@ func main() -> i32:
         print("RAYLIB ready")
         for not rl.window_should_close():
             var direction: i32 = 0
-            if rl.is_key_down(rl.key_right):
+            if rl.is_key_down(rl.keyboard_key.right):
                 direction += 1
-            if rl.is_key_down(rl.key_left):
+            if rl.is_key_down(rl.keyboard_key.left):
                 direction -= 1
             if direction != 0:
                 input_frames += 1

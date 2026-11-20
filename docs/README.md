@@ -1,5 +1,8 @@
 # VOID documentation
 
+- [G88 standard-library/package modernization](projects/G88_STDLIB_PACKAGES_MODERNIZATION.md):
+  complete inventory, typed APIs, migration, specification consolidation and qualification.
+
 - [G87 conditional compilation: syntax, project conditions and local qualification](projects/G87_CONDITIONAL_COMPILATION.md)
 
 Current operations use **LLVM/Clang/LLD 23.1.4 exclusively**. Start with the
@@ -14,7 +17,7 @@ holds in historical records do not govern current work.
 - [Creating and composing libraries](LOCAL_LIBRARIES.md#creating-and-composing-libraries),
   [package add/tidy](CLI.md#source-packages-add-and-tidy) and
   [G27 implementation and qualification](projects/G27_LIBRARY_AUTHORING.md).
-- [Language design](LANGUAGE_BIBLE.md), [numeric types](NUMERIC_TYPES.md),
+- [Language specification](LANGUAGE_BIBLE.md), [numeric types](NUMERIC_TYPES.md),
   [modules](MODULE_SYSTEM.md), [strings](STRINGS.md), [value semantics](VALUE_SEMANTICS.md),
   [value structs](VALUE_STRUCTS.md), [reference/value structs](REFERENCE_VALUE_STRUCTS.md),
   [managed structs](MANAGED_STRUCTS.md), [initialization](INITIALIZATION.md),
@@ -154,6 +157,8 @@ The ordinary CLI entry is synchronous; async examples use the explicit host abov
 [Work log](WORK_LOG.md), [decisions](DECISIONS.md),
 [approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md), module implementation reports
 and Stage 7–11 acceptance records retain original decisions, CI links and failures.
+The [pre-G88 Language Bible](LANGUAGE_BIBLE_HISTORY.md) preserves its complete
+workshop discussion and superseded implementation-status narrative.
 Original proposal bodies remain at their existing `*_PROPOSAL.md` paths, labeled
 historical; API guides above define delivered behavior.
 

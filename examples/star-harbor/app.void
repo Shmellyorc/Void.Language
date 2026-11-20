@@ -26,13 +26,13 @@ func main() -> i32:
     var y: i32 = 220
     rl.set_target_fps(60)
     for not rl.window_should_close():
-        if rl.is_key_down(rl.key_left) and x > 4:
+        if rl.is_key_down(rl.keyboard_key.left) and x > 4:
             x -= 4
-        if rl.is_key_down(rl.key_right) and x < 588:
+        if rl.is_key_down(rl.keyboard_key.right) and x < 588:
             x += 4
-        if rl.is_key_down(rl.key_up) and y > 4:
+        if rl.is_key_down(rl.keyboard_key.up) and y > 4:
             y -= 4
-        if rl.is_key_down(rl.key_down) and y < 308:
+        if rl.is_key_down(rl.keyboard_key.down) and y < 308:
             y += 4
 
         rl.begin_drawing()

@@ -28,4 +28,4 @@ func demo() -> result<i32, json.error>:
     return Ok(0)
 func main():
     if demo() is Err(var failure):
-        print("error {failure.kind} {failure.offset} {failure.path} {failure.message}")
+        print("error {failure.kind.name} {failure.offset} {failure.path} {failure.message}")

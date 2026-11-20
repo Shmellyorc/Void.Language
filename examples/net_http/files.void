@@ -11,19 +11,19 @@ func transfer_files(base: string) -> i32:
                 with payload_file:
                     # Native bulk download writes at the current cursor and never closes the file.
                     if owner.download(http.request(target = base + "/large?1048576"), payload_file) is Err(var failure):
-                        print("HTTP download {failure.kind}; partial bytes {failure.downloaded}")
+                        print("HTTP download {failure.kind.name}; partial bytes {failure.downloaded}")
                         if not (failure.io_cause is null):
                             var cause = failure.io_cause as io.error
-                            print("IO {cause.kind}; native code {cause.os_code}")
+                            print("IO {cause.kind.name}; native code {cause.os_code}")
                         return 1
                     if payload_file.seek(0) is Err(var failure):
-                        print("IO seek {failure.kind}")
+                        print("IO seek {failure.kind.name}")
                         return 1
                     if owner.upload(http.request(method = "POST", target = base + "/echo"), payload_file) is Err(var failure):
-                        print("HTTP upload {failure.kind}; uploaded {failure.uploaded}")
+                        print("HTTP upload {failure.kind.name}; uploaded {failure.uploaded}")
                         return 1
                     if payload_file.seek(0) is Err(var failure):
-                        print("IO seek {failure.kind}")
+                        print("IO seek {failure.kind.name}")
                         return 1
                     var file_part = http.part(name = "payload_file", filename = "payload.bin",
                         content_type = "application/octet-stream", data = http.part_data.file(payload_file, -1))
@@ -34,11 +34,11 @@ func transfer_files(base: string) -> i32:
                             print("Native download, upload and multipart complete")
                             return 0
                     else if response_result is Err(var failure):
-                        print("HTTP multipart {failure.kind}")
+                        print("HTTP multipart {failure.kind.name}")
             else if file_result is Err(var failure):
-                print("IO open {failure.kind}; native code {failure.os_code}")
+                print("IO open {failure.kind.name}; native code {failure.os_code}")
     else if client_result is Err(var failure):
-        print("HTTP configuration {failure.kind}")
+        print("HTTP configuration {failure.kind.name}")
     return 1
 
 if os.env("VOID_HTTP_URL") is Ok(var base):

@@ -83,7 +83,7 @@ func check_configuration(config_path: string) -> i32:
         Err(var issue):
             match issue:
                 configuration_issue.input(var failure):
-                    print("input {failure.kind}")
+                    print("input {failure.kind.name}")
                     return 1
                 configuration_issue.document(var failure):
                     print("json {failure.code}@{failure.offset}:{failure.path}")
@@ -120,7 +120,7 @@ func write_example(destination: string) -> i32:
         Ok(var serialized):
             match save_configuration(destination, serialized):
                 Err(var failure):
-                    print("input {failure.kind}")
+                    print("input {failure.kind.name}")
                     return 1
                 Ok(var status):
                     return status

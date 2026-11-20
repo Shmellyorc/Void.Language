@@ -547,6 +547,17 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/project/protocol.py" "$<TARGET_FILE:voidls>"
     "@VOID_TEST_OUTPUT@/project-protocol-evidence.json")
   set_tests_properties(project_protocol PROPERTIES TIMEOUT 180)
+  add_test(NAME stdlib_modernization_inventory COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/modernization/inventory.py")
+  void_add_output_test(lsp_stdlib_modernization "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/modernization/lsp.py" "$<TARGET_FILE:voidls>"
+    "@VOID_TEST_OUTPUT@/stdlib-modernization-lsp.json")
+  set_tests_properties(stdlib_modernization_inventory PROPERTIES TIMEOUT 30)
+  set_tests_properties(lsp_stdlib_modernization PROPERTIES TIMEOUT 120)
+  void_add_output_test(stdlib_modernization_source "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/modernization/source.py" "$<TARGET_FILE:voidc>"
+    "@VOID_TEST_OUTPUT@/stdlib-modernization.json")
+  set_tests_properties(stdlib_modernization_source PROPERTIES TIMEOUT 600)
   add_test(NAME raylib_public_documentation COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/raylib_documentation.py" --docs-only)
   set_tests_properties(raylib_public_documentation PROPERTIES TIMEOUT 30)

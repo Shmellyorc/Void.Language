@@ -1,5 +1,22 @@
 # Standard library
 
+## Typed library values
+
+Console colors/keys/errors, IO modes/origins/errors, JSON and OS errors, logging levels,
+URL/HTTP policies and errors now expose explicit numeric discriminants matching
+their existing contracts. Names and member selection remain the same. Use `.name`
+for textual diagnostics, `.value` for exact backing integers and `as?` to validate
+an external code. Compare enums directly instead of comparing formatted strings.
+The shared host error enum preserves sparse codes (for example invalid_range is 6).
+Native replies, OS error numbers, HTTP status codes and numeric quantities retain
+their existing primitive types.
+
+The [modernization report](../docs/projects/G88_STDLIB_PACKAGES_MODERNIZATION.md) lists every
+audited module, changes, intentional retentions, migration examples and qualification
+limits. Resource acquisition, explicit cleanup and async cancellation contracts
+remain specified by the individual modules below.
+
+
 `use url` supplies immutable HTTP(S) addresses, shared CURLU parsing/resolution,
 strict percent text/byte helpers and ordered query pairs. Its source/IR/JIT/AOT
 and tooling have local Linux evidence. `use net/http` provides explicit clients,

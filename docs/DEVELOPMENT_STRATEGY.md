@@ -27,6 +27,7 @@ shared. Current API guides determine behavior; proposals record design history.
 | Area | Current engineering record |
 | --- | --- |
 | Project/library/native workflow | [Milestone register](roadmap/MILESTONE_REGISTER.md), [library authoring](LOCAL_LIBRARIES.md), [G25](projects/G25_NATIVE_HEADER_IMPORTER.md), [G26](projects/G26_PACKAGE_MAINTENANCE.md), [G27](projects/G27_LIBRARY_AUTHORING.md) |
+| Library modernization and canonical specification | [G88 candidate](projects/G88_STDLIB_PACKAGES_MODERNIZATION.md); former G91 scope absorbed; focused review corrections completed locally, Golden Wrench re-review pending |
 | Conditional compilation | [G87 candidate and local qualification](projects/G87_CONDITIONAL_COMPILATION.md); independent Golden Wrench review pending |
 | Advanced async | [G86 candidate and local qualification](projects/G86_ADVANCED_ASYNC.md), [async iteration](CUSTOM_ITERATION.md#async-iteration--g86); independent review pending |
 | Custom iteration | [G85 candidate and local qualification](projects/G85_CUSTOM_ITERATION.md), [iteration contract](CUSTOM_ITERATION.md); independent review pending |

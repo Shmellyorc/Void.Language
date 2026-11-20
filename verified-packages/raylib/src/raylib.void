@@ -66,26 +66,26 @@ func color(r: u8 = 0, g: u8 = 0, b: u8 = 0, a: u8 = 255) -> native.color:
 func rectangle(x: f32 = 0, y: f32 = 0, width: f32 = 0, height: f32 = 0) -> native.rectangle:
     return native.rectangle(x = x, y = y, width = width, height = height)
 
-## Construct patch information from an explicit source rectangle; omitted borders are zero and layout is npatch_nine_patch.
+## Construct patch information from an explicit source rectangle; omitted borders are zero and layout is n_patch_layout.nine_patch.
 ## @param source Source region of the texture in pixels.
 ## @param left Left border or coordinate.
 ## @param top Top border or coordinate.
 ## @param right Right border or coordinate.
 ## @param bottom Bottom border or coordinate.
-## @param layout Layout selector from the constants for this operation.
+## @param layout Layout selector from the corresponding typed enum. Uses n_patch_layout; its exact integer value crosses the native boundary.
 ## @return The computed n patch info value.
-func n_patch_info(source: native.rectangle, left: i32 = 0, top: i32 = 0, right: i32 = 0, bottom: i32 = 0, layout: i32 = npatch_nine_patch) -> native.n_patch_info:
-    return native.n_patch_info(source = source, left = left, top = top, right = right, bottom = bottom, layout = layout)
+func n_patch_info(source: native.rectangle, left: i32 = 0, top: i32 = 0, right: i32 = 0, bottom: i32 = 0, layout: n_patch_layout = n_patch_layout.nine_patch) -> native.n_patch_info:
+    return native.n_patch_info(source = source, left = left, top = top, right = right, bottom = bottom, layout = layout.value)
 
 ## Construct a 3D camera; omitted fields use position (0, 0, 1), target (0, 0, 0), up (0, 1, 0), fovy 45 and perspective projection.
 ## @param position Camera position in world coordinates.
 ## @param target Point in world coordinates toward which the camera looks.
 ## @param up Camera up vector.
 ## @param fovy Vertical field of view in degrees for perspective, or near-plane height in world units for orthographic projection.
-## @param projection Projection mode selected from camera_perspective or camera_orthographic.
+## @param projection Projection mode selected from camera_projection.perspective or camera_projection.orthographic. Uses camera_projection; its exact integer value crosses the native boundary.
 ## @return The exact native 3D camera value; no window or native allocation is required.
-func camera_3d(position: native.vector3 = native.vector3(x = 0, y = 0, z = 1), target: native.vector3 = native.vector3(x = 0, y = 0, z = 0), up: native.vector3 = native.vector3(x = 0, y = 1, z = 0), fovy: f32 = 45, projection: i32 = camera_perspective) -> native.camera3_d:
-    return native.camera3_d(position = position, target = target, up = up, fovy = fovy, projection = projection)
+func camera_3d(position: native.vector3 = native.vector3(x = 0, y = 0, z = 1), target: native.vector3 = native.vector3(x = 0, y = 0, z = 0), up: native.vector3 = native.vector3(x = 0, y = 1, z = 0), fovy: f32 = 45, projection: camera_projection = camera_projection.perspective) -> native.camera3_d:
+    return native.camera3_d(position = position, target = target, up = up, fovy = fovy, projection = projection.value)
 
 ## Construct a 2D camera; omitted offset, target and rotation are zero, and zoom is 1.
 ## @param offset Screen-space camera offset in pixels.
@@ -163,8 +163,8 @@ func vr_stereo_config(projection: [native.matrix, 2], view_offset: [native.matri
 
 ## Construct an automation event from an explicit frame, event type and type-specific payload.
 ## @param frame Animation or automation frame.
-## @param type Type selector from the constants for this operation.
-## @param params Four event-specific integer parameters.
+## @param type Raw provider automation-event type number (u32); no public event-type enum is defined.
+## @param params Four integer parameters interpreted according to the provider event type.
 ## @return The computed automation event value.
 func automation_event(frame: u32, type: u32, params: [i32, 4]) -> native.automation_event:
     return native.automation_event(frame = frame, type = type, params = params)
@@ -226,23 +226,23 @@ func is_window_resized() -> bool:
     return value
 
 ## Check if one specific window flag is enabled.
-## @param flag Flag or bit mask to test.
+## @param flag Flag or bit mask to test. Uses config_flags; its exact integer value crosses the native boundary.
 ## @return True when the requested window flag is enabled.
-func is_window_state(flag: u32) -> bool:
-    var value = native.is_window_state(flag)
+func is_window_state(flag: config_flags) -> bool:
+    var value = native.is_window_state(flag.value)
     _check()
     return value
 
 ## Set window configuration state using flags.
-## @param flags Bitwise combination of flags for this operation.
-func set_window_state(flags: u32):
-    native.set_window_state(flags)
+## @param flags Bitwise combination of flags for this operation. Uses config_flags; its exact integer value crosses the native boundary.
+func set_window_state(flags: config_flags):
+    native.set_window_state(flags.value)
     _check()
 
 ## Clear window configuration state flags.
-## @param flags Bitwise combination of flags for this operation.
-func clear_window_state(flags: u32):
-    native.clear_window_state(flags)
+## @param flags Bitwise combination of flags for this operation. Uses config_flags; its exact integer value crosses the native boundary.
+func clear_window_state(flags: config_flags):
+    native.clear_window_state(flags.value)
     _check()
 
 ## Toggle window state: fullscreen/windowed, resizes monitor to match window resolution.
@@ -512,9 +512,9 @@ func end_shader_mode():
     _check()
 
 ## Begin blending mode (alpha, additive, multiplied, subtract, custom).
-## @param mode Mode selector from the constants for this operation.
-func begin_blend_mode(mode: i32):
-    native.begin_blend_mode(mode)
+## @param mode Mode selector from the corresponding typed enum. Uses blend_mode; its exact integer value crosses the native boundary.
+func begin_blend_mode(mode: blend_mode):
+    native.begin_blend_mode(mode.value)
     _check()
 
 ## End blending mode (reset to default: alpha blending).
@@ -694,15 +694,15 @@ func get_random_value(min: i32, max: i32) -> i32:
     return value
 
 ## Setup init configuration flags (view FLAGS).
-## @param flags Bitwise combination of flags for this operation.
-func set_config_flags(flags: u32):
-    native.set_config_flags(flags)
+## @param flags Bitwise combination of flags for this operation. Uses config_flags; its exact integer value crosses the native boundary.
+func set_config_flags(flags: config_flags):
+    native.set_config_flags(flags.value)
     _check()
 
 ## Set the current threshold (minimum) log level.
-## @param log_level Log severity from the log constants.
-func set_trace_log_level(log_level: i32):
-    native.set_trace_log_level(log_level)
+## @param log_level Log severity from trace_log_level. Uses trace_log_level; its exact integer value crosses the native boundary.
+func set_trace_log_level(log_level: trace_log_level):
+    native.set_trace_log_level(log_level.value)
     _check()
 
 ## Check if a file has been dropped into window.
@@ -735,47 +735,82 @@ func play_automation_event(event_value: native.automation_event):
     _check()
 
 ## Check if a key has been pressed once.
-## @param key Keyboard key code from the key constants.
+## @param key Named keyboard key. Its exact i32 value is forwarded unchanged; use is_key_pressed_code for raw provider codes.
 ## @return True when the key was pressed once during this frame.
-func is_key_pressed(key: i32) -> bool:
+func is_key_pressed(key: keyboard_key) -> bool:
+    return is_key_pressed_code(key.value)
+
+## Check whether a raw provider key code was pressed once.
+## @param key Raw i32 code, including unnamed provider keys such as GLFW F13 (302). Passed unchanged; support depends on the active provider.
+## Pinned raylib returns false for codes <= 0 or >= 512; no source enum conversion or filtering is applied.
+## @return True when the provider reports a press this frame.
+func is_key_pressed_code(key: i32) -> bool:
     var value = native.is_key_pressed(key)
     _check()
     return value
 
 ## Check if a key has been pressed again.
-## @param key Keyboard key code from the key constants.
+## @param key Named keyboard key. Its exact i32 value is forwarded unchanged; use is_key_pressed_repeat_code for raw provider codes.
 ## @return True when a repeated key-press event is reported.
-func is_key_pressed_repeat(key: i32) -> bool:
+func is_key_pressed_repeat(key: keyboard_key) -> bool:
+    return is_key_pressed_repeat_code(key.value)
+
+## Check whether a raw provider key code repeated this frame.
+## @param key Raw i32 code, including unnamed provider keys such as GLFW F13 (302). Passed unchanged; support depends on the active provider.
+## Pinned raylib returns false for codes <= 0 or >= 512; no source enum conversion or filtering is applied.
+## @return True when the provider reports a repeat this frame.
+func is_key_pressed_repeat_code(key: i32) -> bool:
     var value = native.is_key_pressed_repeat(key)
     _check()
     return value
 
 ## Check if a key is being pressed.
-## @param key Keyboard key code from the key constants.
+## @param key Named keyboard key. Its exact i32 value is forwarded unchanged; use is_key_down_code for raw provider codes.
 ## @return True when the key is currently held down.
-func is_key_down(key: i32) -> bool:
+func is_key_down(key: keyboard_key) -> bool:
+    return is_key_down_code(key.value)
+
+## Check whether a raw provider key code is held down.
+## @param key Raw i32 code, including unnamed provider keys such as GLFW F13 (302). Passed unchanged; support depends on the active provider.
+## Pinned raylib returns false for codes <= 0 or >= 512; no source enum conversion or filtering is applied.
+## @return True when the provider reports the key held down.
+func is_key_down_code(key: i32) -> bool:
     var value = native.is_key_down(key)
     _check()
     return value
 
 ## Check if a key has been released once.
-## @param key Keyboard key code from the key constants.
+## @param key Named keyboard key. Its exact i32 value is forwarded unchanged; use is_key_released_code for raw provider codes.
 ## @return True when the key was released during this frame.
-func is_key_released(key: i32) -> bool:
+func is_key_released(key: keyboard_key) -> bool:
+    return is_key_released_code(key.value)
+
+## Check whether a raw provider key code was released once.
+## @param key Raw i32 code, including unnamed provider keys such as GLFW F13 (302). Passed unchanged; support depends on the active provider.
+## Pinned raylib returns false for codes <= 0 or >= 512; no source enum conversion or filtering is applied.
+## @return True when the provider reports a release this frame.
+func is_key_released_code(key: i32) -> bool:
     var value = native.is_key_released(key)
     _check()
     return value
 
 ## Check if a key is NOT being pressed.
-## @param key Keyboard key code from the key constants.
+## @param key Named keyboard key. Its exact i32 value is forwarded unchanged; use is_key_up_code for raw provider codes.
 ## @return True when the key is currently up.
-func is_key_up(key: i32) -> bool:
+func is_key_up(key: keyboard_key) -> bool:
+    return is_key_up_code(key.value)
+
+## Check whether a raw provider key code is up.
+## @param key Raw i32 code, including unnamed provider keys such as GLFW F13 (302). Passed unchanged; support depends on the active provider.
+## Pinned raylib returns false for codes <= 0 or >= 512; no source enum conversion or filtering is applied.
+## @return True when the provider reports the key up.
+func is_key_up_code(key: i32) -> bool:
     var value = native.is_key_up(key)
     _check()
     return value
 
 ## Read the next queued key code.
-## @return Next queued key code, or 0 when the queue is empty. Call repeatedly to drain queued key presses.
+## @return Raw provider key code, or 0 when empty. Drain repeatedly; pass codes directly to is_key_*_code or set_exit_key_code without casting to keyboard_key.
 func get_key_pressed() -> i32:
     var value = native.get_key_pressed()
     _check()
@@ -789,8 +824,14 @@ func get_char_pressed() -> i32:
     return value
 
 ## Set a custom key to exit program (default is ESC).
-## @param key Keyboard key code from the key constants.
-func set_exit_key(key: i32):
+## @param key Named keyboard key. Its exact i32 value is forwarded unchanged; use set_exit_key_code for raw provider codes.
+func set_exit_key(key: keyboard_key):
+    set_exit_key_code(key.value)
+
+## Set the exit key from its raw provider code.
+## @param key Raw i32 code, including unnamed provider keys such as GLFW F13 (302). Passed unchanged; support depends on the active provider.
+## The provider stores the code unchanged. Zero disables the exit key; unsupported codes generate no matching key event.
+func set_exit_key_code(key: i32):
     native.set_exit_key(key)
     _check()
 
@@ -804,37 +845,37 @@ func is_gamepad_available(gamepad: i32) -> bool:
 
 ## Check if a gamepad button has been pressed once.
 ## @param gamepad Zero-based gamepad index.
-## @param button Mouse or gamepad button code for this operation.
+## @param button Mouse or gamepad button code for this operation. Uses gamepad_button; its exact integer value crosses the native boundary.
 ## @return True when the selected gamepad button was pressed during this frame.
-func is_gamepad_button_pressed(gamepad: i32, button: i32) -> bool:
-    var value = native.is_gamepad_button_pressed(gamepad, button)
+func is_gamepad_button_pressed(gamepad: i32, button: gamepad_button) -> bool:
+    var value = native.is_gamepad_button_pressed(gamepad, button.value)
     _check()
     return value
 
 ## Check if a gamepad button is being pressed.
 ## @param gamepad Zero-based gamepad index.
-## @param button Mouse or gamepad button code for this operation.
+## @param button Mouse or gamepad button code for this operation. Uses gamepad_button; its exact integer value crosses the native boundary.
 ## @return True when the selected gamepad button is currently held down.
-func is_gamepad_button_down(gamepad: i32, button: i32) -> bool:
-    var value = native.is_gamepad_button_down(gamepad, button)
+func is_gamepad_button_down(gamepad: i32, button: gamepad_button) -> bool:
+    var value = native.is_gamepad_button_down(gamepad, button.value)
     _check()
     return value
 
 ## Check if a gamepad button has been released once.
 ## @param gamepad Zero-based gamepad index.
-## @param button Mouse or gamepad button code for this operation.
+## @param button Mouse or gamepad button code for this operation. Uses gamepad_button; its exact integer value crosses the native boundary.
 ## @return True when the selected gamepad button was released during this frame.
-func is_gamepad_button_released(gamepad: i32, button: i32) -> bool:
-    var value = native.is_gamepad_button_released(gamepad, button)
+func is_gamepad_button_released(gamepad: i32, button: gamepad_button) -> bool:
+    var value = native.is_gamepad_button_released(gamepad, button.value)
     _check()
     return value
 
 ## Check if a gamepad button is NOT being pressed.
 ## @param gamepad Zero-based gamepad index.
-## @param button Mouse or gamepad button code for this operation.
+## @param button Mouse or gamepad button code for this operation. Uses gamepad_button; its exact integer value crosses the native boundary.
 ## @return True when the selected gamepad button is currently up.
-func is_gamepad_button_up(gamepad: i32, button: i32) -> bool:
-    var value = native.is_gamepad_button_up(gamepad, button)
+func is_gamepad_button_up(gamepad: i32, button: gamepad_button) -> bool:
+    var value = native.is_gamepad_button_up(gamepad, button.value)
     _check()
     return value
 
@@ -855,10 +896,10 @@ func get_gamepad_axis_count(gamepad: i32) -> i32:
 
 ## Get movement value for a gamepad axis.
 ## @param gamepad Zero-based gamepad index.
-## @param axis Gamepad axis index.
+## @param axis Gamepad axis index. Uses gamepad_axis; its exact integer value crosses the native boundary.
 ## @return The movement value for a gamepad axis.
-func get_gamepad_axis_movement(gamepad: i32, axis: i32) -> f32:
-    var value = native.get_gamepad_axis_movement(gamepad, axis)
+func get_gamepad_axis_movement(gamepad: i32, axis: gamepad_axis) -> f32:
+    var value = native.get_gamepad_axis_movement(gamepad, axis.value)
     _check()
     return value
 
@@ -872,34 +913,34 @@ func set_gamepad_vibration(gamepad: i32, left_motor: f32, right_motor: f32, dura
     _check()
 
 ## Check if a mouse button has been pressed once.
-## @param button Mouse or gamepad button code for this operation.
+## @param button Mouse or gamepad button code for this operation. Uses mouse_button; its exact integer value crosses the native boundary.
 ## @return True when the mouse button was pressed during this frame.
-func is_mouse_button_pressed(button: i32) -> bool:
-    var value = native.is_mouse_button_pressed(button)
+func is_mouse_button_pressed(button: mouse_button) -> bool:
+    var value = native.is_mouse_button_pressed(button.value)
     _check()
     return value
 
 ## Check if a mouse button is being pressed.
-## @param button Mouse or gamepad button code for this operation.
+## @param button Mouse or gamepad button code for this operation. Uses mouse_button; its exact integer value crosses the native boundary.
 ## @return True when the mouse button is currently held down.
-func is_mouse_button_down(button: i32) -> bool:
-    var value = native.is_mouse_button_down(button)
+func is_mouse_button_down(button: mouse_button) -> bool:
+    var value = native.is_mouse_button_down(button.value)
     _check()
     return value
 
 ## Check if a mouse button has been released once.
-## @param button Mouse or gamepad button code for this operation.
+## @param button Mouse or gamepad button code for this operation. Uses mouse_button; its exact integer value crosses the native boundary.
 ## @return True when the mouse button was released during this frame.
-func is_mouse_button_released(button: i32) -> bool:
-    var value = native.is_mouse_button_released(button)
+func is_mouse_button_released(button: mouse_button) -> bool:
+    var value = native.is_mouse_button_released(button.value)
     _check()
     return value
 
 ## Check if a mouse button is NOT being pressed.
-## @param button Mouse or gamepad button code for this operation.
+## @param button Mouse or gamepad button code for this operation. Uses mouse_button; its exact integer value crosses the native boundary.
 ## @return True when the mouse button is currently up.
-func is_mouse_button_up(button: i32) -> bool:
-    var value = native.is_mouse_button_up(button)
+func is_mouse_button_up(button: mouse_button) -> bool:
+    var value = native.is_mouse_button_up(button.value)
     _check()
     return value
 
@@ -967,9 +1008,9 @@ func get_mouse_wheel_move_v() -> native.vector2:
     return value
 
 ## Set mouse cursor.
-## @param cursor Mouse cursor identifier.
-func set_mouse_cursor(cursor: i32):
-    native.set_mouse_cursor(cursor)
+## @param cursor Mouse cursor identifier. Uses mouse_cursor; its exact integer value crosses the native boundary.
+func set_mouse_cursor(cursor: mouse_cursor):
+    native.set_mouse_cursor(cursor.value)
     _check()
 
 ## Get touch position X for touch point 0 (relative to screen size).
@@ -1010,16 +1051,16 @@ func get_touch_point_count() -> i32:
     return value
 
 ## Enable a set of gestures using flags.
-## @param flags Bitwise combination of flags for this operation.
-func set_gestures_enabled(flags: u32):
-    native.set_gestures_enabled(flags)
+## @param flags Bitwise combination of flags for this operation. Uses gesture_flags; its exact integer value crosses the native boundary.
+func set_gestures_enabled(flags: gesture_flags):
+    native.set_gestures_enabled(flags.value)
     _check()
 
 ## Check whether the requested gesture has been detected.
-## @param gesture Gesture flag to test.
+## @param gesture Gesture flag to test. Uses gesture_flags; its exact integer value crosses the native boundary.
 ## @return True when the requested gesture has been detected.
-func is_gesture_detected(gesture: u32) -> bool:
-    var value = native.is_gesture_detected(gesture)
+func is_gesture_detected(gesture: gesture_flags) -> bool:
+    var value = native.is_gesture_detected(gesture.value)
     _check()
     return value
 
@@ -1748,10 +1789,10 @@ func get_color(hex_value: u32) -> native.color:
 ## Get pixel data size in bytes for certain format.
 ## @param width Width in pixels.
 ## @param height Height in pixels.
-## @param format Pixel format from the pixel-format constants.
+## @param format Pixel format from the pixel-format constants. Uses pixel_format; its exact integer value crosses the native boundary.
 ## @return Required byte size for the image dimensions and selected pixel format.
-func get_pixel_data_size(width: i32, height: i32, format: i32) -> i32:
-    var value = native.get_pixel_data_size(width, height, format)
+func get_pixel_data_size(width: i32, height: i32, format: pixel_format) -> i32:
+    var value = native.get_pixel_data_size(width, height, format.value)
     _check()
     return value
 
@@ -3941,10 +3982,10 @@ func load_model_from_mesh(mesh_value: mesh) -> model?:
 ## Transfer an exclusive texture into an owning material map.
 ## This mutation requires an exclusive owning resource and invalidates earlier views.
 ## @param material_value Exclusive owning material receiving the texture.
-## @param map_type Material map slot whose old texture is released.
+## @param map_type Material map slot whose old texture is released. Uses material_map_index; its exact integer value crosses the native boundary.
 ## @param texture_value Exclusive texture transferred into the material. Its source owner is consumed after the transfer.
-func set_material_texture(material_value: material, map_type: i32, texture_value: texture):
-    native.set_material_texture(material_value.owner, map_type, texture_value.owner)
+func set_material_texture(material_value: material, map_type: material_map_index, texture_value: texture):
+    native.set_material_texture(material_value.owner, map_type.value, texture_value.owner)
     _check()
     native.owner_texture_close(texture_value.owner)
 
@@ -4096,19 +4137,19 @@ func get_shader_location_attrib(shader_value: shader, attrib_name: string) -> i3
 ## @param shader_value Shader resource, borrowed for this call.
 ## @param loc_index Shader location index returned by a location query.
 ## @param value Live byte buffer containing native uniform data matching uniform_type.
-## @param uniform_type Uniform data type selected from shader_uniform_* constants.
-func set_shader_value(shader_value: shader, loc_index: i32, value: byte_buffer, uniform_type: i32):
-    native.set_shader_value(shader_value.owner, loc_index, value.owner, uniform_type)
+## @param uniform_type Uniform data type selected from shader_uniform_* constants. Uses shader_uniform_type; its exact integer value crosses the native boundary.
+func set_shader_value(shader_value: shader, loc_index: i32, value: byte_buffer, uniform_type: shader_uniform_type):
+    native.set_shader_value(shader_value.owner, loc_index, value.owner, uniform_type.value)
     _check()
 
 ## Set shader uniform value vector.
 ## @param shader_value Shader resource, borrowed for this call.
 ## @param loc_index Shader location index returned by a location query.
 ## @param value Live byte buffer containing native uniform data matching uniform_type.
-## @param uniform_type Uniform element type selected from shader_uniform_* constants.
+## @param uniform_type Uniform element type selected from shader_uniform_* constants. Uses shader_uniform_type; its exact integer value crosses the native boundary.
 ## @param count Number of uniform values encoded in the supplied byte buffer.
-func set_shader_value_v(shader_value: shader, loc_index: i32, value: byte_buffer, uniform_type: i32, count: i32):
-    native.set_shader_value_v(shader_value.owner, loc_index, value.owner, uniform_type, count)
+func set_shader_value_v(shader_value: shader, loc_index: i32, value: byte_buffer, uniform_type: shader_uniform_type, count: i32):
+    native.set_shader_value_v(shader_value.owner, loc_index, value.owner, uniform_type.value, count)
     _check()
 
 ## Set shader uniform value (matrix 4x4).
@@ -4717,9 +4758,16 @@ func set_automation_event_list(list: automation_event_list):
     _check()
 
 ## Get name of a QWERTY key on the current keyboard layout (eg returns string 'q' for KEY_A on an AZERTY keyboard).
-## @param key Keyboard key code from the key constants.
+## @param key Named keyboard key. Its exact i32 value is forwarded unchanged; use get_key_name_code for raw provider codes.
 ## @return An owning byte buffer, or null if acquisition fails. Release with buffer_close.
-func get_key_name(key: i32) -> byte_buffer?:
+func get_key_name(key: keyboard_key) -> byte_buffer?:
+    return get_key_name_code(key.value)
+
+## Get the current-layout name of a raw provider key code.
+## @param key Raw i32 code, including unnamed provider keys such as GLFW F13 (302). Passed unchanged; support depends on the active provider.
+## Non-printable or unsupported codes may have no name; naming requires an initialized native keyboard backend.
+## @return An owning byte buffer, or null when the provider supplies no name or acquisition fails. Release with buffer_close.
+func get_key_name_code(key: i32) -> byte_buffer?:
     var value = native.get_key_name(key)
     _check()
     if value == null:
@@ -4751,10 +4799,10 @@ func set_gamepad_mappings(mappings: string) -> i32:
 
 ## Update a camera value and return the modified camera.
 ## @param camera Camera value used by this operation.
-## @param mode Mode selector from the constants for this operation.
+## @param mode Mode selector from the corresponding typed enum. Uses camera_mode; its exact integer value crosses the native boundary.
 ## @return The updated camera value. Assign it back to retain the update.
-func update_camera(camera: native.camera3_d, mode: i32) -> native.camera3_d:
-    var value = native.update_camera(camera, mode)
+func update_camera(camera: native.camera3_d, mode: camera_mode) -> native.camera3_d:
+    var value = native.update_camera(camera, mode.value)
     _check()
     return value
 
@@ -4880,13 +4928,13 @@ func load_image(file_name: string) -> image?:
 ## @param file_name Path to the file. Relative paths use the process working directory.
 ## @param width Width in pixels.
 ## @param height Height in pixels.
-## @param format Pixel format from the pixel-format constants.
+## @param format Pixel format from the pixel-format constants. Uses pixel_format; its exact integer value crosses the native boundary.
 ## @param header_size Number of file-header bytes skipped before the raw pixels.
 ## @return An owning image, or null if acquisition fails. Release with unload_image.
-func load_image_raw(file_name: string, width: i32, height: i32, format: i32, header_size: i32) -> image?:
+func load_image_raw(file_name: string, width: i32, height: i32, format: pixel_format, header_size: i32) -> image?:
     var file_name_bytes = _string_buffer(file_name)
     defer native.buffer_close(file_name_bytes)
-    var value = native.load_image_raw(file_name_bytes, width, height, format, header_size)
+    var value = native.load_image_raw(file_name_bytes, width, height, format.value, header_size)
     return _wrap_image(value)
 
 ## Load all frames of an animated image and retain the frame count.
@@ -5136,9 +5184,9 @@ func image_text_ex(font_value: font, text: string, font_size: f32, spacing: f32,
 ## Convert image data to desired format.
 ## This mutation requires an exclusive owning resource and invalidates earlier views.
 ## @param image_value Image resource, borrowed for this call.
-## @param new_format Target pixel format.
-func image_format(image_value: image, new_format: i32):
-    native.image_format(image_value.owner, new_format)
+## @param new_format Target pixel format. Uses pixel_format; its exact integer value crosses the native boundary.
+func image_format(image_value: image, new_format: pixel_format):
+    native.image_format(image_value.owner, new_format.value)
     _check()
 
 ## Convert image to POT (power-of-two).
@@ -5650,10 +5698,10 @@ func load_texture_from_image(image_value: image) -> texture?:
 
 ## Load cubemap from image, multiple image cubemap layouts supported.
 ## @param image_value Image resource, borrowed for this call.
-## @param layout Layout selector from the constants for this operation.
+## @param layout Layout selector from the corresponding typed enum. Uses cubemap_layout; its exact integer value crosses the native boundary.
 ## @return An owning texture, or null if acquisition fails. Release with unload_texture.
-func load_texture_cubemap(image_value: image, layout: i32) -> texture?:
-    var value = native.load_texture_cubemap(image_value.owner, layout)
+func load_texture_cubemap(image_value: image, layout: cubemap_layout) -> texture?:
+    var value = native.load_texture_cubemap(image_value.owner, layout.value)
     return _wrap_texture(value)
 
 ## Load texture for rendering (framebuffer).
@@ -5716,16 +5764,16 @@ func gen_texture_mipmaps(texture_value: texture):
 
 ## Set texture scaling filter mode.
 ## @param texture_value Texture resource, borrowed for this call.
-## @param filter Texture scaling filter selected from the texture_filter_* constants.
-func set_texture_filter(texture_value: texture, filter: i32):
-    native.set_texture_filter(texture_value.owner, filter)
+## @param filter Texture scaling filter selected from texture_filter. Uses texture_filter; its exact integer value crosses the native boundary.
+func set_texture_filter(texture_value: texture, filter: texture_filter):
+    native.set_texture_filter(texture_value.owner, filter.value)
     _check()
 
 ## Set texture wrapping mode.
 ## @param texture_value Texture resource, borrowed for this call.
-## @param wrap Texture wrapping mode from the wrap constants.
-func set_texture_wrap(texture_value: texture, wrap: i32):
-    native.set_texture_wrap(texture_value.owner, wrap)
+## @param wrap Texture wrapping mode from the wrap constants. Uses texture_wrap; its exact integer value crosses the native boundary.
+func set_texture_wrap(texture_value: texture, wrap: texture_wrap):
+    native.set_texture_wrap(texture_value.owner, wrap.value)
     _check()
 
 ## Draw a Texture2D.
@@ -5788,10 +5836,10 @@ func draw_texture_n_patch(texture_value: texture, n_patch_info_value: native.n_p
 
 ## Read a color from a byte buffer using the requested pixel format.
 ## @param src_ptr Source pixel bytes in a live byte buffer.
-## @param format Pixel format from the pixel-format constants.
+## @param format Pixel format from the pixel-format constants. Uses pixel_format; its exact integer value crosses the native boundary.
 ## @return The computed color value.
-func get_pixel_color(src_ptr: byte_buffer, format: i32) -> native.color:
-    var value = native.get_pixel_color(src_ptr.owner, format)
+func get_pixel_color(src_ptr: byte_buffer, format: pixel_format) -> native.color:
+    var value = native.get_pixel_color(src_ptr.owner, format.value)
     _check()
     return value
 
@@ -5799,9 +5847,9 @@ func get_pixel_color(src_ptr: byte_buffer, format: i32) -> native.color:
 ## This mutation requires an exclusive owning resource and invalidates earlier views.
 ## @param dst_ptr Writable destination pixel bytes in a live byte buffer.
 ## @param color_value Color including its alpha channel.
-## @param format Pixel format from the pixel-format constants.
-func set_pixel_color(dst_ptr: byte_buffer, color_value: native.color, format: i32):
-    native.set_pixel_color(dst_ptr.owner, color_value, format)
+## @param format Pixel format from the pixel-format constants. Uses pixel_format; its exact integer value crosses the native boundary.
+func set_pixel_color(dst_ptr: byte_buffer, color_value: native.color, format: pixel_format):
+    native.set_pixel_color(dst_ptr.owner, color_value, format.value)
     _check()
 
 ## Acquire a parent-retained view of the default font.
@@ -5871,10 +5919,10 @@ func is_font_valid(font_value: font) -> bool:
 ## @param font_size Font size in pixels.
 ## @param codepoints Unicode codepoint array, borrowed for this call.
 ## @param codepoint_count Number of codepoints to use from the supplied array.
-## @param type Glyph rasterization mode selected from font_default, font_bitmap or font_sdf.
+## @param type Glyph rasterization mode selected from font_type.default, font_type.bitmap or font_type.sdf. Uses font_type; its exact integer value crosses the native boundary.
 ## @return An owning glyph info array, or null if acquisition fails. Release with glyph_info_array_close.
-func load_font_data(file_data: byte_buffer, data_size: i32, font_size: i32, codepoints: int_array, codepoint_count: i32, type: i32) -> glyph_info_array?:
-    var value = native.load_font_data(file_data.owner, data_size, font_size, codepoints.owner, codepoint_count, type)
+func load_font_data(file_data: byte_buffer, data_size: i32, font_size: i32, codepoints: int_array, codepoint_count: i32, type: font_type) -> glyph_info_array?:
+    var value = native.load_font_data(file_data.owner, data_size, font_size, codepoints.owner, codepoint_count, type.value)
     _check()
     if value == null:
         return null
@@ -7328,12 +7376,12 @@ func callback_active(registration: callback_registration) -> bool:
 
 ## Log UTF-8 text at the requested severity. Percent sequences remain literal text.
 ## Text passed to native code is copied as UTF-8 and rejects embedded NUL.
-## @param log_level Log severity from the log constants.
+## @param log_level Log severity from trace_log_level. Uses trace_log_level; its exact integer value crosses the native boundary.
 ## @param text Text supplied to this operation.
-func trace_log(log_level: i32, text: string):
+func trace_log(log_level: trace_log_level, text: string):
     var text_local = _string_buffer(text)
     defer native.buffer_close(text_local)
-    native.trace_log(log_level, text_local)
+    native.trace_log(log_level.value, text_local)
     _check()
 
 # Same supported types/hooks as the builtin formatter. Multiple values use ordinary
@@ -7486,311 +7534,701 @@ func attach_audio_mixed_processor(handler: func([u8], u32) -> [u8]) -> callback_
 func detach_audio_mixed_processor(registration: callback_registration) -> i32:
     _require(native.callback_kind(registration.owner) == 8)
     return callback_close(registration)
-const flag_vsync_hint: i32 = 64
-const flag_fullscreen_mode: i32 = 2
-const flag_window_resizable: i32 = 4
-const flag_window_undecorated: i32 = 8
-const flag_window_hidden: i32 = 128
-const flag_window_minimized: i32 = 512
-const flag_window_maximized: i32 = 1024
-const flag_window_unfocused: i32 = 2048
-const flag_window_topmost: i32 = 4096
-const flag_window_always_run: i32 = 256
-const flag_window_transparent: i32 = 16
-const flag_window_highdpi: i32 = 8192
-const flag_window_mouse_passthrough: i32 = 16384
-const flag_borderless_windowed_mode: i32 = 32768
-const flag_msaa_4x_hint: i32 = 32
-const flag_interlaced_hint: i32 = 65536
-const log_all: i32 = 0
-const log_trace: i32 = 1
-const log_debug: i32 = 2
-const log_info: i32 = 3
-const log_warning: i32 = 4
-const log_error: i32 = 5
-const log_fatal: i32 = 6
-const log_none: i32 = 7
-const key_null: i32 = 0
-const key_apostrophe: i32 = 39
-const key_comma: i32 = 44
-const key_minus: i32 = 45
-const key_period: i32 = 46
-const key_slash: i32 = 47
-const key_zero: i32 = 48
-const key_one: i32 = 49
-const key_two: i32 = 50
-const key_three: i32 = 51
-const key_four: i32 = 52
-const key_five: i32 = 53
-const key_six: i32 = 54
-const key_seven: i32 = 55
-const key_eight: i32 = 56
-const key_nine: i32 = 57
-const key_semicolon: i32 = 59
-const key_equal: i32 = 61
-const key_a: i32 = 65
-const key_b: i32 = 66
-const key_c: i32 = 67
-const key_d: i32 = 68
-const key_e: i32 = 69
-const key_f: i32 = 70
-const key_g: i32 = 71
-const key_h: i32 = 72
-const key_i: i32 = 73
-const key_j: i32 = 74
-const key_k: i32 = 75
-const key_l: i32 = 76
-const key_m: i32 = 77
-const key_n: i32 = 78
-const key_o: i32 = 79
-const key_p: i32 = 80
-const key_q: i32 = 81
-const key_r: i32 = 82
-const key_s: i32 = 83
-const key_t: i32 = 84
-const key_u: i32 = 85
-const key_v: i32 = 86
-const key_w: i32 = 87
-const key_x: i32 = 88
-const key_y: i32 = 89
-const key_z: i32 = 90
-const key_left_bracket: i32 = 91
-const key_backslash: i32 = 92
-const key_right_bracket: i32 = 93
-const key_grave: i32 = 96
-const key_space: i32 = 32
-const key_escape: i32 = 256
-const key_enter: i32 = 257
-const key_tab: i32 = 258
-const key_backspace: i32 = 259
-const key_insert: i32 = 260
-const key_delete: i32 = 261
-const key_right: i32 = 262
-const key_left: i32 = 263
-const key_down: i32 = 264
-const key_up: i32 = 265
-const key_page_up: i32 = 266
-const key_page_down: i32 = 267
-const key_home: i32 = 268
-const key_end: i32 = 269
-const key_caps_lock: i32 = 280
-const key_scroll_lock: i32 = 281
-const key_num_lock: i32 = 282
-const key_print_screen: i32 = 283
-const key_pause: i32 = 284
-const key_f1: i32 = 290
-const key_f2: i32 = 291
-const key_f3: i32 = 292
-const key_f4: i32 = 293
-const key_f5: i32 = 294
-const key_f6: i32 = 295
-const key_f7: i32 = 296
-const key_f8: i32 = 297
-const key_f9: i32 = 298
-const key_f10: i32 = 299
-const key_f11: i32 = 300
-const key_f12: i32 = 301
-const key_left_shift: i32 = 340
-const key_left_control: i32 = 341
-const key_left_alt: i32 = 342
-const key_left_super: i32 = 343
-const key_right_shift: i32 = 344
-const key_right_control: i32 = 345
-const key_right_alt: i32 = 346
-const key_right_super: i32 = 347
-const key_kb_menu: i32 = 348
-const key_kp_0: i32 = 320
-const key_kp_1: i32 = 321
-const key_kp_2: i32 = 322
-const key_kp_3: i32 = 323
-const key_kp_4: i32 = 324
-const key_kp_5: i32 = 325
-const key_kp_6: i32 = 326
-const key_kp_7: i32 = 327
-const key_kp_8: i32 = 328
-const key_kp_9: i32 = 329
-const key_kp_decimal: i32 = 330
-const key_kp_divide: i32 = 331
-const key_kp_multiply: i32 = 332
-const key_kp_subtract: i32 = 333
-const key_kp_add: i32 = 334
-const key_kp_enter: i32 = 335
-const key_kp_equal: i32 = 336
-const key_back: i32 = 4
-const key_menu: i32 = 5
-const key_volume_up: i32 = 24
-const key_volume_down: i32 = 25
-const mouse_button_left: i32 = 0
-const mouse_button_right: i32 = 1
-const mouse_button_middle: i32 = 2
-const mouse_button_side: i32 = 3
-const mouse_button_extra: i32 = 4
-const mouse_button_forward: i32 = 5
-const mouse_button_back: i32 = 6
-const mouse_cursor_default: i32 = 0
-const mouse_cursor_arrow: i32 = 1
-const mouse_cursor_ibeam: i32 = 2
-const mouse_cursor_crosshair: i32 = 3
-const mouse_cursor_pointing_hand: i32 = 4
-const mouse_cursor_resize_ew: i32 = 5
-const mouse_cursor_resize_ns: i32 = 6
-const mouse_cursor_resize_nwse: i32 = 7
-const mouse_cursor_resize_nesw: i32 = 8
-const mouse_cursor_resize_all: i32 = 9
-const mouse_cursor_not_allowed: i32 = 10
-const gamepad_button_unknown: i32 = 0
-const gamepad_button_left_face_up: i32 = 1
-const gamepad_button_left_face_right: i32 = 2
-const gamepad_button_left_face_down: i32 = 3
-const gamepad_button_left_face_left: i32 = 4
-const gamepad_button_right_face_up: i32 = 5
-const gamepad_button_right_face_right: i32 = 6
-const gamepad_button_right_face_down: i32 = 7
-const gamepad_button_right_face_left: i32 = 8
-const gamepad_button_left_trigger_1: i32 = 9
-const gamepad_button_left_trigger_2: i32 = 10
-const gamepad_button_right_trigger_1: i32 = 11
-const gamepad_button_right_trigger_2: i32 = 12
-const gamepad_button_middle_left: i32 = 13
-const gamepad_button_middle: i32 = 14
-const gamepad_button_middle_right: i32 = 15
-const gamepad_button_left_thumb: i32 = 16
-const gamepad_button_right_thumb: i32 = 17
-const gamepad_axis_left_x: i32 = 0
-const gamepad_axis_left_y: i32 = 1
-const gamepad_axis_right_x: i32 = 2
-const gamepad_axis_right_y: i32 = 3
-const gamepad_axis_left_trigger: i32 = 4
-const gamepad_axis_right_trigger: i32 = 5
-const material_map_albedo: i32 = 0
-const material_map_metalness: i32 = 1
-const material_map_normal: i32 = 2
-const material_map_roughness: i32 = 3
-const material_map_occlusion: i32 = 4
-const material_map_emission: i32 = 5
-const material_map_height: i32 = 6
-const material_map_cubemap: i32 = 7
-const material_map_irradiance: i32 = 8
-const material_map_prefilter: i32 = 9
-const material_map_brdf: i32 = 10
-const shader_loc_vertex_position: i32 = 0
-const shader_loc_vertex_texcoord01: i32 = 1
-const shader_loc_vertex_texcoord02: i32 = 2
-const shader_loc_vertex_normal: i32 = 3
-const shader_loc_vertex_tangent: i32 = 4
-const shader_loc_vertex_color: i32 = 5
-const shader_loc_matrix_mvp: i32 = 6
-const shader_loc_matrix_view: i32 = 7
-const shader_loc_matrix_projection: i32 = 8
-const shader_loc_matrix_model: i32 = 9
-const shader_loc_matrix_normal: i32 = 10
-const shader_loc_vector_view: i32 = 11
-const shader_loc_color_diffuse: i32 = 12
-const shader_loc_color_specular: i32 = 13
-const shader_loc_color_ambient: i32 = 14
-const shader_loc_map_albedo: i32 = 15
-const shader_loc_map_metalness: i32 = 16
-const shader_loc_map_normal: i32 = 17
-const shader_loc_map_roughness: i32 = 18
-const shader_loc_map_occlusion: i32 = 19
-const shader_loc_map_emission: i32 = 20
-const shader_loc_map_height: i32 = 21
-const shader_loc_map_cubemap: i32 = 22
-const shader_loc_map_irradiance: i32 = 23
-const shader_loc_map_prefilter: i32 = 24
-const shader_loc_map_brdf: i32 = 25
-const shader_loc_vertex_boneids: i32 = 26
-const shader_loc_vertex_boneweights: i32 = 27
-const shader_loc_matrix_bonetransforms: i32 = 28
-const shader_loc_vertex_instancetransform: i32 = 29
-const shader_uniform_float: i32 = 0
-const shader_uniform_vec2: i32 = 1
-const shader_uniform_vec3: i32 = 2
-const shader_uniform_vec4: i32 = 3
-const shader_uniform_int: i32 = 4
-const shader_uniform_ivec2: i32 = 5
-const shader_uniform_ivec3: i32 = 6
-const shader_uniform_ivec4: i32 = 7
-const shader_uniform_uint: i32 = 8
-const shader_uniform_uivec2: i32 = 9
-const shader_uniform_uivec3: i32 = 10
-const shader_uniform_uivec4: i32 = 11
-const shader_uniform_sampler2d: i32 = 12
-const shader_attrib_float: i32 = 0
-const shader_attrib_vec2: i32 = 1
-const shader_attrib_vec3: i32 = 2
-const shader_attrib_vec4: i32 = 3
-const pixelformat_uncompressed_grayscale: i32 = 1
-const pixelformat_uncompressed_gray_alpha: i32 = 2
-const pixelformat_uncompressed_r5g6b5: i32 = 3
-const pixelformat_uncompressed_r8g8b8: i32 = 4
-const pixelformat_uncompressed_r5g5b5a1: i32 = 5
-const pixelformat_uncompressed_r4g4b4a4: i32 = 6
-const pixelformat_uncompressed_r8g8b8a8: i32 = 7
-const pixelformat_uncompressed_r32: i32 = 8
-const pixelformat_uncompressed_r32g32b32: i32 = 9
-const pixelformat_uncompressed_r32g32b32a32: i32 = 10
-const pixelformat_uncompressed_r16: i32 = 11
-const pixelformat_uncompressed_r16g16b16: i32 = 12
-const pixelformat_uncompressed_r16g16b16a16: i32 = 13
-const pixelformat_compressed_dxt1_rgb: i32 = 14
-const pixelformat_compressed_dxt1_rgba: i32 = 15
-const pixelformat_compressed_dxt3_rgba: i32 = 16
-const pixelformat_compressed_dxt5_rgba: i32 = 17
-const pixelformat_compressed_etc1_rgb: i32 = 18
-const pixelformat_compressed_etc2_rgb: i32 = 19
-const pixelformat_compressed_etc2_eac_rgba: i32 = 20
-const pixelformat_compressed_pvrt_rgb: i32 = 21
-const pixelformat_compressed_pvrt_rgba: i32 = 22
-const pixelformat_compressed_astc_4x4_rgba: i32 = 23
-const pixelformat_compressed_astc_8x8_rgba: i32 = 24
-const texture_filter_point: i32 = 0
-const texture_filter_bilinear: i32 = 1
-const texture_filter_trilinear: i32 = 2
-const texture_filter_anisotropic_4x: i32 = 3
-const texture_filter_anisotropic_8x: i32 = 4
-const texture_filter_anisotropic_16x: i32 = 5
-const texture_wrap_repeat: i32 = 0
-const texture_wrap_clamp: i32 = 1
-const texture_wrap_mirror_repeat: i32 = 2
-const texture_wrap_mirror_clamp: i32 = 3
-const cubemap_layout_auto_detect: i32 = 0
-const cubemap_layout_line_vertical: i32 = 1
-const cubemap_layout_line_horizontal: i32 = 2
-const cubemap_layout_cross_three_by_four: i32 = 3
-const cubemap_layout_cross_four_by_three: i32 = 4
-const font_default: i32 = 0
-const font_bitmap: i32 = 1
-const font_sdf: i32 = 2
-const blend_alpha: i32 = 0
-const blend_additive: i32 = 1
-const blend_multiplied: i32 = 2
-const blend_add_colors: i32 = 3
-const blend_subtract_colors: i32 = 4
-const blend_alpha_premultiply: i32 = 5
-const blend_custom: i32 = 6
-const blend_custom_separate: i32 = 7
-const gesture_none: i32 = 0
-const gesture_tap: i32 = 1
-const gesture_doubletap: i32 = 2
-const gesture_hold: i32 = 4
-const gesture_drag: i32 = 8
-const gesture_swipe_right: i32 = 16
-const gesture_swipe_left: i32 = 32
-const gesture_swipe_up: i32 = 64
-const gesture_swipe_down: i32 = 128
-const gesture_pinch_in: i32 = 256
-const gesture_pinch_out: i32 = 512
-const camera_custom: i32 = 0
-const camera_free: i32 = 1
-const camera_orbital: i32 = 2
-const camera_first_person: i32 = 3
-const camera_third_person: i32 = 4
-const camera_perspective: i32 = 0
-const camera_orthographic: i32 = 1
-const npatch_nine_patch: i32 = 0
-const npatch_three_patch_vertical: i32 = 1
-const npatch_three_patch_horizontal: i32 = 2
+
+## ConfigFlags values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; unnamed bit combinations remain valid.
+flags enum config_flags(u32):
+    ## Set to try enabling V-Sync on GPU
+    vsync_hint = 64
+    ## Set to run program in fullscreen
+    fullscreen_mode = 2
+    ## Set to allow resizable window
+    window_resizable = 4
+    ## Set to disable window decoration (frame and buttons)
+    window_undecorated = 8
+    ## Set to hide window
+    window_hidden = 128
+    ## Set to minimize window (iconify)
+    window_minimized = 512
+    ## Set to maximize window (expanded to monitor)
+    window_maximized = 1024
+    ## Set to window non focused
+    window_unfocused = 2048
+    ## Set to window always on top
+    window_topmost = 4096
+    ## Set to allow windows running while minimized
+    window_always_run = 256
+    ## Set to allow transparent framebuffer
+    window_transparent = 16
+    ## Set to support HighDPI
+    window_highdpi = 8192
+    ## Set to support mouse passthrough, only supported when FLAG_WINDOW_UNDECORATED
+    window_mouse_passthrough = 16384
+    ## Set to run program in borderless windowed mode
+    borderless_windowed_mode = 32768
+    ## Set to try enabling MSAA 4X
+    msaa_4x_hint = 32
+    ## Set to try enabling interlaced video format (for V3D)
+    interlaced_hint = 65536
+
+## TraceLogLevel values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum trace_log_level(i32):
+    ## Display all logs
+    all = 0
+    ## Trace logging, intended for internal use only
+    trace = 1
+    ## Debug logging, used for internal debugging, it should be disabled on release builds
+    debug = 2
+    ## Info logging, used for program execution info
+    info = 3
+    ## Warning logging, used on recoverable failures
+    warning = 4
+    ## Error logging, used on unrecoverable failures
+    error = 5
+    ## Fatal logging, used to abort program: exit(EXIT_FAILURE)
+    fatal = 6
+    ## Disable logging
+    none = 7
+
+## KeyboardKey values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum keyboard_key(i32):
+    ## Key: NULL, used for no key pressed
+    none = 0
+    ## Key: '
+    apostrophe = 39
+    ## Key: ,
+    comma = 44
+    ## Key: -
+    minus = 45
+    ## Key: .
+    period = 46
+    ## Key: /
+    slash = 47
+    ## Key: 0
+    zero = 48
+    ## Key: 1
+    one = 49
+    ## Key: 2
+    two = 50
+    ## Key: 3
+    three = 51
+    ## Key: 4
+    four = 52
+    ## Key: 5
+    five = 53
+    ## Key: 6
+    six = 54
+    ## Key: 7
+    seven = 55
+    ## Key: 8
+    eight = 56
+    ## Key: 9
+    nine = 57
+    ## Key: ;
+    semicolon = 59
+    ## Key: =
+    equal = 61
+    ## Key: A | a
+    a = 65
+    ## Key: B | b
+    b = 66
+    ## Key: C | c
+    c = 67
+    ## Key: D | d
+    d = 68
+    ## Key: E | e
+    e = 69
+    ## Key: F | f
+    f = 70
+    ## Key: G | g
+    g = 71
+    ## Key: H | h
+    h = 72
+    ## Key: I | i
+    i = 73
+    ## Key: J | j
+    j = 74
+    ## Key: K | k
+    k = 75
+    ## Key: L | l
+    l = 76
+    ## Key: M | m
+    m = 77
+    ## Key: N | n
+    n = 78
+    ## Key: O | o
+    o = 79
+    ## Key: P | p
+    p = 80
+    ## Key: Q | q
+    q = 81
+    ## Key: R | r
+    r = 82
+    ## Key: S | s
+    s = 83
+    ## Key: T | t
+    t = 84
+    ## Key: U | u
+    u = 85
+    ## Key: V | v
+    v = 86
+    ## Key: W | w
+    w = 87
+    ## Key: X | x
+    x = 88
+    ## Key: Y | y
+    y = 89
+    ## Key: Z | z
+    z = 90
+    ## Key: [
+    left_bracket = 91
+    ## Key: '\'
+    backslash = 92
+    ## Key: ]
+    right_bracket = 93
+    ## Key: `
+    grave = 96
+    ## Key: Space
+    space = 32
+    ## Key: Esc
+    escape = 256
+    ## Key: Enter
+    enter = 257
+    ## Key: Tab
+    tab = 258
+    ## Key: Backspace
+    backspace = 259
+    ## Key: Ins
+    insert = 260
+    ## Key: Del
+    delete = 261
+    ## Key: Cursor right
+    right = 262
+    ## Key: Cursor left
+    left = 263
+    ## Key: Cursor down
+    down = 264
+    ## Key: Cursor up
+    up = 265
+    ## Key: Page up
+    page_up = 266
+    ## Key: Page down
+    page_down = 267
+    ## Key: Home
+    home = 268
+    ## Key: End
+    end = 269
+    ## Key: Caps lock
+    caps_lock = 280
+    ## Key: Scroll down
+    scroll_lock = 281
+    ## Key: Num lock
+    num_lock = 282
+    ## Key: Print screen
+    print_screen = 283
+    ## Key: Pause
+    pause = 284
+    ## Key: F1
+    f1 = 290
+    ## Key: F2
+    f2 = 291
+    ## Key: F3
+    f3 = 292
+    ## Key: F4
+    f4 = 293
+    ## Key: F5
+    f5 = 294
+    ## Key: F6
+    f6 = 295
+    ## Key: F7
+    f7 = 296
+    ## Key: F8
+    f8 = 297
+    ## Key: F9
+    f9 = 298
+    ## Key: F10
+    f10 = 299
+    ## Key: F11
+    f11 = 300
+    ## Key: F12
+    f12 = 301
+    ## Key: Shift left
+    left_shift = 340
+    ## Key: Control left
+    left_control = 341
+    ## Key: Alt left
+    left_alt = 342
+    ## Key: Super left
+    left_super = 343
+    ## Key: Shift right
+    right_shift = 344
+    ## Key: Control right
+    right_control = 345
+    ## Key: Alt right
+    right_alt = 346
+    ## Key: Super right
+    right_super = 347
+    ## Key: KB menu
+    kb_menu = 348
+    ## Key: Keypad 0
+    kp_0 = 320
+    ## Key: Keypad 1
+    kp_1 = 321
+    ## Key: Keypad 2
+    kp_2 = 322
+    ## Key: Keypad 3
+    kp_3 = 323
+    ## Key: Keypad 4
+    kp_4 = 324
+    ## Key: Keypad 5
+    kp_5 = 325
+    ## Key: Keypad 6
+    kp_6 = 326
+    ## Key: Keypad 7
+    kp_7 = 327
+    ## Key: Keypad 8
+    kp_8 = 328
+    ## Key: Keypad 9
+    kp_9 = 329
+    ## Key: Keypad .
+    kp_decimal = 330
+    ## Key: Keypad /
+    kp_divide = 331
+    ## Key: Keypad *
+    kp_multiply = 332
+    ## Key: Keypad -
+    kp_subtract = 333
+    ## Key: Keypad +
+    kp_add = 334
+    ## Key: Keypad Enter
+    kp_enter = 335
+    ## Key: Keypad =
+    kp_equal = 336
+    ## Key: Android back button
+    back = 4
+    ## Key: Android menu button
+    menu = 5
+    ## Key: Android volume up button
+    volume_up = 24
+    ## Key: Android volume down button
+    volume_down = 25
+
+## MouseButton values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum mouse_button(i32):
+    ## Mouse button left
+    left = 0
+    ## Mouse button right
+    right = 1
+    ## Mouse button middle (pressed wheel)
+    middle = 2
+    ## Mouse button side (advanced mouse device)
+    side = 3
+    ## Mouse button extra (advanced mouse device)
+    extra = 4
+    ## Mouse button forward (advanced mouse device)
+    forward = 5
+    ## Mouse button back (advanced mouse device)
+    back = 6
+
+## MouseCursor values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum mouse_cursor(i32):
+    ## Default pointer shape
+    default = 0
+    ## Arrow shape
+    arrow = 1
+    ## Text writing cursor shape
+    ibeam = 2
+    ## Cross shape
+    crosshair = 3
+    ## Pointing hand cursor
+    pointing_hand = 4
+    ## Horizontal resize/move arrow shape
+    resize_ew = 5
+    ## Vertical resize/move arrow shape
+    resize_ns = 6
+    ## Top-left to bottom-right diagonal resize/move arrow shape
+    resize_nwse = 7
+    ## The top-right to bottom-left diagonal resize/move arrow shape
+    resize_nesw = 8
+    ## The omnidirectional resize/move cursor shape
+    resize_all = 9
+    ## The operation-not-allowed shape
+    not_allowed = 10
+
+## GamepadButton values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum gamepad_button(i32):
+    ## Unknown button, for error checking
+    unknown = 0
+    ## Gamepad left DPAD up button
+    left_face_up = 1
+    ## Gamepad left DPAD right button
+    left_face_right = 2
+    ## Gamepad left DPAD down button
+    left_face_down = 3
+    ## Gamepad left DPAD left button
+    left_face_left = 4
+    ## Gamepad right button up (i.e. PS3: Triangle, Xbox: Y)
+    right_face_up = 5
+    ## Gamepad right button right (i.e. PS3: Circle, Xbox: B)
+    right_face_right = 6
+    ## Gamepad right button down (i.e. PS3: Cross, Xbox: A)
+    right_face_down = 7
+    ## Gamepad right button left (i.e. PS3: Square, Xbox: X)
+    right_face_left = 8
+    ## Gamepad top/back trigger left (first), it could be a trailing button
+    left_trigger_1 = 9
+    ## Gamepad top/back trigger left (second), it could be a trailing button
+    left_trigger_2 = 10
+    ## Gamepad top/back trigger right (first), it could be a trailing button
+    right_trigger_1 = 11
+    ## Gamepad top/back trigger right (second), it could be a trailing button
+    right_trigger_2 = 12
+    ## Gamepad center buttons, left one (i.e. PS3: Select)
+    middle_left = 13
+    ## Gamepad center buttons, middle one (i.e. PS3: PS, Xbox: XBOX)
+    middle = 14
+    ## Gamepad center buttons, right one (i.e. PS3: Start)
+    middle_right = 15
+    ## Gamepad joystick pressed button left
+    left_thumb = 16
+    ## Gamepad joystick pressed button right
+    right_thumb = 17
+
+## GamepadAxis values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum gamepad_axis(i32):
+    ## Gamepad left stick X axis
+    left_x = 0
+    ## Gamepad left stick Y axis
+    left_y = 1
+    ## Gamepad right stick X axis
+    right_x = 2
+    ## Gamepad right stick Y axis
+    right_y = 3
+    ## Gamepad back trigger left, pressure level: [1..-1]
+    left_trigger = 4
+    ## Gamepad back trigger right, pressure level: [1..-1]
+    right_trigger = 5
+
+## MaterialMapIndex values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum material_map_index(i32):
+    ## Albedo material (same as: MATERIAL_MAP_DIFFUSE)
+    albedo = 0
+    ## Metalness material (same as: MATERIAL_MAP_SPECULAR)
+    metalness = 1
+    ## Normal material
+    normal = 2
+    ## Roughness material
+    roughness = 3
+    ## Ambient occlusion material
+    occlusion = 4
+    ## Emission material
+    emission = 5
+    ## Heightmap material
+    height = 6
+    ## Cubemap material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+    cubemap = 7
+    ## Irradiance material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+    irradiance = 8
+    ## Prefilter material (NOTE: Uses GL_TEXTURE_CUBE_MAP)
+    prefilter = 9
+    ## Brdf material
+    brdf = 10
+
+## ShaderLocationIndex values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum shader_location_index(i32):
+    ## Shader location: vertex attribute: position
+    vertex_position = 0
+    ## Shader location: vertex attribute: texcoord01
+    vertex_texcoord01 = 1
+    ## Shader location: vertex attribute: texcoord02
+    vertex_texcoord02 = 2
+    ## Shader location: vertex attribute: normal
+    vertex_normal = 3
+    ## Shader location: vertex attribute: tangent
+    vertex_tangent = 4
+    ## Shader location: vertex attribute: color
+    vertex_color = 5
+    ## Shader location: matrix uniform: model-view-projection
+    matrix_mvp = 6
+    ## Shader location: matrix uniform: view (camera transform)
+    matrix_view = 7
+    ## Shader location: matrix uniform: projection
+    matrix_projection = 8
+    ## Shader location: matrix uniform: model (transform)
+    matrix_model = 9
+    ## Shader location: matrix uniform: normal
+    matrix_normal = 10
+    ## Shader location: vector uniform: view
+    vector_view = 11
+    ## Shader location: vector uniform: diffuse color
+    color_diffuse = 12
+    ## Shader location: vector uniform: specular color
+    color_specular = 13
+    ## Shader location: vector uniform: ambient color
+    color_ambient = 14
+    ## Shader location: sampler2d texture: albedo (same as: SHADER_LOC_MAP_DIFFUSE)
+    map_albedo = 15
+    ## Shader location: sampler2d texture: metalness (same as: SHADER_LOC_MAP_SPECULAR)
+    map_metalness = 16
+    ## Shader location: sampler2d texture: normal
+    map_normal = 17
+    ## Shader location: sampler2d texture: roughness
+    map_roughness = 18
+    ## Shader location: sampler2d texture: occlusion
+    map_occlusion = 19
+    ## Shader location: sampler2d texture: emission
+    map_emission = 20
+    ## Shader location: sampler2d texture: heightmap
+    map_height = 21
+    ## Shader location: samplerCube texture: cubemap
+    map_cubemap = 22
+    ## Shader location: samplerCube texture: irradiance
+    map_irradiance = 23
+    ## Shader location: samplerCube texture: prefilter
+    map_prefilter = 24
+    ## Shader location: sampler2d texture: brdf
+    map_brdf = 25
+    ## Shader location: vertex attribute: bone indices
+    vertex_boneids = 26
+    ## Shader location: vertex attribute: bone weights
+    vertex_boneweights = 27
+    ## Shader location: matrix attribute: bone transforms (animation)
+    matrix_bonetransforms = 28
+    ## Shader location: vertex attribute: instance transforms
+    vertex_instancetransform = 29
+
+## ShaderUniformDataType values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum shader_uniform_type(i32):
+    ## Shader uniform type: float
+    float = 0
+    ## Shader uniform type: vec2 (2 float)
+    vec2 = 1
+    ## Shader uniform type: vec3 (3 float)
+    vec3 = 2
+    ## Shader uniform type: vec4 (4 float)
+    vec4 = 3
+    ## Shader uniform type: int
+    int = 4
+    ## Shader uniform type: ivec2 (2 int)
+    ivec2 = 5
+    ## Shader uniform type: ivec3 (3 int)
+    ivec3 = 6
+    ## Shader uniform type: ivec4 (4 int)
+    ivec4 = 7
+    ## Shader uniform type: unsigned int
+    uint = 8
+    ## Shader uniform type: uivec2 (2 unsigned int)
+    uivec2 = 9
+    ## Shader uniform type: uivec3 (3 unsigned int)
+    uivec3 = 10
+    ## Shader uniform type: uivec4 (4 unsigned int)
+    uivec4 = 11
+    ## Shader uniform type: sampler2d
+    sampler2d = 12
+
+## ShaderAttributeDataType values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum shader_attribute_type(i32):
+    ## Shader attribute type: float
+    float = 0
+    ## Shader attribute type: vec2 (2 float)
+    vec2 = 1
+    ## Shader attribute type: vec3 (3 float)
+    vec3 = 2
+    ## Shader attribute type: vec4 (4 float)
+    vec4 = 3
+
+## PixelFormat values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum pixel_format(i32):
+    ## 8 bit per pixel (no alpha)
+    uncompressed_grayscale = 1
+    ## 8*2 bpp (2 channels)
+    uncompressed_gray_alpha = 2
+    ## 16 bpp
+    uncompressed_r5g6b5 = 3
+    ## 24 bpp
+    uncompressed_r8g8b8 = 4
+    ## 16 bpp (1 bit alpha)
+    uncompressed_r5g5b5a1 = 5
+    ## 16 bpp (4 bit alpha)
+    uncompressed_r4g4b4a4 = 6
+    ## 32 bpp
+    uncompressed_r8g8b8a8 = 7
+    ## 32 bpp (1 channel - float)
+    uncompressed_r32 = 8
+    ## 32*3 bpp (3 channels - float)
+    uncompressed_r32g32b32 = 9
+    ## 32*4 bpp (4 channels - float)
+    uncompressed_r32g32b32a32 = 10
+    ## 16 bpp (1 channel - half float)
+    uncompressed_r16 = 11
+    ## 16*3 bpp (3 channels - half float)
+    uncompressed_r16g16b16 = 12
+    ## 16*4 bpp (4 channels - half float)
+    uncompressed_r16g16b16a16 = 13
+    ## 4 bpp (no alpha)
+    compressed_dxt1_rgb = 14
+    ## 4 bpp (1 bit alpha)
+    compressed_dxt1_rgba = 15
+    ## 8 bpp
+    compressed_dxt3_rgba = 16
+    ## 8 bpp
+    compressed_dxt5_rgba = 17
+    ## 4 bpp
+    compressed_etc1_rgb = 18
+    ## 4 bpp
+    compressed_etc2_rgb = 19
+    ## 8 bpp
+    compressed_etc2_eac_rgba = 20
+    ## 4 bpp
+    compressed_pvrt_rgb = 21
+    ## 4 bpp
+    compressed_pvrt_rgba = 22
+    ## 8 bpp
+    compressed_astc_4x4_rgba = 23
+    ## 2 bpp
+    compressed_astc_8x8_rgba = 24
+
+## TextureFilter values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum texture_filter(i32):
+    ## No filter, pixel approximation
+    point = 0
+    ## Linear filtering
+    bilinear = 1
+    ## Trilinear filtering (linear with mipmaps)
+    trilinear = 2
+    ## Anisotropic filtering 4x
+    anisotropic_4x = 3
+    ## Anisotropic filtering 8x
+    anisotropic_8x = 4
+    ## Anisotropic filtering 16x
+    anisotropic_16x = 5
+
+## TextureWrap values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum texture_wrap(i32):
+    ## Repeats texture in tiled mode
+    repeat = 0
+    ## Clamps texture to edge pixel in tiled mode
+    clamp = 1
+    ## Mirrors and repeats the texture in tiled mode
+    mirror_repeat = 2
+    ## Mirrors and clamps to border the texture in tiled mode
+    mirror_clamp = 3
+
+## CubemapLayout values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum cubemap_layout(i32):
+    ## Automatically detect layout type
+    auto_detect = 0
+    ## Layout is defined by a vertical line with faces
+    line_vertical = 1
+    ## Layout is defined by a horizontal line with faces
+    line_horizontal = 2
+    ## Layout is defined by a 3x4 cross with cubemap faces
+    cross_three_by_four = 3
+    ## Layout is defined by a 4x3 cross with cubemap faces
+    cross_four_by_three = 4
+
+## FontType values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum font_type(i32):
+    ## Default font generation, anti-aliased
+    default = 0
+    ## Bitmap font generation, no anti-aliasing
+    bitmap = 1
+    ## SDF font generation, requires external shader
+    sdf = 2
+
+## BlendMode values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum blend_mode(i32):
+    ## Blend textures considering alpha (default)
+    alpha = 0
+    ## Blend textures adding colors
+    additive = 1
+    ## Blend textures multiplying colors
+    multiplied = 2
+    ## Blend textures adding colors (alternative)
+    add_colors = 3
+    ## Blend textures subtracting colors (alternative)
+    subtract_colors = 4
+    ## Blend premultiplied textures considering alpha
+    alpha_premultiply = 5
+    ## Blend textures using custom src/dst factors (use rlSetBlendFactors())
+    custom = 6
+    ## Blend textures using custom rgb/alpha separate src/dst factors (use rlSetBlendFactorsSeparate())
+    custom_separate = 7
+
+## Gesture values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; unnamed bit combinations remain valid.
+flags enum gesture_flags(u32):
+    ## No gesture
+    none = 0
+    ## Tap gesture
+    tap = 1
+    ## Double tap gesture
+    doubletap = 2
+    ## Hold gesture
+    hold = 4
+    ## Drag gesture
+    drag = 8
+    ## Swipe right gesture
+    swipe_right = 16
+    ## Swipe left gesture
+    swipe_left = 32
+    ## Swipe up gesture
+    swipe_up = 64
+    ## Swipe down gesture
+    swipe_down = 128
+    ## Pinch in gesture
+    pinch_in = 256
+    ## Pinch out gesture
+    pinch_out = 512
+
+## CameraMode values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum camera_mode(i32):
+    ## Camera custom, controlled by user (UpdateCamera() does nothing)
+    custom = 0
+    ## Camera free mode
+    free = 1
+    ## Camera orbital, around target, zoom supported
+    orbital = 2
+    ## Camera first person
+    first_person = 3
+    ## Camera third person
+    third_person = 4
+
+## CameraProjection values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum camera_projection(i32):
+    ## Perspective projection
+    perspective = 0
+    ## Orthographic projection
+    orthographic = 1
+
+## NPatchLayout values from the pinned raylib 6.0 header.
+## Extract .value at native boundaries; integer conversions validate declared members.
+enum n_patch_layout(i32):
+    ## Npatch layout: 3x3 tiles
+    nine_patch = 0
+    ## Npatch layout: 1x3 tiles
+    three_patch_vertical = 1
+    ## Npatch layout: 3x1 tiles
+    three_patch_horizontal = 2
+
 const raylib_version_major: i32 = 6
 const raylib_version_minor: i32 = 0
 const raylib_version_patch: i32 = 0
@@ -7972,7 +8410,7 @@ func gallery_direction(gallery: gallery_window) -> i32:
     return native.direction(gallery.owner)
 
 
-# G77 fallible companions. Physical source; native declarations and ABI are unchanged.
+# Recoverable resource-loading companions.
 
 ## Observable failures from fallible raylib operations, without guessing an OS or decoder cause.
 enum load_error_kind:
@@ -8149,11 +8587,11 @@ func try_load_image(file_name: string) -> result<image, load_error>:
 ## @param file_name Path to the file. Relative paths use the process working directory.
 ## @param width Width in pixels.
 ## @param height Height in pixels.
-## @param format Pixel format from the pixel-format constants.
+## @param format Pixel format from the pixel-format constants. Uses pixel_format; its exact integer value crosses the native boundary.
 ## @param header_size Number of file-header bytes skipped before the raw pixels.
 ## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
 ## @return Ok with one image owner to release using unload_image; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
-func try_load_image_raw(file_name: string, width: i32, height: i32, format: i32, header_size: i32) -> result<image, load_error>:
+func try_load_image_raw(file_name: string, width: i32, height: i32, format: pixel_format, header_size: i32) -> result<image, load_error>:
     return _try_image(load_image_raw(file_name, width, height, format, header_size), "load_image_raw")
 
 ## Try to load all frames of an animated image and retain the frame count.
@@ -8214,10 +8652,10 @@ func try_load_texture_from_image(image_value: image) -> result<texture, load_err
 
 ## Try to load cubemap from image, multiple image cubemap layouts supported.
 ## @param image_value Image resource, borrowed for this call.
-## @param layout Layout selector from the constants for this operation.
+## @param layout Layout selector from the corresponding typed enum. Uses cubemap_layout; its exact integer value crosses the native boundary.
 ## Native lifetime, thread, input-extent and required device/context checks retain their checked failures.
 ## @return Ok with one texture owner to release using unload_texture; Err(load_error) if no owner is acquired or resource validation fails. Rejected temporary owners are released.
-func try_load_texture_cubemap(image_value: image, layout: i32) -> result<texture, load_error>:
+func try_load_texture_cubemap(image_value: image, layout: cubemap_layout) -> result<texture, load_error>:
     return _try_texture(load_texture_cubemap(image_value, layout), "load_texture_cubemap")
 
 ## Try to load texture for rendering (framebuffer).

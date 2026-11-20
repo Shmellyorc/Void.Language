@@ -35,8 +35,8 @@ func encode<t>(value: t, order: byte_order = byte_order.little) -> [u8]:
     var bytes: [u8] = []
 
     for index in 0..<width:
-        bytes.push((bits % 256) as u8)
-        bits = bits / 256
+        bytes.push((bits & 255) as u8)
+        bits = bits >> 8
 
     if order is byte_order.big:
         return bytes[width - 1..0]
@@ -69,6 +69,6 @@ func decode<t>(const bytes: [u8], order: byte_order = byte_order.little) -> resu
         if order is byte_order.big:
             selected = index
 
-        bits = bits * 256 + (bytes[selected] as u64)
+        bits = (bits << 8) | (bytes[selected] as u64)
 
     return Ok(_binary_value<t>(bits))

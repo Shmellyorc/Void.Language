@@ -3,58 +3,58 @@ use error as core
 
 
 ## Portable categories of recoverable file, directory and host-path failures.
-enum error_kind:
+enum error_kind(i64):
 
     ## The named file, directory or parent does not exist.
-    not_found
+    not_found = 1
 
     ## The host denied access to the requested operation.
-    permission_denied
+    permission_denied = 2
 
     ## An exclusive destination or creation name already exists.
-    already_exists
+    already_exists = 3
 
     ## A path, filename pattern or collision target is invalid.
-    invalid_path
+    invalid_path = 4
 
     ## The file mode does not permit this operation.
-    invalid_mode
+    invalid_mode = 5
 
     ## A count, length, seek origin or position is invalid or overflows.
-    invalid_range
+    invalid_range = 6
 
     ## The shared file resource is closed or was never opened.
-    closed
+    closed = 7
 
     ## An unrelated operation currently reserves this shared file.
-    busy
+    busy = 8
 
     ## An exact read ended before its required byte count.
-    unexpected_eof
+    unexpected_eof = 9
 
     ## Consumed bytes are not a complete strict UTF-8 sequence.
-    invalid_utf8
+    invalid_utf8 = 10
 
     ## The host or resource does not support this operation.
-    unsupported
+    unsupported = 11
 
     ## A byte or traversal budget would be exceeded.
-    limit_exceeded
+    limit_exceeded = 12
 
     ## A native rename cannot cross filesystem volumes.
-    cross_device
+    cross_device = 13
 
     ## An operation requiring a real directory received another entry type.
-    not_directory
+    not_directory = 14
 
     ## A file operation received a directory.
-    is_directory
+    is_directory = 15
 
     ## An empty-only directory operation found children.
-    not_empty
+    not_empty = 16
 
     ## Another native transfer or filesystem operation failed.
-    io_failure
+    io_failure = 17
 
 
 ## Managed filesystem failure retaining native diagnostics and actual progress.
@@ -123,39 +123,39 @@ value struct entry:
 
 
 ## Creation, truncation and access policy selected when opening a file.
-enum open_mode:
+enum open_mode(i64):
     ## Read an existing file; writes fail with invalid_mode.
-    read
+    read = 0
 
     ## Create or truncate a file for writing; reading is prohibited.
-    write
+    write = 1
 
     ## Create or open for writing at EOF on every write, even after seeking.
-    append
+    append = 2
 
     ## Open an existing file for reading and writing without truncation.
-    read_write
+    read_write = 3
 
     ## Create or truncate a file for both reading and writing.
-    create
+    create = 4
 
     ## Create if absent, otherwise retain contents, with read/write access.
-    open_or_create
+    open_or_create = 5
 
     ## Exclusively create a new read/write file; an existing name fails.
-    create_new
+    create_new = 6
 
 
 ## Reference point for checked signed file seeks.
-enum seek_origin:
+enum seek_origin(i64):
     ## Absolute byte offset from the beginning.
-    start
+    start = 0
 
     ## Signed offset from the shared logical cursor, accounting for read-ahead.
-    current
+    current = 1
 
     ## Signed offset from the current native file length.
-    end
+    end = 2
 
 
 ## A decoded logical line or distinct end of input.
@@ -183,59 +183,9 @@ private value struct _reply:
 
 
 private func _kind(code: i64) -> error_kind:
-    if code == 1:
-        return error_kind.not_found
-
-    if code == 2:
-        return error_kind.permission_denied
-
-    if code == 3:
-        return error_kind.already_exists
-
-    if code == 4:
-        return error_kind.invalid_path
-
-    if code == 5:
-        return error_kind.invalid_mode
-
-    if code == 6:
-        return error_kind.invalid_range
-
-    if code == 7:
-        return error_kind.closed
-
-    if code == 8:
-        return error_kind.busy
-
-    if code == 9:
-        return error_kind.unexpected_eof
-
-    if code == 10:
-        return error_kind.invalid_utf8
-
-    if code == 11:
-        return error_kind.unsupported
-
-    if code == 12:
-        return error_kind.limit_exceeded
-
-    if code == 13:
-        return error_kind.cross_device
-
-    if code == 14:
-        return error_kind.not_directory
-
-    if code == 15:
-        return error_kind.is_directory
-
-    if code == 16:
-        return error_kind.not_empty
-
-    if code == 17:
-        return error_kind.io_failure
-
+    if code as? error_kind is Some(var decoded):
+        return decoded
     return error_kind.io_failure
-
 
 private func _error(operation: string, path: string, target: string, reply: _reply) -> error:
     return error(
@@ -253,50 +203,11 @@ private func _error(operation: string, path: string, target: string, reply: _rep
     )
 
 
-private func _code(kind: error_kind) -> i32:
-    match kind:
-        error_kind.not_found:
-            return 1
-        error_kind.permission_denied:
-            return 2
-        error_kind.already_exists:
-            return 3
-        error_kind.invalid_path:
-            return 4
-        error_kind.invalid_mode:
-            return 5
-        error_kind.invalid_range:
-            return 6
-        error_kind.closed:
-            return 7
-        error_kind.busy:
-            return 8
-        error_kind.unexpected_eof:
-            return 9
-        error_kind.invalid_utf8:
-            return 10
-        error_kind.unsupported:
-            return 11
-        error_kind.limit_exceeded:
-            return 12
-        error_kind.cross_device:
-            return 13
-        error_kind.not_directory:
-            return 14
-        error_kind.is_directory:
-            return 15
-        error_kind.not_empty:
-            return 16
-        error_kind.io_failure:
-            return 17
-    return 17
-
-
 private func _reason(operation: string, path: string, kind: error_kind, partial: [u8] = [], completed: i64 = 0) -> error:
     return error(
         message = "Filesystem {operation} validation failed",
         path = path,
-        code = _code(kind),
+        code = (kind as i32),
         operation = operation,
         kind = kind,
         partial = partial,
@@ -309,48 +220,6 @@ private func _flag(value: bool) -> i64:
         return 1
 
     return 0
-
-
-private func _mode(value: open_mode) -> i64:
-    match value:
-
-        open_mode.read:
-            return 0
-
-        open_mode.write:
-            return 1
-
-        open_mode.append:
-            return 2
-
-        open_mode.read_write:
-            return 3
-
-        open_mode.create:
-            return 4
-
-        open_mode.open_or_create:
-            return 5
-
-        open_mode.create_new:
-            return 6
-
-    return -1
-
-
-private func _origin(value: seek_origin) -> i64:
-    match value:
-
-        seek_origin.start:
-            return 0
-
-        seek_origin.current:
-            return 1
-
-        seek_origin.end:
-            return 2
-
-    return -1
 
 
 ## Owned native file with shared cursor and closed state across aliases.
@@ -390,7 +259,7 @@ private func _reserve(const owner: file, operation: string, allow_closed: bool =
     var guard = _lease(owner = owner)
     var code = _io_claim(owner)
 
-    if allow_closed and code == (_code(error_kind.closed) as i64):
+    if allow_closed and code == ((error_kind.closed as i32) as i64):
         return Ok(guard)
 
     if code != 0:
@@ -421,7 +290,7 @@ func open(value: string, mode: open_mode = open_mode.read, order: binary.byte_or
     var resource = file(value, order)
 
     with _acquisition(owner = resource) as guard:
-        var reply = _io_open(resource, value, _mode(mode))
+        var reply = _io_open(resource, value, mode.value)
 
         if reply.kind != 0:
             return Err(_error("open", value, "", reply))
@@ -440,7 +309,7 @@ func open(value: string, mode: open_mode = open_mode.read, order: binary.byte_or
 ## @return Ok with one shared managed file, or Err with path, mode or native failure details.
 async func open_async(value: string, mode: open_mode = open_mode.read, order: binary.byte_order = binary.byte_order.little) -> result<file, error>:
     var resource = file(value, order)
-    var reply = await _io_open_async(resource, value, _mode(mode))
+    var reply = await _io_open_async(resource, value, mode.value)
 
     if reply.kind != 0:
         return Err(_error("open", value, "", reply))
@@ -462,7 +331,7 @@ internal func _prepare_open(value: string) -> file:
 ## @param mode Existing native opening policy; the identity must be fresh and unopened.
 ## @return True after acquisition, or the original typed native failure.
 internal async func (self file) _complete_open_async(mode: open_mode) -> result<bool, error>:
-    var reply = await _io_open_async(self, self._path, _mode(mode))
+    var reply = await _io_open_async(self, self._path, mode.value)
     if reply.kind != 0:
         return Err(_error("open", self._path, "", reply))
     return Ok(true)
@@ -604,7 +473,7 @@ async func (self file) write_bytes_async(const bytes: [u8]) -> result<i64, error
 ## @return Ok with the new absolute cursor; invalid or unsupported seeks preserve the logical cursor.
 func (self file) seek(offset: i64, origin: seek_origin = seek_origin.start) -> result<i64, error>:
     with _reserve(self, "seek")? as lease:
-        var reply = _io_seek(self, offset, _origin(origin))
+        var reply = _io_seek(self, offset, origin.value)
 
         if reply.kind != 0:
             return Err(_error("seek", self._path, "", reply))
@@ -619,7 +488,7 @@ func (self file) seek(offset: i64, origin: seek_origin = seek_origin.start) -> r
 ## @return Ok with the new absolute cursor; invalid or unsupported seeks preserve the logical cursor.
 async func (self file) seek_async(offset: i64, origin: seek_origin = seek_origin.start) -> result<i64, error>:
     with _reserve(self, "seek")? as lease:
-        var reply = await _io_seek_async(self, offset, _origin(origin))
+        var reply = await _io_seek_async(self, offset, origin.value)
 
         if reply.kind != 0:
             return Err(_error("seek", self._path, "", reply))
@@ -800,7 +669,7 @@ async func read_bytes_async(value: string, max_bytes: i64 = 67108864) -> result<
 ## @param mode Writable open policy; default write creates or truncates, read mode is rejected.
 ## @return Ok with bytes written, or Err with completed bytes and cleanup details; changes are not atomic.
 func write_bytes(value: string, const bytes: [u8], mode: open_mode = open_mode.write) -> result<i64, error>:
-    var reply = _io_write_all(value, bytes, _mode(mode))
+    var reply = _io_write_all(value, bytes, mode.value)
 
     if reply.kind != 0:
         return Err(_error("write_bytes", value, "", reply))
@@ -815,7 +684,7 @@ func write_bytes(value: string, const bytes: [u8], mode: open_mode = open_mode.w
 ## @param mode Writable open policy; default write creates or truncates, read mode is rejected.
 ## @return Ok with bytes written, or Err with completed bytes and cleanup details; changes are not atomic.
 async func write_bytes_async(value: string, const bytes: [u8], mode: open_mode = open_mode.write) -> result<i64, error>:
-    var reply = await _io_write_all_async(value, bytes, _mode(mode))
+    var reply = await _io_write_all_async(value, bytes, mode.value)
 
     if reply.kind != 0:
         return Err(_error("write_bytes", value, "", reply))

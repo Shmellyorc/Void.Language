@@ -78,8 +78,8 @@ func try_encode(const bytes: [u8], uppercase: bool = false) -> result<string, er
     var output: [u8] = []
 
     for byte in bytes:
-        output.push(digits[(byte / 16) as i64])
-        output.push(digits[(byte % 16) as i64])
+        output.push(digits[(byte >> 4) as i64])
+        output.push(digits[(byte & 15) as i64])
 
     return Ok(convert.unwrap(string.from_utf8(output)))
 
@@ -109,7 +109,7 @@ func decode(value: string) -> result<[u8], error>:
         if low < 0:
             return Err(_error(error_kind.invalid_digit, cursor + 1))
 
-        output.push((high * 16 + low) as u8)
+        output.push(((high << 4) | low) as u8)
         cursor += 2
 
     return Ok(output)

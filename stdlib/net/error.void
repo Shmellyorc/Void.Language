@@ -2,58 +2,106 @@ use error as core
 
 ## Portable checked networking failure category.
 enum error_kind(u8):
+    ## An input violates the operation contract.
     invalid_argument = 1
+    ## A numeric IP address is invalid.
     invalid_address = 2
+    ## Resolution found no usable address.
     name_not_found = 3
+    ## The resolver failed independently of an absent name.
     resolve_failed = 4
+    ## The local endpoint is already bound.
     address_in_use = 5
+    ## The requested local address is unavailable.
     address_not_available = 6
+    ## Native socket access was denied.
     permission_denied = 7
+    ## The remote endpoint refused the connection.
     connection_refused = 8
+    ## The peer reset the connection; this is distinct from EOF.
     connection_reset = 9
+    ## No route to the network is available.
     network_unreachable = 10
+    ## The remote host is unreachable.
     host_unreachable = 11
+    ## The monotonic operation deadline expired.
     timed_out = 12
+    ## The resource is closed.
     closed = 13
+    ## TCP sending was half-closed; receiving can remain usable.
     write_closed = 14
+    ## A conflicting operation already reserves this direction or resource.
     busy = 15
+    ## The datagram exceeds a send or receive capacity.
     message_too_large = 16
+    ## An independent native or library resource limit was exceeded.
     limit_exceeded = 17
+    ## The host does not support the requested facility.
     unsupported = 18
+    ## Another native networking operation failed.
     io_failure = 19
 
+## Native stage of the primary failure, independent of the public operation.
 enum error_phase(u8):
+    ## Validate and snapshot inputs.
     prepare = 0
+    ## Resolve the supplied hostname.
     resolve = 1
+    ## Acquire the native socket.
     open = 2
+    ## Bind a local endpoint.
     bind = 3
+    ## Enable listener admission.
     listen = 4
+    ## Establish the remote connection.
     connect = 5
+    ## Acquire a separately owned incoming connection.
     accept = 6
+    ## Read bytes or receive a datagram.
     read = 7
+    ## Write bytes or send a datagram.
     write = 8
+    ## Shut down the write direction.
     shutdown = 9
+    ## Close native resources.
     close = 10
 
+## Domain that interprets native_code; portable validation can have no native code.
 enum error_domain(u8):
+    ## No native diagnostic domain.
     none = 0
+    ## POSIX errno.
     posix = 1
+    ## Windows Winsock status.
     winsock = 2
+    ## c-ares resolver status.
     cares = 3
 
 ## Owned networking error retaining native status and observed effects.
 struct error extends core.error:
+    ## Portable checked failure category.
     kind: error_kind
+    ## Public operation that failed.
     operation: string
+    ## Native stage of the primary failure.
     phase: error_phase
+    ## Domain interpreting native_code.
     native_domain: error_domain
+    ## Original native diagnostic; zero when no native status applies.
     native_code: i64
+    ## Separate native cleanup error; never replaces the primary failure.
     cleanup_code: i64
+    ## Exact local TCP write prefix or known consumed UDP byte count.
     bytes_transferred: i64
+    ## Owned partial bytes; discarded oversized UDP payloads leave this empty.
     partial: [u8]
+    ## Numeric peer or last attempted endpoint when available.
     peer: string
+    ## True when the failed receive consumed and discarded a UDP message.
     datagram_consumed: bool
+    ## Known consumed datagram size, or -1 when unknown or inapplicable.
     datagram_size: i64
+    ## Number of attempted hostname-connect candidates.
     attempted_count: i64
 
 internal func make(operation: string, code: i64, phase: i64, domain: i64, native: i64, cleanup: i64, progress: i64, partial: [u8], peer: string, consumed: bool, datagram_size: i64, attempts: i64) -> error:

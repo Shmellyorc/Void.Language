@@ -1,0 +1,69 @@
+use console as console
+use io as io
+use json as json
+use log as log
+use os as os
+use process as process
+use url as url
+use system_error as system_error
+use convert as convert
+use encoding/binary as binary
+use encoding/hex as hex
+use encoding/base64 as base64
+use net/address as address
+use net/http as http
+
+## Preserve an enum through generic specialization and nullable extraction.
+func present<t>(value: t) -> t?:
+    return value
+
+## Exercise stable numeric contracts and source implementations without external IO.
+func main() -> i32:
+    if console.io_error_kind.io_failure.value != 9 or console.color.bright_white.value != 15 or console.key.unknown.value != 27:
+        return 1
+    if io.error_kind.io_failure.value != 17 or io.open_mode.create_new.value != 6 or io.seek_origin.end.value != 2:
+        return 2
+    if json.error_kind.invalid_limits.value != 13 or os.error_kind.system_failure.value != 8:
+        return 3
+    if system_error.error_kind.invalid_range.value != 6 or system_error.error_kind.invalid_argument.value != 20:
+        return 4
+    if log.level.off.value != 5 or http.error_kind.transport_failure.value != 23 or http.failure_phase.cleanup.value != 11:
+        return 5
+    if http.ip_family.v6.value != 2 or address.family.v6.value != 6:
+        return 6
+    if url.error_kind.limit_exceeded.value != 5 or process.capture_end.cancelled.value != 4:
+        return 7
+    var absent = 0 as? json.error_kind
+    if not (absent is None):
+        return 8
+    var malformed = json.parse("{{")
+    if malformed is Err(var failure):
+        if failure.kind != json.error_kind.syntax or failure.code != 1:
+            return 9
+    else:
+        return 10
+    var nullable = present(io.open_mode.create_new)
+    if nullable is Ok(var mode):
+        if mode != io.open_mode.create_new:
+            return 11
+    else:
+        return 12
+    var labels: {io.error_kind: string} = {io.error_kind.closed: "closed"}
+    if labels[io.error_kind.closed] != io.error_kind.closed.name:
+        return 13
+    var bytes = binary.encode<u64>(u64.max_value, binary.byte_order.big)
+    if bytes != [255 as u8, 255, 255, 255, 255, 255, 255, 255]:
+        return 14
+    if convert.unwrap(binary.decode<u64>(bytes, binary.byte_order.big)) != u64.max_value:
+        return 15
+    if hex.encode([0 as u8, 15, 128, 255]) != "000f80ff":
+        return 16
+    if base64.encode([0 as u8, 15, 128, 255]) != "AA+A/w==":
+        return 17
+    if convert.unwrap(base64.decode("AA+A/w==")) != [0 as u8, 15, 128, 255]:
+        return 18
+    compile if target_os == "linux":
+        if os.platform() != "linux":
+            return 19
+    print("G88 standard library contracts passed")
+    return 0

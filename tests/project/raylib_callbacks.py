@@ -90,7 +90,7 @@ func entry(value: i32) -> i32:
         var status = rl.callback_close(registration as rl.callback_registration)
         registration = null
         return status
-    rl.trace_log(rl.log_warning, "retained code")
+    rl.trace_log(rl.trace_log_level.warning, "retained code")
     return (saved as capture).last
 ''')
         print(run(reload[0],reload_entry,native,library,library,native/f'raylib-{platform}.descriptor').strip())

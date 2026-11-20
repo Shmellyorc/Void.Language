@@ -4,8 +4,11 @@ use net/error as net_error
 
 ## Address-family filter. Each numeric address has a concrete family.
 enum family(u8):
+    ## Allow either family during resolution; not a concrete socket family.
     any = 0
+    ## IPv4, preserving native protocol code 4.
     v4 = 4
+    ## IPv6, preserving native protocol code 6.
     v6 = 6
 
 ## Validated IP address with a canonical numeric representation.
@@ -21,11 +24,16 @@ private func (self ip_address) init(canonical: string, selected: family, scope: 
 
 ## Numeric endpoint with a host-order port. Port zero requests ephemeral bind.
 value struct endpoint:
+    ## Validated numeric address, including its IPv6 scope.
     ip: ip_address
+    ## Host-order port; zero requests an ephemeral local bind.
     port: u16
 
+## Address filtering and bounded native DNS resolution.
 value struct resolve_options:
+    ## Requested address-family filter.
     family: family = family.any
+    ## Overall positive monotonic resolver deadline in milliseconds.
     timeout_ms: i64 = 5000
 
 private value struct _network_reply:
@@ -47,6 +55,8 @@ private func _error(operation: string, reply: _network_reply) -> net_error.error
         reply.cleanup, 0, reply.bytes, "", false, -1, 0)
 
 ## Parse a strict numeric IPv4 or IPv6 address, with an optional IPv6 numeric scope.
+## @param value Numeric IPv4 or IPv6 text; this call performs no DNS lookup.
+## @return Ok with canonical owned address text and scope, or a checked networking error.
 func parse_ip(value: string) -> result<ip_address, net_error.error>:
     var reply = _net_parse(value)
     if reply.kind != 0:
@@ -57,43 +67,56 @@ func parse_ip(value: string) -> result<ip_address, net_error.error>:
     return Ok(ip_address(reply.text, selected, reply.detail as u32))
 
 ## Canonical numeric IP without brackets or a port.
+## @param value Validated address to format.
+## @return Canonical numeric text without brackets or a port.
 func format_ip(value: ip_address) -> string:
     return value.numeric()
 
 ## Canonical endpoint, with brackets around IPv6.
+## @param value Typed address and host-order port.
+## @return Canonical address:port text, with brackets around IPv6.
 func format_endpoint(value: endpoint) -> string:
     var numeric = value.ip.numeric()
     if value.ip.address_family() == family.v6:
         return "[{numeric}]:{value.port}"
     return "{numeric}:{value.port}"
 
+## Return this address's concrete numeric family.
+## @return IPv4 or IPv6; never the resolution-only any filter.
 func (self ip_address) address_family() -> family:
     return self._family
 
 private func (self ip_address) numeric() -> string:
     return self._canonical
 
+## Return the numeric IPv6 scope retained during parsing.
+## @return Native interface scope index, or zero when no scope was supplied.
 func (self ip_address) scope_index() -> u32:
     return self._scope
 
+## Construct the IPv4 wildcard bind address.
+## @return 0.0.0.0 with no scope.
 func any_v4() -> ip_address:
     return ip_address("0.0.0.0", family.v4, 0)
 
+## Construct the IPv6 wildcard bind address.
+## @return :: with no scope.
 func any_v6() -> ip_address:
     return ip_address("::", family.v6, 0)
 
+## Construct the IPv4 loopback address.
+## @return 127.0.0.1 with no scope.
 func loopback_v4() -> ip_address:
     return ip_address("127.0.0.1", family.v4, 0)
 
+## Construct the IPv6 loopback address.
+## @return ::1 with no scope.
 func loopback_v6() -> ip_address:
     return ip_address("::1", family.v6, 0)
 
 internal func _family_code(selected: family) -> i64:
-    if selected == family.v4:
-        return 4
-    if selected == family.v6:
-        return 6
-    return 0
+    return selected as i64
+
 
 internal func _endpoint(numeric: string, port: i64) -> endpoint:
     return endpoint(ip = convert.unwrap(parse_ip(numeric)), port = port as u16)
@@ -107,10 +130,18 @@ private func _resolved(operation: string, reply: _network_reply, port: u16) -> r
     return Ok(endpoints)
 
 ## Resolve a numeric literal or ASCII DNS name to at most 32 distinct endpoints.
+## @param host Numeric literal or ASCII hostname; no URL parsing.
+## @param port Host-order port attached to each result.
+## @param options Family filter and overall resolver deadline.
+## @return At most 32 distinct owned endpoints, or a checked networking error.
 func resolve(host: string, port: u16, options: resolve_options = resolve_options()) -> result<[endpoint], net_error.error>:
     return _resolved("address.resolve", _net_resolve(host, port as i64, _family_code(options.family), options.timeout_ms), port)
 
 ## Resolve through the Runtime provider while the owner activation remains available.
+## @param host Numeric literal or ASCII hostname; no URL parsing.
+## @param port Host-order port attached to each result.
+## @param options Family filter and overall resolver deadline.
+## @return At most 32 distinct owned endpoints, or a checked networking error.
 async func resolve_async(host: string, port: u16, options: resolve_options = resolve_options()) -> result<[endpoint], net_error.error>:
     var reply = await _net_resolve_async(host, port as i64, _family_code(options.family), options.timeout_ms)
     return _resolved("address.resolve_async", reply, port)

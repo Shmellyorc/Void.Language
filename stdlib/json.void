@@ -17,33 +17,33 @@ enum value_kind:
     object
 
 ## Stable categories of recoverable JSON failures, in code order starting at 1.
-enum error_kind:
+enum error_kind(i32):
     ## Input does not follow the complete JSON grammar.
-    syntax
+    syntax = 1
     ## A Unicode escape contains an invalid scalar or surrogate pair.
-    invalid_unicode
+    invalid_unicode = 2
     ## Two object names decode to the same string.
-    duplicate_key
+    duplicate_key = 3
     ## A required property is absent, distinct from explicit null.
-    missing_property
+    missing_property = 4
     ## An array index has no corresponding element.
-    index_out_of_range
+    index_out_of_range = 5
     ## The value kind does not match the requested operation or type.
-    wrong_type
+    wrong_type = 6
     ## A number cannot be represented exactly or within the target range.
-    out_of_range
+    out_of_range = 7
     ## A typed floating value is NaN or infinity.
-    non_finite
+    non_finite = 8
     ## Text is not an exact payload-free enum case name.
-    invalid_enum
+    invalid_enum = 9
     ## An object contains a name absent from the requested schema.
-    unknown_property
+    unknown_property = 10
     ## An array has the wrong fixed extent.
-    length_mismatch
+    length_mismatch = 11
     ## An operation would exceed its configured resource budget.
-    limit_exceeded
+    limit_exceeded = 12
     ## A supplied limit is nonpositive or depth exceeds 128.
-    invalid_limits
+    invalid_limits = 13
 
 ## Whether typed decoding admits extra object properties.
 enum unknown_fields:
@@ -54,7 +54,7 @@ enum unknown_fields:
 
 ## Recoverable JSON failure. Inherited path is a JSON Pointer relative to this operation.
 struct error extends core.error:
-    ## Stable module category; inherited code is its one-based declaration index.
+    ## Stable module category; inherited code is its explicit numeric value.
     kind: error_kind
     ## Original zero-based UTF-8 byte position, or -1 for converted values.
     offset: i64
@@ -105,36 +105,6 @@ private func (self value) init(payload: _payload, offset: i64 = -1):
 private func _decode(const bytes: [u8]) -> string:
     return convert.unwrap(string.from_utf8(bytes))
 
-private func _code(kind: error_kind) -> i32:
-    match kind:
-        error_kind.syntax:
-            return 1
-        error_kind.invalid_unicode:
-            return 2
-        error_kind.duplicate_key:
-            return 3
-        error_kind.missing_property:
-            return 4
-        error_kind.index_out_of_range:
-            return 5
-        error_kind.wrong_type:
-            return 6
-        error_kind.out_of_range:
-            return 7
-        error_kind.non_finite:
-            return 8
-        error_kind.invalid_enum:
-            return 9
-        error_kind.unknown_property:
-            return 10
-        error_kind.length_mismatch:
-            return 11
-        error_kind.limit_exceeded:
-            return 12
-        error_kind.invalid_limits:
-            return 13
-    return 0
-
 private func _segment(name: string) -> string:
     var bytes: [u8] = []
     for byte in name.to_utf8():
@@ -149,7 +119,7 @@ private func _segment(name: string) -> string:
     return _decode(bytes)
 
 private func _error(kind: error_kind, offset: i64, path: string = "", detail: string = "JSON operation failed") -> error:
-    return error(message = detail, code = _code(kind), path = path, kind = kind, offset = offset)
+    return error(message = detail, code = kind.value, path = path, kind = kind, offset = offset)
 
 private struct _context:
     budget: limits
@@ -469,9 +439,16 @@ private func (self _scanner) number() -> result<string, error>:
     var token = _decode(self.bytes[start..<self.cursor])
     return Ok(token)
 
+# Parser states are source-only; byte tokens and resource counters remain numeric.
+private enum _parse_phase:
+    first
+    after_value
+    after_comma
+    object_value
+
 private struct _parse_frame:
     object: bool
-    phase: i32
+    phase: _parse_phase = _parse_phase.first
     start: i64
     items: [value]
     members: [_member]
@@ -494,7 +471,7 @@ private func (self _parse_frame) attach(child: value):
         self.key = ""
     else:
         self.items.push(child)
-    self.phase = 1
+    self.phase = _parse_phase.after_value
 
 private func _parse(text: string, context: _context) -> result<value, error>:
     context.location = 0
@@ -516,14 +493,14 @@ private func _parse(text: string, context: _context) -> result<value, error>:
                 closing = 125
             if scanner.cursor >= scanner.bytes.count:
                 return Err(context.fail(error_kind.syntax, "Unterminated JSON container", scanner.cursor))
-            if frame.phase == 1:
+            if frame.phase == _parse_phase.after_value:
                 if scanner.bytes[scanner.cursor] == closing:
                     close = true
                 else:
                     var comma = scanner.expect(44)?
-                    frame.phase = 2
+                    frame.phase = _parse_phase.after_comma
                     continue
-            else if frame.phase == 0 and scanner.bytes[scanner.cursor] == closing:
+            else if frame.phase == _parse_phase.first and scanner.bytes[scanner.cursor] == closing:
                 close = true
             if close:
                 var end = scanner.take()?
@@ -531,7 +508,7 @@ private func _parse(text: string, context: _context) -> result<value, error>:
                 completed = popped.finish()
                 if popped.nested:
                     var segment = context.path.remove_at(context.path.count - 1)
-            else if frame.object and frame.phase != 3:
+            else if frame.object and frame.phase != _parse_phase.object_value:
                 if frame.members.count >= context.budget.max_object_members:
                     return Err(context.fail(error_kind.limit_exceeded, "max_object_members", scanner.cursor))
                 var key_offset = scanner.cursor
@@ -546,7 +523,7 @@ private func _parse(text: string, context: _context) -> result<value, error>:
                 frame.key_offset = key_offset
                 var space = scanner.whitespace()?
                 var colon = scanner.expect(58)?
-                frame.phase = 3
+                frame.phase = _parse_phase.object_value
                 continue
         if completed == null:
             if frames.count > 0:

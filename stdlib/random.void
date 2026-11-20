@@ -44,9 +44,9 @@ value struct generator:
     private s3: u64
 
 private func _mix(value: u64) -> u64:
-    var word = _random_xor(value, value / 1073741824) * (13787848793156543929 as u64)
-    word = _random_xor(word, word / 134217728) * (10723151780598845931 as u64)
-    return _random_xor(word, word / (2147483648 as u64))
+    var word = (value ^ (value >> 30)) * (13787848793156543929 as u64)
+    word = (word ^ (word >> 27)) * (10723151780598845931 as u64)
+    return word ^ (word >> 31)
 
 ## Construct a deterministic independent stream without requesting OS entropy.
 ## @param seed Exact u64 seed, including zero and u64.max_value.
@@ -67,14 +67,14 @@ func (self generator) seed(value: u64):
 
 private func (self generator) _word() -> u64:
     var product = self.s1 * 5
-    var output = (product * 128 + product / (144115188075855872 as u64)) * 9
-    var shifted = self.s1 * 131072
-    self.s2 = _random_xor(self.s2, self.s0)
-    self.s3 = _random_xor(self.s3, self.s1)
-    self.s1 = _random_xor(self.s1, self.s2)
-    self.s0 = _random_xor(self.s0, self.s3)
-    self.s2 = _random_xor(self.s2, shifted)
-    self.s3 = self.s3 * (35184372088832 as u64) + self.s3 / 524288
+    var output = ((product << 7) | (product >> 57)) * 9
+    var shifted = self.s1 << 17
+    self.s2 ^= self.s0
+    self.s3 ^= self.s1
+    self.s1 ^= self.s2
+    self.s0 ^= self.s3
+    self.s2 ^= shifted
+    self.s3 = (self.s3 << 45) | (self.s3 >> 19)
     return output
 
 private func _ordinal<t>(value: t) -> u64:

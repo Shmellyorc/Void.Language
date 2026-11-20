@@ -14,6 +14,7 @@ from owned_bindings import OWNERS, extend
 from callback_bindings import extend as callback_extensions
 from public_docs import verify_public_api
 from names import abi_snake, canonical_name, snake
+from enums import ENUMS, member_name, verify_enums
 
 TOOLS = Path(__file__).resolve().parent
 ROOT = TOOLS.parents[1] / "verified-packages/raylib"
@@ -213,7 +214,7 @@ def generate(clang):
         known_record=canonical in POD or canonical in OWNERS
         inventory['typedefs'].append({'name': n['name'], 'c_declaration': declaration(text, n), 'native_abi': n['type']['qualType'],
             'void_name': abi_snake(canonical) if known_record else 'transform_array' if n['name']=='ModelAnimPose' else None,
-            'implementation': 'alias to exact native record/owner' if known_record else 'extent-checked transform-array view' if n['name']=='ModelAnimPose' else 'enumerator constants' if enum_id(n) in enum_by_id else 'opaque internal audio pointer' if n['name'] in ('rAudioBuffer','rAudioProcessor') else 'technically unsupported context-free callback; exact C signature asserted' if 'Callback' in n['name'] else 'C compatibility typedef',
+            'implementation': 'alias to exact native record/owner' if known_record else 'extent-checked transform-array view' if n['name']=='ModelAnimPose' else 'typed source enum; explicit primitive native conversions' if enum_id(n) in enum_by_id else 'opaque internal audio pointer' if n['name'] in ('rAudioBuffer','rAudioProcessor') else 'technically unsupported context-free callback; exact C signature asserted' if 'Callback' in n['name'] else 'C compatibility typedef',
             'compile_verification': 'Clang AST; native/raylib_parity.h', 'test_coverage': 'inventory parity'})
         if enum_id(n) not in enum_by_id:
             continue
@@ -229,11 +230,11 @@ def generate(clang):
                         return found
             explicit = find_value(f)
             value = value + 1 if explicit is None else explicit
-            values.append({'name': f['name'], 'value': value, 'void_name': f['name'].lower()})
+            values.append({'name': f['name'], 'value': value, 'void_name': ENUMS[n['name']][0] + '.' + member_name(f['name'], ENUMS[n['name']][1])})
             checks.append(f'_Static_assert({f["name"]} == {value}, "{f["name"]} value");')
         inventory['enumerations'].append({'name': n['name'], 'c_declaration': declaration(text, en), 'values': values,
             'native_abi': 'C int constants; bitmask values preserved', 'ownership': 'value',
-            'implementation': 'generated i32 constants', 'compile_verification': 'native/raylib_parity.h', 'test_coverage': 'all enumerator value assertions'})
+            'void_name': ENUMS[n['name']][0], 'implementation': 'typed source flags enum' if ENUMS[n['name']][3] else 'typed source numeric enum', 'compile_verification': 'native/raylib_parity.h', 'test_coverage': 'all enumerator value assertions'})
     for m in re.finditer(r'^#define\s+(\w+)([^\n]*)', text, re.M):
         name, definition = m[1], m[2].split('//')[0].strip()
         color = re.fullmatch(r'CLITERAL\(Color\)\{\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+)\s*\}', definition)
@@ -264,6 +265,7 @@ def generate(clang):
             legacy = entry.get('void_name')
             if legacy and (preferred := canonical_name(legacy)) != legacy:
                 entry.update(public_name=preferred)
+    verify_enums((ROOT / "src/raylib.void").read_text(), inventory["enumerations"])
     verify_public_api((ROOT / 'src/raylib.void').read_text(), nodes, inventory, snake)
     return {'inventory.json': json.dumps(inventory, indent=2) + '\n',
             'native/raylib_api.h': '\n'.join(declarations) + '\n', 'native/raylib_api.c': '\n'.join(c) + '\n',

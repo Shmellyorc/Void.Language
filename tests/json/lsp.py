@@ -84,9 +84,11 @@ with tempfile.TemporaryDirectory(prefix='void-json-lsp-') as tmp:
                 check('_json_' not in str(result),result)
             replace('use json as json\nfunc main():\n    if json.parse("0") is Ok(var node):\n        var result = node.as_number<u64>(')
             result=query('signatureHelp','node.as_number<u64>(',len('node.as_number<u64>('),context={'triggerKind':1,'isRetrigger':False})
-            # The accepted documentation contract suppresses signature help
-            # without an active documented argument, including zero-arg methods.
-            check(result is None,result)
+            # G76 recovery retains a callable signature for zero-argument
+            # methods even though there is no active parameter documentation.
+            check(bool(result) and len(result['signatures']) == 1, result)
+            check(result['signatures'][0]['label'].startswith('as_number() -> '), result)
+            check(result['signatures'][0]['parameters'] == [], result)
             replace(base)
             denied=client.request('textDocument/rename',{'textDocument':{'uri':entry.as_uri()},'position':point(text,'json.parse_as',6),'newName':'changed'})[0]
             check('read-only' in str(denied),denied)

@@ -8,19 +8,20 @@ use text as strings
 use error as core
 
 ## Record severity and inclusive filtering threshold; off cannot be emitted.
-enum level:
+## Numeric values preserve the established ordering from trace (0) through off (5).
+enum level(i32):
     ## Most detailed application diagnostics.
-    trace
+    trace = 0
     ## Development diagnostics.
-    debug
+    debug = 1
     ## Ordinary application events; the default threshold.
-    info
+    info = 2
     ## Recoverable application problems.
-    warn
+    warn = 3
     ## Application errors; logging does not terminate execution.
-    error
+    error = 4
     ## Disable every record.
-    off
+    off = 5
 
 ## Borrowed standard output destination.
 enum console_sink:
@@ -243,22 +244,6 @@ private func (self logger) _enter(guard: _guard):
     guard.active = true
     self._busy = true
 
-private func _rank(value: level) -> i32:
-    match value:
-        level.trace:
-            return 0
-        level.debug:
-            return 1
-        level.info:
-            return 2
-        level.warn:
-            return 3
-        level.error:
-            return 4
-        level.off:
-            return 5
-    return -1
-
 private func _label(value: level) -> string:
     match value:
         level.trace:
@@ -279,11 +264,11 @@ private func _label(value: level) -> string:
 ## @param severity Record severity; off is always false.
 ## @return True when this severity passes the configured threshold.
 func (self logger) enabled(severity: level) -> bool:
-    var rank = _rank(severity)
-    return rank >= 0 and rank < 5 and rank >= _rank(self._options.minimum)
+    var rank = severity.value
+    return rank >= 0 and rank < 5 and rank >= self._options.minimum.value
 
 private func (self logger) _admit(severity: level) -> result<bool, failure>:
-    if _rank(severity) < 0 or (severity is level.off):
+    if severity.value < 0 or (severity is level.off):
         return Err(_reason(failure_kind.invalid_level, "write", "Invalid record severity"))
     if self._closed or self._terminal:
         return Err(_reason(failure_kind.closed, "write", "Logger is closed"))
@@ -387,7 +372,7 @@ private func _quote(text: string, budget: i64) -> result<string, failure>:
 private func _validate(options: config) -> result<bool, failure>:
     var valid_console = (options.console is console_sink.none) or (options.console is console_sink.stdout) or (options.console is console_sink.stderr)
     var valid_existing = (options.existing is existing_files.reject) or (options.existing is existing_files.adopt)
-    if _rank(options.minimum) < 0 or not valid_console or not valid_existing:
+    if options.minimum.value < 0 or not valid_console or not valid_existing:
         return Err(_reason(failure_kind.invalid_config, "configure", "Invalid enum setting"))
     if options.rotation_bytes <= 0 or options.max_record_bytes <= 0 or options.backups < 0 or options.backups > 32:
         return Err(_reason(failure_kind.invalid_config, "configure", "Invalid size or backup count"))

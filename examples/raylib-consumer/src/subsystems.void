@@ -5,7 +5,7 @@ use convert as conversion
 
 # Each nonzero return identifies a native subsystem or ownership assertion.
 func headless() -> i32:
-    rl.set_trace_log_level(rl.log_warning)
+    rl.set_trace_log_level(rl.trace_log_level.warning)
     if rl.load_image("/__void_raylib_missing__/image.png") != null or rl.load_wave("/__void_raylib_missing__/sound.wav") != null:
         return 127
     var bytes = rl.buffer_from_bytes("hello é🎮".to_utf8())
@@ -215,7 +215,7 @@ func graphics() -> i32:
     if os.platform() != "windows" and gpu.mipmaps < 2:
         return 160
     var material_data = rl.load_material_default() as rl.material
-    rl.set_material_texture(material_data, rl.material_map_albedo, gpu)
+    rl.set_material_texture(material_data, rl.material_map_index.albedo, gpu)
     rl.unload_material(material_data)
     var generated = rl.gen_mesh_cube(2 as f32, 2 as f32, 2 as f32) as rl.mesh
     var scene = rl.load_model_from_mesh(generated) as rl.model
@@ -289,8 +289,8 @@ func graphics() -> i32:
         if location < 0:
             return 180
         var uniform_bytes = rl.buffer_from_bytes([12,0,0,0,34,0,0,0,56,0,0,0,255,0,0,0])
-        rl.set_shader_value_v(custom_program, location, uniform_bytes, rl.shader_uniform_uivec4, 1)
-        rl.set_shader_value(custom_program, -1, uniform_bytes, rl.shader_uniform_sampler2d)
+        rl.set_shader_value_v(custom_program, location, uniform_bytes, rl.shader_uniform_type.uivec4, 1)
+        rl.set_shader_value(custom_program, -1, uniform_bytes, rl.shader_uniform_type.sampler2d)
         rl.buffer_close(uniform_bytes)
         var custom_target = rl.load_render_texture(16, 16) as rl.render_texture
         rl.begin_texture_mode(custom_target)
@@ -314,7 +314,7 @@ func graphics() -> i32:
 func graphics_assets(directory: string) -> i32:
     var font_data = rl.load_file_data(directory + "/font.ttf") as rl.byte_buffer
     var points = rl.int_array_from([65, 66, 67])
-    var glyphs = rl.load_font_data(font_data, rl.buffer_bytes(font_data).count as i32, 20, points, 3, rl.font_default) as rl.glyph_info_array
+    var glyphs = rl.load_font_data(font_data, rl.buffer_bytes(font_data).count as i32, 20, points, 3, rl.font_type.default) as rl.glyph_info_array
     var glyph_count = rl.glyph_info_array_count(glyphs) as i32
     if glyph_count != 3:
         return 171

@@ -25,11 +25,11 @@ func post(target: string, token: string) -> i32:
                         if reply.require_success() is Ok(var passed):
                             return 0
                     else if response_result is Err(var failure):
-                        print("HTTP {failure.kind}, phase {failure.phase}")
+                        print("HTTP {failure.kind.name}, phase {failure.phase.name}")
         else if client_result is Err(var failure):
-            print("HTTP configuration {failure.kind}")
+            print("HTTP configuration {failure.kind.name}")
     else if encoded_result is Err(var failure):
-        print("JSON {failure.kind} at byte {failure.offset}")
+        print("JSON {failure.kind.name} at byte {failure.offset}")
     return 1
 
 if os.env("VOID_HTTP_URL") is Ok(var target):

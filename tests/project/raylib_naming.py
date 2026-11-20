@@ -25,12 +25,12 @@ func headless() -> i32:
     var spatial = rl.camera_3d()
     if flat.zoom != 1 or flat.rotation != 0 or flat.offset.x != 0 or flat.target.y != 0:
         return 1
-    if spatial.position.z != 1 or spatial.target.z != 0 or spatial.up.y != 1 or spatial.fovy != 45 or spatial.projection != rl.camera_perspective:
+    if spatial.position.z != 1 or spatial.target.z != 0 or spatial.up.y != 1 or spatial.fovy != 45 or spatial.projection != rl.camera_projection.perspective.value:
         return 2
     if global_2d.target.x != 3 or global_2d.target.y != 4 or global_2d.zoom != 1 or global_3d.fovy != 60 or partial_global.zoom != 3:
         return 3
-    var selected = rl.camera_3d(projection = rl.camera_orthographic, fovy = 10)
-    if selected.fovy != 10 or selected.projection != rl.camera_orthographic or selected.up.y != 1:
+    var selected = rl.camera_3d(projection = rl.camera_projection.orthographic, fovy = 10)
+    if selected.fovy != 10 or selected.projection != rl.camera_projection.orthographic.value or selected.up.y != 1:
         return 4
     var local = rl.camera_2d(zoom = 2)
     var point = rl.vector2(10, 20)
@@ -43,7 +43,7 @@ func headless() -> i32:
     var matrix = rl.get_camera_matrix_2d(local)
     if matrix.m0 != 2 or matrix.m15 != 1:
         return 7
-    var equivalent = rl.camera_3d(rl.vector3(4, 5, 6), rl.vector3(1, 2, 3), rl.vector3(0, 1, 0), 70, rl.camera_perspective)
+    var equivalent = rl.camera_3d(rl.vector3(4, 5, 6), rl.vector3(1, 2, 3), rl.vector3(0, 1, 0), 70, rl.camera_projection.perspective)
     if equivalent.position.x != 4 or equivalent.target.y != 2 or equivalent.fovy != 70:
         return 8
     var identity = rl.matrix()
@@ -61,14 +61,14 @@ func headless() -> i32:
         return 11
     if opaque.r != 255 as u8 or opaque.a != 255 as u8 or empty.width != 0 or forward.direction.z != -1:
         return 12
-    if miss.hit or bounds.min.x != 0 or bounds.max.x != 0 or patch.layout != rl.npatch_nine_patch:
+    if miss.hit or bounds.min.x != 0 or bounds.max.x != 0 or patch.layout != rl.n_patch_layout.nine_patch.value:
         return 13
     print("raylib numeric names, ABI values, local/global partial values and canonical spellings passed")
     return 0
 
 func graphics() -> i32:
-    rl.set_trace_log_level(rl.log_warning)
-    rl.set_config_flags(rl.flag_window_hidden as u32)
+    rl.set_trace_log_level(rl.trace_log_level.warning)
+    rl.set_config_flags(rl.config_flags.window_hidden)
     var owner = rl.init_window(64, 64, "raylib numeric names") as rl.window
     defer rl.close_window(owner)
     var color_value = rl.white()

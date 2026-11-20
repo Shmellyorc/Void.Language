@@ -96,7 +96,7 @@ def configuration_cases(work):
     invalid_unicode = b'{"player":"\\uD800","audio":{}}'
     duplicate = b'{"player":"A","audio":{"music":true,"\\u006dusic":false}}'
     excess_nodes = b'{"player":"A","audio":{},"extra":[' + b','.join([b'0'] * 61) + b']}'
-    io_error = b"input /@stdlib/io.void::error_kind."
+    io_error = b"input "
     loaded = "初雪 music=true volume=60\n".encode()
     cases = [
         ("defaults", default, 0, loaded),

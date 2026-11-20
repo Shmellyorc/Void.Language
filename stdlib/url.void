@@ -2,12 +2,12 @@ use error as core
 
 
 ## Recoverable URL and percent/query construction failures.
-enum error_kind:
-    invalid_url
-    invalid_encoding
-    invalid_utf8
-    unsupported_scheme
-    limit_exceeded
+enum error_kind(i64):
+    invalid_url = 1
+    invalid_encoding = 2
+    invalid_utf8 = 3
+    unsupported_scheme = 4
+    limit_exceeded = 5
 
 
 ## Safe diagnostics omit the URL, userinfo and query contents.
@@ -73,14 +73,8 @@ func (self address) to_string() -> string:
 
 private func _error(operation: string, reply: _reply) -> error:
     var kind = error_kind.invalid_url
-    if reply.kind == 2:
-        kind = error_kind.invalid_encoding
-    else if reply.kind == 3:
-        kind = error_kind.invalid_utf8
-    else if reply.kind == 4:
-        kind = error_kind.unsupported_scheme
-    else if reply.kind == 5:
-        kind = error_kind.limit_exceeded
+    if reply.kind as? error_kind is Some(var decoded):
+        kind = decoded
     return error(message = "URL operation rejected its input", code = reply.kind as i32,
         kind = kind, operation = operation, offset = reply.offset)
 
@@ -105,30 +99,37 @@ func parse(value: string) -> result<address, error>:
 
 
 ## Resolve a relative reference through the same CURLU parser/security profile.
+## @param base Absolute HTTP(S) base URL, validated through the shared parser.
+## @param reference Relative or absolute reference; the resolved URL must satisfy the same profile.
 ## @return Immutable resolved HTTP(S) address, or a safe recoverable error.
 func resolve(base: string, reference: string) -> result<address, error>:
     return _address("resolve", _url_resolve(base, reference))
 
 
 ## Canonicalize authority; path dot removal is an explicit option.
+## @param value Absolute HTTP(S) URL to validate and normalize.
+## @param remove_dot_segments Whether to request provider dot-segment removal; false preserves encoded path dots.
 ## @return Canonical encoded URL without changing reserved escapes or query order.
 func normalize(value: string, remove_dot_segments: bool = false) -> result<string, error>:
     return _text("normalize", _url_parse(value, remove_dot_segments))
 
 
 ## Encode UTF-8 bytes, preserving only ASCII unreserved bytes.
+## @param value Immutable Unicode text; every UTF-8 byte outside the unreserved set is escaped.
 ## @return Uppercase percent escapes; space is %20 and literal plus is %2B.
 func encode_component(value: string) -> string:
     return _url_encode(value, false).text
 
 
 ## Decode strict percent triplets; literal plus remains plus.
+## @param value Percent-encoded component; malformed triplets or invalid decoded UTF-8 return Err.
 ## @return Strict UTF-8 text, allowing decoded NUL as ordinary string data.
 func decode_component(value: string) -> result<string, error>:
     return _text("decode_component", _url_decode(value, false, true))
 
 
 ## Decode percent triplets into arbitrary owned bytes.
+## @param value Percent-encoded bytes; decoded NUL and non-UTF-8 bytes are allowed.
 ## @return Independent bytes, or an error with an attributable escape offset.
 func decode_bytes(value: string) -> result<[u8], error>:
     var reply = _url_decode(value, false, false)
@@ -138,12 +139,17 @@ func decode_bytes(value: string) -> result<[u8], error>:
 
 
 ## Encode ordered query pairs once; form mode maps spaces to plus.
+## @param items Readonly ordered pairs; duplicate names and has_value=false bare flags are preserved.
+## @param form Encode spaces as plus instead of %20; literal plus is still escaped.
 ## @return At most 16 KiB of encoded query text, retaining duplicates/bare flags.
 func encode_query(const items: [query_item], form: bool = false) -> result<string, error>:
     return _text("encode_query", _url_encode_query(items, form))
 
 
 ## Split encoded separators before strict percent and UTF-8 decoding.
+## @param value Encoded query text without the leading question mark.
+## @param form Decode plus as space; false preserves literal plus.
+## @param max_items Nonnegative maximum decoded pair count; zero accepts only an empty query.
 ## @return Owned ordered pairs; an empty query yields an empty list.
 func parse_query(value: string, form: bool = false, max_items: i64 = 1024) -> result<[query_item], error>:
     var reply = _url_parse_query(value, form, max_items)
@@ -153,6 +159,8 @@ func parse_query(value: string, form: bool = false, max_items: i64 = 1024) -> re
 
 
 ## Replace a validated URL's query, preserving path and fragment.
+## @param value Absolute HTTP(S) URL validated through the shared parser.
+## @param items Readonly ordered replacement pairs; an empty list removes the query.
 ## @return Canonical URL with exactly one query encoding; empty items remove query.
 func with_query(value: string, const items: [query_item]) -> result<string, error>:
     return _text("with_query", _url_with_query(value, items))
