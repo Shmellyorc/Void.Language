@@ -569,6 +569,26 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/enums/lsp.py" "$<TARGET_FILE:voidls>"
     "${CMAKE_CURRENT_BINARY_DIR}/g78-enum-lsp-results.json")
   set_tests_properties(lsp_enum_completeness PROPERTIES TIMEOUT 180)
+  add_test(NAME static_members_imported_owners COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/static_members/imported_owners.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g81-imported-owners-results.json")
+  set_tests_properties(static_members_imported_owners PROPERTIES TIMEOUT 180)
+  add_test(NAME integer_bitwise_patterns COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/bitwise/patterns.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g81-pattern-correction-results.json")
+  set_tests_properties(integer_bitwise_patterns PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_integer_bitwise COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/bitwise/lsp.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g81-bitwise-lsp-results.json")
+  set_tests_properties(lsp_integer_bitwise PROPERTIES TIMEOUT 180)
+  add_test(NAME integer_bitwise_completeness COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/bitwise/completeness.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g81-integer-bitwise-results.json")
+  set_tests_properties(integer_bitwise_completeness PROPERTIES TIMEOUT 300)
+  add_executable(void_integer_bitwise tests/bitwise/runtime.cpp)
+  target_link_libraries(void_integer_bitwise PRIVATE void_llvm void_runtime)
+  add_test(NAME integer_bitwise_runtime COMMAND void_integer_bitwise)
+  set_tests_properties(integer_bitwise_runtime PROPERTIES TIMEOUT 180)
   add_test(NAME static_members_generic_results COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/static_members/nested_generics.py" "$<TARGET_FILE:voidc>"
     "${CMAKE_CURRENT_BINARY_DIR}/g80-nested-generic-results.json")

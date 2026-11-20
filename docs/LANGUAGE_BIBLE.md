@@ -338,6 +338,16 @@ set_speed(0.5)
 
 Explicit conversions that may lose precision need an explicit `as`; implicit conversions of existing variables should not silently discard precision. Overflow, integer literal boundaries, `NaN`, and floating-point rounding details require exact specifications and tests.
 
+G81 implements exact-width integer `&`, `|`, `^`, `~`, `<<`, `>>` and their
+compound assignments. Shift counts are any fixed-width integer, modulo the left
+value's width; signed right shifts extend the sign bit. Counts of zero or a
+multiple of the width leave the value unchanged, and `-1` shifts by width minus
+one. Shifts bind below addition and above bitwise AND, associating left to right.
+No integer promotion, undefined shift behavior, Boolean/float operations or enum
+shifts are introduced. G78 flags retain their nominal bitwise rules. See
+[the exact numeric contract](NUMERIC_TYPES.md#integer-bitwise-and-shifts-g81) and
+[executable packed-data example](../examples/learn/integer_bitwise.void).
+
 ## 7. Automatic default initialization [AGREED]
 
 Every safe-language field/variable without an initializer must receive a valid default appropriate to its type. No uninitialized garbage values are observable through safe VOID.
@@ -3176,7 +3186,7 @@ The built-in game API is optional. This is intended to feel PICO-8-like without 
 | Match omissions | Statement warns/no-op; expression warns/runtime error if unmatched |
 | Errors | `result<t,e>`, `Ok`, `Err`, propagation `?`, panic distinct from errors |
 | Iteration | Only `for`: iterable/range traversal, Boolean condition, or unbounded `for:`; optional index/key, `reverse`, `break`, `continue` |
-| Operators | `and`/`or`/`not`; arithmetic compound assignments; postfix statement-only `++`/`--` |
+| Operators | `and`/`or`/`not`; exact-width integer bitwise/shifts and compound assignments; arithmetic assignments; postfix statement-only `++`/`--` |
 | Generics | `<>`, inference, interface constraints, no arbitrary parameter-count cap |
 | Collections | `[]` growable/fixed arrays, `{}` dictionaries, no compiler-special stack/queue |
 | Defaults | No uninitialized garbage data visible through safe VOID |

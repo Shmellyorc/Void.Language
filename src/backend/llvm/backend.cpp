@@ -2912,6 +2912,18 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 case Op::bit_or: v=b.CreateOr(values[instruction.a],values[instruction.b]);break;
                 case Op::bit_xor: v=b.CreateXor(values[instruction.a],values[instruction.b]);break;
                 case Op::bit_not: v=b.CreateNot(values[instruction.a]);break;
+                case Op::shift_left: case Op::shift_right: {
+                    auto* left=values[instruction.a];auto* count=values[instruction.b];
+                    // Counts are integer bit patterns, modulo the value width.
+                    // Mask in the original count type before converting to the
+                    // LLVM-required matching operand width. Never set nsw/nuw/exact.
+                    const auto width=left->getType()->getIntegerBitWidth();
+                    count=b.CreateAnd(count,llvm::ConstantInt::get(count->getType(),width-1));
+                    count=b.CreateZExtOrTrunc(count,left->getType());
+                    v=instruction.op==Op::shift_left?b.CreateShl(left,count):
+                      numeric::signed_integer(value_types[instruction.a])?b.CreateAShr(left,count):b.CreateLShr(left,count);
+                    break;
+                }
                 case Op::negate: v = values[instruction.a]->getType()->isFloatingPointTy() ? b.CreateFNeg(values[instruction.a]) : b.CreateNeg(values[instruction.a]); break;
                 case Op::upcast: case Op::stage_prefix: v=values[instruction.a]; break;
                 case Op::math: {

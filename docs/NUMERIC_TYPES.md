@@ -50,6 +50,69 @@ additional fallible categories and `??` remain outside this slice.
 See [enums and flags](ENUMS.md) and [G78 evidence](projects/G78_ENUM_COMPLETENESS.md).
 The older nullable-cast proposal remains superseded for this conversion family.
 
+## Integer bitwise and shifts (G81)
+
+All eight fixed-width integers support `&`, `|`, `^`, `~`, `<<`, `>>` and
+`&=`, `|=`, `^=`, `<<=`, `>>=`. Results retain the exact value type: an `u8`
+operation returns `u8`, without promotion to i32. AND/OR/XOR require equal operand
+types, with the usual contextual interpretation of unsuffixed literals.
+Complement reverses exactly the declared number of bits.
+
+Shifts take an integer value on the left and **any fixed-width integer count**
+on the right. The count's type does not choose or widen the value type. An
+untyped count defaults independently to i32; explicitly type larger literals.
+The value uses its ordinary annotation/argument/return context. Established
+operand types still require explicit conversions when different types are wanted.
+
+For an N-bit value the effective count is the count's low `log2(N)` bits,
+equivalently mathematical modulo N. This policy applies identically to constants
+and runtime, Debug/Release, JIT/AOT and O0/O2:
+
+| Count | Effective count |
+| --- | --- |
+| `0`, `N`, `2*N` | `0` (value unchanged) |
+| `N-1`, `-1` | `N-1` |
+| `N+1`, `1-N` | `1` |
+| `-N` | `0` |
+
+`<<` inserts zero low bits and discards high bits outside the result width.
+Signed `>>` extends the sign bit (arithmetic shift); unsigned `>>` inserts zeros
+(logical shift). These are bit-pattern operations, not checked multiplication or
+division; shifting a negative value or shifting into the sign bit is defined.
+No count produces undefined behavior or LLVM poison.
+
+```void
+var mask: u8 = 1 << 7       # 128, still u8
+mask >>= 8                 # 128: count wraps modulo eight
+var signed: i8 = -4
+signed >>= 1               # -2: sign extending
+var high: u8 = 1 << -1      # 128: -1 modulo eight is seven
+var count: u64 = 9
+var byte: u8 = 1 << count   # 2: no promotion from the count type
+```
+
+From weaker to stronger, binary precedence is `or`, `and`, comparisons/`is`,
+`|`, `^`, `&`, shifts, addition/subtraction, multiplication/division/remainder,
+then conversions. Binary shifts associate left to right: `32 >> 1 >> 2` is
+`(32 >> 1) >> 2`, and `1 << 2 + 1` is `1 << (2 + 1)`. Unary complement follows
+ordinary unary binding. Use parentheses to make masks and comparisons obvious.
+Shift glyphs are adjacent characters; `< <` and `> >` are not shifts. Nested
+generic closers such as `box<box<u32>>` remain valid.
+
+Compound assignments reuse ordinary mutable-place rules, including readonly
+fields/collections and static/global state. The target selection and count are
+evaluated once, in the existing compound-assignment order. Generic bodies are
+checked for each concrete specialization; unsupported operand types diagnose.
+
+Booleans, floating-point values, ordinary enums and nullable values do not gain
+integer bitwise operations. [Flags enums](ENUMS.md) retain their existing nominal
+AND/OR/XOR/complement rules; **neither enum family supports shifts**, including
+as counts. Extract an integer `.value` or use an explicit checked conversion.
+Custom bitwise/shift operator declarations and `>>>` are not supported.
+Decimal literal spelling is unchanged; hexadecimal/binary literal syntax is not
+part of G81. See the runnable [masks and packed bytes example](../examples/learn/integer_bitwise.void)
+and [implementation/qualification record](projects/G81_INTEGER_BITWISE.md).
+
 ## Existing numeric contract
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.

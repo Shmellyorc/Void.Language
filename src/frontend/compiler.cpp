@@ -371,6 +371,9 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
             emit(TokenKind::number, text.substr(start, p - start), start); continue;
         }
         if(text.substr(p,2)=="..") {auto op=text.substr(p,3)=="..<" ? "..<" : "..";p+=std::string_view(op).size();emit(TokenKind::symbol,op,start);continue;}
+        if(text.substr(p,3)=="<<=" || text.substr(p,3)==">>=") {
+            p+=3;emit(TokenKind::symbol,text.substr(start,3),start);continue;
+        }
         std::string pair = text.substr(p, 2);
         if (pair == "->" || pair == "==" || pair == "!=" || pair == "<=" || pair == ">=" || pair == "+=" ||
             pair == "&=" || pair == "|=" || pair == "^=" || pair == "-=" || pair == "*=" || pair == "/=" || pair == "%=" || pair == "++" || pair == "--") {
@@ -996,6 +999,7 @@ class Parser {
     bool type_call(bool value=false,bool relationship=false,std::size_t start=std::string::npos) const {
         if(start==std::string::npos)start=p;
         if(start>=tokens.size() || tokens[start].text!="<")return false;
+        if(binary_operator(start)=="<<")return false;
         unsigned nesting=0;
         for(auto n=start;n<tokens.size();++n) {
             if(tokens[n].text=="<")++nesting;
@@ -1123,6 +1127,17 @@ class Parser {
     }
 #include "pattern_parser.inc"
 #include "enum_parser.inc"
+    // Keep angle tokens separate for nested generic types. Only adjacent,
+    // equal angles in expression position form a shift (not `< <` or `> >`).
+    std::string binary_operator(std::size_t start=std::string::npos) const {
+        if(start==std::string::npos)start=p;
+        if(start>=tokens.size())return {};
+        const auto& first=tokens[start];
+        if((first.text=="<" || first.text==">") && start+1<tokens.size() &&
+           tokens[start+1].text==first.text && tokens[start+1].offset==first.offset+1)
+            return first.text+tokens[start+1].text;
+        return first.text;
+    }
     static int precedence(const std::string& op) {
         if (op == "or") return 1;
         if (op == "and") return 2;
@@ -1131,8 +1146,9 @@ class Parser {
         if (op == "|") return 4;
         if (op == "^") return 5;
         if (op == "&") return 6;
-        if (op == "+" || op == "-") return 7;
-        if (op == "*" || op == "/" || op == "%") return 8;
+        if (op == "<<" || op == ">>") return 7;
+        if (op == "+" || op == "-") return 8;
+        if (op == "*" || op == "/" || op == "%") return 9;
         return 0;
     }
     std::unique_ptr<Expr> postfix(std::unique_ptr<Expr> e, bool propagation = true) {
@@ -1233,7 +1249,7 @@ class Parser {
     std::unique_ptr<Expr> expression(int minimum = 1) {
         Depth guard(depth, source, peek());
         auto left = unary();
-        while (precedence(peek().text) >= minimum || ((at("as") || at("as?")) && minimum <= 9)) {
+        while (precedence(binary_operator()) >= minimum || ((at("as") || at("as?")) && minimum <= 10)) {
             if (at("as") || at("as?")) {
                 if (++nodes > 512) error(source, peek(), Code::nesting, "Expression size limit exceeded.", "Split this expression into smaller local values.");
                 auto token = take();
@@ -1241,7 +1257,8 @@ class Parser {
                 auto e = std::make_unique<Expr>(Expr::Kind::conversion, token);
                 e->parts.push_back(std::move(left)); e->type = type(); left = std::move(e); continue;
             }
-            auto token = take();
+            auto op=binary_operator();auto token=take();
+            if(op.size()==2 && (op=="<<" || op==">>")){take();token.text=op;}
             if(token.text=="is") {auto e=std::make_unique<Expr>(Expr::Kind::test,token);e->parts.push_back(std::move(left));e->patterns.push_back(pattern());left=std::move(e);continue;}
             auto e = std::make_unique<Expr>(Expr::Kind::binary, token); e->op = token.text;
             e->parts.push_back(std::move(left)); e->parts.push_back(expression(precedence(token.text) + 1));
@@ -1356,7 +1373,8 @@ class Parser {
             newline();s.source_end=peek().offset; return s;
         }
         if(at("with")){
-            Statement statement(Statement::Kind::scoped,take());statement.expression=expression(10);
+            // Stop before conversions so `as` still introduces the resource binder.
+            Statement statement(Statement::Kind::scoped,take());statement.expression=expression(11);
             if(accept("as"))statement.binder=name();else statement.binder={TokenKind::name,"$with$"+std::to_string(statement.token.offset),statement.token.offset};
             statement.body=block();return statement;
         }
@@ -1392,7 +1410,7 @@ class Parser {
                 while(end+1<tokens.size() && brackets && tokens[end].kind!=TokenKind::newline);
             }
             auto op = tokens[end].text;
-            if (op == "=" || op == "+=" || op == "-=" || op == "*=" || op == "/=" || op == "%=" || op == "&=" || op == "|=" || op == "^=" || op == "++" || op == "--") {
+            if (op == "=" || op == "+=" || op == "-=" || op == "*=" || op == "/=" || op == "%=" || op == "&=" || op == "|=" || op == "^=" || op == "<<=" || op == ">>=" || op == "++" || op == "--") {
                 Statement s(Statement::Kind::assignment, name());s.name=s.token.text;
                 if(indexes>1 || after_index || generic_selection)s.selection=postfix(std::make_unique<Expr>(Expr::Kind::name,s.token));
                 else {while(accept("."))s.fields.push_back(name());if(accept("[")){s.index=expression();need("]");}}
@@ -1691,7 +1709,7 @@ public:
 };
 ir::Op operation(const std::string& op) {
     static const std::map<std::string, ir::Op> ops = {{"+", ir::Op::add}, {"-", ir::Op::subtract}, {"*", ir::Op::multiply},
-        {"&",ir::Op::bit_and},{"|",ir::Op::bit_or},{"^",ir::Op::bit_xor}, {"/", ir::Op::divide}, {"%", ir::Op::remainder}, {"<", ir::Op::less}, {"<=", ir::Op::less_equal},
+        {"<<",ir::Op::shift_left},{">>",ir::Op::shift_right},{"&",ir::Op::bit_and},{"|",ir::Op::bit_or},{"^",ir::Op::bit_xor}, {"/", ir::Op::divide}, {"%", ir::Op::remainder}, {"<", ir::Op::less}, {"<=", ir::Op::less_equal},
         {">", ir::Op::greater}, {">=", ir::Op::greater_equal}, {"==", ir::Op::equal}, {"!=", ir::Op::not_equal}};
     return ops.at(op);
 }
@@ -2830,6 +2848,7 @@ class Semantics {
         if(e.kind == K::field)return field_anchor(e);
         if((e.kind==K::binary || e.kind==K::unary) && (e.op=="+" || e.op=="-" || e.op=="*" || e.op=="/" || e.op=="%"))return operator_anchor(e);
         if (e.op == "not" || e.op == "and" || e.op == "or" || e.op == "==" || e.op == "!=" || e.op == "<" || e.op == "<=" || e.op == ">" || e.op == ">=") return Type::boolean;
+        if(e.kind==K::binary && (e.op=="<<" || e.op==">>"))return anchor(*e.parts[0]);
         for (auto& part : e.parts) if (auto t = anchor(*part)) return t;
         return {};
         } catch (const CompilationError&) { return {}; }
@@ -4215,6 +4234,12 @@ class Semantics {
     }
 #include "enum_equality.inc"
     void assignment_value(Statement& s,Type type) {
+        if(s.op=="<<=" || s.op==">>=") {
+            auto count=expression(*s.expression);
+            if(type!=error_type && count!=error_type && (!numeric::integer(type) || !numeric::integer(count)))
+                error(source,s.compound_token,Code::numeric_operator,"Shifts require integer values and integer counts; enums are not shift operands.");
+            return;
+        }
         if((s.op=="&=" || s.op=="|=" || s.op=="^=") && type!=error_type && !ir::bitwise_type(type))
             error(source,s.compound_token,Code::numeric_operator,"Bitwise assignment requires an integer or flags enum.");
         if(s.op!="=" && s.op.size()==2 && s.op[1]=='=') {
@@ -4255,6 +4280,14 @@ class Semantics {
     }
     VOID_SEMANTIC_HANDLER Type binary_expression(Expr& e, const std::optional<Type>& expected) {
         using K = Expr::Kind;
+        if(e.op=="<<" || e.op==">>") {
+            auto left=expression(*e.parts[0],expected);
+            auto count=expression(*e.parts[1]);
+            if(left==error_type || count==error_type)return error_type;
+            if(!numeric::integer(left) || !numeric::integer(count))
+                error(source,e.token,Code::numeric_operator,"Shifts require integer values and integer counts; enums are not shift operands.");
+            return e.type=left;
+        }
         bool logical = e.op == "and" || e.op == "or";
         auto left_hint = anchor(*e.parts[0]), right_hint = anchor(*e.parts[1]);
         // Result context cannot choose a custom signature. Numeric anchors and
@@ -5839,7 +5872,7 @@ class Lowering {
     unsigned compound_value(const Statement& s,unsigned old_slot,unsigned right) {
         auto rhs=snapshot(right,expression_type(*s.expression),s.expression->token);
         auto left=emit({ir::Op::load,old_slot},s.compound_token);right=emit({ir::Op::load,rhs},s.compound_token);
-        if(s.compound_target.empty())return emit({s.assigned_type==Type::string?ir::Op::string_concat:operation(s.op.substr(0,1)),left,right},s.token);
+        if(s.compound_target.empty())return emit({s.assigned_type==Type::string?ir::Op::string_concat:operation(s.op.substr(0,s.op.size()-1)),left,right},s.token);
         ir::Instruction call{ir::Op::call};call.callee=s.compound_target;call.operator_glyph=s.op.substr(0,1);call.arguments={left,right};auto value=emit(call,s.compound_token);
         if(s.compound_conversion){emit({ir::Op::store,s.compound_slot,value},s.compound_token);return expression(*s.compound_conversion);}return value;
     }

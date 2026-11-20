@@ -9,7 +9,9 @@ VOID_SEMANTIC_HANDLER std::pair<Unit*,Structure*> static_type(Expr& base) {
     if(spelling.empty())return {};
     auto [owner,structure]=structure_lookup(unit,root,units,spelling,base.token);
     if(!structure || structure->definition->interface_type || !structure->case_tokens.empty())return {};
-    return {owner,&concrete_structure(base,*owner,*structure)};
+    // A type selector has no constructor arguments; its children only qualify
+    // the owner. Keep those out of the shared constructor-inference argument span.
+    return {owner,&concrete_structure(base,*owner,*structure,static_cast<unsigned>(base.parts.size()))};
 }
 void static_access(Type type,const std::string& visibility,const Token& token) {
     if((visibility=="private" && lexical_owner()!=Type::key(type)) ||

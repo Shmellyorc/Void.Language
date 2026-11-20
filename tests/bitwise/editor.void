@@ -1,0 +1,15 @@
+## Shift an exact byte without integer promotion.
+## @param value Unsigned byte bit pattern.
+## @param count Shift count, modulo eight.
+## @return An unsigned byte containing the shifted bits.
+func shift_byte(value: u8, count: i64) -> u8:
+    return value << count
+func main():
+    var count: i64 = -1
+    var result = shift_byte(1, count)
+    result >>= 8
+    result &= 127
+    result |= 2
+    result ^= 1
+    var complement = ~result
+    print(result)

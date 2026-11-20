@@ -1,0 +1,44 @@
+public value struct box<t>:
+    item: t
+public struct node:
+    item: i32
+public value struct factory<t>:
+    item: t
+    static count = 0
+    static current: t?
+    static const limit = 7
+## Preserve a method-specific argument through an imported generic owner.
+## @param value Value to preserve.
+## @return The same concrete value.
+public static func factory<t>.echo<u>(value: u) -> u:
+    return value
+## Produce a value without constructing an instance.
+## @return One.
+public static func factory<t>.one() -> i32:
+    return 1
+## Preserve a value with the owner's type argument.
+## @param value Value to preserve.
+## @return The supplied owner-typed value.
+public static func factory<t>.same(value: t) -> t:
+    return value
+## Preserve readonly authority on a borrowed value.
+## @param value Readonly input.
+## @return The readonly input view.
+public static func factory<t>.read<u>(const value: u) -> u:
+    return value
+private static func factory<t>.secret() -> i32:
+    return 7
+public struct depot<t>:
+    item: t
+    static count = 0
+## Preserve a method-specific value on a managed generic owner.
+## @param value Value to preserve.
+## @return The same concrete value.
+public static func depot<t>.echo<u>(value: u) -> u:
+    return value
+public value struct plain:
+    item: i32
+## Produce a value from a nongeneric owner.
+## @return One.
+public static func plain.one() -> i32:
+    return 1

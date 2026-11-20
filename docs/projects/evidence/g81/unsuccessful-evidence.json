@@ -1,0 +1,69 @@
+{
+  "schema": 1,
+  "raw_directory": "/tmp/g81-82_6glp5",
+  "records": [
+    {
+      "path": "/tmp/g81-82_6glp5/baseline-shifts.log",
+      "sha256": "9450fe4d53c0c015c22dc1a9ba14f6ace1dddd5fff873d754dc2e04f73b93d69",
+      "classification": "Expected pre-G81 shift-syntax rejection; existing Release artifact, not a comparative performance baseline.",
+      "excerpt": "Traceback (most recent call last):\n  File \"/home/shmellyorc/Documents/Void.Language/tests/bitwise/completeness.py\", line 78, in <module>\n    run([compiler, 'check', source])\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/Documents/Void.Language/tests/bitwise/completeness.py\", line 18, in run\n    assert result.returncode == expected, row\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'command': ['/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc', 'check', '/tmp/VOID G81 y_c9wbns/widths.void'], 'expected': 0, 'actual': 1, 'stdout': '', 'stderr': \"/tmp/VOID G81 y_c9wbns/widths.void:1:37: error: Expected an expression, found '<'.\\n    code: VOID1101\\n"
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/debug-first.log",
+      "sha256": "2515e19d94ffe9b7e337f528ca3781d2f3bc5e03c21b7d10fd04ad6d65079806",
+      "classification": "Initial test fixture accidentally shadowed the count() function; fixture corrected, no production semantic change.",
+      "excerpt": "Traceback (most recent call last):\n  File \"/home/shmellyorc/Documents/Void.Language/tests/bitwise/completeness.py\", line 78, in <module>\n    run([compiler, 'check', source])\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/shmellyorc/Documents/Void.Language/tests/bitwise/completeness.py\", line 18, in run\n    assert result.returncode == expected, row\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'command': ['/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc', 'check', '/home/shmellyorc/Documents/Void.Language/tests/bitwise/completeness.void'], 'expected': 0, 'actual': 1, 'stdout': '', 'stderr': \"/home/shmellyorc/Documents/Void.Language/tests/bitwise/completeness."
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/build-runtime.log",
+      "sha256": "69e0d133b8f43ef2a9addd39d495b6e93421ed22c65711642e86ea98b955e8a9",
+      "classification": "New target was requested before CMake regeneration; retained setup failure.",
+      "excerpt": "gmake: *** No rule to make target 'void_integer_bitwise'.  Stop.\n"
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/debug-lsp-first.log",
+      "sha256": "3f38d99522d4cbbbe747b921024da26504457f8ddf7423823dd24208cf5350f1",
+      "classification": "Harness did not advertise semantic-token capabilities; harness corrected.",
+      "excerpt": "Traceback (most recent call last):\n  File \"/home/shmellyorc/Documents/Void.Language/tests/bitwise/lsp.py\", line 39, in <module>\n    tokens = request('semanticTokens/full'); assert tokens and tokens['data'], tokens\n                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'data': []}\n"
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/debug-gates.log",
+      "sha256": "d3dd4ab14548a86df5b28e7f180744ae1103f70fad77ebc7fb3cb92713d4a2f9",
+      "classification": "Intermediate integrated Debug gate 24/27; resource binding cutoff and malformed IR fixture failures.",
+      "excerpt": "Test project /home/shmellyorc/Documents/Void.Language/build/llvm23-debug\n      Start 534: numeric_cli\n      Start  45: nullable_review_corrections\n 1/27 Test  #45: nullable_review_corrections ......   Passed   13.48 sec\n      Start  46: nullable_completeness\n 2/27 Test #534: numeric_cli ......................   Passed   26.66 sec\n      Start  44: static_members_completeness\n 3/27 Test  #46: nullable_completeness ............   Passed   15.73 sec\n      Start  50: enum_completeness\n 4/27 Test  #44: static_members_completeness ......   Passed   11.55 sec\n      Start 425: async_syntax_stack\n 5/27 Test  #50: enum_completeness ................   Passed   11.23 sec\n      Start 160: generics_hint_ex"
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/with-binding-before.log",
+      "sha256": "9f1bbd1739d5772802ad326857be335c7f1c8d1cb70a4f0095fec5a4e8a13182",
+      "classification": "Direct source-located reproduction of intermediate with/as conversion-precedence regression.",
+      "excerpt": "/tmp/g81-82_6glp5/with-binding.void:6:5: error: with requires a non-nullable managed resource with deinit.\n    code: VOID2001\n\n 6 |     with resource(bits = 1) as owned:\n   |     ^^^^\n    Module: /with-binding.void\n\n/tmp/g81-82_6glp5/with-binding.void:6:32: error: Unsupported type 'owned'.\n    code: VOID1103\n\n 6 |     with resource(bits = 1) as owned:\n   |                                ^^^^^\n    Module: /with-binding.void\n    Hint: Use a numeric type, bool, string or a visible value/managed struct.\n\n"
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/debug-runtime-second.log",
+      "sha256": "e2be30b0e42bb98872143f8ce458606e35493e21922e7c5edac25a2aacabac8f",
+      "classification": "Specific IR diagnostic assertion exposed missing module identity in malformed fixture; corrected fixture now reaches shift validation.",
+      "excerpt": "Unexpected rejection: VOID IR: missing module identity\ninvalid shift IR accepted\n"
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/baseline-shifts.json",
+      "sha256": "e42a723ce9c4d09a78a366c215596eec734c31e6d777a03a78b4651ab4e3aa76",
+      "classification": "Preserved input/output evidence; original input text retained in JSON or standalone source."
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/debug-first.json",
+      "sha256": "321c528a4dde83e01a5a922bfe377756732c239a6cc73e66407b911ab22a9936",
+      "classification": "Preserved input/output evidence; original input text retained in JSON or standalone source."
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/debug-second.json",
+      "sha256": "b93f8b75fb5a42d22f4d4b9c4f694317befd61b31e0d962a81358a09cf24068b",
+      "classification": "Preserved input/output evidence; original input text retained in JSON or standalone source."
+    },
+    {
+      "path": "/tmp/g81-82_6glp5/with-binding.void",
+      "sha256": "fbed95ca64757d9c9f03da9e5e8c00aabfa4f1bcb7ea03150f3f674da22608fa",
+      "classification": "Preserved input/output evidence; original input text retained in JSON or standalone source."
+    }
+  ],
+  "policy": "Unfavorable evidence is retained; no original test limit or assertion is weakened."
+}

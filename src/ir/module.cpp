@@ -1648,6 +1648,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     valid_type(i.type);
                     if (!((operand(i.a).definition && i.type.definition && operand(i.a).definition->callable && i.type.definition->callable && Type::key(operand(i.a))==Type::key(i.type)) || (reference_value(operand(i.a)) && !operand(i.a).construction && i.type.kind==operand(i.a).kind && !i.type.construction && Type::key(operand(i.a))==Type::key(i.type) && !i.type.nullable) || (numeric::number(operand(i.a)) && numeric::number(i.type)) || (operand(i.a).kind==Type::numeric_enum && numeric::integer(i.type)) || (numeric::integer(operand(i.a)) && i.type.kind==Type::numeric_enum))) fail("invalid conversion");
                     result = i.type; break;
+                case Op::shift_left: case Op::shift_right:
+                    result=operand(i.a);
+                    if(!numeric::integer(result) || !numeric::integer(operand(i.b)) || i.immediate || i.array_repeat ||
+                       !i.arguments.empty() || !i.callee.empty() || i.receiver || i.initialization)
+                        fail("invalid integer shift operation");
+                    break;
                 case Op::bit_and: case Op::bit_or: case Op::bit_xor: case Op::bit_not:
                     result=operand(i.a);
                     if(!(numeric::integer(result) || (result.kind==Type::numeric_enum && result.definition->enum_flags)) ||

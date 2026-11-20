@@ -1,0 +1,22 @@
+## Pack three unsigned bytes into an RGB bit pattern.
+## @param red High byte.
+## @param green Middle byte.
+## @param blue Low byte.
+## @return A packed 24-bit color held in u32.
+func pack_rgb(red: u8, green: u8, blue: u8) -> u32:
+    return ((red as u32) << 16) | ((green as u32) << 8) | (blue as u32)
+
+func main():
+    var packed = pack_rgb(18, 52, 86)
+    print("packed: {packed}")
+    print("red: {packed >> 16 & 255}")
+    print("green: {packed >> 8 & 255}")
+    print("blue: {packed & 255}")
+    var permissions: u8 = 0
+    permissions |= 1 << 2
+    permissions ^= 1 << 1
+    permissions &= ~(1 << 2)
+    var bytes: [u8] = [18, 52]
+    var network_word: u16 = ((bytes[0] as u16) << 8) | (bytes[1] as u16)
+    if permissions != 2 or network_word != 4660:
+        print("invalid packed data")

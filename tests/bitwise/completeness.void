@@ -1,0 +1,75 @@
+value struct packet:
+    bits: u32
+struct cell:
+    bits: u8
+value struct box<t>:
+    value: t
+struct resource:
+    bits: u8
+func (self resource) deinit():
+    pass
+var global_mask: u16 = 1 << 8
+var calls = 0
+## Shift a concrete integer specialization.
+## @param value Integer bit pattern.
+## @param count Count interpreted modulo the value width.
+## @return Shifted value in the original integer type.
+func shift<t>(value: t, count: i64) -> t:
+    return value << count
+## Preserve a concrete generic value.
+## @param value Value to preserve.
+## @return The same concrete value.
+func keep<t>(value: t) -> t:
+    return value
+func next_count() -> i64:
+    calls += 1
+    return 1
+func index() -> i32:
+    calls += 1
+    return 0
+func main() -> i32:
+    with resource(bits = 1) as owned:
+        owned.bits <<= 1
+        if owned.bits != 2:
+            return 11
+    if global_mask != 256:
+        return 1
+    global_mask >>= 8
+    if global_mask != 1:
+        return 2
+    var p = packet(bits = 1 << 24)
+    p.bits >>= 8
+    p.bits |= 15
+    p.bits ^= 7
+    p.bits &= 65535
+    if p.bits != 8:
+        return 3
+    var c = cell(bits = 1)
+    c.bits <<= next_count()
+    var items: [u8] = [1]
+    items[index()] <<= next_count()
+    if c.bits != 2 or items[0] != 2 or calls != 3:
+        return 4
+    var packed = keep(box<box<u32>>(value = box<u32>(value = 8 >> 1)))
+    if packed.value.value != 4 or keep(shift<u8>(1, 7)) != 128:
+        return 5
+    if keep(1 << (2 as u64)) != 4:
+        return 10
+    var inferred: u8 = 1 << (9 as u64)
+    if inferred != 2:
+        return 6
+    if 1 << 2 + 1 != 8 or 32 >> 1 >> 2 != 4 or 1 | 2 << 2 != 9:
+        return 7
+    if 1 + 2 << 1 != 6 or 1 << (2 + 1) != 8 or 7 & 3 << 1 != 6:
+        return 8
+    var flag = mask.one
+    flag |= mask.two
+    flag &= ~mask.two
+    flag ^= mask.two
+    if flag != mask.one | mask.two:
+        return 9
+    print("integer masks and packing preserved")
+    return 0
+flags enum mask:
+    one
+    two

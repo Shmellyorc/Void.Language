@@ -1,0 +1,640 @@
+{
+  "schema": 1,
+  "milestone": "G81",
+  "accepted_baseline": "58eac251838d6f6a63f55b92fd7818a11ed15e28",
+  "platform": "Linux x86-64, PikaOS",
+  "toolchain": "LLVM/Clang/LLD 23.1.4",
+  "raw_directory": "/tmp/g81-82_6glp5",
+  "profiles": {
+    "debug": {
+      "result": "27/27",
+      "junit": "/tmp/g81-82_6glp5/debug-final.xml",
+      "junit_sha256": "441bda120d89e70181660345137ad02895b03a6251c2a34f5db67ea25caf3f3b",
+      "log": "/tmp/g81-82_6glp5/debug-final.log",
+      "tests": [
+        {
+          "name": "lsp_enum_completeness",
+          "seconds": "0.108112",
+          "output": "G78 enum hover, flags completion/docs, generic payloads, active parameter, diagnostics and semantic tokens passed\n"
+        },
+        {
+          "name": "lsp_integer_bitwise",
+          "seconds": "0.096064",
+          "output": "G81 LSP: types, parameter help, navigation, tokens, formatting and edit recovery passed\n"
+        },
+        {
+          "name": "integer_bitwise_completeness",
+          "seconds": "9.94534",
+          "output": "G81: 44 compiler/application checks; all integer/count widths; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "integer_bitwise_runtime",
+          "seconds": "1.03047",
+          "output": "G81: 1442 dynamic JIT/constant-model/IR checks\n"
+        },
+        {
+          "name": "static_members_generic_results",
+          "seconds": "2.3019",
+          "output": "G80 nested static results: 15 checks; ordinary/generic managed/value owners; JIT/AOT O0/O2; expected rejections retained\n"
+        },
+        {
+          "name": "lsp_static_members",
+          "seconds": "0.240517",
+          "output": "G80 LSP: static hover, signatures, definitions, references, semantic modifiers, generic completion and recovery passed\n"
+        },
+        {
+          "name": "static_members_completeness",
+          "seconds": "10.9226",
+          "output": "G80 static members: 68 checks; JIT/AOT O0/O2, generics, ownership, visibility, startup\n"
+        },
+        {
+          "name": "nullable_review_corrections",
+          "seconds": "12.6297",
+          "output": "G79 review corrections: 17 checks; constants, presentation, readonly; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "nullable_completeness",
+          "seconds": "15.0754",
+          "output": "G79 nullable: 81 checks, JIT/AOT O0/O2; expected failures retained\n"
+        },
+        {
+          "name": "lsp_nullable_completeness",
+          "seconds": "0.151843",
+          "output": "G79 LSP: nullable hover/signatures, generic metadata, semantic tokens, unwrapped completion and unsaved recovery passed\n"
+        },
+        {
+          "name": "enum_review_corrections",
+          "seconds": "2.90155",
+          "output": "G78 review corrections: 23 compiler/application checks; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "enum_completeness",
+          "seconds": "10.8366",
+          "output": "G78: 60 checked compiler/application invocations; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "stage10_tooling",
+          "seconds": "0.64649",
+          "output": "120 Stage 10 tooling metadata checks passed\n"
+        },
+        {
+          "name": "generics_hint_execution",
+          "seconds": "11.7561",
+          "output": "Shared hint contracts: 54 process checks on 1 MiB stacks passed\n"
+        },
+        {
+          "name": "generics_hint_lsp",
+          "seconds": "0.0927612",
+          "output": "Shared hints LSP: projected hover, navigation, diagnostics and repair passed on 1 MiB stack\n"
+        },
+        {
+          "name": "generics_cli",
+          "seconds": "5.5346",
+          "output": "-- Generic programs passed normal/O2 JIT and linked AOT\n"
+        },
+        {
+          "name": "text_encoding_semantic_depth",
+          "seconds": "1.35098",
+          "output": "Deep receiver chains: bounded stack, nesting location and later error verified\nNumeric receiver chains: legal depth and recovering rejection fit the unchanged 1 MiB budget\nString index chains: legal depth and recovering rejection fit the unchanged 1 MiB budget\nValid deferred nesting: parser and semantic analysis fit the unchanged 1 MiB budget\nRecursive type grammar: shallow acceptance, bounded stack, nesting diagnostic and later recovery verified\n"
+        },
+        {
+          "name": "static_members_lifecycle",
+          "seconds": "0.69354",
+          "output": "static async preserved\nstatic async preserved\n46 G80 static lifecycle/GC/reload/IR checks passed\n"
+        },
+        {
+          "name": "async_syntax_stack",
+          "seconds": "7.10646",
+          "output": "await error allocation sweep: 140 injected failures passed; O2=0\nawait error allocation sweep: 140 injected failures passed; O2=1\nawait syntax: 14 positive source/CFG checks, 12 rejected cases, 6 recovery checks, 20 JIT/GC executions passed; stack=1048576/1048576\n"
+        },
+        {
+          "name": "tooling",
+          "seconds": "0.564543",
+          "output": "queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots\nplan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required\ntooling: passed\n"
+        },
+        {
+          "name": "numeric",
+          "seconds": "4.71685",
+          "output": "210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed\nnumeric: passed\n"
+        },
+        {
+          "name": "numeric_enum_ir",
+          "seconds": "1.34029",
+          "output": "enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nenum initialized: accepted\nfield: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nfield initialized: accepted\narray: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\narray initialized: accepted\nfield-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nfield-array initialized: accepted\narray-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\narray-field initialized: accepted\nnested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nnested initialized: accepted\nmanaged: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)\nmanaged initialized: accepted\nzero-backed holder: rejected (VOID IR: nominal source objects require complete construction)...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        },
+        {
+          "name": "frontend",
+          "seconds": "10.6589",
+          "output": "Frontend begin: diagnostics\n50+ source diagnostic cases and UTF-8/ABI checks passed\nFrontend passed: diagnostics\nFrontend begin: programs\nReal .void files and independent programs executed through normal/O2 JIT\nFrontend passed: programs\nFrontend begin: numeric values\n1216 constant/normal/O2 numeric matrix comparisons passed\nReadonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed\nFrontend passed: numeric values\nFrontend begin: diagnostic recovery/resource limits\nFrontend resource case: combined expression/constant depth\nStructured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified\nFrontend passed: diagnostic recovery/resource limits\nFrontend begin: value structs\nFrontend resource case: bounded expanded value layouts\nValue struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed\nFrontend passed: value structs\nFrontend begin: receiver methods\nFrontend resource case: b...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        },
+        {
+          "name": "numeric_sprint2",
+          "seconds": "2.5938",
+          "output": "Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed\n"
+        },
+        {
+          "name": "stage11_globals_stack",
+          "seconds": "0.215366",
+          "output": "1 MiB inferred-global guard and explicit-type chain passed\n"
+        },
+        {
+          "name": "source_cli",
+          "seconds": "5.5169",
+          "output": "Source checked successfully\nWrote native source object: /tmp/void-test-source_cli-abv39wfu/source programs with spaces/architecture-normal.o\nWrote native source object: /tmp/void-test-source_cli-abv39wfu/source programs with spaces/architecture-optimized.o\nSource checked successfully\nWrote native source object: /tmp/void-test-source_cli-abv39wfu/source programs with spaces/loops-normal.o\nWrote native source object: /tmp/void-test-source_cli-abv39wfu/source programs with spaces/loops-optimized.o\nSource checked successfully\nWrote native source object: /tmp/void-test-source_cli-abv39wfu/source programs with spaces/functions-normal.o\nWrote native source object: /tmp/void-test-source_cli-abv39wfu/source programs with spaces/functions-optimized.o\nSource checked successfully\nWrote native source object: /tmp/void-test-source_cli-abv39wfu/source programs with spaces/pass-normal.o\nWrote native source object: /tmp/void-test-source_cli-abv39wfu/source programs with spaces/pass-optimized.o\nWrote native source object: /tmp...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        },
+        {
+          "name": "numeric_cli",
+          "seconds": "24.9965",
+          "output": "-- Numeric source constants, JIT and native AOT passed in both optimization modes\n"
+        }
+      ],
+      "artifacts": {
+        "voidc": {
+          "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+          "sha256": "74d7689249609f34bd98b8e0cad159e847b83554f155d9f634723ab69ba4a5c9"
+        },
+        "voidls": {
+          "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidls",
+          "sha256": "b13ef7dce3ad481f7034129b2db280047662ec769604cf337311bb43dfba80e9"
+        },
+        "void_integer_bitwise": {
+          "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/void_integer_bitwise",
+          "sha256": "1178be23a89a5fd139294c575f968d792c1ff2b8bbb1d5e155ab8c97626169b8"
+        }
+      },
+      "compiler_version": "VOID Language Compiler v0.1.0 (development)\nLLVM 23.1.4\nTarget: x86_64-unknown-linux-gnu\nBuild identity: ba04fd694e3e0856926e92e00c4e3827c0b899be8d711c3664f3ba239dba345c\n",
+      "flags": "# CMAKE generated file: DO NOT EDIT!\n# Generated by \"Unix Makefiles\" Generator, CMake Version 4.3\n\n# compile C with /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang\n# compile CXX with /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++\nC_DEFINES = -DVOID_GIT_EXECUTABLE=\\\"/usr/bin/git\\\" -DVOID_STDLIB_ROOT=\\\"/home/shmellyorc/Documents/Void.Language/stdlib\\\"\n\nC_INCLUDES = -I/home/shmellyorc/Documents/Void.Language/include -isystem /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus -isystem /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include\n\nC_FLAGS = -g -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Wall -Wextra -Wpedantic\n\nCXX_DEFINES = -DVOID_GIT_EXECUTABLE=\\\"/usr/bin/git\\\" -DVOID_STDLIB_ROOT=\\\"/home/shmellyorc/Documents/Void.Language/stdlib\\\"\n\nCXX_INCLUDES = -I/home/shmellyorc/Documents/Void.Language/include -isystem /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus -isystem /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include\n\nCXX_FLAGS = -g -std=c++20 -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic\n\n",
+      "source_evidence": "/tmp/g81-82_6glp5/debug-source-final.json",
+      "source_evidence_sha256": "85d6c56d1b608e0964ee165ff09d24786854b4d031a5100d9d067652520894ae",
+      "lsp_evidence": "/tmp/g81-82_6glp5/debug-lsp-final.json",
+      "lsp_evidence_sha256": "a1d7c85112505a785e0ff3b816e6652278de23b55703054549fd8c10e541b847"
+    },
+    "release": {
+      "result": "27/27",
+      "junit": "/tmp/g81-82_6glp5/release-final.xml",
+      "junit_sha256": "7838fa67487e178608aca9dffe0a21fa0ab7029b4ef8feb1c3d0ef4857924025",
+      "log": "/tmp/g81-82_6glp5/release-final.log",
+      "tests": [
+        {
+          "name": "lsp_enum_completeness",
+          "seconds": "0.0914036",
+          "output": "G78 enum hover, flags completion/docs, generic payloads, active parameter, diagnostics and semantic tokens passed\n"
+        },
+        {
+          "name": "lsp_integer_bitwise",
+          "seconds": "0.0851892",
+          "output": "G81 LSP: types, parameter help, navigation, tokens, formatting and edit recovery passed\n"
+        },
+        {
+          "name": "integer_bitwise_completeness",
+          "seconds": "3.99937",
+          "output": "G81: 44 compiler/application checks; all integer/count widths; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "integer_bitwise_runtime",
+          "seconds": "0.284075",
+          "output": "G81: 1442 dynamic JIT/constant-model/IR checks\n"
+        },
+        {
+          "name": "static_members_generic_results",
+          "seconds": "1.07642",
+          "output": "G80 nested static results: 15 checks; ordinary/generic managed/value owners; JIT/AOT O0/O2; expected rejections retained\n"
+        },
+        {
+          "name": "lsp_static_members",
+          "seconds": "0.130928",
+          "output": "G80 LSP: static hover, signatures, definitions, references, semantic modifiers, generic completion and recovery passed\n"
+        },
+        {
+          "name": "static_members_completeness",
+          "seconds": "4.78722",
+          "output": "G80 static members: 68 checks; JIT/AOT O0/O2, generics, ownership, visibility, startup\n"
+        },
+        {
+          "name": "nullable_review_corrections",
+          "seconds": "5.87954",
+          "output": "G79 review corrections: 17 checks; constants, presentation, readonly; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "nullable_completeness",
+          "seconds": "7.37241",
+          "output": "G79 nullable: 81 checks, JIT/AOT O0/O2; expected failures retained\n"
+        },
+        {
+          "name": "lsp_nullable_completeness",
+          "seconds": "0.100671",
+          "output": "G79 LSP: nullable hover/signatures, generic metadata, semantic tokens, unwrapped completion and unsaved recovery passed\n"
+        },
+        {
+          "name": "enum_review_corrections",
+          "seconds": "1.29605",
+          "output": "G78 review corrections: 23 compiler/application checks; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "enum_completeness",
+          "seconds": "5.0399",
+          "output": "G78: 60 checked compiler/application invocations; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "stage10_tooling",
+          "seconds": "0.104043",
+          "output": "120 Stage 10 tooling metadata checks passed\n"
+        },
+        {
+          "name": "generics_hint_execution",
+          "seconds": "5.33157",
+          "output": "Shared hint contracts: 54 process checks on 1 MiB stacks passed\n"
+        },
+        {
+          "name": "generics_hint_lsp",
+          "seconds": "0.083159",
+          "output": "Shared hints LSP: projected hover, navigation, diagnostics and repair passed on 1 MiB stack\n"
+        },
+        {
+          "name": "generics_cli",
+          "seconds": "2.97884",
+          "output": "-- Generic programs passed normal/O2 JIT and linked AOT\n"
+        },
+        {
+          "name": "text_encoding_semantic_depth",
+          "seconds": "0.795964",
+          "output": "Deep receiver chains: bounded stack, nesting location and later error verified\nNumeric receiver chains: legal depth and recovering rejection fit the unchanged 1 MiB budget\nString index chains: legal depth and recovering rejection fit the unchanged 1 MiB budget\nValid deferred nesting: parser and semantic analysis fit the unchanged 1 MiB budget\nRecursive type grammar: shallow acceptance, bounded stack, nesting diagnostic and later recovery verified\n"
+        },
+        {
+          "name": "static_members_lifecycle",
+          "seconds": "0.417904",
+          "output": "static async preserved\nstatic async preserved\n46 G80 static lifecycle/GC/reload/IR checks passed\n"
+        },
+        {
+          "name": "async_syntax_stack",
+          "seconds": "3.35042",
+          "output": "await error allocation sweep: 140 injected failures passed; O2=0\nawait error allocation sweep: 140 injected failures passed; O2=1\nawait syntax: 14 positive source/CFG checks, 12 rejected cases, 6 recovery checks, 20 JIT/GC executions passed; stack=1048576/1048576\n"
+        },
+        {
+          "name": "tooling",
+          "seconds": "0.226947",
+          "output": "queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots\nplan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required\ntooling: passed\n"
+        },
+        {
+          "name": "numeric",
+          "seconds": "2.04401",
+          "output": "210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed\nnumeric: passed\n"
+        },
+        {
+          "name": "numeric_enum_ir",
+          "seconds": "0.50323",
+          "output": "enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nenum initialized: accepted\nfield: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nfield initialized: accepted\narray: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\narray initialized: accepted\nfield-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nfield-array initialized: accepted\narray-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\narray-field initialized: accepted\nnested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nnested initialized: accepted\nmanaged: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)\nmanaged initialized: accepted\nzero-backed holder: rejected (VOID IR: nominal source objects require complete construction)...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        },
+        {
+          "name": "frontend",
+          "seconds": "4.52163",
+          "output": "Frontend begin: diagnostics\n50+ source diagnostic cases and UTF-8/ABI checks passed\nFrontend passed: diagnostics\nFrontend begin: programs\nReal .void files and independent programs executed through normal/O2 JIT\nFrontend passed: programs\nFrontend begin: numeric values\n1216 constant/normal/O2 numeric matrix comparisons passed\nReadonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed\nFrontend passed: numeric values\nFrontend begin: diagnostic recovery/resource limits\nFrontend resource case: combined expression/constant depth\nStructured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified\nFrontend passed: diagnostic recovery/resource limits\nFrontend begin: value structs\nFrontend resource case: bounded expanded value layouts\nValue struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed\nFrontend passed: value structs\nFrontend begin: receiver methods\nFrontend resource case: b...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        },
+        {
+          "name": "numeric_sprint2",
+          "seconds": "1.23144",
+          "output": "Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed\n"
+        },
+        {
+          "name": "stage11_globals_stack",
+          "seconds": "0.0883138",
+          "output": "1 MiB inferred-global guard and explicit-type chain passed\n"
+        },
+        {
+          "name": "source_cli",
+          "seconds": "3.53834",
+          "output": "Source checked successfully\nWrote native source object: /tmp/void-test-source_cli-9nethqtk/source programs with spaces/architecture-normal.o\nWrote native source object: /tmp/void-test-source_cli-9nethqtk/source programs with spaces/architecture-optimized.o\nSource checked successfully\nWrote native source object: /tmp/void-test-source_cli-9nethqtk/source programs with spaces/loops-normal.o\nWrote native source object: /tmp/void-test-source_cli-9nethqtk/source programs with spaces/loops-optimized.o\nSource checked successfully\nWrote native source object: /tmp/void-test-source_cli-9nethqtk/source programs with spaces/functions-normal.o\nWrote native source object: /tmp/void-test-source_cli-9nethqtk/source programs with spaces/functions-optimized.o\nSource checked successfully\nWrote native source object: /tmp/void-test-source_cli-9nethqtk/source programs with spaces/pass-normal.o\nWrote native source object: /tmp/void-test-source_cli-9nethqtk/source programs with spaces/pass-optimized.o\nWrote native source object: /tmp...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        },
+        {
+          "name": "numeric_cli",
+          "seconds": "15.5738",
+          "output": "-- Numeric source constants, JIT and native AOT passed in both optimization modes\n"
+        }
+      ],
+      "artifacts": {
+        "voidc": {
+          "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidc",
+          "sha256": "37925303cf9bb114b21dc078b0f626d1d8bd4c5754b784a7bd6d53f074955e40"
+        },
+        "voidls": {
+          "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/voidls",
+          "sha256": "354dfc18d3427b89089dd8583cbc405646263f5f411de8069925abfea37e15e7"
+        },
+        "void_integer_bitwise": {
+          "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-release/void_integer_bitwise",
+          "sha256": "cd8a583bad2dc6aa595c936aa922c993711f832ae56c28419e4c6fad966f2885"
+        }
+      },
+      "compiler_version": "VOID Language Compiler v0.1.0 (development)\nLLVM 23.1.4\nTarget: x86_64-unknown-linux-gnu\nBuild identity: 5dcf39cf135a9c08a52840726702623291b6f3f45005397dd373c00c47ff692e\n",
+      "flags": "# CMAKE generated file: DO NOT EDIT!\n# Generated by \"Unix Makefiles\" Generator, CMake Version 4.3\n\n# compile C with /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang\n# compile CXX with /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++\nC_DEFINES = -DVOID_GIT_EXECUTABLE=\\\"/usr/bin/git\\\" -DVOID_STDLIB_ROOT=\\\"/home/shmellyorc/Documents/Void.Language/stdlib\\\"\n\nC_INCLUDES = -I/home/shmellyorc/Documents/Void.Language/include -isystem /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus -isystem /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include\n\nC_FLAGS = -O3 -DNDEBUG -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Wall -Wextra -Wpedantic\n\nCXX_DEFINES = -DVOID_GIT_EXECUTABLE=\\\"/usr/bin/git\\\" -DVOID_STDLIB_ROOT=\\\"/home/shmellyorc/Documents/Void.Language/stdlib\\\"\n\nCXX_INCLUDES = -I/home/shmellyorc/Documents/Void.Language/include -isystem /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus -isystem /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include\n\nCXX_FLAGS = -O3 -DNDEBUG -std=c++20 -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic\n\n",
+      "source_evidence": "/tmp/g81-82_6glp5/release-source-final.json",
+      "source_evidence_sha256": "49ecec7adfadbee994627eab63873c9fccde6799f0a44812c7311191a4b38d7b",
+      "lsp_evidence": "/tmp/g81-82_6glp5/release-lsp-final.json",
+      "lsp_evidence_sha256": "6fdef6996c5576752e0f8ce871a50cf26ac9aa63ea218037df751cb57db1f647"
+    },
+    "strict": {
+      "result": "27/27",
+      "junit": "/tmp/g81-82_6glp5/strict-final.xml",
+      "junit_sha256": "9936d7bea40c02144ebe042251e19959074d038ab53440dbe80367be762420e5",
+      "log": "/tmp/g81-82_6glp5/strict-final.log",
+      "tests": [
+        {
+          "name": "lsp_enum_completeness",
+          "seconds": "0.134223",
+          "output": "G78 enum hover, flags completion/docs, generic payloads, active parameter, diagnostics and semantic tokens passed\n"
+        },
+        {
+          "name": "lsp_integer_bitwise",
+          "seconds": "0.114136",
+          "output": "G81 LSP: types, parameter help, navigation, tokens, formatting and edit recovery passed\n"
+        },
+        {
+          "name": "integer_bitwise_completeness",
+          "seconds": "14.0142",
+          "output": "G81: 44 compiler/application checks; all integer/count widths; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "integer_bitwise_runtime",
+          "seconds": "0.646051",
+          "output": "G81: 1442 dynamic JIT/constant-model/IR checks\n"
+        },
+        {
+          "name": "static_members_generic_results",
+          "seconds": "4.29113",
+          "output": "G80 nested static results: 15 checks; ordinary/generic managed/value owners; JIT/AOT O0/O2; expected rejections retained\n"
+        },
+        {
+          "name": "lsp_static_members",
+          "seconds": "0.367153",
+          "output": "G80 LSP: static hover, signatures, definitions, references, semantic modifiers, generic completion and recovery passed\n"
+        },
+        {
+          "name": "static_members_completeness",
+          "seconds": "20.8173",
+          "output": "G80 static members: 68 checks; JIT/AOT O0/O2, generics, ownership, visibility, startup\n"
+        },
+        {
+          "name": "nullable_review_corrections",
+          "seconds": "16.6865",
+          "output": "G79 review corrections: 17 checks; constants, presentation, readonly; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "nullable_completeness",
+          "seconds": "29.0812",
+          "output": "G79 nullable: 81 checks, JIT/AOT O0/O2; expected failures retained\n"
+        },
+        {
+          "name": "lsp_nullable_completeness",
+          "seconds": "0.217734",
+          "output": "G79 LSP: nullable hover/signatures, generic metadata, semantic tokens, unwrapped completion and unsaved recovery passed\n"
+        },
+        {
+          "name": "enum_review_corrections",
+          "seconds": "5.79278",
+          "output": "G78 review corrections: 23 compiler/application checks; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "enum_completeness",
+          "seconds": "19.5645",
+          "output": "G78: 60 checked compiler/application invocations; JIT/AOT O0/O2\n"
+        },
+        {
+          "name": "stage10_tooling",
+          "seconds": "0.698914",
+          "output": "120 Stage 10 tooling metadata checks passed\n"
+        },
+        {
+          "name": "generics_hint_execution",
+          "seconds": "21.9345",
+          "output": "Shared hint contracts: 54 process checks on 1 MiB stacks passed\n"
+        },
+        {
+          "name": "generics_hint_lsp",
+          "seconds": "0.112904",
+          "output": "Shared hints LSP: projected hover, navigation, diagnostics and repair passed on 1 MiB stack\n"
+        },
+        {
+          "name": "generics_cli",
+          "seconds": "9.92423",
+          "output": "-- Generic programs passed normal/O2 JIT and linked AOT\n"
+        },
+        {
+          "name": "text_encoding_semantic_depth",
+          "seconds": "2.79428",
+          "output": "Deep receiver chains: bounded stack, nesting location and later error verified\nNumeric receiver chains: legal depth and recovering rejection fit the unchanged 1 MiB budget\nString index chains: legal depth and recovering rejection fit the unchanged 1 MiB budget\nValid deferred nesting: parser and semantic analysis fit the unchanged 1 MiB budget\nRecursive type grammar: shallow acceptance, bounded stack, nesting diagnostic and later recovery verified\n"
+        },
+        {
+          "name": "static_members_lifecycle",
+          "seconds": "0.911974",
+          "output": "static async preserved\nstatic async preserved\n46 G80 static lifecycle/GC/reload/IR checks passed\n"
+        },
+        {
+          "name": "async_syntax_stack",
+          "seconds": "7.78542",
+          "output": "await error allocation sweep: 140 injected failures passed; O2=0\nawait error allocation sweep: 140 injected failures passed; O2=1\nawait syntax: 14 positive source/CFG checks, 12 rejected cases, 6 recovery checks, 20 JIT/GC executions passed; stack=1048576/1048576\n"
+        },
+        {
+          "name": "tooling",
+          "seconds": "0.936657",
+          "output": "queries: aliased/direct definitions, 2 callers, root/local constants, byte spans and retained snapshots\nplan: /leaf.void -> /middle.void::wrapper -> /main.void::entry; validated 53 -> 61, const restart required\ntooling: passed\n"
+        },
+        {
+          "name": "numeric",
+          "seconds": "5.04389",
+          "output": "210 real-file numeric constant/JIT/O2 checks; structured numeric recovery passed\nnumeric: passed\n"
+        },
+        {
+          "name": "numeric_enum_ir",
+          "seconds": "1.54523",
+          "output": "enum: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nenum initialized: accepted\nfield: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nfield initialized: accepted\narray: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\narray initialized: accepted\nfield-array: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nfield-array initialized: accepted\narray-field: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\narray-field initialized: accepted\nnested: rejected (VOID IR: read of uninitialized numeric enum storage in /enum-storage.void::probe)\nnested initialized: accepted\nmanaged: rejected (VOID IR: non-nullable reference storage read before initialization in /enum-storage.void::probe)\nmanaged initialized: accepted\nzero-backed holder: rejected (VOID IR: nominal source objects require complete construction)...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        },
+        {
+          "name": "frontend",
+          "seconds": "12.5978",
+          "output": "Frontend begin: diagnostics\n50+ source diagnostic cases and UTF-8/ABI checks passed\nFrontend passed: diagnostics\nFrontend begin: programs\nReal .void files and independent programs executed through normal/O2 JIT\nFrontend passed: programs\nFrontend begin: numeric values\n1216 constant/normal/O2 numeric matrix comparisons passed\nReadonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed\nFrontend passed: numeric values\nFrontend begin: diagnostic recovery/resource limits\nFrontend resource case: combined expression/constant depth\nStructured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified\nFrontend passed: diagnostic recovery/resource limits\nFrontend begin: value structs\nFrontend resource case: bounded expanded value layouts\nValue struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed\nFrontend passed: value structs\nFrontend begin: receiver methods\nFrontend resource case: b...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        },
+        {
+          "name": "numeric_sprint2",
+          "seconds": "4.72231",
+          "output": "Sprint 2: 71 argument/numeric/diagnostic normal/O2 JIT and linked AOT checks passed\n"
+        },
+        {
+          "name": "stage11_globals_stack",
+          "seconds": "0.261629",
+          "output": "1 MiB inferred-global guard and explicit-type chain passed\n"
+        },
+        {
+          "name": "source_cli",
+          "seconds": "17.4674",
+          "output": "Source checked successfully\nWrote native source object: /tmp/void-test-source_cli-btmnvum9/source programs with spaces/architecture-normal.o\nWrote native source object: /tmp/void-test-source_cli-btmnvum9/source programs with spaces/architecture-optimized.o\nSource checked successfully\nWrote native source object: /tmp/void-test-source_cli-btmnvum9/source programs with spaces/loops-normal.o\nWrote native source object: /tmp/void-test-source_cli-btmnvum9/source programs with spaces/loops-optimized.o\nSource checked successfully\nWrote native source object: /tmp/void-test-source_cli-btmnvum9/source programs with spaces/functions-normal.o\nWrote native source object: /tmp/void-test-source_cli-btmnvum9/source programs with spaces/functions-optimized.o\nSource checked successfully\nWrote native source object: /tmp/void-test-source_cli-btmnvum9/source programs with spaces/pass-normal.o\nWrote native source object: /tmp/void-test-source_cli-btmnvum9/source programs with spaces/pass-optimized.o\nWrote native source object: /tmp...\n[This part of the test output was removed since it exceeds the threshold of 1024 bytes.]\n"
+        },
+        {
+          "name": "numeric_cli",
+          "seconds": "44.8755",
+          "output": "-- Numeric source constants, JIT and native AOT passed in both optimization modes\n"
+        }
+      ],
+      "artifacts": {
+        "voidc": {
+          "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidc",
+          "sha256": "b7a9cc4a007a557e66307197cb8c4850af11d05b5073124341526b05e258b562"
+        },
+        "voidls": {
+          "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/voidls",
+          "sha256": "0e09900bc9504e17b4b2611dfaa55e46ac12207f9e80a34459c01727c7ff2dcf"
+        },
+        "void_integer_bitwise": {
+          "path": "/home/shmellyorc/Documents/Void.Language/build/llvm23-strict/void_integer_bitwise",
+          "sha256": "a5c96aca52784ee142d39c581eb49be92e3e6774115e8dff5c39735006282413"
+        }
+      },
+      "compiler_version": "VOID Language Compiler v0.1.0 (development)\nLLVM 23.1.4\nTarget: x86_64-unknown-linux-gnu\nBuild identity: 673754f1e8e97c3a573d910c79f1d0ae9a240d426182c30675ccdd57de5754cf\n",
+      "flags": "# CMAKE generated file: DO NOT EDIT!\n# Generated by \"Unix Makefiles\" Generator, CMake Version 4.3\n\n# compile C with /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang\n# compile CXX with /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/bin/clang++\nC_DEFINES = -DVOID_GIT_EXECUTABLE=\\\"/usr/bin/git\\\" -DVOID_STDLIB_ROOT=\\\"/home/shmellyorc/Documents/Void.Language/stdlib\\\"\n\nC_INCLUDES = -I/home/shmellyorc/Documents/Void.Language/include -isystem /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus -isystem /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include\n\nC_FLAGS = -O2 -g -DNDEBUG -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer\n\nCXX_DEFINES = -DVOID_GIT_EXECUTABLE=\\\"/usr/bin/git\\\" -DVOID_STDLIB_ROOT=\\\"/home/shmellyorc/Documents/Void.Language/stdlib\\\"\n\nCXX_INCLUDES = -I/home/shmellyorc/Documents/Void.Language/include -isystem /home/shmellyorc/Documents/Void.Language/third_party/tomlplusplus -isystem /home/shmellyorc/Documents/Void.Language/.toolchains/llvm-23.1.4/include\n\nCXX_FLAGS = -O2 -g -DNDEBUG -std=c++20 -D_GNU_SOURCE -D_GLIBCXX_USE_CXX11_ABI=1 -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -fno-rtti -Wall -Wextra -Wpedantic -fsanitize=address,undefined -fno-omit-frame-pointer\n\n",
+      "source_evidence": "/tmp/g81-82_6glp5/strict-source-final.json",
+      "source_evidence_sha256": "378a9802ec94351d005a42a4a38bd12882b2f7b7697be1ba36d243f68d6d9f1e",
+      "lsp_evidence": "/tmp/g81-82_6glp5/strict-lsp-final.json",
+      "lsp_evidence_sha256": "b077cf6be77c6648fb160b25c35119a635c47b0cfbd750ab65726d13a3a908e0"
+    }
+  },
+  "source_application_checks_per_profile": 44,
+  "dynamic_jit_constant_model_ir_checks_per_profile": 1442,
+  "editor_checks": {
+    "vscode": {
+      "result": "8/8",
+      "evidence": "/tmp/g81-82_6glp5/vscode-results.json",
+      "sha256": "9ef33b1cbaf00aff18ee0bd7d8100b53a44bc3c6c5d37e0d448d339a97d9322e",
+      "observations": {
+        "editor": "1.141.0",
+        "observations": [
+          "Shift result remains readable u8",
+          "Complement result retains exact width",
+          "Documented parameter help with active count parameter",
+          "Operator helper navigation",
+          "Semantic coloring provider populated",
+          "Helper completion remains available during unsaved typing",
+          "Invalid count produces readable diagnostic",
+          "Valid recovery and formatting preserve operators/types"
+        ]
+      }
+    },
+    "codium": {
+      "result": "8/8",
+      "evidence": "/tmp/g81-82_6glp5/codium-results.json",
+      "sha256": "bd7e1e1bb3e454c318eb4e3a906e8b60d4f1c3df65581c0eeefada958e1dfd3e",
+      "observations": {
+        "editor": "1.143.1",
+        "observations": [
+          "Shift result remains readable u8",
+          "Complement result retains exact width",
+          "Documented parameter help with active count parameter",
+          "Operator helper navigation",
+          "Semantic coloring provider populated",
+          "Helper completion remains available during unsaved typing",
+          "Invalid count produces readable diagnostic",
+          "Valid recovery and formatting preserve operators/types"
+        ]
+      }
+    }
+  },
+  "extension_tests": {
+    "result": "14/14",
+    "log": "/tmp/g81-82_6glp5/extension-tests.log",
+    "sha256": "b2ec50b89f586fcd9b98a3cb2c3eb501540f1ab4efa26719d299f14f2844a75d"
+  },
+  "strict_environment": {
+    "ASAN_OPTIONS": "detect_leaks=1:halt_on_error=1:abort_on_error=1:exitcode=87",
+    "UBSAN_OPTIONS": "halt_on_error=1:print_stacktrace=1:exitcode=86",
+    "LSAN_OPTIONS": null
+  },
+  "unchanged_original_stack_test_inputs": {
+    "tests/integration/semantic_depth.py": "a92ee39ae67c61337a77aeafe7fda0b02cc4b53dc820cf257110cccbfb7c7d70",
+    "tests/async/syntax.cpp": "754a521d82e0f7b33aee99eab7acaaf6ce841212fb69998e9418eefe20a11cdb",
+    "tests/stage11/stack.py": "e114dfe00c444562cc63e99bbb024302f60cbfc0c53869eed1875c57acf4d998",
+    "tests/integration/source.cmake": "3e3608b557831cdf996b4dcff67a8c3f8fa469d7dc09d255a6158c6604318f25"
+  },
+  "changed_files": [
+    "CMakeLists.txt",
+    "docs/ENUMS.md",
+    "docs/LANGUAGE_BIBLE.md",
+    "docs/NUMERIC_TYPES.md",
+    "docs/README.md",
+    "docs/projects/G81_INTEGER_BITWISE.md",
+    "docs/projects/evidence/g81/qualification.json",
+    "docs/projects/evidence/g81/research.json",
+    "docs/projects/evidence/g81/unsuccessful-evidence.json",
+    "docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md",
+    "docs/stage10/OPERATORS.md",
+    "editors/vscode/src/test/bitwiseGrammar.test.ts",
+    "editors/vscode/src/test/bitwiseHost.ts",
+    "editors/vscode/syntaxes/void.tmLanguage.json",
+    "examples/learn/integer_bitwise.void",
+    "include/void/ir.hpp",
+    "src/backend/llvm/backend.cpp",
+    "src/frontend/compiler.cpp",
+    "src/ir/module.cpp",
+    "src/numeric.cpp",
+    "tests/bitwise/completeness.py",
+    "tests/bitwise/completeness.void",
+    "tests/bitwise/editor.void",
+    "tests/bitwise/lsp.py",
+    "tests/bitwise/runtime.cpp"
+  ],
+  "modified": [
+    "CMakeLists.txt",
+    "docs/ENUMS.md",
+    "docs/LANGUAGE_BIBLE.md",
+    "docs/NUMERIC_TYPES.md",
+    "docs/README.md",
+    "docs/roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md",
+    "docs/stage10/OPERATORS.md",
+    "editors/vscode/syntaxes/void.tmLanguage.json",
+    "include/void/ir.hpp",
+    "src/backend/llvm/backend.cpp",
+    "src/frontend/compiler.cpp",
+    "src/ir/module.cpp",
+    "src/numeric.cpp"
+  ],
+  "new": [
+    "docs/projects/G81_INTEGER_BITWISE.md",
+    "docs/projects/evidence/g81/qualification.json",
+    "docs/projects/evidence/g81/research.json",
+    "docs/projects/evidence/g81/unsuccessful-evidence.json",
+    "editors/vscode/src/test/bitwiseGrammar.test.ts",
+    "editors/vscode/src/test/bitwiseHost.ts",
+    "examples/learn/integer_bitwise.void",
+    "tests/bitwise/completeness.py",
+    "tests/bitwise/completeness.void",
+    "tests/bitwise/editor.void",
+    "tests/bitwise/lsp.py",
+    "tests/bitwise/runtime.cpp"
+  ],
+  "code_test_hashes": {
+    "CMakeLists.txt": "7aec8a45cc0db5a425586086d42c45c26861ea2df72791995d6f8a5bdaddaead",
+    "editors/vscode/src/test/bitwiseGrammar.test.ts": "fe068c563337bd8b59c65038482d5233819c557c53708d91331ef9ce6affc028",
+    "editors/vscode/src/test/bitwiseHost.ts": "4abc3aefaa3c9ed971b32040380398af3657ad51092b6dcba748ca0d9eef6706",
+    "editors/vscode/syntaxes/void.tmLanguage.json": "6534694d79c16b6425a4ac58d8dfab7125c714fc92f84d4f2671a27fff7feb30",
+    "examples/learn/integer_bitwise.void": "68ad037f7916fdb2402f16ca9ff640c5061f5099d13c8ba856eefe444604f0e7",
+    "include/void/ir.hpp": "8c1f80f16d0ed613670202b41ca590ae7ba81dac169a487f55680b8dc0eccd2d",
+    "src/backend/llvm/backend.cpp": "d27dc863ff38f24318fd697e4cda5ec679be1d60fc451121c22d82fb6cf9d1b6",
+    "src/frontend/compiler.cpp": "3f247fb741231a1e6cea2d17ed2aa2a4d47a631b17cd11b26ef0b857f3eaf579",
+    "src/ir/module.cpp": "7636c30bf213e08559c61592a16ffe44c3d63cc8d9657b236786641246b0507c",
+    "src/numeric.cpp": "f743818ff131d95e07c90a604e5e7228fc5cb1bae97bd127a0a94d67692aa69d",
+    "tests/bitwise/completeness.py": "5a4949db4d746a187bf5c21854d096b78621211bf82699facaa29388438056c5",
+    "tests/bitwise/completeness.void": "106ecf3e54792884397d5395d297c8ea1ce162e307bcf046942d34e8209534d2",
+    "tests/bitwise/editor.void": "8f358220db1787e4bac9b62aa0a1b510cd400a9368e7c852810ee68ca65a66d8",
+    "tests/bitwise/lsp.py": "3fbc25b2f01751caba5ea8c39ab49d07de57f3aa3f31b9a2ed45a5889158fdc5",
+    "tests/bitwise/runtime.cpp": "11952dcffa5ed4fb72e0d09a709ed03efdffc7d20f3460b64947e50796f0b41a"
+  },
+  "git_diff_check": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "limits": [
+    "Selected relevant suite, not the complete repository suite.",
+    "Windows/macOS native execution unqualified.",
+    "No comparative performance benchmark or popup paint measurement.",
+    "Real-editor development profiles, no user tool installation.",
+    "No hosted CI, independent review acceptance, staging, commit, push, installation or publication."
+  ]
+}

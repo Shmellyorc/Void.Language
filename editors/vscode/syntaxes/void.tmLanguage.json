@@ -19,6 +19,6 @@
     {"name":"support.function.void", "match":"\\b(?:Ok|Err|Some)(?=[ \\t]*\\()"},
     {"name":"constant.language.void", "match":"\\b(?:true|false|null|None)\\b"},
     {"name":"constant.numeric.void", "match":"\\b[0-9]+(?:\\.[0-9]+)?[fd]?\\b"},
-    {"name":"keyword.operator.void", "match":"->|==|!=|<=|>=|\\+=|-=|\\*=|/=|%=|\\+\\+|--|[+*/%=<>&|^~-]"}
+    {"name":"keyword.operator.void", "match":"<<=|>>=|<<|>>|&=|\\|=|\\^=|->|==|!=|<=|>=|\\+=|-=|\\*=|/=|%=|\\+\\+|--|[+*/%=<>&|^~-]"}
   ]
 }

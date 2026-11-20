@@ -64,7 +64,9 @@ theorem proved by the compiler. Derived `!=` guarantees only complementarity.
 No independently declared compound operators, assignment, conversions, Boolean
 short-circuit operators, `not`, `is`, `as`, `has`, indexing/call, shifts,
 bitwise operators or increment/decrement are added to this approved family.
-Existing builtin versions remain where already supported. Callable structs keep
+Existing builtin versions remain where already supported. G81 adds fixed-width
+integer shifts and shift assignments through builtin numeric machinery, without
+extending this custom operator family; see [numeric operators](../NUMERIC_TYPES.md#integer-bitwise-and-shifts-g81). Callable structs keep
 their existing `call()` mechanism. This is an explicit scope boundary, not a
 proposal to leave part of the approved arithmetic/equality/order set unfinished.
 

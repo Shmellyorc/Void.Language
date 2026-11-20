@@ -107,9 +107,10 @@ its full width, including the sign bit.
 `&`, `|`, `^` and `~` preserve the exact integer or flags type. Binary operands
 must have the same type; ordinary numeric enums, bools and floats do not acquire
 bitwise operations. `&=`, `|=` and `^=` mutate an explicitly mutable target.
-No shifts or broader custom bitwise operator protocol is introduced by G78.
+G81 adds general integer shifts, but enums remain excluded as shift values and
+counts. Use `.value` explicitly. No custom bitwise operator protocol is introduced.
 From weaker to stronger precedence: `or`, `and`, comparisons/`is`, `|`, `^`, `&`,
-addition, multiplication, conversions. Parenthesize masks used in comparisons
+integer shifts, addition, multiplication, conversions. Parenthesize masks used in comparisons
 when that improves readability.
 
 All backing-width bit patterns are valid flags values, including unnamed

@@ -169,3 +169,5 @@ Boss controls Git and hosted acceptance. See [Wrench](WRENCH_CLANKER.md) for the
 shared workflow; old sprint gates do not create fresh authorization requirements.
 
 - [Enums and flags](ENUMS.md): equality, keys, generic payloads, conversions and typed flags.
+
+- [Integer bitwise and shifts](NUMERIC_TYPES.md#integer-bitwise-and-shifts-g81): exact widths, signed shifts, modulo counts and packed-data examples.

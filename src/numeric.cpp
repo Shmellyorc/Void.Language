@@ -36,7 +36,8 @@ bool supports(ir::Op op, Type t) {
     switch (op) {
     case Op::equal: case Op::not_equal: return number(t) || t == Type::boolean;
     case Op::remainder: return integer(t);
-    case Op::bit_and: case Op::bit_or: case Op::bit_xor: case Op::bit_not: return integer(t);
+    case Op::bit_and: case Op::bit_or: case Op::bit_xor: case Op::bit_not:
+    case Op::shift_left: case Op::shift_right: return integer(t);
     case Op::add: case Op::subtract: case Op::multiply: case Op::divide:
     case Op::less: case Op::less_equal: case Op::greater: case Op::greater_equal:
     case Op::negate: return number(t);
@@ -139,6 +140,14 @@ std::uint64_t binary(ir::Op op, std::uint64_t x, std::uint64_t y, Type t) {
         case Op::greater_equal: return c == llvm::APFloat::cmpGreaterThan || c == llvm::APFloat::cmpEqual;
         default: throw std::invalid_argument("Illegal floating operator");
         }
+    }
+    // Mask before constructing a count APInt: its source type may be wider
+    // than the value. The low bits also define negative counts modulo width.
+    if (op == Op::shift_left || op == Op::shift_right) {
+        llvm::APInt a(width(t),x);
+        const auto count = static_cast<unsigned>(y & (width(t)-1));
+        return (op == Op::shift_left ? a.shl(count) :
+                signed_integer(t) ? a.ashr(count) : a.lshr(count)).getZExtValue();
     }
     llvm::APInt a(width(t),x), b(width(t),y);
     bool sign = signed_integer(t);

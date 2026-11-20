@@ -21,11 +21,19 @@
             need("}");return result;
         }
         if(peek().kind==TokenKind::name && peek().text!="true" && peek().text!="false" && peek().text!="null") {
-            auto end=p+1;while(end+1<tokens.size() && tokens[end].text=="." && tokens[end+1].kind==TokenKind::name)end+=2;
-            bool generic=false;
-            if(end<tokens.size() && tokens[end].text=="<"){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="<")++count;else if(tokens[close].text==">" && !--count)break;else if(tokens[close].kind==TokenKind::newline || tokens[close].kind==TokenKind::end)break;}if(close<tokens.size() && tokens[close].text==">"){generic=true;end=close+1;}}
+            auto end=p+1;bool generic=false;
+            // Find the final call after qualified generic owners/methods too.
+            // Scan only: actual type arguments still use the ordinary parser.
+            while(end<tokens.size()) {
+                if(end+1<tokens.size() && tokens[end].text=="." && tokens[end+1].kind==TokenKind::name){end+=2;continue;}
+                if(binary_operator(end)!="<")break;
+                unsigned count=0;auto close=end;
+                for(;close<tokens.size();++close){if(tokens[close].text=="<")++count;else if(tokens[close].text==">" && !--count)break;else if(tokens[close].kind==TokenKind::newline || tokens[close].kind==TokenKind::end)break;}
+                if(close>=tokens.size() || tokens[close].text!=">")break;
+                generic=true;end=close+1;
+            }
             bool value_tail=false;
-            if(end<tokens.size() && tokens[end].text=="("){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="(")++count;else if(tokens[close].text==")" && !--count)break;}if(close+1<tokens.size())value_tail=precedence(tokens[close+1].text)>=4 || tokens[close+1].text=="as" || tokens[close+1].text=="as?" || tokens[close+1].text==".." || tokens[close+1].text=="..<";}
+            if(end<tokens.size() && tokens[end].text=="("){unsigned count=0;auto close=end;for(;close<tokens.size();++close){if(tokens[close].text=="(")++count;else if(tokens[close].text==")" && !--count)break;}if(close+1<tokens.size())value_tail=precedence(binary_operator(close+1))>=4 || tokens[close+1].text=="as" || tokens[close+1].text=="as?" || tokens[close+1].text==".." || tokens[close+1].text=="..<";}
             if(end<tokens.size() && (tokens[end].text=="(" || generic) && !value_tail) {
                 result.kind=Pattern::Kind::constructor;result.variant_token=take();result.spelling=result.variant_token.text;
                 unsigned components=1;

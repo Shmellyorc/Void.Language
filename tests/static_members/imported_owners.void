@@ -1,0 +1,56 @@
+use "./imported_owners_library.void" as api
+value struct local_factory<t>:
+    item: t
+    static count = 100
+## Preserve a value through a local generic owner.
+## @param value Value to preserve.
+## @return The same concrete value.
+static func local_factory<t>.echo<u>(value: u) -> u:
+    return value
+## Preserve the type of a nested generic result.
+## @param value Input value.
+## @return The same concrete value.
+func keep<t>(value: t) -> t:
+    return value
+func main() -> i32:
+    if api.factory<i32>.echo<i32>(3) != 3 or api.factory<i32>.one() != 1:
+        return 1
+    if keep(api.factory<i32>.echo(7)) != 7:
+        return 2
+    if api.factory<string>.same("Boss") != "Boss":
+        return 3
+    if api.factory<api.box<i32>>.echo<i32>(9) != 9:
+        return 4
+    if api.depot<string>.echo<i32>(5) != 5:
+        return 5
+    var callback = api.factory<i32>.echo<i32>
+    var zero = api.factory<i32>.one
+    if callback(8) != 8 or zero() != 1:
+        return 6
+    api.factory<i32>.count = 3
+    api.factory<string>.count = 5
+    api.depot<string>.count = 11
+    api.factory<i32>.current = 6
+    api.factory<string>.current = "Boss"
+    if api.factory<i32>.count != 3 or api.factory<string>.count != 5 or api.depot<string>.count != 11:
+        return 7
+    if api.factory<i32>.limit != 7 or (api.factory<i32>.current as i32) != 6 or (api.factory<string>.current as string) != "Boss":
+        return 8
+    if local_factory<i32>.echo<i32>(4) != 4 or local_factory<i32>.count != 100:
+        return 9
+    var typed: i32 = 17
+    var value = api.factory(item = typed)
+    var managed = api.depot(item = "Boss")
+    var explicit_value = api.factory<i32>(item = 23)
+    var local_value = local_factory(item = typed)
+    if value.item != 17 or managed.item != "Boss" or explicit_value.item != 23 or local_value.item != 17:
+        return 10
+    match 2:
+        api.factory<i32>.echo<i32>(1) << 1:
+            pass
+        _:
+            return 11
+    if not (1 is api.factory<api.box<i32>>.echo<i32>(2) >> 1):
+        return 12
+    print("imported generic owners preserved")
+    return 0
