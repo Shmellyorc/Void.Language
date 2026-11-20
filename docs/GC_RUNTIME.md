@@ -50,6 +50,15 @@ compiler-checked staged field roots and the existing complete-object commit; the
 runtime implementation is unchanged. Phase 18 source values now carry managed
 references using this same Frame/Slot/descriptor runtime; see REFERENCE_VALUE_STRUCTS.md.
 
+G86 async iteration uses ordinary heap activations and checked resource scopes.
+The cursor, yielded managed values, pending advancement task and body locals
+remain precisely rooted across suspension. Advancement and its child scopes drain
+before iterator `deinit`; completed-frame retirement and task-record reclamation
+still require the existing quiescent points. No iterator-specific persistent
+handles, queue, native callback ownership or collector mechanism is added. See
+[the async iterator contract](CUSTOM_ITERATION.md#async-iteration--g86) and
+[G86 evidence](projects/G86_ADVANCED_ASYNC.md).
+
 Stage 6 Delivery 1 uses this same Runtime for precisely traced heap activation
 frames and task results. Native task records hold ordinary persistent handles
 through complete root draining; frame maps contain data offsets, never code

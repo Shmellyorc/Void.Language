@@ -479,6 +479,8 @@ std::string type_name(Type t) {
     if (t.construction) { t.construction=false; return "construction view " + type_name(t); }
     if(nullable_value(t))return type_name(nullable_payload(t))+"?";
     if(t.nullable && !reference_value(t) && !(t.definition && t.definition->callable)){t.nullable=false;return type_name(t)+"?";}
+    if(t.definition && t.definition->task_result)return std::string(t.readonly?"readonly ":"")+"task<"+
+        type_name(Type(*t.definition->task_result)==Type::none?Type(Type::none):field_type(t,1))+">"+(t.nullable?"?":"");
     if(t.definition && !t.definition->display_name.empty())return std::string(t.readonly?"readonly ":"")+t.definition->display_name+(t.nullable?"?":"");
     if(t.kind==Type::interface_ref && t.definition) return std::string(t.readonly ? "readonly " : "")+t.definition->identity+(t.nullable ? "?" : "");
     if(t.kind==Type::prepared_receiver && t.definition) return "prepared receiver "+t.definition->identity;

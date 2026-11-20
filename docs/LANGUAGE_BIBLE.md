@@ -1987,7 +1987,7 @@ for e, index in reverse enemies:
 
 This is convenient for games and can be safe under specific contiguous-list rules, but exact iterator-invalidating semantics are **OPEN**. Avoid locking it in until tests prove the contract for duplicates, nested iterators, and concurrent modification.
 
-## 35. Custom iteration protocol [IMPLEMENTED — G85]
+## 35. Custom iteration protocol [IMPLEMENTED — G85/G86]
 
 User-defined collections expose ordinary synchronous `iterator()` and, optionally,
 `reverse_iterator()` methods returning concrete non-nullable iterator structs.
@@ -2005,8 +2005,8 @@ The expression and factory run once; `index()` runs only after a successful
 `next()`. Managed state with `deinit()` uses existing scoped cleanup on completion,
 early exit and checked failure; value state keeps ordinary copy semantics.
 Readonly authority, ownership, generics and structural member access apply to all
-protocol calls. No implicit ordinal, reverse copy, erased iterator state or new
-async iteration protocol is introduced. Custom implementations own their mutation
+protocol calls. No implicit ordinal, reverse copy or erased iterator state is
+introduced. Custom implementations own their mutation
 and concurrency policies; built-in invalidation rules remain unchanged, including
 reverse remove-current.
 
@@ -2014,6 +2014,16 @@ The [iteration guide](CUSTOM_ITERATION.md) defines the exact contract, lifetime,
 interface integration and limitations. [Runnable examples](../examples/custom_iteration/main.void)
 and [qualification](projects/G85_CUSTOM_ITERATION.md) distinguish implementation
 from independent Golden Wrench acceptance.
+
+G86 adds `for await item, key in source:` and `in reverse source` in async
+functions. The separate synchronous `async_iterator()` / `reverse_async_iterator()`
+factory returns concrete state with a managed `async next() -> option<T>` receiver. Each
+advance is awaited before optional synchronous `index()` and the body. Resource
+state drains outstanding advancement before one-shot `deinit()` on every checked
+exit, including cancellation. Built-in collections and ordinary synchronous loops
+retain their original protocol. Async factories/destructors, async interface
+requirements and value receivers remain deferred. See
+[the complete async iteration contract](CUSTOM_ITERATION.md#async-iteration--g86).
 
 ---
 

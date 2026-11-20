@@ -2057,6 +2057,47 @@ if(BUILD_TESTING)
         "$<TARGET_FILE:void_async_tests>" "${mode}" "${syntax_object}")
     endforeach()
   endforeach()
+  add_executable(void_advanced_async_tests tests/async/advanced/tests.cpp
+    tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_advanced_async_tests PRIVATE void_llvm)
+  add_test(NAME advanced_async_runtime COMMAND void_advanced_async_tests "${PROJECT_SOURCE_DIR}")
+  set_tests_properties(advanced_async_runtime PROPERTIES TIMEOUT 180)
+  foreach(mode normal optimized)
+    set(object "${CMAKE_CURRENT_BINARY_DIR}/advanced-async-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${object}"
+      COMMAND void_advanced_async_tests --emit-library
+        "${PROJECT_SOURCE_DIR}/tests/async/advanced/roots.void" "${object}" "${mode}"
+      DEPENDS void_advanced_async_tests "${PROJECT_SOURCE_DIR}/tests/async/advanced/roots.void" VERBATIM)
+    set_source_files_properties("${object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_advanced_async_aot_${mode} tests/async/advanced/aot.cpp
+      tests/managed/probe.cpp "${object}" $<TARGET_OBJECTS:void_managed_test_abi>)
+    target_link_libraries(void_advanced_async_aot_${mode} PRIVATE void_runtime)
+    add_test(NAME advanced_async_aot_${mode} COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/async/advanced/aot.py" "$<TARGET_FILE:void_advanced_async_tests>"
+      "$<TARGET_FILE:void_advanced_async_aot_${mode}>" "${PROJECT_SOURCE_DIR}/tests/async/advanced/roots.void"
+      "${object}" "${mode}" --emit-library)
+    set_tests_properties(advanced_async_aot_${mode} PROPERTIES TIMEOUT 180)
+    set(workflow_object "${CMAKE_CURRENT_BINARY_DIR}/advanced-async-workflow-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${workflow_object}"
+      COMMAND void_io_runner --emit-async "${PROJECT_SOURCE_DIR}/examples/async/advanced/workflow.void" "${workflow_object}" "${mode}"
+      DEPENDS void_io_runner "${PROJECT_SOURCE_DIR}/examples/async/advanced/workflow.void"
+        "${PROJECT_SOURCE_DIR}/examples/async/advanced/sequence.void" VERBATIM)
+    set_source_files_properties("${workflow_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_advanced_async_workflow_${mode} tests/async/aot.cpp "${workflow_object}")
+    target_link_libraries(void_advanced_async_workflow_${mode} PRIVATE void_runtime)
+    add_test(NAME advanced_async_workflow_${mode} COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/async/advanced/aot.py" "$<TARGET_FILE:void_io_runner>"
+      "$<TARGET_FILE:void_advanced_async_workflow_${mode}>" "${PROJECT_SOURCE_DIR}/examples/async/advanced/workflow.void"
+      "${workflow_object}" "${mode}" --emit-async)
+  endforeach()
+  void_add_output_test(advanced_async_source "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/async/advanced/source.py" "$<TARGET_FILE:voidc>"
+    "$<TARGET_FILE:void_io_runner>" "@VOID_TEST_OUTPUT@/advanced-async-source.json")
+  set_tests_properties(advanced_async_source PROPERTIES TIMEOUT 300)
+  void_add_output_test(lsp_advanced_async "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/async/advanced/lsp.py" "$<TARGET_FILE:voidls>"
+    "@VOID_TEST_OUTPUT@/advanced-async-lsp.json")
+  set_tests_properties(lsp_advanced_async PROPERTIES TIMEOUT 180)
   add_test(NAME lsp_async_syntax COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/async/syntax_lsp.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_async_syntax PROPERTIES TIMEOUT 90)
   set_tests_properties(async_source PROPERTIES TIMEOUT 180)

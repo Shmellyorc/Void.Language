@@ -1,5 +1,47 @@
 # Stage 6 Deliveries 1–5: async, lifecycle, workers and native integration
 
+## G86 advanced async iteration and composition
+
+`for await item in source:` consumes the separate
+[async iterator protocol](CUSTOM_ITERATION.md#async-iteration--g86).
+Synchronous `async_iterator()` / `reverse_async_iterator()` acquire concrete
+state; its managed receiver implements `async next() -> option<T>`. Each advance
+is awaited before optional synchronous `index()` and the body. Managed state with
+`deinit()` uses existing resource scopes: cancellation drains advancement and
+descendants before destruction. There is no async destructor or generator syntax.
+Synchronous `for` keeps the G85 protocol and never implicitly awaits.
+
+Generic async functions and concrete managed generic receivers compose with these
+loops. Collection constraints/interface views may expose the synchronous factory
+returning concrete state. Async interface dispatch, async callable values and
+async value receivers remain rejected. An ordinary synchronous closure may still
+be used within a suspended activation; transferring callable-containing arguments
+or results across a task boundary remains forbidden.
+
+Use the existing `with tasks.group()` for lexical joining and start independent
+jobs before awaiting their results. Normal group exit joins all admitted children;
+typed `Err` values remain successful task completion, while runtime failures and
+cancellation use their existing distinct paths. `?` keeps its checked early-exit
+drain behavior. No separate `all`, race, detached-task or scheduler API is added.
+The [generic workflow](../examples/async/advanced/workflow.void) coordinates two
+typed results and combines generic async iteration, a bounded value worker and a
+native timer. The [sequence module](../examples/async/advanced/sequence.void)
+also supplies a reusable constrained `collect` example; these are application
+examples, not new standard-library modules.
+
+Task types display as `task<T>` (or `task<no result>`) in diagnostics and editor
+hover, including nested generic results. This is a readable presentation of the
+existing inferred opaque handle, **not public annotation or constructor syntax**.
+The explicit async host adapter remains required. With a development build:
+
+```text
+build/llvm23-debug/void_io_runner --async examples/async/advanced/workflow.void
+```
+
+This maintained host runs O0 and O2 and expects the workflow's result of 7.
+[G86 implementation and qualification](projects/G86_ADVANCED_ASYNC.md) separates
+local evidence, deliberate deferrals and the independent review boundary.
+
 ## HTTP Runtime foundation ownership amendment, 30 October 2026
 
 The Boss-authorized HTTP mission now implements a working-tree

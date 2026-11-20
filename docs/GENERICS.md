@@ -1,5 +1,23 @@
 # Native generics (Phase 24)
 
+## Generic async composition — G86
+
+Async functions and concrete managed generic receiver methods specialize through
+the ordinary exact generic/authority pipeline. G86
+[async iteration](CUSTOM_ITERATION.md#async-iteration--g86) supports concrete generic
+cursors and collection constraints/interface views whose synchronous factory
+returns concrete cursor state. The
+[sequence module](../examples/async/advanced/sequence.void) demonstrates a reusable
+constrained async `collect`; the
+[workflow](../examples/async/advanced/workflow.void) combines generic typed results
+inside an existing structured task group. Independent jobs start before their
+awaits. Typed errors do not automatically cancel siblings.
+
+`task<T>` in tooling describes an inferred opaque handle; it is not new source
+type syntax. Independent generic protocol method parameters cannot be inferred
+from a loop header, and erased async interface requirements, async function
+values, callable task transfers and async value receivers remain unsupported.
+
 The [28 October generic operator amendment](collections/GENERIC_OPERATORS.md)
 allows public operators on exact substituted public nominal owners, with verified
 IR specialization provenance. Ordinary code keeps the direct-import restriction;

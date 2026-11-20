@@ -4,16 +4,17 @@
 // same operations as authored source; there is no second iteration ABI.
 VOID_SEMANTIC_HANDLER Type iteration_expression(Expr& e) {
     const auto operation=e.token.text;
+    const bool async_next=e.op=="$async_iteration_next";
     auto type=method_expression(e);
     if(type==error_type)throw Poison{};
     const Function* selected=nullptr;
     for(const auto& [id,owner]:units)for(const auto& f:owner->functions)
         if(f.symbol==e.target)selected=&f;
     if(!selected || selected->token.text!=operation || selected->accessor ||
-       !selected->parameters.empty() || selected->asynchronous)
+       !selected->parameters.empty() || selected->asynchronous!=async_next)
         error(source,e.token,Code::unsupported_iteration,
-            "Custom iteration requires an ordinary synchronous '"+operation+"()' method with no parameters.");
-    if(operation=="iterator" || operation=="reverse_iterator") {
+            "Custom iteration requires an ordinary "+std::string(async_next?"async":"synchronous")+" '"+operation+"()' method with no parameters.");
+    if(operation=="iterator" || operation=="reverse_iterator" || operation=="async_iterator" || operation=="reverse_async_iterator") {
         if(type.nullable || !type.definition ||
            (type.kind!=Type::managed_ref && type.kind!=Type::aggregate) ||
            type.definition->callable || !type.definition->cases.empty() ||
@@ -21,7 +22,8 @@ VOID_SEMANTIC_HANDLER Type iteration_expression(Expr& e) {
             error(source,e.token,Code::unsupported_iteration,
                 "Custom '"+operation+"()' must return a non-nullable concrete iterator struct.");
     } else if(operation=="next") {
-        if(!type.definition || !type.definition->option_type)
+        auto yielded=async_next && type.definition && type.definition->task_result ? Type(*type.definition->task_result) : type;
+        if(!yielded.definition || !yielded.definition->option_type)
             error(source,e.token,Code::unsupported_iteration,
                 "Custom iterator next() must return option<T>; Some(value) yields a value and None completes the loop.");
     } else if(type==Type::none) {
@@ -37,7 +39,8 @@ VOID_SEMANTIC_HANDLER void custom_iteration(Statement& s) {
         auto e=std::make_unique<Expr>(Expr::Kind::method_call,site);
         e->op="$iteration";e->implicit=true;e->parts.push_back(std::move(receiver));return e;
     };
-    auto factory=call(s.reverse?"reverse_iterator":"iterator",std::move(s.expression));
+    auto factory=call(s.asynchronous_iteration?(s.reverse?"reverse_async_iterator":"async_iterator"):
+        (s.reverse?"reverse_iterator":"iterator"),std::move(s.expression));
     const auto state=expression(*factory);
     if(state==error_type)throw Poison{};
     Token hidden{TokenKind::name,"$iterator$"+std::to_string(s.token.offset),s.token.offset};
@@ -47,7 +50,15 @@ VOID_SEMANTIC_HANDLER void custom_iteration(Statement& s) {
     };
     Statement loop(Statement::Kind::loop,s.token);
     loop.expression=std::make_unique<Expr>(Expr::Kind::test,s.token);
-    loop.expression->implicit=true;loop.expression->parts.push_back(call("next",state_read()));
+    loop.expression->implicit=true;
+    auto next=call("next",state_read());
+    if(s.asynchronous_iteration) {
+        next->op="$async_iteration_next";
+        Token token{TokenKind::name,"await",s.token.offset};token.source_width=s.token.text.size();
+        auto awaited=std::make_unique<Expr>(Expr::Kind::awaited,token);awaited->implicit=true;
+        awaited->parts.push_back(std::move(next));next=std::move(awaited);
+    }
+    loop.expression->parts.push_back(std::move(next));
     Pattern some;some.kind=Pattern::Kind::constructor;some.spelling="Some";some.token=s.token;
     Pattern item;item.kind=Pattern::Kind::capture;item.token=s.binder;
     some.children.push_back(std::move(item));some.fields.push_back({});

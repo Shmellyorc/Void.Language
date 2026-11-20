@@ -1,5 +1,12 @@
 # Advanced language: Stage 4
 
+G86 adds [async iteration](CUSTOM_ITERATION.md#async-iteration--g86) and
+[generic async coordination examples](ASYNC.md#g86-advanced-async-iteration-and-composition).
+`for await` uses ordinary checked async receiver calls, option patterns and scoped
+cleanup. Success, typed errors, runtime failure and cancellation retain their
+separate behavior, including reached defers and child draining. The historical
+stage boundaries below describe their original delivery scope.
+
 ## Stage 8 Sprint 3 — current extension
 
 The owner-approved [text/collection contract](STAGE8_TEXT_COLLECTIONS.md) supersedes

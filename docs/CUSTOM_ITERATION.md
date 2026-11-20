@@ -1,4 +1,4 @@
-# Custom iteration — G85
+# Custom iteration — G85/G86
 
 Developer-defined collections participate in ordinary `for` loops through checked
 receiver methods. No registration, new keyword or built-in collection identifier
@@ -82,8 +82,63 @@ An iterator can yield `option<result<T, E>>`; the body then handles or propagate
 that result normally. [The checked collection example](../examples/custom_iteration/checked.void)
 uses this to report structural invalidation without adding exceptions.
 Synchronous protocol methods can run in an async function and survive body
-suspension through its existing state/cleanup machinery. Async factories and
-async `next` are not an asynchronous iteration protocol.
+suspension through its existing state/cleanup machinery. G86 adds the separate
+async protocol below; ordinary `for` never implicitly awaits.
+
+## Async iteration — G86
+
+```void
+for await item, key in values:
+    print(item, key)
+for await item in reverse values:
+    print(item)
+```
+
+An awaited condition such as `for await ready():` retains the ordinary condition
+loop grammar. The `await` iteration modifier is selected only before an item
+binding followed by `in` (or a second binding and `in`).
+
+Use `for await` iteration only in async functions outside deferred cleanup. It requires a
+custom source with synchronous `async_iterator()` (or `reverse_async_iterator()`)
+returning concrete non-nullable state. The state's ordinary parameterless
+**async** `next() -> option<T>` supplies each value through a task. Async value
+receivers remain forbidden; advancement must select a managed receiver. A
+concrete value wrapper can use ordinary one-hop promotion to its managed
+component's async method. Such a value wrapper has no automatic destructor;
+resource-owning state must be managed. The factory's receiver can be managed or
+value state under ordinary synchronous call rules.
+An optional second binder requires ordinary synchronous parameterless `index()`
+with its exact declared key type. Defaults do not make protocol parameters legal.
+Built-in arrays/lists/dictionaries/ranges use ordinary `for` and diagnose under
+`for await`; there is no fallback between the two protocols.
+
+The source and factory execute once, then each `next()` call is awaited exactly
+once before inspecting `Some`/`None`. Only `Some` assigns the item and calls
+`index()`, then enters the body. `None` ends traversal without another advance.
+`continue` advances; `break` stops without prefetch. There is at most one
+advancement initiated by the loop in flight. A factory returning aliased shared
+state still owns its synchronization policy; the loop adds no lock or
+concurrent-next API. The [generic example](../examples/async/advanced/sequence.void)
+implements forward and reverse traversal, owner specialization and constrained
+collection.
+
+State with `deinit()` uses the same checked resource scope as G85. A cancelled or
+failing advancement drains its descendants and reached defers before iterator
+destruction. Before-start cancellation runs neither factory nor unreached
+cleanup. Failed acquisition activates no cleanup; acquired state cleans once on
+completion, early return, `break`, typed propagation, cancellation or runtime
+failure. An actual cleanup failure retains its existing precedence over
+cancellation. The body can suspend and use nested structured groups. Item and key
+copies, precise roots, readonly provenance and visibility follow ordinary checked
+calls; the loop grants no receiver or callback authority.
+
+Typed errors can be yielded as `option<result<T,E>>`; the body chooses whether to
+handle or propagate them. There is no implicit conversion of cancellation or
+runtime failure into `Err`. Async factories, async `index`/destruction, erased
+iterator state, async interface requirements, `yield`, streams/backpressure,
+prefetch and arbitrary async callback values remain deferred. In particular,
+async acquisition would need an explicit ownership contract for an acquired
+resource whose task result is abandoned before the loop activates its scope.
 
 ## Mutation and readonly authority
 

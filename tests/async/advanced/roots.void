@@ -1,0 +1,111 @@
+struct ledger:
+    closed: i32
+    sum: i32
+    advancing: bool
+    reached: i32
+
+struct tile:
+    value: i32
+
+async func tick() -> i32:
+    return 1
+
+struct cursor:
+    ledger: ledger
+    value: tile
+    mode: i32
+    position: i32
+
+async func (self cursor) next() -> option<tile>:
+    defer {
+        self.ledger.reached += 10
+        self.ledger.advancing = false
+    }
+    self.ledger.advancing = true
+    var ignored = await tick()
+    self.position += 1
+    if self.position > 3:
+        if self.mode == 6:
+            var empty: [tile] = []
+            return Some(empty[0])
+        return None
+    self.value = tile(value = self.position)
+    return Some(self.value)
+
+func (self cursor) index() -> i32:
+    if self.mode == 7:
+        var empty: [i32] = []
+        return empty[0]
+    return self.position - 1
+
+func (self cursor) deinit():
+    self.ledger.closed += 1
+    if self.ledger.advancing:
+        var empty: [i32] = []
+        self.ledger.sum += empty[0]
+    if self.mode == 10 or self.mode == 14:
+        var empty: [i32] = []
+        self.ledger.sum += empty[0]
+    self.value = tile(value = 99)
+
+value struct sequence:
+    ledger: ledger
+    mode: i32
+
+func (self sequence) async_iterator() -> cursor:
+    if self.mode == 11:
+        var empty: [tile] = []
+        return cursor(ledger = self.ledger, value = empty[0])
+    return cursor(ledger = self.ledger, value = tile(value = 0), mode = self.mode)
+
+func stop() -> result<i32, string>:
+    return Err("stop")
+
+async func walk(owner: ledger, mode: i32) -> result<i32, string>:
+    for await value, key in sequence(ledger = owner, mode = mode):
+        if mode == 1 and key == 1:
+            continue
+        owner.sum += value.value
+        if mode == 2:
+            break
+        if mode == 3:
+            return Ok(11)
+        if mode == 4:
+            return Ok(stop()?)
+        if mode == 5:
+            var empty: [i32] = []
+            return Ok(empty[0])
+    return Ok(owner.sum)
+
+async func first(owner: ledger) -> tile:
+    for await value in sequence(ledger = owner):
+        return value
+    return tile(value = 0)
+
+async func entry(mode: i32) -> i32:
+    var owner = ledger()
+    if mode == 8:
+        var last = tile(value = 0)
+        for await value in sequence(ledger = owner):
+            last = value
+        return owner.closed * 100 + last.value
+    if mode == 9:
+        var saved = await first(owner)
+        var allocation = tile(value = 10)
+        return owner.closed * 100 + saved.value
+    if mode >= 12:
+        var job = walk(owner, mode)
+        if mode != 12:
+            for not owner.advancing:
+                var ignored = await tick()
+        job.cancel()
+        match await job:
+            Ok(var value):
+                return value
+            Err(var failure):
+                return -1
+    match await walk(owner, mode):
+        Ok(var value):
+            return owner.closed * 100 + value
+        Err(var failure):
+            return owner.closed * 100 + 20

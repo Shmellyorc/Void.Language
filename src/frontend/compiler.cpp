@@ -498,7 +498,7 @@ struct Statement {
     unsigned compound_slot=0;
     Token binder{TokenKind::name,"",0}, index_binder{TokenKind::name,"",0};
     unsigned index_slot=0;
-    bool reverse=false, exclusive=false, exhaustive=false;
+    bool reverse=false, exclusive=false, exhaustive=false, asynchronous_iteration=false;
     std::vector<Token> fields;
     std::vector<bool> implicit_fields;
     std::vector<unsigned> field_indexes;
@@ -1335,6 +1335,11 @@ class Parser {
     // so the unchanged 64-block guard can diagnose on a 1 MiB native stack.
     VOID_SEMANTIC_HANDLER Statement loop_statement() {
         Statement s(Statement::Kind::loop, take());
+        // Await is also an ordinary condition expression (`for await ready():`).
+        // Only consume the iteration modifier when a binder header follows it.
+        s.asynchronous_iteration=at("await") && peek(1).kind==TokenKind::name &&
+            (peek(2).text=="in" || peek(2).text==",");
+        if(s.asynchronous_iteration)take();
         if(peek().kind==TokenKind::name && (peek(1).text=="in" || peek(1).text==",")) {
             s.binder=name();if(accept(","))s.index_binder=name();need("in");s.reverse=accept("reverse");
             s.expression=expression();
@@ -3236,7 +3241,7 @@ class Semantics {
             if(e.token.text=="Ok" || e.token.text=="Err")return result_expression(e,expected);
             if((e.token.text=="Some" || e.token.text=="None") && e.qualifier.empty())return option_expression(e,expected);
             return call_expression(e);
-        case Expr::Kind::method_call: return e.op=="$iteration" ? iteration_expression(e) : method_expression(e);
+        case Expr::Kind::method_call: return e.op=="$iteration" || e.op=="$async_iteration_next" ? iteration_expression(e) : method_expression(e);
         case Expr::Kind::conversion: return conversion_expression(e);
         case Expr::Kind::unary: return unary_expression(e, expected);
         default: return binary_expression(e, expected);
@@ -4764,12 +4769,15 @@ class Semantics {
     VOID_SEMANTIC_HANDLER unsigned loop_statement(Statement& s) {
         unsigned flow = next_flow;
 
+        if(s.asynchronous_iteration && (!current || !current->asynchronous || current->deferred))
+            error(source,s.token,Code::unsupported_iteration,"for await requires an async function outside deferred cleanup.");
         if(!s.binder.text.empty()) {
             // Editor recovery may retain an unfinished header. Its binder
             // slots are valid only after the iterable has been checked.
             s.invalid=true;
             Type item;
             if(s.range_end) {
+                if(s.asynchronous_iteration)error(source,s.token,Code::unsupported_iteration,"for await requires a custom async iterable, not a range.");
                 if(!s.index_binder.text.empty())error(source,s.index_binder,Code::unsupported_iteration,"Ranges have one item binding.");
                 auto hint=anchor(*s.expression);if(!hint)hint=anchor(*s.range_end);
                 auto first=expression(*s.expression,hint);auto last=expression(*s.range_end,first);expect(last,first,s.range_end->token);
@@ -4778,7 +4786,9 @@ class Semantics {
             } else {
                 auto array=expression(*s.expression);
                 if(array==error_type)throw Poison{};
-                if(!ir::collection_type(array)){custom_iteration(s);return statement(s);}
+                if(s.asynchronous_iteration && ir::collection_type(array))
+                    error(source,s.token,Code::unsupported_iteration,"for await requires a custom async iterable; built-in collections use ordinary for.");
+                if(s.asynchronous_iteration || !ir::collection_type(array)){custom_iteration(s);return statement(s);}
                 item=array.kind==Type::dictionary?ir::dictionary_value(array):ir::array_element(array);
             }
             scopes.emplace_back();s.slot=declare(s.binder,item);

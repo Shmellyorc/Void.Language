@@ -1,0 +1,47 @@
+use "./sequence.void" as sequences
+use time
+use convert
+
+value struct pair<t>:
+    first: t
+    second: t
+
+# Source workers keep their existing value-only transfer and effect checks.
+func double(value: i32) -> i32:
+    return value * 2
+
+async func checked<t>(value: t) -> result<t, string>:
+    return Ok(value)
+
+# Start both jobs before awaiting either; a typed Err remains ordinary data.
+async func coordinate<t>(first: t, second: t) -> result<pair<t>, string>:
+    var answer = pair<t>(first = first, second = second)
+    with tasks.group() as jobs:
+        var left = checked(first)
+        var right = checked(second)
+        answer.first = await left?
+        answer.second = await right?
+    return Ok(answer)
+
+async func entry(value: i32) -> i32:
+    var worker = spawn double(value)
+    var coordinated = pair(first = 0, second = 0)
+    match await coordinate(3, 4):
+        Ok(var answer):
+            coordinated = answer
+        Err(var failure):
+            return -3
+    # A native completion uses the existing owning executor and timer provider.
+    match await time.sleep(convert.unwrap(time.make_duration(0))):
+        Err(var failure):
+            return -1
+        Ok(var slept):
+            pass
+    var values = sequences.sequence(values = [coordinated.first, coordinated.second])
+    var collected = await sequences.collect(0, values)
+    var backwards = 0
+    for await item, key in reverse values:
+        backwards += item
+    if backwards != 7 or await worker != value * 2:
+        return -2
+    return collected[0] + collected[1]

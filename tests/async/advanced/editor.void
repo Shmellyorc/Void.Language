@@ -1,0 +1,12 @@
+use "./api.void" as api
+
+async func entry(value: i32) -> i32:
+    var values = api.sequence(values = [4, 5, 6])
+    var state = values.async_iterator()
+    var pending = state.next()
+    var yielded = await pending
+    for await element, key in values:
+        print(element, key)
+    for await repeated in values:
+        print(repeated)
+    return value
