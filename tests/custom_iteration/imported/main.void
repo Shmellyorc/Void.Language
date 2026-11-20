@@ -1,0 +1,20 @@
+use "./api.void" as api
+
+func total<t, c: api.iterable<t>>(seed: t, input: c) -> i64:
+    var count: i64 = 0
+    for element, key in input:
+        count += key + 1
+    return count
+
+func via_interface(input: api.iterable<i32>) -> i32:
+    var sum = 0
+    for element in input:
+        sum += element
+    return sum
+
+func main():
+    var values = api.sequence(values = [4, 5, 6])
+    print(total(0, values), via_interface(values))
+    var letters = api.sequence(values = ["a", "b"])
+    for letter, key in letters:
+        print(letter, key)

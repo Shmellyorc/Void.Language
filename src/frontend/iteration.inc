@@ -1,0 +1,80 @@
+// Custom iteration is expanded into ordinary checked calls, an option pattern
+// loop and (for resource-owning managed state) the existing with scope. All
+// subsequent effect, construction, capability, IR and backend passes see the
+// same operations as authored source; there is no second iteration ABI.
+VOID_SEMANTIC_HANDLER Type iteration_expression(Expr& e) {
+    const auto operation=e.token.text;
+    auto type=method_expression(e);
+    if(type==error_type)throw Poison{};
+    const Function* selected=nullptr;
+    for(const auto& [id,owner]:units)for(const auto& f:owner->functions)
+        if(f.symbol==e.target)selected=&f;
+    if(!selected || selected->token.text!=operation || selected->accessor ||
+       !selected->parameters.empty() || selected->asynchronous)
+        error(source,e.token,Code::unsupported_iteration,
+            "Custom iteration requires an ordinary synchronous '"+operation+"()' method with no parameters.");
+    if(operation=="iterator" || operation=="reverse_iterator") {
+        if(type.nullable || !type.definition ||
+           (type.kind!=Type::managed_ref && type.kind!=Type::aggregate) ||
+           type.definition->callable || !type.definition->cases.empty() ||
+           type.definition->nullable_value)
+            error(source,e.token,Code::unsupported_iteration,
+                "Custom '"+operation+"()' must return a non-nullable concrete iterator struct.");
+    } else if(operation=="next") {
+        if(!type.definition || !type.definition->option_type)
+            error(source,e.token,Code::unsupported_iteration,
+                "Custom iterator next() must return option<T>; Some(value) yields a value and None completes the loop.");
+    } else if(type==Type::none) {
+        error(source,e.token,Code::unsupported_iteration,
+            "Custom iterator index() must return the index or key of the value just yielded by next().");
+    }
+    return type;
+}
+
+VOID_SEMANTIC_HANDLER void custom_iteration(Statement& s) {
+    auto call=[&](const std::string& name,std::unique_ptr<Expr> receiver) {
+        Token site{TokenKind::name,name,s.token.offset};site.source_width=s.token.text.size();
+        auto e=std::make_unique<Expr>(Expr::Kind::method_call,site);
+        e->op="$iteration";e->implicit=true;e->parts.push_back(std::move(receiver));return e;
+    };
+    auto factory=call(s.reverse?"reverse_iterator":"iterator",std::move(s.expression));
+    const auto state=expression(*factory);
+    if(state==error_type)throw Poison{};
+    Token hidden{TokenKind::name,"$iterator$"+std::to_string(s.token.offset),s.token.offset};
+    hidden.source_width=0;
+    auto state_read=[&] {
+        auto e=std::make_unique<Expr>(Expr::Kind::name,hidden);e->implicit=true;return e;
+    };
+    Statement loop(Statement::Kind::loop,s.token);
+    loop.expression=std::make_unique<Expr>(Expr::Kind::test,s.token);
+    loop.expression->implicit=true;loop.expression->parts.push_back(call("next",state_read()));
+    Pattern some;some.kind=Pattern::Kind::constructor;some.spelling="Some";some.token=s.token;
+    Pattern item;item.kind=Pattern::Kind::capture;item.token=s.binder;
+    some.children.push_back(std::move(item));some.fields.push_back({});
+    loop.expression->patterns.push_back(std::move(some));
+    if(!s.index_binder.text.empty()) {
+        Statement index(Statement::Kind::variable,s.index_binder);index.name=s.index_binder.text;
+        index.expression=call("index",state_read());loop.body.push_back(std::move(index));
+    }
+    for(auto& child:s.body)loop.body.push_back(std::move(child));
+
+    // A declared destructor is a capability, including inaccessible/ambiguous
+    // declarations: ordinary with checking must diagnose them rather than omit
+    // cleanup. Value structs have no deinit under the existing lifetime model.
+    bool resource=false;
+    if(state.kind==Type::managed_ref) {
+        const auto selected=ir::select_member(*root.member_catalog,state,"deinit",unit.identity,nullptr,lexical_owner());
+        resource=selected.status!=ir::MemberSelection::missing;
+    }
+    Statement scope(resource?Statement::Kind::scoped:Statement::Kind::conditional,s.token);
+    scope.source_end=s.source_end;
+    if(resource) {
+        scope.binder=hidden;scope.expression=std::move(factory);
+    } else {
+        scope.expression=std::make_unique<Expr>(Expr::Kind::literal,s.token);
+        scope.expression->type=Type::boolean;scope.expression->value=1;scope.expression->implicit=true;
+        Statement binding(Statement::Kind::variable,hidden);binding.name=hidden.text;binding.expression=std::move(factory);
+        scope.body.push_back(std::move(binding));
+    }
+    scope.body.push_back(std::move(loop));s=std::move(scope);
+}

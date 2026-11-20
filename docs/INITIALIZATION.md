@@ -246,3 +246,12 @@ the existing source failure channel rather than becoming a typed `Err`.
 Runnable examples are in `examples/fallible_initialization/`. Source, native JIT/AOT
 GC/IR proofs, protocol and real-editor evidence are recorded in the
 [G84 report](projects/G84_FALLIBLE_CONSTRUCTORS.md).
+
+## Iterator state (G85)
+
+Custom loop factories return completed concrete iterator structs through ordinary
+calls. Managed state with `deinit()` receives existing `with` cleanup after
+successful acquisition; a failed factory activates no disposal for unacquired
+state. Value iterators retain copy semantics and cannot declare value `deinit`.
+Yielded managed values keep their own precise roots when they escape the loop.
+See [iterator ownership and failures](CUSTOM_ITERATION.md#ownership-and-failures).

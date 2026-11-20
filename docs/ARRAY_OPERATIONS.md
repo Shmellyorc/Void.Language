@@ -126,3 +126,12 @@ separately cover growth, in-capacity insertion and slicing without requiring an
 allocation-free operation to fail. `collections_cli` executes real programs via
 normal/O2 JIT and independently linked AOT. Large cases exceed 2 MiB and run under
 the existing 1 MiB stack checks. Exact commands and results are in WORK_LOG.md.
+
+## Developer-defined collections (G85)
+
+Custom collection wrappers can expose `iterator()` and `reverse_iterator()` with
+`next() -> option<T>` and optional `index()`. They define and enforce their own
+mutation policy: merely storing a list does not install its built-in for-loop
+version check. Built-in next-access/completion invalidation, readonly views, fixed
+array ownership and reverse remove-current rules are unchanged. See
+[custom iteration](CUSTOM_ITERATION.md) and the [checked wrapper](../examples/custom_iteration/checked.void).

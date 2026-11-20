@@ -233,3 +233,13 @@ structural conformance, generic specialization, capabilities and checked failure
 rules remain authoritative. Both conditional branches type-check. Formatting and
 numeric/bool/custom string conversion remain deferred. Approval and implementation
 are separate from local acceptance, Wrench review and the final hosted lock.
+
+## Custom iteration (G85)
+
+An interface can require `iterator() -> concrete_cursor<t>` (or a concrete
+managed iterator) and serve as an iterable collection view or generic constraint.
+The loop checks the returned state's ordinary `next() -> option<T>` and optional
+`index()` methods. Iterator state itself must be concrete, because interface
+erasure cannot expose the optional `deinit` lifecycle capability. No associated
+types, lifecycle requirements, value boxing or transitive access are added. See
+[the iteration contract](CUSTOM_ITERATION.md#generics-interfaces-and-editors).

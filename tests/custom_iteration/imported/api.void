@@ -1,0 +1,33 @@
+value struct cursor<t>:
+    values: [t]
+    position: i64
+
+# Yield an independent value copy, or None after the last element.
+func (self cursor<t>) next() -> option<t>:
+    if self.position == self.values.count:
+        return None
+    self.position += 1
+    return Some(self.values[self.position - 1])
+
+# Return the original zero-based position of the last yielded value.
+func (self cursor<t>) index() -> i64:
+    return self.position - 1
+
+struct sequence<t>:
+    values: [t]
+
+# Create independent cursor state for each traversal.
+func (self sequence<t>) iterator() -> cursor<t>:
+    return cursor<t>(values = self.values)
+
+interface iterable<t>:
+    func iterator() -> cursor<t>
+
+private struct hidden:
+    count: i32
+
+private func (self hidden) iterator() -> cursor<i32>:
+    return cursor<i32>(values = [self.count])
+
+func secret() -> hidden:
+    return hidden(count = 42)

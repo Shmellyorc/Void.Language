@@ -129,3 +129,11 @@ fixture uses 2 MiB fixed payloads in nested collections. Native Runtime sweeps s
 exercise construction, growth, in-capacity insertion, replacement, removal, clear and
 queries; allocation-free paths are not forced to fail. Exact final evidence and
 commands belong in the latest Stage 3 WORK_LOG entry.
+
+## Developer-defined iteration (G85)
+
+Custom collections may return a key from `index()` for `for value, key in source`.
+Its type and meaning are explicit in the iterator API; the compiler does not add
+a numeric counter. Native dictionary loops still use their existing key/value
+bindings, insertion order and next-access/completion invalidation. See the
+[custom iteration contract](CUSTOM_ITERATION.md).

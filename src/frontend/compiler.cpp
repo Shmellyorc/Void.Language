@@ -1328,7 +1328,19 @@ class Parser {
     Statement statement() {
         nodes = 0;
         if(at("defer"))return deferred_statement();
+        if(at("for"))return loop_statement();
         return ordinary_statement();
+    }
+    // Keep unrelated declaration temporaries off nested loop parser frames,
+    // so the unchanged 64-block guard can diagnose on a 1 MiB native stack.
+    VOID_SEMANTIC_HANDLER Statement loop_statement() {
+        Statement s(Statement::Kind::loop, take());
+        if(peek().kind==TokenKind::name && (peek(1).text=="in" || peek(1).text==",")) {
+            s.binder=name();if(accept(","))s.index_binder=name();need("in");s.reverse=accept("reverse");
+            s.expression=expression();
+            if(at("..") || at("..<")) {s.exclusive=take().text=="..<";s.range_end=expression();}
+        } else if (!at(":")) s.expression = expression();
+        s.body = block(); return s;
     }
     // A deferred body recurses through statement(). Keep unrelated statement
     // temporaries off that path so its existing 64-level guard can report.
@@ -1369,15 +1381,6 @@ class Parser {
             need("<dedent>");return s;
         }
         if (at("if")) return conditional(take());
-        if (at("for")) {
-            Statement s(Statement::Kind::loop, take());
-            if(peek().kind==TokenKind::name && (peek(1).text=="in" || peek(1).text==",")) {
-                s.binder=name();if(accept(","))s.index_binder=name();need("in");s.reverse=accept("reverse");
-                s.expression=expression();
-                if(at("..") || at("..<")) {s.exclusive=take().text=="..<";s.range_end=expression();}
-            } else if (!at(":")) s.expression = expression();
-            s.body = block(); return s;
-        }
         if (at("var") || at("const")) {
             auto start = p;
             bool readonly = at("const");
@@ -2404,7 +2407,7 @@ class Semantics {
         }
         out.signature+=") -> "+editor_return_type(target);
         out.active_parameter=static_cast<unsigned>(*active-first);
-        if(out.multiple_return_signature && target.parameters.empty() &&
+        if(target.parameters.empty() &&
            e.parts.size()==first+1 && editor_cursor(*e.parts[first]) &&
            e.names.size()==1 && e.names.front().text.empty())
             throw EditorProbeFound{};
@@ -3233,7 +3236,7 @@ class Semantics {
             if(e.token.text=="Ok" || e.token.text=="Err")return result_expression(e,expected);
             if((e.token.text=="Some" || e.token.text=="None") && e.qualifier.empty())return option_expression(e,expected);
             return call_expression(e);
-        case Expr::Kind::method_call: return method_expression(e);
+        case Expr::Kind::method_call: return e.op=="$iteration" ? iteration_expression(e) : method_expression(e);
         case Expr::Kind::conversion: return conversion_expression(e);
         case Expr::Kind::unary: return unary_expression(e, expected);
         default: return binary_expression(e, expected);
@@ -3328,9 +3331,15 @@ class Semantics {
         thunk.parameters.push_back({Token{TokenKind::name,"$environment",statement.token.offset},environment});thunk.locals.push_back(environment);
         auto reference=std::make_unique<Expr>(Expr::Kind::function_reference,statement.token);reference->target=thunk.symbol;reference->type=unit.make_callable({},Type::none);reference->environment=environment;reference->implicit=true;
         for(unsigned n=0;n<call.parts.size();++n){
-            auto& part=call.parts[n];auto type=part->type;auto cell=unit.make_capture_record(thunk.symbol+"::$cell$"+std::to_string(n),type,true);definition->fields.push_back({"$capture$"+std::to_string(n),cell,definition->identity});
+            // print retains display wrappers for delayed rendering. Capture the
+            // argument inside each wrapper, not the wrapper itself; replacing
+            // it with a name loses the lowering plan (and bare null is constant).
+            const bool printed=call.target=="$console.print" && call.argument_indexes[n]<call.slot;
+            if(printed && call.parts[n]->op=="$print.null")continue;
+            auto& part=printed?call.parts[n]->parts[0]:call.parts[n];auto capture=reference->parts.size();
+            auto type=part->type;auto cell=unit.make_capture_record(thunk.symbol+"::$cell$"+std::to_string(n),type,true);definition->fields.push_back({"$capture$"+std::to_string(n),cell,definition->identity});
             auto snapshot=std::make_unique<Expr>(Expr::Kind::capture_reference,part->token);snapshot->type=cell;snapshot->implicit=true;snapshot->parts.push_back(std::move(part));reference->parts.push_back(std::move(snapshot));
-            auto slot=static_cast<unsigned>(thunk.locals.size());thunk.locals.push_back(type);thunk.captured_locals.emplace(slot,cell);thunk.capture_inputs.emplace(slot,n);
+            auto slot=static_cast<unsigned>(thunk.locals.size());thunk.locals.push_back(type);thunk.captured_locals.emplace(slot,cell);thunk.capture_inputs.emplace(slot,capture);
             part=std::make_unique<Expr>(Expr::Kind::name,reference->parts.back()->token);part->type=type;part->slot=slot;
         }
         call.receiver_addressable=false;call.selected_receiver=false;
@@ -4575,8 +4584,14 @@ class Semantics {
             current->cleanup_type=unit.make_cleanup();
             return s.flow = next_flow;
         }
+        // Expanded loops add scopes; retain only their own handler frames so
+        // recursive checking still fits the supported 1 MiB native stack.
+        if(s.kind==Statement::Kind::loop)return loop_statement(s);
+        if(s.kind==Statement::Kind::scoped)return scoped_statement(s);
+        if(s.kind==Statement::Kind::conditional)return conditional_statement(s);
         return ordinary_statement(s);
     }
+    #include "iteration.inc"
     VOID_SEMANTIC_HANDLER unsigned ordinary_statement(Statement& s) {
         using K = Statement::Kind;
         unsigned flow = next_flow;
@@ -4584,26 +4599,8 @@ class Semantics {
         case K::no_op: break;
         case K::variable: variable_statement(s); break;
         case K::destructure: destructure_statement(s); break;
-        case K::scoped:{
-            auto& call=*s.expression;
-            if(call.kind==Expr::Kind::method_call && call.token.text=="group" && call.parts.size()==1 && call.parts[0]->kind==Expr::Kind::name && call.parts[0]->token.text=="tasks" && !lookup("tasks") && !visible_name("tasks")){
-                if(!current || !current->asynchronous || current->deferred || !call.type_arguments.empty())error(source,s.token,Code::unsupported_type,"tasks.group() requires an async scope.");
-                call.kind=Expr::Kind::literal;call.type=Type::u64;call.parts.clear();s.task_group=true;scopes.emplace_back();s.slot=declare(s.binder,Type::u64,true);lookup(s.binder.text)->task_group=true;
-                flow=sequence(s.body,false);scopes.pop_back();break;
-            }
-            auto type=expression(*s.expression);if(type.kind!=Type::managed_ref || type.nullable)error(source,s.token,Code::type_mismatch,"with requires a non-nullable managed resource with deinit.");
-            scopes.emplace_back();s.slot=declare(s.binder,type,false);
-            auto cell=unit.make_capture_record(current->symbol+"::$cell$"+std::to_string(s.slot),type,true);auto initial=type;initial.nullable=true;std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=initial;current->captured_locals.emplace(s.slot,cell);
-            Function lambda;lambda.anonymous=true;lambda.token=s.token;lambda.token.text="$with$"+std::to_string(current->lambdas.size());lambda.visibility="private";
-            Statement invoke(Statement::Kind::expression,s.token);invoke.expression=std::make_unique<Expr>(Expr::Kind::method_call,Token{TokenKind::name,"deinit",s.token.offset});invoke.expression->parts.push_back(std::make_unique<Expr>(Expr::Kind::name,s.binder));lambda.body.push_back(std::move(invoke));
-            s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);
-            for(const auto& selected:unit.functions)if(selected.symbol==s.selection->target && selected.body.size()==1 && selected.body[0].expression){
-                const auto& dispose=*selected.body[0].expression;
-                if(dispose.kind==Expr::Kind::method_call && dispose.token.text=="deinit" && dispose.type==Type::none && dispose.virtual_slot.empty() && !dispose.interface_call && dispose.native_symbol.empty() && dispose.parts.size()==1 && dispose.parts[0]->type==current->locals[s.slot])s.cleanup_target=dispose.target;
-            }
-            current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();break;
-        }
-        case K::deferred: break; // Handled before the ordinary statement frame.
+        case K::deferred: case K::loop: case K::scoped: case K::conditional:
+            break; // Dispatched before reserving the ordinary statement frame.
         case K::assignment: {
             if (diagnostics.editor && diagnostics.editor->module == unit.identity) {
                 auto cursor = [&](const Token& token) { return token.text == "_void_editor_cursor_" && token.offset == diagnostics.editor->offset; };
@@ -4716,49 +4713,11 @@ class Semantics {
         case K::returned:
             return_statement(s);
             flow = return_flow; break;
-        case K::conditional: {
-            scopes.emplace_back();
-            try {
-                if(s.selection)expression(*s.selection); // Authored receiver of an editor-only member hole.
-                condition(*s.expression);
-            }
-            catch (const CompilationError& failure) { diagnostics.add(failure); }
-            pattern_bindings=false;
-            auto yes=sequence(s.body);scopes.pop_back();
-            flow=yes | (s.otherwise.empty()?next_flow:sequence(s.otherwise));break;
-        }
         case K::match: {
             auto subject=expression(*s.expression);flow=0;
             for(auto& arm:s.body){scopes.emplace_back();check_pattern(*arm.pattern,subject);flow|=sequence(arm.body);scopes.pop_back();}
             s.exhaustive=warn_match(s.token,subject,[&](auto visit){for(const auto& arm:s.body)visit(*arm.pattern);});
             if(!s.exhaustive)flow|=next_flow;break;
-        }
-        case K::loop: {
-            if(!s.binder.text.empty()) {
-                Type item;
-                if(s.range_end) {
-                    if(!s.index_binder.text.empty())error(source,s.index_binder,Code::unsupported_iteration,"Ranges have one item binding.");
-                    auto hint=anchor(*s.expression);if(!hint)hint=anchor(*s.range_end);
-                    auto first=expression(*s.expression,hint);auto last=expression(*s.range_end,first);expect(last,first,s.range_end->token);
-                    if(first!=Type::i32 && first!=Type::i64)error(source,s.token,Code::type_mismatch,"Range endpoints require matching i32 or i64 values.");
-                    item=first;
-                } else {
-                    auto array=expression(*s.expression);
-                    if(!ir::collection_type(array))error(source,s.token,Code::unsupported_iteration,"Iteration requires an array, dictionary or integer range.");
-                    item=array.kind==Type::dictionary?ir::dictionary_value(array):ir::array_element(array);
-                }
-                scopes.emplace_back();s.slot=declare(s.binder,item);
-                if(!s.index_binder.text.empty())s.index_slot=declare(s.index_binder,s.expression->type.kind==Type::dictionary?ir::dictionary_key(s.expression->type):Type(Type::i64));
-            } else if (s.expression) {
-                scopes.emplace_back();
-                try { condition(*s.expression); }
-                catch (const CompilationError& failure) { diagnostics.add(failure); }
-            }
-            ++loops; auto body = sequence(s.body); --loops;
-            if(!s.binder.text.empty() || s.expression)scopes.pop_back();
-            flow = body & return_flow;
-            if (!s.binder.text.empty() || !always(s.expression.get()) || (body & break_flow)) flow |= next_flow;
-            break;
         }
         case K::broken: case K::continued:
             if (!loops) error(source, s.token, Code::loop_control, s.token.text + " is only valid inside a for loop.");
@@ -4766,6 +4725,77 @@ class Semantics {
         }
         return s.flow = flow;
     }
+    VOID_SEMANTIC_HANDLER unsigned scoped_statement(Statement& s) {
+        unsigned flow = next_flow;
+
+        auto& call=*s.expression;
+        if(call.kind==Expr::Kind::method_call && call.token.text=="group" && call.parts.size()==1 && call.parts[0]->kind==Expr::Kind::name && call.parts[0]->token.text=="tasks" && !lookup("tasks") && !visible_name("tasks")){
+            if(!current || !current->asynchronous || current->deferred || !call.type_arguments.empty())error(source,s.token,Code::unsupported_type,"tasks.group() requires an async scope.");
+            call.kind=Expr::Kind::literal;call.type=Type::u64;call.parts.clear();s.task_group=true;scopes.emplace_back();s.slot=declare(s.binder,Type::u64,true);lookup(s.binder.text)->task_group=true;
+            flow=sequence(s.body,false);scopes.pop_back();return s.flow=flow;
+        }
+        auto type=expression(*s.expression);if(type.kind!=Type::managed_ref || type.nullable)error(source,s.token,Code::type_mismatch,"with requires a non-nullable managed resource with deinit.");
+        scopes.emplace_back();s.slot=declare(s.binder,type,false);
+        auto cell=unit.make_capture_record(current->symbol+"::$cell$"+std::to_string(s.slot),type,true);auto initial=type;initial.nullable=true;std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=initial;current->captured_locals.emplace(s.slot,cell);
+        Function lambda;lambda.anonymous=true;lambda.token=s.token;lambda.token.text="$with$"+std::to_string(current->lambdas.size());lambda.visibility="private";
+        Statement invoke(Statement::Kind::expression,s.token);invoke.expression=std::make_unique<Expr>(Expr::Kind::method_call,Token{TokenKind::name,"deinit",s.token.offset});invoke.expression->parts.push_back(std::make_unique<Expr>(Expr::Kind::name,s.binder));lambda.body.push_back(std::move(invoke));
+        s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);
+        for(const auto& selected:unit.functions)if(selected.symbol==s.selection->target && selected.body.size()==1 && selected.body[0].expression){
+            const auto& dispose=*selected.body[0].expression;
+            if(dispose.kind==Expr::Kind::method_call && dispose.token.text=="deinit" && dispose.type==Type::none && dispose.virtual_slot.empty() && !dispose.interface_call && dispose.native_symbol.empty() && dispose.parts.size()==1 && dispose.parts[0]->type==current->locals[s.slot])s.cleanup_target=dispose.target;
+        }
+        current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();return s.flow = flow;
+    }
+
+    VOID_SEMANTIC_HANDLER unsigned conditional_statement(Statement& s) {
+        unsigned flow = next_flow;
+
+        scopes.emplace_back();
+        try {
+            if(s.selection)expression(*s.selection); // Authored receiver of an editor-only member hole.
+            condition(*s.expression);
+        }
+        catch (const CompilationError& failure) { diagnostics.add(failure); }
+        pattern_bindings=false;
+        auto yes=sequence(s.body);scopes.pop_back();
+        flow=yes | (s.otherwise.empty()?next_flow:sequence(s.otherwise));return s.flow = flow;
+    }
+
+    VOID_SEMANTIC_HANDLER unsigned loop_statement(Statement& s) {
+        unsigned flow = next_flow;
+
+        if(!s.binder.text.empty()) {
+            // Editor recovery may retain an unfinished header. Its binder
+            // slots are valid only after the iterable has been checked.
+            s.invalid=true;
+            Type item;
+            if(s.range_end) {
+                if(!s.index_binder.text.empty())error(source,s.index_binder,Code::unsupported_iteration,"Ranges have one item binding.");
+                auto hint=anchor(*s.expression);if(!hint)hint=anchor(*s.range_end);
+                auto first=expression(*s.expression,hint);auto last=expression(*s.range_end,first);expect(last,first,s.range_end->token);
+                if(first!=Type::i32 && first!=Type::i64)error(source,s.token,Code::type_mismatch,"Range endpoints require matching i32 or i64 values.");
+                item=first;
+            } else {
+                auto array=expression(*s.expression);
+                if(array==error_type)throw Poison{};
+                if(!ir::collection_type(array)){custom_iteration(s);return statement(s);}
+                item=array.kind==Type::dictionary?ir::dictionary_value(array):ir::array_element(array);
+            }
+            scopes.emplace_back();s.slot=declare(s.binder,item);
+            if(!s.index_binder.text.empty())s.index_slot=declare(s.index_binder,s.expression->type.kind==Type::dictionary?ir::dictionary_key(s.expression->type):Type(Type::i64));
+            s.invalid=false;
+        } else if (s.expression) {
+            scopes.emplace_back();
+            try { condition(*s.expression); }
+            catch (const CompilationError& failure) { diagnostics.add(failure); }
+        }
+        ++loops; auto body = sequence(s.body); --loops;
+        if(!s.binder.text.empty() || s.expression)scopes.pop_back();
+        flow = body & return_flow;
+        if (!s.binder.text.empty() || !always(s.expression.get()) || (body & break_flow)) flow |= next_flow;
+        return s.flow = flow;
+    }
+
 public:
     Type infer_default(Expr& e,const Function& context) {
         inferring_default=true;return pure_expression(e,&context);
@@ -6019,6 +6049,13 @@ class Lowering {
     }
     void sequence(const std::vector<Statement>& body) { for (const auto& s : body) if (current) statement(s); }
     void statement(const Statement& s) {
+        // Match the semantic handler boundaries during recursive lowering.
+        if(s.kind==Statement::Kind::loop){if(s.binder.text.empty())loop_statement(s);else iterable_statement(s);return;}
+        if(s.kind==Statement::Kind::scoped){scoped_statement(s);return;}
+        if(s.kind==Statement::Kind::conditional){conditional_statement(s);return;}
+        ordinary_statement(s);
+    }
+    VOID_SEMANTIC_HANDLER void ordinary_statement(const Statement& s) {
         using K = Statement::Kind;
         switch (s.kind) {
         case K::match: {
@@ -6027,30 +6064,7 @@ class Lowering {
             if(s.exhaustive)terminate({ir::Terminator::Kind::unreachable});else jump(done);
             if(s.flow&next_flow)current=done;break;
         }
-        case K::scoped:{
-            if(s.task_group){emit({ir::Op::store,s.slot,emit({ir::Op::async_group_enter},s.token)},s.token);with_scopes.push_back({s.slot,true});sequence(s.body);if(current)join_group(s.slot,false,s.token);with_scopes.pop_back();break;}
-            if(auto selected=local_cleanup_targets.find(s.slot);selected!=local_cleanup_targets.end()) {
-                auto active=static_cast<unsigned>(output.locals.size());output.locals.push_back(Type::boolean);
-                local_cleanups.push_back({s.slot,active,selected->second});auto index=static_cast<unsigned>(local_cleanups.size()-1);
-                emit({ir::Op::store,active,constant(Type::boolean,{0,{}},s.token)},s.token);
-                emit({ir::Op::store,s.slot,expression(*s.expression)},s.token);
-                emit({ir::Op::store,active,constant(Type::boolean,{1,{}},s.token)},s.token);
-                with_scopes.push_back({index,false,{},true});sequence(s.body);
-                if(current)leave_with(with_scopes.back(),s.token,false);with_scopes.pop_back();break;
-            }
-            std::optional<unsigned> group;
-            auto home=cells.at(s.slot);auto cell=output.locals.at(home);auto field=ir::field_type(cell,0);ir::Instruction construct{ir::Op::gc_construct};construct.type=cell;construct.arguments={constant(field,{0,{}},s.token)};emit({ir::Op::store,home,emit(construct,s.token)},s.token);
-            auto node=register_cleanup(expression(*s.selection),false,s.token);
-            auto value=expression(*s.expression);emit({ir::Op::store,s.slot,value},s.token);
-            ir::Instruction activate{ir::Op::gc_write,emit({ir::Op::load,node},s.token),constant(Type::boolean,{1,{}},s.token)};activate.immediate=2;emit(activate,s.token);
-            // Acquisition can propagate Err before the resource scope exists.
-            // Register and activate disposal first, then create the child group;
-            // a group-allocation failure still reaches the acquired cleanup.
-            if (output.asynchronous) {
-                group = snapshot(emit({ir::Op::async_group_enter}, s.token), Type::u64, s.token);
-            }
-            with_scopes.push_back({node,false,group});sequence(s.body);if(current)leave_with(with_scopes.back(),s.token,false);with_scopes.pop_back();break;
-        }
+        case K::loop: case K::scoped: case K::conditional: return;
         case K::deferred:register_cleanup(expression(*s.expression),true,s.token);break;
         case K::no_op: break;
         case K::variable: {
@@ -6129,79 +6143,107 @@ class Lowering {
         case K::returned:
             return_through_cleanup(s.expression?std::optional<unsigned>{expression(*s.expression)}:std::nullopt,s.token,&s!=normal_return);
             break;
-        case K::conditional: {
-            auto yes=block(),no=block(),merge=block();
-            lower_condition(*s.expression,yes,no);
-            current = yes; sequence(s.body); bool yes_next = current.has_value(); if (current) jump(merge);
-            current = no; sequence(s.otherwise); bool no_next = current.has_value(); if (current) jump(merge);
-            if (yes_next || no_next) current = merge;
-            break;
-        }
-        case K::loop: {
-            if(!s.binder.text.empty()) {
-                const auto item=output.locals[s.slot];
-                auto scalar=[&](Type t,std::uint64_t bits){return constant(t,{bits,{}},s.token);};
-                auto load=[&](unsigned slot){return emit({ir::Op::load,slot},s.token);};
-                auto store=[&](unsigned slot,unsigned value){ir::Instruction store{ir::Op::store,slot,value};store.initialization=slot==s.slot || (!s.index_binder.text.empty() && slot==s.index_slot);emit(store,s.token);};
-                unsigned cursor,terminal,direction;std::optional<unsigned> owner,version;std::optional<Selection> fixed_view;
-                auto test=block(),body=block(),step=block(),done=block();
-                if(s.range_end) {
-                    auto first=snapshot(expression(*s.expression),item,s.token);
-                    auto last=snapshot(expression(*s.range_end),item,s.token);
-                    direction=snapshot(emit({ir::Op::less_equal,load(first),load(last)},s.token),Type::boolean,s.token);
-                    cursor=snapshot(load(s.reverse?last:first),item,s.token);
-                    terminal=snapshot(load(s.reverse?first:last),item,s.token);
-                    if(s.reverse) {
-                        store(direction,emit({ir::Op::logical_not,load(direction)},s.token));
-                        if(s.exclusive) {
-                            auto prepare=block();terminate({ir::Terminator::Kind::branch,emit({ir::Op::not_equal,load(first),load(last)},s.token),prepare,done});current=prepare;
-                            auto up=block(),down=block(),ready=block();terminate({ir::Terminator::Kind::branch,load(direction),up,down});
-                            current=up;store(cursor,emit({ir::Op::add,load(cursor),scalar(item,1)},s.token));jump(ready);
-                            current=down;store(cursor,emit({ir::Op::subtract,load(cursor),scalar(item,1)},s.token));jump(ready);current=ready;
-                        }
-                    }
-                } else {
-                    auto array=s.expression->type;
-                    // Root the selected handle without invoking fixed value-copy storage.
-                    owner=static_cast<unsigned>(output.locals.size());output.locals.push_back(array);
-                    if(array.kind==Type::fixed_array)fixed_view=select_expression(*s.expression);
-                    if(array.kind!=Type::fixed_array)store(*owner,expression(*s.expression));else {ir::Instruction capture{ir::Op::array_capture,fixed_view ? fixed_view->read() : expression(*s.expression)};capture.immediate=*owner;emit(capture,s.token);}
-                    auto count=snapshot(emit({array.kind==Type::dictionary?ir::Op::dict_count:ir::Op::array_count,load(*owner)},s.token),Type::i64,s.token);
-                    if(array.kind==Type::growable_array || array.kind==Type::dictionary)version=snapshot(emit({array.kind==Type::dictionary?ir::Op::dict_version:ir::Op::list_version,load(*owner)},s.token),Type::u64,s.token);
-                    cursor=snapshot(s.reverse ? emit({ir::Op::subtract,load(count),scalar(Type::i64,1)},s.token) : scalar(Type::i64,0),Type::i64,s.token);
-                    terminal=snapshot(s.reverse ? scalar(Type::i64,~std::uint64_t{0}) : load(count),Type::i64,s.token);
-                    direction=snapshot(scalar(Type::boolean,!s.reverse),Type::boolean,s.token);
-                }
-                jump(test);current=test;
-                if(fixed_view){ir::Instruction refresh{ir::Op::array_capture,fixed_view->read()};refresh.immediate=*owner;emit(refresh,s.token);}
-                if(version)emit({s.expression->type.kind==Type::dictionary?ir::Op::dict_check:ir::Op::list_check,load(*owner),load(*version)},s.token);
-                if(!s.range_end || (s.exclusive && !s.reverse))terminate({ir::Terminator::Kind::branch,emit({ir::Op::not_equal,load(cursor),load(terminal)},s.token),body,done});else jump(body);
-                current=body;
-                if(!s.range_end && s.expression->type.kind==Type::dictionary){auto entry=emit({ir::Op::dict_entry,load(*owner),load(cursor)},s.token);ir::Instruction value{ir::Op::extract,entry};value.immediate=1;store(s.slot,emit(value,s.token));if(!s.index_binder.text.empty()){ir::Instruction key{ir::Op::extract,entry};key.immediate=0;store(s.index_slot,emit(key,s.token));}}
-                else {store(s.slot,s.range_end ? load(cursor) : emit({ir::Op::array_get,load(*owner),load(cursor)},s.token));
-                if(!s.index_binder.text.empty())store(s.index_slot,load(cursor));}
-                loops.emplace_back(step,done);loop_with_depth.push_back(with_scopes.size());sequence(s.body);if(current)jump(step);loops.pop_back();loop_with_depth.pop_back();
-                current=step;
-                if(s.range_end && (!s.exclusive || s.reverse)) {
-                    auto advance=block();terminate({ir::Terminator::Kind::branch,emit({ir::Op::equal,load(cursor),load(terminal)},s.token),done,advance});current=advance;
-                }
-                auto up=block(),down=block();terminate({ir::Terminator::Kind::branch,load(direction),up,down});
-                current=up;store(cursor,emit({ir::Op::add,load(cursor),scalar(s.range_end?item:Type(Type::i64),1)},s.token));jump(test);
-                current=down;store(cursor,emit({ir::Op::subtract,load(cursor),scalar(s.range_end?item:Type(Type::i64),1)},s.token));jump(test);
-                current=done;break;
-            }
-            auto test = block(), body = block(), done = block(); jump(test);
-            current = test;
-            if (always(s.expression.get())) jump(body);
-            else lower_condition(*s.expression,body,done);
-            loops.emplace_back(test, done);loop_with_depth.push_back(with_scopes.size());current = body; sequence(s.body); if (current) jump(test); loops.pop_back();loop_with_depth.pop_back();
-            if (s.flow & next_flow) current = done;
-            break;
-        }
         case K::broken:for(auto n=with_scopes.size();n>loop_with_depth.back();--n)leave_with(with_scopes[n-1],s.token);jump(loops.back().second); break;
         case K::continued:for(auto n=with_scopes.size();n>loop_with_depth.back();--n)leave_with(with_scopes[n-1],s.token);jump(loops.back().first); break;
         }
     }
+    VOID_SEMANTIC_HANDLER void scoped_statement(const Statement& s) {
+        if(s.task_group){emit({ir::Op::store,s.slot,emit({ir::Op::async_group_enter},s.token)},s.token);with_scopes.push_back({s.slot,true});sequence(s.body);if(current)join_group(s.slot,false,s.token);with_scopes.pop_back();return;}
+        if(auto selected=local_cleanup_targets.find(s.slot);selected!=local_cleanup_targets.end()) {
+            auto active=static_cast<unsigned>(output.locals.size());output.locals.push_back(Type::boolean);
+            local_cleanups.push_back({s.slot,active,selected->second});auto index=static_cast<unsigned>(local_cleanups.size()-1);
+            emit({ir::Op::store,active,constant(Type::boolean,{0,{}},s.token)},s.token);
+            emit({ir::Op::store,s.slot,expression(*s.expression)},s.token);
+            emit({ir::Op::store,active,constant(Type::boolean,{1,{}},s.token)},s.token);
+            with_scopes.push_back({index,false,{},true});sequence(s.body);
+            if(current)leave_with(with_scopes.back(),s.token,false);with_scopes.pop_back();return;
+        }
+        std::optional<unsigned> group;
+        auto home=cells.at(s.slot);auto cell=output.locals.at(home);auto field=ir::field_type(cell,0);ir::Instruction construct{ir::Op::gc_construct};construct.type=cell;construct.arguments={constant(field,{0,{}},s.token)};emit({ir::Op::store,home,emit(construct,s.token)},s.token);
+        auto node=register_cleanup(expression(*s.selection),false,s.token);
+        auto value=expression(*s.expression);emit({ir::Op::store,s.slot,value},s.token);
+        ir::Instruction activate{ir::Op::gc_write,emit({ir::Op::load,node},s.token),constant(Type::boolean,{1,{}},s.token)};activate.immediate=2;emit(activate,s.token);
+        // Acquisition can propagate Err before the resource scope exists.
+        // Register and activate disposal first, then create the child group;
+        // a group-allocation failure still reaches the acquired cleanup.
+        if (output.asynchronous) {
+            group = snapshot(emit({ir::Op::async_group_enter}, s.token), Type::u64, s.token);
+        }
+        with_scopes.push_back({node,false,group});sequence(s.body);if(current)leave_with(with_scopes.back(),s.token,false);with_scopes.pop_back();return;
+    }
+
+    VOID_SEMANTIC_HANDLER void conditional_statement(const Statement& s) {
+        auto yes=block(),no=block(),merge=block();
+        lower_condition(*s.expression,yes,no);
+        current = yes; sequence(s.body); bool yes_next = current.has_value(); if (current) jump(merge);
+        current = no; sequence(s.otherwise); bool no_next = current.has_value(); if (current) jump(merge);
+        if (yes_next || no_next) current = merge;
+        return;
+    }
+
+    VOID_SEMANTIC_HANDLER void iterable_statement(const Statement& s) {
+        const auto item=output.locals[s.slot];
+        auto scalar=[&](Type t,std::uint64_t bits){return constant(t,{bits,{}},s.token);};
+        auto load=[&](unsigned slot){return emit({ir::Op::load,slot},s.token);};
+        auto store=[&](unsigned slot,unsigned value){ir::Instruction store{ir::Op::store,slot,value};store.initialization=slot==s.slot || (!s.index_binder.text.empty() && slot==s.index_slot);emit(store,s.token);};
+        unsigned cursor,terminal,direction;std::optional<unsigned> owner,version;std::optional<Selection> fixed_view;
+        auto test=block(),body=block(),step=block(),done=block();
+        if(s.range_end) {
+            auto first=snapshot(expression(*s.expression),item,s.token);
+            auto last=snapshot(expression(*s.range_end),item,s.token);
+            direction=snapshot(emit({ir::Op::less_equal,load(first),load(last)},s.token),Type::boolean,s.token);
+            cursor=snapshot(load(s.reverse?last:first),item,s.token);
+            terminal=snapshot(load(s.reverse?first:last),item,s.token);
+            if(s.reverse) {
+                store(direction,emit({ir::Op::logical_not,load(direction)},s.token));
+                if(s.exclusive) {
+                    auto prepare=block();terminate({ir::Terminator::Kind::branch,emit({ir::Op::not_equal,load(first),load(last)},s.token),prepare,done});current=prepare;
+                    auto up=block(),down=block(),ready=block();terminate({ir::Terminator::Kind::branch,load(direction),up,down});
+                    current=up;store(cursor,emit({ir::Op::add,load(cursor),scalar(item,1)},s.token));jump(ready);
+                    current=down;store(cursor,emit({ir::Op::subtract,load(cursor),scalar(item,1)},s.token));jump(ready);current=ready;
+                }
+            }
+        } else {
+            auto array=s.expression->type;
+            // Root the selected handle without invoking fixed value-copy storage.
+            owner=static_cast<unsigned>(output.locals.size());output.locals.push_back(array);
+            if(array.kind==Type::fixed_array)fixed_view=select_expression(*s.expression);
+            if(array.kind!=Type::fixed_array)store(*owner,expression(*s.expression));else {ir::Instruction capture{ir::Op::array_capture,fixed_view ? fixed_view->read() : expression(*s.expression)};capture.immediate=*owner;emit(capture,s.token);}
+            auto count=snapshot(emit({array.kind==Type::dictionary?ir::Op::dict_count:ir::Op::array_count,load(*owner)},s.token),Type::i64,s.token);
+            if(array.kind==Type::growable_array || array.kind==Type::dictionary)version=snapshot(emit({array.kind==Type::dictionary?ir::Op::dict_version:ir::Op::list_version,load(*owner)},s.token),Type::u64,s.token);
+            cursor=snapshot(s.reverse ? emit({ir::Op::subtract,load(count),scalar(Type::i64,1)},s.token) : scalar(Type::i64,0),Type::i64,s.token);
+            terminal=snapshot(s.reverse ? scalar(Type::i64,~std::uint64_t{0}) : load(count),Type::i64,s.token);
+            direction=snapshot(scalar(Type::boolean,!s.reverse),Type::boolean,s.token);
+        }
+        jump(test);current=test;
+        if(fixed_view){ir::Instruction refresh{ir::Op::array_capture,fixed_view->read()};refresh.immediate=*owner;emit(refresh,s.token);}
+        if(version)emit({s.expression->type.kind==Type::dictionary?ir::Op::dict_check:ir::Op::list_check,load(*owner),load(*version)},s.token);
+        if(!s.range_end || (s.exclusive && !s.reverse))terminate({ir::Terminator::Kind::branch,emit({ir::Op::not_equal,load(cursor),load(terminal)},s.token),body,done});else jump(body);
+        current=body;
+        if(!s.range_end && s.expression->type.kind==Type::dictionary){auto entry=emit({ir::Op::dict_entry,load(*owner),load(cursor)},s.token);ir::Instruction value{ir::Op::extract,entry};value.immediate=1;store(s.slot,emit(value,s.token));if(!s.index_binder.text.empty()){ir::Instruction key{ir::Op::extract,entry};key.immediate=0;store(s.index_slot,emit(key,s.token));}}
+        else {store(s.slot,s.range_end ? load(cursor) : emit({ir::Op::array_get,load(*owner),load(cursor)},s.token));
+        if(!s.index_binder.text.empty())store(s.index_slot,load(cursor));}
+        loops.emplace_back(step,done);loop_with_depth.push_back(with_scopes.size());sequence(s.body);if(current)jump(step);loops.pop_back();loop_with_depth.pop_back();
+        current=step;
+        if(s.range_end && (!s.exclusive || s.reverse)) {
+            auto advance=block();terminate({ir::Terminator::Kind::branch,emit({ir::Op::equal,load(cursor),load(terminal)},s.token),done,advance});current=advance;
+        }
+        auto up=block(),down=block();terminate({ir::Terminator::Kind::branch,load(direction),up,down});
+        current=up;store(cursor,emit({ir::Op::add,load(cursor),scalar(s.range_end?item:Type(Type::i64),1)},s.token));jump(test);
+        current=down;store(cursor,emit({ir::Op::subtract,load(cursor),scalar(s.range_end?item:Type(Type::i64),1)},s.token));jump(test);
+        current=done;return;
+    }
+
+    VOID_SEMANTIC_HANDLER void loop_statement(const Statement& s) {
+        auto test = block(), body = block(), done = block(); jump(test);
+        current = test;
+        if (always(s.expression.get())) jump(body);
+        else lower_condition(*s.expression,body,done);
+        loops.emplace_back(test, done);loop_with_depth.push_back(with_scopes.size());current = body; sequence(s.body); if (current) jump(test); loops.pop_back();loop_with_depth.pop_back();
+        if (s.flow & next_flow) current = done;
+        return;
+    }
+
 public:
     explicit Lowering(const SourceFile& s, ir::Module& m, StringPool& p) : source(s), module(m), strings(p) {}
     const std::set<std::string>& elided_handlers() const {return elided_cleanup_handlers;}
@@ -8168,7 +8210,7 @@ struct AnalysisAccess {
                 std::map<unsigned,std::string> locals;
                 for(const auto& binding:f.editor_bindings) {
                     if(presentation && f.locals.at(binding.slot)==error_type)continue;
-                    if(!f.generic_origin.empty() || f.display_adapter || f.json_adapter || f.enum_adapter || (f.global_initializer && !valid_editor_identifier(binding.token.text)))continue;
+                    if(!f.generic_origin.empty() || f.display_adapter || f.json_adapter || f.enum_adapter || binding.token.text.starts_with("$iterator$") || (f.global_initializer && !valid_editor_identifier(binding.token.text)))continue;
                     const bool parameter=(f.receiver && f.receiver->slot==binding.slot) ||
                         std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;});
                     if(binding.readonly && !parameter) continue;

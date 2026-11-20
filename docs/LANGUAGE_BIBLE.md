@@ -1987,17 +1987,33 @@ for e, index in reverse enemies:
 
 This is convenient for games and can be safe under specific contiguous-list rules, but exact iterator-invalidating semantics are **OPEN**. Avoid locking it in until tests prove the contract for duplicates, nested iterators, and concurrent modification.
 
-## 35. Custom iteration protocol [RECOMMENDED]
+## 35. Custom iteration protocol [IMPLEMENTED — G85]
 
-Custom `.void` collections should be able to participate in `for item` and, when supported, `for item, index`. Reverse iteration can require an explicit reversible-iteration capability. The mechanism might use interfaces or compiler-recognized iteration methods, but **should not hardcode every collection implementation into the compiler**.
+User-defined collections expose ordinary synchronous `iterator()` and, optionally,
+`reverse_iterator()` methods returning concrete non-nullable iterator structs.
+The iterator's `next() -> option<T>` yields `Some(value)` or ends on `None`.
+Indexed loops additionally require `index()`, whose exact return type and
+collection-specific key/position meaning belong to the iterator API.
 
-```python
-var tiles = tile_collection()
-for tile, index in tiles:
-    draw(tile)
+```void
+var tiles = tile_collection(values = [10, 20, 30])
+for tile, index in reverse tiles:
+    print(tile, index)
 ```
 
-The syntax is agreed; the precise `iterator`/`next`/disposal protocol is still **OPEN**.
+The expression and factory run once; `index()` runs only after a successful
+`next()`. Managed state with `deinit()` uses existing scoped cleanup on completion,
+early exit and checked failure; value state keeps ordinary copy semantics.
+Readonly authority, ownership, generics and structural member access apply to all
+protocol calls. No implicit ordinal, reverse copy, erased iterator state or new
+async iteration protocol is introduced. Custom implementations own their mutation
+and concurrency policies; built-in invalidation rules remain unchanged, including
+reverse remove-current.
+
+The [iteration guide](CUSTOM_ITERATION.md) defines the exact contract, lifetime,
+interface integration and limitations. [Runnable examples](../examples/custom_iteration/main.void)
+and [qualification](projects/G85_CUSTOM_ITERATION.md) distinguish implementation
+from independent Golden Wrench acceptance.
 
 ---
 

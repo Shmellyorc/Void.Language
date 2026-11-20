@@ -732,9 +732,9 @@ class Server {
         vd::observation::Scope timing(vd::observation::EditorDetail::formatting);
         if(method=="textDocument/signatureHelp") {
             if(assistance.signature.empty())return nullptr;
-            const bool no_parameters=assistance.multiple_return_signature && assistance.parameters.empty();
+            const bool no_parameters=assistance.parameters.empty();
             if(!no_parameters && assistance.active_parameter>=assistance.parameters.size())return nullptr;
-            if(!assistance.constructor_signature && !assistance.multiple_return_signature &&
+            if(!no_parameters && !assistance.constructor_signature && !assistance.multiple_return_signature &&
                (assistance.active_parameter>=assistance.parameter_documentation.size() || assistance.parameter_documentation[assistance.active_parameter].empty()))return nullptr;
             const auto signature=display_text(assistance.signature,true);
             std::size_t parameter_at=signature.find('(')+1;

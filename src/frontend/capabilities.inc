@@ -530,7 +530,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 } else if (s.kind==K::returned) {
                     changed|=ir::join_facts(f.reference_effects.returned,rhs);
                 }
-                if(s.kind==K::loop && !s.binder.text.empty()) {
+                if(s.kind==K::loop && !s.binder.text.empty() && !s.invalid) {
                     auto item=s.range_end ? ir::ReferenceFacts{} : ir::field_facts(s.expression->type,rhs,ir::array_element_path);
                     if(s.expression->type.kind==Type::dictionary){auto pair=item;item=ir::field_facts(ir::array_element(s.expression->type),pair,1);if(!s.index_binder.text.empty()){auto key=ir::field_facts(ir::array_element(s.expression->type),pair,0);f.locals[s.index_slot]=ir::fact_type(f.locals[s.index_slot],key);local_changed|=ir::join_facts(locals[s.index_slot],key);}}
                     f.locals[s.slot]=ir::fact_type(f.locals[s.slot],item);local_changed|=ir::join_facts(locals[s.slot],item);

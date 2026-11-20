@@ -1,0 +1,37 @@
+# A value iterator owns its cursor; a new loop gets independent state.
+value struct tile_cursor<t>:
+    values: [t]
+    position: i64 = 0
+    backwards: bool = false
+
+func (self tile_cursor<t>) next() -> option<t>:
+    if self.position < 0 or self.position >= self.values.count:
+        return None
+    var tile = self.values[self.position]
+    if self.backwards:
+        self.position -= 1
+    else:
+        self.position += 1
+    return Some(tile)
+
+# The index belongs to the most recently yielded tile, in either direction.
+func (self tile_cursor<t>) index() -> i64:
+    if self.backwards:
+        return self.position + 1
+    return self.position - 1
+
+struct tile_collection<t>:
+    values: [t]
+
+func (self tile_collection<t>) iterator() -> tile_cursor<t>:
+    return tile_cursor<t>(values = self.values)
+
+func (self tile_collection<t>) reverse_iterator() -> tile_cursor<t>:
+    return tile_cursor<t>(values = self.values, position = self.values.count - 1, backwards = true)
+
+func main():
+    var tiles = tile_collection(values = [10, 20, 30])
+    for tile in tiles:
+        print(tile)
+    for tile, index in reverse tiles:
+        print(tile, index)

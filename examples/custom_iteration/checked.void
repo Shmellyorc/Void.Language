@@ -1,0 +1,41 @@
+# Custom collections own their mutation policy. Here an invalidated traversal
+# yields a typed error, including when mutation occurs after its last value.
+struct bag:
+    values: [i32]
+    revision: i64
+
+func (self bag) add(value: i32):
+    self.values.push(value)
+    self.revision += 1
+
+value struct checked_cursor:
+    owner: bag
+    expected_revision: i64
+    position: i64
+    finished: bool = false
+
+func (self checked_cursor) next() -> option<result<i32, string>>:
+    if self.finished:
+        return None
+    if self.owner.revision != self.expected_revision:
+        self.finished = true
+        return Some(Err("collection changed"))
+    if self.position == self.owner.values.count:
+        self.finished = true
+        return None
+    var value = self.owner.values[self.position]
+    self.position += 1
+    return Some(Ok(value))
+
+func (self bag) iterator() -> checked_cursor:
+    return checked_cursor(owner = self, expected_revision = self.revision)
+
+func main():
+    var values = bag(values = [1])
+    for outcome in values:
+        match outcome:
+            Ok(var item):
+                print(item)
+                values.add(2)
+            Err(var reason):
+                print(reason)

@@ -19,7 +19,7 @@ holds in historical records do not govern current work.
   [managed initialization](MANAGED_INITIALIZATION.md), [composition](COMPOSITION.md),
   [inheritance](INHERITANCE.md), [receiver methods](RECEIVER_METHODS.md), [static members](STATIC_MEMBERS.md), [properties](PROPERTIES.md).
 - [Fixed arrays](FIXED_ARRAYS.md), [growable arrays](GROWABLE_ARRAYS.md),
-  [array operations](ARRAY_OPERATIONS.md), [dictionaries](DICTIONARIES.md),
+  [array operations](ARRAY_OPERATIONS.md), [custom iteration](CUSTOM_ITERATION.md), [dictionaries](DICTIONARIES.md),
   [collection equality and hashing](COLLECTION_EQUALITY.md),
   [G83 implementation and qualification](projects/G83_COLLECTION_EQUALITY_HASHING.md),
   [generics](GENERICS.md), [nullable types](NULLABLE_TYPES.md), [interfaces](INTERFACES.md), [advanced language](ADVANCED_LANGUAGE.md).
@@ -93,6 +93,9 @@ The ordinary CLI entry is synchronous; async examples use the explicit host abov
 | Child output capture | [Capture application](../examples/process/capture.void), [launch authority and budgets](process/API.md#choosing-launch-and-capture) |
 
 ## Engineering documentation
+
+- [G85 custom iteration](projects/G85_CUSTOM_ITERATION.md): concrete iterator factories,
+  option advancement, explicit keys/reverse capability, cleanup and qualification.
 
 - [G77 fallible raylib loaders](projects/G77_FALLIBLE_RAYLIB_LOADERS.md):
   typed resource results, accurate failure categories, cleanup, source docs and native/editor evidence.

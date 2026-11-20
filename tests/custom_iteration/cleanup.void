@@ -1,0 +1,61 @@
+var events = 0
+var factories = 0
+
+struct cursor:
+    position: i32
+    count: i32
+
+func (self cursor) next() -> option<i32>:
+    if self.position >= self.count:
+        return None
+    self.position += 1
+    return Some(self.position)
+
+func (self cursor) deinit():
+    events = events * 10 + self.count
+
+value struct numbers:
+    count: i32
+
+func (self numbers) iterator() -> cursor:
+    factories += 1
+    return cursor(count = self.count)
+
+struct guard:
+    value: i32
+
+func (self guard) deinit():
+    events = events * 10 + self.value
+
+func fail() -> result<i32, string>:
+    return Err("stop")
+
+func traverse(mode: i32) -> result<i32, string>:
+    defer print("deferred", events)
+    with guard(value = 9):
+        for item in numbers(count = 3):
+            with guard(value = item):
+                if mode == 1:
+                    continue
+                if mode == 2:
+                    break
+                if mode == 3:
+                    return Ok(item)
+                if mode == 4:
+                    return Ok(fail()?)
+    return Ok(0)
+
+func main():
+    for mode in 0..4:
+        events = 0
+        var outcome = traverse(mode)
+        print(events, outcome is Err("stop"))
+    events = 0
+    for outer in numbers(count = 2):
+        for inner in numbers(count = 1):
+            continue
+    print(events, factories)
+    events = 0
+    for empty in numbers(count = 0):
+        print("unreachable")
+    print(events, factories)

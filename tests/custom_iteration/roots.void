@@ -1,0 +1,106 @@
+struct ledger:
+    closed: i32
+    sum: i32
+
+struct tile:
+    value: i32
+
+struct cursor:
+    ledger: ledger
+    value: tile
+    mode: i32
+    position: i32
+
+func (self cursor) next() -> option<tile>:
+    self.position += 1
+    if self.position > 3:
+        if self.mode == 6:
+            var empty: [tile] = []
+            return Some(empty[0])
+        return None
+    # Force allocation while the iterator, its owner and last value are live.
+    self.value = tile(value = self.position)
+    return Some(self.value)
+
+func (self cursor) index() -> i32:
+    if self.mode == 7:
+        var empty: [i32] = []
+        return empty[0]
+    return self.position - 1
+
+func (self cursor) deinit():
+    self.ledger.closed += 1
+    if self.mode == 10:
+        var empty: [i32] = []
+        self.ledger.sum += empty[0]
+    self.value = tile(value = 99)
+
+value struct sequence:
+    ledger: ledger
+    mode: i32
+
+func (self sequence) iterator() -> cursor:
+    if self.mode == 11:
+        var empty: [tile] = []
+        return cursor(ledger = self.ledger, value = empty[0])
+    return cursor(ledger = self.ledger, value = tile(value = 0), mode = self.mode)
+
+func stop() -> result<i32, string>:
+    return Err("stop")
+
+func walk(owner: ledger, mode: i32) -> result<i32, string>:
+    for value, key in sequence(ledger = owner, mode = mode):
+        if mode == 1 and key == 1:
+            continue
+        owner.sum += value.value
+        if mode == 2:
+            break
+        if mode == 3:
+            return Ok(11)
+        if mode == 4:
+            return Ok(stop()?)
+        if mode == 5:
+            var empty: [i32] = []
+            return Ok(empty[0])
+    return Ok(owner.sum)
+
+value struct value_cursor:
+    ledger: ledger
+    position: i32
+
+func (self value_cursor) next() -> option<tile>:
+    var allocation = tile(value = 10)
+    if self.position == 2:
+        return None
+    self.position += 1
+    self.ledger.sum += self.position
+    return Some(tile(value = self.position))
+
+value struct value_sequence:
+    ledger: ledger
+
+func (self value_sequence) iterator() -> value_cursor:
+    return value_cursor(ledger = self.ledger)
+
+func first(owner: ledger) -> tile:
+    for value in sequence(ledger = owner, mode = 0):
+        return value
+    return tile(value = 0)
+
+func entry(mode: i32) -> i32:
+    var owner = ledger()
+    if mode == 8:
+        var last = tile(value = 0)
+        for value in value_sequence(ledger = owner):
+            last = value
+        var allocation = tile(value = 10)
+        return last.value + owner.sum
+    if mode == 9:
+        var saved = first(owner)
+        var allocation = tile(value = 10)
+        return owner.closed * 100 + saved.value
+    match walk(owner, mode):
+        Ok(var value):
+            return owner.closed * 100 + value
+        Err(var failure):
+            return owner.closed * 100 + 20

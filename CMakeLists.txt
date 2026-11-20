@@ -1312,6 +1312,32 @@ if(BUILD_TESTING)
     "${CMAKE_CURRENT_BINARY_DIR}/g84-fallible-initialization-lsp-results.json")
   set_tests_properties(fallible_initialization_source PROPERTIES TIMEOUT 300)
   set_tests_properties(lsp_fallible_initialization PROPERTIES TIMEOUT 180)
+  void_add_output_test(custom_iteration_source "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/custom_iteration/source.py" "$<TARGET_FILE:voidc>"
+    "@VOID_TEST_OUTPUT@/custom-iteration-source.json")
+  void_add_output_test(lsp_custom_iteration "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/custom_iteration/lsp.py" "$<TARGET_FILE:voidls>"
+    "@VOID_TEST_OUTPUT@/custom-iteration-lsp.json")
+  set_tests_properties(custom_iteration_source PROPERTIES TIMEOUT 300)
+  set_tests_properties(lsp_custom_iteration PROPERTIES TIMEOUT 180)
+  add_executable(void_custom_iteration_tests tests/custom_iteration/tests.cpp
+    tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_custom_iteration_tests PRIVATE void_llvm)
+  add_test(NAME custom_iteration_runtime COMMAND void_custom_iteration_tests "${PROJECT_SOURCE_DIR}")
+  set_tests_properties(custom_iteration_runtime PROPERTIES TIMEOUT 180)
+  foreach(mode normal optimized)
+    set(object "${CMAKE_CURRENT_BINARY_DIR}/custom-iteration-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${object}"
+      COMMAND void_custom_iteration_tests --emit-library
+        "${PROJECT_SOURCE_DIR}/tests/custom_iteration/roots.void" "${object}" "${mode}"
+      DEPENDS void_custom_iteration_tests "${PROJECT_SOURCE_DIR}/tests/custom_iteration/roots.void" VERBATIM)
+    set_source_files_properties("${object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_custom_iteration_aot_${mode} tests/custom_iteration/aot.cpp
+      tests/managed/probe.cpp "${object}" $<TARGET_OBJECTS:void_managed_test_abi>)
+    target_link_libraries(void_custom_iteration_aot_${mode} PRIVATE void_runtime)
+    add_test(NAME custom_iteration_aot_${mode} COMMAND void_custom_iteration_aot_${mode})
+    set_tests_properties(custom_iteration_aot_${mode} PROPERTIES TIMEOUT 180)
+  endforeach()
   void_managed_source_tests(reference_values reference_values stress "copies;readonly;initialization;templates;methods;staged;order;imports;required;stress;null_failure")
   void_managed_source_tests(composition composition stress "main;stress;imports;order;staged;receiver_order")
   void_managed_source_tests(inheritance inheritance stress "main;initialization;stress;order;imports;receiver_order;nested;results;failure")

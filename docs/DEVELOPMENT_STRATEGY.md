@@ -27,6 +27,7 @@ shared. Current API guides determine behavior; proposals record design history.
 | Area | Current engineering record |
 | --- | --- |
 | Project/library/native workflow | [Milestone register](roadmap/MILESTONE_REGISTER.md), [library authoring](LOCAL_LIBRARIES.md), [G25](projects/G25_NATIVE_HEADER_IMPORTER.md), [G26](projects/G26_PACKAGE_MAINTENANCE.md), [G27](projects/G27_LIBRARY_AUTHORING.md) |
+| Custom iteration | [G85 candidate and local qualification](projects/G85_CUSTOM_ITERATION.md), [iteration contract](CUSTOM_ITERATION.md); independent review pending |
 | Collection equality and hashing | [G83 candidate and local qualification](projects/G83_COLLECTION_EQUALITY_HASHING.md), [content/key contract](COLLECTION_EQUALITY.md); independent review pending |
 | Generic structural interfaces | [G82 candidate and local qualification](projects/G82_GENERIC_INTERFACES.md), [interface contract](INTERFACES.md#generic-interfaces-g82); independent integration review pending |
 | Language/compiler and entry semantics | [Source compiler](SOURCE_COMPILER.md), [CLI](CLI.md), [language guide](LANGUAGE_BIBLE.md) |

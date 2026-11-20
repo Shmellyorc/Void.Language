@@ -190,3 +190,13 @@ in enclosing generic call inference; its owner is not mistaken for an already
 unwrapped value. Error-only/return-only parameters still need explicit type
 arguments when ordinary argument inference cannot determine them. `?` requires
 the exact substituted error type. See [initialization](INITIALIZATION.md#typed-fallible-initialization-g84).
+
+## Custom iteration (G85)
+
+Generic collections can return concrete generic iterator structs from `iterator()`
+and `reverse_iterator()`. The selected `next() -> option<T>` infers the loop item,
+and `index()` infers the optional second binder. Structural interface constraints
+can describe factories with substituted concrete iterator results; normal owner
+access, specialization limits and readonly provenance still apply. There are no
+new runtime generic objects or iterator-specific inference rules. See the
+[iteration guide](CUSTOM_ITERATION.md) and [runnable generic collection](../examples/custom_iteration/main.void).

@@ -1,0 +1,39 @@
+use "./roots.void" as sync
+
+async func read(value: sync.tile) -> i32:
+    return value.value
+
+async func walk(owner: sync.ledger, mode: i32) -> result<i32, string>:
+    for value, key in sync.sequence(ledger = owner, mode = mode):
+        var number = await read(value)
+        if mode == 1 and key == 1:
+            continue
+        owner.sum += number
+        if mode == 2:
+            break
+        if mode == 3:
+            return Ok(11)
+        if mode == 4:
+            return Ok(sync.stop()?)
+        if mode == 5:
+            var empty: [i32] = []
+            return Ok(empty[0])
+    return Ok(owner.sum)
+
+async func entry(mode: i32) -> i32:
+    var owner = sync.ledger()
+    if mode == 8:
+        var last = sync.tile(value = 0)
+        for value in sync.value_sequence(ledger = owner):
+            last = value
+        var allocation = sync.tile(value = 10)
+        return last.value + owner.sum
+    if mode == 9:
+        var saved = sync.first(owner)
+        var allocation = sync.tile(value = 10)
+        return owner.closed * 100 + saved.value
+    match await walk(owner, mode):
+        Ok(var value):
+            return owner.closed * 100 + value
+        Err(var failure):
+            return owner.closed * 100 + 20

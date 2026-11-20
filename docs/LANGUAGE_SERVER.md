@@ -94,6 +94,8 @@ cover the separate Boss-authorized repair after Stage 11. Callable hover/complet
 filters recognized parameter/return tags into description and applicable return
 text. Signature help retains labels/binding metadata but returns null unless the
 active parameter has nonempty documentation, for both automatic and manual requests.
+G85 additionally exposes zero-parameter callable signatures with an empty parameter
+list and no active parameter; iterator()/next()/index() therefore remain discoverable.
 Only the active parameter carries documentation; signature-level documentation is
 omitted. The server negotiates plaintext MarkupContent and otherwise uses a plain
 string. Clients never parse documentation tags.
