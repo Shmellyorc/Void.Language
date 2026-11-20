@@ -1830,7 +1830,7 @@ ir::ConstantValue constant_value(const SourceFile&, const Expr&);
 void check_dictionary_key(const SourceFile& source,const Token& use,Type key,const std::map<std::string,std::unique_ptr<Unit>>& units) {
     if(auto owner=ir::dictionary_equality_owner(key)) {
         std::vector<RelatedLocation> related;
-        if(auto found=units.find(owner->definition->module_identity);found!=units.end())related.push_back({span(found->second->source,Token{TokenKind::symbol,"==",owner->definition->custom_equality_offset}),"Custom equality declared by "+Type::key(*owner)+"."});
+        if(auto found=units.find(owner->definition->module_identity);found!=units.end())related.push_back({span(found->second->source,Token{TokenKind::symbol,"==",owner->definition->custom_equality_offset}),"Custom equality declared here."});
         error(source,use,Code::unsupported_type,"Dictionary key contains a type defining custom operator ==.","Use an explicit scalar, string or eligible value key projection; custom equality has no authorized hash contract.",std::move(related));
     }
     if(!ir::dictionary_key_supported(key))error(source,use,Code::unsupported_type,"Unsupported dictionary key type.");
@@ -4230,7 +4230,7 @@ class Semantics {
         if(e.implicit)return false; // Compiler-generated identity guards are not source operators.
         const auto glyph=e.op=="!="?std::string("=="):e.op;
         ir::MemberSelection selected;
-        if(diagnostics.editor && diagnostics.editor->operator_context && diagnostics.editor->module==unit.identity && diagnostics.editor->offset==e.token.offset) {
+        if(diagnostics.editor && diagnostics.editor->operator_context && !(current && current->enum_adapter) && diagnostics.editor->module==unit.identity && diagnostics.editor->offset==e.token.offset) {
             auto& out=diagnostics.editor->result;++diagnostics.editor->operator_occurrences;
             if(!invalid_function && !unit.failed_import)for(const auto& name:{"+","-","*","/","%","==","!=","<",">","<=",">="}) {
                 auto match=ir::select_operator(*root.member_catalog,name==std::string("!=")?"==":name,operands,unit.identity,lexical_owner(),operator_generic_arguments());
@@ -4260,6 +4260,7 @@ class Semantics {
         return true;
     }
 #include "enum_equality.inc"
+#include "collection_equality.inc"
     void assignment_value(Statement& s,Type type) {
         if(s.op=="<<=" || s.op==">>=") {
             auto count=expression(*s.expression);
@@ -4307,6 +4308,8 @@ class Semantics {
     }
     VOID_SEMANTIC_HANDLER Type binary_expression(Expr& e, const std::optional<Type>& expected) {
         using K = Expr::Kind;
+        // Overload/display binding may revisit an already checked null test.
+        if(e.op=="$nullable_null_equal" || e.op=="$nullable_null_unequal")return e.type;
         if(e.op=="<<" || e.op==">>") {
             auto left=expression(*e.parts[0],expected);
             auto count=expression(*e.parts[1]);
@@ -4323,7 +4326,12 @@ class Semantics {
         auto context=logical?std::optional<Type>(Type::boolean):left_hint && numeric::number(*left_hint)?left_hint:right_hint && numeric::number(*right_hint)?right_hint:!left_hint && !right_hint && expected && numeric::number(*expected)?expected:std::optional<Type>(decimal(e)?Type::f32:Type::i32);
         if(left_hint && ir::nullable_value(*left_hint) && numeric::number(ir::nullable_payload(*left_hint)))context=ir::nullable_payload(*left_hint);
         else if(right_hint && ir::nullable_value(*right_hint) && numeric::number(ir::nullable_payload(*right_hint)))context=ir::nullable_payload(*right_hint);
-        auto null_context=[&](const Expr& part,const std::optional<Type>& opposite)->std::optional<Type>{if(part.token.text=="null" && opposite && (ir::nullable_type(*opposite) || ir::reference_value(*opposite) || (opposite->definition && opposite->definition->callable))){auto type=*opposite;if(!ir::nullable_value(type))type.nullable=true;return type;}return context;};
+        auto null_context=[&](const Expr& part,const std::optional<Type>& opposite)->std::optional<Type>{
+            if((e.op=="==" || e.op=="!=") && (part.kind==K::array_literal || part.kind==K::dictionary_literal)) {
+                if(opposite){auto type=ir::nullable_type(*opposite)?ir::nullable_payload(*opposite):*opposite;if(ir::collection_type(type))return type;}
+                return std::nullopt;
+            }
+            if(part.token.text=="null" && opposite && (ir::nullable_type(*opposite) || ir::reference_value(*opposite) || (opposite->definition && opposite->definition->callable))){auto type=*opposite;if(!ir::nullable_value(type))type.nullable=true;return type;}return context;};
         auto left=expression(*e.parts[0],null_context(*e.parts[0],right_hint));
         bool previous=suppress_zero;
         if(e.parts[0]->kind==K::literal && ((e.op=="and" && !e.parts[0]->value) || (e.op=="or" && e.parts[0]->value)))suppress_zero=true;
@@ -4351,6 +4359,9 @@ class Semantics {
             }
             return enum_equality(e,left);
         }
+        if((e.op=="==" || e.op=="!=") && (ir::collection_type(left) || ir::collection_type(right)) &&
+           (left.kind!=right.kind || Type::key(left)!=Type::key(right)))
+            error(source,e.token,Code::type_mismatch,"Collection equality requires matching collection and element types.");
         auto builtin_context=left_hint?left_hint:right_hint?right_hint:expected && numeric::number(*expected)?expected:context;
         if(builtin_context && (ir::reference_value(*builtin_context) || (builtin_context->definition && builtin_context->definition->callable)) && (e.op=="==" || e.op=="!="))builtin_context->nullable=true;
         left=contextual_conversion(*e.parts[0],left,builtin_context);right=contextual_conversion(*e.parts[1],right,builtin_context);
@@ -4373,7 +4384,15 @@ class Semantics {
         } else if(!(left.definition && right.definition && left.definition->callable && right.definition->callable && Type::key(left)==Type::key(right)))expect(right,left,e.token);
         if (e.op == "==" || e.op == "!=") {
             if(left.definition && right.definition && left.definition->callable && right.definition->callable && Type::key(left)==Type::key(right))return e.type=Type::boolean;
-            if(ir::collection_type(left))error(source,e.token,Code::numeric_operator,"Collection equality is not implemented; use an element predicate.");
+            if(ir::collection_type(left)) {
+                auto result=collection_equality(e,left);
+                if(diagnostics.editor && diagnostics.editor->operator_context && !(current && current->enum_adapter) && !invalid_function && !unit.failed_import && diagnostics.editor->module==unit.identity && diagnostics.editor->offset==e.token.offset)
+                    for(const auto& name:{"==","!="}) {
+                        diagnostics.editor->result.candidates.push_back({name,"Collection content equality -> bool",24});
+                        diagnostics.editor->candidate_targets[name].insert("$collection_equal");++diagnostics.editor->candidate_occurrences[name];
+                    }
+                return result;
+            }
             if (left.kind == Type::aggregate) {
                 const auto& definition = *left.definition;
                 if (!definition.cases.empty() && !definition.result_type && !definition.option_type) {
@@ -6536,8 +6555,13 @@ public:
 };
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
 // preserves declared precision and wrapping independently of host arithmetic.
+#include "collection_constants.inc"
 #include "enum_constants.inc"
 ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
+    if(e.kind==Expr::Kind::call && e.op=="$collection_equal") {
+        const auto type=e.parts.at(0)->type;collection_constant_type(source,e.token,type);
+        return {collection_constant_equal(source,e.token,type,constant_value(source,*e.parts[0]),constant_value(source,*e.parts[1]),0),{}};
+    }
     if(auto result=enum_constant(source,e))return *result;
     if(e.target=="$interpolation") {
         formatting::Builder builder;
@@ -8222,6 +8246,10 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
             std::set<std::string> details,docs;
             for(const auto& [id,u]:graph.units)for(const auto& f:u->functions)if(editor->candidate_targets.at(name).contains(f.symbol)) {
                 details.insert(editor_signature(f));auto doc=source_documentation(u->source,f.token.offset).text(f.result!=Type::none);if(!doc.empty())docs.insert(std::move(doc));
+            }
+            if(editor->candidate_targets.at(name).contains("$collection_equal")) {
+                details.insert("Collection content equality -> bool");
+                docs.insert("Compares sequence elements in order, or dictionary key/value contents independently of insertion order, using existing element equality. != negates the same comparison.");
             }
             candidate.detail=details.size()>1?"Selected specializations:":"";
             for(const auto& detail:details){if(!candidate.detail.empty())candidate.detail+="\n\n";candidate.detail+=detail;}

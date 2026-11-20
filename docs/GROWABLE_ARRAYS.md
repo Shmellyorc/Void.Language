@@ -1,5 +1,14 @@
 # Growable arrays
 
+## Collection content equality — G83
+
+Matching supported collection types implement `==` and `!=`. Sequences compare
+length and ordered elements; dictionaries compare logical key/value contents,
+independently of insertion order. Element equality, nullable presence, custom
+operators, recursive-shape diagnostics and key exclusions follow
+[the current equality and hashing contract](COLLECTION_EQUALITY.md). Dated
+phase-only equality exclusions below do not describe the current implementation.
+
 ## Stage 8 Sprint 3 — current extension
 
 The owner-approved [text/collection contract](STAGE8_TEXT_COLLECTIONS.md) supersedes
@@ -17,7 +26,7 @@ default to null. See [ADVANCED_LANGUAGE.md](ADVANCED_LANGUAGE.md).
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 `[T]` lists execute through the production frontend, typed IR, shared LLVM
-19.1.7 JIT/AOT lowerer and coordinated Runtime. Research builds are unnecessary.
+23.1.4 JIT/AOT lowerer and coordinated Runtime. Research builds are unnecessary.
 Elements support all existing numeric types and bool, strings, value structs,
 managed/nullable and interface references, and nested fixed/growable arrays.
 

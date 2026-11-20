@@ -75,8 +75,9 @@ addition and returns typed zero for empty input. `min`/`max` keep the first tie.
 `text_less` compares unsigned UTF-8 bytes, including NUL, with no normalization or
 locale processing; its owned conversions can allocate on each comparison.
 
-`index_of`/`contains` use existing identity/scalar/custom equality, including its
-effects. Unsupported collection/value equality diagnoses at specialization.
+`index_of`/`contains` use ordinary scalar, identity, custom and supported collection
+content equality, including its effects. Unsupported value/element equality
+diagnoses at specialization. See [collection equality](../COLLECTION_EQUALITY.md).
 Public operators on exact substituted public nominal owners follow the separately
 [approved generic rule](GENERIC_OPERATORS.md); private/internal access remains
 unchanged. Dictionary supported-key restrictions and insertion order are retained.

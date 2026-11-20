@@ -1,0 +1,9 @@
+value struct secret:
+    value: i32
+    private operator ==(const a: secret, const b: secret) -> bool:
+        return a.value == b.value
+static func secret.same(const left: [secret], const right: [secret]) -> bool:
+    return left == right
+func main():
+    var a = [secret(value = 7)]
+    print(secret.same(a, a))

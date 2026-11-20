@@ -20,6 +20,8 @@ holds in historical records do not govern current work.
   [inheritance](INHERITANCE.md), [receiver methods](RECEIVER_METHODS.md), [static members](STATIC_MEMBERS.md), [properties](PROPERTIES.md).
 - [Fixed arrays](FIXED_ARRAYS.md), [growable arrays](GROWABLE_ARRAYS.md),
   [array operations](ARRAY_OPERATIONS.md), [dictionaries](DICTIONARIES.md),
+  [collection equality and hashing](COLLECTION_EQUALITY.md),
+  [G83 implementation and qualification](projects/G83_COLLECTION_EQUALITY_HASHING.md),
   [generics](GENERICS.md), [nullable types](NULLABLE_TYPES.md), [interfaces](INTERFACES.md), [advanced language](ADVANCED_LANGUAGE.md).
   [G82 generic interface implementation and qualification](projects/G82_GENERIC_INTERFACES.md).
 - [Async/Tasks](ASYNC.md), [native libraries](NATIVE_LIBRARIES.md),

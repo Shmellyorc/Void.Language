@@ -85,8 +85,9 @@ lambda inference before a separately approved shared-language enhancement.
   results/enums and functions, subject to each operation's actual callback/type
   requirements. No default `t()` or zero initialization is assumed for arbitrary t.
 - `index_of`/`contains` require existing source `==` on t under readonly authority.
-  They use its exact identity/value/custom-operator semantics. Do not invent
-  structural list/dictionary equality or custom hashing. Unsupported equality
+  They use its exact identity/value/custom-operator semantics. G83 now supplies
+  supported collection content equality through ordinary source `==`; see
+  [the current contract](../COLLECTION_EQUALITY.md). No custom hashing is added. Unsupported equality
   diagnoses at specialization, even when runtime input might be empty. Predicate
   find/any remains available for types without that equality.
 - `sum` and `numeric_less` specialize only for the ten numeric primitives using

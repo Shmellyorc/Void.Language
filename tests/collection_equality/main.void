@@ -1,0 +1,48 @@
+const same_lists = [1, 2, 3] == [1, 2, 3]
+const different_lists = [1, 2] != [2, 1]
+const same_maps = {"one": 1, "two": 2} == {"two": 2, "one": 1}
+const duplicate_maps = {"one": 9, "one": 1} == {"one": 1}
+enum choice:
+    empty
+    numbers(values: [i32])
+value struct parity:
+    value: i32
+    operator ==(const left: parity, const right: parity) -> bool:
+        return left.value % 2 == right.value % 2
+struct cell:
+    n: i32
+func main() -> i32:
+    if not same_lists or not different_lists or not same_maps or not duplicate_maps:
+        return 1
+    var a: [i32] = [1, 2, 3]
+    var b: [i32] = [1, 2, 3]
+    if a != b:
+        return 2
+    b[1] = 8
+    if a == b:
+        return 3
+    var fixed_left: [i32, 3] = [1, 2, 3]
+    var fixed_right: [i32, 3] = [1, 2, 3]
+    if fixed_left != fixed_right:
+        return 4
+    var map_left = {"a": [1, 2], "b": [3]}
+    var map_right = {"b": [3], "a": [1, 2]}
+    if map_left != map_right:
+        return 5
+    var nullable: [i32]? = null
+    if nullable != null or nullable == a:
+        return 6
+    nullable = a
+    if nullable == null or nullable != [1, 2, 3]:
+        return 7
+    var parities = [parity(value = 1), parity(value = 2)]
+    if parities != [parity(value = 3), parity(value = 4)]:
+        return 8
+    var values = [choice.numbers([1, 2]), choice.empty]
+    if values != [choice.numbers([1, 2]), choice.empty]:
+        return 9
+    var c = cell(n = 1)
+    if [c] != [c] or [c] == [cell(n = 1)]:
+        return 10
+    print("collection equality preserved")
+    return 0

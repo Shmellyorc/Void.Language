@@ -1,0 +1,28 @@
+struct cell:
+    value: i32
+    next: cell?
+value struct parity:
+    value: i32
+    operator ==(const left: parity, const right: parity) -> bool:
+        var roots = [cell(value = left.value), cell(value = right.value)]
+        for i in 0..<20:
+            roots.push(cell(value = i))
+        return roots[0].value % 2 == roots[1].value % 2
+func entry(value: i32) -> i32:
+    var owner = cell(value = value)
+    owner.next = owner
+    var left = {"refs": [owner], "same": [owner]}
+    var right = {"same": [owner], "refs": [owner]}
+    if left != right:
+        return -1
+    var a = [parity(value = 1), parity(value = 2)]
+    var b = [parity(value = 3), parity(value = 4)]
+    if a != b:
+        return -2
+    var alias = right
+    alias["same"] = [cell(value = value)]
+    if left == right:
+        return -3
+    if a != a:
+        return -4
+    return value

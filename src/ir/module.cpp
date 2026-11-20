@@ -553,6 +553,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     auto package_call = [&](const Function& caller, const Function& callee) {
         const auto& from = caller.module_identity;
         const auto& to = callee.module_identity;
+        if(derived_equality_adapter(callee) && caller.name!=callee.lexical_parent)fail("derived equality helper called outside its proven parent");
         if(callee.static_member && ((callee.visibility=="private" && caller.lexical_owner!=callee.lexical_owner) || (callee.visibility=="internal" && source_domain(from)!=source_domain(to))))fail("inaccessible static callable");
         if (from == to || (!package_source(from) && !package_source(to))) return;
         if (!method_accessible(m, callee, from)) fail("inaccessible package callable");
@@ -998,7 +999,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 if(!f.module_identity.empty() && f.parameters[0].definition->module_identity!=f.module_identity)fail("foreign lexical field owner");
             } else {
                 auto parent=functions.find(f.lexical_parent);
-                const bool adapter=!f.receiver && !f.asynchronous && f.visibility=="private" && f.name.starts_with(f.lexical_parent+"::$display$");
+                const bool adapter=derived_equality_adapter(f) || (!f.receiver && !f.asynchronous && f.visibility=="private" && f.name.starts_with(f.lexical_parent+"::$display$"));
                 if((!f.closure && !adapter) || parent==functions.end() || parent->second==&f || parent->second->lexical_owner!=f.lexical_owner || parent->second->module_identity!=f.module_identity)fail("forged closure field owner");
                 bool selected=false;for(const auto& block:parent->second->blocks)for(const auto& i:block.instructions)selected|=(i.op==Op::function_reference || (adapter && i.op==Op::call)) && i.callee==f.name;
                 if(!selected)fail("closure field owner has no lexical creation");
@@ -1196,8 +1197,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     valid_type(i.type);if(!i.type.definition || !i.type.definition->callable || !i.type.nullable || i.receiver || !i.arguments.empty() || !i.callee.empty())fail("invalid null function value");result=i.type;break;
                 case Op::function_reference: {
                     valid_type(i.type);auto target=names.find(i.callee);
-                    if (auto declaration = functions.find(i.callee); declaration != functions.end())
+                    if (auto declaration = functions.find(i.callee); declaration != functions.end()) {
+                        if(derived_equality_adapter(*declaration->second))fail("derived equality helper cannot escape as a function value");
                         package_call(f, *declaration->second);
+                    }
                     else if (package_source(f.module_identity)) fail("inaccessible package callable");
                     if (primitive) {
                         auto declaration = functions.find(i.callee);

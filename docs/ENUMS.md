@@ -51,7 +51,10 @@ operator; the compiler does not compare padding, inactive payloads or pointers i
 place of unsupported value equality. Constant comparisons support pure built-in
 payload equality, including named and nullable function-value identity. This
 compares function values without calling them. User function calls and custom
-operator calls remain excluded from compile-time constants.
+operator calls remain excluded from compile-time constants. G83 supports eligible
+fixed-array/list/dictionary payload equality through the same ordinary operators;
+recursive structural shapes diagnose. See [collection equality](COLLECTION_EQUALITY.md).
+Collection payloads still do not make an enum an eligible dictionary key.
 
 ## Numeric-backed enums and conversion
 

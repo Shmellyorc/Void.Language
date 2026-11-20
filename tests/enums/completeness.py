@@ -65,7 +65,7 @@ with tempfile.TemporaryDirectory(prefix='VOID G78 enums ') as directory:
         invoke([binary])
     negatives = {
         'nominal': ('enum a:\n    one\nenum b:\n    one\nfunc main():\n    var wrong = a.one == b.one\n', 'Type mismatch'),
-        'list_equality': ('enum bag:\n    list(items: [i32])\nfunc main():\n    var wrong = bag.list([1]) == bag.list([1])\n', 'equality'),
+        'list_equality': ('value struct item:\n    number: i32\nenum bag:\n    list(items: [item])\nfunc main():\n    var wrong = bag.list([item()]) == bag.list([item()])\n', 'equality'),
         'float_key': ('enum bag:\n    number(x: f32)\nfunc main():\n    var wrong: {bag: i32} = {}\n', 'dictionary'),
         'list_key': ('enum bag:\n    list(items: [i32])\nfunc main():\n    var wrong: {bag: i32} = {}\n', 'dictionary'),
         'custom_key': ('value struct digit:\n    value: i32\n    operator ==(const left: digit, const right: digit) -> bool:\n        return left.value == right.value\nenum key:\n    item(data: digit)\nfunc main():\n    var wrong: {key: i32} = {}\n', 'Dictionary key contains a type defining custom operator =='),

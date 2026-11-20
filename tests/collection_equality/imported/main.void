@@ -1,0 +1,5 @@
+use "./api.void" as api
+use "./helper.void" as h
+func main():
+    var a = [api.item(value = 7)]
+    print(h.same(a, a))

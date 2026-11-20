@@ -16,6 +16,11 @@ Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRA
 G78 also specializes tagged and numeric/flags enum declarations through the same
 machinery, including payload inference, matching and collections. See [enums](ENUMS.md).
 
+G83 derives collection equality inside the existing concrete specialization,
+retaining the checked caller context for exact substituted-owner operators and
+private access. It does not grant unrelated callers access or add hash callbacks.
+See [collection equality](COLLECTION_EQUALITY.md).
+
 G82 extends the same specialization machinery to structural interfaces. See
 [generic interfaces](INTERFACES.md#generic-interfaces-g82).
 

@@ -178,6 +178,14 @@ std::string generic_instance_identity(const Module& m,const Module::GenericInsta
     }
     return identity;
 }
+// Equality adapters are source-owned direct helpers, like display adapters.
+// Their parent is checked through an actual direct call, not a permission bit.
+static bool derived_equality_adapter(const Function& f) {
+    return !f.lexical_parent.empty() && !f.receiver && !f.static_member && !f.closure && !f.initializer && !f.asynchronous &&
+           f.visibility=="private" && f.name.starts_with(f.lexical_parent+"::$equality$") && f.result==Type::boolean &&
+           f.parameters.size()==2 && f.parameters[0]==f.parameters[1] &&
+           readonly_paths(f.parameters[0])==reference_paths(f.parameters[0]) && readonly_paths(f.parameters[1])==reference_paths(f.parameters[1]);
+}
 std::vector<Type> generic_operator_arguments(const Module& m,const Function& function) {
     std::vector<Type> result;
     auto instance=[&](const std::string& identity) {
@@ -197,12 +205,13 @@ std::vector<Type> generic_operator_arguments(const Module& m,const Function& fun
         if(current->static_member)instance(current->lexical_owner);
         if(current->lexical_parent.empty())break;
         auto parent=std::find_if(m.functions.begin(),m.functions.end(),[&](const auto& f){return f.name==current->lexical_parent;});
-        if(!current->closure || parent==m.functions.end() || current->module_identity!=parent->module_identity ||
-           !current->name.starts_with(parent->name+"::$lambda$"))
+        const bool equality=derived_equality_adapter(*current);
+        if(parent==m.functions.end() || current->module_identity!=parent->module_identity ||
+           (equality?current->lexical_owner!=parent->lexical_owner:(!current->closure || !current->name.starts_with(parent->name+"::$lambda$"))))
             throw std::invalid_argument("Invalid generic operator lexical provenance.");
         bool created=false;
         for(const auto& block:parent->blocks)for(const auto& instruction:block.instructions)
-            created|=instruction.op==Op::function_reference && instruction.callee==current->name;
+            created|=instruction.op==(equality?Op::call:Op::function_reference) && instruction.callee==current->name;
         if(!created)throw std::invalid_argument("Generic operator closure has no lexical creation.");
         current=&*parent;
     }

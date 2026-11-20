@@ -20,10 +20,10 @@ cases = {
  'string-sum': 'var output = c.sum(["x"])',
  'bool-order': 'var output = c.numeric_less(true, false)',
  'string-order': 'var output = c.numeric_less("a", "b")',
- 'list-equality': 'var output = c.contains([[1]], [1])',
- 'dict-equality': 'var output = c.contains([{1: 2}], {1: 2})',
+ 'list-equality': 'var output = c.contains([[packet(number = 1)]], [packet(number = 1)])',
+ 'dict-equality': 'var output = c.contains([{1: packet(number = 1)}], {1: packet(number = 1)})',
  'value-equality': 'var output = c.contains([packet(number = 1)], packet(number = 1))',
- 'fixed-equality': 'var input: [[i32, 2]] = [[1, 2]]\nvar needle: [i32, 2] = [1, 2]\nvar output = c.contains(input, needle)',
+ 'fixed-equality': 'var input: [[packet, 1]] = [[packet()]]\nvar needle: [packet, 1] = [packet()]\nvar output = c.contains(input, needle)',
  'bare-generic': 'var output = c.sorted([1, 2], c.numeric_less)',
  'untyped-lambda': 'var output = c.sorted([1, 2], func(a, b) -> bool:\n    return a < b\n)',
  'map-destination-only': 'var output: [i32] = c.map([1], func(const value: i32) -> i32:\n    return value\n)',
@@ -83,6 +83,17 @@ with tempfile.TemporaryDirectory(prefix='VOID-collections-negative-') as directo
         source.write_text(base + 'func main():\n' + ''.join('    ' + line + '\n' for line in body.splitlines()), encoding='utf-8')
         result = h.run([compiler, 'check', source], status=1, sources=[work], context={'mode': 'expected_source_diagnostic'})
         diagnostic(result, [work])
+    # G83 makes these formerly unsupported element shapes comparable. Keep the
+    # original primitive collection examples as positive execution regressions,
+    # and retain the negatives above with genuinely unsupported value elements.
+    for name, body in {
+        'list-equality-positive': 'print(c.contains([[1]], [1]))',
+        'dict-equality-positive': 'print(c.contains([{1: 2}], {1: 2}))',
+        'fixed-equality-positive': 'var input: [[i32, 2]] = [[1, 2]]\nvar needle: [i32, 2] = [1, 2]\nprint(c.contains(input, needle))',
+    }.items():
+        source = work / (name + '.void')
+        source.write_text(base + 'func main():\n' + ''.join('    ' + line + '\n' for line in body.splitlines()), encoding='utf-8')
+        h.run([compiler, 'run', source, '--no-cache'], expected=b'true\n')
     # A project spelling never acquires canonical guard authority.
     source = work / 'collections.void'
     source.write_text('func main():\n    var token = _collections_version([1])\n', encoding='utf-8')
@@ -101,4 +112,4 @@ with tempfile.TemporaryDirectory(prefix='VOID-collections-negative-') as directo
         result = h.run([compiler, 'check', main], status=1, sources=[work],
                        env=dict(os.environ, VOID_STDLIB_ROOT=str(library)), context={'mode':'expected_guard_diagnostic'})
         diagnostic(result, [work])
-print(f'Collections: {len(cases) + 7} source-located negative cases and ordinary same-name function passed')
+print(f'Collections: {len(cases) + 7} source-located negative cases, three collection-equality positives and ordinary same-name function passed')

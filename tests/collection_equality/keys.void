@@ -1,0 +1,45 @@
+value struct key:
+    number: i32
+    text: string
+struct object:
+    number: i32
+enum code(u8):
+    zero = 0
+    one = 1
+enum variant:
+    empty
+    integer(value: i32)
+    text(value: string)
+const value_keys = {key(number = 1, text = "a\0雪"): [1], key(number = 2, text = ""): [2]} == {key(number = 2, text = ""): [2], key(number = 1, text = "a\0雪"): [1]}
+const enum_keys = {variant.empty: 1, variant.integer(0): 2, variant.text(""): 3} == {variant.text(""): 3, variant.integer(0): 2, variant.empty: 1}
+const nullable_left: {i32?: string} = {null: "none", 0: "zero"}
+const nullable_right: {i32?: string} = {0: "zero", null: "none"}
+const nullable_keys = nullable_left == nullable_right
+func main() -> i32:
+    if not value_keys or not enum_keys or not nullable_keys:
+        return 6
+    var integers: {i8: i32} = {1: 2}
+    var unsigneds: {u64: i32} = {1: 2}
+    var flags: {code: i32} = {code.one: 3}
+    var values: {variant: string} = {variant.integer(7): "value", variant.empty: "empty", variant.text("a\0雪"): "text"}
+    if integers[1] != 2 or unsigneds[1] != 2 or flags[code.one] != 3 or values[variant.integer(7)] != "value" or values[variant.text("a\0雪")] != "text":
+        return 1
+    var optional: {i32?: string} = {null: "null", 0: "zero", 1: "one"}
+    if optional.count != 3 or optional[null] != "null" or optional[0] != "zero":
+        return 2
+    var original = key(number = 1, text = "a\0雪")
+    var first = {original: [1, 2]}
+    original.number = 8
+    var second = {key(number = 1, text = "a\0雪"): [1, 2]}
+    if first != second or first.contains(original) or not first.contains(key(number = 1, text = "a\0雪")):
+        return 3
+    var identity = object(number = 1)
+    var identities: {object?: i32} = {identity: 7, null: 8}
+    identity.number = 9
+    if identities[identity] != 7 or identities[null] != 8 or identities.contains(object(number = 9)):
+        return 4
+    var reverse_order: {variant: string} = {variant.text("a\0雪"): "text", variant.empty: "empty", variant.integer(7): "value"}
+    if values != reverse_order:
+        return 5
+    print("dictionary key contracts preserved")
+    return 0

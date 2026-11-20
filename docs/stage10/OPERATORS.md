@@ -1,5 +1,14 @@
 # Stage 10 operator overloading
 
+## Collection equality — G83
+
+Built-in content `==`/`!=` for supported arrays, lists and dictionaries retain
+existing equality precedence and left-to-right operand evaluation. Elements use
+ordinary operators, including custom `==` and its derived `!=`; key eligibility
+and data-only hashing remain separate. Readonly and generic/operator access checks
+also apply to compiler-derived comparisons. See
+[the collection equality contract](../COLLECTION_EQUALITY.md).
+
 ## Approved generic access amendment, 28 October 2026
 
 Boss approved [public exact substituted-owner operator access](../collections/GENERIC_OPERATORS.md)

@@ -1915,12 +1915,24 @@ Earlier examples used Lua-like bare keys `health = 100`, while the later typed-d
 
 ### 33.1 Equality and hashing
 
-| Key type | Intended default |
+**Implemented G83:** Matching fixed arrays and growable lists compare ordered
+contents and length; dictionaries compare logical key/value contents independently
+of insertion order. Element comparisons use supported ordinary equality, including
+nested collections, nullable presence, enums and custom operators. Managed
+references retain identity. Collection equality does not grant key eligibility;
+collection/float/interface/custom-equality key exclusions remain. Structural
+mutation during element callbacks fails through existing checked iteration;
+recursive structural shapes diagnose instead of traversing arbitrary cycles.
+Pure built-in constant comparisons are supported without executing custom hooks.
+See [collection equality and hashing](COLLECTION_EQUALITY.md) for precise contracts.
+
+
+| Key type | Implemented key rule |
 |---|---|
 | `string` | Equality/hash by UTF-8 text content under explicitly defined rules |
 | Integer/bool/enum | Equality/hash by value |
-| `value struct` | Field-based if all relevant fields have compatible equality/hash behavior |
-| Ordinary reference `struct` | Identity equality by default; mutable object keys discouraged |
+| `value struct` | Field-based key schema if stored fields are eligible; ordinary source `==` remains a separate capability |
+| Ordinary reference `struct` | Managed identity; field mutation does not change stored key identity |
 
 Equal keys must always hash equally. Developers should not have to configure a lookup strategy simply because a key is `string`, `bool`, or a supported value struct. Hash algorithms, collision handling, resizing, and lookup behavior belong in the runtime/library implementation, not application code.
 

@@ -1,0 +1,21 @@
+## Compares integer sequence contents in source order.
+## @param left The first sequence.
+## @param right The second sequence.
+## @return True when lengths and corresponding values agree.
+func same(const left: [i32], const right: [i32]) -> bool:
+    return left == right
+
+value struct parity:
+    value: i32
+    operator ==(const left: parity, const right: parity) -> bool:
+        return left.value % 2 == right.value % 2
+
+func main():
+    var left = [1, 2, 3]
+    var right = [1, 2, 3]
+    var equal = same(left, right)
+    var different = left != right
+    var a = [parity(value = 1)]
+    var b = [parity(value = 3)]
+    var custom = a == b
+    print(equal, different, custom)

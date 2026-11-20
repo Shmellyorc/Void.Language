@@ -1,0 +1,2 @@
+func same<t>(const a: [t], const b: [t]) -> bool:
+    return a == b

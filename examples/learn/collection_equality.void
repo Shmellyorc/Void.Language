@@ -1,0 +1,23 @@
+## Compare packet fields without changing managed identity or dictionary key rules.
+## @param received The decoded field sequence.
+## @param expected The expected field sequence.
+## @return True when both sequences have the same length and ordered values.
+func same_packet(const received: [i32], const expected: [i32]) -> bool:
+    return received == expected
+
+## Demonstrate ordered sequence and order-independent dictionary equality.
+## @return Zero when the example completes normally.
+func main() -> i32:
+    var received = [2, 7, 11]
+    var expected = [2, 7, 11]
+    print(same_packet(received, expected))
+    print(received != [11, 7, 2])
+    var settings = {"width": 1280, "height": 720}
+    var reordered = {"height": 720, "width": 1280}
+    print(settings == reordered)
+    reordered["width"] = 1920
+    print(settings != reordered)
+    var absent: [i32]? = null
+    var empty: [i32]? = []
+    print(absent != empty)
+    return 0

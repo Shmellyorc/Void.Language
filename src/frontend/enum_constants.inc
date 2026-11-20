@@ -4,6 +4,7 @@ bool enum_constant_equal(const SourceFile& source,const Token& site,Type type,
                          const ir::ConstantValue& left,const ir::ConstantValue& right,unsigned depth=0) {
     if(depth>=128)error(source,site,Code::nesting,"Enum constant comparison nesting limit exceeded.");
     if(type.definition && type.definition->custom_equality)error(source,site,Code::constant_call,"A compile-time enum comparison cannot call a payload's custom equality operator.");
+    if(ir::collection_type(type)){collection_constant_type(source,site,type);return collection_constant_equal(source,site,type,left,right,depth);}
     // Function values are aggregates too, but compare by callable identity.
     if(type.definition && type.definition->callable)return left.text==right.text;
     if(type.kind==Type::aggregate) {

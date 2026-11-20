@@ -569,6 +569,18 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/enums/lsp.py" "$<TARGET_FILE:voidls>"
     "${CMAKE_CURRENT_BINARY_DIR}/g78-enum-lsp-results.json")
   set_tests_properties(lsp_enum_completeness PROPERTIES TIMEOUT 180)
+  add_test(NAME collection_equality_source COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/collection_equality/source.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g83-collection-equality-results.json")
+  set_tests_properties(collection_equality_source PROPERTIES TIMEOUT 240)
+  add_test(NAME collection_equality_nesting COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/collection_equality/nesting.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g83-collection-equality-nesting-results.json")
+  set_tests_properties(collection_equality_nesting PROPERTIES TIMEOUT 1200)
+  add_test(NAME lsp_collection_equality COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/collection_equality/lsp.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g83-collection-equality-lsp-results.json")
+  set_tests_properties(lsp_collection_equality PROPERTIES TIMEOUT 180)
   add_test(NAME generic_interfaces_source COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/generic_interfaces/source.py" "$<TARGET_FILE:voidc>"
     "${CMAKE_CURRENT_BINARY_DIR}/g82-generic-interfaces-results.json")
@@ -1092,6 +1104,10 @@ if(BUILD_TESTING)
   target_link_libraries(void_dictionaries_tests PRIVATE void_llvm)
   add_test(NAME dictionaries_source COMMAND void_dictionaries_tests "${PROJECT_SOURCE_DIR}")
   set_tests_properties(dictionaries_source PROPERTIES TIMEOUT 600)
+  add_executable(void_collection_equality tests/collection_equality/runtime.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_collection_equality PRIVATE void_llvm)
+  add_test(NAME collection_equality_runtime COMMAND void_collection_equality "${PROJECT_SOURCE_DIR}")
+  set_tests_properties(collection_equality_runtime PROPERTIES TIMEOUT 180)
   add_executable(void_properties_tests tests/properties/tests.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_properties_tests PRIVATE void_llvm)
   add_test(NAME properties_source COMMAND void_properties_tests "${PROJECT_SOURCE_DIR}")

@@ -18,7 +18,9 @@ id="org.example.enum.app"
 [sources]
 roots=["src"]
 """
-DECLARATION = "enum key:\n    up\n    down\n    data(items: [i32])\n"
+# G83 makes integer-list payloads comparable. Keep this diagnostic/revision
+# regression on a genuinely unsupported value element instead.
+DECLARATION = "value struct payload:\n    value: i32\nenum key:\n    up\n    down\n    data(items: [payload])\n"
 SOURCE = DECLARATION + """
 func main() -> i32:
     var pressed = key.up
@@ -37,7 +39,7 @@ func main() -> i32:
         _:
             return 1
 """
-ERROR = "Collection equality is not implemented; use an element predicate."
+ERROR = "Value struct equality is not implemented."
 CASE = "Use 'is' to test this enum case, or 'match' to handle multiple cases."
 NEGATED_CASE = "Use a negated 'is' test to exclude this enum case, or 'match' to handle multiple cases."
 MATCH = "Use 'match' to inspect the cases and compare any payloads explicitly."

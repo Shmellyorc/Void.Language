@@ -2,13 +2,16 @@
 // Its case tests and payload == expressions use the existing semantic checker,
 // including custom operators, nominal identity, readonly views and diagnostics.
 Type enum_equality(Expr& expression,Type enumeration) {
-    const auto key=Type::key(enumeration)+"|"+ir::capability_key(enumeration);
+    const auto parent=current?current->symbol:std::string{};
+    const auto key=std::to_string(parent.size())+":"+parent+Type::key(enumeration)+"|"+ir::capability_key(enumeration);
     Function* helper=nullptr;
     if(auto found=unit.enum_equalities.find(key);found!=unit.enum_equalities.end())helper=found->second;
     else {
         Function function;function.token=expression.token;
-        function.token.text="$enum_equal$"+std::to_string(unit.enum_equalities.size());
-        function.symbol=unit.identity+"::"+function.token.text;function.visibility="private";
+        function.token.text="$equality$enum$"+std::to_string(unit.enum_equalities.size());
+        function.symbol=(parent.empty()?unit.identity:parent)+"::"+function.token.text;function.visibility="private";
+        function.concrete_name=function.symbol.substr(unit.identity.size()+2);function.display_name="<enum equality>";
+        if(current){function.lexical_owner=lexical_owner();function.lexical_parent=parent;function.substitutions=current->substitutions;function.substitution_sources=current->substitution_sources;function.specialization_depth=current->specialization_depth;function.instantiation_context=current->instantiation_context;}
         function.prepared=true;function.enum_adapter=true;function.result=Type::boolean;
         function.body_syntax="enum-equality-v1:"+key;
         const auto operand=ir::readonly_view(enumeration);
@@ -46,8 +49,10 @@ Type enum_equality(Expr& expression,Type enumeration) {
         }
         function.body.push_back(returned(boolean(false)));
         unit.functions.push_back(std::move(function));helper=&unit.functions.back();
-        unit.enum_equalities.emplace(key,helper); // Publish before recursive payload equality.
-        Semantics checker(unit,units,root,evaluate,diagnostics,defaults);checker.analyze_one(*helper);
+        unit.enum_equalities.emplace(key,helper);
+        // Use the pending-function pass, as collection equality does. Payloads
+        // can alternate enums and collections; neither edge may analyze a child
+        // helper while the parent's semantic frames are still live.
     }
     const bool negate=expression.op=="!=";
     expression.kind=Expr::Kind::call;expression.op="$enum_equal";expression.target=helper->symbol;

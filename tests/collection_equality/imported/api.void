@@ -1,0 +1,4 @@
+value struct item:
+    value: i32
+    operator ==(const a: item, const b: item) -> bool:
+        return a.value == b.value
