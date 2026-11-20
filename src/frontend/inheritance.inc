@@ -34,6 +34,10 @@ void validate_inheritance(std::map<std::string,std::unique_ptr<Unit>>& units,Uni
                     if (s->base_type) {
                         if (f.body.empty() || f.body.front().kind!=Statement::Kind::expression || !f.body.front().expression)
                             error(owner.source,f.token,Code::initializer,"A derived initializer must begin with super.init(...).");
+                        if(f.body.front().expression->kind==Expr::Kind::propagate) {
+                            auto invocation=std::move(f.body.front().expression->parts.at(0));
+                            f.body.front().expression=std::move(invocation);f.base_propagates=true;
+                        }
                         auto& e=*f.body.front().expression;
                         if (e.kind!=Expr::Kind::method_call || e.token.text!="init" || e.parts.empty() || e.parts[0]->kind!=Expr::Kind::name || e.parts[0]->token.text!="super")
                             error(owner.source,f.body.front().token,Code::initializer,"A derived initializer must begin with super.init(...).");

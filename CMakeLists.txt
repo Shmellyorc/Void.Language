@@ -651,6 +651,10 @@ if(BUILD_TESTING)
   add_test(NAME lsp_enum_equality COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/enum_equality.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_enum_equality PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_enum_field_defaults COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/enum_field_defaults.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/enum-field-defaults-results.json")
+  set_tests_properties(lsp_enum_field_defaults PROPERTIES TIMEOUT 180)
   add_test(NAME lsp_quick_fixes COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/quick_fixes.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_quick_fixes PROPERTIES TIMEOUT 90)
@@ -1282,6 +1286,32 @@ if(BUILD_TESTING)
     endforeach()
   endforeach()
   void_managed_source_tests(managed_initialization managed_initialization stress "main;stress;numeric;imports;failure;fail_default;fail_argument;fail_child")
+  add_executable(void_fallible_initialization_tests tests/fallible_initialization/tests.cpp
+    tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_fallible_initialization_tests PRIVATE void_llvm)
+  add_test(NAME fallible_initialization_runtime COMMAND void_fallible_initialization_tests "${PROJECT_SOURCE_DIR}")
+  set_tests_properties(fallible_initialization_runtime PROPERTIES TIMEOUT 180)
+  foreach(mode normal optimized)
+    set(object "${CMAKE_CURRENT_BINARY_DIR}/fallible-initialization-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${object}"
+      COMMAND void_fallible_initialization_tests --emit-library
+        "${PROJECT_SOURCE_DIR}/examples/fallible_initialization/roots.void" "${object}" "${mode}"
+      DEPENDS void_fallible_initialization_tests "${PROJECT_SOURCE_DIR}/examples/fallible_initialization/roots.void" VERBATIM)
+    set_source_files_properties("${object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_fallible_initialization_aot_${mode} tests/fallible_initialization/aot.cpp
+      tests/managed/probe.cpp "${object}" $<TARGET_OBJECTS:void_managed_test_abi>)
+    target_link_libraries(void_fallible_initialization_aot_${mode} PRIVATE void_runtime)
+    add_test(NAME fallible_initialization_aot_${mode} COMMAND void_fallible_initialization_aot_${mode})
+    set_tests_properties(fallible_initialization_aot_${mode} PROPERTIES TIMEOUT 180)
+  endforeach()
+  add_test(NAME fallible_initialization_source COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/fallible_initialization/source.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g84-fallible-initialization-results.json")
+  add_test(NAME lsp_fallible_initialization COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/fallible_initialization/lsp.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g84-fallible-initialization-lsp-results.json")
+  set_tests_properties(fallible_initialization_source PROPERTIES TIMEOUT 300)
+  set_tests_properties(lsp_fallible_initialization PROPERTIES TIMEOUT 180)
   void_managed_source_tests(reference_values reference_values stress "copies;readonly;initialization;templates;methods;staged;order;imports;required;stress;null_failure")
   void_managed_source_tests(composition composition stress "main;stress;imports;order;staged;receiver_order")
   void_managed_source_tests(inheritance inheritance stress "main;initialization;stress;order;imports;receiver_order;nested;results;failure")

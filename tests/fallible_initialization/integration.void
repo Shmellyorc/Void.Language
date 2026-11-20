@@ -1,0 +1,64 @@
+enum failure<t>:
+    invalid(value: t)
+
+value struct pair<t>:
+    value: t
+
+func (p pair<t>) init(value: t, fail: bool = false) -> result<bool, failure<string>>:
+    if fail:
+        return Err(failure<string>.invalid("pair"))
+    p.value = value
+    return Ok(true)
+
+struct box<t, e>:
+    value: t
+
+func (b box<t, e>) init(value: t, error: e, fail: bool = false) -> result<bool, e>:
+    if fail:
+        return Err(error)
+    b.value = value
+    return Ok(true)
+
+func identity<t>(value: t) -> t:
+    return value
+
+struct leaf:
+    value: i32
+
+struct base:
+    child: leaf
+
+func (b base) init(value: i32, fail: bool = false) -> result<bool, string>:
+    if fail:
+        return Err("base")
+    b.child = leaf(value = value)
+    return Ok(true)
+
+struct derived extends base:
+    child2: leaf
+
+func (d derived) init(value: i32, fail_base: bool = false, fail_self: bool = false) -> result<bool, string>:
+    super.init(value, fail_base)?
+    if fail_self:
+        return Err("derived")
+    d.child2 = leaf(value = value + 1)
+    return Ok(true)
+
+func build(value: i32, fail: bool) -> result<derived, string>:
+    return Ok(derived(value, fail)?)
+
+func main():
+    print(pair(3, true) is Err(failure<string>.invalid("pair")))
+    print(identity(box(value = 7, error = "box", fail = true)) is Err("box"))
+    match identity(box(value = 7, error = "box")):
+        Ok(var b):
+            print(b.value)
+        Err(var error):
+            print(error)
+    print(derived(8, true) is Err("base"))
+    print(derived(8, fail_self = true) is Err("derived"))
+    match build(8, false):
+        Ok(var d):
+            print(d.child.value, d.child2.value)
+        Err(var error):
+            print(error)

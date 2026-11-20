@@ -1,0 +1,43 @@
+var attempts = 0
+
+value struct point:
+    value: i32
+
+func (p point) init(value: i32) -> result<bool, string>:
+    attempts += 1
+    p.value = value
+    if value < 0:
+        return Err("point")
+    return Ok(true)
+
+struct node:
+    value: i32
+
+func (n node) init(value: i32) -> result<bool, string>:
+    attempts += 1
+    n.value = value
+    if value < 0:
+        return Err("node")
+    return Ok(true)
+
+struct holder:
+    point: point
+    node: node
+
+func replace_value(h: holder) -> result<bool, string>:
+    h.point = point(-1)?
+    return Ok(true)
+
+func replace_reference(h: holder) -> result<bool, string>:
+    h.node = node(-1)?
+    return Ok(true)
+
+func exercise() -> result<bool, string>:
+    var h = holder(point = point(7)?, node = node(9)?)
+    print(replace_value(h) is Err("point"), h.point.value)
+    print(replace_reference(h) is Err("node"), h.node.value)
+    print(attempts)
+    return Ok(true)
+
+func main():
+    print(exercise() is Ok(true))

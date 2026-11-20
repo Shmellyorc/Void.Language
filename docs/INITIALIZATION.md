@@ -34,7 +34,8 @@ The owner approved C1 in INITIALIZATION_PROPOSAL.md, including recursive nested
 construction, required-child availability, visibility, conservative initialization
 reload dependencies and the specific obsolete Phase 13 test updates. This document
 describes implemented source behavior; final verification is recorded in WORK_LOG.md.
-Fallible constructors and resource lifetimes remain separate future work. LLVM is pinned to 23.1.4 under the [migration](llvm23/COMPATIBILITY.md), preserving the SDK-wide RTTI policy.
+G84 adds typed fallible initialization through the same constructor syntax and
+construction machinery; see the contract below. LLVM is pinned to 23.1.4 under the [migration](llvm23/COMPATIBILITY.md), preserving the SDK-wide RTTI policy.
 
 ## Source interface
 
@@ -56,8 +57,8 @@ func entry(value: i32) -> i32:
 ```
 
 One initializer belongs to the type's owning source module. It has explicitly typed
-parameters and no result annotation. Empty return or reaching the end completes
-construction. Initializers use the same supported numeric, Boolean and nested
+parameters. Infallible init has no result annotation; an empty return or reaching
+the end completes construction. G84 also permits `result<bool, e>` as described below. Initializers use the same supported numeric, Boolean and nested
 nominal value types, statements, methods and diagnostics as ordinary functions.
 
 With custom init, constructor arguments refer **only to initializer parameters**.
@@ -122,16 +123,16 @@ while another module cannot bypass that private constructor through its own fiel
 
 Direct `.init(...)` and type-qualified lifecycle calls are rejected even in the
 owner/body. An unrelated free function named init retains its ordinary meaning.
-Custom deinit, initializer result annotations and foreign extension initializers
-remain unsupported and produce source diagnostics.
+Value deinit, initializer result annotations other than `result<bool, e>`, and
+foreign extension initializers remain unsupported and produce source diagnostics.
 
 Construction uses private fresh storage and publishes only after successful
 completion. Argument, nested initializer and body failures propagate existing
 source-located arithmetic/conversion errors; remaining steps do not execute. A
 failed new value does not overwrite an assignment destination. Earlier argument
 effects are not rolled back. There is no general exception, destructor, rollback
-or fallible result construction system. Those future features need their own
-approved contract and must preserve the successful-publication boundary.
+or transactional rollback system. Typed fallible construction follows the G84
+contract below and preserves the successful-publication boundary.
 
 ## Compiler, tools and reload
 
@@ -186,3 +187,62 @@ including what still needs hosted Windows/macOS execution.
 G79 nullable value/collection locals and omitted fields default to null without
 constructing an underlying payload. Required non-nullable initialization remains
 unchanged. See [nullable types](NULLABLE_TYPES.md).
+
+## Typed fallible initialization (G84)
+
+The ordinary constructor call is the only construction operation:
+
+```void
+value struct point:
+    x: i32
+
+func (p point) init(x: i32) -> result<bool, string>:
+    if x < 0:
+        return Err("x must be nonnegative")
+    p.x = x
+    return Ok(true)
+
+func build(x: i32) -> result<point, string>:
+    return Ok(point(x)?)
+```
+
+An infallible `init` keeps `T(...) -> T`. A fallible `init` declares
+`result<bool, e>` and makes that same `T(...)` expression produce `result<T, e>`.
+The successful result contains the finished object, not the initializer's Boolean.
+Success is determined by the `Ok` case; `Ok(true)` is the completion convention,
+and `Ok(false)` is also an `Ok` under ordinary result semantics. `Err(error)`
+contains exactly the declared error type. VOID adds no `void` payload, exception
+mechanism, implicit unwrap, constructor overload ranking or separate factory API.
+
+Use ordinary `match`, result patterns or `?`. Propagation requires exactly matching
+error types. Constructor parameters, defaults, generic inference/specialization,
+visibility and argument evaluation order are unchanged. The constructor result
+participates in ordinary call inference, including generic functions receiving it.
+Assigning `T(...)` directly to `T` does not hide a possible failure.
+
+C1 still prepares every value field before the initializer body. A failed result
+never supplies the new value to its caller or overwrites an assignment target.
+During a fallible initializer, the fresh value and local copies remain private:
+returning, storing or capturing the whole receiver is rejected, including through
+helpers. Safe helpers retain ordinary value-copy semantics; receiver methods
+retain ordinary mutation semantics. On failure, private temporary field roots are
+released before the caller continues.
+A fallible child cannot be default-constructed implicitly: use an explicit call,
+handle/propagate its result, and supply the completed child to named-field
+construction or an existing valid initializer parameter/field path. Implicit
+`var item: T` cannot silently introduce a result or discard an error.
+
+Managed construction uses the same private stage, readiness analysis and final
+commit; see [managed initialization](MANAGED_INITIALIZATION.md#typed-fallible-managed-initialization-g84).
+`with` and `defer` unwind through the same return path as ordinary result functions.
+A failed acquisition does not activate cleanup for an object that was never
+constructed. Completed references/collections retain their ordinary alias and GC
+behavior. Construction does not assume ownership of every referenced resource:
+lexical owners use existing deterministic cleanup, while shared/external resources
+are not implicitly closed. No arbitrary side-effect rollback or automatic partial
+object `deinit` is promised. Runtime arithmetic/allocation/cleanup failures keep
+the existing source failure channel rather than becoming a typed `Err`.
+
+Runnable examples are in `examples/fallible_initialization/`. Source, native JIT/AOT
+GC/IR proofs, protocol and real-editor evidence are recorded in the
+[G84 report](projects/G84_FALLIBLE_CONSTRUCTORS.md).

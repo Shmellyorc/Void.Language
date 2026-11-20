@@ -1,0 +1,53 @@
+var events = 0
+
+func record(value: i32):
+    events += value
+
+struct guard:
+    value: i32
+
+func (g guard) deinit():
+    record(g.value)
+
+struct child:
+    value: i32
+
+struct owner:
+    child: child
+
+func (o owner) init(fail: bool) -> result<bool, string>:
+    with guard(value = 1):
+        defer record(10)
+        o.child = child(value = 3)
+        if fail:
+            return Err("owner")
+        return Ok(true)
+
+func nested(fail: bool) -> result<i32, string>:
+    with guard(value = 100):
+        var value = owner(fail)?
+        return Ok(value.child.value)
+
+struct acquired:
+    value: i32
+
+func (a acquired) init(fail: bool) -> result<bool, string>:
+    if fail:
+        return Err("acquire")
+    a.value = 1000
+    return Ok(true)
+
+func (a acquired) deinit():
+    record(a.value)
+
+func scoped(fail: bool) -> result<bool, string>:
+    with acquired(fail)?:
+        return Ok(true)
+
+func main():
+    print(nested(true) is Err("owner"), events)
+    events = 0
+    print(nested(false) is Ok(3), events)
+    events = 0
+    print(scoped(true) is Err("acquire"), events)
+    print(scoped(false) is Ok(true), events)

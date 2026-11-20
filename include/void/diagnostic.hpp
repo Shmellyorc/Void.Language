@@ -45,6 +45,9 @@ struct Diagnostic {
     bool editor_member_recovery = false;
 };
 std::string diagnostic_code(DiagnosticCode code);
+// Shorten source nominal identities for presentation only. Structured identities
+// and actual file locations retain their full spelling.
+std::string display_nominal_names(std::string text);
 std::string render_diagnostic(const Diagnostic& diagnostic);
 // Both APIs expose identical structured errors. No IR is returned on failure.
 class CompilationError : public std::invalid_argument {

@@ -428,6 +428,7 @@ struct Expr {
     bool event=false, asynchronous_call=false;
     std::string event_owner,native_symbol;
     Type environment=Type::none;
+    Type constructed_type=Type::none, initializer_result=Type::none;
     enum class Kind { global, spawned, task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, choice, has, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal, return_pack, editor_hole } kind;
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
@@ -497,7 +498,7 @@ struct Statement {
     unsigned compound_slot=0;
     Token binder{TokenKind::name,"",0}, index_binder{TokenKind::name,"",0};
     unsigned index_slot=0;
-    bool reverse=false, exclusive=false;
+    bool reverse=false, exclusive=false, exhaustive=false;
     std::vector<Token> fields;
     std::vector<bool> implicit_fields;
     std::vector<unsigned> field_indexes;
@@ -561,7 +562,7 @@ struct Function {
     std::string operator_glyph, operator_pattern;
     std::vector<Parameter> parameters;
     std::optional<Parameter> receiver;
-    bool receiver_mutates = false, initializer = false;
+    bool receiver_mutates = false, initializer = false, base_propagates = false;
     unsigned accessor = 0; // 1 getter, 2 setter; bodies use the ordinary method checker.
     bool virtual_method = false, overriding = false, interface_requirement = false;
     std::string virtual_slot;
@@ -579,6 +580,16 @@ struct Function {
     std::size_t source_end = 0;
     std::vector<Type> locals;
 };
+// Value construction contexts enforce source quarantine using ordinary value
+// copies. Only managed private places need a distinct IR passing convention.
+std::set<unsigned> managed_construction_parameters(const Function& f,const std::set<unsigned>& mask) {
+    std::set<unsigned> result;const unsigned first=f.receiver?1u:0u;
+    for(auto index:mask) {
+        auto type=index<first?f.receiver->type:f.parameters.at(index-first).type;
+        if(type.kind==Type::managed_ref)result.insert(index);
+    }
+    return result;
+}
 // Presentation uses the selected compiler function, including concrete generic
 // types. Source identities remain shared for navigation and references.
 std::string random_public_name(const Function& f) {
@@ -1823,8 +1834,17 @@ Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std
     if (result.nullable && !ir::reference_value(result)) error(unit.source,token,Code::unsupported_type,"Only managed references can be nullable in this phase.");
     return result;
 }
+std::string declaring_field_name(Type owner,unsigned index) {
+    const auto& identity=owner.definition->fields.at(index).owner;
+    for(auto definition=owner.definition;definition;definition=definition->base.lock())
+        if(definition->identity==identity)return display_nominal_names(ir::type_name(Type::nominal(definition)));
+    return display_nominal_names(identity);
+}
 bool checked_initializer_default(Type t) {
-    return t.kind==Type::numeric_enum || (t.definition && t.definition->option_type) || console::endpoint_type(t);
+    // These required-value fields can have a checked pure declaration default.
+    // Prepare that value before init, just as for numeric enums and options.
+    return t.kind==Type::numeric_enum ||
+        (t.definition && (t.definition->callable || !t.definition->cases.empty())) || console::endpoint_type(t);
 }
 ir::ConstantValue constant_value(const SourceFile&, const Expr&);
 void check_dictionary_key(const SourceFile& source,const Token& use,Type key,const std::map<std::string,std::unique_ptr<Unit>>& units) {
@@ -2061,7 +2081,7 @@ class Semantics {
             for(auto index:selected.path) {
                 auto [module,structure]=owned_structure(owner);
                 const auto& origin=structure->effective_fields.at(index);
-                related.push_back({span(origin.first->source,origin.second->token),"Stored field declared by "+owner.definition->fields[index].owner+"."});
+                related.push_back({span(origin.first->source,origin.second->token),"Stored field declared by "+declaring_field_name(owner,index)+"."});
                 owner=ir::field_type(owner,index);
             }
             error(source,token,Code::visibility,"Member '"+token.text+"' is not accessible from this lexical context.","Use an accessible owner operation; stored-field privacy belongs to its declaring struct.",std::move(related));
@@ -2510,7 +2530,9 @@ class Semantics {
                 if(field.annotation->kind!=Type::aggregate || (field.annotation->definition && (field.annotation->definition->callable || !field.annotation->definition->cases.empty())))continue;
                 auto [child_owner,child] = owned_structure(*field.annotation);
                 auto value = std::make_unique<Expr>(Expr::Kind::construction,initializer_declaration ? field.token : e.token); value->slot = n;
-                try { construction(*value,*child_owner,*child,runtime,field_owner); }
+                try { construction(*value,*child_owner,*child,runtime,field_owner);
+                    if(value->constructed_type!=Type::none)error(source,value->token,Code::initializer,"A fallible child requires an explicitly handled constructor expression.","Supply a completed child, or propagate construction with ? before storing it.");
+                }
                 catch (CompilationError& failure) {
                     auto errors = failure.diagnostics();
                     for (auto& d : errors) d.related.push_back({span(field_owner.source,field.token),"Default construction required for this field."});
@@ -2605,6 +2627,8 @@ class Semantics {
             out.parameter_documentation.push_back(std::move(documentation));
         }
         out.signature+=")";
+        if(init && ir::fallible_initializer_result(init->result))
+            out.signature+=" -> "+ir::type_name(unit.make_result(e.type,ir::field_type(init->result,2)));
         if(editing_label || (bare_cursor && !positional_active))throw EditorProbeFound{};
         if(bare_cursor)editor_name_candidates(*e.parts[active],parameters[index].type);
     }
@@ -2617,6 +2641,7 @@ class Semantics {
         e.kind = Expr::Kind::construction; e.type = Type(structure.definition,structure.definition->interface_type ? Type::interface_ref : structure.definition->managed ? Type::managed_ref : Type::aggregate); e.target = structure.definition->identity;
         e.aggregate_value = structure.defaults;
         auto* init = structure.initializer;
+        const bool fallible=init && ir::fallible_initializer_result(init->result);
         if (init) {
             if (!runtime) error(source,e.token,Code::constant_call,"Compile-time expressions cannot execute custom initialization.","Construct this value in a function or local const.",{{span(owner.source,init->token),"Runtime initializer declared here."}});
             if (!source_visible(init->visibility,owner.identity,access.identity)) error(source,e.token,Code::visibility,"Initializer is private to " + owner.identity + ".");
@@ -2657,6 +2682,10 @@ class Semantics {
             }
         }
         if (!structure.initializer || !structure.definition->managed) construction_fields(e,owner,structure,runtime);
+        if(fallible) {
+            e.constructed_type=e.type;e.initializer_result=init->result;
+            e.type=unit.make_result(e.constructed_type,ir::field_type(init->result,2));
+        }
     }
     void expect(Type actual, Type expected, const Token& token) {
         if (actual == error_type || expected == error_type) return;
@@ -2808,14 +2837,24 @@ class Semantics {
         if(selected.function)return call_result_anchor(*selected.function);
         return {};
     }
+    Type constructor_result(Type type,Structure& structure) {
+        return structure.initializer && ir::fallible_initializer_result(structure.initializer->result)
+            ? unit.make_result(type,ir::field_type(structure.initializer->result,2)) : type;
+    }
     VOID_SEMANTIC_HANDLER std::optional<Type> call_anchor(Expr& e) {
         if(e.token.text=="$interpolation" || e.token.text=="$hole")return text_anchor();
         if(e.target.starts_with("$display.") || display_prelude(e))return e.token.text=="string"?text_anchor():text_result_anchor();
         if(e.op=="$static_call" || e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
         if(auto* value=lookup(e.token.text);value && value->type.definition && value->type.definition->callable)return Type(*value->type.definition->call_result);
-        if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text))return current->substitutions.at(e.token.text);
+        if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text)) {
+            auto type=current->substitutions.at(e.token.text);
+            if(type.definition && (type.kind==Type::aggregate || type.kind==Type::managed_ref) && !type.nullable && type.definition->cases.empty() && !type.definition->callable) {
+                auto [owner,structure]=owned_structure(type);return constructor_result(type,*structure);
+            }
+            return type;
+        }
         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
-        if (structure) {auto& concrete=concrete_structure(e,*owner,*structure);return Type(concrete.definition,concrete.definition->interface_type?Type::interface_ref:concrete.definition->managed?Type::managed_ref:Type::aggregate);}
+        if (structure) {auto& concrete=concrete_structure(e,*owner,*structure);return constructor_result(Type(concrete.definition,concrete.definition->interface_type?Type::interface_ref:concrete.definition->managed?Type::managed_ref:Type::aggregate),concrete);}
         const auto& target=concrete_function(e,resolve(e));
         return call_result_anchor(target);
     }
@@ -3046,8 +3085,8 @@ class Semantics {
                 } else {
                     if(t.definition->native_resource)continue; // Source methods remain visible; native payloads do not.
                     auto type=t;bool readonly=false;std::string declaring;
-                    for(auto field:selected.path){readonly|=type.definition->fields[field].readonly;declaring=type.definition->fields[field].owner;type=ir::field_type(type,field);}
-                    if(auto* candidate=add(name,type,5)){if(readonly)candidate->detail="const "+candidate->detail;candidate->documentation="Stored field declared by "+declaring+".";}
+                    for(auto field:selected.path){readonly|=type.definition->fields[field].readonly;declaring=declaring_field_name(type,field);type=ir::field_type(type,field);}
+                    if(auto* candidate=add(name,type,5)){if(readonly)candidate->detail="const "+candidate->detail;candidate->documentation=display_nominal_names("Stored field declared by "+declaring+".");}
                 }
             } catch(const CompilationError&) {} catch(const Poison&) {}
         } else {
@@ -4083,7 +4122,7 @@ class Semantics {
             if(current->substitution_sources.contains(e.token.text))e.source_target=current->substitution_sources.at(e.token.text);
             const auto type=current->substitutions.at(e.token.text);
             if(type.definition && type.definition->task_result)error(source,e.token,Code::not_callable,"Inferred task handles have no source constructor; call an async function.");
-            if(!type.definition || type.nullable || (type.kind!=Type::aggregate && type.kind!=Type::managed_ref))error(source,e.token,Code::not_callable,"The specialized type has no source constructor.");
+            if(!type.definition || ir::nullable_type(type) || (type.kind!=Type::aggregate && type.kind!=Type::managed_ref) || type.definition->enum_backing || !type.definition->cases.empty() || type.definition->callable)error(source,e.token,Code::not_callable,"The specialized type has no source constructor.");
             auto [owner,structure]=owned_structure(type);construction(e,*owner,*structure,true,unit);return e.type;
         }
         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
@@ -4437,6 +4476,7 @@ class Semantics {
                 auto [owner,structure] = owned_structure(t);
                 s.expression = std::make_unique<Expr>(Expr::Kind::construction,s.token);
                 construction(*s.expression,*owner,*structure,true,unit);
+                if(s.expression->constructed_type!=Type::none)error(source,s.token,Code::initializer,"Fallible initialization requires an explicit constructor expression and result handling.");
 
             }
             if (!ir::reference_value(t) && t.kind!=Type::growable_array && t.kind!=Type::dictionary) t.readonly=false;
@@ -4690,7 +4730,8 @@ class Semantics {
         case K::match: {
             auto subject=expression(*s.expression);flow=0;
             for(auto& arm:s.body){scopes.emplace_back();check_pattern(*arm.pattern,subject);flow|=sequence(arm.body);scopes.pop_back();}
-            if(!warn_match(s.token,subject,[&](auto visit){for(const auto& arm:s.body)visit(*arm.pattern);}))flow|=next_flow;break;
+            s.exhaustive=warn_match(s.token,subject,[&](auto visit){for(const auto& arm:s.body)visit(*arm.pattern);});
+            if(!s.exhaustive)flow|=next_flow;break;
         }
         case K::loop: {
             if(!s.binder.text.empty()) {
@@ -4774,6 +4815,9 @@ public:
     void initializer_fields(Function& f) {
         if (!f.initializer || f.initializer_prepared) return;f.initializer_prepared=true;
         auto [owner,structure] = owned_structure(f.receiver->type);
+        // A rejected/recovered field default leaves a partial template. Reuse
+        // the default resolver's poison state before reading any template field.
+        defaults(*owner,*structure);
         if (f.receiver->type.kind==Type::aggregate) for (const auto& field:structure->fields) {
             auto type=*field.annotation;
             const bool complete_default=field.expression && type.definition && (type.kind==Type::numeric_enum || type.definition->callable || !type.definition->cases.empty() || console::endpoint_type(type));
@@ -4803,7 +4847,7 @@ public:
         }
         if(t.definition && t.definition->callable){if(!t.nullable)error(source,token,Code::initializer,"An array of functions requires complete values.");e->kind=Expr::Kind::function_null;return e;}
         if(t.kind==Type::numeric_enum || (t.definition && !t.definition->cases.empty()))error(source,token,Code::initializer,"Enum/result elements require explicit variants.");
-        if(t.kind==Type::aggregate){auto [owner,structure]=owned_structure(t);construction(*e,*owner,*structure,runtime,access);}
+        if(t.kind==Type::aggregate){auto [owner,structure]=owned_structure(t);construction(*e,*owner,*structure,runtime,access);if(e->constructed_type!=Type::none)error(source,token,Code::initializer,"A fallible array element requires explicit constructor result handling.");}
         else if(ir::reference_value(t) && !t.nullable)error(source,token,Code::initializer,"A required array reference needs an explicit initializer.");
         return e;
     }
@@ -4875,6 +4919,14 @@ public:
                 try {
                     auto [base_owner,base]=owned_structure(*owned_structure(f.receiver->type).second->base_type);
                     construction(*f.base_prelude,*base_owner,*base,true,unit);
+                    const bool fallible=f.base_prelude->constructed_type!=Type::none;
+                    if(fallible) {
+                        if(!f.base_propagates || !ir::fallible_initializer_result(f.result))
+                            error(source,f.base_prelude->token,Code::initializer,"A fallible base initializer requires super.init(...)? in a fallible derived initializer.");
+                        if(ir::field_type(f.base_prelude->initializer_result,2)!=ir::field_type(f.result,2))
+                            error(source,f.base_prelude->token,Code::type_mismatch,"Base initializer propagation requires exactly matching error types.");
+                        f.base_prelude->type=f.base_prelude->constructed_type;
+                    } else if(f.base_propagates)error(source,f.base_prelude->token,Code::initializer,"An infallible super.init does not produce a result to propagate.");
                     f.base_prelude->kind=Expr::Kind::base_initialization;
                 } catch (const CompilationError& failure) { diagnostics.add(failure); }
                   catch (const Poison&) {}
@@ -4999,6 +5051,9 @@ class Lowering {
     const Statement* normal_return=nullptr;
     std::vector<unsigned> cleanup_jumps;
     void return_through_cleanup(std::optional<unsigned> value,const Token& token,bool early=false){
+        if(output.initializer && ir::fallible_initializer_result(output.result) && value) {
+            ir::Instruction checked{ir::Op::initializer_return,*value};value=emit(checked,token);
+        }
         if(output.asynchronous && early)emit({ir::Op::async_cancel_children},token);
         if(output.asynchronous)for(auto scope=with_scopes.rbegin();scope!=with_scopes.rend();++scope){if(scope->group)join_group(scope->slot,true,token);else if(scope->owned_group)join_group(*scope->owned_group,true,token);}
         if(!cleanup_head && !output.asynchronous){terminate(value?ir::Terminator{ir::Terminator::Kind::return_value,*value}:ir::Terminator{ir::Terminator::Kind::return_void});return;}
@@ -5448,6 +5503,10 @@ class Lowering {
         });
         case K::field: return frontend_case([&]() -> unsigned { auto value=expression(*e.parts[0]); if(e.target=="$text.length" || e.target=="$text.byte_length"){ir::Instruction i{ir::Op::string_count,value};i.immediate=e.target=="$text.byte_length";return emit(i,e.token);} if(e.target=="$dict.count")return emit({ir::Op::dict_count,value},e.token);if(e.target=="$array.count")return emit({ir::Op::array_count,value},e.token); ir::Instruction i{e.parts[0]->type.kind==Type::managed_ref ? ir::Op::gc_read : ir::Op::extract,value}; i.immediate=e.slot; return emit(i,e.token); });
         case K::construction: return frontend_case([&]() -> unsigned {
+            const bool fallible=e.constructed_type!=Type::none;
+            const auto owner_type=fallible?e.constructed_type:e.type;
+            std::optional<unsigned> outcome,answer,done;
+            if(fallible){answer=static_cast<unsigned>(output.locals.size());output.locals.push_back(e.type);done=block();}
             std::vector<unsigned> arguments;
             for (const auto& part : e.parts) {
                 auto argument = static_cast<unsigned>(output.locals.size()); output.locals.push_back(part->type);
@@ -5455,31 +5514,31 @@ class Lowering {
             }
             if (e.initializer.empty()) {
                 std::vector<unsigned> fields;
-                for (unsigned field=0;field<e.type.definition->fields.size();++field) {
-                    Type t=ir::field_type(e.type,field);
+                for (unsigned field=0;field<owner_type.definition->fields.size();++field) {
+                    Type t=ir::field_type(owner_type,field);
                     std::optional<unsigned> selected;
                     for (unsigned n=0;n<arguments.size();++n) if (e.field_indexes[n]==field) selected=emit({ir::Op::load,arguments[n]},e.token);
                     for (const auto& child:e.omitted) if (child->slot==field) selected=expression(*child);
                     auto value=selected ? *selected : constant(t,e.aggregate_value.fields.at(field),e.token);
                     fields.push_back(snapshot(value,t,e.token));
                 }
-                ir::Instruction i{e.type.kind==Type::managed_ref ? ir::Op::gc_construct : ir::Op::aggregate}; i.type=e.type;
+                ir::Instruction i{owner_type.kind==Type::managed_ref ? ir::Op::gc_construct : ir::Op::aggregate}; i.type=owner_type;
                 for (auto field:fields) i.arguments.push_back(emit({ir::Op::load,field},e.token));
                 return emit(i,e.token);
             }
-            bool staged=e.type.kind==Type::managed_ref;
-            auto storage_type=e.type; storage_type.construction=staged;
+            bool staged=owner_type.kind==Type::managed_ref;
+            auto storage_type=owner_type; storage_type.construction=staged;
             auto slot = static_cast<unsigned>(output.locals.size()); output.locals.push_back(storage_type);
             unsigned initial;
             if (staged) {
                 output.construction_origins[slot]=slot;
                 ir::Instruction begin{ir::Op::stage_begin,slot}; begin.type=storage_type; initial=emit(begin,e.token);
-            } else initial=constant(e.type,e.aggregate_value,e.token);
+            } else initial=constant(owner_type,e.aggregate_value,e.token);
             emit({ir::Op::store,slot,initial},e.token);
-            for (unsigned field=0;!staged && field<e.type.definition->fields.size();++field) {
+            for (unsigned field=0;!staged && field<owner_type.definition->fields.size();++field) {
                 std::optional<unsigned> value;
                 if (staged) {
-                    Type field_type=e.type.definition->fields[field].type;
+                    Type field_type=owner_type.definition->fields[field].type;
                     if (ir::requires_initialization(field_type)) continue;
                     value=constant(field_type,e.aggregate_value.fields.at(field),e.token);
                 }
@@ -5496,18 +5555,41 @@ class Lowering {
                 ir::Instruction call{ir::Op::call}; call.callee=e.initializer; call.receiver=ir::Place{slot,{}}; call.initialization=true;
                 call.arguments.resize(arguments.size());
                 for (unsigned n=0;n<arguments.size();++n) call.arguments[e.field_indexes[n]]=emit({ir::Op::load,arguments[n]},e.token);
-                emit(call,e.token);
+                const auto invoked=emit(call,e.token);
+                if(fallible) {
+                    outcome=capture(invoked,e.initializer_result,e.token);
+                    auto yes=block(),no=block();
+                    unsigned check;
+                    if(staged){ir::Instruction checked{ir::Op::stage_check,invoked};checked.receiver=ir::Place{slot,{}};check=emit(checked,e.token);}
+                    else check=emit({ir::Op::equal,extract(emit({ir::Op::load,*outcome},e.token),0,e.token),constant(Type::i32,{0,{}},e.token)},e.token);
+                    terminate({ir::Terminator::Kind::branch,check,yes,no});
+                    current=no;
+                    ir::Instruction payload{ir::Op::sum_get,emit({ir::Op::load,*outcome},e.token)};payload.immediate=2;
+                    auto error=emit(payload,e.token);
+                    if(staged){ir::Instruction abort{ir::Op::stage_abort};abort.receiver=ir::Place{slot,{}};emit(abort,e.token);}
+                    else emit({ir::Op::store,slot,constant(owner_type,e.aggregate_value,e.token)},e.token);
+                    ir::Instruction failed{ir::Op::sum};failed.type=e.type;failed.immediate=1;failed.arguments={error};
+                    emit({ir::Op::store,*answer,emit(failed,e.token)},e.token);jump(*done);current=yes;
+                }
             }
             if (staged) {
-                ir::Instruction commit{ir::Op::gc_construct}; commit.type=e.type; commit.receiver=ir::Place{slot,{}};
-                for (unsigned field=0;field<e.type.definition->fields.size();++field) {
+                ir::Instruction commit{ir::Op::gc_construct}; commit.type=owner_type; commit.receiver=ir::Place{slot,{}};
+                for (unsigned field=0;field<owner_type.definition->fields.size();++field) {
                     auto view=emit({ir::Op::load,slot},e.token);
                     ir::Instruction read{ir::Op::gc_read,view}; read.immediate=field;
                     commit.arguments.push_back(emit(read,e.token));
                 }
-                return emit(commit,e.token);
+                auto value=emit(commit,e.token);
+                if(!fallible)return value;
+                ir::Instruction ok{ir::Op::sum};ok.type=e.type;ok.arguments={value};
+                emit({ir::Op::store,*answer,emit(ok,e.token)},e.token);jump(*done);current=*done;
+                return emit({ir::Op::load,*answer},e.token);
             }
-            return emit({ir::Op::load,slot},e.token);
+            auto value=emit({ir::Op::load,slot},e.token);
+            if(!fallible)return value;
+            ir::Instruction ok{ir::Op::sum};ok.type=e.type;ok.arguments={value};
+            emit({ir::Op::store,*answer,emit(ok,e.token)},e.token);jump(*done);current=*done;
+            return emit({ir::Op::load,*answer},e.token);
         });
         case K::spawned:return spawned(e);
         case K::task_cancel: return emit({ir::Op::async_cancel,expression(*e.parts[0])},e.token);
@@ -5903,7 +5985,15 @@ class Lowering {
             }
             for(auto field:fields) call.arguments.push_back(emit({ir::Op::load,field},e.token));
         }
-        emit(call,e.token);
+        auto invoked=emit(call,e.token);
+        if(e.constructed_type!=Type::none) {
+            auto outcome=capture(invoked,e.initializer_result,e.token);auto yes=block(),no=block();
+            ir::Instruction check{ir::Op::stage_check,invoked};check.receiver=ir::Place{0,{}};
+            terminate({ir::Terminator::Kind::branch,emit(check,e.token),yes,no});current=no;
+            ir::Instruction payload{ir::Op::sum_get,emit({ir::Op::load,outcome},e.token)};payload.immediate=2;
+            auto error=emit(payload,e.token);ir::Instruction failed{ir::Op::sum};failed.type=output.result;failed.immediate=1;failed.arguments={error};
+            return_through_cleanup(emit(failed,e.token),e.token,true);current=yes;
+        }
     }
     unsigned event_emit(const Expr& expression_node){
         const auto& token=expression_node.token;auto array=expression_node.parts[0]->type;auto load=[&](unsigned slot){return emit({ir::Op::load,slot},token);};auto owner=snapshot(expression(*expression_node.parts[0]),array,token);std::vector<unsigned> arguments;for(unsigned n=1;n<expression_node.parts.size();++n)arguments.push_back(snapshot(expression(*expression_node.parts[n]),expression_node.parts[n]->type,token));
@@ -5934,7 +6024,8 @@ class Lowering {
         case K::match: {
             auto subject=capture(expression(*s.expression),s.expression->type,s.token);auto done=block();
             for(const auto& arm:s.body){auto yes=block(),no=block();lower_pattern(*arm.pattern,subject,yes,no);current=yes;sequence(arm.body);if(current)jump(done);current=no;}
-            if(s.flow&next_flow){jump(done);current=done;}else terminate({ir::Terminator::Kind::unreachable});break;
+            if(s.exhaustive)terminate({ir::Terminator::Kind::unreachable});else jump(done);
+            if(s.flow&next_flow)current=done;break;
         }
         case K::scoped:{
             if(s.task_group){emit({ir::Op::store,s.slot,emit({ir::Op::async_group_enter},s.token)},s.token);with_scopes.push_back({s.slot,true});sequence(s.body);if(current)join_group(s.slot,false,s.token);with_scopes.pop_back();break;}
@@ -6115,7 +6206,19 @@ public:
     explicit Lowering(const SourceFile& s, ir::Module& m, StringPool& p) : source(s), module(m), strings(p) {}
     const std::set<std::string>& elided_handlers() const {return elided_cleanup_handlers;}
     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
-        context=construction;normal_return=!f.body.empty() && f.body.back().kind==Statement::Kind::returned?&f.body.back():nullptr;
+        ConstructionContext projected;
+        if(construction) {
+            projected.parameters=managed_construction_parameters(f,construction->parameters);
+            for(auto [slot,origin]:construction->aliases)if(f.locals.at(slot).kind==Type::managed_ref)projected.aliases.emplace(slot,origin);
+            for(const auto& [expression,mask]:construction->calls) {
+                auto& checked=projected.calls[expression];const unsigned first=expression->kind==Expr::Kind::method_call?1u:0u;
+                for(unsigned n=0;n<expression->parts.size();++n) {
+                    const auto formal=n<first || expression->argument_indexes.empty()?n:first+expression->argument_indexes[n-first];
+                    if(mask.contains(formal) && expression->parts[n]->type.kind==Type::managed_ref)checked.insert(formal);
+                }
+            }
+        }
+        context=construction?&projected:nullptr;normal_return=!f.body.empty() && f.body.back().kind==Statement::Kind::returned?&f.body.back():nullptr;
         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
         if(f.static_owner)output.source_name=f.symbol.substr(f.static_owner->type.definition->module_identity.size()+2);
         output.static_member=bool(f.static_owner) || (f.global_initializer && !f.lexical_owner.empty());
@@ -6558,6 +6661,10 @@ public:
 #include "collection_constants.inc"
 #include "enum_constants.inc"
 ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
+    // Presentation recovery keeps the nominal type of a partial enum member,
+    // but the hole has no value or operands. Propagate the existing poison
+    // boundary instead of evaluating it as an ordinary constant expression.
+    if(e.kind==Expr::Kind::editor_hole)throw Poison{};
     if(e.kind==Expr::Kind::call && e.op=="$collection_equal") {
         const auto type=e.parts.at(0)->type;collection_constant_type(source,e.token,type);
         return {collection_constant_equal(source,e.token,type,constant_value(source,*e.parts[0]),constant_value(source,*e.parts[1]),0),{}};
@@ -6720,9 +6827,11 @@ void generic_provenance(ir::Module& module,const std::map<std::string,std::uniqu
             module.generic_declarations.emplace(generic.definition->identity,ir::Module::GenericDeclaration{id,static_cast<unsigned>(generic.generics.size()),true});
         for(const auto& function:unit->functions)if(!function.generic_arguments.empty()) {
             module.generic_instances.emplace(function.symbol,ir::Module::GenericInstance{function.generic_origin,function.generic_arguments});
-            for(const auto& [mask,context]:function.construction_contexts)
-                module.generic_instances.emplace(ir::construction_name(function.symbol,{mask.begin(),mask.end()}),
+            for(const auto& [mask,context]:function.construction_contexts) {
+                const auto managed=managed_construction_parameters(function,mask);
+                if(!managed.empty())module.generic_instances.emplace(ir::construction_name(function.symbol,{managed.begin(),managed.end()}),
                     ir::Module::GenericInstance{function.generic_origin,function.generic_arguments});
+            }
         }
         for(const auto& structure:unit->structures)if(structure.generic_origin)
             module.generic_instances.emplace(structure.definition->identity,ir::Module::GenericInstance{structure.generic_origin->definition->identity,structure.type_arguments});
@@ -7227,7 +7336,8 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 if(unit->static_fields.contains(Type::key(t)+"::static::"+f.token.text) || unit->static_methods.contains(Type::key(t)+"::static::"+f.token.text))error(unit->source,f.token,Code::duplicate,"Instance method conflicts with a static member.");
                 f.initializer = f.token.text == "init";
                 if(f.token.text=="deinit" && (t.kind!=Type::managed_ref || f.result!=Type::none || !f.parameters.empty()))error(unit->source,f.token,Code::initializer_deferred,"deinit requires a managed receiver, no arguments and no result.");
-                if (f.initializer && f.result != Type::none) error(unit->source,f.token,Code::type_mismatch,"An initializer must not declare a result; fallible construction is deferred.");
+                if (f.initializer && f.result != Type::none && !ir::fallible_initializer_result(f.result))
+                    error(unit->source,f.token,Code::type_mismatch,"An initializer result must be result<bool, e>; use Ok(true) for successful completion.");
                 for (const auto& field : t.definition->fields) if (field.name == f.token.text)
                     error(unit->source,f.token,Code::duplicate,"Method name conflicts with field '" + f.token.text + "'.");
                 if(f.interface_requirement) {
@@ -7386,9 +7496,9 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         }
     }
     for(auto& [id,u]:units)u->globals.sort([](const Global& a,const Global& b){return a.token.offset!=b.token.offset?a.token.offset<b.token.offset:a.identity<b.identity;});
-    if(presentation && diagnostics.failed() && diagnostics.presentation_errors()) {
+    if(presentation && (diagnostics.failed() || diagnostics.recovery->repaired) && diagnostics.presentation_errors()) {
         diagnostics.recovery->repaired=true;
-        return; // No ownership/IR contracts are built from a broken body.
+        return; // Typed holes/poisoned defaults have presentation, never ownership/IR contracts.
     }
     diagnostics.finish();
     try {root.member_catalog->interface_bindings=ir::interface_universe(*root.member_catalog);}
@@ -7585,7 +7695,10 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
                 }
                 module.functions.push_back(std::move(lowered));
             }
+            std::set<std::set<unsigned>> emitted_contexts;
             for (const auto& [mask,context]:f.construction_contexts) {
+                const auto managed=managed_construction_parameters(f,mask);
+                if(managed.empty() || !emitted_contexts.insert(managed).second)continue;
                 auto lowered=lowering.lower(f,&context); lowered.module_identity=id;elided_handlers.insert(lowering.elided_handlers().begin(),lowering.elided_handlers().end());
                 module.functions.push_back(std::move(lowered));
             }
@@ -7765,6 +7878,14 @@ struct AnalysisAccess {
             std::string binding;
             if(native_contract){field(binding,from);field(binding,to);if(auto spec=format_specification(e))field(binding,*spec);}
             std::string presentation=signatures.contains(to)?signatures.at(to):"";
+            if(e.kind==Expr::Kind::construction && e.constructed_type!=Type::none && to==e.initializer && !presentation.empty()) {
+                const auto open=presentation.find('(');
+                const auto end=presentation.find('\n');
+                const auto result=presentation.rfind(") -> ",end);
+                if(result!=std::string::npos)presentation.replace(result+5,(end==std::string::npos?presentation.size():end)-(result+5),ir::type_name(e.type));
+                if(open!=std::string::npos)presentation.replace(0,open,ir::type_name(e.constructed_type));
+            }
+
             if(!e.source_target.empty() && e.source_target==to && e.target.starts_with("/@stdlib/random.void::") && signatures.contains(e.target))presentation=signatures.at(e.target);
             if(e.kind==Expr::Kind::field && !e.parts.empty() && e.parts[0]->type.definition && e.slot<e.parts[0]->type.definition->fields.size()) {
                 const auto& member=e.parts[0]->type.definition->fields[e.slot];

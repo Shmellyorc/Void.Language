@@ -985,7 +985,16 @@ match player("Hero"):
         print("Creation failed: {err}")
 ```
 
-**OPEN:** Formal rules for constructor result rewriting, errors during parent initialization, ownership of native resources initialized before failure, interaction between named-field construction and custom `init`, and whether `init` should return `result<bool, error>` or a simpler `result<void, error>` equivalent without introducing a `void` keyword. The example is illustrative, not a finalized ABI.
+**G84 contract:** A fallible initializer declares `result<bool, e>`; the ordinary
+`player(...)` call produces `result<player, e>`. `Ok(true)` is the completion
+convention; the ordinary `Ok`/`Err` tag determines success, and the successful
+constructor result contains the finished player. There is no general `void`
+payload or second construction operation. `match` and existing `?` handle/propagate
+the result. A fallible base uses the mandatory first `super.init(...)?` prelude
+with an exactly matching error type. Required fields are proved on successful
+exits, failed stages never publish, and existing lexical resource cleanup runs
+without promising rollback of arbitrary effects. See [initialization](INITIALIZATION.md#typed-fallible-initialization-g84)
+and [managed initialization](MANAGED_INITIALIZATION.md#typed-fallible-managed-initialization-g84).
 
 Phase 13 approved receiver methods and initializer groundwork (I1), deferring
 custom execution at that time. Phase 14 now approves C1 in

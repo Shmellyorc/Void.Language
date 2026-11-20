@@ -244,6 +244,11 @@ bool async_boundary_safe(Type root) {
     return true;
 }
 bool requires_initialization(Type t){return !nullable_type(t) && (t.kind==Type::numeric_enum || console::endpoint_type(t) || reference_value(t) || (t.definition && (t.definition->callable || !t.definition->cases.empty())));}
+bool fallible_initializer_result(Type t) {
+    return t.kind==Type::aggregate && !t.nullable && !t.construction && t.definition &&
+        t.definition->result_type && t.definition->fields.size()==3 && field_type(t,1)==Type::boolean;
+}
+
 bool reference_value(Type t) { return t.kind==Type::managed_ref || t.kind==Type::interface_ref; }
 Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
     if (!d) return;
@@ -888,7 +893,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         if(f.accessor>2 || (f.accessor && (!f.receiver || f.initializer)) ||
            (f.accessor==1 && (f.parameters.size()!=1 || f.result==Type::none || f.receiver_mutates)) ||
            (f.accessor==2 && (f.parameters.size()!=2 || f.result!=Type::none)))fail("invalid property accessor");
-        if (f.initializer && (!f.receiver || f.result != Type::none)) fail("invalid initializer signature");
+        if (f.initializer && (!f.receiver || (f.result != Type::none && !fallible_initializer_result(f.result)))) fail("invalid initializer signature");
         if(f.initializer && !f.module_identity.empty() && f.method_name!="init")fail("initializer grant on an ordinary source method");
         if(f.initializer && f.parameters[0].construction && f.parameters[0].readonly) fail("initializer requires mutable construction storage");
         if(f.result.kind==Type::prepared_receiver) fail("prepared receiver cannot be returned");
@@ -1104,6 +1109,15 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     for(unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],requirement.parameters[n+1]);
                     result=requirement.result;break;
                 }
+                case Op::stage_check:
+                    if(!i.receiver || !i.receiver->fields.empty() || !slot(i.receiver->slot).construction || !fallible_initializer_result(operand(i.a)) || i.b || i.immediate || !i.arguments.empty() || !i.callee.empty() || i.initialization)fail("invalid fallible construction check");
+                    result=Type::boolean;break;
+                case Op::stage_abort:
+                    if(!i.receiver || !i.receiver->fields.empty() || !slot(i.receiver->slot).construction || i.a || i.b || i.immediate || !i.arguments.empty() || !i.callee.empty() || i.initialization)fail("invalid failed construction disposal");
+                    result=Type::none;break;
+                case Op::initializer_return:
+                    if(!f.initializer || !fallible_initializer_result(f.result) || operand(i.a)!=f.result || i.b || i.immediate || i.receiver || !i.arguments.empty() || !i.callee.empty() || i.initialization)fail("invalid checked initializer return");
+                    result=f.result;break;
                 case Op::stage_begin:
                     valid_type(i.type);
                     if (!i.type.construction || !i.type.definition->managed || slot(i.a)!=i.type) fail("invalid construction storage");
@@ -1610,7 +1624,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                         package_call(f, *found->second);
                         for(unsigned n=0;n<i.arguments.size();++n) expect(i.arguments[n],found->second->parameters[n+1]);
                     }
-                    result=Type::none; break;
+                    result=i.callee.empty()?Type(Type::none):functions.at(i.callee)->result; break;
                 }
                 case Op::math: {
                     const auto* operation=math::operation(i.immediate);

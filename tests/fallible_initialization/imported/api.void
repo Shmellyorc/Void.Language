@@ -1,0 +1,29 @@
+value struct point:
+    value: i32
+
+private func (p point) init(value: i32) -> result<bool, string>:
+    if value < 0:
+        return Err("private point")
+    p.value = value
+    return Ok(true)
+
+func make_point(value: i32) -> result<point, string>:
+    return point(value)
+
+struct gate:
+    value: i32
+
+## Creates a validated gate.
+## @param value nonnegative gate value
+func (g gate) init(value: i32 = 9) -> result<bool, string>:
+    if value < 0:
+        return Err("gate")
+    g.value = value
+    return Ok(true)
+
+struct box<t>:
+    value: t
+
+func (b box<t>) init(value: t) -> result<bool, string>:
+    b.value = value
+    return Ok(true)

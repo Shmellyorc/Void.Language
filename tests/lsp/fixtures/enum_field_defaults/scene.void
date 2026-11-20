@@ -1,0 +1,2 @@
+struct scene:
+	value: i32

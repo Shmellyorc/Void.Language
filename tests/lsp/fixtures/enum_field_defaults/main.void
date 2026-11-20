@@ -1,0 +1,23 @@
+use "./scene.void"
+
+private enum scene_state:
+	none
+	add_or_remove
+
+struct scene_manager:
+	scenes: [scene] = []
+	active: [scene] = []
+	state: scene_state = scene_state.none
+
+func (s scene_manager) init():
+	pass
+
+func (s scene_manager) is_idle() -> bool:
+	return s.state == scene_state.none
+
+func unaffected(value: i32) -> i32:
+	return value
+
+func main():
+	var manager = scene_manager()
+	print(manager.is_idle())

@@ -1,0 +1,27 @@
+value struct point:
+    value: i32
+
+func tweak<t>(value: t) -> i32:
+    value.value += 10
+    return value.value
+
+func (p point) adjust():
+    p.value += 1
+
+func (p point) init(value: i32) -> result<bool, string>:
+    p.value = value
+    var copied = p
+    copied.value += 100
+    var inspected = tweak(p)
+    if inspected < 0:
+        return Err("point")
+    p.adjust()
+    return Ok(true)
+
+func main():
+    match point(4):
+        Ok(var complete):
+            print(complete.value)
+        Err(var error):
+            print(error)
+    print(point(-20) is Err("point"))

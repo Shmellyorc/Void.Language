@@ -1,0 +1,47 @@
+value struct point:
+    x: i32
+
+func (p point) init(x: i32) -> result<bool, string>:
+    if x < 0:
+        return Err("point")
+    p.x = x
+    return Ok(true)
+
+struct leaf:
+    value: i32
+
+struct player:
+    child: leaf
+    health: i32
+
+func (p player) init(health: i32) -> result<bool, string>:
+    if health < 0:
+        return Err("player")
+    p.child = leaf(value = health)
+    p.health = health
+    return Ok(true)
+
+func make(health: i32) -> result<player, string>:
+    return Ok(player(health)?)
+
+func main():
+    match point(3):
+        Ok(var p):
+            print(p.x)
+        Err(var error):
+            print(error)
+    match point(-1):
+        Ok(var p):
+            print(p.x)
+        Err(var error):
+            print(error)
+    match make(7):
+        Ok(var p):
+            print(p.health, p.child.value)
+        Err(var error):
+            print(error)
+    match make(-1):
+        Ok(var p):
+            print(p.health)
+        Err(var error):
+            print(error)

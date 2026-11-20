@@ -15,7 +15,7 @@ void validate_construction(const Function& f,const Module& module,const std::vec
         if (i.op==Op::gc_construct && initializers.contains(Type::key(i.type)) && !i.receiver) fail("custom construction omitted initialization");
         if (i.op==Op::gc_allocate && initializers.contains(Type::key(i.type))) fail("legacy allocation bypasses custom initialization");
     }
-    if (f.construction_origins.empty() && owned.empty() && std::none_of(f.parameters.begin(),f.parameters.end(),[](auto t){return t.construction;}) && std::none_of(f.locals.begin(),f.locals.end(),[](auto t){return t.construction;})) return;
+    if (!(f.initializer && fallible_initializer_result(f.result)) && f.construction_origins.empty() && owned.empty() && std::none_of(f.parameters.begin(),f.parameters.end(),[](auto t){return t.construction;}) && std::none_of(f.locals.begin(),f.locals.end(),[](auto t){return t.construction;})) return;
     for (unsigned parameter=0;parameter<f.parameters.size();++parameter) if (f.parameters[parameter].construction) {
         if (parameter>=f.locals.size() || f.locals[parameter]!=f.parameters[parameter] || !f.construction_origins.contains(parameter) || f.construction_origins.at(parameter)!=parameter || owned.contains(parameter)) fail("invalid construction formal storage");
     }
@@ -26,9 +26,9 @@ void validate_construction(const Function& f,const Module& module,const std::vec
         if (slot>=f.locals.size() || origin>=f.locals.size() || !f.locals[origin].construction || !f.construction_origins.contains(origin) || f.construction_origins.at(origin)!=origin || !([](Type a,Type b){a.construction=b.construction=false;return subtype(b,a);})(f.locals[slot],f.locals[origin])) fail("invalid construction alias origin");
         if (!owned.contains(origin) && (origin>=f.parameters.size() || !f.parameters[origin].construction)) fail("unowned construction storage");
     }
-    enum Phase { inactive=1, preparing=2, initialized=4, committed=8 };
+    enum Phase { inactive=1, preparing=2, initialized=4, committed=8, awaiting=16, rejected=32 };
     struct Region { unsigned phase=inactive; std::set<unsigned> ready; unsigned base_phase=2; bool operator==(const Region&) const=default; };
-    struct State { std::map<unsigned,Region> regions; std::set<unsigned> bound; bool operator==(const State&) const=default; };
+    struct State { std::map<unsigned,Region> regions; std::set<unsigned> bound, checked_returns; bool operator==(const State&) const=default; };
     State entry;
     auto fields=[&](unsigned root)->const auto& { return f.locals.at(root).definition->fields; };
     for (auto [slot,origin]:f.construction_origins) {
@@ -44,6 +44,7 @@ void validate_construction(const Function& f,const Module& module,const std::vec
     auto intersection=[](auto a,const auto& b) { std::erase_if(a,[&](const auto& value){return !b.contains(value);}); return a; };
     auto join=[&](State a,const State& b) {
         a.bound=intersection(a.bound,b.bound);
+        a.checked_returns=intersection(a.checked_returns,b.checked_returns);
         for (auto& [root,region]:a.regions) { region.phase|=b.regions.at(root).phase; region.base_phase|=b.regions.at(root).base_phase; region.ready=intersection(region.ready,b.regions.at(root).ready); }
         return a;
     };
@@ -52,8 +53,11 @@ void validate_construction(const Function& f,const Module& module,const std::vec
     for (std::size_t next=0;next<pending.size();++next) {
         auto block=pending[next]; auto state=*inputs[block];
         std::vector<std::optional<unsigned>> origins;
+        std::vector<bool> checked_values;
+        std::vector<std::optional<std::pair<unsigned,bool>>> checks;
+
         auto active=[&](unsigned root) {
-            if (state.regions.at(root).phase & (inactive|committed)) fail("construction view used outside its active scope");
+            if (state.regions.at(root).phase & (inactive|committed|rejected)) fail("construction view used outside its active scope");
         };
         auto require_all=[&](unsigned root) {
             active(root);
@@ -70,16 +74,43 @@ void validate_construction(const Function& f,const Module& module,const std::vec
         };
         for (unsigned index=0;index<f.blocks[block].instructions.size();++index) {
             const auto& i=f.blocks[block].instructions[index]; std::optional<unsigned> origin;
+            bool checked=false;std::optional<std::pair<unsigned,bool>> decision;
+            if(i.op==Op::load)checked=state.checked_returns.contains(i.a);
+            if(i.op==Op::store) {
+                if(checked_values.at(i.b))state.checked_returns.insert(i.a);else state.checked_returns.erase(i.a);
+            }
+            if(i.op==Op::initializer_return) {
+                const auto& returned=f.blocks[block].instructions.at(i.a);
+                const bool failure=returned.op==Op::sum && returned.immediate==1;
+                if(f.parameters[0].construction && !failure)require_all(0);
+                checked=true;
+            }
+
             if (i.op==Op::stage_begin) {
-                if (f.construction_origins.at(i.a)!=i.a || state.regions.at(i.a).phase & (preparing|initialized)) fail("staging restarted before commit");
+                if (f.construction_origins.at(i.a)!=i.a || state.regions.at(i.a).phase & (preparing|initialized|awaiting|rejected)) fail("staging restarted before commit");
                 state.regions.at(i.a)={preparing,{},f.locals[i.a].definition->base.expired() ? 2u : 1u};
                 std::erase_if(state.bound,[&](auto slot){return f.construction_origins.at(slot)==i.a;}); origin=i.a;
             } else if (i.op==Op::base_init) {
                 auto root=place_origin(*i.receiver); auto& region=state.regions.at(root);
                 if(root!=0 || owned.contains(root) || region.base_phase!=1 || region.phase!=preparing || !region.ready.empty()) fail("base initialization out of order or repeated");
                 auto base=f.parameters[0].definition->base.lock();
-                for(unsigned n=0;n<base->fields.size();++n) region.ready.insert(n);
-                region.base_phase=2;
+                if(!i.callee.empty() && fallible_initializer_result(functions.at(i.callee)->result))region.base_phase=3;
+                else {for(unsigned n=0;n<base->fields.size();++n) region.ready.insert(n);region.base_phase=2;}
+
+            } else if(i.op==Op::stage_check) {
+                auto root=place_origin(*i.receiver);
+                const auto& invocation=f.blocks[block].instructions.at(i.a);
+                const bool base=invocation.op==Op::base_init;
+                if((invocation.op!=Op::call && !base) || !invocation.receiver || (invocation.receiver->slot!=i.receiver->slot || invocation.receiver->fields!=i.receiver->fields) ||
+                   (!base && (!invocation.initialization || state.regions.at(root).phase!=awaiting)) ||
+                   (base && state.regions.at(root).base_phase!=3))fail("construction result check lacks its pending initializer call");
+                decision=std::pair{root,base};
+            } else if(i.op==Op::stage_abort) {
+                const auto root=i.receiver->slot;
+                if(!owned.contains(root) || !state.bound.contains(root) || state.regions.at(root).phase!=rejected)
+                    fail("construction disposal lacks proven initialization failure");
+                state.regions.at(root)={inactive,{},2};
+                std::erase_if(state.bound,[&](auto slot){return f.construction_origins.at(slot)==root;});
             } else if (i.op==Op::stage_prefix) {
                 origin=value_origin(i.a);
                 if(state.regions.at(*origin).base_phase!=2) fail("base projection before base initialization");
@@ -95,6 +126,7 @@ void validate_construction(const Function& f,const Module& module,const std::vec
             } else if ((i.op==Op::gc_read || i.op==Op::gc_write) && types[block][i.a].construction) {
                 auto root=value_origin(i.a); auto field=static_cast<unsigned>(i.immediate);
                 if(state.regions.at(root).base_phase!=2) fail("derived storage accessed before base initialization");
+                if(state.regions.at(root).phase & (awaiting|rejected))fail("construction field accessed before successful initialization");
                 if (i.op==Op::gc_read && !state.regions.at(root).ready.contains(field)) fail("uninitialized construction field read");
                 if (i.op==Op::gc_write) {
                     if (owned.contains(root) && state.regions.at(root).phase!=preparing) fail("construction fields changed after initializer completion");
@@ -120,10 +152,11 @@ void validate_construction(const Function& f,const Module& module,const std::vec
                         if (roots.size()!=1 || !i.receiver || !i.receiver->fields.empty()) fail("invalid initializer construction operands");
                         auto root=roots[0].first;
                         if (!owned.contains(root) || state.regions.at(root).phase!=preparing || Type::key(f.locals[root])!=Type::key(target.parameters[0])) fail("initializer called twice or on borrowed storage");
-                        for (unsigned field=0;field<fields(root).size();++field) {
-                            state.regions.at(root).ready.insert(field);
+                        if(fallible_initializer_result(target.result))state.regions.at(root).phase=awaiting;
+                        else {
+                            for (unsigned field=0;field<fields(root).size();++field)state.regions.at(root).ready.insert(field);
+                            state.regions.at(root).phase=initialized;state.regions.at(root).base_phase=2;
                         }
-                        state.regions.at(root).phase=initialized; state.regions.at(root).base_phase=2;
                     } else for (auto [root,view]:roots) {
                         active(root);
                         if(owned.contains(root) && state.regions.at(root).phase!=initialized) fail("construction helper before initializer completion");
@@ -141,18 +174,34 @@ void validate_construction(const Function& f,const Module& module,const std::vec
                 }
                 state.regions.at(root).phase=committed;
             }
-            origins.push_back(origin);
+            origins.push_back(origin);checked_values.push_back(checked);checks.push_back(decision);
         }
         const auto& end=f.blocks[block].end;
         if (end.kind==Terminator::Kind::return_value || end.kind==Terminator::Kind::return_void) {
-            if (f.initializer && f.parameters[0].construction) require_all(0);
-            for (auto root:owned) if (state.regions.at(root).phase & (preparing|initialized)) fail("uncommitted construction on successful exit");
+            if(f.initializer && fallible_initializer_result(f.result)) {
+                if(end.kind!=Terminator::Kind::return_value || !checked_values.at(end.value))fail("fallible initializer exit lacks checked result/readiness");
+            } else if (f.initializer && f.parameters[0].construction) require_all(0);
+            for (auto root:owned) if (state.regions.at(root).phase & (preparing|initialized|awaiting|rejected)) fail("uncommitted construction on successful exit");
         }
         auto propagate=[&](unsigned target) {
             auto merged=inputs[target] ? join(*inputs[target],state) : state;
             if (!inputs[target] || merged!=*inputs[target]) { inputs[target]=std::move(merged); pending.push_back(target); }
         };
         if (end.kind==Terminator::Kind::jump) propagate(end.yes);
-        if (end.kind==Terminator::Kind::branch) { propagate(end.yes); propagate(end.no); }
+        if (end.kind==Terminator::Kind::branch) {
+            if(checks.at(end.value)) {
+                auto [root,base]=*checks.at(end.value);auto before=state;
+                if(base) {
+                    auto& region=state.regions.at(root);region.base_phase=2;
+                    for(unsigned n=0;n<f.parameters[0].definition->base.lock()->fields.size();++n)region.ready.insert(n);
+                } else {
+                    state.regions.at(root).phase=initialized;state.regions.at(root).base_phase=2;
+                    for(unsigned n=0;n<fields(root).size();++n)state.regions.at(root).ready.insert(n);
+                }
+                propagate(end.yes);state=before;
+                if(base)state.regions.at(root).base_phase=4;else state.regions.at(root).phase=rejected;
+                propagate(end.no);
+            } else {propagate(end.yes);propagate(end.no);}
+        }
     }
 }

@@ -178,6 +178,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         break;
                     case Op::await: case Op::sum_get: case Op::extract: case Op::gc_read:
                         value=field_facts(types[function][block][i.a],values[i.a],i.op==Op::await?1:static_cast<unsigned>(i.immediate)); break;
+                    case Op::initializer_return:value=values[i.a];break;
                     case Op::insert:
                         value=replaced_facts(values[i.a],static_cast<unsigned>(i.immediate),values[i.b]); break;
                     case Op::fixed_array:

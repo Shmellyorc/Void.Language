@@ -14,7 +14,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
     };
     for (auto& [id,u]:units) for (auto& f:u->functions) {
         functions.emplace(f.symbol,std::pair{u.get(),&f});
-        if (f.initializer && f.receiver->type.kind==Type::managed_ref) request(*u,f,{0},{});
+        if (f.initializer && (f.receiver->type.kind==Type::managed_ref || ir::fallible_initializer_result(f.result))) request(*u,f,{0},{});
     }
     for (std::size_t n=0;n<pending.size();++n) {
         auto work=pending[n]; auto& unit=*work.owner; auto& f=*work.function;
@@ -37,7 +37,7 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     std::any_of(f.initialization_defaults.begin(),f.initialization_defaults.end(),[&](const auto& value){return value->slot==field;});
                 // The existing initializer prelude writes these checked constant
                 // copies before the body; independent IR still proves the write.
-                if (!f.initializer || !ir::requires_initialization(t) || checked_default) initial.emplace(origin,field);
+                if (!f.initializer || parameters.at(origin).kind==Type::aggregate || !ir::requires_initialization(t) || checked_default) initial.emplace(origin,field);
             }
         }
         auto require_field=[&](unsigned origin,unsigned field,const Ready& ready,const Token& token) {
@@ -48,8 +48,17 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 if (!ready.contains({origin,field})) issue(token,"Construction requires initialized field '"+parameters.at(origin).definition->fields[field].name+"' on every successful exit and before whole-view helper calls.");
         };
         std::function<std::optional<unsigned>(const Expr&,const Ready&)> expression;
+        auto pattern_values=[&](const Pattern& pattern,const Ready& ready) {
+            std::vector<const Pattern*> pending{&pattern};
+            while(!pending.empty()) {
+                const auto* selected=pending.back();pending.pop_back();
+                for(const auto& value:selected->values)if(expression(*value,ready))issue(value->token,"A construction view cannot escape through a pattern expression.");
+                for(const auto& child:selected->children)pending.push_back(&child);
+            }
+        };
         expression=[&](const Expr& e,const Ready& ready)->std::optional<unsigned> {
             using K=Expr::Kind;
+            for(const auto& pattern:e.patterns)pattern_values(pattern,ready);
             if(e.kind==K::capture_reference && e.parts.empty() && context.aliases.contains(e.slot))issue(e.token,"A construction view cannot escape in a closure.");
             if (e.kind==K::name) {
                 if (auto i=context.aliases.find(e.slot);i!=context.aliases.end()) return i->second;
@@ -139,7 +148,9 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 }
                 if(s.range_end && expression(*s.range_end,current))issue(s.range_end->token,"A construction view cannot be a range endpoint.");
                 if (s.kind==K::returned) {
-                    if (f.initializer) require_all(0,current,s.token);
+                    const bool failure=ir::fallible_initializer_result(f.result) && s.expression &&
+                        s.expression->kind==Expr::Kind::sum && s.expression->slot==1;
+                    if (f.initializer && !failure) require_all(0,current,s.token);
                     result.next.reset(); continue;
                 }
                 if (s.kind==K::broken || s.kind==K::continued) {
@@ -150,6 +161,18 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     result.next=merge(yes.next,no.next);
                     result.breaks.insert(result.breaks.end(),yes.breaks.begin(),yes.breaks.end()); result.breaks.insert(result.breaks.end(),no.breaks.begin(),no.breaks.end());
                     result.continues.insert(result.continues.end(),yes.continues.begin(),yes.continues.end()); result.continues.insert(result.continues.end(),no.continues.begin(),no.continues.end());
+                } else if(s.kind==K::scoped) {
+                    auto inner=sequence(s.body,current);result.next=inner.next;
+                    result.breaks.insert(result.breaks.end(),inner.breaks.begin(),inner.breaks.end());
+                    result.continues.insert(result.continues.end(),inner.continues.begin(),inner.continues.end());
+                } else if(s.kind==K::match) {
+                    result.next=s.exhaustive?std::optional<Ready>{}:std::optional{current};
+                    for(const auto& arm:s.body) {
+                        pattern_values(*arm.pattern,current);
+                        auto inner=sequence(arm.body,current);result.next=merge(result.next,inner.next);
+                        result.breaks.insert(result.breaks.end(),inner.breaks.begin(),inner.breaks.end());
+                        result.continues.insert(result.continues.end(),inner.continues.begin(),inner.continues.end());
+                    }
                 } else if (s.kind==K::loop) {
                     auto inner=sequence(s.body,current);
                     result.next=s.binder.text.empty() && always(s.expression.get()) ? std::optional<Ready>{} : std::optional{current};

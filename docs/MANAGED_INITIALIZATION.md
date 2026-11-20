@@ -36,8 +36,9 @@ func entry(value: i32) -> i32:
     return p.total + p.child.value
 ```
 
-One owner-module initializer has typed parameters and no result annotation. An
-empty return or fallthrough completes it. Constructor arguments bind exclusively
+One owner-module initializer has typed parameters. Infallible init has no result
+annotation; an empty return or fallthrough completes it. G84 permits
+`result<bool, e>` with the typed construction contract below. Constructor arguments bind exclusively
 to initializer parameters. Types without init retain named-field construction.
 There is no mixed parameter/field namespace, constructor overload or fallback.
 C1's positional prefix, named arguments, exact contextual typing, pure parameter
@@ -192,7 +193,7 @@ ARM64 ABI/layout/O2 execution and Debug editor runs; Linux cannot certify these.
 Self identity/self-links during construction, borrowed view returns/rebinding,
 helper-assisted first initialization, required
 value-field definite initialization, runtime defaults, ordinary named/default calls,
-fallible constructor results, resources/deinit/finalizers, native managed exports,
+resources/deinit/finalizers, native managed exports,
 strings/collections, generics/inheritance/interfaces and source threading remain
 future design work. These are current boundaries, not permanent language bans.
 No production GC readiness or arbitrary native-provider teardown guarantee is claimed.
@@ -200,3 +201,44 @@ No production GC readiness or arbitrary native-provider teardown guarantee is cl
 Phase 18 implements approved reference-containing value capabilities through the
 same staging/publication machinery; see REFERENCE_VALUE_STRUCTS.md. Broader construction-view
 escape or identity support requires its own approved publication/lifetime design.
+
+## Typed fallible managed initialization (G84)
+
+A managed initializer can declare `result<bool, e>`. Its ordinary `T(...)` call
+then returns `result<T, e>`; there is no second construction API. Arguments run
+once before staging, and defaults/body use the existing construction view. Only
+an `Ok` initializer result permits the existing most-derived `gc_construct` commit.
+An `Err` result is copied into the caller's result while the unpublished stage is
+discarded and its root leaves cleared. No incomplete parent identity exists and
+no partial parent `deinit` runs. Completed children/error payloads stay rooted
+where reachable, including across GC while the caller handles a typed error.
+
+Every possible successful exit still requires all fields ready. Explicit
+`return Err(...)` and failures propagated by `?` can leave fields unavailable.
+Returning an arbitrary result variable/call that might contain `Ok` requires all
+fields ready; the checker does not guess that a runtime value must be `Err`.
+Aliases retain their existing construction capability. Returning/storing/capturing
+self, including as an error payload, remains prohibited. Whole-view helpers still
+require readiness and proven nonescape. `with` scopes and exhaustive `match` arms
+participate in the same readiness flow; their branches cannot bypass the proof.
+
+The required first base prelude remains `super.init(...)`. When the base initializer
+is fallible, use `super.init(...)?` in a fallible derived initializer with the same
+error type. A base `Err` skips derived defaults/body and most-derived publication.
+A successful base prepares only its prefix; it does not allocate a separate parent
+identity. Fallible derived initializers can call infallible bases without `?`.
+
+Independent typed-IR checks bind a staging result check to its once-only initializer
+call and refine success/failure edges. Commit requires the success edge; disposal
+requires the failure edge. Checked initializer returns prove readiness before
+shared cleanup and retain that authority through the eventual returned result.
+LLVM uses the existing aligned staging/root storage, clears abandoned storage and
+lowers result checks through the existing sum layout. Runtime allocation/commit
+entry points and source ownership authority are unchanged.
+
+Explicit-resource ownership stays lexical under `with`/`defer`; references in
+fields do not imply exclusive ownership or automatic closure. Earlier effects on
+completed objects are retained. Runtime failure during a successful initializer's
+final allocation still prevents publication; it is distinct from a typed `Err`.
+See [the value/common contract](INITIALIZATION.md#typed-fallible-initialization-g84)
+and the [G84 evidence/report](projects/G84_FALLIBLE_CONSTRUCTORS.md).

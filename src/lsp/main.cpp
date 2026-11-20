@@ -218,13 +218,7 @@ j::Object project_summary(const fs::path& root,const vd::ProjectAnalysisResult& 
 // Presentation alone shortens nominal names. Canonical identities, bindings,
 // diagnostics, edit targets and compiler type/compatibility contracts stay intact.
 std::string display_text(std::string text,bool compact=false) {
-    std::size_t at=0;
-    while((at=text.find('/',at))!=std::string::npos) {
-        const auto end=text.find(".void::",at);
-        if(end!=std::string::npos && text.find_first_of(" \t\r\n<>,()[]{}",at)>=end) {
-            text.erase(at,end+7-at);
-        } else ++at;
-    }
+    text=vd::display_nominal_names(std::move(text));
     if(compact) {
         std::string summary;
         for(std::size_t begin=0;begin<text.size();) {

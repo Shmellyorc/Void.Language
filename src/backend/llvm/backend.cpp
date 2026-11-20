@@ -2092,6 +2092,16 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 case Op::gc_release:v=b.CreateCall(module->getOrInsertFunction("vd_gc_release",b.getInt1Ty(),b.getPtrTy()),{values[instruction.a]});break;
                 case Op::gc_alive:
                     v = b.CreateCall(module->getOrInsertFunction("vd_gc_alive",b.getInt1Ty(),b.getPtrTy()),{values[instruction.a]}); break;
+                case Op::stage_check:
+                    v=b.CreateICmpEQ(b.CreateExtractValue(values[instruction.a],0),b.getInt32(0));break;
+                case Op::initializer_return:
+                    v=values[instruction.a];break;
+                case Op::stage_abort: {
+                    auto slot=instruction.receiver->slot;
+                    auto* native=type(ir::Type(f.locals.at(slot).definition));
+                    v=b.CreateMemSet(stage_storage.at(slot),b.getInt8(0),std::max<std::uint64_t>(1,layout.getTypeAllocSize(native)),layout.getABITypeAlign(native));
+                    break;
+                }
                 case Op::stage_begin: {
                     auto* native=type(ir::Type(instruction.type.definition));
                     v=stage_storage.at(instruction.a);

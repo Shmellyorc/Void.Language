@@ -182,3 +182,11 @@ bind the owner's declared parameters without a receiver and may add distinct
 method-specific parameters. Generic declarations retain symbolic editor types;
 concrete uses retain nominal identities and concrete signatures. See
 [Static members](STATIC_MEMBERS.md#generic-owners) for initialization and access rules.
+
+G84 preserves constructor inference and specialization for fallible init. If the
+selected initializer declares `result<bool, e>`, the ordinary constructed call is
+`result<ConcreteOwner, e>` with the substituted error type. This result participates
+in enclosing generic call inference; its owner is not mistaken for an already
+unwrapped value. Error-only/return-only parameters still need explicit type
+arguments when ordinary argument inference cannot determine them. `?` requires
+the exact substituted error type. See [initialization](INITIALIZATION.md#typed-fallible-initialization-g84).

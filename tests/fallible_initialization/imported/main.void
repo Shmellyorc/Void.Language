@@ -1,0 +1,10 @@
+use "./api.void" as api
+
+func main():
+    print(api.make_point(-1) is Err("private point"))
+    print(api.gate(-1) is Err("gate"))
+    match api.gate():
+        Ok(var gate):
+            print(gate.value)
+        Err(var error):
+            print(error)

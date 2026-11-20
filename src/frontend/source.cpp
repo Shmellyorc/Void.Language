@@ -59,13 +59,23 @@ std::string SourceFile::diagnostic(std::size_t offset, std::string_view message)
 
 namespace vd {
 std::string diagnostic_code(DiagnosticCode code) { return "VOID" + std::to_string(static_cast<int>(code)); }
+std::string display_nominal_names(std::string text) {
+    std::size_t at=0;
+    while((at=text.find('/',at))!=std::string::npos) {
+        const auto end=text.find(".void::",at);
+        if(end!=std::string::npos && text.find_first_of(" \t\r\n<>,()[]{}",at)>=end)
+            text.erase(at,end+7-at);
+        else ++at;
+    }
+    return text;
+}
 std::string render_diagnostic(const Diagnostic& d) {
     const auto& span = d.primary;
     const auto& source = *span.source;
     auto position = source.location(span.begin);
     const char* severity = d.severity == Severity::error ? "error" : d.severity == Severity::warning ? "warning" : "info";
     std::string result = position.path + ":" + std::to_string(position.line) + ":" + std::to_string(position.column) +
-        ": " + severity + ": " + d.description + "\n    code: " + diagnostic_code(d.code) + "\n";
+        ": " + severity + ": " + display_nominal_names(d.description) + "\n    code: " + diagnostic_code(d.code) + "\n";
     // Escape rejected source bytes only in this presentation. Runtime excerpts,
     // owned snapshots, byte spans and source/LSP coordinates remain unchanged.
     const auto& text = source.text();
@@ -93,7 +103,7 @@ std::string render_diagnostic(const Diagnostic& d) {
     if (!span.module_identity.empty()) result += "    Module: " + span.module_identity + "\n";
     for (const auto& related : d.related) {
         auto location = related.span.source->location(related.span.begin);
-        result += "    " + related.description + " at " + location.path + ":" + std::to_string(location.line) + ":" + std::to_string(location.column) + "\n";
+        result += "    " + display_nominal_names(related.description) + " at " + location.path + ":" + std::to_string(location.line) + ":" + std::to_string(location.column) + "\n";
         auto nested = d;
         nested.primary = related.span; nested.related.clear(); nested.expected_type.clear(); nested.received_type.clear(); nested.hint.clear();
         // Render related snippets with the same range utility without recursive diagnostics.
@@ -101,8 +111,8 @@ std::string render_diagnostic(const Diagnostic& d) {
         auto start = snippet.find("\n\n");
         if (start != std::string::npos) result += snippet.substr(start + 1);
     }
-    if (!d.expected_type.empty()) result += "    Expected: " + d.expected_type + "\n";
-    if (!d.received_type.empty()) result += "    Received: " + d.received_type + "\n";
+    if (!d.expected_type.empty()) result += "    Expected: " + display_nominal_names(d.expected_type) + "\n";
+    if (!d.received_type.empty()) result += "    Received: " + display_nominal_names(d.received_type) + "\n";
     if (!d.hint.empty()) result += "    Hint: " + d.hint + "\n";
     return result;
 }

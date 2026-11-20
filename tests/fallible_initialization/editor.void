@@ -1,0 +1,22 @@
+use "./api.void" as api
+
+func make() -> result<i32, string>:
+    var wanted = 7
+    var made = api.gate(value = wanted)
+    match made:
+        Ok(var complete):
+            return Ok(complete.value)
+        Err(var error):
+            return Err(error)
+
+func main():
+    print(make() is Ok(7))
+
+func generic() -> result<i32, string>:
+    var wanted = 11
+    var boxed = api.box<i32>(value = wanted)
+    match boxed:
+        Ok(var complete_box):
+            return Ok(complete_box.value)
+        Err(var error):
+            return Err(error)

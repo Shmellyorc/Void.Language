@@ -1,0 +1,53 @@
+struct child:
+    value: i32
+
+struct owner:
+    first: child
+    second: child
+
+func (o owner) init(value: i32) -> result<bool, child>:
+    o.first = child(value = value)
+    if value < 0:
+        return Err(o.first)
+    o.second = child(value = value + 1)
+    return Ok(true)
+
+value struct data:
+    child: child?
+
+func (d data) init(value: i32) -> result<bool, i32>:
+    d.child = child(value = value)
+    if value < 0:
+        return Err(9)
+    return Ok(true)
+
+func value_entry(value: i32) -> i32:
+    var attempt = data(value)
+    var extra = child(value = 1)
+    match attempt:
+        Ok(var complete):
+            var stored = complete.child as child
+            if stored == extra:
+                return 999
+            return stored.value + extra.value
+        Err(var error):
+            if extra != extra:
+                return 999
+            return error
+
+func entry(value: i32) -> i32:
+    if value == 42:
+        return value_entry(-7)
+    if value == 43:
+        return value_entry(7)
+    var attempt = owner(value)
+    var extra = child(value = 2)
+    match attempt:
+        Ok(var complete):
+            if complete != complete or complete.first == complete.second:
+                return 999
+            return complete.first.value + complete.second.value + extra.value
+        Err(var error):
+            if error == extra:
+                return 999
+            return -error.value

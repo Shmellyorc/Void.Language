@@ -39,7 +39,7 @@ void diagnostics() {
     invalid(types+declaration+"    o.child = c\n    const view = o\n    var alias = view\n    alias.value++\n","readonly");
     invalid(types+"func (o owner) init(const c: leaf):\n    o.child = c\n","readonly");
     invalid(types+declaration+"    o.child = c\n\nfunc entry(x: i32) -> i32:\n    var o = owner(leaf())\n    o.init(leaf())\n    return 0\n","Lifecycle");
-    invalid(types+"func (o owner) init(c: leaf) -> i32:\n    return 1\n","must not declare");
+    invalid(types+"func (o owner) init(c: leaf) -> i32:\n    return 1\n","initializer result must");
     invalid(types+declaration+"    o.child = c\n\nfunc entry(x: i32) -> i32:\n    return owner(flag = true, c = leaf(), flag = false).value\n","more than once");
     invalid(types+declaration+"    o.child = c\n\nfunc entry(x: i32) -> i32:\n    return owner(child = leaf()).value\n","Unknown initializer parameter");
     invalid(types+declaration+"    o.child = c\n\nfunc entry(x: i32) -> i32:\n    var o: owner\n    return 0\n","non-nullable");
