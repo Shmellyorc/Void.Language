@@ -553,6 +553,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     auto package_call = [&](const Function& caller, const Function& callee) {
         const auto& from = caller.module_identity;
         const auto& to = callee.module_identity;
+        if(callee.static_member && ((callee.visibility=="private" && caller.lexical_owner!=callee.lexical_owner) || (callee.visibility=="internal" && source_domain(from)!=source_domain(to))))fail("inaccessible static callable");
         if (from == to || (!package_source(from) && !package_source(to))) return;
         if (!method_accessible(m, callee, from)) fail("inaccessible package callable");
     };
@@ -578,6 +579,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         auto initializer = std::find_if(m.functions.begin(), m.functions.end(), [&](const auto& f) { return f.name == value.initializer; });
         if (initializer == m.functions.end() || !initializer->parameters.empty() || initializer->result != value.cell || initializer->asynchronous || initializer->module_identity != value.module_identity)
             fail("invalid global initializer");
+        if(!value.static_owner.empty() && (initializer->lexical_owner!=value.static_owner || !initializer->static_member || !value.identity.starts_with(value.static_owner+"::static::")))fail("invalid static global owner");
         if (!m.source_imports.contains(value.module_identity) || !value.identity.starts_with(value.module_identity + "::") ||
             std::none_of(m.nominal_types.begin(), m.nominal_types.end(), [&](auto type) { return type == value.cell && type.definition == value.cell.definition; }))
             fail("global cell missing from admitted nominal universe");
@@ -981,8 +983,15 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
     if(bindings.size()!=expected_bindings.size()) fail("incomplete interface binding universe");
     for (const auto& f : m.functions) {
         if (f.blocks.empty()) fail("function has no blocks");
+        if(f.static_member) {
+            auto owner=std::find_if(m.nominal_types.begin(),m.nominal_types.end(),[&](Type t){return t.definition && Type::key(t)==f.lexical_owner && (t.kind==Type::aggregate || t.kind==Type::managed_ref) && t.definition->module_identity==f.module_identity && t.definition->cases.empty() && !t.definition->callable;});
+            const bool global_initializer=std::any_of(m.globals.begin(),m.globals.end(),[&](const auto& value){return value.initializer==f.name && value.static_owner==f.lexical_owner;});
+            if(owner==m.nominal_types.end() || f.receiver || f.initializer || f.closure || !f.operator_glyph.empty() || !f.lexical_parent.empty() || (!f.name.starts_with(f.lexical_owner+"::static::") && !global_initializer))fail("invalid static lexical owner");
+        }
         if(!f.lexical_owner.empty()) {
-            if(!f.operator_glyph.empty()) {
+            if(f.static_member) {
+                // The nominal type and owning module were independently validated.
+            } else if(!f.operator_glyph.empty()) {
                 // The independently validated static owner grants only lexical field access.
             } else if(f.receiver) {
                 if(f.parameters.empty() || Type::key(f.parameters[0])!=f.lexical_owner)fail("forged lexical field owner");
@@ -994,11 +1003,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 bool selected=false;for(const auto& block:parent->second->blocks)for(const auto& i:block.instructions)selected|=(i.op==Op::function_reference || (adapter && i.op==Op::call)) && i.callee==f.name;
                 if(!selected)fail("closure field owner has no lexical creation");
                 std::set<std::string> ancestry{f.name};auto enclosing=parent->second;
-                while(!enclosing->receiver && enclosing->operator_glyph.empty()) {
+                while(!enclosing->receiver && !enclosing->static_member && enclosing->operator_glyph.empty()) {
                     if(!ancestry.insert(enclosing->name).second || !functions.contains(enclosing->lexical_parent))fail("cyclic or unowned closure field context");
                     enclosing=functions.at(enclosing->lexical_parent);
                 }
                 if(!enclosing->operator_glyph.empty()){if(Type::key(enclosing->operator_owner)!=f.lexical_owner)fail("closure field context has no declaring operator owner");}
+                else if(enclosing->static_member){if(enclosing->lexical_owner!=f.lexical_owner)fail("closure field context has no declaring static owner");}
                 else if(enclosing->parameters.empty() || Type::key(enclosing->parameters[0])!=f.lexical_owner)fail("closure field context has no declaring receiver");
             }
         }
@@ -1655,6 +1665,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     const bool same_domain = source_domain(value.module_identity) == source_domain(f.module_identity);
                     bool root = value.module_identity == m.root_identity && same_domain;
                     if (f.module_identity != value.module_identity && (value.visibility == "private" || (!imported && !root) || (value.visibility == "internal" && !same_domain))) fail("inaccessible global");
+                    if(!value.static_owner.empty() && value.visibility=="private" && f.lexical_owner!=value.static_owner)fail("inaccessible private static field");
                     result = value.cell; break;
                 }
                 case Op::load: result = slot(i.a); break;

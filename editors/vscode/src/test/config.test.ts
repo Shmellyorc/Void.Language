@@ -137,9 +137,9 @@ test('presentation covers approved keyword colors and block indentation', async 
     const bitwise: RegExp[] = grammar.patterns.filter((p:{name?:string}) => p.name === 'keyword.operator.void').map((p:{match:string}) => new RegExp(p.match));
     for (const symbol of ['&', '|', '^', '~', '&=', '|=', '^=']) assert(bitwise.some(rule => rule.test(symbol)), symbol);
     const highlighted = (text:string) => keywords.some((rule:RegExp) => rule.test(text));
-    for (const word of ['func','property','enum','is','match', 'has','defer','with','event','async','await','spawn','return','pass','const','for','break','continue','as','and','or','not','in','reverse','struct','value struct'])
+    for (const word of ['static','func','property','enum','is','match', 'has','defer','with','event','async','await','spawn','return','pass','const','for','break','continue','as','and','or','not','in','reverse','struct','value struct'])
         assert(highlighted(word), `Missing keyword highlighting: ${word}`);
-    for (const word of ['spawning','awaited','while','structure','function','returning','passing','bypass','value'])
+    for (const word of ['statics','statically','spawning','awaited','while','structure','function','returning','passing','bypass','value'])
         assert(!highlighted(word), `Unexpected keyword highlighting: ${word}`);
     assert(highlighted('    get:')); assert(highlighted('    set(value):'));
     assert(!highlighted('item.get')); assert(!highlighted('item.set'));

@@ -1,0 +1,39 @@
+## Application settings shared without constructing an instance.
+struct game_settings:
+    ## Maximum simultaneous players.
+    static max_players: i32 = 4
+    private static debug_mode = true
+    ## Readonly display title, initialized once per application.
+    static const title = "VOID"
+## Restore public settings and the owner's private debug switch.
+## @return No value; updates shared settings.
+static func game_settings.reset():
+    game_settings.max_players = 4
+    game_settings.debug_mode = false
+## A two-coordinate value with a type-qualified factory.
+value struct vector2:
+    x: f32
+    y: f32
+## Construct the origin without a dummy receiver.
+## @return A vector with zero coordinates.
+static func vector2.zero() -> vector2:
+    return vector2(x = 0, y = 0)
+## Independent optional state for each concrete payload type.
+value struct storage<t>:
+    ## The most recently stored payload.
+    static item: t?
+## Read this concrete type's shared payload.
+## @return The payload, or null when no value was stored.
+static func storage<t>.read() -> t?:
+    return storage<t>.item
+## Demonstrate type state, factories and generic specialization.
+## @return Zero when all expected static values are preserved.
+func main() -> i32:
+    game_settings.max_players = 8
+    game_settings.reset()
+    var origin = vector2.zero()
+    storage<i32>.item = 7
+    storage<string>.item = "Boss"
+    print(game_settings.title, game_settings.max_players, origin.x, origin.y)
+    print(storage<i32>.read(), storage<string>.read())
+    return 0

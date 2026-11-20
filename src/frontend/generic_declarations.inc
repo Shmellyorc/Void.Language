@@ -46,6 +46,10 @@ for(auto& [id,u]:units) {
     for(auto& s:u->generic_structures)try {
         auto names=parameters(s);std::set<std::string> fields;
         if(s.base_type)type(*s.base_type,s.base_token,names);
+        for(const auto& f:s.static_fields) {
+            if(!fields.insert(f.name).second)error(u->source,f.token,Code::duplicate,"Duplicate generic static field.");
+            if(f.annotation)type(*f.annotation,f.token,names);
+        }
         for(const auto& f:s.fields) {
             if(!fields.insert(f.name).second)error(u->source,f.token,Code::duplicate,"Duplicate generic field '"+f.name+"'.");
             type(*f.annotation,f.token,names);
@@ -82,29 +86,32 @@ for(auto& [id,u]:units) {
     std::set<std::string> methods;
     for(auto& f:u->generic_functions)try {
         auto names=parameters(f);Semantics semantics(*u,units,root,evaluate,diagnostics,defaults);
-        if(f.receiver) {
-            if(f.receiver->type.nullable)error(u->source,f.receiver->token,Code::receiver,"A receiver must be non-nullable.");
+        const auto* receiver=f.receiver?&*f.receiver:f.static_owner?&*f.static_owner:nullptr;
+        if(receiver) {
+            if(receiver->type.nullable)error(u->source,receiver->token,Code::receiver,"A receiver must be non-nullable.");
             Structure* owner=nullptr;
-            auto application=std::find_if(u->applications.begin(),u->applications.end(),[&](const auto& a){return a.definition==f.receiver->type.definition;});
+            auto application=std::find_if(u->applications.begin(),u->applications.end(),[&](const auto& a){return a.definition==receiver->type.definition;});
             if(application!=u->applications.end()) {
                 auto found=structure_lookup(*u,root,units,application->name,application->token);
-                if(found.first!=u.get() || !found.second || found.second->generics.empty())error(u->source,f.receiver->token,Code::receiver,"A generic receiver must name an owning-module generic struct.");
+                if(found.first!=u.get() || !found.second || found.second->generics.empty())error(u->source,receiver->token,Code::receiver,"A generic receiver must name an owning-module generic struct.");
                 owner=found.second;
-                if(application->arguments.size()!=owner->generics.size())error(u->source,f.receiver->token,Code::argument_count,"Generic receiver parameter count mismatch.");
+                if(application->arguments.size()!=owner->generics.size())error(u->source,receiver->token,Code::argument_count,"Generic receiver parameter count mismatch.");
                 for(unsigned n=0;n<owner->generics.size();++n) {
                     auto argument=application->arguments[n];const auto& parameter=owner->generics[n];
                     if(argument.kind!=Type::unresolved || argument.nullable || argument.definition->name!=parameter.token.text)
-                        error(u->source,f.receiver->token,Code::receiver,"A generic receiver must bind its owner's declared type parameter names.");
+                        error(u->source,receiver->token,Code::receiver,"A generic receiver must bind its owner's declared type parameter names.");
                     if(!names.insert(parameter.token.text).second)error(u->source,parameter.token,Code::duplicate,"Method type parameters cannot shadow owner type parameters.");
                 }
             } else {
-                auto receiver=resolve_type(f.receiver->type,*u,root,units,f.receiver->token);
-                for(auto& s:u->structures)if(s.definition==receiver.definition)owner=&s;
-                if(!owner)error(u->source,f.receiver->token,Code::receiver,"Methods must be declared in their receiver's owning module.");
+                auto resolved_receiver=resolve_type(receiver->type,*u,root,units,receiver->token);
+                for(auto& s:u->structures)if(s.definition==resolved_receiver.definition)owner=&s;
+                if(!owner)error(u->source,receiver->token,Code::receiver,"Methods must be declared in their receiver's owning module.");
             }
-            if(!f.generics.empty() && owner->generics.empty())semantics.validate_generic_receiver(Type(owner->definition,owner->definition->managed?Type::managed_ref:Type::aggregate),f.token);
-            f.symbol=owner->definition->identity+"::method::"+f.token.text;
+            if(f.receiver && !f.generics.empty() && owner->generics.empty())semantics.validate_generic_receiver(Type(owner->definition,owner->definition->managed?Type::managed_ref:Type::aggregate),f.token);
+            f.symbol=owner->definition->identity+(f.static_owner?"::static::":"::method::")+f.token.text;
+            if(!methods.insert(owner->definition->identity+"::member::"+f.token.text).second || u->methods.contains(owner->definition->identity+"::method::"+f.token.text) || u->static_methods.contains(owner->definition->identity+"::static::"+f.token.text))error(u->source,f.token,Code::duplicate,"Static and instance methods cannot share a name.");
             if(!methods.insert(f.symbol).second || u->methods.contains(f.symbol))error(u->source,f.token,Code::duplicate,"Duplicate generic receiver method.");
+            for(const auto& field:owner->static_fields)if(field.name==f.token.text)error(u->source,f.token,Code::duplicate,"Method conflicts with a static field.");
             for(const auto& field:owner->fields)if(field.name==f.token.text)error(u->source,f.token,Code::duplicate,"Method conflicts with a stored field.");
             if(!f.generics.empty() && (f.token.text=="init" || f.virtual_method || f.overriding))error(u->source,f.token,Code::unsupported_type,"Initializers and virtual methods cannot introduce method-specific type parameters.");
         }

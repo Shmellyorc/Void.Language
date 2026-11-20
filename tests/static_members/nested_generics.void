@@ -1,0 +1,83 @@
+value struct utility:
+    static count = 0
+## Preserve a value and count executions, without a receiver.
+## @param value Value to preserve.
+## @return The supplied concrete value.
+static func utility.echo<t>(value: t) -> t:
+    utility.count += 1
+    return value
+static func utility.wrap<t>(value: t) -> [t]:
+    return [value]
+static func utility.optional<t>(value: t) -> t?:
+    return value
+static func utility.outcome<t>(value: t) -> result<t, string>:
+    return Ok(value)
+struct managed_tools:
+    static count = 0
+static func managed_tools.echo<t>(value: t) -> t:
+    managed_tools.count += 1
+    return value
+value struct storage<owner>:
+    static count = 0
+    value: owner?
+static func storage<owner>.echo<t>(value: t) -> t:
+    storage<owner>.count += 1
+    return value
+struct registry<owner>:
+    static count = 0
+    value: owner?
+static func registry<owner>.echo<t>(value: t) -> t:
+    registry<owner>.count += 1
+    return value
+struct node:
+    value: i32
+func echo<t>(value: t) -> t:
+    return value
+func keep<u>(value: u) -> u:
+    return value
+func main() -> i32:
+    if utility.echo(7) != 7 or keep(echo(7)) != 7:
+        return 1
+    var before = utility.count
+    var implicit = keep(utility.echo(7))
+    if implicit != 7 or utility.count != before + 1:
+        return 2
+    before = utility.count
+    var explicit = keep(utility.echo<i32>(7))
+    if explicit != 7 or utility.count != before + 1:
+        return 3
+    before = utility.count
+    var named = keep(utility.echo(value = 9))
+    if named != 9 or utility.count != before + 1:
+        return 4
+    before = utility.count
+    var nested = keep(keep(utility.echo(utility.echo(11))))
+    if nested != 11 or utility.count != before + 2:
+        return 5
+    if keep(utility.echo("Boss")) != "Boss" or keep(managed_tools.echo(12)) != 12:
+        return 6
+    if managed_tools.count != 1:
+        return 7
+    if keep(storage<string>.echo(7)) != 7 or keep(storage<string>.echo<i32>(9)) != 9:
+        return 8
+    if storage<string>.count != 2 or storage<i32>.count != 0:
+        return 9
+    if keep(registry<string>.echo("Boss")) != "Boss" or keep(registry<i32>.echo<i32>(13)) != 13:
+        return 10
+    if registry<string>.count != 1 or registry<i32>.count != 1:
+        return 11
+    var list = keep(utility.wrap(7))
+    if list.count != 1 or list[0] != 7:
+        return 12
+    if not (keep(utility.optional(7)) is Ok(7)) or not (keep(utility.outcome(7)) is Ok(7)):
+        return 13
+    var object = node(value = 9)
+    var alias = keep(utility.echo(object))
+    alias.value += 1
+    if object.value != 10:
+        return 14
+    var callback = keep(utility.echo<i32>)
+    if callback(15) != 15:
+        return 15
+    print("nested static results preserved")
+    return 0

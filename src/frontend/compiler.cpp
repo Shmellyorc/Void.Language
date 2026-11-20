@@ -219,7 +219,7 @@ public:
 bool letter(char c) { return (c >= 'a' && c <= 'z') || c == '_'; }
 bool digit(char c) { return c >= '0' && c <= '9'; }
 const std::set<std::string> reserved = {"func", "var", "return", "if", "else", "for", "break", "continue", "pass",
-    "operator", "async", "await", "spawn", "event", "defer", "with", "enum", "has", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
+    "static", "operator", "async", "await", "spawn", "event", "defer", "with", "enum", "has", "is", "match", "property", "and", "or", "not", "true", "false", "null", "while", "const", "use", "struct", "in", "reverse", "i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64", "f32", "f64", "bool", "string", "as", "private", "public", "internal"};
 #include "strings.inc"
 struct Indentation {
     std::size_t end, width = 0;
@@ -527,6 +527,7 @@ struct Function {
     bool collection_adapter=false;
     bool json_adapter=false, enum_adapter=false;
     bool global_initializer=false;
+    std::optional<Parameter> static_owner; // Type context only; never an ABI receiver.
     bool anonymous=false, deferred=false, bound_receiver=false, asynchronous=false, display_adapter=false, display_has_string=false, display_has_format=false;
     Type task=Type::none;
     unsigned binding_ordinal=0;
@@ -610,6 +611,7 @@ std::string editor_return_type(const Function& f) {
 std::string editor_signature(const Function& f) {
     observation::Scope timing(observation::EditorDetail::formatting);
     std::string out=(random_numeric_function(f) && f.token.text.starts_with("_arity_") ? "public" : f.visibility)+std::string(" ");
+    if(f.static_owner)out+="static "+ir::type_name(f.static_owner->type)+".";
     if(!f.operator_glyph.empty())out+="operator "+f.operator_glyph;
     else out+=random_public_name(f);
     out+="(";
@@ -637,6 +639,8 @@ std::string editor_signature(const Function& f) {
 struct Global {
     Token token;
     std::string identity, visibility, syntax;
+    Type static_owner=Type::none;
+    bool readonly=false;
     Function* initializer = nullptr;
     Type type = Type::none, cell = Type::none;
     unsigned state = 0;
@@ -684,7 +688,8 @@ struct Structure {
     unsigned specialization_depth=0;
     std::shared_ptr<ir::ValueType> definition;
     std::string visibility = "public";
-    std::vector<Statement> fields;
+    std::vector<Statement> fields, static_fields;
+    bool statics_registered=false;
     std::optional<Type> base_type;
     Token base_token{TokenKind::name,"",0};
     std::vector<std::pair<Unit*,Statement*>> effective_fields;
@@ -784,7 +789,8 @@ struct Unit {
     std::list<Function> functions, generic_functions;
     std::vector<Constant> constants;
     std::list<Global> globals;
-    std::map<std::string, Global*> global_names;
+    std::map<std::string, Global*> global_names, static_fields;
+    std::map<std::string, Function*> static_methods;
     std::function<void(Global&)> resolve_global;
     std::list<Structure> structures, generic_structures;
     std::list<FunctionSyntax> function_types;
@@ -1027,7 +1033,7 @@ class Parser {
         Type result(d,extent ? Type::fixed_array : Type::growable_array);result.nullable=nullable;
         arrays.push_back({token,element,d,std::move(extent)});return result;
     }
-    VOID_SEMANTIC_HANDLER Type named_type() {
+    VOID_SEMANTIC_HANDLER Type named_type(bool qualified=true) {
         static const std::map<std::string, Type> types = {
             {"i8",Type::i8},{"i16",Type::i16},{"i32",Type::i32},{"i64",Type::i64},
             {"u8",Type::u8},{"u16",Type::u16},{"u32",Type::u32},{"u64",Type::u64},
@@ -1038,7 +1044,7 @@ class Parser {
         auto token = name();
         std::string spelling = token.text;
         auto reference_token = token;
-        if (accept(".")) { reference_token = name(); spelling += "." + reference_token.text; }
+        if (qualified && accept(".")) { reference_token = name(); spelling += "." + reference_token.text; }
         if(spelling==token.text && substitutions.contains(spelling)) {
             auto result=substitutions.at(spelling);if(accept("?"))result.nullable=true;return result;
         }
@@ -1048,14 +1054,14 @@ class Parser {
         type_uses.push_back({reference_token,result,reference_token.offset==token.offset?std::optional<Token>{}:token});
         return result;
     }
-    Type type() {
+    Type type(bool static_owner=false) {
         Depth guard(depth,source,peek());
         if(accept("("))return grouped_type_end(type());
         if(at("func"))return function_type();
         if(at("result")){auto result=result_type();result.nullable=accept("?");return result;}
         if(at("{"))return dictionary_type();
         if(at("["))return array_type();
-        return named_type();
+        return named_type(!static_owner);
     }
     void newline() { if(multiline_expression && !at("<newline>")){multiline_expression=false;return;}multiline_expression=false;need("<newline>"); }
     bool repair_available() const { return recover_editor && diagnostics.recovery->available(); }
@@ -1373,8 +1379,12 @@ class Parser {
             newline(); return s;
         }
         if (peek().kind == TokenKind::name && p + 1 < tokens.size()) {
-            auto end = p + 1;unsigned indexes=0;bool after_index=false;
+            auto end = p + 1;unsigned indexes=0;bool after_index=false,generic_selection=false;
             while(end+1<tokens.size()) {
+                if(tokens[end].text=="<") {
+                    auto saved=end;unsigned nesting=0;do {if(tokens[end].text=="<")++nesting;else if(tokens[end].text==">")--nesting;++end;}while(end+1<tokens.size() && nesting && tokens[end].kind!=TokenKind::newline);
+                    if(nesting || tokens[end].text!="."){end=saved;break;}generic_selection=true;continue;
+                }
                 if(tokens[end].text=="." && tokens[end+1].kind==TokenKind::name){after_index|=indexes!=0;end+=2;continue;}
                 if(tokens[end].text!="[")break;
                 ++indexes;unsigned brackets=0;
@@ -1384,7 +1394,7 @@ class Parser {
             auto op = tokens[end].text;
             if (op == "=" || op == "+=" || op == "-=" || op == "*=" || op == "/=" || op == "%=" || op == "&=" || op == "|=" || op == "^=" || op == "++" || op == "--") {
                 Statement s(Statement::Kind::assignment, name());s.name=s.token.text;
-                if(indexes>1 || after_index)s.selection=postfix(std::make_unique<Expr>(Expr::Kind::name,s.token));
+                if(indexes>1 || after_index || generic_selection)s.selection=postfix(std::make_unique<Expr>(Expr::Kind::name,s.token));
                 else {while(accept("."))s.fields.push_back(name());if(accept("[")){s.index=expression();need("]");}}
                 s.compound_token=take();s.op = s.compound_token.text;
                 if (op == "++" || op == "--") {
@@ -1439,7 +1449,10 @@ public:
             Function f;
             if (accept("private")) { f.file_private = true; f.visibility = "private"; }
             else if (!accept("public") && accept("internal")) f.visibility = "internal"; // All graph files belong to this project.
+            const bool static_declaration=accept("static");
+            if(static_declaration && !at("func") && !at("async"))error(source,peek(),Code::syntax,"Use static func for a type-level method; static fields belong inside a struct.");
             if (at("var")) {
+                if(static_declaration)error(source,peek(),Code::syntax,"Static fields belong inside a struct declaration.");
                 auto begin = p;
                 auto declaration = statement();
                 if(declaration.kind==Statement::Kind::destructure)
@@ -1555,6 +1568,7 @@ public:
                     if(at("private") || at("internal") || at("public"))visibility=take().text;
                     if(at("operator")){operator_declaration(structure,visibility);continue;}
                     if((at("const") || at("async") || at("virtual") || at("override") || at("static") || at("func")) && peek(1).text=="operator")error(source,peek(),Code::syntax,"Operators permit only one optional visibility modifier; const belongs on each operand.");
+                    const bool static_field=accept("static");
                     bool readonly=accept("const");
                     if(at("private") || at("internal") || at("public") || at("const"))error(source,peek(),Code::syntax,"Duplicate, conflicting or out-of-order field modifiers; use visibility then const.");
                     bool composition = at("using") && peek(1).text != ":";
@@ -1569,11 +1583,15 @@ public:
                         p = start; field.annotation = type();
                         field.token = tokens[p - (field.annotation->nullable ? 2 : 1)];
                         field.name = field.token.text;
-                    } else { need(":"); field.annotation = type(); }
+                    } else if(accept(":"))field.annotation=type();
+                    else if(!static_field)error(source,peek(),Code::syntax,"An instance field requires a type annotation.");
                     auto begin = p; nodes = 0;
                     if (accept("=")){if(event)error(source,field.token,Code::initializer,"Events start empty and cannot declare an initializer.");field.expression = expression();}
                     for (auto n = begin; n < p; ++n) field.constant_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
-                    newline();field.source_end=peek().offset; structure.fields.push_back(std::move(field));
+                    if(static_field && (composition || event))error(source,field.token,Code::syntax,"Static fields cannot be using fields or events.");
+                    if(static_field && readonly && !field.expression)error(source,field.token,Code::initializer,"A static const requires an initializer.");
+                    newline();field.source_end=peek().offset;
+                    (static_field?structure.static_fields:structure.fields).push_back(std::move(field));
                 }
                 if (fields) need("<dedent>");
                 structure.source_end=peek().offset;
@@ -1627,7 +1645,9 @@ public:
             f.virtual_method=accept("virtual");
             f.overriding=!f.virtual_method && accept("override");
             need("func");
-            if (accept("(")) {
+            if(static_declaration) {
+                auto site=peek();auto owner=type(true);need(".");f.static_owner=Parameter{site,owner};
+            } else if (accept("(")) {
                 auto receiver = name(); auto receiver_type = type(); need(")");
                 f.receiver = Parameter{receiver,receiver_type};
             }
@@ -1638,7 +1658,8 @@ public:
             for (auto n = body_begin; n < p; ++n) f.body_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
             f.source_end=peek().offset;
             f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset);
-            const bool generic_receiver=f.receiver && std::any_of(applications.begin(),applications.end(),[&](const auto& a){return a.definition==f.receiver->type.definition;});
+            const auto* owner=f.receiver?&*f.receiver:f.static_owner?&*f.static_owner:nullptr;
+            const bool generic_receiver=owner && std::any_of(applications.begin(),applications.end(),[&](const auto& a){return a.definition==owner->type.definition;});
             if(!instantiating && (!f.generics.empty() || generic_receiver)) {
                 template_syntax(f);f.syntax.assign(tokens.begin()+start,tokens.begin()+p);unit.generic_functions.push_back(std::move(f));
             } else {f.generics.clear();f.substitutions=substitutions;unit.functions.push_back(std::move(f));}
@@ -1948,7 +1969,7 @@ class Semantics {
 #include "generic_inference.inc"
     std::string lexical_owner() const {
         if(!current)return {};
-        return current->receiver?Type::key(current->receiver->type):current->lexical_owner;
+        return current->receiver?Type::key(current->receiver->type):current->static_owner?Type::key(current->static_owner->type):current->lexical_owner;
     }
     struct Member {
         std::vector<unsigned> path;
@@ -2142,6 +2163,7 @@ class Semantics {
         const auto result=call_arguments(e,target,type_level?0:1);
         return e.type=result;
     }
+#include "static_members.inc"
     VOID_SEMANTIC_HANDLER Type method_expression(Expr& e) {
         if(!e.argument_indexes.empty())return e.type;
         if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
@@ -2152,6 +2174,7 @@ class Semantics {
         if (super) return super_expression(e);
         if ((e.token.text == "init") && !(e.parts[0]->kind==Expr::Kind::name && unit.qualifiers.contains(e.parts[0]->token.text)))
             error(source,e.token,Code::initializer_deferred,"Lifecycle methods cannot be called directly; construct a new value using its type.");
+        if(auto result=static_expression(e,true))return *result;
         if (module_call(e)) {
             e.qualifier = e.parts[0]->token.text; e.qualifier_token = e.parts[0]->token;
             if(editor_cursor(e))editor_candidates(e);
@@ -2297,7 +2320,7 @@ class Semantics {
             }
         }
         if(!active)return;
-        auto& out=diagnostics.editor->result;out.parameters.clear();out.signature=random_public_name(target)+"(";
+        auto& out=diagnostics.editor->result;out.parameters.clear();out.signature=(target.static_owner?ir::type_name(target.static_owner->type)+".":std::string{})+random_public_name(target)+"(";
         out.constructor_signature=false;
         out.multiple_return_signature=!target.returns.empty();
         Documentation docs;
@@ -2721,6 +2744,7 @@ class Semantics {
         return {};
     }
     VOID_SEMANTIC_HANDLER std::optional<Type> method_anchor(Expr& e) {
+        if(auto result=static_expression(e,true,true))return result;
         using K=Expr::Kind;
         if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
         if(text_type_base(*e.parts[0]) && e.token.text=="from_utf8")return text_result_anchor();
@@ -2742,7 +2766,7 @@ class Semantics {
     VOID_SEMANTIC_HANDLER std::optional<Type> call_anchor(Expr& e) {
         if(e.token.text=="$interpolation" || e.token.text=="$hole")return text_anchor();
         if(e.target.starts_with("$display.") || display_prelude(e))return e.token.text=="string"?text_anchor():text_result_anchor();
-        if(e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
+        if(e.op=="$static_call" || e.target.starts_with("$numeric::") || !e.argument_indexes.empty())return e.type;
         if(auto* value=lookup(e.token.text);value && value->type.definition && value->type.definition->callable)return Type(*value->type.definition->call_result);
         if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text))return current->substitutions.at(e.token.text);
         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
@@ -2751,6 +2775,7 @@ class Semantics {
         return call_result_anchor(target);
     }
     VOID_SEMANTIC_HANDLER std::optional<Type> field_anchor(Expr& e) {
+        if(auto result=static_expression(e,false,true))return result;
         using K=Expr::Kind;
         if (auto [owner, declaration] = enum_declaration(e); declaration) {
             return Type::nominal(declaration->definition);
@@ -3574,6 +3599,7 @@ class Semantics {
                 throw;
             }
         }
+        if(auto result=static_expression(e,false))return *result;
         if(auto variant=enum_expression(e,false))return *variant;
         auto t = expression(base);
         if (t == error_type) return error_type;
@@ -4004,6 +4030,7 @@ class Semantics {
         return std::nullopt;
     }
     VOID_SEMANTIC_HANDLER Type call_expression(Expr& e) {
+        if(e.op=="$static_call")return e.type; // Already bound through its nominal owner.
         if (auto builtin = builtin_call_expression(e)) return *builtin;
         if(current && e.qualifier.empty() && !lookup(e.token.text) && current->substitutions.contains(e.token.text)) {
             if(!e.type_arguments.empty())error(source,e.token,Code::unsupported_type,"Type parameters are not generic constructors.");
@@ -4474,7 +4501,8 @@ class Semantics {
                 if (!s.fields.empty() && unit.qualifiers.contains(s.name)) {
                     probe.qualifier = s.name; probe.qualifier_token = s.token; probe.token = s.fields.front();
                 }
-                if (global(probe).second) {
+                const bool static_selection=!s.fields.empty() && structure_lookup(unit,root,units,unit.qualifiers.contains(s.name)?s.name+"."+s.fields.front().text:s.name,s.token).second;
+                if (global(probe).second || static_selection || s.selection) {
                     if (!s.selection) {
                         auto target = std::make_unique<Expr>(Expr::Kind::name, s.token);
                         for (const auto& field : s.fields) { auto child = std::make_unique<Expr>(Expr::Kind::field, field); child->parts.push_back(std::move(target)); target = std::move(child); }
@@ -4507,6 +4535,7 @@ class Semantics {
             if(s.selection) {
                 auto previous=allow_event;allow_event=true;t=expression(*s.selection);allow_event=previous;
                 std::function<void(const Expr&,bool)> writable=[&](const Expr& e,bool writeback){
+                    if(e.kind==Expr::Kind::global && writeback)for(const auto& [id,owner]:units)for(const auto& value:owner->globals)if(value.identity==e.target && value.readonly)error(source,e.token,Code::readonly,"Cannot mutate a static const field.");
                     if(e.kind==Expr::Kind::field && !e.property && (e.parts[0]->type.kind==Type::aggregate || e.parts[0]->type.kind==Type::managed_ref) && e.parts[0]->type.definition && e.parts[0]->type.definition->fields.at(e.slot).readonly)
                         const_field_error(e.parts[0]->type,e.slot,e.token);
                     if(e.property && writeback && e.setter.empty())error(source,e.token,Code::readonly,"Property has no setter.");
@@ -4739,7 +4768,7 @@ public:
         auto& f = *value.initializer;
         current = &f; scopes = {{}}; invalid_function = false;
         variable_statement(f.body.front());
-        value.type = f.locals.at(f.body.front().slot); f.result = value.type;
+        value.type = f.locals.at(f.body.front().slot);if(value.readonly)value.type=ir::readonly_view(value.type); f.result = value.type;
         Statement returned(Statement::Kind::returned, value.token);
         returned.expression = std::make_unique<Expr>(Expr::Kind::name, f.body.front().token);
         statement(returned); f.body.push_back(std::move(returned)); f.analyzed = true;
@@ -5203,6 +5232,9 @@ class Lowering {
             const bool package_call=package_source(owner) || package_source(target_owner);
             wrapper.module_identity=package_call ? owner : target_owner;
             wrapper.name=(package_call ? output.name : call.target)+suffix;
+            if(!output.lexical_owner.empty() && owner==target_owner && call.target.starts_with(output.lexical_owner+"::static::")) {
+                wrapper.name=call.target+suffix;wrapper.static_member=true;wrapper.lexical_owner=output.lexical_owner;
+            }
             wrapper.source_name=wrapper.name.substr(wrapper.module_identity.size()+2);wrapper.source=source.location(e.token.offset);wrapper.visibility="private";wrapper.asynchronous=true;wrapper.worker=true;wrapper.task=e.type;wrapper.result=call.type;wrapper.parameters.clear();
             ir::Block body;ir::Instruction invoke{ir::Op::call};invoke.callee=call.target;invoke.source=wrapper.source;
             wrapper.parameters.resize(call.parts.size());for(unsigned n=0;n<call.parts.size();++n){wrapper.parameters[call.argument_indexes.empty()?n:call.argument_indexes[n]]=call.parts[n]->type;invoke.arguments.push_back(n);body.instructions.push_back({ir::Op::argument,n});}
@@ -6006,6 +6038,8 @@ public:
     ir::Function lower(const Function& f, const ConstructionContext* construction=nullptr) {
         context=construction;normal_return=!f.body.empty() && f.body.back().kind==Statement::Kind::returned?&f.body.back():nullptr;
         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
+        if(f.static_owner)output.source_name=f.symbol.substr(f.static_owner->type.definition->module_identity.size()+2);
+        output.static_member=bool(f.static_owner) || (f.global_initializer && !f.lexical_owner.empty());
         output.asynchronous=f.asynchronous;output.task=f.task;output.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;output.lexical_parent=f.lexical_parent;output.operator_owner=f.operator_owner;output.operator_glyph=f.operator_glyph;
         output.bound_receiver=f.bound_receiver;output.closure=f.anonymous;cells.clear();cleanup_head.reset();return_slot.reset();cleanup_jumps.clear();with_scopes.clear();loop_with_depth.clear();
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
@@ -6575,6 +6609,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
 #include "inheritance.inc"
 ir::Function member_header(const Unit& u,const Function& f) {
     ir::Function header;header.name=f.symbol;header.module_identity=u.identity;header.method_name=f.receiver?(f.concrete_method_name.empty()?f.token.text:f.concrete_method_name):std::string{};
+    header.static_member=bool(f.static_owner) || (f.global_initializer && !f.lexical_owner.empty());
     header.asynchronous=f.asynchronous;header.task=f.task;header.bound_receiver=f.bound_receiver;header.closure=f.anonymous;header.accessor=f.accessor;header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
     header.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;header.lexical_parent=f.lexical_parent;header.operator_owner=f.operator_owner;header.operator_glyph=f.operator_glyph;
     header.parameters.clear();if(f.receiver)header.parameters.push_back(f.receiver->type);
@@ -6618,7 +6653,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     for(auto& [id,u]:units)if(u->application_body) {
         try {
             if(id!=entry)error(u->source,{TokenKind::name,"",0},Code::entry,"Imported modules cannot contain executable top-level statements.");
-            for(const auto& f:u->functions)if(f.token.text=="main" && !f.receiver && f.parameters.empty() && f.generics.empty() && !f.asynchronous && (f.result==Type::none || f.result==Type::i32))error(u->source,f.token,Code::entry,"Executable top-level statements compete with main().");
+            for(const auto& f:u->functions)if(f.token.text=="main" && !f.receiver && !f.static_owner && f.parameters.empty() && f.generics.empty() && !f.asynchronous && (f.result==Type::none || f.result==Type::i32))error(u->source,f.token,Code::entry,"Executable top-level statements compete with main().");
         } catch(const CompilationError& failure){diagnostics.add(failure);}
     }
     auto arena = std::make_shared<ir::TypeArena>();
@@ -6633,7 +6668,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     for (auto& [id, unit] : units) {
     std::vector<Function*> declarations;for(auto& f:unit->functions)declarations.push_back(&f);for(auto& f:unit->generic_functions)declarations.push_back(&f);
     for(auto* declaration:declarations) {auto& f=*declaration;
-        if (f.receiver || !f.operator_glyph.empty()) continue;
+        if (f.receiver || f.static_owner || !f.operator_glyph.empty()) continue;
         f.symbol = id + "::" + f.token.text;
         auto [previous, inserted] = unit->declarations.emplace(f.token.text, &f);
         if (!inserted) {
@@ -6969,6 +7004,23 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         Depth guard(diagnostics.semantic_depth(),owner.source,structure.token,128);
         structure.layout_state = 1;
         try {
+            if(!structure.statics_registered) {
+                structure.statics_registered=true;std::set<std::string> names;
+                for(const auto& field:structure.fields)names.insert(field.name);
+                for(auto& field:structure.static_fields) {
+                    if(!names.insert(field.name).second)error(owner.source,field.token,Code::duplicate,"Static field conflicts with another member: "+field.name+".");
+                    Global value;value.token=field.token;value.visibility=field.visibility;value.readonly=field.readonly;
+                    value.static_owner=Type::nominal(structure.definition);value.identity=Type::key(value.static_owner)+"::static::"+field.name;
+                    value.syntax=field.constant_syntax+(field.readonly?":const":":var");
+                    Function initializer;initializer.global_initializer=true;initializer.visibility="private";initializer.token=field.token;
+                    initializer.token.text="$static$"+structure.definition->name+"$"+field.name;initializer.symbol=owner.identity+"::"+initializer.token.text;
+                    initializer.lexical_owner=Type::key(value.static_owner);
+                    if(structure.generic_origin)for(unsigned n=0;n<structure.type_arguments.size();++n)initializer.substitutions.emplace(structure.generic_origin->generics[n].token.text,structure.type_arguments[n]);
+                    initializer.body_syntax=value.syntax;field.name=field.token.text="$value$"+field.name;initializer.body.push_back(std::move(field));
+                    owner.functions.push_back(std::move(initializer));value.initializer=&owner.functions.back();
+                    owner.globals.push_back(std::move(value));auto& stored=owner.globals.back();owner.static_fields.emplace(stored.identity,&stored);
+                }
+            }
             std::set<std::string> names;
             if (structure.base_type) {
                 auto t=resolve_type(*structure.base_type,owner,root,units,structure.base_token);
@@ -7065,6 +7117,19 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             if(previous!=owner.functions.end())error(owner.source,f.token,Code::duplicate,"Duplicate operator operand tuple.",{},{{span(owner.source,previous->token),"Previously declared"}});
         }catch(const CompilationError& failure){diagnostics.add(failure);f.parse_failed=true;}
          catch(const std::invalid_argument& reason){try{error(owner.source,f.token,Code::type_mismatch,reason.what());}catch(const CompilationError& failure){diagnostics.add(failure);f.parse_failed=true;}}
+        if(f.static_owner) {
+            resolve(f.static_owner->type,f.static_owner->token);
+            auto t=f.static_owner->type;
+            if(t==error_type){f.parse_failed=true;return;}
+            if((t.kind!=Type::aggregate && t.kind!=Type::managed_ref) || t.nullable || !t.definition->cases.empty() || t.definition->callable)error(owner.source,f.token,Code::receiver,"Static methods require an owning-module struct type.");
+            if(t.definition->module_identity!=owner.identity)error(owner.source,f.token,Code::receiver,"Static methods must be declared in their type's owning module.");
+            if(f.virtual_method || f.overriding || f.token.text=="init" || f.token.text=="deinit")error(owner.source,f.token,Code::receiver,"Static methods cannot be lifecycle or virtual methods.");
+            f.symbol=Type::key(t)+"::static::"+(f.concrete_method_name.empty()?f.token.text:f.concrete_method_name);
+            f.lexical_owner=Type::key(t);
+            if(owner.static_fields.contains(f.symbol) || !owner.static_methods.emplace(f.symbol,&f).second)error(owner.source,f.token,Code::duplicate,"Duplicate static member: "+f.token.text+".");
+            for(const auto& field:t.definition->fields)if(field.name==f.token.text)error(owner.source,f.token,Code::duplicate,"Static method conflicts with an instance field.");
+            if(owner.methods.contains(Type::key(t)+"::method::"+f.token.text))error(owner.source,f.token,Code::duplicate,"Static and instance methods cannot share a name.");
+        }
         if (f.receiver) {
             resolve(f.receiver->type,f.receiver->token);
             try {
@@ -7074,6 +7139,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 if (!unit->structure_names.contains(t.definition->name) || unit->structure_names.at(t.definition->name)->definition != t.definition)
                     error(unit->source,f.receiver->token,Code::receiver,"Methods must be declared in their value type's owning module; extension methods are deferred.");
                 if(t.kind==Type::interface_ref && !f.interface_requirement) error(unit->source,f.token,Code::receiver,"Interfaces declare requirements, not receiver implementations.");
+                if(unit->static_fields.contains(Type::key(t)+"::static::"+f.token.text) || unit->static_methods.contains(Type::key(t)+"::static::"+f.token.text))error(unit->source,f.token,Code::duplicate,"Instance method conflicts with a static member.");
                 f.initializer = f.token.text == "init";
                 if(f.token.text=="deinit" && (t.kind!=Type::managed_ref || f.result!=Type::none || !f.parameters.empty()))error(unit->source,f.token,Code::initializer_deferred,"deinit requires a managed receiver, no arguments and no result.");
                 if (f.initializer && f.result != Type::none) error(unit->source,f.token,Code::type_mismatch,"An initializer must not declare a result; fallible construction is deferred.");
@@ -7134,8 +7200,10 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                     value.type = resolve_type(*value.initializer->body.front().annotation,
                                               *u, root, units, value.token);
                 }
+                prepare_function(*u,*value.initializer);
                 Semantics(*u, units, root, evaluate, diagnostics, defaults).analyze_global(value);
                 value.cell = u->make_capture_record(value.identity + "::$global_cell", value.type, true);
+                if(value.readonly)std::const_pointer_cast<ir::ValueType>(value.cell.definition)->fields[0].readonly=true;
                 value.state = 2;
             } catch (...) {
                 value.state = 3;
@@ -7215,9 +7283,11 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         pending_bodies=false;
         for(auto& [id,u]:units) {
             for(const auto& f:u->functions)if(!f.analyzed && !f.interface_requirement){pending_bodies=true;break;}
+            for(auto& value:u->globals)if(value.state==0) {u->resolve_global(value);pending_bodies=true;}
             Semantics(*u,units,root,evaluate,diagnostics,defaults).analyze();
         }
     }
+    for(auto& [id,u]:units)u->globals.sort([](const Global& a,const Global& b){return a.token.offset!=b.token.offset?a.token.offset<b.token.offset:a.identity<b.identity;});
     if(presentation && diagnostics.failed() && diagnostics.presentation_errors()) {
         diagnostics.recovery->repaired=true;
         return; // No ownership/IR contracts are built from a broken body.
@@ -7342,7 +7412,7 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
             for (const auto& dependency : reach[id]) if (!emitted.contains(dependency) && !reach[dependency].contains(id)) ready = false;
             if (!ready) continue;
             for (const auto& [member, owner] : units) if (!emitted.contains(member) && reach[id].contains(member) && reach[member].contains(id)) {
-                for (const auto& value : owner->globals) module.globals.push_back({value.identity, member, value.visibility, value.cell, value.initializer->symbol, value.syntax, owner->source.location(value.token.offset)});
+                for (const auto& value : owner->globals) module.globals.push_back({value.identity, member, value.visibility, value.cell, value.initializer->symbol, value.syntax, owner->source.location(value.token.offset),value.static_owner==Type::none?std::string{}:Type::key(value.static_owner)});
                 emitted.insert(member);
             }
             break;
@@ -7514,7 +7584,9 @@ struct AnalysisAccess {
         std::map<std::string,std::string> owner_names;
         for(const auto& [id,u]:*graph)for(const auto& structure:u->structures)owner_names.emplace(structure.definition->identity,ir::type_name(Type(structure.definition,structure.definition->managed?Type::managed_ref:Type::aggregate)));
         std::map<std::string,std::string> signatures;
-        for(const auto& [id,u]:*graph)for(const auto& f:u->functions)if(!f.operator_glyph.empty() || f.receiver || random_numeric_function(f) || !f.returns.empty() || !f.generic_origin.empty())signatures.emplace(f.symbol,editor_signature(f));
+        for(const auto& [id,u]:*graph)for(const auto& f:u->functions)if(!f.operator_glyph.empty() || f.receiver || f.static_owner || random_numeric_function(f) || !f.returns.empty() || !f.generic_origin.empty())signatures.emplace(f.symbol,editor_signature(f));
+        for(const auto& [id,u]:*graph)for(const auto& value:u->globals)if(value.static_owner!=Type::none)
+            signatures.emplace(value.identity,value.visibility+" static "+std::string(value.readonly?"const ":"")+ir::type_name(value.static_owner)+"."+value.token.text+": "+ir::type_name(value.type));
         // Hook calls already selected in ordinary display adapter bodies supply
         // navigation. No editor-side method lookup or runtime hook search.
         for(const auto& [id,u]:*graph)for(const auto& structure:u->structures)if(structure.generic_origin && !structure.case_tokens.empty()) {
@@ -7549,6 +7621,7 @@ struct AnalysisAccess {
             if(native_contract) {
             field(result->contract_, "declaration"); field(result->contract_, d.identity); field(result->contract_, d.visibility);
             field(result->contract_,d.owner);field(result->contract_,d.operator_glyph);
+            field(result->contract_,d.static_member?"static":"ordinary");
             field(result->contract_,d.generic_template?"template":"concrete");
             if(!d.operator_glyph.empty())field(result->contract_,d.constant_syntax);
             field(result->contract_, std::to_string(static_cast<int>(d.kind)));
@@ -7803,7 +7876,9 @@ struct AnalysisAccess {
             }
             for (const auto& value : unit->globals) {
                 AnalyzedDeclaration record{AnalyzedDeclaration::Kind::global_variable, value.identity, id, value.visibility, location(value.token), {}, value.type, value.syntax};
-                record.rename_safe = true; record.signature = value.visibility + " var " + value.token.text + ": " + ir::type_name(value.type);
+                record.rename_safe = true;record.readonly=value.readonly;
+                if(value.static_owner!=Type::none){record.static_member=true;record.owner=Type::key(value.static_owner);record.editor_symbol_kind=8;}
+                record.signature=value.visibility+(record.static_member?" static ":" ")+std::string(value.readonly?"const ":"var ")+(record.static_member?ir::type_name(value.static_owner)+".":"")+value.token.text+": "+ir::type_name(value.type);
                 declaration(std::move(record));
             }
             for (const auto& c : unit->constants) {
@@ -7816,6 +7891,7 @@ struct AnalysisAccess {
             for (const auto& f : unit->functions) {
                 std::vector<Type> parameters; for (const auto& p : f.parameters) parameters.push_back(p.type);
                 AnalyzedDeclaration method_record{!f.operator_glyph.empty() ? AnalyzedDeclaration::Kind::operator_function : f.interface_requirement ? AnalyzedDeclaration::Kind::interface_requirement : f.initializer ? AnalyzedDeclaration::Kind::initializer : f.receiver ? AnalyzedDeclaration::Kind::receiver_method : AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,f.result,{}};
+                if(f.static_owner){method_record.owner=Type::key(f.static_owner->type);method_record.static_member=true;method_record.editor_symbol_kind=6;}
                 if (f.receiver) { method_record.owner = f.receiver->type.definition->identity; method_record.receiver = f.receiver->type; method_record.receiver_mutates = f.receiver_mutates; }
                 if(!f.operator_glyph.empty()){method_record.owner=Type::key(f.operator_owner);method_record.operator_glyph=f.operator_glyph;method_record.editor_symbol_kind=25;}
                 if(f.accessor) {
@@ -8341,7 +8417,7 @@ std::optional<EditorAssistance> editor_namespace_assistance(const ValidatedAnaly
     const auto prefix=name.substr(0,cursor-out.begin);
     std::map<std::string,EditorCandidate> candidates;
     auto consider=[&](const AnalyzedDeclaration& d) {
-        if(d.module!=target->second || !source_visible(d.visibility,d.module,module) ||
+        if(d.static_member || d.module!=target->second || !source_visible(d.visibility,d.module,module) ||
            !d.source.source || d.source.end<=d.source.begin)return;
         const auto label=d.source.source->text().substr(d.source.begin,d.source.end-d.source.begin);
         if(!label.starts_with(prefix) || !valid_editor_identifier(label))return;

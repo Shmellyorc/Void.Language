@@ -1,0 +1,186 @@
+{
+  "schema": 1,
+  "raw_directory": "/tmp/g80-px1if_gm",
+  "baseline": "baseline.json",
+  "records": [
+    {
+      "file": "first-implementation.json",
+      "sha256": "996ad555a00ee2457f1488c46fc9615ef90f5a4a656d9bb194802c67074a5256",
+      "observations": [
+        {
+          "command": [
+            "check",
+            "/tmp/g80-px1if_gm/baseline.void"
+          ],
+          "exit": 0,
+          "stdout": "Source checked successfully\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "run",
+            "/tmp/g80-px1if_gm/baseline.void",
+            "--no-cache"
+          ],
+          "exit": 1,
+          "stdout": "",
+          "stderr": "VOID IR: forged closure field owner\n"
+        }
+      ]
+    },
+    {
+      "file": "async-initial.json",
+      "sha256": "30f117ef027c77fbc6226ac51a1311c7a43e52328303556a62c4db8953e68084",
+      "observations": [
+        {
+          "command": [
+            "check"
+          ],
+          "exit": 0,
+          "stdout": "Source checked successfully\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "run"
+          ],
+          "exit": 1,
+          "stdout": "",
+          "stderr": "/home/shmellyorc/Documents/Void.Language/tests/static_members/async.void:1:1: error: No entry function found.\n    code: VOID4001\n\n 1 | value struct utilities:\n   | ^\n    Module: /async.void\n    Hint: Define func entry(value: i32) -> i32 to run or emit this file; check accepts libraries without an entry.\n\n"
+        }
+      ]
+    },
+    {
+      "file": "async-second.json",
+      "sha256": "602354e1fefce2833a8ec452360c99c3322b4037e8f02085100beda36227da32",
+      "observations": {
+        "exit": 1,
+        "stdout": "",
+        "stderr": "VOID IR: inaccessible static callable\n"
+      }
+    },
+    {
+      "file": "invented-method-arguments-before.json",
+      "sha256": "b8541d858c01c8728f776453858f453d9961a08da779729686bd46023b033a6a",
+      "observations": {
+        "command": [
+          "build/llvm23-debug/voidc",
+          "check",
+          "/tmp/g80-px1if_gm/invented-method-arguments.void"
+        ],
+        "expected": 1,
+        "actual": 0,
+        "stdout": "Source checked successfully\n",
+        "stderr": ""
+      }
+    },
+    {
+      "file": "release-source-smoke.json",
+      "sha256": "5eccaafa268a2fe643f1922a0d1c829bc7e340938d8812372ed9de2fd1247de5",
+      "observations": {
+        "command": [
+          "build/llvm23-release/voidc",
+          "check",
+          "/tmp/g80-px1if_gm/invented-method-arguments.void"
+        ],
+        "actual": 0,
+        "stdout": "Source checked successfully\n",
+        "stderr": ""
+      }
+    },
+    {
+      "file": "first-focused-debug.json",
+      "sha256": "bc4c596daf3ebfab1a47fc346eacf4d8ca8845ba42bb048a8a7b27785241c2fc",
+      "failed": [
+        {
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+            "run",
+            "/home/shmellyorc/Documents/Void.Language/tests/static_members/generics.void",
+            "--no-cache"
+          ],
+          "expected": 0,
+          "actual": 1,
+          "stdout": "",
+          "stderr": "VOID IR: invalid generic specialization provenance for /generics.void::storage<3:19:>::static::echo<2:0:> from /generics.void::storage::static::echo (canonical /generics.void::storage::static::echo<2:0:>)\n"
+        }
+      ]
+    },
+    {
+      "file": "second-focused-debug.json",
+      "sha256": "ca12428fa6ad18991b46406854de5f19fec9a5ebfd14d17077907d483a429c12",
+      "failed": [
+        {
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+            "check",
+            "/tmp/VOID G80 c9wgthu0/imports.void"
+          ],
+          "expected": 0,
+          "actual": 1,
+          "stdout": "",
+          "stderr": "/tmp/VOID G80 c9wgthu0/imports.void:5:5: error: Cannot mutate readonly const or declaration 'b'.\n    code: VOID2007\n\n 5 |     b.counter.value += 3\n   |     ^\n    Module: /imports.void\n    Hint: Use var for a mutable local binding.\n\n"
+        }
+      ]
+    },
+    {
+      "file": "fourth-focused-debug.json",
+      "sha256": "9f75562a4c91b68731ed30e909532949345603cbf4f8252d5f355c515f86f9cb",
+      "failed": [
+        {
+          "command": [
+            "/home/shmellyorc/Documents/Void.Language/build/llvm23-debug/voidc",
+            "run",
+            "/home/shmellyorc/Documents/Void.Language/tests/static_members/async.void",
+            "--no-cache"
+          ],
+          "expected": 0,
+          "actual": 1,
+          "stdout": "",
+          "stderr": "Async entry requires the explicit scheduler root adapter\n"
+        }
+      ]
+    },
+    {
+      "file": "first-lsp-debug.log",
+      "sha256": "a27c6898fae1357ed1a73e97b25aa8587c5502b4b3160e152426321e24035e87",
+      "output": "Traceback (most recent call last):\n  File \"/home/shmellyorc/Documents/Void.Language/tests/static_members/lsp.py\", line 62, in <module>\n    assert signature['activeParameter']==1 and 'amount: i32' in str(signature) and 'Human-readable reason' in str(signature),signature\n           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^\nTypeError: 'NoneType' object is not subscriptable\n"
+    },
+    {
+      "file": "second-lsp-debug.log",
+      "sha256": "f9e961373238d8ec151a8dbdd41e0ba932bbc95b9c52c2792986c4ce1d27b92d",
+      "output": "Traceback (most recent call last):\n  File \"/home/shmellyorc/Documents/Void.Language/tests/static_members/lsp.py\", line 65, in <module>\n    assert definition and definition[0]['range']['start']['line']==2,definition\n                          ~~~~~~~~~~^^^\nKeyError: 0\n"
+    },
+    {
+      "file": "build-debug-first.log",
+      "sha256": "13114bc7ccd15c39cf32986cc40e5b98498294f144b540862f98c38f4a1bc9bb",
+      "output": "[  0%] Built target void_application_objects\n[  0%] Built target void_format_objects\n[  0%] Built target void_zone_objects\n[ 75%] Built target libcurl_static\n[ 75%] Built target void_native_fixture\n[ 75%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o\n[ 91%] Built target void_runtime\n[ 91%] Built target void_native_inventory\nIn file included from /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2165:\n/home/shmellyorc/Documents/Void.Language/src/frontend/static_members.inc:21:72: warning: unused parameter 'result_type' [-Wunused-parameter]\n   21 |     auto add=[&](const Token& token,const std::string& visibility,Type result_type,int kind,const std::string& detail) {\n      |                                                                        ^\n/home/shmellyorc/Documents/Void.Language/src/frontend/static_members.inc:19:99: warning: unused parameter 'site' [-Wunused-parameter]\n   19 | VOID_SEMANTIC_HANDLER void editor_static_candidates(Unit& owner,Structure& structure,const Token& site) {\n      |                                                                                                   ^\n/home/shmellyorc/Documents/Void.Language/src/frontend/static_members.inc:67:22: error: no viable overloaded '='\n   67 |         return e.type=call_result_anchor(*target);\n      |                ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~\n/home/shmellyorc/Documents/Void.Language/include/void/ir.hpp:21:8: note: candidate function (the implicit copy assignment operator) not viable: no known conversion from 'std::optional<Type>' (aka 'std::optional<ir::Type>') to 'const Type' for 1st argument\n   21 | struct Type {\n      |        ^~~~\n/home/shmellyorc/Documents/Void.Language/include/void/ir.hpp:21:8: note: candidate function (the implicit move assignment operator) not viable: no known conversion from 'std::optional<Type>' (aka 'std::optional<ir::Type>') to 'Type' for 1st argument\n   21 | struct Type {\n      |        ^~~~\n/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8529:63: warning: missing field 'prefix' initializer [-Wmissing-field-initializers]\n 8529 |     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;\n      |                                                               ^\n3 warnings and 1 error generated.\ngmake[3]: *** [CMakeFiles/void_core.dir/build.make:121: CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o] Error 1\ngmake[2]: *** [CMakeFiles/Makefile2:2299: CMakeFiles/void_core.dir/all] Error 2\ngmake[1]: *** [CMakeFiles/Makefile2:2628: CMakeFiles/voidc.dir/rule] Error 2\ngmake: *** [Makefile:401: voidc] Error 2\n"
+    },
+    {
+      "file": "build-debug-second.log",
+      "sha256": "e1e631563d86e1c07a25dc275e530953d71db20672314c11b452646702ce412d",
+      "output": "[  0%] Built target void_application_objects\n[  0%] Built target void_format_objects\n[  0%] Built target void_zone_objects\n[ 75%] Built target libcurl_static\n[ 75%] Built target void_native_fixture\n[ 75%] Building CXX object CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o\n[ 91%] Built target void_runtime\n[ 91%] Built target void_native_inventory\nIn file included from /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:2165:\n/home/shmellyorc/Documents/Void.Language/src/frontend/static_members.inc:21:72: warning: unused parameter 'result_type' [-Wunused-parameter]\n   21 |     auto add=[&](const Token& token,const std::string& visibility,Type result_type,int kind,const std::string& detail) {\n      |                                                                        ^\n/home/shmellyorc/Documents/Void.Language/src/frontend/static_members.inc:19:99: warning: unused parameter 'site' [-Wunused-parameter]\n   19 | VOID_SEMANTIC_HANDLER void editor_static_candidates(Unit& owner,Structure& structure,const Token& site) {\n      |                                                                                                   ^\nIn file included from /home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:7235:\n/home/shmellyorc/Documents/Void.Language/src/frontend/generic_declarations.inc:106:44: error: variable 'receiver' declared with deduced type 'auto' cannot appear in its own initializer\n  106 |                 auto receiver=resolve_type(receiver->type,*u,root,units,receiver->token);\n      |                                            ^\n/home/shmellyorc/Documents/Void.Language/src/frontend/generic_declarations.inc:106:73: error: variable 'receiver' declared with deduced type 'auto' cannot appear in its own initializer\n  106 |                 auto receiver=resolve_type(receiver->type,*u,root,units,receiver->token);\n      |                                                                         ^\n/home/shmellyorc/Documents/Void.Language/src/frontend/compiler.cpp:8529:63: warning: missing field 'prefix' initializer [-Wmissing-field-initializers]\n 8529 |     EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;\n      |                                                               ^\n3 warnings and 2 errors generated.\ngmake[3]: *** [CMakeFiles/void_core.dir/build.make:121: CMakeFiles/void_core.dir/src/frontend/compiler.cpp.o] Error 1\ngmake[2]: *** [CMakeFiles/Makefile2:2299: CMakeFiles/void_core.dir/all] Error 2\ngmake[1]: *** [CMakeFiles/Makefile2:2628: CMakeFiles/voidc.dir/rule] Error 2\ngmake: *** [Makefile:401: voidc] Error 2\n"
+    },
+    {
+      "file": "example-debug.stderr",
+      "sha256": "8d2fee48f2f11f3e0683e570f600ce3a7de29a89d9acf5a13588c4a915cad27f",
+      "output": "/home/shmellyorc/Documents/Void.Language/examples/learn/static_members.void:38:24: error: Unknown function 'read'.\n    code: VOID2003\n\n 38 |     print(storage<i32>.read(), storage<string>.read())\n    |                        ^^^^\n    Module: /static_members.void\n    Hint: Declare it here or import its declaring file; imports are not transitive exports.\n\n/home/shmellyorc/Documents/Void.Language/examples/learn/static_members.void:38:48: error: Unknown function 'read'.\n    code: VOID2003\n\n 38 |     print(storage<i32>.read(), storage<string>.read())\n    |                                                ^^^^\n    Module: /static_members.void\n    Hint: Declare it here or import its declaring file; imports are not transitive exports.\n\n"
+    },
+    {
+      "file": "integrated-debug.xml",
+      "sha256": "9ef62334872fd8974cda79f665895eccda2d888d772d05f8757e539380559407",
+      "case": {
+        "name": "frontend",
+        "classname": "frontend",
+        "time": "9.98148",
+        "status": "fail"
+      },
+      "output": "Frontend begin: diagnostics\n50+ source diagnostic cases and UTF-8/ABI checks passed\nFrontend passed: diagnostics\nFrontend begin: programs\nReal .void files and independent programs executed through normal/O2 JIT\nFrontend passed: programs\nFrontend begin: numeric values\n1216 constant/normal/O2 numeric matrix comparisons passed\nReadonly/compile-time constants, numeric boundaries, concurrent failures, bounded traces and restart checks passed\nFrontend passed: numeric values\nFrontend begin: diagnostic recovery/resource limits\nFrontend resource case: combined expression/constant depth\nStructured diagnostics: independent files, recovery, bounded cascades, snapshots and failed reload verified\nFrontend passed: diagnostic recovery/resource limits\nFrontend begin: value structs\nFrontend resource case: bounded expanded value layouts\nValue struct source: nested/mixed layouts, copies, normal/O2 JIT, diagnostics, tooling and reload passed\nFrontend passed: value structs\nFrontend begin: receiver methods\nFrontend resource case: bounded receiver-chain semantics\nReceiver methods: actual storage, copies, imports, source order, effects, cycles, diagnostics, tooling and reload passed\nFrontend passed: receiver methods\nFrontend begin: initialization\nInitialization project main optimized=0\nInitialization project main optimized=1\nInitialization project order optimized=0\nInitialization project order optimized=1\nInitialization project required optimized=0\nInitialization project required optimized=1\nInitialization project numeric optimized=0\nInitialization project numeric optimized=1\nInitialization project failure optimized=0\nInitialization project failure optimized=1\nInitialization project copies optimized=0\nInitialization project copies optimized=1\nInitialization begin: layout retirement\nInitialization layout generation 0 fields=1\nInitialization layout generation 1 fields=8\nInitialization layout generation 2 fields=15\nInitialization layout generation 3 fields=5\nInitialization layout generation 4 fields=12\nInitialization layout generation 5 fields=2\nInitialization layout generation 6 fields=9\nInitialization layout generation 7 fields=16\nInitialization layout generation 8 fields=6\nInitialization layout generation 9 fields=13\nInitialization layout generation 10 fields=3\nInitialization layout generation 11 fields=10\nInitialization layout generation 12 fields=17\nInitialization layout generation 13 fields=7\nInitialization layout generation 14 fields=14\nInitialization layout generation 15 fields=4\nInitialization layout generation 16 fields=11\nInitialization layout generation 17 fields=1\nInitialization layout generation 18 fields=8\nInitialization layout generation 19 fields=15\nInitialization layout generation 20 fields=5\nInitialization layout generation 21 fields=12\nInitialization layout generation 22 fields=2\nInitialization layout generation 23 fields=9\nInitialization layout generation 24 fields=16\nInitialization layout generation 25 fields=6\nInitialization layout generation 26 fields=13\nInitialization layout generation 27 fields=3\nInitialization layout generation 28 fields=10\nInitialization layout generation 29 fields=17\nInitialization layout generation 30 fields=7\nInitialization layout generation 31 fields=14\nInitialization layout generation 32 fields=4\nInitialization layout generation 33 fields=11\nInitialization layout generation 34 fields=1\nInitialization layout generation 35 fields=8\nInitialization layout generation 36 fields=15\nInitialization layout generation 37 fields=5\nInitialization layout generation 38 fields=12\nInitialization layout generation 39 fields=2\nInitialization layout generation 40 fields=9\nInitialization layout generation 41 fields=16\nInitialization layout generation 42 fields=6\nInitialization layout generation 43 fields=13\nInitialization layout generation 44 fields=3\nInitialization layout generation 45 fields=10\nInitialization layout generation 46 fields=17\nInitialization layout generation 47 fields=7\nInitialization layout generation 48 fields=14\nInitialization layout generation 49 fields=4\nInitialization layout generation 50 fields=11\nInitialization layout generation 51 fields=1\nInitialization layout generation 52 fields=8\nInitialization layout generation 53 fields=15\nInitialization layout generation 54 fields=5\nInitialization layout generation 55 fields=12\nInitialization layout generation 56 fields=2\nInitialization layout generation 57 fields=9\nInitialization layout generation 58 fields=16\nInitialization layout generation 59 fields=6\nInitialization layout generation 60 fields=13\nInitialization layout generation 61 fields=3\nInitialization layout generation 62 fields=10\nInitialization layout generation 63 fields=17\nInitialization nested layout generation 0 padding=i8\nInitialization nested layout generation 1 padding=i64\nInitialization nested layout generation 2 padding=i8\nInitialization nested layout generation 3 padding=i64\nInitialization nested layout generation 4 padding=i8\nInitialization nested layout generation 5 padding=i64\nInitialization nested layout generation 6 padding=i8\nInitialization nested layout generation 7 padding=i64\nInitialization nested layout generation 8 padding=i8\nInitialization nested layout generation 9 padding=i64\nInitialization nested layout generation 10 padding=i8\nInitialization nested layout generation 11 padding=i64\nInitialization nested layout generation 12 padding=i8\nInitialization nested layout generation 13 padding=i64\nInitialization nested layout generation 14 padding=i8\nInitialization nested layout generation 15 padding=i64\n80 aggregate layout generations retired through normal/O2 JIT\nFAILED: /initialization.void:8:18: error: Unknown static member 'point.init'.\n    code: VOID2019\n\n 8 |     return point.init()\n   |                  ^^^^\n    Module: /initialization.void\n\nSet VOID_TEST_DIAGNOSTICS_DIR to retain a rerun's full diagnostics.\n"
+    }
+  ],
+  "source_inputs": {
+    "invented-method-arguments.void": "## Independent storage for each concrete payload type.\nvalue struct storage<t>:\n    static count = 0\n    static item: t?\n    value: t?\n## Store an optional payload in this concrete type's cell.\n## @param value Payload to store.\n## @return The number of writes to this concrete type.\nstatic func storage<t>.store(value: t?) -> i32:\n    storage<t>.item = value\n    storage<t>.count += 1\n    return storage<t>.count\n## Read the concrete type's current payload.\n## @return The most recently stored payload or null.\nstatic func storage<t>.read() -> t?:\n    return storage<t>.item\n## Identity utility with a method-specific parameter.\n## @param value Value to preserve.\n## @return The supplied value.\nstatic func storage<t>.echo<u>(value: u) -> u:\n    return value\nfunc main() -> i32:\n    if storage<i32>.store(7) != 1 or storage<string>.store(\"Boss\") != 1:\n        return 1\n    storage<i32>.count += 2\n    if storage<i32>.count != 3 or storage<string>.count != 1:\n        return 2\n    if not (storage<i32>.read<string>() is Ok(7)) or not (storage<string>.read() is Ok(\"Boss\")):\n        return 3\n    var copied = storage<i32>(value = 9)\n    if not (copied.value is Ok(9)) or storage<string>.echo<i32>(4) != 4 or storage<i32>.echo(\"ok\") != \"ok\":\n        return 4\n    print(\"static specializations preserved\")\n    return 0\n",
+    "managed-generics.void": "struct registry<t>:\n    static count = 0\n    static item: t?\n    value: t?\nstatic func registry<t>.store(value: t?) -> i32:\n    registry<t>.item = value\n    registry<t>.count += 1\n    return registry<t>.count\nstatic func registry<t>.read() -> t?:\n    return registry<t>.item\nfunc main() -> i32:\n    if registry<i32>.store(7) != 1 or registry<string>.store(\"Boss\") != 1:\n        return 1\n    var held = registry<i32>(value = 9)\n    registry<i32>.count += 2\n    if not (held.value is Ok(9)) or registry<i32>.count != 3 or registry<string>.count != 1:\n        return 2\n    if not (registry<i32>.read() is Ok(7)) or not (registry<string>.read() is Ok(\"Boss\")):\n        return 3\n    print(\"managed generic state preserved\")\n    return 0\n",
+    "async_initial_note": "The initial async fixture used async main; the final fixture uses async entry through compile_async. CLI entry/scheduler semantics were preserved."
+  }
+}

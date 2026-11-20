@@ -38,15 +38,15 @@ for(auto& [id,u]:units) {
                       "Math function '"+generic.token.text+"' requires exactly f32 or f64.":
                       "Math function '"+generic.token.text+"' requires a numeric primitive, excluding bool, enums and nominal types.");
         }
-        const auto method_name=generic.receiver?specialization_name(caller.source,site,generic.token.text,arguments):std::string{};
-        const auto name=generic.receiver?receiver.definition->identity+"::method::"+method_name:specialization_name(caller.source,site,generic.symbol,arguments);
+        const auto method_name=(generic.receiver || generic.static_owner)?specialization_name(caller.source,site,generic.token.text,arguments):std::string{};
+        const auto name=(generic.receiver || generic.static_owner)?receiver.definition->identity+(generic.static_owner?"::static::":"::method::")+method_name:specialization_name(caller.source,site,generic.symbol,arguments);
         if(auto found=owner.specialized_functions.find(name);found!=owner.specialized_functions.end())return *found->second;
         if(depth>=128)error(caller.source,site,Code::nesting,"Generic specialization dependency depth limit exceeded.");
         std::vector<RelatedLocation> context{{span(caller.source,site),"Generic specialization requested here."},{span(owner.source,generic.token),"Generic declaration."}};
         Diagnostics::Context diagnostic_context(diagnostics,context,depth);
         check_constraints(caller,owner,generic.generics,arguments,site);
         std::map<std::string,Type> bindings;
-        if(generic.receiver)for(const auto& s:owner.structures)if(s.definition==receiver.definition && s.generic_origin)
+        if(generic.receiver || generic.static_owner)for(const auto& s:owner.structures)if(s.definition==receiver.definition && s.generic_origin)
             for(unsigned n=0;n<s.type_arguments.size();++n)bindings.emplace(s.generic_origin->generics[n].token.text,s.type_arguments[n]);
         for(unsigned n=0;n<arguments.size();++n)bindings.emplace(generic.generics[n].token.text,arguments[n]);
         Unit parsed(owner.source,owner.identity);Parser(owner.source,diagnostics,generic.syntax,std::move(bindings)).parse(parsed);
@@ -55,7 +55,7 @@ for(auto& [id,u]:units) {
         auto& concrete=owner.functions.back();concrete.accessor=generic.accessor;
         concrete.generic_arguments=arguments;
         for(const auto& p:generic.generics)concrete.substitution_sources.emplace(p.token.text,generic.symbol+"::type::"+p.token.text);
-        if(generic.receiver)for(const auto& s:owner.structures)if(s.definition==receiver.definition && s.generic_origin)
+        if(generic.receiver || generic.static_owner)for(const auto& s:owner.structures)if(s.definition==receiver.definition && s.generic_origin)
             for(const auto& p:s.generic_origin->generics)concrete.substitution_sources.emplace(p.token.text,s.generic_origin->definition->identity+"::type::"+p.token.text);
         concrete.symbol=name;concrete.generic_origin=generic.symbol;concrete.concrete_name=name.substr(owner.identity.size()+2);concrete.display_name=generic.token.text;concrete.concrete_method_name=method_name;concrete.specialization_depth=depth;concrete.instantiation_context=context;
         owner.specialized_functions.emplace(name,&concrete);
@@ -92,13 +92,14 @@ for(auto& [id,u]:units) {
             methods.push_back(&f);
         }
         owner.functions.splice(owner.functions.end(),parsed.functions);
-        for(auto& method:owner.generic_functions)if(method.receiver && method.generics.empty()) {
-            const auto application=std::find_if(owner.applications.begin(),owner.applications.end(),[&](const auto& a){return a.definition==method.receiver->type.definition;});
+        for(auto& method:owner.generic_functions)if((method.receiver || method.static_owner) && method.generics.empty()) {
+            const auto& receiver=method.receiver?*method.receiver:*method.static_owner;
+            const auto application=std::find_if(owner.applications.begin(),owner.applications.end(),[&](const auto& a){return a.definition==receiver.type.definition;});
             if(application==owner.applications.end() || application->name!=generic.token.text)continue;
             Unit body(owner.source,owner.identity);Parser(owner.source,diagnostics,method.syntax,bindings).parse(body);
             if(body.parse_failed || body.functions.size()!=1)throw Poison{};
             transfer_syntax(owner,body);owner.functions.splice(owner.functions.end(),body.functions);auto& f=owner.functions.back();f.accessor=method.accessor;
-            f.generic_origin=generic.definition->identity+"::method::"+method.token.text;f.display_name=generic.token.text+"::method::"+method.token.text;f.instantiation_context=context;f.specialization_depth=depth;
+            f.generic_origin=generic.definition->identity+(method.static_owner?"::static::":"::method::")+method.token.text;f.display_name=generic.token.text+"::method::"+method.token.text;f.instantiation_context=context;f.specialization_depth=depth;
             for(const auto& p:generic.generics)f.substitution_sources.emplace(p.token.text,generic.definition->identity+"::type::"+p.token.text);
             methods.push_back(&f);
             if(f.token.text=="init")concrete.initializer=&f;

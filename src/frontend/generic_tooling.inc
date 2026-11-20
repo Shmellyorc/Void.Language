@@ -40,6 +40,12 @@ for(const auto& s:unit->generic_structures) {
         AnalyzedDeclaration record{s.definition->managed?AnalyzedDeclaration::Kind::managed_field:AnalyzedDeclaration::Kind::value_field,key+"::field::"+f.name,id,f.visibility,location(f.token),{},editor_pattern_type(*f.annotation),f.constant_syntax,{},key};
         record.readonly=f.readonly;declaration(std::move(record),false);
     }
+    for(const auto& f:s.static_fields) {
+        AnalyzedDeclaration record{AnalyzedDeclaration::Kind::global_variable,key+"::static::"+f.name,id,f.visibility,location(f.token),{},f.annotation?editor_pattern_type(*f.annotation):Type(Type::none),f.constant_syntax,{},key};
+        record.generic_template=true;record.static_member=true;record.readonly=f.readonly;record.editor_symbol_kind=8;
+        record.signature=f.visibility+" static "+std::string(f.readonly?"const ":"")+spelling+"."+f.name+(f.annotation?": "+ir::type_name(editor_pattern_type(*f.annotation)):"");
+        declaration(std::move(record),false);
+    }
     // Template declarations own symbolic case signatures. Concrete references
     // supply their selected signatures without replacing these source records.
     for(unsigned n=0;n<s.definition->numeric_members.size();++n) {
@@ -86,7 +92,7 @@ for(const auto& s:unit->generic_structures) {
 }
 for(const auto& f:unit->generic_functions) {
     std::vector<Type> parameters;for(const auto& p:f.parameters)parameters.push_back(editor_pattern_type(p.type));
-    const auto owner=f.receiver?f.symbol.substr(0,f.symbol.rfind("::method::")):id;
+    const auto owner=f.static_owner?f.symbol.substr(0,f.symbol.rfind("::static::")):f.receiver?f.symbol.substr(0,f.symbol.rfind("::method::")):id;
     AnalyzedDeclaration record{f.token.text=="init"?AnalyzedDeclaration::Kind::initializer:f.receiver?AnalyzedDeclaration::Kind::receiver_method:AnalyzedDeclaration::Kind::function,f.symbol,id,f.visibility,location(f.token),parameters,editor_pattern_type(f.result),{},{},owner};
     for(const auto& p:f.parameters) {
         AnalyzedParameter parameter{p.token.text,editor_pattern_type(p.type),location(p.token)};
@@ -94,6 +100,7 @@ for(const auto& f:unit->generic_functions) {
         record.written_parameters.push_back(std::move(parameter));
     }
     if(f.source_end>f.token.offset){auto r=location(f.token);r.begin=unit->source.line_starts().at(unit->source.location(f.token.offset).line-1);r.end=f.source_end;record.extent=r;}
+    if(f.static_owner){record.static_member=true;record.editor_symbol_kind=6;record.signature=editor_signature(f);}
     if(f.accessor)record.editor_symbol_kind=7;
     record.generic_template=true;
     if(f.receiver)record.receiver=editor_pattern_type(f.receiver->type);
@@ -102,7 +109,7 @@ for(const auto& f:unit->generic_functions) {
     return_components(f);
     std::map<std::string,std::string> names;
     for(const auto& p:f.generics)names.emplace(p.token.text,f.symbol+"::type::"+p.token.text);
-    if(f.receiver)for(const auto& s:unit->generic_structures)if(s.definition->identity==owner)
+    if(f.receiver || f.static_owner)for(const auto& s:unit->generic_structures)if(s.definition->identity==owner)
         for(const auto& p:s.generics)names.emplace(p.token.text,owner+"::type::"+p.token.text);
     type_references(f.type_uses,names,f.symbol);
 }

@@ -569,6 +569,18 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/enums/lsp.py" "$<TARGET_FILE:voidls>"
     "${CMAKE_CURRENT_BINARY_DIR}/g78-enum-lsp-results.json")
   set_tests_properties(lsp_enum_completeness PROPERTIES TIMEOUT 180)
+  add_test(NAME static_members_generic_results COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/static_members/nested_generics.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g80-nested-generic-results.json")
+  set_tests_properties(static_members_generic_results PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_static_members COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/static_members/lsp.py" "$<TARGET_FILE:voidls>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g80-static-lsp-results.json")
+  set_tests_properties(lsp_static_members PROPERTIES TIMEOUT 180)
+  add_test(NAME static_members_completeness COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/static_members/completeness.py" "$<TARGET_FILE:voidc>"
+    "${CMAKE_CURRENT_BINARY_DIR}/g80-static-results.json")
+  set_tests_properties(static_members_completeness PROPERTIES TIMEOUT 240)
   add_test(NAME nullable_review_corrections COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/nullable/corrections.py" "$<TARGET_FILE:voidc>"
     "${CMAKE_CURRENT_BINARY_DIR}/g79-review-corrections-results.json")
@@ -1553,6 +1565,11 @@ if(BUILD_TESTING)
   target_link_libraries(void_operator_compounds PRIVATE void_llvm)
   add_test(NAME stage10_operator_compounds COMMAND void_operator_compounds "${PROJECT_SOURCE_DIR}")
   set_tests_properties(stage10_operator_compounds PROPERTIES TIMEOUT 180)
+  add_executable(void_static_members tests/static_members/lifecycle.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
+  target_link_libraries(void_static_members PRIVATE void_llvm void_cache_identity)
+  target_compile_definitions(void_static_members PRIVATE VOID_STATIC_SOURCE_DIR="${PROJECT_SOURCE_DIR}/tests/static_members")
+  void_add_output_test(static_members_lifecycle "$<TARGET_FILE:void_static_members>" "@VOID_TEST_OUTPUT@/g80 static lifecycle")
+  set_tests_properties(static_members_lifecycle PROPERTIES TIMEOUT 180)
   add_executable(void_globals tests/stage11/globals.cpp tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)
   target_link_libraries(void_globals PRIVATE void_llvm void_cache_identity)
   void_add_output_test(stage11_globals "$<TARGET_FILE:void_globals>" "@VOID_TEST_OUTPUT@/stage11 native fixtures")

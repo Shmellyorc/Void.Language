@@ -149,3 +149,13 @@ root visibility. Unsaved overlays and stale-result rejection keep the existing
 language service contract. Installed standard sources remain protected. Editors
 do not execute startup or maintain a separate semantic parser. The separate
 result/Ok/Err/parameter-documentation hover repair is outside this assignment.
+
+## User-defined type state — G80
+
+[Static fields](STATIC_MEMBERS.md) lower to these same rooted, eager runtime cells;
+static methods are ordinary functions with a validated nominal access context and
+no receiver. Module and type fields share source-order startup. Concrete generic
+owners have independent cells, with canonical identity resolving equal-site ties.
+Static const fields preserve readonly authority. Existing unpublished-cell failure,
+owner-thread/worker checks, cache isolation, resource drain and reload contracts
+remain in force. This adds no lazy initialization or second Runtime state system.

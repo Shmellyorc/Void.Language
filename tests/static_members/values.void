@@ -1,0 +1,51 @@
+## Mutable application settings shared by all instances.
+struct game_settings:
+    ## Maximum simultaneous players.
+    static max_players: i32 = 4
+    private static debug_mode = true
+    ## Stable name with readonly authority.
+    static const label = "Boss"
+    instance: i32
+## Restore the public settings and private debug switch.
+## @return No value; updates this type's shared settings.
+static func game_settings.reset():
+    game_settings.max_players = 4
+    game_settings.debug_mode = false
+## Read the private debugging switch through its owner's API.
+## @return The current debug flag.
+static func game_settings.debugging() -> bool:
+    return game_settings.debug_mode
+## Add a value without any instance receiver.
+## @param amount Number of players to add; defaults to one.
+## @return The updated maximum player count.
+static func game_settings.add(amount: i32 = 1) -> i32:
+    game_settings.max_players += amount
+    return game_settings.max_players
+## A vector whose factories and fields coexist.
+value struct vector2:
+    x: i32
+    y: i32
+    static count = 0
+## Construct the origin and count calls.
+## @return A zero vector.
+static func vector2.zero() -> vector2:
+    vector2.count += 1
+    return vector2(x = 0, y = 0)
+func preserve<t>(value: t) -> t:
+    return value
+func main() -> i32:
+    var first = game_settings(instance = 9)
+    var second = game_settings(instance = 3)
+    if game_settings.add(amount = 2) != 6 or first.instance != 9 or second.instance != 3:
+        return 1
+    game_settings.reset()
+    var origin = vector2.zero()
+    if game_settings.debugging() or game_settings.max_players != 4 or game_settings.label != "Boss":
+        return 2
+    var callback = preserve(game_settings.add)
+    if callback(3) != 7 or origin.x != 0 or origin.y != 0 or vector2.count != 1:
+        return 3
+    if "{game_settings.add()}:{game_settings.add()}" != "8:9" or game_settings.max_players != 9:
+        return 4
+    print("static values preserved")
+    return 0

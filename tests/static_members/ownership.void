@@ -1,0 +1,28 @@
+struct node:
+    value: i32
+value struct owner:
+    static object = node(value = 5)
+    static values: [node] = [owner.object]
+    static fixed: [i32, 2] = [1, 2]
+    static table: {string: node} = {"boss": owner.object}
+    static optional: string? = ""
+    static const frozen = node(value = 8)
+static func owner.bump() -> i32:
+    var count = 0
+    var update = func() -> i32:
+        count += 1
+        owner.object.value += 1
+        return count + owner.object.value
+    return update()
+func main() -> i32:
+    var snapshot = owner.fixed
+    snapshot[0] = 9
+    owner.fixed[1] = 7
+    if owner.bump() != 7 or owner.values[0].value != 6 or owner.table["boss"].value != 6:
+        return 1
+    if owner.fixed[0] != 1 or owner.fixed[1] != 7 or owner.frozen.value != 8:
+        return 2
+    if not (owner.optional is Ok("")):
+        return 3
+    print("static roots preserved")
+    return 0

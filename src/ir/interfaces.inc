@@ -153,11 +153,11 @@ std::string generic_instance_identity(const Module& m,const Module::GenericInsta
     if(declaration==m.generic_declarations.end() || proof.arguments.size()!=declaration->second.arity)
         throw std::invalid_argument("Invalid generic declaration/argument provenance.");
     auto base=proof.declaration;
-    if(function && function->receiver) {
-        const auto separator=base.rfind("::method::");
-        if(separator==std::string::npos || function->parameters.empty())
+    if(function && (function->receiver || function->static_member)) {
+        const auto separator=base.rfind(function->static_member?"::static::":"::method::");
+        if(separator==std::string::npos || (!function->static_member && function->parameters.empty()))
             throw std::invalid_argument("Generic method has no declaring receiver.");
-        const auto owner=base.substr(0,separator), receiver=Type::key(function->parameters[0]);
+        const auto owner=base.substr(0,separator), receiver=function->static_member?function->lexical_owner:Type::key(function->parameters[0]);
         if(owner!=receiver) {
             auto bound=m.generic_instances.find(receiver);
             auto nominal=m.generic_declarations.find(owner);
@@ -194,6 +194,7 @@ std::vector<Type> generic_operator_arguments(const Module& m,const Function& fun
         if(!seen.insert(current->name).second)throw std::invalid_argument("Cyclic generic operator lexical provenance.");
         instance(current->name);
         if(current->receiver && !current->parameters.empty())instance(Type::key(current->parameters[0]));
+        if(current->static_member)instance(current->lexical_owner);
         if(current->lexical_parent.empty())break;
         auto parent=std::find_if(m.functions.begin(),m.functions.end(),[&](const auto& f){return f.name==current->lexical_parent;});
         if(!current->closure || parent==m.functions.end() || current->module_identity!=parent->module_identity ||

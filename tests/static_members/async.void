@@ -1,0 +1,26 @@
+value struct utilities:
+    static count = 0
+## Compute without accessing shared application state.
+## @param value Input integer.
+## @return The next integer.
+static func utilities.increment(value: i32) -> i32:
+    return value + 1
+## Compute privately without accessing shared application state.
+## @param value Input integer.
+## @return The next integer.
+private static func utilities.private_increment(value: i32) -> i32:
+    return value + 1
+## Exercise owner async state and safe worker snapshots.
+## @param value Input integer.
+## @return The combined worker results.
+static async func utilities.combine(value: i32) -> i32:
+    utilities.count += 1
+    var first = spawn utilities.increment(value)
+    var second = spawn utilities.private_increment(value)
+    return await first + await second
+async func entry(value: i32) -> i32:
+    var result = await utilities.combine(3)
+    if result != 8 or utilities.count != 1:
+        return 1
+    print("static async preserved")
+    return 0

@@ -195,6 +195,7 @@ struct Function {
     std::string lexical_owner = {}, lexical_parent = {};
     Type operator_owner = Type::none;
     std::string operator_glyph = {};
+    bool static_member = false; // Validated nominal lexical context, no receiver.
 };
 bool checked_storage_cleanup_return(const Function&, unsigned block, const CPrimitiveAdmission* = nullptr);
 bool operator_arity(std::string_view glyph,std::size_t arity);
@@ -206,6 +207,7 @@ struct Global {
     Type cell;
     std::string initializer, syntax;
     SourceLocation source;
+    std::string static_owner = {};
 };
 struct Module {
     std::string identity;

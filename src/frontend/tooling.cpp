@@ -86,6 +86,8 @@ SemanticToken::Kind semantic_kind(const AnalyzedDeclaration& d) {
     using K=SemanticToken::Kind;
     // These editor kinds come from validated enum, accessor and event declarations.
     switch(d.editor_symbol_kind) {
+    case 6: return K::method;
+    case 8: return K::property;
     case 7: return K::property;
     case 10: return K::enumeration;
     case 22: return K::enum_member;
@@ -193,7 +195,7 @@ struct Graph {
         }
         for(const auto& d:analysis.declarations()) {
             declarations.emplace(d.identity,&d);
-            if(d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field || d.kind==AnalyzedDeclaration::Kind::managed_field || d.kind==AnalyzedDeclaration::Kind::interface_requirement || d.kind==AnalyzedDeclaration::Kind::receiver_method || d.kind==AnalyzedDeclaration::Kind::initializer || d.kind==AnalyzedDeclaration::Kind::operator_function) references[d.identity].insert(d.owner);
+            if(d.static_member || d.kind==AnalyzedDeclaration::Kind::local_constant || d.kind==AnalyzedDeclaration::Kind::value_field || d.kind==AnalyzedDeclaration::Kind::managed_field || d.kind==AnalyzedDeclaration::Kind::interface_requirement || d.kind==AnalyzedDeclaration::Kind::receiver_method || d.kind==AnalyzedDeclaration::Kind::initializer || d.kind==AnalyzedDeclaration::Kind::operator_function) references[d.identity].insert(d.owner);
         }
         for(const auto& r:analysis.references()) {
             references[r.to].insert(r.from); bindings[r.from].push_back(r.binding_contract.empty()?r.to:r.binding_contract);
@@ -202,7 +204,7 @@ struct Graph {
 };
 bool metadata_equal(const AnalyzedDeclaration& a,const AnalyzedDeclaration& b) {
     auto same_type=[](auto x,auto y) { return x==y && x.readonly==y.readonly && x.readonly_references==y.readonly_references; };
-    return a.operator_glyph==b.operator_glyph && a.readonly==b.readonly && a.base_identity==b.base_identity && a.virtual_slot==b.virtual_slot && a.override_target==b.override_target && a.using_field==b.using_field && a.kind==b.kind && a.module==b.module && a.owner==b.owner && a.visibility==b.visibility &&
+    return a.static_member==b.static_member && a.operator_glyph==b.operator_glyph && a.readonly==b.readonly && a.base_identity==b.base_identity && a.virtual_slot==b.virtual_slot && a.override_target==b.override_target && a.using_field==b.using_field && a.kind==b.kind && a.module==b.module && a.owner==b.owner && a.visibility==b.visibility &&
         a.parameters.size()==b.parameters.size() && std::equal(a.parameters.begin(),a.parameters.end(),b.parameters.begin(),same_type) && same_type(a.type,b.type) && a.constant_syntax==b.constant_syntax && a.value==b.value && same_type(a.receiver,b.receiver) && a.receiver_mutates==b.receiver_mutates && a.initialization_contract==b.initialization_contract && a.capability_contract==b.capability_contract && a.construction_parameters==b.construction_parameters && a.required_initialization_fields==b.required_initialization_fields;
 }
 void merge(Edges& into,const Edges& from) {

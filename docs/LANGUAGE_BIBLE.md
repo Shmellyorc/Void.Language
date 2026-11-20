@@ -624,7 +624,7 @@ A `.void` module may contain private functions and top-level instances, rather t
 
 ## 11. Visibility and `static` [AGREED]
 
-**Implemented clarification:** Public/internal/file-private ownership and direct-owner imports are enforced for current source declarations. Later phases establish receiver ownership, one-hop composition, managed inheritance, exact virtual overrides and structural interface lookup. Richer protected access and static member source syntax beyond the existing supported surface remain future work; do not erase approved object semantics because this broader section is incomplete.
+**Implemented clarification:** Public/internal/file-private ownership and direct-owner imports are enforced for current source declarations. Later phases establish receiver ownership, one-hop composition, managed inheritance, exact virtual overrides and structural interface lookup. G80 implements user-defined static fields and methods under [STATIC_MEMBERS.md](STATIC_MEMBERS.md). Richer protected access remains future work; do not erase approved object semantics because this broader section is incomplete.
 
 - **Public by default.** Omit the `public` keyword in ordinary declarations.
 - `public` may be written explicitly for documentation or library APIs.
@@ -1066,20 +1066,33 @@ property (p player) health_percent: f32:
 
 Property getter/setter **body** changes should be hot-reloadable; changing property signature or backing-field layout requires manual restart. Accessors use the same source documentation and IntelliSense metadata as methods. Automatic C#-style properties such as `get; private set;` are not planned unless a real need emerges.
 
-## 19. Static fields and methods [AGREED / method syntax RECOMMENDED]
+## 19. Static fields and methods [IMPLEMENTED — G80]
 
-`static` marks type-level state/behavior and can combine with access modifiers. An instance is not needed to access them.
+`static` marks type-level state/behavior and combines with visibility. Managed and
+value structs support inferred or annotated runtime fields and readonly
+`static const` fields. No instance is needed:
 
-```python
+```void
 struct game_settings:
     static max_players: i32 = 4
     private static debug_mode = false
 
+## Restore shared settings.
+## @return No value; resets the owner's shared debug state.
 static func game_settings.reset():
     game_settings.debug_mode = false
 ```
 
-Agreed concept: shared type state and functions. Proposed spelling: `static func type_name.method_name(...)`. Exact syntax for type-qualified declarations outside the struct and initialization/thread safety remains to be formalized.
+Methods have no hidden receiver. Named/default arguments, returns, visibility,
+ordinary callable values and generic specialization reuse existing functions.
+Each concrete generic owner gets independent state. Static fields reuse eager
+runtime-global initialization, ownership, GC roots, owner-thread restrictions and
+reload guards. They are runtime state even when readonly; compile-time and
+instance/parameter defaults cannot read them. Type-qualified lookup preserves
+nominal identity and distinguishes instance members. Full syntax, source order,
+private access, async boundaries and limits are in
+[Static members](STATIC_MEMBERS.md); [G80 evidence](projects/G80_STATIC_MEMBERS.md)
+records native platform qualification.
 
 ## 20. Callable structs and function-valued members [AGREED]
 
@@ -3184,7 +3197,7 @@ This section matters especially when an AI assistant inherits this file without 
 1. **`const` and deep immutability:** [IMPLEMENTED CORE: P3/RV deep readonly access, not global freezing] P3/RV implement deep readonly reference **views**, not object-wide freezing: mutation through a `const` reference or any derived copy/view is rejected, while an independent mutable alias still works. Module `const` is pure compile-time, local `const` is runtime readonly. A separate globally-frozen-object feature and any broader borrowing optimization require distinct future approval.
 2. **File/module import identity:** [IMPLEMENTED CORE: local VFS and explicit dependency identity] Local VFS identity and imports normalize in-root `../`, repeated paths, import cycles and exact-case spellings; symlinks/redirected imported components and duplicate hard-link identities are rejected by current policy. Explicit local/immutable Git package identities and locks follow [package maintenance](LOCAL_LIBRARIES.md#g26-installed-source-packages-and-maintenance); arbitrary root-escaping imports and unclaimed identity extensions remain outside that contract.
 3. **Exact grammar for module scopes:** [IMPLEMENTED CORE: compile-time root constants/cycle rules; runtime globals open] Public/internal entry-file compile-time root constants, project-wide name collisions and structural constant dependency cycles have implemented deterministic rules. Runtime file-level mutable variables, their initialization order and runtime dependency cycles remain unimplemented and undecided.
-4. **Static syntax:** [FUTURE DESIGN: full static member grammar] The concept is accepted; `static func type.method()` grammar and visibility combinations need a parser contract.
+4. **Static syntax:** [IMPLEMENTED — G80] Type-qualified static fields/methods, visibility, generic owner state and runtime lifecycle follow [STATIC_MEMBERS.md](STATIC_MEMBERS.md).
 5. **Object-model boundary:** [IMPLEMENTED CORE: I1–I8 and IF1–IF8 bounded semantics; richer OOP open] Phase 20 implements owner-approved I1–I8 for managed inheritance, substitutability, exact overrides, explicit super preludes, prefix layouts, guarded leased dispatch and conservative reload. Ordinary methods remain nonvirtual. Protected/richer visibility, hiding, variance/covariance, abstract/final, source downcasts/type patterns, automatic constructor chaining and open-world loading remain deferred. Phase 21 implements owner-approved IF1–IF8 for managed-backed structural views with exact conformance, original ownership, readonly effects, precise roots and guarded leased dispatch. Standalone value erasure, interface inheritance/defaults, dynamic type tests and richer conversions remain deferred; Phase 24 adds compile-time constraints without value erasure; no mandatory implements keyword is introduced. See Sections 12.1 and 13 and INHERITANCE.md.
 6. **Construction:** [IMPLEMENTED CORE: C1/S1 init; fallible/resource init open] `init()` is implemented for approved value and managed structs: custom-init calls bind constructor arguments solely to init parameters; types without init retain named-field construction; derived initialization uses an explicit `super.init(...)` prelude. Fallible `result`-returning init, native-resource rollback/destruction and richer constructor escape remain future design.
 7. **`value struct` native ownership:** [FUTURE DESIGN: resource-owning value copies] Ensure copying cannot double-release a native handle; initially restrict resource-owning value types or introduce an explicit safe transfer contract.

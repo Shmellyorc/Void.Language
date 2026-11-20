@@ -814,3 +814,12 @@ Hover, completion details and signatures retain explicit nullable spelling,
 including `i32?`, `string?`, `[string]?` and `player?`. Generic declarations remain
 symbolic (`t?`); concrete calls show concrete nullable signatures. Private nullable
 storage names are not members or public symbols. See [nullable types](NULLABLE_TYPES.md).
+
+## User-defined static members — G80
+
+With the matching compiler/server, type-qualified static fields and methods have
+compiler-owned hover, completion, parameter help, definition/reference navigation
+and static semantic modifiers. Type completion excludes instance and inaccessible
+members. Generic declarations remain symbolic; concrete usages show concrete,
+readable types. The TextMate grammar also colors `static` before semantic analysis
+is ready. [Static-member syntax and lifecycle](STATIC_MEMBERS.md).

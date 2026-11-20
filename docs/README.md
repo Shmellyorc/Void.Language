@@ -17,7 +17,7 @@ holds in historical records do not govern current work.
   [value structs](VALUE_STRUCTS.md), [reference/value structs](REFERENCE_VALUE_STRUCTS.md),
   [managed structs](MANAGED_STRUCTS.md), [initialization](INITIALIZATION.md),
   [managed initialization](MANAGED_INITIALIZATION.md), [composition](COMPOSITION.md),
-  [inheritance](INHERITANCE.md), [receiver methods](RECEIVER_METHODS.md), [properties](PROPERTIES.md).
+  [inheritance](INHERITANCE.md), [receiver methods](RECEIVER_METHODS.md), [static members](STATIC_MEMBERS.md), [properties](PROPERTIES.md).
 - [Fixed arrays](FIXED_ARRAYS.md), [growable arrays](GROWABLE_ARRAYS.md),
   [array operations](ARRAY_OPERATIONS.md), [dictionaries](DICTIONARIES.md),
   [generics](GENERICS.md), [nullable types](NULLABLE_TYPES.md), [interfaces](INTERFACES.md), [advanced language](ADVANCED_LANGUAGE.md).

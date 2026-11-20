@@ -134,3 +134,12 @@ structural conformance, generic specialization, capabilities and checked failure
 rules remain authoritative. Both conditional branches type-check. Formatting and
 numeric/bool/custom string conversion remain deferred. Approval and implementation
 are separate from local acceptance, Wrench review and the final hosted lock.
+
+## Static members of generic owners
+
+G80 gives each concrete generic struct specialization independent static fields.
+`storage<i32>.item` and `storage<string>.item` do not share a cell. Static methods
+bind the owner's declared parameters without a receiver and may add distinct
+method-specific parameters. Generic declarations retain symbolic editor types;
+concrete uses retain nominal identities and concrete signatures. See
+[Static members](STATIC_MEMBERS.md#generic-owners) for initialization and access rules.
