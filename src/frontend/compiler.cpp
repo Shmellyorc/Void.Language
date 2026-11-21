@@ -93,6 +93,10 @@ SourceSpan span(const SourceFile& source, const Token& token) {
 // A poisoned dependency has already produced a primary error. It is never a value.
 struct Poison {};
 const Type error_type = Type::invalid; // AST-only; the lowering gate excludes it.
+struct Expr;
+struct Statement;
+struct Function;
+struct Unit;
 struct EditorProbe {
     std::string module;
     std::size_t offset;
@@ -102,8 +106,20 @@ struct EditorProbe {
     std::map<std::string,unsigned> candidate_occurrences;
     unsigned operator_occurrences = 0;
     std::string prefix;
+    // A receiver needing effects is completed only after the ordinary compiler
+    // stabilizes reference profiles. The unfinished activation remains opaque.
+    Expr* receiver = nullptr;
+    Function* function = nullptr;
+    Unit* owner = nullptr;
+    bool finalizing = false, readonly_storage = false, receiver_addressable = true;
 };
 struct EditorProbeFound {};
+struct EditorReceiverFound {
+    Statement* statement;
+    std::unique_ptr<Expr> receiver;
+    Token site;
+    bool readonly_storage, addressable;
+};
 // A second editor-only parse may recognize a small number of safe holes in
 // one open source. The ordinary analysis still owns all reported diagnostics.
 struct EditorRecovery {
@@ -537,7 +553,7 @@ struct GenericParameter { Token token; std::optional<Type> constraint; std::vect
 struct ReturnComponent { Token site; std::optional<Token> name; Type type; };
 struct Function {
     struct Capture {unsigned outer_slot;Type cell;Token token;bool snapshot=false;};
-    bool collection_adapter=false;
+    bool collection_adapter=false, positional_only=false;
     bool json_adapter=false, enum_adapter=false;
     bool global_initializer=false;
     std::optional<Parameter> static_owner; // Type context only; never an ABI receiver.
@@ -1890,6 +1906,7 @@ class Semantics {
     std::function<Variable*(const std::string&,bool)> enclosing;
     std::vector<std::map<std::string, Variable>> scopes;
     Function* current = nullptr;
+    Statement* editor_statement = nullptr;
     const Function* default_context = nullptr;
     bool inferring_default=false;
     unsigned loops = 0;
@@ -2206,18 +2223,17 @@ class Semantics {
         unit.builtins.insert_or_assign(function.symbol,std::move(record));
     }
 #include "enum_api.inc"
-    VOID_SEMANTIC_HANDLER Type text_property(Expr& e) {
-        if(!current)error(source,e.token,Code::constant_call,"String inspection requires runtime evaluation.");
-        e.target="$text."+e.token.text;Function property;property.token=e.token;property.result=Type::i64;property.symbol=e.target;
-        builtin_record(property,e.token.text=="length"?"Unicode scalar count (i64); no grapheme segmentation.":"UTF-8 byte count (i64), including embedded NUL.");
-        auto& record=unit.builtins.at(property.symbol);record.kind=AnalyzedDeclaration::Kind::module_constant;
-        record.editor_symbol_kind=7;record.readonly=true;e.source_target=e.target;return e.type=Type::i64;
+#include "core_members.inc"
+    // Signature construction owns a Function-sized temporary. Keep it out of
+    // recursive method/field hint frames at the unchanged 1 MiB stack limit.
+    VOID_SEMANTIC_HANDLER std::optional<Type> core_member_anchor(const Type& receiver,const Token& token,bool type_level=false,bool property=false) {
+        const auto* api=core_member(receiver,token.text,type_level);
+        if(!api || api->property!=property)return {};
+        return core_signature(*api,receiver,token).result;
     }
     VOID_SEMANTIC_HANDLER Type text_type_call(Expr& e) {return core_call(e,Type::string,true);}
     VOID_SEMANTIC_HANDLER std::optional<Type> text_anchor() {return Type::string;}
     VOID_SEMANTIC_HANDLER std::optional<Type> text_result_anchor() {return unit.make_result(Type::string,Type::string);}
-    VOID_SEMANTIC_HANDLER std::optional<Type> core_result_anchor(const Type& receiver) {return unit.make_result(receiver.kind==Type::dictionary?ir::dictionary_value(receiver):ir::array_element(receiver),Type::string);}
-    VOID_SEMANTIC_HANDLER std::optional<Type> byte_list_anchor() {return byte_list();}
     VOID_SEMANTIC_HANDLER Type text_index_expression(Expr& e) {
         if(!current)error(source,e.token,Code::constant_call,"String indexing requires runtime evaluation.");
         if(!numeric::integer(expression(*e.parts[1])))error(source,e.parts[1]->token,Code::type_mismatch,"String index requires an integer, excluding bool and floats.");e.target="$text.index";return e.type=Type::string;
@@ -2225,30 +2241,22 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type core_call(Expr& e,const Type& receiver,bool type_level=false) {
         if(!current)error(source,e.token,Code::constant_call,"Text and collection APIs require runtime evaluation.");
         if(!e.type_arguments.empty())error(source,e.token,Code::argument_count,"Core members do not take explicit generic arguments.");
-        Function target;target.token=e.token;std::string documentation;std::optional<Type> argument;std::string name;
-        if(type_level) {
-            if(e.token.text!="from_utf8")error(source,e.token,Code::unknown_method,"The string type exposes from_utf8(bytes).");
-            e.target="$text.from_utf8";target.result=unit.make_result(Type::string,Type::string);argument=ir::readonly_view(byte_list());name="bytes";documentation="Copy and validate owned UTF-8 bytes; malformed encoding returns Err(\"invalid UTF-8\").";
-        } else if(receiver==Type::string) {
-            if(e.token.text!="to_utf8")error(source,e.token,Code::unknown_method,"String methods expose to_utf8().");
-            e.target="$text.to_utf8";target.result=byte_list();documentation="Copy immutable text into a fresh independent UTF-8 byte list.";
-        } else {
-            const bool pop=e.token.text=="pop";
-            if(pop && receiver.kind!=Type::growable_array)error(source,e.token,Code::type_mismatch,"Only growable lists support pop().");
-            auto value=receiver.kind==Type::dictionary?ir::dictionary_value(receiver):ir::array_element(receiver);
-            target.result=unit.make_result(value,Type::string);e.target=receiver.kind==Type::dictionary?"$safe.dict.get":pop?"$safe.array.pop":"$safe.array.get";
-            if(!pop){name=receiver.kind==Type::dictionary?"key":"index";argument=receiver.kind==Type::dictionary?ir::readonly_view(ir::dictionary_key(receiver)):Type(Type::i32);
-                if(receiver.kind!=Type::dictionary && e.parts.size()==2 && !editor_cursor(*e.parts[1])){auto t=expression(*e.parts[1]);if(!numeric::integer(t))error(source,e.parts[1]->token,Code::type_mismatch,"Collection index requires an integer, excluding bool and floats.");argument=t;}}
-            documentation=pop?"Remove the last list value; empty lists return Err(\"empty list\") without mutation.":"Recoverable lookup preserving value copies and deep readonly authority.";
-        }
-        target.symbol=e.target+"::"+ir::capability_key(receiver)+(argument?"::"+ir::capability_key(*argument):"");
-        if(argument)target.parameters.push_back({Token{TokenKind::name,name,e.token.offset},*argument});
-        builtin_record(target,documentation);
-        auto& record=unit.builtins.at(target.symbol);record.kind=AnalyzedDeclaration::Kind::receiver_method;record.static_member=type_level;
-        if(argument)record.documentation.parameters.push_back({name,type_level?"The UTF-8 bytes to validate and copy.":receiver.kind==Type::dictionary?"The key to look up.":"The index to look up; negative indexes count from the end.",{}});e.source_target=target.symbol;
+        const auto* api=core_member(receiver,e.token.text,type_level);
+        if(!api || api->property)error(source,e.token,Code::unknown_method,"Unknown callable member '"+e.token.text+"' in "+ir::type_name(receiver)+".");
+        auto target=core_signature(*api,receiver,e.token);
+        const auto first=type_level?0u:1u;
         if(type_level)e.parts.erase(e.parts.begin());
-        const auto result=call_arguments(e,target,type_level?0:1);
-        return e.type=result;
+        if(api->positional && std::any_of(e.names.begin(),e.names.end(),[](const auto& n){return !n.text.empty();}))
+            error(source,e.token,Code::argument_count,"Incorrect positional arguments for collection operation.");
+        if(!target.parameters.empty() && target.parameters.front().token.text=="index" && e.parts.size()>first && !editor_cursor(*e.parts[first])) {
+            auto index=expression(*e.parts[first]);
+            if(!numeric::integer(index))error(source,e.parts[first]->token,Code::type_mismatch,"Collection index requires an integer, excluding bool and floats.");
+            target.parameters.front().type=index;
+            if(e.token.text=="get")target.symbol=target.symbol.substr(0,target.symbol.rfind("::"))+"::"+ir::capability_key(index);
+        }
+        core_record(*api,target,receiver,type_level);
+        e.target=target.symbol.substr(0,target.symbol.find("::"));e.source_target=target.symbol;
+        return e.type=call_arguments(e,target,first);
     }
 #include "static_members.inc"
     VOID_SEMANTIC_HANDLER Type method_expression(Expr& e) {
@@ -2286,7 +2294,7 @@ class Semantics {
     VOID_SEMANTIC_HANDLER Type resolved_method_expression(Expr& e,Type receiver) {
         if(auto result=enum_value_api(e,receiver,true))return *result;
         if(numeric::number(receiver))return numeric_call(e,receiver,false);
-        if(receiver.kind==Type::string || (ir::collection_type(receiver) && (e.token.text=="get" || e.token.text=="pop")))return core_call(e,receiver);
+        if(core_member(receiver,e.token.text))return core_call(e,receiver);
         if(e.parts[0]->event){
             bool owner=false;if(current && current->receiver)for(auto type=current->receiver->type.definition;type;type=type->base.lock())owner|=type->identity==e.parts[0]->event_owner;
             if(e.token.text!="emit" || !owner)error(source,e.token,Code::visibility,"Only methods of the event owner may emit it.");
@@ -2294,28 +2302,6 @@ class Semantics {
             for(unsigned n=1;n<e.parts.size();++n){auto parameter=Type(signature.definition->call_parameters[n-1]);expect(expression(*e.parts[n],parameter),parameter,e.parts[n]->token);}e.target="$event.emit";return e.type=Type::none;
         }
         if(receiver.definition && receiver.definition->callable && e.token.text=="call"){e.kind=Expr::Kind::function_call;return function_invocation(e);}
-        if(receiver.kind==Type::dictionary && (e.token.text=="contains" || e.token.text=="remove" || e.token.text=="clear" || e.token.text=="get")) {
-
-            if(!current)error(source,e.token,Code::constant_call,"Dictionary operations require runtime evaluation.");
-            if(e.parts.size()!=(e.token.text=="clear"?1u:2u) || std::any_of(e.names.begin(),e.names.end(),[](const auto& n){return !n.text.empty();}))error(source,e.token,Code::argument_count,"Incorrect dictionary positional arguments.");
-            if(e.parts.size()==2)expect(expression(*e.parts[1],ir::readonly_view(ir::dictionary_key(receiver))),ir::readonly_view(ir::dictionary_key(receiver)),e.parts[1]->token);
-            e.target="$dict."+e.token.text;return e.type=e.token.text=="clear"?Type(Type::none):Type(Type::boolean);
-        }
-        if(ir::array_type(receiver) && (e.token.text=="push" || e.token.text=="remove_at" || e.token.text=="insert" || e.token.text=="clear" || e.token.text=="pop")) {
-
-            if(!current)error(source,e.token,Code::constant_call,"List mutation is not a pure constant expression.");
-            if(receiver.kind!=Type::growable_array)error(source,e.token,Code::type_mismatch,"Fixed arrays cannot change length.");
-            const auto count=e.token.text=="clear"?1u:e.token.text=="insert"?3u:2u;
-            if(e.parts.size()!=count || std::any_of(e.names.begin(),e.names.end(),[](const auto& n){return !n.text.empty();}))error(source,e.token,Code::argument_count,"Incorrect positional arguments for list operation.");
-            e.target="$array."+e.token.text;
-            if(count>1) {
-                const bool index=e.token.text!="push";auto argument=expression(*e.parts[1],index?std::nullopt:std::optional(ir::array_element(receiver)));
-                if(index){if(!numeric::integer(argument))error(source,e.parts[1]->token,Code::type_mismatch,"List index requires an integer, excluding bool and floats.");}
-                else expect(argument,ir::array_element(receiver),e.parts[1]->token);
-            }
-            if(count==3)expect(expression(*e.parts[2],ir::array_element(receiver)),ir::array_element(receiver),e.parts[2]->token);
-            return e.type=e.token.text=="remove_at"?ir::array_element(receiver):Type(Type::none);
-        }
         if (!current) error(source,e.token,Code::constant_call,"A compile-time constant cannot call a method.","Use a local const for runtime values.");
         if (e.token.text == "init")
             error(source,e.token,Code::initializer_deferred,"Lifecycle methods cannot be called directly; construct a new value using its type.");
@@ -2444,7 +2430,7 @@ class Semantics {
         const auto& label=e.names[*active-first];
         const bool editing_label=editor_cursor(label);
         const bool bare_cursor=label.text.empty() && e.parts[*active]->kind==Expr::Kind::name && editor_cursor(*e.parts[*active]);
-        if((editing_label || bare_cursor) && !invalid_function && !unit.failed_import &&
+        if((editing_label || bare_cursor) && !target.positional_only && !invalid_function && !unit.failed_import &&
            !(current && current->parse_failed) && (!selected_docs || !target.generics.empty()) &&
            !target.symbol.starts_with("$result::") && !target.symbol.starts_with("$nullable::")) {
             // Bind every other written argument through the ordinary mapper.
@@ -2843,17 +2829,15 @@ class Semantics {
         if(auto result=static_expression(e,true,true))return result;
         using K=Expr::Kind;
         if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
-        if(text_type_base(*e.parts[0]) && e.token.text=="from_utf8")return text_result_anchor();
+        if(text_type_base(*e.parts[0]))return core_member_anchor(Type::string,e.token,true);
         if(primitive_base_selected(*e.parts[0]))return primitive_anchor(*e.parts[0]);
         if (module_call(e)) {
             return qualified_anchor(e,K::call);
         }
         auto receiver = anchor(*e.parts[0]);
         if (!receiver) return std::nullopt;
-        if(receiver->kind==Type::string && e.token.text=="to_utf8")return byte_list_anchor();
-        if(ir::collection_type(*receiver) && (e.token.text=="get" || (receiver->kind==Type::growable_array && e.token.text=="pop")))return core_result_anchor(*receiver);
+        if(auto result=core_member_anchor(*receiver,e.token))return result;
         if(numeric::number(*receiver) && numeric::member(e.token.text))return *receiver;
-        if(ir::array_type(*receiver) && e.token.text=="remove_at")return ir::array_element(*receiver);
         if(auto* specialized=concrete_method(e,*receiver))return call_result_anchor(*specialized);
         auto selected=member(*receiver,e.token,true);
         if(selected.function)return call_result_anchor(*selected.function);
@@ -2896,7 +2880,7 @@ class Semantics {
             if(e.token.text=="name")return Type::string;
             if(e.token.text=="value" && base->kind==Type::numeric_enum)return Type(*base->definition->enum_backing);
         }
-        if(base && ((base->kind==Type::string && (e.token.text=="length" || e.token.text=="byte_length")) || (ir::collection_type(*base) && e.token.text=="count")))return Type::i64;
+        if(base)if(auto result=core_member_anchor(*base,e.token,false,true))return result;
         if (base && (base->kind == Type::aggregate || base->kind == Type::managed_ref)) {
             auto selected=member(*base,e.token);
             if (!selected.function) { auto t=*base; for (auto index:selected.path) t=ir::field_type(t,index); return t; }
@@ -3031,6 +3015,34 @@ class Semantics {
             diagnostics.editor->offset==token.offset && token.text=="_void_editor_cursor_";
     }
     bool editor_cursor(const Expr& e) const {return editor_cursor(e.token);}
+    bool editor_mutable_storage(const Expr& expression) {
+        const Expr* selected=&expression;
+        while(selected->kind==Expr::Kind::field || (selected->kind==Expr::Kind::method_call && selected->property)) {
+            if(selected->property) {if(selected->setter.empty())return false;}
+            else if(selected->parts[0]->type.definition->fields.at(selected->slot).readonly)return false;
+            if(selected->parts[0]->type.kind==Type::managed_ref)return !ir::readonly_paths(selected->parts[0]->type).contains({});
+            selected=selected->parts[0].get();
+        }
+        if(selected->kind==Expr::Kind::name) {
+            if(auto* variable=lookup(selected->token.text))return !variable->readonly;
+            return true; // Finalized probes use the captured storage permission.
+        }
+        return selected->kind==Expr::Kind::global;
+    }
+    bool editor_method_available(const Function& function,Type receiver,const std::vector<unsigned>& path,const Expr& expression) {
+        const bool storage=receiver.kind==Type::managed_ref || (editor_mutable_storage(expression) &&
+            (!diagnostics.editor->finalizing || diagnostics.editor->receiver_addressable));
+        bool readonly=receiver.readonly;
+        for(auto field:path){readonly|=receiver.definition->fields[field].readonly;receiver=ir::field_type(receiver,field);}
+        const bool restricted=readonly || !ir::readonly_paths(receiver).empty();
+        if(!diagnostics.editor->finalizing)return !restricted;
+        if(function.receiver_mutates && (readonly || (receiver.kind==Type::aggregate && !storage)))return false;
+        const auto& effects=function.virtual_slot.empty()?function.reference_effects:function.virtual_effects;
+        const auto paths=ir::readonly_paths(receiver);
+        for(const auto* requirements:{&effects.mutations,&effects.retained,&effects.required_mutable})
+            for(const auto& origin:*requirements)if(origin.parameter==0 && paths.contains(origin.path))return false;
+        return true;
+    }
     VOID_SEMANTIC_HANDLER void editor_candidates(Expr& e, std::optional<Type> receiver = {}) {
         observation::Scope timing(observation::EditorDetail::candidates);
         auto& out=diagnostics.editor->result;
@@ -3043,11 +3055,16 @@ class Semantics {
         };
         if(receiver) {
             auto t=*receiver;
-            if(t==Type::string || ir::collection_type(t)) {
-                if(t==Type::string){if(text_type_base(*e.parts[0]))add("from_utf8",unit.make_result(Type::string,Type::string),2);else{add("length",Type::i64,10);add("byte_length",Type::i64,10);add("to_utf8",byte_list(),2);}}
-                else {add("count",Type::i64,10);auto value=t.kind==Type::dictionary?ir::dictionary_value(t):ir::array_element(t);add("get",unit.make_result(value,Type::string),2);
-                    if(!t.readonly && !ir::readonly_paths(t).contains({})){if(t.kind==Type::growable_array)for(const auto& name:{"pop","push","remove_at","insert","clear"})add(name,name==std::string("pop")?unit.make_result(value,Type::string):name==std::string("remove_at")?value:Type(Type::none),2);if(t.kind==Type::dictionary)for(const auto& name:{"remove","clear"})add(name,name==std::string("remove")?Type(Type::boolean):Type(Type::none),2);}
-                    if(t.kind==Type::dictionary)add("contains",Type::boolean,2);
+            if(t.kind==Type::string || ir::collection_type(t)) {
+                const bool type_level=text_type_base(*e.parts[0]);
+                for(const auto& api:core_members)if(core_member(t,api.name,type_level) &&
+                    (!api.mutates || (!t.readonly && !ir::readonly_paths(t).contains({})))) {
+                    auto token=e.token;token.text=api.name;auto target=core_signature(api,t,token);
+                    core_record(api,target,t,type_level);
+                    if(auto* candidate=add(api.name,target.result,api.property?10:2)) {
+                        candidate->detail=api.property?ir::type_name(target.result):editor_signature(target);
+                        candidate->documentation=unit.builtins.at(target.symbol).documentation.text(target.result!=Type::none);
+                    }
                 }
                 for(auto& [name,candidate]:candidates)out.candidates.push_back(std::move(candidate));throw EditorProbeFound{};
             }
@@ -3090,6 +3107,7 @@ class Semantics {
                     }
 
                     if (auto* candidate = add(name, result, 2)) {
+                        candidate->detail=editor_signature(*generic);
                         candidate->documentation = source_documentation(
                             owner->source, generic->token.offset).text(generic->result != Type::none);
                     }
@@ -3099,7 +3117,7 @@ class Semantics {
 
                 auto selected = member(t, token);
                 if(selected.function) {
-                    if(t.readonly || !ir::readonly_paths(t).empty()) continue; // Recovered effects are not finalized.
+                    if(!editor_method_available(*selected.function,t,selected.path,*e.parts[0]))continue;
                     if(auto* candidate=add(name,selected.function->result,selected.function->accessor==1?10:2)) {
                         candidate->detail=editor_signature(*selected.function);
                         for(const auto& [id,u]:units)for(const auto& f:u->functions)if(&f==selected.function)candidate->documentation=source_documentation(u->source,f.token.offset).text(f.result!=Type::none);
@@ -3107,8 +3125,12 @@ class Semantics {
                 } else {
                     if(t.definition->native_resource)continue; // Source methods remain visible; native payloads do not.
                     auto type=t;bool readonly=false;std::string declaring;
-                    for(auto field:selected.path){readonly|=type.definition->fields[field].readonly;declaring=declaring_field_name(type,field);type=ir::field_type(type,field);}
-                    if(auto* candidate=add(name,type,5)){if(readonly)candidate->detail="const "+candidate->detail;candidate->documentation=display_nominal_names("Stored field declared by "+declaring+".");}
+                    Documentation docs;
+                    for(auto field:selected.path){readonly|=type.definition->fields[field].readonly;declaring=declaring_field_name(type,field);
+                        auto [owner,structure]=owned_structure(type);const auto& origin=structure->effective_fields.at(field);
+                        docs=source_documentation(origin.first->source,origin.second->token.offset);type=ir::field_type(type,field);}
+                    if(auto* candidate=add(name,type,5)){if(readonly)candidate->detail="const "+candidate->detail;candidate->documentation=docs.text();
+                        if(candidate->documentation.empty())candidate->documentation=display_nominal_names("Stored field declared by "+declaring+".");}
                 }
             } catch(const CompilationError&) {} catch(const Poison&) {}
         } else {
@@ -3208,6 +3230,25 @@ class Semantics {
     VOID_SEMANTIC_HANDLER void editor_field_candidates(Expr& e,const Type& receiver) {
         auto type=receiver;
         if(e.parts[0]->kind==Expr::Kind::name)if(auto* variable=lookup(e.parts[0]->token.text))type.readonly|=variable->readonly;
+        if(ir::nullable_type(type))throw EditorProbeFound{};
+        auto& probe=*diagnostics.editor;
+        if(current && editor_statement && !current->global_initializer && !current->initializer && !probe.finalizing &&
+           !invalid_function && !unit.failed_import && !current->parse_failed) {
+            const bool addressable=type.kind!=Type::aggregate || editor_mutable_storage(*e.parts[0]);
+            // Nominally mutable bindings can acquire readonly authority from
+            // earlier calls/aliases. Stabilize every reference-bearing receiver,
+            // even when its immediate syntax contains no call or readonly token.
+            bool effects=type.readonly || !ir::reference_paths(type).empty() || !addressable;
+            std::vector<const Expr*> pending{e.parts[0].get()};
+            while(!pending.empty()) {
+                const auto* part=pending.back();pending.pop_back();
+                effects|=part->kind==Expr::Kind::method_call || part->kind==Expr::Kind::call || part->kind==Expr::Kind::function_call;
+                for(const auto& child:part->parts)pending.push_back(child.get());
+            }
+            // Argument checking can own temporary rewrites. Capture the receiver
+            // before unwinding them; retain by its owning checked statement.
+            if(effects)throw EditorReceiverFound{editor_statement,std::move(e.parts.front()),e.token,type.readonly,addressable};
+        }
         if(enum_value_type(type)) {
             std::vector<std::string> names{"name","is_defined"};if(type.kind==Type::numeric_enum)names.push_back("value");
             if(type.kind==Type::numeric_enum && type.definition->enum_flags)for(auto name:{"has","has_any","with","without","toggled"})names.push_back(name);
@@ -3216,7 +3257,7 @@ class Semantics {
             for(const auto& [id,owner]:units)for(const auto& function:owner->functions)
                 if(function.receiver && function.receiver->type.definition==type.definition && !function.initializer && !function.accessor && accessible(function)) {
                     explicit_names.insert(function.token.text);
-                    if(!type.readonly && ir::readonly_paths(type).empty())diagnostics.editor->result.candidates.push_back({function.token.text,editor_signature(function),2,function.symbol,source_documentation(owner->source,function.token.offset).text(function.result!=Type::none)});
+                    if(editor_method_available(function,type,{},*e.parts[0]))diagnostics.editor->result.candidates.push_back({function.token.text,editor_signature(function),2,function.symbol,source_documentation(owner->source,function.token.offset).text(function.result!=Type::none)});
                 }
             for(const auto& name:names){if(explicit_names.contains(name))continue;auto site=e.token;site.text=name;auto target=enum_api_signature(type,site,name);auto& record=unit.builtins.at(target.symbol);diagnostics.editor->result.candidates.push_back({name,(name=="name" || name=="value")?ir::type_name(target.result):editor_signature(target),name=="name" || name=="value"?10:2,target.symbol,record.documentation.text(true)});}
             throw EditorProbeFound{};
@@ -3721,8 +3762,11 @@ class Semantics {
         if(e.token.text.empty() && member_recovery_available())return recover_member(e);
         if(t.definition && t.definition->task_result)error(source,e.token,Code::unsupported_type,"Inferred task handles support await; task internals are not source fields.");
         if(base.event)error(source,e.token,Code::invalid_value,"Event subscription storage is private.");
-        if(t.kind==Type::string && (e.token.text=="length" || e.token.text=="byte_length"))return text_property(e);
-        if(ir::collection_type(t) && e.token.text=="count") {if(t.kind==Type::dictionary && !current)error(source,e.token,Code::constant_call,"Dictionary count requires runtime evaluation.");e.target=t.kind==Type::dictionary?"$dict.count":"$array.count";return e.type=Type::i64;}
+        if(const auto* api=core_member(t,e.token.text);api && api->property) {
+            if(!current && (t.kind==Type::string || t.kind==Type::dictionary))error(source,e.token,Code::constant_call,"Collection inspection requires runtime evaluation.");
+            auto target=core_signature(*api,t,e.token);core_record(*api,target,t);
+            e.source_target=target.symbol;e.target=target.symbol.substr(0,target.symbol.find("::"));return e.type=target.result;
+        }
         if (ir::nullable_type(t)) error(source,e.token,Code::type_mismatch,"Unwrap the nullable value before field access.");
         if (t.kind != Type::aggregate && t.kind != Type::managed_ref && t.kind!=Type::interface_ref) error(source,e.token,Code::type_mismatch,"Field access requires a struct or interface.");
         if(t.kind==Type::interface_ref && !direct_method(t,e.token))error(source,e.token,Code::type_mismatch,"Field access requires a struct; interface views expose only declared methods.");
@@ -4580,6 +4624,12 @@ class Semantics {
         if (nested) scopes.emplace_back();
         unsigned flow = next_flow;
         for (auto& s : body) {
+            struct RestoreStatement {
+                Statement*& current;
+                Statement* previous;
+                ~RestoreStatement(){current=previous;}
+            } restore_statement{editor_statement,editor_statement};
+            editor_statement=&s;
             if (diagnostics.full()) break;
             unsigned result = next_flow;
             auto old_zero = suppress_zero;
@@ -4950,6 +5000,65 @@ public:
         returned.expression = std::make_unique<Expr>(Expr::Kind::name, f.body.front().token);
         statement(returned); f.body.push_back(std::move(returned)); f.analyzed = true;
     }
+    VOID_SEMANTIC_HANDLER void retain_editor_receiver(Function& function,EditorReceiverFound& found) {
+        auto& probe=*diagnostics.editor;
+        auto receiver=std::move(found.receiver);
+        std::function<bool(std::vector<Statement>&)> retain=[&](auto& body) {
+            for(std::size_t n=0;n<body.size();++n) {
+                auto& statement=body[n];
+                if(&statement==found.statement) {
+                    Statement evaluation(Statement::Kind::expression,found.site);
+                    probe.receiver=receiver.get();evaluation.expression=std::move(receiver);
+                    body.erase(body.begin()+n,body.end());body.push_back(std::move(evaluation));return true;
+                }
+                if(retain(statement.body)){statement.otherwise.clear();body.erase(body.begin()+n+1,body.end());return true;}
+                if(retain(statement.otherwise)){body.erase(body.begin()+n+1,body.end());return true;}
+            }
+            return false;
+        };
+        if(!retain(function.body))throw EditorProbeFound{};
+        probe.function=&function;probe.owner=&unit;probe.readonly_storage=found.readonly_storage;
+        probe.receiver_addressable=found.addressable;
+        // The missing suffix may mutate, retain or return any formal reference.
+        // Never infer a pure recursive callee from the truncated activation.
+        std::vector<ir::ReferenceOrigin> origins;
+        unsigned index=0;
+        const bool nonmutating_receiver=function.accessor==1 || (function.receiver &&
+            (function.token.text=="string" || function.token.text=="format"));
+        auto opaque=[&](Type type) {
+            const auto readonly=ir::readonly_paths(type);
+            for(const auto& path:ir::reference_paths(type)) {
+                ir::ReferenceOrigin origin{index,path};origins.push_back(origin);
+                // An unknown suffix cannot grant authority forbidden by its
+                // formal contract. Such leaves may still be returned as aliases.
+                if(readonly.contains(path))continue;
+                if(index!=0 || !function.receiver || !nonmutating_receiver) {
+                    function.reference_effects.mutations.insert(origin);function.reference_effects.required_mutable.insert(origin);
+                }
+                function.reference_effects.retained.insert(origin);
+            }
+            ++index;
+        };
+        if(function.receiver){opaque(function.receiver->type);function.receiver_mutates=!nonmutating_receiver;}
+        for(const auto& parameter:function.parameters)opaque(parameter.type);
+        for(const auto& path:ir::reference_paths(function.result)) {
+            auto& fact=function.reference_effects.returned[path];fact.readonly=true;
+            fact.origins.insert(origins.begin(),origins.end());
+        }
+        if(function.receiver && function.receiver->type.kind==Type::aggregate && !nonmutating_receiver)
+            for(const auto& path:ir::reference_paths(function.receiver->type)) {
+                auto& fact=function.reference_effects.receiver_after[path];fact.readonly=true;
+                fact.origins.insert(origins.begin(),origins.end());
+            }
+    }
+    void finish_editor_receiver(Function& function) {
+        current=&function;invalid_function=false;
+        auto& probe=*diagnostics.editor;probe.finalizing=true;
+        Expr selection(Expr::Kind::field,Token{TokenKind::name,"_void_editor_cursor_",probe.offset});
+        selection.parts.push_back(std::make_unique<Expr>(std::move(*probe.receiver)));
+        auto type=selection.parts.front()->type;type.readonly|=probe.readonly_storage;
+        editor_field_candidates(selection,type);
+    }
     void analyze_one(Function& f) {
             if(f.interface_requirement) {
                 f.analyzed=true;f.locals={f.receiver->type};f.receiver->slot=0;
@@ -4986,7 +5095,9 @@ public:
                   catch (const Poison&) {}
             }
             if(!f.native_symbol.empty() || f.c_primitive)return;
-            auto flow = sequence(f.body, false);
+            unsigned flow;
+            try {flow=sequence(f.body,false);}
+            catch(EditorReceiverFound& found) {retain_editor_receiver(f,found);return;}
             if (f.result != Type::none && (flow & next_flow) && diagnostics.size() == before && !f.parse_failed && !invalid_function)
                 try { error(source, f.token, Code::missing_return, "Missing return path in '" + f.token.text + "'.", "Return " + editor_return_type(f) + " on every path that reaches the end."); }
                 catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -7668,6 +7779,8 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     diagnostics.finish();
     analyze_capabilities(units,diagnostics);
     diagnostics.finish();
+    if(diagnostics.editor && diagnostics.editor->receiver)
+        Semantics(*diagnostics.editor->owner,units,root,evaluate,diagnostics,defaults).finish_editor_receiver(*diagnostics.editor->function);
     analyze_construction(units,diagnostics);
     diagnostics.finish();
     (void)string_pool(units);
@@ -8848,7 +8961,7 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     if(missing){if(insertion>stop)return empty;repaired.insert(insertion+std::string_view("_void_editor_cursor_").size()-(end-begin),static_cast<std::size_t>(missing),')');}
     }
     auto frozen=overrides;frozen.insert_or_assign(module,SourceFile(source.path(),std::move(repaired)));
-    EditorProbe probe{module,begin,{},operator_context,{},{},0};probe.result.begin=begin;probe.result.end=end;
+    EditorProbe probe{module,begin,{},operator_context,{},{},0,{}};probe.result.begin=begin;probe.result.end=end;
     probe.prefix=operator_context?std::string{}:text.substr(begin,cursor-begin);
     EditorRecovery recovery{module,{}};
     if(begin && !format_context && !operator_context) {

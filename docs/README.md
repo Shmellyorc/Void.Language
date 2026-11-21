@@ -1,5 +1,8 @@
 # VOID documentation
 
+- [G92 member completion candidate](projects/G92_INTELLISENSE_MEMBER_COMPLETION.md):
+  shared builtin declarations, typed chains, readonly methods and editor evidence.
+
 - [G90 opt-in crash diagnostics candidate](projects/G90_CRASH_DIAGNOSTICS.md):
   local supervision, bounded private reports, editor recovery and qualification.
 

@@ -1,5 +1,36 @@
 # Minimal VOID language server (Phase 10)
 
+## Member completion (G92)
+
+Value member probes retain the ordinary compiler receiver, field, property,
+method, generic and composition resolution. Text, fixed arrays, lists and
+dictionaries share one builtin catalog for checked calls, property binding,
+type hints, completion and documentation. Builtin properties such as `count`
+have analyzed declarations for hover and semantic tokens as well as completion.
+
+Every reference-bearing receiver is stabilized, including a nominally mutable
+local whose readonly authority comes from an earlier call or binding. The probe
+owns the receiver before unwinding temporary expression rewrites and retains
+its nominally checked activation prefix by the owning statement's identity.
+The opaque suffix summary respects each formal parameter's readonly paths;
+it cannot add mutation, mutable-retention or mutable-authority requirements for
+those paths. Returned aliases still retain their provenance.
+
+When reference effects are needed, the probe retains the nominally checked
+activation prefix and receiver evaluation, discards the unfinished statement
+and suffix, and marks the missing activation's effects conservatively. The
+existing capability analysis stabilizes exact receiver profiles and method
+effects before candidates are selected. No hole or poisoned expression is
+admitted to capability analysis, and no completion probe can lower executable IR.
+Nullable receivers remain unavailable until unwrapped. An uninstantiated
+method-specific generic header has no proven readonly effect contract and is
+withheld for a restricted receiver.
+
+Transport, cancellation, input verification, request freshness and presentation
+recovery retain their existing paths. See the
+[G92 candidate report](projects/G92_INTELLISENSE_MEMBER_COMPLETION.md) for actual
+editor evidence, reproduction results, tool identities and qualification limits.
+
 ## Local crash diagnostics (G90)
 
 `VOID_CRASH_DIAGNOSTICS=1` opts a directly launched server into local supervision.

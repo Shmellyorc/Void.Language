@@ -9,8 +9,8 @@ from lsp_client import Client, frame
 server = Path(sys.argv[1]).resolve()
 method = 'textDocument/semanticTokens/full'
 types = ['namespace', 'type', 'struct', 'interface', 'enum', 'typeParameter', 'parameter',
-         'variable', 'property', 'enumMember', 'event', 'function', 'method', 'operator']
-modifiers = ['declaration', 'definition', 'readonly', 'static', 'defaultLibrary']
+         'variable', 'property', 'enumMember', 'event', 'function', 'method', 'operator', 'comment', 'keyword']
+modifiers = ['declaration', 'definition', 'readonly', 'static', 'defaultLibrary', 'inactive']
 defines = ('declaration', 'definition')
 manifest = """schema=1
 [project]

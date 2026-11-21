@@ -594,6 +594,20 @@ if(BUILD_TESTING)
   add_test(NAME lsp_intellisense COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/intellisense.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_intellisense PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_member_completion COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/member_completion.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
+  set_tests_properties(lsp_member_completion PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_readonly_completion COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/readonly_completion.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
+  set_tests_properties(lsp_readonly_completion PROPERTIES TIMEOUT 180)
+  if(UNIX)
+    add_test(NAME lsp_member_completion_stack COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/lsp/member_completion.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>" --small-stack)
+    set_tests_properties(lsp_member_completion_stack PROPERTIES TIMEOUT 180)
+    add_test(NAME lsp_readonly_completion_stack COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/lsp/readonly_completion.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>" --small-stack)
+    set_tests_properties(lsp_readonly_completion_stack PROPERTIES TIMEOUT 180)
+  endif()
   add_test(NAME lsp_semantic_tokens COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/semantic_tokens.py" "$<TARGET_FILE:voidls>")
   set_tests_properties(lsp_semantic_tokens PROPERTIES TIMEOUT 180)

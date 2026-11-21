@@ -68,6 +68,21 @@ assistance until the source is repaired.
 
 ### Readable and responsive IntelliSense
 
+Receiver fields and methods and nested selections such as `s.scenes.` use the
+compiler's member lookup. Collection completion, hover and parameter help share
+the compiler's builtin declarations: `count` is an `i64` property and, for example,
+`push(value: scene)` and `get(index: i32) -> result<scene, string>` retain their
+concrete element types. Fixed arrays omit operations that change length.
+Readonly receivers retain applicable reads and pure methods while mutation and
+inaccessible members are filtered using compiler authority and effect analysis.
+An optional value must be unwrapped before its members are available.
+
+If installed behavior differs from a local build, check **Output → VOID** for
+the active extension location and `voidls` path, and compare the explicit matching
+`void.compiler.path`/`void.server.path` artifacts. The extension version alone
+does not identify a development build. Changing an installation is a separate
+operation. [G92 evidence and qualification](projects/G92_INTELLISENSE_MEMBER_COMPLETION.md)
+
 Callable completion details include compact parameter and return types, for
 example `fade(color_value: color, alpha: f32) -> color`. Hover and completion
 documentation retain the authored descriptions. Short type names are editor

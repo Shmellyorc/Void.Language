@@ -1,0 +1,12 @@
+struct scene:
+    on_enter: func()
+    on_exit: func()
+    on_update: func(f32)
+    on_draw: func()
+
+struct scene_manager:
+    scenes: [scene]
+
+func (s scene_manager) on_update(dt: f32):
+    if s.scenes.count == 0:
+        return

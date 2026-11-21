@@ -91,7 +91,7 @@ class Fixture:
         assert '.' in capabilities['completionProvider']['triggerCharacters']
         self.legend = capabilities['semanticTokensProvider']['legend']
         assert self.legend['tokenTypes'][4] == 'enum' and self.legend['tokenTypes'][9] == 'enumMember'
-        assert self.legend['tokenModifiers'] == ['declaration', 'definition', 'readonly', 'static', 'defaultLibrary']
+        assert self.legend['tokenModifiers'] == ['declaration', 'definition', 'readonly', 'static', 'defaultLibrary', 'inactive']
         client.notify('initialized', {})
         client.sync()
         self.version = 0
