@@ -1,5 +1,16 @@
 # Minimal VOID language server (Phase 10)
 
+## Local crash diagnostics (G90)
+
+`VOID_CRASH_DIAGNOSTICS=1` opts a directly launched server into local supervision.
+Editor users enable the machine setting `void.crashDiagnostics.enabled`; it applies
+to the server, preflights and compiler commands and overrides inherited enablement.
+Output → VOID shows native process exits and saved crash-report paths. Existing
+source diagnostics remain in Problems; recovery still requires **VOID: Restart
+Language Server**. See [G90](projects/G90_CRASH_DIAGNOSTICS.md) for privacy,
+retention, configuration and native platform limits.
+
+
 ## Creation subprocesses (Slice 5)
 
 The VS Code adapter uses an additive schema-1 subprocess contract. It calls

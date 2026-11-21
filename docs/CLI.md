@@ -1,5 +1,19 @@
 # voidc command reference
 
+## Local crash diagnostics (G90)
+
+Capture is disabled by default. Set `VOID_CRASH_DIAGNOSTICS=1` before launching
+`voidc` or `voidls`; unset it or set it to `0` to disable collection. An optional
+absolute `VOID_CRASH_DIRECTORY` selects the private report leaf (existing parent).
+`voidc crashes run ABSOLUTE-EXECUTABLE [arguments...]` explicitly opts in for one
+native/AOT launch. Generated binaries and the Runtime do not acquire crash handlers.
+Windows collects only owning-process sanitizer findings; unmarked native exception
+collection (including AOT) is unsupported so application exception handlers remain
+under normal Windows behavior. Native Windows execution remains unqualified.
+See the [G90 guide](projects/G90_CRASH_DIAGNOSTICS.md) for locations, local review,
+export/deletion, bounded retention, performance and qualification limits.
+
+
 ## Conditional build configuration (G87)
 
 Use explicit booleans in the selected project's `void.project.toml`:

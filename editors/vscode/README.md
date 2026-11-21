@@ -147,4 +147,22 @@ hover and navigation include selected declarations; inactive lines have semantic
 token `comment` with modifier `inactive`, while directive lines use `keyword`.
 Themes can customize `comment.inactive`. Incomplete conditions produce diagnostics
 and remain editable. Formatting a file with conditional directives currently returns
-no edits to preserve all branches. See [G87](../../docs/projects/G87_CONDITIONAL_COMPILATION.md).
+no edits to preserve all branches. See [G87](https://github.com/Shmellyorc/Void.Language/blob/main/docs/projects/G87_CONDITIONAL_COMPILATION.md).
+
+## Local crash diagnostics
+
+Crash capture is off by default. Enable the **user/machine** setting
+`void.crashDiagnostics.enabled` to supervise compiler/editor launches locally.
+Optionally set `void.crashDiagnostics.directory` to an absolute local directory
+with an existing parent. The server restarts when either setting changes.
+
+After a native language-server crash, Output → VOID retains the native exit and
+local report path. Use **VOID: Restart Language Server** for explicit recovery;
+there is no automatic restart loop. Set the enable setting back to `false` to
+stop capture. Ordinary source errors and program exit codes do not create reports.
+
+Reports retain at most 32 operation identifiers and binary/build identities;
+they exclude source text, command arguments, environment contents and memory dumps.
+There are no uploads. Inspect, export or delete the local JSON files yourself.
+The [crash diagnostics guide](https://github.com/Shmellyorc/Void.Language/blob/main/docs/projects/G90_CRASH_DIAGNOSTICS.md)
+covers retention, CLI/AOT launches, privacy and native platform qualification.

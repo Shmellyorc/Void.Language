@@ -1,3 +1,4 @@
+#include "void/crash_diagnostics.hpp"
 #include "void/compiler_observation.hpp"
 #include "void/native_build.hpp"
 #include "void/native_import.hpp"
@@ -224,6 +225,7 @@ int execute(const std::vector<std::string>& arguments,const fs::path& capture={}
     const auto capture_text=path_utf8(capture);
     if(!capture.empty())redirects={std::nullopt,capture_text,std::nullopt};
     int status=llvm::sys::ExecuteAndWait(arguments[0],refs,std::nullopt,redirects,0,0,&error,&failed);
+    vd::crash::child_termination(utf8_path(arguments[0]),status,false);
     if(failed || status<0)throw std::runtime_error("Native toolchain execution failed: "+error);
     return status;
 }

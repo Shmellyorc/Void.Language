@@ -160,6 +160,8 @@
     "configuration": {
       "title": "VOID",
       "properties": {
+        "void.crashDiagnostics.enabled": {"type": "boolean", "default": false, "scope": "machine", "description": "Opt in to bounded local compiler/language-server crash evidence. No uploads. Restarting the server applies changes; native programs require an explicit diagnostic launch."},
+        "void.crashDiagnostics.directory": {"type": "string", "default": "", "scope": "machine", "description": "Optional absolute local report directory (private leaf, existing parent). Empty uses VOID_CRASH_DIRECTORY or the platform state directory. Reports contain operation identifiers and binary hashes, never source text or arguments."},
         "void.compiler.path": {
           "type": "string",
           "default": "",
@@ -229,7 +231,7 @@
     "typecheck": "tsc --noEmit",
     "compile": "tsc && node build.cjs",
     "build": "npm run typecheck && npm run compile",
-    "test": "npm run build && node --test out/test/config.test.js out/test/debugBuildReceipt.test.js out/test/diagnosticVersions.test.js",
+    "test": "npm run build && node --test out/test/config.test.js out/test/debugBuildReceipt.test.js out/test/diagnosticVersions.test.js out/test/crashDiagnostics.test.js",
     "test:host": "node out/test/runHost.js",
     "package": "npm run build && vsce package --no-dependencies --allow-missing-repository --out dist/void-language-0.1.2.vsix",
     "vscode:prepublish": "npm run build"

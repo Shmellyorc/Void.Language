@@ -1,3 +1,4 @@
+#include "void/crash_diagnostics.hpp"
 #include "void/lsp.hpp"
 #include "void/tooling.hpp"
 #include "void/project_creation.hpp"
@@ -1137,6 +1138,11 @@ public:
             error(id ? *id : j::Value(nullptr),-32600,"Request requires a method string"); return {};
         }
         auto name=method->str();
+        using Op=vd::crash::Operation;
+        vd::crash::context(name=="textDocument/completion"?Op::lsp_completion:
+            name=="textDocument/hover"?Op::lsp_hover:
+            (name=="textDocument/didOpen" || name=="textDocument/didChange")?Op::lsp_analysis:
+            (name=="shutdown" || name=="exit")?Op::lsp_shutdown:Op::lsp_request);
         auto fail=[&](int code,const std::string& text) { if(id) error(*id,code,text); else std::cerr<<name<<": "<<text<<'\n'; };
         if(name=="exit") {
             if(!id) return state==State::shutdown ? 0 : 1;
@@ -1200,7 +1206,7 @@ public:
                         {"tokenModifiers",std::move(modifiers)}}},{"full",true}};
                 }
                 send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",j::Object{
-                    {"capabilities",std::move(capabilities)},{"serverInfo",j::Object{{"name","VOID"},{"version","0.2.0"}}}}}});
+                    {"capabilities",std::move(capabilities)},{"serverInfo",j::Object{{"name","VOID"},{"version",vd::lsp::server_version}}}}}});
                 return {};
             }
             if(name=="initialized") {
@@ -1469,6 +1475,8 @@ int run(const fs::path& entry,bool project=false,const std::optional<std::string
 }
 #ifdef _WIN32
 int wmain(int argc,wchar_t** argv) {
+    auto diagnostic_executable=vd::path_utf8(fs::path(argv[0]));
+    if(auto status=vd::crash::start("voidls",diagnostic_executable.c_str()))return *status;
     try {
         auto executable=vd::path_utf8(fs::path(argv[0]));vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(executable.c_str(),reinterpret_cast<void*>(&wmain))));
         auto text=[&](int index){auto utf8=fs::path(argv[index]).u8string();return std::string(utf8.begin(),utf8.end());};
@@ -1482,6 +1490,7 @@ int wmain(int argc,wchar_t** argv) {
         return run(fs::path(argv[2]));
 #else
 int main(int argc,char** argv) {
+    if(auto status=vd::crash::start("voidls",argv[0]))return *status;
     try {
         vd::configure_standard_library_root(vd::utf8_path(llvm::sys::fs::getMainExecutable(argv[0],reinterpret_cast<void*>(&vd::configure_standard_library_root))));
         if(argc==4 && std::string_view(argv[1])=="--discover-creation")return creation_preflight(vd::utf8_path(argv[2]),vd::utf8_path(argv[3]));

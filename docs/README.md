@@ -1,5 +1,8 @@
 # VOID documentation
 
+- [G90 opt-in crash diagnostics candidate](projects/G90_CRASH_DIAGNOSTICS.md):
+  local supervision, bounded private reports, editor recovery and qualification.
+
 - [G89 GitHub Wiki candidate](projects/G89_GITHUB_WIKI_OVERHAUL.md):
   tutorial pages, sidebar and contextual navigation, checked examples and publication preparation.
 

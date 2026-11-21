@@ -45,7 +45,7 @@ for args in ([], ['--help'], ['-h'], ['help']):
         assert command in result.stdout.decode()
 version = run(['--version'], out='LLVM 23.1.4')
 assert b'VOID Language Compiler v0.1.0 (development)' in version.stdout and b'Target:' in version.stdout
-for command in ('check', 'run', 'build', 'emit', 'init', 'new', 'add', 'remove', 'tidy', 'resolve', 'deps', 'package', 'native', 'native-bind'):
+for command in ('crashes', 'check', 'run', 'build', 'emit', 'init', 'new', 'add', 'remove', 'tidy', 'resolve', 'deps', 'package', 'native', 'native-bind'):
     for args in ([command, '--help'], [command, '-h'], ['help', command]):
         result = run(args, out='Usage: voidc ' + command)
         assert b'Example' in result.stdout and not result.stderr
@@ -53,7 +53,7 @@ for command in ('check', 'run', 'build', 'emit', 'init', 'new', 'add', 'remove',
 
 # Top-level columns come from the command inventory, not literal padding.
 rows = full_help.decode().split('Commands:\n', 1)[1].split('\nOptions:', 1)[0].strip('\n').splitlines()
-assert len(rows) == 15
+assert len(rows) == 16
 assert {re.match(r'  (\S+)( +)(.+)', line).start(3) for line in rows} == {15}
 assert all('\t' not in line for line in rows)
 for command, flags in {'run': ['--cache', '--no-cache'], 'build': ['-o PATH', '--no-opt'],

@@ -1,3 +1,4 @@
+import {crashEnvironment} from './crashDiagnostics';
 import * as vscode from 'vscode';
 import {execFile} from 'node:child_process';
 import {isAbsolute} from 'node:path';
@@ -23,7 +24,7 @@ const isTemplate = (value: unknown): value is Template => {
 };
 
 async function compilerJson(compiler: string, args: string[], cwd: string): Promise<Record<string, unknown>> {
-    const {stdout} = await exec(compiler, args, {cwd, timeout: 60000, maxBuffer: 1024 * 1024});
+    const {stdout} = await exec(compiler, args, {cwd, env: crashEnvironment(), timeout: 60000, maxBuffer: 1024 * 1024});
     try {
         const result = JSON.parse(stdout);
         if (result?.schema === 1) return result;

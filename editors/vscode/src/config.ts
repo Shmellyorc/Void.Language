@@ -1,3 +1,4 @@
+import {crashEnvironment} from './crashDiagnostics';
 import * as path from 'node:path';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
@@ -68,7 +69,7 @@ export async function resolveProject(settings: Settings, workspaces: readonly st
         ['--discover-project', workspace ?? '', active ?? '', selectedRoot, entryOverride ?? ''];
     let stdout: string;
     // Debug/instrumented analysis of a large locked package can exceed ten seconds.
-    try { ({stdout} = await promisify(execFile)(server, args, {encoding: 'utf8', maxBuffer: 65536, timeout: 60000})); }
+    try { ({stdout} = await promisify(execFile)(server, args, {env: crashEnvironment(), encoding: 'utf8', maxBuffer: 65536, timeout: 60000})); }
     catch (error) { throw new Error(`VOID project preflight failed. Automatic/manifest selection requires a matching voidProjectProtocol 1 server; no legacy downgrade was attempted. ${String(error)}`); }
     const selected = JSON.parse(stdout) as {schema?: number; mode?: string; requestedRoot?: string; entry: string|null; root: string; standalone: boolean; status?: string};
     const {entry, root} = selected;
@@ -92,7 +93,7 @@ export async function plainStatusCapability(compiler: string, cwd: string): Prom
     try {
         const before = await compilerFileIdentity(compiler);
         const {stdout, stderr} = await promisify(execFile)(compiler, ['--capabilities'],
-            {cwd, encoding: 'utf8', timeout: 5000, maxBuffer: 4096, windowsHide: true});
+            {cwd, env: crashEnvironment(), encoding: 'utf8', timeout: 5000, maxBuffer: 4096, windowsHide: true});
         const after = await compilerFileIdentity(compiler);
         if (before !== after)
             throw new Error('The compiler changed during capability negotiation.');

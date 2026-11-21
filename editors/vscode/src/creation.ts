@@ -1,3 +1,4 @@
+import {crashEnvironment} from './crashDiagnostics';
 import {execFile} from 'node:child_process';
 import * as path from 'node:path';
 import {promisify} from 'node:util';
@@ -22,7 +23,7 @@ export interface Plan extends Root {
 }
 async function request(server: string, args: string[]): Promise<unknown> {
     try {
-        const {stdout} = await promisify(execFile)(server, args, {encoding: 'utf8', maxBuffer: 65536, timeout: 10000, windowsHide: true});
+        const {stdout} = await promisify(execFile)(server, args, {env: crashEnvironment(), encoding: 'utf8', maxBuffer: 65536, timeout: 10000, windowsHide: true});
         return JSON.parse(stdout);
     } catch (error) {
         throw new Error(`Project creation requires a matching voidls and an admitted directory. ${String(error)}`);

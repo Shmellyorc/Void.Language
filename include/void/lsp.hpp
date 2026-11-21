@@ -5,6 +5,7 @@
 #include <optional>
 #include <cstdint>
 namespace vd::lsp {
+inline constexpr const char* server_version = "0.2.0";
 struct Position {
     std::uint32_t line = 0, character = 0;
     bool operator==(const Position&) const = default;

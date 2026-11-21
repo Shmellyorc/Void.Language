@@ -1,3 +1,4 @@
+import {crashEnvironment} from './crashDiagnostics';
 import * as vscode from 'vscode';
 import {execFile} from 'node:child_process';
 import {basename} from 'node:path';
@@ -26,7 +27,7 @@ async function invoke(project: Selection, args: string[], readOnly: boolean): Pr
     project.verify();
     const argv = args[0] === 'package' ? args : [...args, '--project', project.requestedRoot];
     const running = exec(project.compiler, argv,
-        {cwd: project.root, shell: false, windowsHide: true, timeout: readOnly ? 60000 : undefined, maxBuffer: 4 * 1024 * 1024});
+        {cwd: project.root, env: crashEnvironment(), shell: false, windowsHide: true, timeout: readOnly ? 60000 : undefined, maxBuffer: 4 * 1024 * 1024});
     running.child.stdin?.end();
     try { return (await running).stdout; }
     catch (error) {

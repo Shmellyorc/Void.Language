@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import {spawn} from 'node:child_process';
+import {crashEnvironment, configureCrashDiagnostics} from './crashDiagnostics';
 import {basename, isAbsolute, join, parse} from 'node:path';
 import {promises as fs, constants} from 'node:fs';
 import {LanguageClient, CloseAction, ErrorAction, State, RevealOutputChannelOn, ServerOptions, LanguageClientOptions} from 'vscode-languageclient/node';
@@ -407,8 +409,17 @@ class ServerManager {
         this.output.info(`Starting ${project.server} ${JSON.stringify(args)}`);
         const selector = {language: 'void', scheme: 'file', pattern: {baseUri: vscode.Uri.file(project.root).toString(),
             pattern: project.singleFile ? basename(project.entry!).replace(/[*?()[\]{}!+@,]/g, c => '[' + c + ']') : '**/*.void'}};
-        const serverOptions: ServerOptions = {command: project.server, args,
-            options: {cwd: project.root, shell: false}};
+        const serverOptions: ServerOptions = async () => {
+            const env = crashEnvironment();
+            const child = spawn(project.server, args, {cwd: project.root, shell: false, env});
+            child.once('exit', (code, signal) => {
+                if (this.client !== client || this.disposed) return;
+                this.output.info(`voidls process exit: code=${code}, signal=${signal ?? 'none'}.`);
+            });
+            if (env.VOID_CRASH_DIAGNOSTICS === '1')
+                this.output.info('Local crash diagnostics enabled. Saved report paths appear in this output channel after a native crash.');
+            return child;
+        };
         let initialized = false;
         let failureReported = false;
         const reportUnexpected = (): void => {
@@ -531,6 +542,10 @@ class ServerManager {
     }
 }
 export function activate(context: vscode.ExtensionContext): {ready: () => Promise<void>; status: () => {state: string; entry?: string}; deactivate: () => Promise<void>} {
+    configureCrashDiagnostics(() => {
+        const config = vscode.workspace.getConfiguration('void');
+        return {enabled: config.get<boolean>('crashDiagnostics.enabled', false), directory: config.get<string>('crashDiagnostics.directory', '')};
+    });
     const output = vscode.window.createOutputChannel('VOID', {log: true});
     const trace = createProtocolTrace();
     output.info(`Activating VOID ${context.extension.packageJSON.version} from ${context.extensionPath}`);
@@ -579,7 +594,7 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
                 if (e.affectsConfiguration('void.editor.useTabs', editor.document)) applyIndentation(editor);
             }
             if (e.affectsConfiguration('void.trace.server')) trace.update();
-            if (['void.server', 'void.project'].some(setting => e.affectsConfiguration(setting))) void current.refresh(true);
+            if (['void.server', 'void.project', 'void.crashDiagnostics'].some(setting => e.affectsConfiguration(setting))) void current.refresh(true);
         }),
         vscode.workspace.onDidChangeWorkspaceFolders(() => { void current.refresh(true); }),
         vscode.workspace.onDidGrantWorkspaceTrust(() => { void current.refresh(true); }));

@@ -8,7 +8,8 @@
 
 namespace vd::cli {
 using HelpRow = std::pair<std::string_view, std::string_view>;
-inline constexpr std::array<HelpRow, 14> commands{{
+inline constexpr std::array<HelpRow, 15> commands{{
+    {"crashes", "Diagnose an explicitly launched native program."},
     {"check", "Check source and imports."},
     {"run", "Compile and run through the JIT."},
     {"build", "Build a native executable."},
@@ -35,6 +36,7 @@ template<class Rows> void help_rows(std::ostream& out, const Rows& rows) {
         out << "  " << row.first << std::string(width - row.first.size() + 2, ' ') << row.second << '\n';
 }
 inline void usage(std::ostream& out, const std::string& command={}) {
+    if(command.empty() || command=="crashes")out<<"Usage: voidc crashes run ABSOLUTE-EXECUTABLE [arguments...]\n";
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
     if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
@@ -71,12 +73,14 @@ inline void help(const std::string& command = {}, std::string_view nested = {}) 
     std::cout << "VOID Language Compiler v" << VOID_COMPILER_VERSION << " (development)\nLLVM " << LLVM_VERSION_STRING << "\n\n";
     if (command.empty()) {
         std::cout << "Usage: voidc <command> [arguments] [options]\n\nCommands:\n";
-        auto rows = std::array<HelpRow, 15>{};
+        auto rows = std::array<HelpRow, 16>{};
         std::copy(commands.begin(), commands.end(), rows.begin());
         rows.back() = {"help", "Show command help."};
         help_rows(std::cout, rows);
         std::cout << "\nOptions:\n";
         help_rows(std::cout, std::array<HelpRow,2>{{{"-h, --help", "Show help."}, {"--version", "Show compiler, LLVM, target and build identity."}}});
+        std::cout << "\nLocal crash diagnostics: VOID_CRASH_DIAGNOSTICS=1 (disabled by default).\n"
+                     "Optional absolute VOID_CRASH_DIRECTORY; see docs/projects/G90_CRASH_DIAGNOSTICS.md.\n";
         std::cout << "\nUse 'voidc <command> --help' for arguments, options and examples.\n";
     } else {
         usage(std::cout, command);
@@ -103,6 +107,9 @@ inline void help(const std::string& command = {}, std::string_view nested = {}) 
                          "No parent-project search or fallback from an invalid manifest. Libraries support check only.\n"
                          "Debug information and optimization are independent and target-dependent.\n";
         }
+        if (command=="crashes") std::cout << "\nOpt in for this explicit native-program launch only. No handlers are installed into the program.\n"
+            "Reports are local; the program keeps its arguments, streams and exit status.\n"
+            "Example: voidc crashes run /absolute/path/to/program argument\n";
         if (command=="check") std::cout << R"help(
 Check source and imports without executing startup code; no application entry is required.
 A file/directory or --project is required. --no-opt is accepted without affecting checks.

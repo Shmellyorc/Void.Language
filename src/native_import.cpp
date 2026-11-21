@@ -1,3 +1,4 @@
+#include "void/crash_diagnostics.hpp"
 #include "void/native_import.hpp"
 #include "void/c_primitive.hpp"
 #include "void/path.hpp"
@@ -57,6 +58,7 @@ struct Clang {
         fs::remove(work/"stdout");fs::remove(work/"stderr");
         std::vector<std::optional<llvm::StringRef>> redirects{std::nullopt,output,errors};std::string error;bool failed=false;
         auto status=llvm::sys::ExecuteAndWait(all[0],refs,std::nullopt,redirects,120,0,&error,&failed);
+        vd::crash::child_termination(driver,status,true);
         auto text=project::read_project_input(work/"stdout",tool_limit);
         auto diagnostics=project::read_project_input(work/"stderr",tool_limit);
         if(failed||status<0||(!allow_errors&&status))throw std::runtime_error("Clang header import failed: "+error+diagnostics);

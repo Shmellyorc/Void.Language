@@ -1,4 +1,5 @@
 #include "void/backend.hpp"
+#include "void/crash_diagnostics.hpp"
 #include "void/c_primitive.hpp"
 #include "void/frontend.hpp"
 #include "void/path.hpp"
@@ -639,7 +640,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
         }
         if(argc>=2 && std::string(argv[1])=="help") {
             if(argc==2) {help();return 0;}
-            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [check|run|build|package|emit|init|new|add|remove|tidy|resolve|deps|native-bind|native].");
+            if(argc!=3 || !known_command(argv[2]))throw UsageError("Expected help [crashes|check|run|build|package|emit|init|new|add|remove|tidy|resolve|deps|native-bind|native].");
             help(argv[2]);return 0;
         }
         if (argc>=2 && (std::string_view(argv[1])=="check" || std::string_view(argv[1])=="run" ||
@@ -653,14 +654,17 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             std::cout<<"Wrote native architecture proof object\n";return 0;
         }
         if(argc==2 && std::string(argv[1])=="--jit-proof") {
+            vd::crash::context(vd::crash::Operation::jit_compile);
             vd::Jit jit;auto code=jit.compile(vd::ir::architecture_proof(),"entry");
-            auto result=code->invoke(0);std::cout<<result<<'\n';return result==42?0:1;
+            vd::crash::context(vd::crash::Operation::jit_execute);
+            auto result=code->invoke(0);vd::crash::context(vd::crash::Operation::finished);std::cout<<result<<'\n';return result==42?0:1;
         }
         command=argv[1];
         if(command=="--app")throw UsageError("--app has been removed; entry selection is automatic.");
         if(!known_command(command))
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
+        if(command=="crashes")throw UsageError("Expected crashes run ABSOLUTE-EXECUTABLE [arguments...].");
         if(command=="add" || command=="remove" || command=="tidy")return maintain_project(command,argc,argv,executable);
         if(command=="resolve")return resolve_project(argc,argv);
         if(command=="deps") {
@@ -814,6 +818,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
         catch(const std::exception& error) {throw UsageError(error.what());}
         presentation.project_context(project_mode);
         if(!project_mode)presentation.configuration(false,{},optimize,"none");
+        vd::crash::context(vd::crash::Operation::frontend);
         vd::observation::Scope frontend(vd::observation::Phase::frontend);
         std::shared_ptr<const vd::ProjectAnalysis> project;
         std::filesystem::path selected;
@@ -888,6 +893,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             return 0;
         }
         if(command=="run") {
+            vd::crash::context(vd::crash::Operation::jit_compile);
             std::unique_ptr<vd::Jit> jit;
             if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{project?project->root():std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())+(project?":project-selection-v1:"+project->selection_key()+":"+profile_key:"")},vd::ir::Emission::entry);
             else jit=std::make_unique<vd::Jit>(vd::DebugCache{{},std::string(vd::compiler_build_identity())+(project?":"+profile_key:"")},vd::ir::Emission::entry);
@@ -898,11 +904,14 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             if(cache)std::cerr<<"Debug cache: "<<jit->cache_status()<<'\n';
             presentation.build_finished();
             presentation.application_begin(application);
+            vd::crash::context(vd::crash::Operation::jit_execute);
             auto status=code->invoke(value);
+            vd::crash::context(vd::crash::Operation::finished);
             presentation.application_finished(status);
             if(application)return status;
             std::cout<<status<<'\n';return 0;
         }
+        vd::crash::context(vd::crash::Operation::aot_build);
         if(command=="build") {
             if(!output) {
                 auto entry=std::filesystem::absolute(selected);
@@ -935,6 +944,13 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
 }
 
 static int run_cli(int argc, char** argv) {
+    const bool external=argc>=4 && std::string_view(argv[1])=="crashes" && std::string_view(argv[2])=="run";
+    if(auto status=vd::crash::start(external?"aot-program":"voidc",external?argv[3]:argv[0],vd::compiler_build_identity(),external))return *status;
+    vd::crash::context(vd::crash::Operation::cli);
+    if(external) {
+        try{return vd::crash::execute_external(argc-3,argv+3);}
+        catch(const std::exception& error){std::cerr<<error.what()<<'\n';return 2;}
+    }
     vd::cli::Presentation presentation;
     auto code=execute_cli(argc,argv,presentation);
     presentation.finish(code);

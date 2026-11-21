@@ -1,5 +1,16 @@
 # VOID editor integration (Phase 11)
 
+## Local crash diagnostics (G90)
+
+In VS Code or VSCodium, enable `void.crashDiagnostics.enabled` in user/machine
+settings. Optional `void.crashDiagnostics.directory` is an absolute local report
+leaf with an existing parent. Changes restart the server; setting enablement to
+`false` disables capture again, including preflight/compiler launches. Workspace
+settings cannot enable collection. Output → VOID preserves the native exit and
+report path; **VOID: Restart Language Server** performs explicit recovery.
+See [G90](projects/G90_CRASH_DIAGNOSTICS.md) for evidence, retention and limits.
+
+
 ## Bundled native package APIs
 
 In a trusted VS Code workspace with the matching `voidls`, run

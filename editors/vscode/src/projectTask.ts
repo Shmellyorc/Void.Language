@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import {crashEnvironment} from './crashDiagnostics';
 import {spawn, ChildProcessWithoutNullStreams} from 'node:child_process';
 import {constants} from 'node:os';
 import {compilerFileIdentity} from './config';
@@ -35,7 +36,7 @@ export function compilerExecution(invocation: CompilerInvocation | (() => Promis
                     if (capabilityIdentity && await compilerFileIdentity(compiler) !== capabilityIdentity)
                         throw new Error('The compiler changed after capability negotiation. Invoke the command again.');
                     if (closed) { finish(1); return; }
-                    process = spawn(compiler, args, {cwd, shell: false, windowsHide: true});
+                    process = spawn(compiler, args, {cwd, shell: false, windowsHide: true, env: crashEnvironment()});
                 } catch (error) {
                     output.fire(`VOID: ${error instanceof Error ? error.message : String(error)}\r\n`);
                     finish(1);
