@@ -1,0 +1,261 @@
+{
+  "schema": 1,
+  "examples": [
+    {
+      "id": "async-1",
+      "page": "Async.md",
+      "block": 0,
+      "mode": "async",
+      "stdout": "27\n",
+      "input": 2
+    },
+    {
+      "id": "collections-1",
+      "page": "Collections.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "35\n"
+    },
+    {
+      "id": "collections-2",
+      "page": "Collections.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "1 9\n4\napple 3\npear 4\n"
+    },
+    {
+      "id": "conditional-compilation-1",
+      "page": "Conditional-compilation.md",
+      "block": 0,
+      "mode": "target",
+      "stdout": "linux\n",
+      "outputs": {
+        "linux": "linux\n",
+        "windows": "windows\n",
+        "other": "other\n"
+      }
+    },
+    {
+      "id": "conditional-compilation-2",
+      "page": "Conditional-compilation.md",
+      "block": 1,
+      "mode": "feature",
+      "stdout": "tracing enabled\nready\n",
+      "disabled_stdout": "ready\n"
+    },
+    {
+      "id": "enums-and-flags-1",
+      "page": "Enums-and-flags.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "120\n"
+    },
+    {
+      "id": "enums-and-flags-2",
+      "page": "Enums-and-flags.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "ready 1\nunknown status\n"
+    },
+    {
+      "id": "enums-and-flags-3",
+      "page": "Enums-and-flags.md",
+      "block": 2,
+      "mode": "sync",
+      "stdout": "true\nfalse\n"
+    },
+    {
+      "id": "errors-and-nullable-values-1",
+      "page": "Errors-and-nullable-values.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "14\nexpected a positive number\n"
+    },
+    {
+      "id": "errors-and-nullable-values-2",
+      "page": "Errors-and-nullable-values.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "no selection\n0\n"
+    },
+    {
+      "id": "first-program-1",
+      "page": "First-program.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "Hello, world!\n"
+    },
+    {
+      "id": "functions-1",
+      "page": "Functions.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "36\n"
+    },
+    {
+      "id": "functions-2",
+      "page": "Functions.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "3\n"
+    },
+    {
+      "id": "generics-and-interfaces-1",
+      "page": "Generics-and-interfaces.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "7\nhello\n"
+    },
+    {
+      "id": "generics-and-interfaces-2",
+      "page": "Generics-and-interfaces.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "7\n"
+    },
+    {
+      "id": "home-1",
+      "page": "Home.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "Hello, Ada!\nHello, Lin!\n"
+    },
+    {
+      "id": "iteration-1",
+      "page": "Iteration.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "6\n0 a\n1 b\n"
+    },
+    {
+      "id": "iteration-2",
+      "page": "Iteration.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "3\n2\n1\n"
+    },
+    {
+      "id": "iteration-3",
+      "page": "Iteration.md",
+      "block": 2,
+      "mode": "async",
+      "stdout": "6\n",
+      "input": 2
+    },
+    {
+      "id": "language-basics-1",
+      "page": "Language-basics.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "9\n"
+    },
+    {
+      "id": "language-basics-2",
+      "page": "Language-basics.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "36\n"
+    },
+    {
+      "id": "managed-memory-1",
+      "page": "Managed-memory.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "2 12 5\n"
+    },
+    {
+      "id": "managed-memory-2",
+      "page": "Managed-memory.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "opened\n",
+      "fixtures": {
+        "notes.txt": "Owned note"
+      }
+    },
+    {
+      "id": "packages-and-raylib-1",
+      "page": "Packages-and-raylib.md",
+      "block": 0,
+      "mode": "raylib",
+      "stdout": "241\n"
+    },
+    {
+      "id": "packages-and-raylib-2",
+      "page": "Packages-and-raylib.md",
+      "block": 1,
+      "mode": "raylib",
+      "stdout": "false\n"
+    },
+    {
+      "id": "projects-and-modules-1",
+      "page": "Projects-and-modules.md",
+      "block": 0,
+      "mode": "module",
+      "stdout": null,
+      "file": "greeting.void",
+      "group": "modules"
+    },
+    {
+      "id": "projects-and-modules-2",
+      "page": "Projects-and-modules.md",
+      "block": 1,
+      "mode": "import",
+      "stdout": "Hello from another module\n",
+      "file": "app.void",
+      "group": "modules"
+    },
+    {
+      "id": "standard-library-1",
+      "page": "Standard-library.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "43\n"
+    },
+    {
+      "id": "standard-library-2",
+      "page": "Standard-library.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "Wiki notes\n",
+      "fixtures": {
+        "notes.txt": "Wiki notes"
+      }
+    },
+    {
+      "id": "standard-library-3",
+      "page": "Standard-library.md",
+      "block": 2,
+      "mode": "sync",
+      "stdout": "42\n"
+    },
+    {
+      "id": "static-members-1",
+      "page": "Static-members.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "origin 0 0\n"
+    },
+    {
+      "id": "structs-and-initialization-1",
+      "page": "Structs-and-initialization.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "2 3\n"
+    },
+    {
+      "id": "structs-and-initialization-2",
+      "page": "Structs-and-initialization.md",
+      "block": 1,
+      "mode": "sync",
+      "stdout": "3\nat least one ticket is required\n"
+    },
+    {
+      "id": "types-1",
+      "page": "Types.md",
+      "block": 0,
+      "mode": "sync",
+      "stdout": "120\n"
+    }
+  ]
+}

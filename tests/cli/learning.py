@@ -1,4 +1,4 @@
-"""Keep README/Wiki examples executable and tied to canonical repository sources."""
+"""Keep introductory canonical examples executable and check the Wiki publication set."""
 import os
 from pathlib import Path
 import re
@@ -16,17 +16,27 @@ cases = {'basics': (5, 9), 'types': (2, 120), 'functions': (3, 36),
          'collections': (5, 35), 'memory': (2, 19), 'async': (2, 27)}
 canonical = {name: (ROOT / 'examples/learn' / (name + '.void')).read_text(encoding='utf-8') for name in cases}
 hello = (ROOT / 'examples/hello/main.void').read_text(encoding='utf-8')
-documents = [ROOT / 'README.md', ROOT / 'docs/FIRST_PROGRAM.md', *(ROOT / 'docs/wiki').glob('*.md')]
+documents = [ROOT / 'README.md', ROOT / 'docs/FIRST_PROGRAM.md']
 blocks = 0
 for document in documents:
     for snippet in re.findall(r'```void\n(.*?)\n```', document.read_text(encoding='utf-8'), re.S):
         assert snippet + '\n' in [hello, *canonical.values()], f'Unverified/divergent example: {document}'
         blocks += 1
-assert blocks == 9, blocks
+assert blocks == 2, blocks
+# Wiki tutorials now have their own complete source/example inventory and checker.
+subprocess.run([sys.executable, '-B', str(ROOT / 'tools/wiki/check.py')], check=True)
+
+
+def limits():
+    if os.name == 'posix':
+        import resource
+        resource.setrlimit(resource.RLIMIT_STACK, (1048576, 1048576))
+        resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
 
 
 def run(argv):
-    result = subprocess.run(list(map(str, argv)), capture_output=True, text=True, encoding='utf-8', timeout=120)
+    result = subprocess.run(list(map(str, argv)), capture_output=True, text=True, encoding='utf-8', timeout=120,
+                            preexec_fn=limits if os.name == 'posix' else None)
     assert result.returncode == 0, (argv, result.returncode, result.stdout, result.stderr)
     return result.stdout.strip()
 
@@ -55,4 +65,4 @@ with tempfile.TemporaryDirectory(prefix='VOID learning é ') as directory:
             run([link[1], obj, *flags, '-o', output])
             assert run([output, value]) == str(expected)
         print(f'PASS: async input {value} => {expected} in normal and optimized AOT modes')
-print(f'PASS: {blocks} README/first-program/Wiki blocks match canonical examples; 12 execution cases')
+print(f'PASS: {blocks} README/first-program blocks match canonical examples; Wiki structure checked; 12 execution cases')

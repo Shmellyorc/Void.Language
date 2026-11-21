@@ -1,8 +1,13 @@
-# Print a message
+# Create your first application
 
-_Draft for Boss approval; repository documentation is canonical._
+With [the tools installed](https://github.com/Shmellyorc/Void.Language/wiki/Installation), create a project in a fresh directory:
 
-Create an empty project directory and save `main.void`:
+```sh
+voidc new app --name Hello
+cd Hello
+```
+
+This creates `void.project.toml` and `src/app.void`. Replace `src/app.void` with:
 
 ```void
 use console
@@ -12,20 +17,35 @@ func main() -> i32:
     return 0
 ```
 
+`print` writes text. `main` is the application entry, and its returned `i32` becomes
+the process status. Zero conventionally means success. The `console` import is
+available for richer terminal operations; `print` itself is a builtin.
+
+## Check, run, build
+
+Run these commands inside `Hello`:
+
 ```sh
 voidc check .
-# Source checked successfully
 voidc run .
-# Hello, world!
 voidc build . -o hello
 ./hello
-# Hello, world!
 ```
 
-Windows: `-o hello.exe`, then `.\hello.exe`. `print` writes the message; `return 0`
-sets the process status. Directory selection finds exact-case `main.void`.
-Application entry selection is automatic. Do not pass the removed entry flag.
-The compiler can also execute top-level application statements; do not mix
-competing entry styles.
+Both executions print `Hello, world!`. `check` diagnoses without executing the
+application. `run` uses the JIT; `build` creates an executable. On Windows use
+`voidc build . -o hello.exe`, then `.\hello.exe` in PowerShell.
 
-Walkthrough and native-flow diagram: [your first program](https://github.com/Shmellyorc/Void.Language/blob/main/docs/FIRST_PROGRAM.md).
+You can also save this program as `main.void` in a directory without a manifest
+and run `voidc run .`. Manifestless directories select that exact filename;
+manifest projects discover the application's main from their source inventory.
+[Projects and modules](https://github.com/Shmellyorc/Void.Language/wiki/Projects-and-modules) explains that difference.
+
+## Try a change
+
+Change the message, check again and rerun. Then add a variable using
+[Language basics](https://github.com/Shmellyorc/Void.Language/wiki/Language-basics), or open the folder with the
+[VOID editor extension](https://github.com/Shmellyorc/Void.Language/wiki/Editor-setup).
+
+Next: [Language basics](https://github.com/Shmellyorc/Void.Language/wiki/Language-basics).
+Precise entry rules: [Modules and applications](https://github.com/Shmellyorc/Void.Language/blob/main/docs/LANGUAGE_BIBLE.md#modules-and-applications).

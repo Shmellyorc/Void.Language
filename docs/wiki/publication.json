@@ -1,0 +1,163 @@
+{
+  "schema": 1,
+  "source_baseline": "553fe3f028ca3ce55d950c0bfe61b8d4503f13b3",
+  "wiki": "https://github.com/Shmellyorc/Void.Language/wiki",
+  "files": [
+    {
+      "file": "Async.md",
+      "sha256": "fa3eabd67df7a9ddc4357b84d731beecd91ebb6dc0a1b89aacaa3e59309ecd46",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Async"
+    },
+    {
+      "file": "CLI-commands.md",
+      "sha256": "f3107851a952dd4b463f72e309f15331c5df70cf586317f8cd54018d3f6d153d",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/CLI-commands"
+    },
+    {
+      "file": "Collections.md",
+      "sha256": "c8d295d05a577d0bfa55de1621bee7f0a467067a7e529b3e86bf6e89b5673e4d",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Collections"
+    },
+    {
+      "file": "Conditional-compilation.md",
+      "sha256": "d4f9252d2d2458502a492b166548c5c521c9d0957716391f3e530d1bf1a977a4",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Conditional-compilation"
+    },
+    {
+      "file": "Editor-setup.md",
+      "sha256": "ddb6a8336bcddeeac95731678852f65c07a4f275909bef545f3ae56a8a7ff596",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Editor-setup"
+    },
+    {
+      "file": "Enums-and-flags.md",
+      "sha256": "8cceb1d9a8a095ce8492edb24f98cd92067ea15f13f135157542df47558d19a5",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Enums-and-flags"
+    },
+    {
+      "file": "Errors-and-nullable-values.md",
+      "sha256": "dec83bd18b6c4039c435a561575dbf4d16cb699724054e190cdaad2a1a7b6ce8",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Errors-and-nullable-values"
+    },
+    {
+      "file": "First-program.md",
+      "sha256": "d1a0909e85def8817c5f4a272e55a5fc2da3a57efcb02d225b5b99a843e62564",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/First-program"
+    },
+    {
+      "file": "Functions.md",
+      "sha256": "c95e6afa011fa821b749365a5c87e8f18fa724bd6a57e6fd1c30ba84c4eae5f5",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Functions"
+    },
+    {
+      "file": "Generics-and-interfaces.md",
+      "sha256": "f35e5faffd03742be135222b6bcc4bc4686801ce0d5dfb31c10b657caf5e06bd",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Generics-and-interfaces"
+    },
+    {
+      "file": "Home.md",
+      "sha256": "17cab443d9ea531df82b33e72f851e26a12647eb859fdd97619fb2f011cf6424",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Home"
+    },
+    {
+      "file": "Installation.md",
+      "sha256": "01509c04a0cebfb1c1532dd59a288d4641a4b8c22fe4421a1590bbd66505808f",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Installation"
+    },
+    {
+      "file": "Iteration.md",
+      "sha256": "bb2e2212ff08ac1b93701be8d905649dcc9c3cdc8ed7f969a4170e77cb0b1a45",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Iteration"
+    },
+    {
+      "file": "Language-basics.md",
+      "sha256": "113a10e2e0de055f46c3d4ab96a4376b4b40e16453623589477aa349ef182aa1",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Language-basics"
+    },
+    {
+      "file": "Managed-memory.md",
+      "sha256": "90b6ac8c2e59daca7e646944ae0aa7f0e1b639d84d8588ad7fc67505ecdb0bf0",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Managed-memory"
+    },
+    {
+      "file": "Native-compilation.md",
+      "sha256": "e5062fd313a6f2fc14c53439578ce324b09f9520b21502809f59482e2d8ebe68",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Native-compilation"
+    },
+    {
+      "file": "Packages-and-raylib.md",
+      "sha256": "c05e178b9eefd4af41373e47f60be27eebdd217b44a10659c0bd6acbbd406bd8",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Packages-and-raylib"
+    },
+    {
+      "file": "Projects-and-modules.md",
+      "sha256": "4cab3679931f146c12ce64b0ba58e5c5de8e73d4cff663fa9ad1e01812fa0874",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Projects-and-modules"
+    },
+    {
+      "file": "Resources-and-status.md",
+      "sha256": "86fb5c0db33b5e051298c577b8dfadab8bac88fe9682db2878d9994b56945ceb",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Resources-and-status"
+    },
+    {
+      "file": "Standard-library.md",
+      "sha256": "ce8969e211f169fb08be2d4b15d9c2c7f3e60730e25b5892e6bf53f341e3413c",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Standard-library"
+    },
+    {
+      "file": "Static-members.md",
+      "sha256": "d38fd1e36692af7457a171850814743435bdbc7a60ad3c74813a517ace5609a7",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Static-members"
+    },
+    {
+      "file": "Structs-and-initialization.md",
+      "sha256": "5b1bd98e0134ba7bb95f2df555c7c5c2f6b223bfe56c600ac4938d763e628b5f",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Structs-and-initialization"
+    },
+    {
+      "file": "Troubleshooting.md",
+      "sha256": "6ae69cf3321ec517200dc2ab96bd8c7412d55a8d805aecff53a8033e14c15bf4",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Troubleshooting"
+    },
+    {
+      "file": "Types.md",
+      "sha256": "dc333325f92810ba6bce7e5b8233c4d8162d741e07079d5c13b1c11392cf4843",
+      "role": "page",
+      "route": "https://github.com/Shmellyorc/Void.Language/wiki/Types"
+    },
+    {
+      "file": "_Footer.md",
+      "sha256": "4618d9e8b986d987134af8fe10a2c44b2a332bc535063926f9757af86626644e",
+      "role": "shared",
+      "route": null
+    },
+    {
+      "file": "_Sidebar.md",
+      "sha256": "2fabca83b146f2bc196bc95e512fa346c863adb3bce539e3595304c4bd565b88",
+      "role": "shared",
+      "route": null
+    }
+  ]
+}

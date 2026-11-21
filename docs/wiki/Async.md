@@ -1,9 +1,8 @@
-# Understand async execution
+# Write asynchronous work with clear ownership
 
-_Draft for Boss approval; repository documentation is canonical._
-
-Async functions produce tasks; `await` suspends the current async activation while
-waiting for a result. This complete example returns 27 for input 2:
+An async function produces a task. `await` waits for its result while permitting
+the owner to run other cooperative work. Start independent tasks before awaiting
+them when you want work to overlap.
 
 ```void
 async func ticket_total(ticket_count: i32) -> i32:
@@ -16,20 +15,46 @@ async func entry(ticket_count: i32) -> i32:
     return tickets + booking_fee
 ```
 
-Save as `async.void`. `voidc check async.void` validates it. Ordinary `voidc run`
-and `voidc build` do not supply the async execution host. To reproduce execution
-from a test-enabled engineering build, use the repository's existing async adapter
-through the learning-example checker:
+For input 2, this computes `27`. `pending_total` is a task handle; `tickets` is the
+integer result after the await. This small example explains the control flow;
+it does not demonstrate parallel CPU execution.
+
+## Check and execute the example
+
+Save as `async.void` and use `voidc check async.void`. Ordinary `voidc run` and
+`voidc build` do **not** supply an async root host. An application's normal `main`
+is synchronous. Async libraries require the explicit embedding/root adapter
+described in the [async contract](https://github.com/Shmellyorc/Void.Language/blob/main/docs/ASYNC.md#explicit-root-adapter).
+
+For contributors with a matching test-enabled source build, the maintained
+learning checker executes this exact example through that adapter:
 
 ```sh
-python3 tests/cli/learning.py build/llvm23-release/voidc build/llvm23-release
-# PASS includes async input 2 => 27 in normal and optimized AOT modes
+python3 -B tests/cli/learning.py build/llvm23-release/voidc build/llvm23-release
 ```
 
-This command checks the canonical `examples/learn/async.void`, matching the source
-above. It requires the matching `void_async_tests` target and native manifests;
-there is no claim that it is part of an installed end-user package.
-Task groups govern child lifetimes/cancellation. Restricted value-only worker
-transfers are a separate facility from cooperative async execution.
+It needs the matching `void_async_tests` target and native resources. That target
+is an engineering fixture, not a command shipped in the installed user toolchain.
+The checker also runs the other learning examples; use the canonical embedding
+guide when building your own host.
 
-Canonical contracts and limits: [async](https://github.com/Shmellyorc/Void.Language/blob/main/docs/ASYNC.md), [task retention](https://github.com/Shmellyorc/Void.Language/blob/main/docs/STAGE8_ASYNC_RETENTION.md), [host integration](https://github.com/Shmellyorc/Void.Language/blob/main/docs/NATIVE_LIBRARIES.md).
+## Own the work
+
+Use structured groups to bound child lifetimes. Group exit joins admitted work;
+there are no detached source tasks. Runtime failure and cancellation can cause
+draining, while a typed `Err` is an ordinary successful task result. Handle it
+using [result patterns](https://github.com/Shmellyorc/Void.Language/wiki/Errors-and-nullable-values), not by assuming it cancels siblings.
+
+Cancellation waits for entered native work and descendants before resources are
+retired. A completion signal alone does not make a running frame safe to destroy.
+Source workers use restricted transfer rules and cannot access runtime globals,
+even through helpers. Shared managed identity is not blanket cross-thread access.
+
+Concrete generic async functions are supported. Async interface dispatch, async
+callable values, async value receivers and async destructors remain unavailable.
+For a source that advances asynchronously, see the worked
+[async iterator](https://github.com/Shmellyorc/Void.Language/wiki/Iteration#await-the-next-item).
+
+Next: [Conditional compilation](https://github.com/Shmellyorc/Void.Language/wiki/Conditional-compilation) or
+[Standard library](https://github.com/Shmellyorc/Void.Language/wiki/Standard-library).
+Precise scheduler, group, worker and cleanup rules: [Async/Tasks](https://github.com/Shmellyorc/Void.Language/blob/main/docs/ASYNC.md).

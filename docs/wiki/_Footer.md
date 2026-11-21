@@ -1,1 +1,1 @@
-[Canonical repository documentation](https://github.com/Shmellyorc/Void.Language/blob/main/docs/README.md) · [Official website](https://voidlang.com)
+[Home](https://github.com/Shmellyorc/Void.Language/wiki/Home) · [Troubleshooting](https://github.com/Shmellyorc/Void.Language/wiki/Troubleshooting) · [Language specification](https://github.com/Shmellyorc/Void.Language/blob/main/docs/LANGUAGE_BIBLE.md) · [Status and resources](https://github.com/Shmellyorc/Void.Language/wiki/Resources-and-status)

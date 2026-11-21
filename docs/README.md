@@ -1,5 +1,8 @@
 # VOID documentation
 
+- [G89 GitHub Wiki candidate](projects/G89_GITHUB_WIKI_OVERHAUL.md):
+  tutorial pages, sidebar and contextual navigation, checked examples and publication preparation.
+
 - [G88 standard-library/package modernization](projects/G88_STDLIB_PACKAGES_MODERNIZATION.md):
   complete inventory, typed APIs, migration, specification consolidation and qualification.
 

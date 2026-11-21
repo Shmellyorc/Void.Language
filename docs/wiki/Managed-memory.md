@@ -1,8 +1,7 @@
-# Copy values and share managed objects
+# Copy values, share objects and close resources
 
-_Draft for Boss approval; repository documentation is canonical._
-
-A `value struct` is copied by value. An ordinary `struct` has managed identity:
+Copying a value and sharing an object are both useful. Choose intentionally when
+you design a [struct](https://github.com/Shmellyorc/Void.Language/wiki/Structs-and-initialization) or a [collection](https://github.com/Shmellyorc/Void.Language/wiki/Collections).
 
 ```void
 value struct point:
@@ -11,38 +10,59 @@ value struct point:
 struct counter:
     total: i32
 
-func entry(value: i32) -> i32:
-    var original = point(x = value)
+func main():
+    var original = point(x = 2)
     var copied = original
     copied.x += 10
     var shared = counter(total = 0)
     var alias = shared
     alias.total += 5
-    return original.x + copied.x + shared.total
+    print(original.x, copied.x, shared.total)
 ```
 
-Save as `memory.void`, then run:
+This prints `2 12 5`. `copied` has its own value storage. `shared` and `alias`
+refer to the same managed counter. Lists and dictionaries also retain shared
+identity on assignment; fixed arrays copy their own value storage.
 
-```sh
-voidc check memory.void
-voidc run memory.void 2
-# 19
+## Readonly access follows references
+
+A `const` binding preserves deep readonly authority through referenced children.
+Copying a scalar or a value's own fields can produce independent writable storage;
+it does not grant writable access to a readonly referenced child. Copying a
+reference field preserves that object's identity and permitted access.
+
+## Close native resources
+
+Garbage collection keeps reachable managed data alive. It does not promise timely
+closure of files, native images, callbacks or other external resources.
+
+```void
+use io as io
+
+func show_open() -> result<bool, io.error>:
+    with io.open("notes.txt")? as handle:
+        print("opened")
+    return Ok(true)
+
+func main():
+    if show_open() is Err(var failure):
+        print("could not open")
 ```
 
-The numeric `entry` adapter prints the result and exits zero.
+Create `notes.txt` in the working directory. On successful open it prints
+`opened`; `with` closes the handle when its body ends. A failed open propagates
+through `?` and the caller prints `could not open`. Resource wrappers can share close authority;
+a copied wrapper is not a new independent native resource. For fallible reads and
+cleanup outcomes, follow the specific API's result contract in
+[the standard-library guide](https://github.com/Shmellyorc/Void.Language/wiki/Standard-library#read-a-file).
 
-`original.x` stays 2, `copied.x` becomes 12, and `alias` changes the same counter
-seen through `shared` to 5. The result is 2 + 12 + 5 = 19.
+Use `with` for types with scoped `deinit` cleanup, and `defer` for explicit calls.
+Cleanup still applies when you return or propagate an error. Task cancellation
+must drain owned native work before resource destruction; see [Async](https://github.com/Shmellyorc/Void.Language/wiki/Async).
+The [raylib image example](https://github.com/Shmellyorc/Void.Language/wiki/Packages-and-raylib#a-first-native-operation) shows an
+explicit native unload.
 
-```mermaid
-flowchart LR
-    O[original: x=2] --> C[value copy: copied x=12]
-    S[shared] --> M[counter total=5]
-    A[alias] --> M
-```
-
-The Runtime coordinates precise collection and required roots. Managed memory
-does not imply unrestricted cross-thread sharing, unbounded resources or automatic
-closure of every external resource. Follow the documented ownership/cleanup APIs.
-
-Canonical details: [managed structs](https://github.com/Shmellyorc/Void.Language/blob/main/docs/MANAGED_STRUCTS.md), [value structs](https://github.com/Shmellyorc/Void.Language/blob/main/docs/VALUE_STRUCTS.md), [GC Runtime](https://github.com/Shmellyorc/Void.Language/blob/main/docs/GC_RUNTIME.md).
+Next: [Standard library](https://github.com/Shmellyorc/Void.Language/wiki/Standard-library).
+Precise rules: [Value semantics](https://github.com/Shmellyorc/Void.Language/blob/main/docs/VALUE_SEMANTICS.md),
+[Managed structs](https://github.com/Shmellyorc/Void.Language/blob/main/docs/MANAGED_STRUCTS.md), [Resource lifecycle](https://github.com/Shmellyorc/Void.Language/blob/main/docs/ADVANCED_LANGUAGE.md),
+[GC Runtime](https://github.com/Shmellyorc/Void.Language/blob/main/docs/GC_RUNTIME.md).

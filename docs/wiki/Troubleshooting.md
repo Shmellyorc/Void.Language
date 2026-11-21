@@ -1,15 +1,52 @@
-# Fix the development loop
+# Find the cause of a failed development step
 
-_Draft for Boss approval; repository documentation is canonical._
+Start with the first diagnostic and the exact command. A compiler failure,
+application error result and nonzero application status have different meanings;
+see [CLI status](https://github.com/Shmellyorc/Void.Language/wiki/CLI-commands#interpret-output-and-status) and
+[result handling](https://github.com/Shmellyorc/Void.Language/wiki/Errors-and-nullable-values).
 
-1. Record `voidc --version`, OS/architecture, source revision and the exact command.
-2. Confirm PATH resolves the installed compiler/server you intended.
-3. Read the first source/toolchain diagnostic; an application status is not printed output.
-4. Inspect `source-install.json` and adjacent logs for a failed source-install step.
-5. Follow the [canonical troubleshooting table](https://github.com/Shmellyorc/Void.Language/blob/main/docs/TROUBLESHOOTING.md)
-   for SDK hashes, HTTP prefixes, installed stdlib, native resources and editor startup.
+## Check the selected installation
 
-Common fixes: remove `--app`, pass the correct source path, remove stale stdlib
-overrides, keep native manifests/archives together, and retain the original SDK
-for native builds. Do not replace missing verified libraries with ambient ones.
-A clean-machine or Windows/macOS claim requires execution on that native platform.
+On Unix:
+
+```sh
+command -v voidc
+command -v voidls
+voidc --version
+```
+
+On Windows use `where.exe voidc` and `where.exe voidls`. Confirm that the tools
+belong to the same installation. When reporting a problem, include the version,
+source revision if known, OS/architecture, exact command and first diagnostic.
+Avoid including credentials or private source unnecessarily.
+
+## Follow the symptom
+
+| Symptom | Useful next step |
+| --- | --- |
+| SDK/dependency setup fails | Read `source-install.json` and adjacent logs in the chosen build directory. Follow the native [installation guide](https://github.com/Shmellyorc/Void.Language/wiki/Installation). |
+| Standard imports cannot resolve | Keep the installed prefix together. Remove a stale `VOID_STDLIB_ROOT` override unless you deliberately need matching external sources. |
+| No main, ambiguous main or wrong source root | Check the [manifest/source selection](https://github.com/Shmellyorc/Void.Language/wiki/Projects-and-modules); do not rename files blindly. |
+| Invalid `--app` or profile option | Remove obsolete `--app`; profiles require manifest project mode. See [CLI commands](https://github.com/Shmellyorc/Void.Language/wiki/CLI-commands). |
+| Native linker/resources are missing | Retain the original pinned SDK and matching manifests/archives. See [Native compilation](https://github.com/Shmellyorc/Void.Language/wiki/Native-compilation#keep-matching-resources). |
+| A dependency or lock is stale | Inspect the changed manifest/source and `voidc deps explain`; review `voidc tidy --check` before choosing an explicit update. |
+| Native execution is refused | Review the exact [provider and approval](https://github.com/Shmellyorc/Void.Language/wiki/Packages-and-raylib); do not bypass a corrupt lock by weakening checks. |
+| An integer is rejected for a selector | Pass the required [nominal enum](https://github.com/Shmellyorc/Void.Language/wiki/Enums-and-flags), or an explicitly documented [raw keyboard-code operation](https://github.com/Shmellyorc/Void.Language/wiki/Packages-and-raylib#typed-input-and-raw-key-codes). |
+| Async source checks but does not run | Ordinary CLI execution has no implicit [async root host](https://github.com/Shmellyorc/Void.Language/wiki/Async#check-and-execute-the-example). |
+| Editor has no diagnostics/completion | Trust the intended folder; inspect **Output → VOID**, actual server path and [project configuration](https://github.com/Shmellyorc/Void.Language/wiki/Editor-setup). Repair imports, refresh or restart after fixing configuration. |
+
+## Reduce a source problem
+
+Keep a small copy outside your original project, retain the exact failure and
+remove unrelated code until the behavior is clear. Do not replace a legitimate
+Runtime diagnostic with a silent default. Check whether a syntax or feature is
+implemented in the [language specification](https://github.com/Shmellyorc/Void.Language/blob/main/docs/LANGUAGE_BIBLE.md), especially
+when reading older discussion or future design notes.
+
+Use the guide for your OS and architecture: SDKs, native providers and editor
+executable paths are platform-specific. See
+[Status and further reading](https://github.com/Shmellyorc/Void.Language/wiki/Resources-and-status) for those boundaries and the
+[canonical troubleshooting guide](https://github.com/Shmellyorc/Void.Language/blob/main/docs/TROUBLESHOOTING.md) for detailed SDK,
+native, source installation and LSP diagnostics.
+
+Next: return to [Home](https://github.com/Shmellyorc/Void.Language/wiki/Home) or [your first application](https://github.com/Shmellyorc/Void.Language/wiki/First-program).
