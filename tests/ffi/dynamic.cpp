@@ -1,4 +1,5 @@
 #include "void/backend.hpp"
+#include "void/cache.hpp"
 #include "void/c_primitive.hpp"
 #include "void/frontend.hpp"
 #include "void/native_resource.hpp"
@@ -336,9 +337,14 @@ void lifecycle(const std::string& recipe, const fs::path& source, const fs::path
     CPrimitiveThunk* thunk = nullptr;
     std::weak_ptr<const DynamicBinding> lease;
     {
-        Jit jit;
+        Jit jit({bundle,std::string(compiler_build_identity())});
         auto program = analyze(probe, admission);
         auto first = jit.compile(*program,optimize);
+        require(jit.cache_status()=="miss", "dynamic cold cache bypassed");
+        auto warm=jit.compile(*program,optimize);
+        require(jit.cache_status()=="hit" && warm->runtime_owner()!=first->runtime_owner() &&
+                warm->invoke(7)==104 && first->invoke(7)==104, "dynamic warm Runtime isolation");
+        first=std::move(warm);
         auto runtime = first->runtime_owner();
         ReloadSlot slot(first);
         thunk = observed_thunk(*runtime,recipe);
@@ -378,6 +384,16 @@ void lifecycle(const std::string& recipe, const fs::path& source, const fs::path
             (void)jit.compile(forged_runtime,forged_runtime.entry_symbol,optimize,{},runtime);
         });
         require(jit.replace(slot,*updated,optimize), "compatible reload failed");
+        require(jit.cache_status()=="miss" && first->invoke(91)==38 && slot.invoke(91)==39,
+                "reload did not compile a new cached generation");
+        require(jit.replace(slot,*updated,optimize) && jit.cache_status()=="hit",
+                "reload generation did not populate the persistent store");
+        {
+            Jit ordinary({bundle,std::string(compiler_build_identity())});
+            auto reused=ordinary.compile(*updated,optimize);
+            require(ordinary.cache_status()=="hit" && reused->invoke(7)==104 &&
+                    reused->runtime_owner()!=runtime, "ordinary run did not reuse the validated reload object");
+        }
         first.reset();
         require(jit.live_generations() == 2 && slot.invoke(91) == 39 &&
                 observed_thunk(*runtime,recipe) == thunk, "reload lost binding or acquisition lease");
@@ -402,8 +418,17 @@ void replacement(const std::string& recipe, const fs::path& source, const fs::pa
     for (const auto& image : plan->images())
         fs::copy_file(root/image.name, stage/image.name, fs::copy_options::overwrite_existing);
     auto program = analyze(source, CPrimitiveAdmission::admit_dynamic(recipe, stage));
-    Jit jit;
+    Jit jit({sandbox,std::string(compiler_build_identity())});
     auto code = jit.compile(*program, false);
+    require(jit.cache_status()=="miss", "replacement fixture did not publish a cache entry");
+    {
+        const auto other=sandbox/"fresh-stage";fs::create_directories(other);
+        for(const auto& image:plan->images())fs::copy_file(root/image.name,other/image.name);
+        auto fresh=analyze(source,CPrimitiveAdmission::admit_dynamic(recipe,other));
+        auto reused=jit.compile(*fresh,false);
+        require(jit.cache_status()=="hit" && reused->invoke(7)==104,
+                "fresh native stage did not reuse the object with fresh authority");
+    }
     const auto staged = stage/"replace.tmp";
     fs::copy_file(competitor, staged, fs::copy_options::overwrite_existing);
     fs::rename(staged, stage/plan->images().front().name);

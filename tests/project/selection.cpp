@@ -34,6 +34,8 @@ void selection_and_snapshots(){
  Fixture f;f.write("src/features/launcher.void",main_source);f.write("src/unrelated.void","func unused() -> i32:\n    return false\n");
  auto p=f.good();check(p->program()->entry_identity()=="/src/features/launcher.void","deep any-name entry");check(p->root()==fs::canonical(f.root),"manifest root");check(p->discovery_sources().size()==2 && p->execution_sources().size()==1,"D differs from E");
  check(&p->discovery_sources().at("/src/features/launcher.void").text()==&p->execution_sources().at("/src/features/launcher.void").text(),"D/E share captured snapshot");
+ f.write(".void/cache/v1/unknown","preserve private artifacts");
+ check(f.good()->selection_key()==p->selection_key(),"first cache publication invalidated unchanged project selection");
  auto old=p->selection_key();f.write("src/second.void",main_source);auto ambiguous=f.bad(Code::project_entry);auto again=f.analyze();check(vd::render_diagnostic(ambiguous.diagnostics[0])==vd::render_diagnostic(again.diagnostics[0]),"deterministic ambiguity");check(ambiguous.diagnostics[0].related.size()==2 && ambiguous.diagnostics[0].related[0].span.module_identity=="/src/features/launcher.void" && ambiguous.diagnostics[0].related[0].span.begin==5 && ambiguous.diagnostics[0].related[0].span.end==9,"exact canonical ambiguity source locations");
  check(p->discovery_sources().size()==2 && p->program()->entry_identity()=="/src/features/launcher.void","returned snapshot independent of later disk changes");
  auto explicit_p=f.good("src/features/launcher.void");check(explicit_p->discovery_sources().empty() && explicit_p->selection_key()!=old,"explicit mode distinct without D");

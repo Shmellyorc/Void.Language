@@ -3,6 +3,7 @@ from contextlib import nullcontext
 from hashlib import sha256
 from pathlib import Path
 import os
+import json
 import re
 import shutil
 import subprocess
@@ -191,9 +192,14 @@ def qualify(root):
         assert output.count('G5 transport refused before native unregister') == 4
         assert output.count('G5 native unregistered and drained') == 4
 
-    def cases(command, env):
+    def cases(command, env, cache_prefix=None):
         for mode in ('normal', 'implicit', 'retired', 'failure'):
-            argv = [*command, mode]
+            selected = list(command)
+            if cache_prefix:
+                report = root / f'{cache_prefix}-{mode}.json'
+                position = selected.index('--')
+                selected[position:position] = ['--timings', '--timings-format', 'json', '--timings-output', report]
+            argv = [*selected, mode]
             if mode == 'failure':
                 output = run(cwd, *argv, status=1, expected='Division by zero', env=env)
                 assert 'G5 native unregistered' not in output
@@ -205,10 +211,18 @@ def qualify(root):
                 assert barrier in output
                 if retired:
                     assert 'closed, null or invalid' in output
+            if cache_prefix:
+                timing = json.loads(report.read_text())
+                expected = 'unavailable' if windows or not managed else 'miss' if cache_prefix.endswith('cold') and mode == 'normal' else 'hit'
+                assert timing['cache']['status'] == expected, timing
+                if not managed:
+                    assert not (project / '.void/cache/v1').exists(), 'unfingerprinted native plan persisted an object'
 
     packages = []
     for name, options in (('normal', ['--no-opt']), ('optimized', [])):
         cases([compiler, 'run', *select, '--allow-native', '--no-cache', *options, '--'], environment)
+        for phase in ('cold', 'warm'):
+            cases([compiler, 'run', *select, '--allow-native', *options, '--'], environment, f'{name}-{phase}')
         output = root / ('linked-' + name) / ('g5' + exe)
         run(cwd, compiler, 'build', *select, '--allow-native', *options, '-o', output)
         package = root / ('relocated ' + name + ' 雪')

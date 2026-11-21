@@ -184,13 +184,23 @@ std::unique_ptr<llvm::TargetMachine> native_machine() {
     if (!machine) throw std::runtime_error("cannot create native target machine");
     return machine;
 }
-static void check_c_primitive_target(const ir::Module& input, const llvm::Triple& target) {
-    if (!input.c_primitives) return;
-    const bool windows = input.c_primitives->target() == "x86_64-pc-windows-msvc";
+static void check_c_primitive_target(const CPrimitiveAdmission::Owner& admission, const llvm::Triple& target) {
+    if (!admission) return;
+    const bool windows = admission->target() == "x86_64-pc-windows-msvc";
     const bool matching = windows ? target.isOSWindows() && target.getEnvironment() == llvm::Triple::MSVC :
         target.isOSLinux() && target.getEnvironment() == llvm::Triple::GNU;
     if (target.getArch() != llvm::Triple::x86_64 || !matching)
         throw std::invalid_argument("C primitive descriptor does not match the native LLVM target");
+}
+static std::shared_ptr<const DynamicBinding> prepare_dynamic(const CPrimitiveAdmission::Owner& admission,
+                                                            const std::shared_ptr<Runtime>& runtime) {
+    if(!admission || !admission->dynamic())return {};
+    if(!runtime)throw std::invalid_argument("C dynamic closure requires a coordinated Runtime");
+    auto dynamic=runtime->dynamic_binding();
+    if(!dynamic)return load_dynamic(admission->dynamic(),admission->dynamic_root());
+    if(!matches_dynamic(*dynamic,*admission->dynamic(),admission->dynamic_root()))
+        throw std::invalid_argument("C dynamic closure is incompatible with the Runtime binding");
+    return dynamic;
 }
 static llvm::CallInst* call_c_primitive(llvm::IRBuilder<>& b, llvm::Module& module, const CPrimitiveAdmission& admission,
                                       std::uint32_t ordinal, llvm::Value* words, std::uint32_t count, llvm::Value* result,
@@ -3523,7 +3533,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
         else { if (!impl_->source_runtime) impl_->source_runtime=std::make_shared<Runtime>(256,Runtime::AllocationPolicy::live); runtime=impl_->source_runtime; }
     }
     std::map<std::string,ir::ReferenceEffects> checked_effects;ir::validate(input,nullptr,&checked_effects);
-    check_c_primitive_target(input, impl_->jit->getTargetTriple());
+    check_c_primitive_target(input.c_primitives, impl_->jit->getTargetTriple());
     if (input.coordinated != static_cast<bool>(runtime)) throw std::invalid_argument("coordinated IR requires an explicit runtime owner");
     const ir::Function* selected = nullptr;
     for (const auto& f : input.functions) if (f.name == entry) selected = &f;
@@ -3605,15 +3615,7 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     module->setTargetTriple(impl_->jit->getTargetTriple());
     ir_timing.finish();
     finish(*module, optimize);
-    std::shared_ptr<const DynamicBinding> dynamic;
-    if (input.c_primitives && input.c_primitives->dynamic()) {
-        const auto& plan = input.c_primitives->dynamic();
-        const auto& root = input.c_primitives->dynamic_root();
-        dynamic = runtime->dynamic_binding();
-        if (!dynamic) dynamic = load_dynamic(plan, root);
-        else if (!matches_dynamic(*dynamic, *plan, root))
-            throw std::invalid_argument("C dynamic closure is incompatible with the Runtime binding");
-    }
+    auto dynamic=prepare_dynamic(input.c_primitives,runtime);
     auto result = impl_->load(std::move(module), std::move(context), native_symbol(*selected, suffix), std::move(contract), impl_, !selected->module_identity.empty() || input.coordinated, runtime,suffix,!selected->module_identity.empty() || bool(input.c_primitives),{},input.c_primitives,dynamic);
     if (dynamic) runtime->bind_dynamic(std::move(dynamic));
     if (!input.globals.empty()) runtime->admit_globals(global_contract(input), impl_->replacing_globals);
@@ -3629,11 +3631,18 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     impl_->cache_status="disabled";
     auto cold=[&]{auto module=analysis.lower(impl_->emission);module.async_root=async_root;return compile(module,module.entry_symbol,optimize,contract,runtime);};
     if(!impl_->cache.project_root.empty() && impl_->cache.build_identity.empty()){impl_->cache_status="unavailable";return cold();}
-    if (analysis.c_primitive_admission()) {
+    const auto& native=analysis.c_primitive_admission();
+    // Parsed closures identify every image; managed conventional plans identify
+    // both provider and adapter in their verified payload. Unmanaged conventional
+    // plans name files without hashing them, just as linked thunks lack a stable
+    // implementation identity. Neither is eligible for persistent reuse.
+    if (native && (!native->dynamic() ||
+        (native->dynamic()->conventional() && native->dynamic()->payload().empty()))) {
         if (!impl_->cache.project_root.empty()) impl_->cache_status = "unavailable";
         return cold();
     }
     if(impl_->custom_bindings || impl_->cache.project_root.empty())return cold();
+    check_c_primitive_target(native,impl_->jit->getTargetTriple());
     observation::Scope lookup_timing(observation::Phase::cache_lookup);
     std::string identity;
     try {
@@ -3642,10 +3651,19 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     field(impl_->cache.build_identity);field("integrated-log-v1;rooted-local-cleanup;join-utf8;compact-sync-write");field("checked-root-location-v2");field(std::to_string(sizeof(Runtime::Frame)));field(formatting::abi_version);field(temporal::abi_version);field(impl_->target_identity);field(analysis.entry_identity());field(async_root?"async-root-v1":"sync-root");
     field(optimize?"ir-O2":"no-ir-O2");
     field(impl_->emission==ir::Emission::entry?"entry-emission-v1":"all-exports");
-    field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime ? "forced-runtime" : "automatic-runtime");
+    // Dynamic source lowering is always coordinated, so supplying its live
+    // Runtime for replacement does not change generated code. Share this new
+    // eligible family with ordinary runs; preserve every existing key recipe.
+    field(analysis.compatibility_contract());field(analysis.constant_contract());field(runtime && !native ? "forced-runtime" : "automatic-runtime");
     field(analysis.application_metadata()?std::string_view(analysis.application_metadata()->bytes()):std::string_view{});
     field(std::to_string(analysis.modules().size()));
     for(const auto& m:analysis.modules()) {field("module");field(m.identity);field(m.source.path());field(m.source.text());field(std::to_string(m.imports.size()));for(const auto& i:m.imports)field(i);}
+    if(native) {
+        field("admitted-dynamic-object-v1");field(native->descriptor());field(native->module());
+        field(native->target());field(native->dynamic()->bytes());
+        // The per-invocation staging root is authority held by the fresh
+        // admission/Runtime, never an object identity or serialized address.
+    }
     } catch(const std::bad_alloc&) {impl_->cache_status="unavailable";lookup_timing.finish();return cold();}
     llvm_backend::NativeCache store(impl_->cache.project_root,identity);
     if(!store.available()){impl_->cache_status="unavailable";lookup_timing.finish();return cold();}
@@ -3656,9 +3674,9 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
             auto object=llvm::MemoryBuffer::getMemBufferCopy(artifact->object);
             auto owner=runtime;
             const bool globals = std::any_of(analysis.declarations().begin(), analysis.declarations().end(), [](const auto& d) { return d.kind == AnalyzedDeclaration::Kind::global_variable; });
-            if (globals && !artifact->coordinated) throw std::runtime_error("global cache coordination mismatch");
+            if ((globals || native) && !artifact->coordinated) throw std::runtime_error("cache coordination mismatch");
             if (artifact->coordinated && !owner) {
-                if (analysis.application_metadata() || globals) owner = std::make_shared<Runtime>(256,Runtime::AllocationPolicy::live);
+                if (analysis.application_metadata() || globals || native) owner = std::make_shared<Runtime>(256,Runtime::AllocationPolicy::live);
                 else { if (!impl_->source_runtime) impl_->source_runtime = std::make_shared<Runtime>(256,Runtime::AllocationPolicy::live); owner = impl_->source_runtime; }
             }
             if (owner) owner->start_application(analysis.application_metadata(),false);
@@ -3670,11 +3688,16 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
             contract.source_contract=analysis.compatibility_contract();contract.constant_contract=analysis.constant_contract();
             contract.analysis=analysis.shared_from_this();contract.runtime_identity=reinterpret_cast<std::uintptr_t>(owner.get());
             contract.application_metadata=analysis.application_metadata();
+            contract.native_thunk_identity=native && native->revision()==3 ? reinterpret_cast<std::uintptr_t>(native->thunk()) : 0;
+            contract.native_dynamic_contract=native ? native->dynamic_contract() : std::string{};
             if (contract.application_metadata)
                 contract.build_provenance=application_build_provenance(&analysis,*contract.application_metadata,impl_->target_identity,optimize,impl_->cache.build_identity);
             ir::Function entry;entry.name=expected;entry.module_identity=analysis.entry_identity();
-            auto result=impl_->load({}, {},native_symbol(entry,"__cache"),contract,impl_,true,owner,"__cache",true,std::move(object));
+            auto dynamic=prepare_dynamic(native,owner);
+            auto result=impl_->load({}, {},native_symbol(entry,"__cache"),contract,impl_,true,owner,"__cache",true,std::move(object),native,dynamic);
+            if(dynamic)owner->bind_dynamic(std::move(dynamic));
             if (globals) owner->admit_globals(global_contract(analysis), impl_->replacing_globals);
+            store.validated();
             impl_->cache_status="hit";return result;
         } catch(const std::exception&) { /* Discard candidate; compile once normally. */ }
     }
@@ -3764,7 +3787,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     for(const auto& f:input.functions)if(f.name==input.entry_symbol && f.asynchronous!=input.async_root)throw std::invalid_argument("Async AOT entry requires the explicit scheduler root adapter");
     if (!entry_valid) throw std::invalid_argument("AOT CLI adapter requires entry: i32(i32)");
     auto machine = native_machine();
-    check_c_primitive_target(input, machine->getTargetTriple());
+    check_c_primitive_target(input.c_primitives, machine->getTargetTriple());
     const auto triple = machine->getTargetTriple().str();
 #ifdef VOID_LLVM_RESEARCH
     llvm_backend::LoweringInventory inventory;

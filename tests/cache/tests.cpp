@@ -90,6 +90,19 @@ func entry(n: i32) -> i32:
      require(entry_only.compile(*a,true)->invoke(7)==47 && entry_only.cache_status()==(supported?"miss":"unavailable"),"entry/export cache separation");
      require(entry_only.compile(*a,true)->invoke(7)==47 && entry_only.cache_status()==(supported?"hit":"unavailable"),"entry-emission warm cache");}
     {vd::Jit custom({root,identity});custom.bind("cache_unused_import",identity_import);require(custom.compile(*a,false)->invoke(7)==47 && custom.cache_status()==(identity.empty()?"unavailable":"disabled"),"custom import persistence bypass");}
+    if(supported){
+        auto leases=root/"leases";std::filesystem::create_directory(leases);
+        vd::Jit retained({leases,identity});std::vector<std::shared_ptr<const vd::NativeCode>> generations;
+        for(int version=0;version<14;++version){
+            auto analysis=vd::analyze_source({"/retention.void","func entry(value: i32) -> i32:\n    return value + "+std::to_string(version)+"\n"});
+            require(analysis.succeeded(),"retention source validation");
+            generations.push_back(retained.compile(*analysis.program,false));
+        }
+        require(std::distance(std::filesystem::directory_iterator(leases/".void/cache/v1"),std::filesystem::directory_iterator{})==10,
+                "retention exceeded ten entries");
+        for(int version=0;version<14;++version)require(generations[version]->invoke(7)==7+version,
+                "disk eviction damaged a live native generation");
+    }
     old.reset();hit.reset();require(slot.invoke(7)==48,"retired old generation");empty(*runtime);
     std::cout<<"cache generations, source/build invalidation, revisions, roots, failures and fallback passed\n";return 0;
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}

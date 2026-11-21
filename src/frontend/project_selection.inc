@@ -342,7 +342,17 @@ std::string project_snapshot_key(const ProjectCapture& capture,const std::string
     }
     for(;disk!=capture.disk_discovery.end();++disk){field(disk->first);field(disk->second.text());}
     for(const auto& [id,present]:capture.boundaries){field(id);field(present?"present":"absent");}
-    for(const auto& [id,names]:capture.listings){field(id);for(const auto& name:names)field(name);field("end-directory");}
+    for(const auto& [id,names]:capture.listings){
+        field(id);
+        // Cache publication creates this reserved root name after capture.
+        // Canonicalize only its absence, preserving all keys for projects that
+        // already have .void. Actual listings/freshness checks remain exact.
+        if(id.empty() && !std::binary_search(names.begin(),names.end(),std::string(".void"))) {
+            auto stable=names;stable.insert(std::lower_bound(stable.begin(),stable.end(),std::string(".void")),".void");
+            for(const auto& name:stable)field(name);
+        } else for(const auto& name:names)field(name);
+        field("end-directory");
+    }
     constexpr char hex[]="0123456789abcdef";std::string result;for(auto byte:hash.final()){result+=hex[byte>>4];result+=hex[byte&15];}return result;
 }
 std::string project_context_key(const ProjectCapture& capture,const std::string& entry) {

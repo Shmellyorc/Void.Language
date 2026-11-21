@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import shutil
+import json
 
 compiler = Path(sys.argv[1]).resolve()
 def small_stack():
@@ -89,4 +90,18 @@ with tempfile.TemporaryDirectory(prefix="void-automatic-cache-") as temporary:
     assert "Type mismatch" in run(expected="", status=1).stderr
     result = run(["--cache", "--no-cache"], expected="", status=2)
     assert "cannot be combined" in result.stderr
+    # The first project-local cache directory must not cause a second miss.
+    project = root / "fresh-project"
+    created = subprocess.run([str(compiler), "new", str(project)], capture_output=True, timeout=60)
+    assert created.returncode == 0, created
+    assert not (project / ".void").exists()
+    for number in range(2):
+        report = root / f"manifest{number}.json"
+        executed = subprocess.run([str(compiler), "run", "--project", str(project), "--timings",
+                                  "--timings-format", "json", "--timings-output", str(report)],
+                                 capture_output=True, timeout=60,
+                                 preexec_fn=small_stack if sys.platform == "linux" else None)
+        assert executed.returncode == 0, executed
+        status = json.loads(report.read_text())["cache"]["status"]
+        assert status == (("miss" if number == 0 else "hit") if supported else "unavailable"), status
 print("Automatic O2/no-IR-O2 caching, bypass, fresh globals and diagnostics passed")

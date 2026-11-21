@@ -48,7 +48,7 @@ add_custom_command(OUTPUT "${g4_plan}"
 add_custom_target(void_g4_plan DEPENDS "${g4_plan}")
 add_executable(void_g4_tests "${g4_src}/dynamic.cpp")
 target_include_directories(void_g4_tests SYSTEM PRIVATE "${VOID_HOST_DEPS_ROOT}/include")
-target_link_libraries(void_g4_tests PRIVATE void_llvm)
+target_link_libraries(void_g4_tests PRIVATE void_llvm void_cache_identity)
 add_dependencies(void_g4_tests void_g4_plan void_g4_competitor void_g4_initializer)
 void_add_output_test(ffi_g4_jit_ir "$<TARGET_FILE:void_g4_tests>" "${g4_plan}" "${g4_src}/dynamic.void" "${g4_bin}/native"
   "@VOID_TEST_OUTPUT@/ffi-g4/jit-probes" "$<TARGET_FILE:void_g4_competitor>" "$<TARGET_FILE:void_g4_initializer>")

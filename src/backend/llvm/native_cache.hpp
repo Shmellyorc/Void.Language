@@ -18,6 +18,9 @@ public:
     NativeCache& operator=(const NativeCache&)=delete;
     bool available() const {return directory_>=0;}
     std::optional<NativeArtifact> read() const noexcept;
+    // Called only after successful native materialization, never for a rejected
+    // envelope/object. Refreshes recency without changing immutable bytes/mtime.
+    void validated() const noexcept;
     bool write(bool coordinated, std::string_view object) const noexcept;
 };
 }

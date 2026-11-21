@@ -1,6 +1,7 @@
 # Automatic native-object cache policy
 
-27 October 2026 engineering policy; acceptance remains pending.
+27 October 2026 engineering policy, updated by the 21 November 2026 G95
+candidate. G95 awaits independent review.
 
 `voidc run main.void` keeps optimized JIT as its default. After full source
 analysis, a validated native-object hit skips typed lowering, LLVM lowering,
@@ -37,4 +38,31 @@ constructors, global initialization and Runtime admission follow the existing
 cache loader. Corrupt or unsafe candidates are misses; publication does not
 replace an existing winner. Removing such a candidate permits publication on a
 later miss. Interrupted temporary files are ignored. Project directories own
-independent caches. No eviction or alternate cache architecture is added.
+independent caches.
+
+G95 permits verified dynamic native plans, including managed raylib, while
+retaining fresh native approval, provider verification and Runtime admission on
+every run. Exact descriptor/module/target and closure/payload identities join
+the existing object recipe. Temporary `.void/run` staging roots and live provider
+addresses are never persistent authority. Eligibility requires complete image
+identities or a managed payload containing both provider and adapter identities;
+the existing loader verifies those contents on every admission. Unmanaged
+conventional plans that only name files remain uncached, including after a
+provider/adapter rebuild. Arbitrary host-linked C thunks also remain unavailable.
+The first creation of the reserved root `.void` name no longer
+invalidates an otherwise unchanged project selection; existing selections with
+that name retain their recipe and real directory freshness checks remain exact.
+
+The existing store retains ten recent entries with validated envelopes, using
+directory locks, immutable publication and inode-checked eviction. Successful
+materialization updates recency without changing object bytes or mtime. Open
+readers and live generations remain usable after disk eviction. Corrupt/unsafe
+objects, interrupted temporary files and unknown contents are preserved outside
+the entry count. Interrupted or failed maintenance can defer pruning until a
+later successful operation; no total-byte quota or recursive cleanup is added.
+
+Compatible explicit native reloads and ordinary runs share these validated
+dynamic objects with their own Runtime admission. `voidc run` has no automatic
+source watcher or automatic hot-reload loop. See the
+[G95 report](../../projects/G95_VOIDC_PERSISTENT_CACHE.md) for measurements,
+qualification, storage rules and remaining limitations.
