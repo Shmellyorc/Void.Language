@@ -1,5 +1,8 @@
 # VOID documentation
 
+- [G93 pure compile functions candidate](projects/G93_COMPILE_FUNCTIONS.md):
+  shared typed constant evaluation, pure value methods, limits and editor evidence.
+
 - [G92 member completion candidate](projects/G92_INTELLISENSE_MEMBER_COMPLETION.md):
   shared builtin declarations, typed chains, readonly methods and editor evidence.
 

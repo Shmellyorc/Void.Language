@@ -117,7 +117,7 @@ NEGATIVES = {
     'different_numeric_case': ('use "./types.void" as api\nfunc main():\n    var held = api.code<i32>.low\n    if held is api.code<string>.low:\n        pass\n', 'different nominal type'),
     'different_flag_case': ('use "./types.void" as api\nfunc main():\n    var held = api.mask<i32>.read\n    if held is api.mask<string>.read:\n        pass\n', 'different nominal type'),
     'numeric_member_call': ('use "./types.void" as api\nfunc main():\n    var held = api.code<i32>.low\n    if held is api.code<i32>.low():\n        pass\n', 'omit parentheses'),
-    'constant_user_call': ('func value() -> i32:\n    return 1\nenum item:\n    data(value: i32)\nconst bad = item.data(value()) == item.data(1)\n', 'compile-time'),
+    'constant_user_call': ('func value() -> i32:\n    return 1\nenum item:\n    data(value: i32)\nconst bad = item.data(value()) == item.data(1)\n', 'explicitly marked compile func'),
     'constant_user_operator': ('value struct digit:\n    value: i32\n    operator ==(const left: digit, const right: digit) -> bool:\n        return true\nenum item:\n    data(value: digit)\nconst bad = item.data(digit(value = 1)) == item.data(digit(value = 2))\n', 'custom equality'),
 }
 

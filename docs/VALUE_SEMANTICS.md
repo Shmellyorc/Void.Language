@@ -41,7 +41,11 @@ Module constants must be pure compile-time expressions. Phase 12 additionally
 supports value construction and field reads in these expressions; aggregate
 constants still undergo the same checker, purity and dependency gates. Literals, constant
 references, unary arithmetic/not, arithmetic, comparisons, equality, parentheses,
-and short-circuit and/or work. Calls are forbidden even in unevaluated operands.
+and short-circuit and/or work. G93 admits explicitly marked `compile func` calls
+and eligible value receiver methods through this same evaluator. Unmarked source
+calls and unsupported effects remain forbidden, including in unevaluated operands.
+See [G93](projects/G93_COMPILE_FUNCTIONS.md) for the supported body subset and
+finite evaluation limits. Local const declarations retain runtime initialization.
 The ordinary expression type checker validates every operand and resolves its
 owner before evaluation. There is no second type checker or runtime global
 initializer. The small evaluator consumes that typed expression tree and shares

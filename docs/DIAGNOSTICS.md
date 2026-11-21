@@ -1,5 +1,12 @@
 # Structured diagnostics and compiler recovery (Phase 5)
 
+G93 uses VOID2011 for unmarked constant calls and unsupported compile-function
+effects, VOID2012 for constant/discriminant cycles, existing numeric/index errors
+for failing operations, and VOID9001 for evaluation budgets/cancellation. Failures
+retain the operation's source and up to twelve call-site related locations across
+imports and specializations. Purity errors are checked on all concrete marked
+bodies, even when no constant calls them. See [G93](projects/G93_COMPILE_FUNCTIONS.md).
+
 ## Slice 2 project admission and entry diagnostics, 8 November 2026
 
 The compiler-owned manifest project API/CLI adds VOID5009 for physical root/file

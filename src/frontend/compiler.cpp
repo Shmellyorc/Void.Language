@@ -1,4 +1,5 @@
 #include "void/compiler_observation.hpp"
+#include "void/compile_evaluation.hpp"
 #include "void/frontend.hpp"
 #include "void/conditional.hpp"
 #include "void/c_primitive.hpp"
@@ -97,6 +98,7 @@ struct Expr;
 struct Statement;
 struct Function;
 struct Unit;
+struct CompileEvaluation;
 struct EditorProbe {
     std::string module;
     std::size_t offset;
@@ -455,6 +457,7 @@ struct Expr {
     Type environment=Type::none;
     Type constructed_type=Type::none, initializer_result=Type::none;
     enum class Kind { global, spawned, task_cancel, awaited, lambda, capture_reference, function_reference, function_call, function_null, test, match, choice, has, sum, propagate, literal, name, call, unary, binary, conversion, field, construction, method_call, base_initialization, array_literal, array_index, array_default, array_slice, dictionary_literal, return_pack, editor_hole } kind;
+    Function* compile_target = nullptr; // Selected ordinary declaration; never native execution.
     Token token;
     Token qualifier_token{TokenKind::name, "", 0};
     std::unique_ptr<TypeUse> enum_type_use;
@@ -555,6 +558,8 @@ struct Function {
     struct Capture {unsigned outer_slot;Type cell;Token token;bool snapshot=false;};
     bool collection_adapter=false, positional_only=false;
     bool json_adapter=false, enum_adapter=false;
+    bool compile_time=false, compile_checked=false, compile_failed=false, analyzing=false;
+    Unit* compile_owner=nullptr;
     bool global_initializer=false;
     std::optional<Parameter> static_owner; // Type context only; never an ABI receiver.
     bool anonymous=false, deferred=false, bound_receiver=false, asynchronous=false, display_adapter=false, display_has_string=false, display_has_format=false;
@@ -651,6 +656,7 @@ std::string editor_return_type(const Function& f,bool symbolic=false) {
 std::string editor_signature(const Function& f) {
     observation::Scope timing(observation::EditorDetail::formatting);
     std::string out=(random_numeric_function(f) && f.token.text.starts_with("_arity_") ? "public" : f.visibility)+std::string(" ");
+    if(f.compile_time)out+="compile func ";
     if(f.static_owner)out+="static "+ir::type_name(f.static_owner->type)+".";
     if(!f.operator_glyph.empty())out+="operator "+f.operator_glyph;
     else out+=random_public_name(f);
@@ -711,6 +717,8 @@ struct Unit;
 struct Structure {
     std::size_t source_end=0;
     std::vector<Token> case_tokens;
+    std::vector<std::unique_ptr<Expr>> numeric_expressions;
+    unsigned numeric_state=0;
     Structure() = default;
     // Fields own noncopyable AST nodes. Container copy traits do not inspect
     // vector<Statement>'s copy body; never let reallocation select that path.
@@ -868,6 +876,8 @@ struct Unit {
     bool application_body = false;
     bool failed_import = false;
     bool parse_failed = false;
+    std::function<void(Structure&)> resolve_numeric;
+    CompileEvaluation* compile_evaluation=nullptr; // Validation-scoped, cleared before publication.
     std::shared_ptr<ir::Module> member_catalog;
     Unit(SourceFile s, std::string id) : source(std::move(s)), identity(std::move(id)) {}
 };
@@ -913,7 +923,7 @@ class Parser {
         }
         bool line_start = p == 0 || tokens[std::min(p, tokens.size()) - 1].kind == TokenKind::newline;
         while (peek().kind != TokenKind::end) {
-            if (declaration && current_depth == 0 && line_start && (at("func") || at("property") || at("interface") || at("const") || at("var") || at("value") || at("struct") || at("virtual") || at("override") || at("use") || at("private") || at("public") || at("internal"))) return;
+            if (declaration && current_depth == 0 && line_start && (at("compile") || at("func") || at("property") || at("interface") || at("const") || at("var") || at("value") || at("struct") || at("virtual") || at("override") || at("use") || at("private") || at("public") || at("internal"))) return;
             if (!declaration && current_depth <= baseline) {
                 if (peek().kind == TokenKind::dedent) return;
                 if (line_start && p > start) return;
@@ -1180,7 +1190,7 @@ class Parser {
         return block_body();
     }
 #include "pattern_parser.inc"
-#include "enum_parser.inc"
+
     // Keep angle tokens separate for nested generic types. Only adjacent,
     // equal angles in expression position form a shift (not `< <` or `> >`).
     std::string binary_operator(std::size_t start=std::string::npos) const {
@@ -1537,6 +1547,8 @@ public:
             Function f;
             if (accept("private")) { f.file_private = true; f.visibility = "private"; }
             else if (!accept("public") && accept("internal")) f.visibility = "internal"; // All graph files belong to this project.
+            f.compile_time=accept("compile");
+            if(f.compile_time && !at("func"))error(source,peek(),Code::syntax,"Expected compile func; compile is not a modifier for other declarations.");
             const bool static_declaration=accept("static");
             if(static_declaration && !at("func") && !at("async"))error(source,peek(),Code::syntax,"Use static func for a type-level method; static fields belong inside a struct.");
             if (at("var")) {
@@ -1584,32 +1596,11 @@ public:
                     auto token=name();enumeration.case_tokens.push_back(token);if(!cases.insert(token.text).second)error(source,token,Code::duplicate,"Duplicate enum variant.");
                     if(enumeration.definition->enum_backing) {
                         if(!letter(token.text.front()))error(source,token,Code::identifier,"Numeric enum member names are lowercase.");
-                        if(flags) {
-                            const auto site=peek();std::uint64_t bits=1;
-                            if(accept("=")) {auto value=expression();bits=flags_discriminant(*value,enumeration.definition->numeric_members,*enumeration.definition->enum_backing);}
-                            else {
-                                std::uint64_t used=0;for(const auto& member:enumeration.definition->numeric_members)used|=member.bits;
-                                while(used){if(bits>(numeric::limit(Type::u64,true)>>1))error(source,token,Code::integer_range,"No automatic flag bit remains.");bits<<=1;used>>=1;}
-                                const auto width=numeric::width(*enumeration.definition->enum_backing);
-                                if(width<64 && bits>>width)error(source,token,Code::integer_range,"Automatic flag value exceeds the backing width.");
-                            }
-                            if(!discriminants.emplace(bits,site).second)error(source,site,Code::duplicate,"Duplicate numeric enum discriminant.");
-                            enumeration.definition->numeric_members.push_back({token.text,bits});newline();continue;
-                        }
-                        need("=");
-                        auto value=peek();std::string spelling;
-                        if(at("+") || at("-"))spelling=take().text;
-                        auto digits=take();
-                        if(digits.kind!=TokenKind::number || !std::all_of(digits.text.begin(),digits.text.end(),digit))
-                            error(source,digits,Code::integer_range,"A numeric enum discriminant must be a decimal integer literal.");
-                        value.source_width=digits.offset+digits.text.size()-value.offset;
-                        std::uint64_t bits;
-                        try {bits=numeric::literal(spelling+digits.text,*enumeration.definition->enum_backing);}
-                        catch(const std::invalid_argument& failure){error(source,value,Code::integer_range,failure.what());}
-                        auto [previous,inserted]=discriminants.emplace(bits,value);
-                        if(!inserted)error(source,value,Code::duplicate,"Duplicate numeric enum discriminant.",{},
-                            {{span(source,previous->second),"Previously declared value."}});
-                        enumeration.definition->numeric_members.push_back({token.text,bits});newline();continue;
+                        std::unique_ptr<Expr> value;
+                        if(accept("="))value=expression();
+                        else if(!flags)error(source,peek(),Code::syntax,"A numeric enum member requires = <constant expression>.");
+                        enumeration.numeric_expressions.push_back(std::move(value));
+                        enumeration.definition->numeric_members.push_back({token.text,0});newline();continue;
                     }
                     ir::SumCase variant{token.text,static_cast<unsigned>(enumeration.fields.size()),0};
                     if(accept("(")) {if(!at(")"))do {
@@ -1884,7 +1875,9 @@ bool checked_initializer_default(Type t) {
     return t.kind==Type::numeric_enum ||
         (t.definition && (t.definition->callable || !t.definition->cases.empty())) || console::endpoint_type(t);
 }
-ir::ConstantValue constant_value(const SourceFile&, const Expr&);
+ir::ConstantValue constant_value(const SourceFile&, const Expr&, CompileEvaluation* = nullptr);
+void validate_compile_function(const SourceFile&, Function&);
+void prepare_compile_call(CompileEvaluation*,Function&,const SourceFile&,const Token&,bool);
 void check_dictionary_key(const SourceFile& source,const Token& use,Type key,const std::map<std::string,std::unique_ptr<Unit>>& units) {
     if(auto owner=ir::dictionary_equality_owner(key)) {
         std::vector<RelatedLocation> related;
@@ -2302,7 +2295,7 @@ class Semantics {
             for(unsigned n=1;n<e.parts.size();++n){auto parameter=Type(signature.definition->call_parameters[n-1]);expect(expression(*e.parts[n],parameter),parameter,e.parts[n]->token);}e.target="$event.emit";return e.type=Type::none;
         }
         if(receiver.definition && receiver.definition->callable && e.token.text=="call"){e.kind=Expr::Kind::function_call;return function_invocation(e);}
-        if (!current) error(source,e.token,Code::constant_call,"A compile-time constant cannot call a method.","Use a local const for runtime values.");
+        if(receiver.kind==Type::aggregate)root.prepare_relationships(receiver,Type::none,source,e.token);
         if (e.token.text == "init")
             error(source,e.token,Code::initializer_deferred,"Lifecycle methods cannot be called directly; construct a new value using its type.");
         // A stored callable struct uses its ordinary call method. Keep the
@@ -2474,6 +2467,9 @@ class Semantics {
     }
 
     Type call_arguments(Expr& e, const Function& target, std::size_t first, bool constructor = false) {
+        e.compile_target=target.compile_owner?const_cast<Function*>(&target):nullptr;
+        if(target.compile_time)prepare_compile_call(root.compile_evaluation,*e.compile_target,source,e.token,false);
+        if(!current && !constructor && target.compile_owner && !target.compile_time)error(source,e.token,Code::constant_call,"A compile-time constant cannot call a function unless it is explicitly marked compile func.",{},target.compile_owner?std::vector<RelatedLocation>{{span(target.compile_owner->source,target.token),"Runtime function declared here."}}:std::vector<RelatedLocation>{});
         e.asynchronous_call=target.asynchronous;e.native_symbol=target.native_symbol;
         if(diagnostics.editor && !constructor) {editor_call(e,target,first);if(first==1 && target.token.text=="format" && e.parts.size()==2)editor_format(*e.parts[1],e.parts[0]->type);}
         if(e.interface_call) {
@@ -2940,7 +2936,7 @@ class Semantics {
         try { binding=ir::structural_binding(*root.member_catalog,concrete,target,unit.identity); }
         catch(const std::invalid_argument& failure) {error(source,e.token,Code::type_mismatch,failure.what());}
         catch(const std::length_error& failure) {error(source,e.token,Code::limit,failure.what());}
-        if(!current && !(from.nullable && target.nullable && constant_value(source,e).bits==0)) error(source,e.token,Code::constant_call,"Interface bindings are runtime views; only nullable all-null templates are compile-time values.");
+        if(!current && !(from.nullable && target.nullable && constant_value(source,e,root.compile_evaluation).bits==0)) error(source,e.token,Code::constant_call,"Interface bindings are runtime views; only nullable all-null templates are compile-time values.");
         auto& bindings=root.member_catalog->interface_bindings;
         if(std::none_of(bindings.begin(),bindings.end(),[&](const auto& b){return b.key==binding.key;})) bindings.push_back(binding);
         auto operand=std::make_unique<Expr>(std::move(e));
@@ -3553,6 +3549,7 @@ class Semantics {
 
     VOID_SEMANTIC_HANDLER std::optional<Type> enum_expression(Expr& e,bool call,const Type* subject=nullptr) {
         auto [owner, structure] = enum_declaration(e,subject);
+        if(structure && structure->definition->enum_backing && owner->resolve_numeric)owner->resolve_numeric(*structure);
         if (!structure) {
             return {};
         }
@@ -4204,7 +4201,6 @@ class Semantics {
             construction(e,*owner,concrete,current != nullptr,unit);
             return e.type;
         }
-        if (!current) error(source, e.token, Code::constant_call, "A compile-time constant cannot call a function.", "Use a local const for runtime values.");
         if (auto* value = e.qualifier.empty() ? lookup(e.token.text) : nullptr) {
             if (value->type == error_type) throw Poison{};
             if(value->type.kind==Type::aggregate || value->type.kind==Type::managed_ref || value->type.kind==Type::interface_ref) {
@@ -4913,7 +4909,7 @@ public:
         for(auto& p:f.parameters)if(p.default_expression) {
             expect(pure_expression(*p.default_expression,&f,p.type),p.type,p.token);
             if(p.default_expression->type==error_type)throw Poison{};
-            p.default_value=constant_value(source,*p.default_expression);
+            p.default_value=constant_value(source,*p.default_expression,root.compile_evaluation);
         }
     }
     void initializer_fields(Function& f) {
@@ -4977,7 +4973,7 @@ public:
         if (field.expression) {
             expect(expression(*field.expression,t),t,field.token);
             if (field.expression->type == error_type) throw Poison{};
-            return constant_value(source,*field.expression);
+            return constant_value(source,*field.expression,root.compile_evaluation);
         }
         if(ir::collection_type(t)) {
             return array_default(t,field.token);
@@ -5066,7 +5062,8 @@ public:
                 return;
             }
             if (diagnostics.full()) return;
-            if(f.analyzed)return;f.analyzed=true;
+            if(f.analyzed)return;f.analyzed=true;f.analyzing=true;
+            struct FinishAnalysis {Function& f;~FinishAnalysis(){f.analyzing=false;}} finish_analysis{f};
             Diagnostics::Context generic_context(diagnostics,f.instantiation_context,f.specialization_depth);
             current = &f; scopes = {{}}; invalid_function = false;
             auto before = diagnostics.size();
@@ -5094,13 +5091,22 @@ public:
                 } catch (const CompilationError& failure) { diagnostics.add(failure); }
                   catch (const Poison&) {}
             }
-            if(!f.native_symbol.empty() || f.c_primitive)return;
+            if(!f.native_symbol.empty() || f.c_primitive) {
+                if(f.compile_time)try {validate_compile_function(source,f);}
+                    catch(const CompilationError& failure){diagnostics.add(failure);f.compile_failed=true;}
+                return;
+            }
             unsigned flow;
             try {flow=sequence(f.body,false);}
             catch(EditorReceiverFound& found) {retain_editor_receiver(f,found);return;}
             if (f.result != Type::none && (flow & next_flow) && diagnostics.size() == before && !f.parse_failed && !invalid_function)
                 try { error(source, f.token, Code::missing_return, "Missing return path in '" + f.token.text + "'.", "Return " + editor_return_type(f) + " on every path that reaches the end."); }
                 catch (const CompilationError& failure) { diagnostics.add(failure); }
+            if(f.compile_time) {
+                f.compile_failed=f.parse_failed || invalid_function || diagnostics.size()!=before;
+                if(!f.compile_failed)try {validate_compile_function(source,f);f.compile_checked=true;}
+                catch(const CompilationError& failure){diagnostics.add(failure);f.compile_failed=true;}
+            }
     }
     void analyze(){for(auto& f:unit.functions)analyze_one(f);}
 
@@ -6842,34 +6848,37 @@ public:
 };
 // Only typed, pure ASTs reach this evaluator. The shared software kernel
 // preserves declared precision and wrapping independently of host arithmetic.
+#include "compile_functions.inc"
 #include "collection_constants.inc"
 #include "enum_constants.inc"
-ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
+ir::ConstantValue constant_expression(const SourceFile& source, const Expr& e, CompileEvaluation* evaluation) {
+    if(evaluation && e.kind==Expr::Kind::name)return evaluation->local(source,e);
+    if(e.compile_target && (e.kind==Expr::Kind::call || e.kind==Expr::Kind::method_call))return evaluation?evaluation->call(source,e):throw std::logic_error("Missing constant evaluation context");
     // Presentation recovery keeps the nominal type of a partial enum member,
     // but the hole has no value or operands. Propagate the existing poison
     // boundary instead of evaluating it as an ordinary constant expression.
     if(e.kind==Expr::Kind::editor_hole)throw Poison{};
-    if(e.kind==Expr::Kind::call && e.op=="$collection_equal") {
+    if(e.kind==Expr::Kind::call && e.op=="$collection_equal") return frontend_case([&]() -> ir::ConstantValue {
         const auto type=e.parts.at(0)->type;collection_constant_type(source,e.token,type);
-        return {collection_constant_equal(source,e.token,type,constant_value(source,*e.parts[0]),constant_value(source,*e.parts[1]),0),{}};
-    }
-    if(auto result=enum_constant(source,e))return *result;
-    if(e.target=="$interpolation") {
+        return {collection_constant_equal(source,e.token,type,constant_value(source,*e.parts[0],evaluation),constant_value(source,*e.parts[1],evaluation),0),{}};
+    });
+    if(auto result=enum_constant(source,e,evaluation))return *result;
+    if(e.target=="$interpolation") return frontend_case([&]() -> ir::ConstantValue {
         formatting::Builder builder;
-        for(const auto& part:e.parts){auto text=constant_value(source,*part).text;if(text.size()>ir::string_constant_limit-builder.size())error(source,part->token,Code::limit,"Folded string exceeds the 16 MiB constant limit.");builder.append(text);}
+        for(const auto& part:e.parts){auto text=constant_value(source,*part,evaluation).text;if(text.size()>ir::string_constant_limit-builder.size())error(source,part->token,Code::limit,"Folded string exceeds the 16 MiB constant limit.");builder.append(text);}
         return {0,{},std::move(builder).finish()};
-    }
-    if(e.target=="$hole") {
-        auto value=constant_value(source,*e.parts[0]);const auto& spec=e.parts[1]->aggregate_value.text;
+    });
+    if(e.target=="$hole") return frontend_case([&]() -> ir::ConstantValue {
+        auto value=constant_value(source,*e.parts[0],evaluation);const auto& spec=e.parts[1]->aggregate_value.text;
         auto plan=formatting::parse_numeric(spec);
         if(plan.alignment.width>ir::string_constant_limit || plan.minimum_integer>ir::string_constant_limit || plan.maximum_fraction>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");
         auto type=e.parts[0]->type;
         auto text=numeric::number(type)?formatting::number(numeric::display_number(value.bits,type),plan):formatting::text(type==Type::boolean?(value.bits?"true":"false"):std::string_view(value.text),spec);
         if(text.size()>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");return {0,{},std::move(text)};
-    }
-    if(e.target.starts_with("$display.") && e.kind==Expr::Kind::call) {
+    });
+    if(e.target.starts_with("$display.") && e.kind==Expr::Kind::call) return frontend_case([&]() -> ir::ConstantValue {
         std::vector<ir::ConstantValue> values(e.parts.size());std::vector<Type> types(e.parts.size());
-        for(unsigned n=0;n<e.parts.size();++n){auto index=e.argument_indexes.at(n);values[index]=constant_value(source,*e.parts[n]);types[index]=e.parts[n]->type;}
+        for(unsigned n=0;n<e.parts.size();++n){auto index=e.argument_indexes.at(n);values[index]=constant_value(source,*e.parts[n],evaluation);types[index]=e.parts[n]->type;}
         const bool formatted=e.target=="$display.format";std::string text;bool valid=true;
         try {
             auto spec=formatted?std::string_view(values[1].text):std::string_view{};
@@ -6882,65 +6891,69 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
         if(text.size()>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");
         if(!formatted)return {0,{},std::move(text)};
         ir::ConstantValue result;result.fields.resize(3);result.fields[0].bits=valid?0:1;result.fields[valid?1:2].text=std::move(text);return result;
-    }
-    if(e.target.starts_with("$numeric::") && e.kind==Expr::Kind::call) {
+    });
+    if(e.target.starts_with("$numeric::") && e.kind==Expr::Kind::call) return frontend_case([&]() -> ir::ConstantValue {
         std::vector<std::uint64_t> values(e.parts.size());
-        for(unsigned n=0;n<e.parts.size();++n)values.at(e.argument_indexes.at(n))=constant_value(source,*e.parts[n]).bits;
+        for(unsigned n=0;n<e.parts.size();++n)values.at(e.argument_indexes.at(n))=constant_value(source,*e.parts[n],evaluation).bits;
         try {return {e.token.text=="abs"?numeric::absolute(values.at(0),e.type):numeric::clamp(values.at(0),values.at(1),values.at(2),e.type),{}};}
         catch(const std::invalid_argument& failure){error(source,e.token,Code::numeric_conversion,failure.what());}
-    }
-    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_try") {
+    });
+    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_try") return frontend_case([&]() -> ir::ConstantValue {
         // Keep the owning input alive while copying into independent output
         // storage. Assigning an input from its own child destroys that child.
-        const auto input=constant_value(source,*e.parts[0]);
+        const auto input=constant_value(source,*e.parts[0],evaluation);
         const bool wrapped=ir::nullable_value(e.parts[0]->type);
         const bool present=wrapped?input.fields.at(0).bits:input.bits || !input.text.empty();
         ir::ConstantValue value;value.fields.resize(2);
         if(present){value.fields[0].bits=1;value.fields[1]=wrapped?input.fields.at(1):input;}
         return value;
-    }
-    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_lift") {ir::ConstantValue value;value.fields.resize(2);value.fields[0].bits=1;value.fields[1]=constant_value(source,*e.parts[0]);return value;}
-    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_unwrap") {auto value=constant_value(source,*e.parts[0]);if(!value.fields.at(0).bits)error(source,e.token,Code::numeric_conversion,"Null value in checked conversion");return value.fields.at(1);}
-    if(e.kind==Expr::Kind::conversion && e.op=="identity" && e.type==e.parts[0]->type)return constant_value(source,*e.parts[0]);
-    if(e.kind==Expr::Kind::binary && e.op.starts_with("$nullable_null_")){bool equal=constant_value(source,*e.parts[0]).fields.at(0).bits==constant_value(source,*e.parts[1]).fields.at(0).bits;return {e.op=="$nullable_null_equal"?equal:!equal,{}};}
-    if(e.kind==Expr::Kind::choice)return constant_value(source,*e.parts[constant_value(source,*e.parts[0]).bits?1:2]);
-    if(e.kind==Expr::Kind::sum) {
+    });
+    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_lift") {ir::ConstantValue value;value.fields.resize(2);value.fields[0].bits=1;value.fields[1]=constant_value(source,*e.parts[0],evaluation);return value;}
+    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_unwrap") {auto value=constant_value(source,*e.parts[0],evaluation);if(!value.fields.at(0).bits)error(source,e.token,Code::numeric_conversion,"Null value in checked conversion");return value.fields.at(1);}
+    if(e.kind==Expr::Kind::conversion && e.op=="identity" && e.type==e.parts[0]->type)return constant_value(source,*e.parts[0],evaluation);
+    if(e.kind==Expr::Kind::binary && e.op.starts_with("$nullable_null_")){bool equal=constant_value(source,*e.parts[0],evaluation).fields.at(0).bits==constant_value(source,*e.parts[1],evaluation).fields.at(0).bits;return {e.op=="$nullable_null_equal"?equal:!equal,{}};}
+    if(e.kind==Expr::Kind::choice)return constant_value(source,*e.parts[constant_value(source,*e.parts[0],evaluation).bits?1:2],evaluation);
+    if(e.kind==Expr::Kind::sum) return frontend_case([&]() -> ir::ConstantValue {
         ir::ConstantValue result;result.fields.resize(e.type.definition->fields.size());result.fields[0].bits=e.slot;
         const auto& variant=e.type.definition->cases.at(e.slot);
-        for(unsigned n=0;n<e.parts.size();++n)result.fields[variant.begin+n]=constant_value(source,*e.parts[n]);return result;
-    }
+        for(unsigned n=0;n<e.parts.size();++n)result.fields[variant.begin+n]=constant_value(source,*e.parts[n],evaluation);return result;
+    });
     if(e.kind==Expr::Kind::function_reference)return {0,{},e.target};
     if(e.kind==Expr::Kind::function_null)return {};
-    if(e.kind==Expr::Kind::dictionary_literal){ir::ConstantValue result;for(const auto& part:e.parts)result.fields.push_back(constant_value(source,*part));return result;}
+    if(e.kind==Expr::Kind::dictionary_literal){ir::ConstantValue result;for(const auto& part:e.parts)result.fields.push_back(constant_value(source,*part,evaluation));return result;}
     if (e.kind == Expr::Kind::literal) return (e.type.kind == Type::aggregate || ir::collection_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}};
-    if(e.kind==Expr::Kind::array_literal) {
-        ir::ConstantValue result;for(const auto& part:e.parts) result.fields.push_back(constant_value(source,*part));return result;
-    }
-    if(e.kind==Expr::Kind::array_index) {
-        auto array=constant_value(source,*e.parts[0]);auto index=constant_value(source,*e.parts[1]);
+    if(e.kind==Expr::Kind::array_default){ir::ConstantValue value;value.repeat=*e.type.definition->extent;if(*value.repeat)value.fields.push_back(constant_value(source,*e.parts.at(0),evaluation));return value;}
+    if(e.kind==Expr::Kind::array_literal || e.kind==Expr::Kind::return_pack) return frontend_case([&]() -> ir::ConstantValue {
+        ir::ConstantValue result;for(const auto& part:e.parts) result.fields.push_back(constant_value(source,*part,evaluation));return result;
+    });
+    if(e.kind==Expr::Kind::array_index) return frontend_case([&]() -> ir::ConstantValue {
+        auto array=constant_value(source,*e.parts[0],evaluation);auto index=constant_value(source,*e.parts[1],evaluation);
         try {
             const auto selected=ir::checked_array_index(index.bits,e.parts[1]->type,array.repeat.value_or(array.fields.size()));
             return array.fields.at(array.repeat ? 0 : static_cast<std::size_t>(selected));
         }
         catch(const std::out_of_range&) {error(source,e.token,Code::invalid_value,"Constant array index out of bounds.");}
-    }
-    if (e.kind == Expr::Kind::construction) {
+    });
+    if (e.kind == Expr::Kind::construction) return frontend_case([&]() -> ir::ConstantValue {
         auto result = e.aggregate_value;
-        for (unsigned n = 0; n < e.parts.size(); ++n) result.fields[e.field_indexes[n]] = constant_value(source,*e.parts[n]);
-        for (const auto& child : e.omitted) result.fields[child->slot] = constant_value(source,*child);
+        for (unsigned n = 0; n < e.parts.size(); ++n) result.fields[e.field_indexes[n]] = constant_value(source,*e.parts[n],evaluation);
+        for (const auto& child : e.omitted) result.fields[child->slot] = constant_value(source,*child,evaluation);
         return result;
-    }
-    if (e.kind == Expr::Kind::field) {auto value=constant_value(source,*e.parts[0]);if(e.target=="$array.count")return {value.repeat.value_or(value.fields.size()),{}};return value.fields.at(e.slot);}
-    if (e.kind==Expr::Kind::binary && e.parts[0]->type==Type::string) {
-        auto a=constant_value(source,*e.parts[0]).text;
-        auto b=constant_value(source,*e.parts[1]).text;
+    });
+    if (e.kind == Expr::Kind::field) {auto value=constant_value(source,*e.parts[0],evaluation);if(e.target=="$array.count")return {value.repeat.value_or(value.fields.size()),{}};return value.fields.at(e.slot);}
+    if (e.kind==Expr::Kind::binary && e.parts[0]->type==Type::string) return frontend_case([&]() -> ir::ConstantValue {
+        auto a=constant_value(source,*e.parts[0],evaluation).text;
+        auto b=constant_value(source,*e.parts[1],evaluation).text;
         if(e.op=="+") {
             if(b.size()>ir::string_constant_limit-a.size()) error(source,e.token,Code::limit,"Folded string exceeds the 16 MiB constant limit.");
             a+=b; return {0,{},std::move(a)};
         }
         return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
-    }
-    auto a = constant_value(source,*e.parts[0]).bits;
+    });
+    return frontend_case([&]() -> ir::ConstantValue {
+    if(e.kind!=Expr::Kind::conversion && e.kind!=Expr::Kind::unary && e.kind!=Expr::Kind::binary)
+        error(source,e.token,Code::constant_call,"Operation is not supported in compile-time evaluation.");
+    auto a = constant_value(source,*e.parts.at(0),evaluation).bits;
     try {
         if (e.kind == Expr::Kind::conversion) {
             if(e.token.text=="as?") {
@@ -6949,6 +6962,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
                 auto from=e.parts[0]->type.kind==Type::numeric_enum?Type(*e.parts[0]->type.definition->enum_backing):e.parts[0]->type;
                 auto value=numeric::try_integer_convert(a,from,backing);
                 ir::ConstantValue result;result.fields.resize(2);
+                if(destination.kind==Type::numeric_enum && evaluation){evaluation->numeric_definition(destination);evaluation->step(source,e.token,destination.definition->numeric_members.size());}
                 if(value && (destination.kind!=Type::numeric_enum || ir::numeric_enum_member(destination,*value))) {
                     result.fields[0].bits=1;result.fields[1].bits=*value;
                 }
@@ -6958,6 +6972,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
             auto from=e.parts[0]->type.kind==Type::numeric_enum?Type(*e.parts[0]->type.definition->enum_backing):e.parts[0]->type;
             auto to=e.type.kind==Type::numeric_enum?Type(*e.type.definition->enum_backing):e.type;
             auto value=numeric::convert(a,from,to);
+            if(e.type.kind==Type::numeric_enum && evaluation){evaluation->numeric_definition(e.type);evaluation->step(source,e.token,e.type.definition->numeric_members.size());}
             if(e.type.kind==Type::numeric_enum && !ir::numeric_enum_member(e.type,value))throw std::invalid_argument("Checked enum conversion requires a declared discriminant.");
             return {value,{}};
         }
@@ -6969,7 +6984,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
         }
         if (e.op == "and" && !a) return {};
         if (e.op == "or" && a) return {1,{}};
-        auto b = constant_value(source,*e.parts[1]).bits;
+        auto b = constant_value(source,*e.parts[1],evaluation).bits;
         if (e.op == "and" || e.op == "or") return {b,{}};
         if (ir::reference_value(e.parts[0]->type)) return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
         auto primitive=e.parts[0]->type.kind==Type::numeric_enum?Type(*e.parts[0]->type.definition->enum_backing):e.parts[0]->type;
@@ -6978,6 +6993,7 @@ ir::ConstantValue constant_value(const SourceFile& source, const Expr& e) {
       catch (const std::invalid_argument& failure) {
         error(source,e.token,e.kind == Expr::Kind::conversion ? Code::numeric_conversion : Code::zero_divisor,failure.what());
     }
+    });
 }
 #include "capabilities.inc"
 #include "construction.inc"
@@ -7046,6 +7062,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     std::vector<Function*> declarations;for(auto& f:unit->functions)declarations.push_back(&f);for(auto& f:unit->generic_functions)declarations.push_back(&f);
     for(auto* declaration:declarations) {auto& f=*declaration;
         if (f.receiver || f.static_owner || !f.operator_glyph.empty()) continue;
+        f.compile_owner=unit.get();
         f.symbol = id + "::" + f.token.text;
         auto [previous, inserted] = unit->declarations.emplace(f.token.text, &f);
         if (!inserted) {
@@ -7137,6 +7154,15 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             } catch (const CompilationError& failure) { diagnostics.add(failure); unit->failed_qualifiers.insert(alias); }
         }
     }
+    // Publish stable generic method identities before layout expressions can
+    // request their specializations. Full owner/type/constraint validation stays
+    // in the existing generic declaration pass; no dependent body is checked here.
+    for(auto& [id,u]:units)for(auto& f:u->generic_functions)if(f.receiver && f.receiver->type.definition) {
+        auto spelling=f.receiver->type.definition->name;
+        for(const auto& application:u->applications)if(application.definition==f.receiver->type.definition){spelling=application.name;break;}
+        if(auto owner=u->structure_names.find(spelling);owner!=u->structure_names.end())
+            f.symbol=owner->second->definition->identity+"::method::"+f.token.text;
+    }
     // Extents may request existing pure value constants before the ordinary
     // body/default pass. Discover runtime-only init presence first, so staged
     // resolution cannot accidentally treat such construction as a pure template.
@@ -7152,6 +7178,71 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     std::function<void(Unit&,Structure&)> layout;
     std::function<void(Unit&,Structure&)> defaults;
     std::function<void(Unit&,Constant&)> evaluate;
+    CompileEvaluation compile_evaluation;root.compile_evaluation=&compile_evaluation;
+    struct ClearCompileEvaluation {Unit& root;~ClearCompileEvaluation(){root.compile_evaluation=nullptr;}} clear_compile_evaluation{root};
+    std::set<const ir::ValueType*> evaluated_numeric_types;
+    compile_evaluation.numeric_definition=[&](Type type) {
+        if(evaluated_numeric_types.contains(type.definition.get()))return;
+        for(auto& [id,u]:units)for(auto& structure:u->structures)if(structure.definition==type.definition) {
+            u->resolve_numeric(structure);evaluated_numeric_types.insert(type.definition.get());return;
+        }
+    };
+    compile_evaluation.prepare=[&](Function& f,const SourceFile& source,const Token& site,bool body) {
+        if(!f.compile_time || !f.compile_owner)error(source,site,Code::constant_call,"Only compile func source declarations can be evaluated.");
+        if(f.compile_failed || f.parse_failed)throw Poison{};
+        if(!f.prepared)prepare_function(*f.compile_owner,f);
+        if(f.result==error_type)throw Poison{};
+        Semantics semantics(*f.compile_owner,units,root,evaluate,diagnostics,defaults);
+        semantics.parameter_defaults(f);
+        if(!body)return;
+        if(f.analyzing)error(source,site,Code::constant_cycle,"Circular dependency while analyzing compile func '"+f.token.text+"'.");
+        if(!f.analyzed) {
+            Depth guard(diagnostics.semantic_depth(),source,site,64);
+            semantics.analyze_one(f);
+        }
+        if(f.compile_failed || !f.compile_checked)throw Poison{};
+    };
+    for(auto& [id,u]:units)u->resolve_numeric=[&,owner=u.get()](Structure& structure) {
+        if(!structure.definition->enum_backing || structure.numeric_state==2)return;
+        if(structure.numeric_state==3)throw Poison{};
+        if(structure.numeric_state==1)error(owner->source,structure.token,Code::constant_cycle,"Circular numeric enum discriminant dependency.");
+        Depth guard(diagnostics.semantic_depth(),owner->source,structure.token,64);
+        structure.numeric_state=1;
+        try {
+            std::map<std::uint64_t,Token> discriminants;
+            auto backing=Type(*structure.definition->enum_backing);
+            auto& members=structure.definition->numeric_members;
+            for(unsigned n=0;n<members.size();++n) {
+                auto& expression=structure.numeric_expressions.at(n);std::uint64_t bits=1;
+                if(expression) {
+                    // Preserve flags' earlier-member vocabulary inside the ordinary
+                    // typed expression; no separate arithmetic evaluator remains.
+                    if(structure.definition->enum_flags) {
+                        std::vector<Expr*> pending{expression.get()};
+                        while(!pending.empty()) {
+                            auto& e=*pending.back();pending.pop_back();
+                            if(e.kind==Expr::Kind::name && e.qualifier.empty())for(unsigned previous=0;previous<n;++previous)
+                                if(members[previous].name==e.token.text){e.kind=Expr::Kind::literal;e.type=backing;e.value=members[previous].bits;e.target=structure.definition->identity+"::variant::"+members[previous].name;break;}
+                            for(auto& part:e.parts)pending.push_back(part.get());
+                        }
+                    }
+                    Semantics semantics(*owner,units,root,evaluate,diagnostics,defaults);
+                    auto type=semantics.pure_expression(*expression,nullptr,backing);
+                    if(type==error_type)throw Poison{};
+                    if(type!=backing)error(owner->source,expression->token,Code::type_mismatch,"Enum discriminant requires exactly its integer backing type.");
+                    bits=constant_value(owner->source,*expression,&compile_evaluation).bits;
+                } else {
+                    std::uint64_t used=0;for(unsigned previous=0;previous<n;++previous)used|=members[previous].bits;
+                    while(used){if(bits>(numeric::limit(Type::u64,true)>>1))error(owner->source,structure.case_tokens[n],Code::integer_range,"No automatic flag bit remains.");bits<<=1;used>>=1;}
+                    if(numeric::width(backing)<64 && bits>>numeric::width(backing))error(owner->source,structure.case_tokens[n],Code::integer_range,"Automatic flag value exceeds the backing width.");
+                }
+                auto [previous,inserted]=discriminants.emplace(bits,structure.case_tokens[n]);
+                if(!inserted)error(owner->source,structure.case_tokens[n],Code::duplicate,"Duplicate numeric enum discriminant.",{},{{span(owner->source,previous->second),"Previously declared value."}});
+                members[n].bits=bits;
+            }
+            structure.numeric_state=2;
+        }catch(...){structure.numeric_state=3;throw;}
+    };
     std::vector<std::string> dependency;
     evaluate = [&](Unit& owner, Constant& c) {
         if (c.state == 2) return;
@@ -7166,7 +7257,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         c.state = 1; dependency.push_back(key);
         try {
             Semantics(owner, units, root, evaluate, diagnostics, defaults).analyze_constant(c);
-            c.aggregate_value = constant_value(owner.source, *c.declaration.expression); c.value = c.aggregate_value.bits;
+            c.aggregate_value = constant_value(owner.source, *c.declaration.expression,root.compile_evaluation); c.value = c.aggregate_value.bits;
             c.state = 2; dependency.pop_back();
         } catch (...) { c.state = 3; dependency.pop_back(); throw; }
     };
@@ -7196,7 +7287,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
                 auto type=semantics.pure_expression(*syntax.extent);
                 if(type==error_type) throw Poison{};
                 if(!numeric::integer(type)) error(owner.source,syntax.extent->token,Code::unsupported_type,"Fixed-array extent requires a pure nonnegative integer module-constant expression.");
-                const auto value=constant_value(owner.source,*syntax.extent).bits;
+                const auto value=constant_value(owner.source,*syntax.extent,root.compile_evaluation).bits;
                 if(numeric::signed_integer(type) && (value & (std::uint64_t{1}<<(numeric::width(type)-1))))
                     error(owner.source,syntax.extent->token,Code::integer_range,"Fixed-array extent cannot be negative.");
                 if(value>static_cast<std::uint64_t>(std::numeric_limits<std::int64_t>::max()))
@@ -7454,7 +7545,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     };
 #include "generics.inc"
     prepare_function = [&](Unit& owner,Function& f) {
-        auto* unit=&owner;
+        auto* unit=&owner;f.compile_owner=&owner;
         if(f.prepared)return;f.prepared=true;
         Diagnostics::Context header_context(diagnostics,f.instantiation_context,std::max(f.specialization_depth,diagnostics.current_specialization_depth()));
         auto resolve = [&](Type& t, const Token& token) {
@@ -7635,6 +7726,8 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     };
 #include "generic_declarations.inc"
     complete_generic_constraints();
+    for(auto& [id,u]:units)for(auto& structure:u->structures)try {u->resolve_numeric(structure);}
+        catch(const CompilationError& failure){diagnostics.add(failure);}catch(const Poison&){}
     for (auto& [id,unit] : units) for (auto& structure : unit->structures) {
         try { defaults(*unit,structure); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }
@@ -7677,6 +7770,14 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             for(const auto& f:u->functions)if(!f.analyzed && !f.interface_requirement){pending_bodies=true;break;}
             for(auto& value:u->globals)if(value.state==0) {u->resolve_global(value);pending_bodies=true;}
             Semantics(*u,units,root,evaluate,diagnostics,defaults).analyze();
+            // Body specialization can introduce numeric enum types after the
+            // header/default pass. Their discriminants must be ready before
+            // runtime conversions and enum metadata reach ordinary lowering.
+            for(auto& structure:u->structures)if(structure.definition->enum_backing && !structure.numeric_state) {
+                pending_bodies=true;
+                try {u->resolve_numeric(structure);}
+                catch(const CompilationError& failure){diagnostics.add(failure);}catch(const Poison&){}
+            }
         }
     }
     for(auto& [id,u]:units)u->globals.sort([](const Global& a,const Global& b){return a.token.offset!=b.token.offset?a.token.offset<b.token.offset:a.identity<b.identity;});
@@ -7725,6 +7826,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         }
     }
     for(auto& [id,u]:units) for(auto& f:u->functions) {
+        if(f.compile_time)pending.push_back(f.symbol);
         std::vector<const Expr*> expressions;
         if(f.base_prelude) expressions.push_back(f.base_prelude.get());
         for(const auto& child:f.initialization_defaults) expressions.push_back(child.get());
@@ -7786,7 +7888,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     (void)string_pool(units);
     for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
     root.prepare_relationships=[](Type,Type,const SourceFile&,const Token&){};
-    for(auto& [id,u]:units) {u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->make_nullable={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
+    for(auto& [id,u]:units) {u->resolve_numeric={};u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->make_nullable={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units, const std::string& entry,
                       std::shared_ptr<const project::LockedDependencies> dependencies) {
@@ -8268,6 +8370,7 @@ struct AnalysisAccess {
                     record.editor_symbol_kind=22;
                     record.signature=ir::type_name(type)+"."+member.name+" = "+value+" ("+ir::type_name(*structure.definition->enum_backing)+")";
                     declaration(std::move(record));
+                    if(structure.numeric_expressions[n])expression(*structure.numeric_expressions[n],key+"::variant::"+member.name,{});
                 }
                 for(unsigned n=0;n<structure.definition->cases.size();++n){const auto& variant=structure.definition->cases[n];std::vector<Type> parameters;for(unsigned field=0;field<variant.count;++field)parameters.push_back(ir::field_type(Type(structure.definition),variant.begin+field));
                     AnalyzedDeclaration record{variant.count?AnalyzedDeclaration::Kind::function:AnalyzedDeclaration::Kind::module_constant,key+"::variant::"+variant.name,id,structure.visibility,location(structure.case_tokens[n]),parameters,Type(structure.definition),std::to_string(n),variant.count?std::optional<std::uint64_t>{}:std::optional<std::uint64_t>{n},key};

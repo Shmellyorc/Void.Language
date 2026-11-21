@@ -63,8 +63,12 @@ their binding instead of appending defaults again.
 
 Module constants and pure init-free value, string, collection and function-value
 templates use the existing compile-time evaluator and materialization rules.
-Ordinary runtime function calls and parameter/receiver references are unavailable
-in defaults. All defaults on concrete declarations are checked, including unused
+G93 `compile func` calls and eligible value methods are available in these pure
+contexts, with exactly the ordinary argument/default binder and numeric kernel.
+Unmarked runtime calls and references to runtime parameters/receivers remain
+unavailable in defaults. The callable body can use its own bound parameters and
+owned locals during evaluation; this does not expose the default declaration
+activation. See [G93](projects/G93_COMPILE_FUNCTIONS.md). All defaults on concrete declarations are checked, including unused
 ones. Numeric prelude operations are pure and can appear in constant/default
 expressions; an invalid reached operation diagnoses at compile time there.
 

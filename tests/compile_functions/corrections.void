@@ -1,0 +1,97 @@
+compile func make_values(input: i32) -> [i32, 2]:
+    return [input, input + 1]
+compile func temporary() -> i32:
+    var seed = 1
+    var total = 0
+    for item in make_values(seed):
+        total += item
+        seed += 10
+    return total
+compile func reversed_temporary() -> i32:
+    var seed = 1
+    var total = 0
+    for item in reverse make_values(seed):
+        total = total * 10 + item
+        seed += 10
+    return total
+compile func live_local() -> i32:
+    var values: [i32, 2] = [1, 2]
+    var total = 0
+    for item in values:
+        total += item
+        values = [10, 20]
+    return total
+value struct holder:
+    values: [i32, 2]
+compile func live_field() -> i32:
+    var owner = holder(values = [1, 2])
+    var total = 0
+    for item in owner.values:
+        total += item
+        owner = holder(values = [10, 20])
+    return total
+compile func selected_index() -> i32:
+    var rows: [[i32, 2], 2] = [[1, 2], [7, 8]]
+    var selected = 0
+    var total = 0
+    for item in rows[selected]:
+        total += item
+        selected = 1
+        rows[0] = [10, 20]
+    return total
+compile func captured_handle() -> i32:
+    var rows: [[i32, 2]] = [[1, 2], [7, 8]]
+    var selected = 0
+    var total = 0
+    for item in rows[selected]:
+        total += item
+        selected = 1
+        rows = [[10, 20], [30, 40]]
+    return total
+compile func compact_local() -> i32:
+    var values: [i32, 2]
+    var total = 0
+    for item in values:
+        total += item
+        values[1] = 10
+    return total
+compile func captured_field() -> i32:
+    var seed = 1
+    var total = 0
+    for item in holder(values = make_values(seed)).values:
+        total += item
+        seed += 10
+    return total
+compile func selected_negative() -> i32:
+    var rows: [[i32, 2], 2] = [[7, 8], [1, 2]]
+    var selected = -1
+    var total = 0
+    for item in rows[selected]:
+        total += item
+        selected = 0
+        rows[1] = [10, 20]
+    return total
+compile func snapshot(values: [i32, 2]) -> [i32, 2]:
+    return values
+compile func captured_value() -> i32:
+    var values: [i32, 2] = [1, 2]
+    var total = 0
+    for item in snapshot(values):
+        total += item
+        values = [10, 20]
+    return total
+const folded_temporary = temporary()
+const folded_reversed = reversed_temporary()
+const folded_local = live_local()
+const folded_field = live_field()
+const folded_index = selected_index()
+const folded_handle = captured_handle()
+const folded_compact = compact_local()
+const folded_captured_field = captured_field()
+const folded_negative = selected_negative()
+const folded_value = captured_value()
+func main():
+    print(folded_temporary, temporary(), folded_reversed, reversed_temporary())
+    print(folded_local, live_local(), folded_field, live_field(), folded_index, selected_index())
+    print(folded_handle, captured_handle(), folded_compact, compact_local())
+    print(folded_captured_field, captured_field(), folded_negative, selected_negative(), folded_value, captured_value())

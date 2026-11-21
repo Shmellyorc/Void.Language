@@ -20,19 +20,20 @@ bool enum_constant_equal(const SourceFile& source,const Token& site,Type type,
     if(!numeric::number(primitive) && primitive!=Type::boolean)error(source,site,Code::constant_call,"This enum payload has no compile-time equality.");
     return numeric::binary(ir::Op::equal,left.bits,right.bits,primitive);
 }
-std::optional<ir::ConstantValue> enum_constant(const SourceFile& source,const Expr& e) {
+std::optional<ir::ConstantValue> enum_constant(const SourceFile& source,const Expr& e,CompileEvaluation* evaluation) {
     if(e.kind!=Expr::Kind::call || (!e.op.starts_with("$enum.") && e.op!="$enum_equal"))return {};
-    const auto type=e.parts.at(0)->type;const auto value=constant_value(source,*e.parts[0]);
-    if(e.op=="$enum_equal")return ir::ConstantValue{enum_constant_equal(source,e.token,type,value,constant_value(source,*e.parts[1])),{}};
+    const auto type=e.parts.at(0)->type;const auto value=constant_value(source,*e.parts[0],evaluation);
+    if(e.op=="$enum_equal")return ir::ConstantValue{enum_constant_equal(source,e.token,type,value,constant_value(source,*e.parts[1],evaluation)),{}};
     if(e.op=="$enum.name" || e.op=="$enum.is_defined") {
         bool defined=false;std::string name;
         if(type.kind==Type::numeric_enum) {
+            if(evaluation)evaluation->step(source,e.token,type.definition->numeric_members.size());
             for(const auto& member:type.definition->numeric_members)if(member.bits==value.bits){defined=true;name=member.name;break;}
             if(!defined)name=numeric::integer_text(value.bits,*type.definition->enum_backing);
         } else {const auto tag=value.fields.at(0).bits;defined=tag<type.definition->cases.size();if(defined)name=type.definition->cases.at(tag).name;}
         return e.op=="$enum.name"?ir::ConstantValue{0,{},std::move(name)}:ir::ConstantValue{defined,{}};
     }
-    const auto mask=constant_value(source,*e.parts.at(1)).bits;
+    const auto mask=constant_value(source,*e.parts.at(1),evaluation).bits;
     if(e.op=="$enum.has")return ir::ConstantValue{(value.bits&mask)==mask,{}};
     if(e.op=="$enum.has_any")return ir::ConstantValue{(value.bits&mask)!=0,{}};
     if(e.op=="$enum.with")return ir::ConstantValue{value.bits|mask,{}};

@@ -5,6 +5,7 @@
 #include "void/numeric.hpp"
 #include "void/path.hpp"
 #include "void/compiler_observation.hpp"
+#include "void/compile_evaluation.hpp"
 #include <bit>
 #include <array>
 #include <llvm/Support/JSON.h>
@@ -287,6 +288,7 @@ class Server {
     bool interactive=false, catalog_current=false, incremental_sync=false;
     using Clock=std::chrono::steady_clock;
     Clock::time_point analyze_after{};
+    std::stop_source worker_stop;
     std::future<std::shared_ptr<const vd::SessionAnalysis>> worker;
     struct DisplayTokens {vd::SourceFile source; std::vector<vd::SemanticToken> tokens;};
     std::map<std::string,DisplayTokens> displayed;
@@ -308,15 +310,17 @@ class Server {
         std::function<vd::EditorAssistance()> compute;
         std::future<vd::EditorAssistance> work;
         bool answered=false;
+        std::stop_source stop;
     };
     std::deque<AssistanceJob> assistance_jobs;
     std::optional<j::Value> handling_id;
     bool deferred_response=false;
     std::optional<std::string> prepared_response;
     void changed() {
+        worker_stop.request_stop();
         for(auto& probe:probes)probe.reset();
         for(auto& job:assistance_jobs)if(!job.answered && !job.snapshot.same_revision(session.select())) {
-            error(job.id,-32801,"Document or project changed during assistance");job.answered=true;
+            error(job.id,-32801,"Document or project changed during assistance");job.answered=true;job.stop.request_stop();
         }
         dirty=true;
         analyze_after=Clock::now()+std::chrono::milliseconds(65);
@@ -903,7 +907,7 @@ class Server {
                         };
                         return result;
                     };
-                    assistance_jobs.push_back(AssistanceJob{*handling_id,method,module,*source,*offset,snapshot,compute,{},false});
+                    assistance_jobs.push_back(AssistanceJob{*handling_id,method,module,*source,*offset,snapshot,compute,{},false,{}});
                 }
                 deferred_response=true;
                 return nullptr;
@@ -1056,7 +1060,8 @@ public:
     void end_batch(){cancellations.clear();}
     bool pending() const {return dirty;}
     void retire_assistance(const std::string& reason) {
-        for(auto& job:assistance_jobs)if(!job.answered){error(job.id,-32800,reason);job.answered=true;}
+        worker_stop.request_stop();
+        for(auto& job:assistance_jobs)if(!job.answered){error(job.id,-32800,reason);job.answered=true;job.stop.request_stop();}
     }
     void flush() {if(dirty)analyze();}
     bool interactive_loop() const {return interactive && state==State::ready;}
@@ -1070,7 +1075,7 @@ public:
                     error(job.id,-32801,"Document or project changed before assistance");
                     assistance_jobs.pop_front();continue;
                 }
-                job.work=std::async(std::launch::async,std::move(job.compute));
+                job.work=std::async(std::launch::async,[compute=std::move(job.compute),stop=job.stop.get_token()] {vd::CompileEvaluationCancellation cancellation(stop);return compute();});
             }
             if(job.work.wait_for(std::chrono::seconds(0))!=std::future_status::ready)break;
             auto result=job.work.get();
@@ -1094,10 +1099,13 @@ public:
         }
         if(worker.valid() && worker.wait_for(std::chrono::seconds(0))==std::future_status::ready)
             publish(worker.get());
-        if(dirty && !worker.valid() && assistance_jobs.empty() && Clock::now()>=analyze_after)
-            worker=std::async(std::launch::async,[snapshot=session.select()] {
+        if(dirty && !worker.valid() && assistance_jobs.empty() && Clock::now()>=analyze_after) {
+            worker_stop=std::stop_source{};
+            worker=std::async(std::launch::async,[snapshot=session.select(),stop=worker_stop.get_token()] {
+                vd::CompileEvaluationCancellation cancellation(stop);
                 return vd::ToolingSession::analyze(snapshot,true);
             });
+        }
     }
     bool parent_alive() const {
         if(!process_id)return true;
@@ -1217,6 +1225,7 @@ public:
             if(name=="shutdown") {
                 if(!id) { fail(-32600,"Shutdown requires a request ID"); return {}; }
                 if(auto p=o->get("params"); p && !p->getAsNull()) throw std::invalid_argument("Shutdown has no parameters");
+                worker_stop.request_stop();
                 retire_assistance("Server shutting down");
                 state=State::shutdown;dirty=false; send(j::Object{{"jsonrpc","2.0"},{"id",*id},{"result",nullptr}}); return {};
             }
@@ -1338,7 +1347,7 @@ public:
                 auto cancelled=object(o->get("params")).get("id");if(!cancelled)throw std::invalid_argument("Missing cancelled request ID");
                 if(!cancelled->getAsString())(void)integer(cancelled);
                 for(auto& job:assistance_jobs)if(!job.answered && job.id==*cancelled) {
-                    error(job.id,-32800,"Request cancelled");job.answered=true;
+                    error(job.id,-32800,"Request cancelled");job.answered=true;job.stop.request_stop();
                 }
                 return {}; // Unknown/completed requests are never remembered for future ID reuse.
             }

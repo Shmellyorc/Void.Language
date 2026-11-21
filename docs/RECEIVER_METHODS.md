@@ -1,5 +1,13 @@
 # Phase 13: receiver methods and initialization groundwork
 
+G93 supports explicitly marked pure value receiver methods, including concrete
+generic owners: `compile func (d dimensions) area() -> i32:`. These methods retain
+ordinary module ownership, visibility, completion and readonly capability checks.
+The receiver cannot be mutated, and calls in a required constant expression use
+owned compiler values. Runtime calls use the same body through LLVM. Managed,
+lifecycle, property and virtual receivers remain outside this constant subset.
+See [G93](projects/G93_COMPILE_FUNCTIONS.md).
+
 **Stage 8 Sprint 2 update (20 October 2026):**
 [The shared calls/numeric contract](STAGE8_CALLS_NUMERIC.md) supersedes older
 ordinary named/default-call exclusions below. Existing constructor, readonly,

@@ -591,6 +591,17 @@ if(BUILD_TESTING)
   add_test(NAME raylib_public_documentation COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/raylib_documentation.py" --docs-only)
   set_tests_properties(raylib_public_documentation PROPERTIES TIMEOUT 30)
+  void_add_output_test(compile_functions_source "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/compile_functions/source.py" "$<TARGET_FILE:voidc>"
+    "@VOID_TEST_OUTPUT@/compile-functions-source.json")
+  void_add_output_test(compile_functions_lsp "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/compile_functions/lsp.py" "$<TARGET_FILE:voidls>"
+    "@VOID_TEST_OUTPUT@/compile-functions-lsp.json")
+  add_executable(void_compile_cancellation tests/compile_functions/cancellation.cpp)
+  target_link_libraries(void_compile_cancellation PRIVATE void_core)
+  add_test(NAME compile_functions_cancellation COMMAND void_compile_cancellation)
+  set_tests_properties(compile_functions_source PROPERTIES TIMEOUT 300)
+  set_tests_properties(compile_functions_lsp compile_functions_cancellation PROPERTIES TIMEOUT 120)
   add_test(NAME lsp_intellisense COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/intellisense.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_intellisense PROPERTIES TIMEOUT 180)

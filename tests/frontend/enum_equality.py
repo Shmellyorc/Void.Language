@@ -69,13 +69,13 @@ func probe(left: api.notice, right: api.notice) -> bool:
         result = invoke("check", source)
         assert result.returncode == 0 and not result.stderr, result
     reject(source, prefix + "left == 7\n", "==", "VOID2001",
-           "Type mismatch: expected /events.void::notice, received i32.")
+           "Type mismatch: expected notice, received i32.")
     reject(source, '''use "./events.void" as api
 enum other:
     idle
 func probe(left: api.notice) -> bool:
     return left != other.idle
-''', "!=", "VOID2001", "Type mismatch: expected /events.void::notice, received /probe.void::other.")
+''', "!=", "VOID2001", "Type mismatch: expected notice, received other.")
     reject(source, '''value struct point:
     x: i32
 func probe(left: point, right: point) -> bool:

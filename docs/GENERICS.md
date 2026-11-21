@@ -1,5 +1,18 @@
 # Native generics (Phase 24)
 
+## Pure generic compile functions (G93)
+
+`compile func identity<t>(value: t) -> t:` uses the ordinary specialization
+pipeline. A concrete specialization can run in required constant contexts and
+through ordinary LLVM calls at runtime. The same applies to eligible value
+receiver types and method-specific generics; no compile-specific type declaration
+exists. Concrete parameter/result/local types and every operation must satisfy
+the [G93 purity contract](projects/G93_COMPILE_FUNCTIONS.md). Unsupported managed
+identities and effects diagnose even for a runtime call to that specialization.
+Uninstantiated generic bodies retain the existing deferred concrete checking.
+Existing specialization depth/identity-work limits combine with finite evaluation
+budgets. Conditional selection captures only the active template.
+
 ## Conditional generic declarations and bodies (G87)
 
 `compile if` selects source once for the immutable target and owning-project

@@ -90,7 +90,10 @@ public:
         const auto& text=source.text();auto end=text.find_first_of("\r\n",prefix.end);
         if(end==std::string::npos)end=text.size();
         auto content=std::string_view(text).substr(prefix.end,end-prefix.end);
-        const bool directive=word(content,"compile");
+        const bool compile_word=word(content,"compile");
+        auto after_compile=compile_word?content.substr(7):std::string_view{};
+        while(!after_compile.empty() && (after_compile.front()==' ' || after_compile.front()=='\t'))after_compile.remove_prefix(1);
+        const bool directive=compile_word && !word(after_compile,"func");
         if(content.empty() || content.front()=='#')return true;
         auto body=directive?content.substr(7):std::string_view{};
         while(!body.empty() && (body.front()==' ' || body.front()=='\t'))body.remove_prefix(1);

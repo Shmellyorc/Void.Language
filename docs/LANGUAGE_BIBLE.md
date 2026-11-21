@@ -1,6 +1,6 @@
 # VOID language specification
 
-This document specifies implemented VOID source behavior through G87, with G88
+This document specifies implemented VOID source behavior through G93, with G88
 library API changes documented in the [modernization report](projects/G88_STDLIB_PACKAGES_MODERNIZATION.md).
 It is organized by language concept. Feature guides linked from each section
 supply detailed rules and boundary cases; implementation reports record evidence
@@ -213,6 +213,52 @@ They follow the exact declaration/binding rules in [advanced language](ADVANCED_
 Use a value struct when a result needs a reusable stored record shape.
 See [receiver methods](RECEIVER_METHODS.md), [callable/function behavior](ADVANCED_LANGUAGE.md)
 and [calls](STAGE8_CALLS_NUMERIC.md).
+
+### Pure compile-time functions (G93)
+
+`compile func` marks an ordinary source function as eligible for required constant
+contexts. It uses the same body, exact types, argument/default mapping, generics,
+source ownership and arithmetic as an ordinary runtime call.
+
+```void
+compile func square(value: i32) -> i32:
+    return value * value
+
+const answer = square(8)
+
+func main():
+    var width = 9
+    print(answer, square(width))
+```
+
+Public/private/internal modifiers precede `compile func`. Eligible pure value
+receiver methods use `compile func (d dimensions) area() -> i32:`; ordinary and
+generic value types retain their existing declarations. Generic functions and
+methods are checked for their concrete operations at specialization. All concrete
+marked bodies are purity checked, including unused bodies and unselected runtime
+branches. Calls to unmarked functions remain excluded from required constants.
+
+Supported constant calls compose with module constants, field and parameter
+defaults, fixed-array extents, numeric/flags discriminants and existing pure value,
+string, enum and collection templates. Locals and ordinary runtime calls retain
+their runtime behavior. Local `const` still means readonly runtime initialization;
+it does not request evaluation during compilation.
+
+The supported body subset includes owned local values, local assignment, returns
+and multiple returns, Boolean branches, conditional/range/fixed-array loops,
+recursion, supported expressions and nested marked calls. Receiver mutation,
+mutable reference storage, managed identities, custom initializers/operators,
+closures, patterns, resource/defer scopes, async work, native calls, globals and
+observable I/O are excluded. Compiler-owned collection templates do not allocate
+Runtime objects during evaluation. No reference can escape a compiler temporary.
+
+Evaluation has finite call, nesting, step, temporary-value and graph budgets.
+Exhaustion produces a source diagnostic; editor cancellation stops constant work.
+G87 selection runs before declarations are captured, so inactive marked functions
+remain excluded. No `compile const`, `compile var`, `compile struct`, `comptime`,
+reflection or macro language is introduced. See
+[G93 semantics, limits and qualification](projects/G93_COMPILE_FUNCTIONS.md) and
+[the runnable example](../examples/compile_functions/main.void).
 
 ## Structs, construction and members
 
@@ -543,8 +589,8 @@ specialization; predicates cannot inspect generic types or ordinary values.
 
 Configuration changes require recompilation and Runtime restart. Original source
 spans and UTF-16 editor positions are preserved. Inactive regions receive compiler
-metadata; formatting a conditional file currently returns no edits. Conditional
-syntax does not add compile-time function execution.
+metadata; formatting a conditional file currently returns no edits. G93
+`compile func` declarations compose with this selection without changing predicates.
 
 <a id="41-native-c-interoperability-agreed"></a>
 ## Native interoperability
@@ -608,7 +654,6 @@ The complete original rationale remains in [the historical Bible](LANGUAGE_BIBLE
 
 | Direction | Current boundary |
 | --- | --- |
-| G93 `compile func` | Planned; no implemented compile-time function declaration/execution facility. G87 conditional selection does not imply it. |
 | Optional `if condition: return` | Deferred; use an indented body. |
 | VOID Sections (`# section Name`, `# endsection`) | Approved organizational-comment direction; specialized tooling remains deferred. Comments do not create scope. |
 | Stateless/method-only reuse and transitive promotion | Future design; `using` currently embeds storage and promotes one hop. |

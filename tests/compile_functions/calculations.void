@@ -1,0 +1,113 @@
+compile func square(value: i32) -> i32:
+    return value * value
+compile func identity<t>(value: t) -> t:
+    return value
+compile func factorial(value: i32) -> i32:
+    if value < 2:
+        return 1
+    return value * factorial(value - 1)
+compile func sum_to(value: i32) -> i32:
+    var total = 0
+    for item in 1..value:
+        if item == 3:
+            continue
+        total += item
+        if item == 8:
+            break
+    return total
+compile func reverse_sum() -> i32:
+    var total = 0
+    for item in reverse 5..<1:
+        total = total * 10 + item
+    return total
+compile func checked_divide(left: i32, right: i32 = 2) -> i32:
+    return left / right
+compile func pairs(value: i32) -> (first: i32, second: i32):
+    return value, value + 1
+compile func unpack(value: i32) -> i32:
+    const left, right = pairs(value)
+    return left + right
+value struct dimensions:
+    width: i32
+    height: i32
+compile func (d dimensions) area() -> i32:
+    return d.width * d.height
+value struct box<t>:
+    value: t
+compile func (b box<t>) read() -> t:
+    return b.value
+compile func (b box<t>) echo<u>(value: u) -> u:
+    return value
+compile func greeting(value: string) -> string:
+    var message = "hello "
+    message += value
+    return message
+compile func array_total(elements: [i32, 3]) -> i32:
+    var total = 0
+    for item, position in elements:
+        total += item + position as i32
+    elements[1] *= 2
+    return total + elements[1]
+compile func build_values() -> [i32, 3]:
+    return [1, 2, 3]
+compile func build_list() -> [i32]:
+    return [4, 5]
+compile func build_dictionary() -> {string: i32}:
+    return {"answer": 42}
+compile func shifted(value: i8, count: i64) -> i8:
+    value <<= count
+    return value
+compile func wrapped(value: i8) -> i8:
+    return value + 1
+compile func bit(value: u32) -> u32:
+    return 1 << value
+compile if target_os == "linux":
+    compile func platform_name() -> string:
+        return "Linux"
+compile else:
+    compile func platform_name() -> string:
+        return "Other"
+compile if false:
+    compile func square(value: missing) -> nope:
+        arbitrary $ invalid
+const answer = square(8)
+const pixels = dimensions(width = 20, height = 10).area()
+const fact = factorial(7)
+const summed = sum_to(10)
+const reversed = reverse_sum()
+const generic = identity<i64>(42)
+const generic_receiver = box<i32>(value = 17).read()
+const generic_method = box<i32>(value = 17).echo<string>("echo")
+const divided = checked_divide(right = 3, left = 21)
+const defaulted = checked_divide(20)
+const unpacked = unpack(5)
+const words = greeting("VOID")
+const values = build_values()
+const array_result = array_total(values)
+const items = build_list()
+const mapping = build_dictionary()
+const shifted_value = shifted(3, -1)
+const wrapped_value = wrapped(127)
+const platform = platform_name()
+enum code(i32):
+    answer = square(8)
+    next = square(9)
+flags enum access(u32):
+    read = bit(0)
+    write = bit(1)
+    both = read | write
+    later
+value struct defaults:
+    value: i32 = square(5)
+func default_parameter(value: i32 = square(6)) -> i32:
+    return value
+func main() -> i32:
+    var input = 8
+    var receiver = dimensions(width = 20, height = 10)
+    var list_value = items
+    var dictionary_value = mapping
+    print(answer, pixels, fact, summed, reversed, generic, generic_receiver, generic_method)
+    print(divided, defaulted, unpacked, words, array_result, values[1], list_value.count, dictionary_value.count)
+    print(shifted_value, wrapped_value, platform, code.answer.value, access.both.value, access.later.value)
+    print(defaults().value, default_parameter(), square(input), receiver.area(), factorial(input - 1))
+    return 0

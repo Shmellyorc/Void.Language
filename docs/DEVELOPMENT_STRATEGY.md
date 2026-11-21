@@ -26,6 +26,7 @@ shared. Current API guides determine behavior; proposals record design history.
 
 | Area | Current engineering record |
 | --- | --- |
+| Pure compile functions | [G93 candidate](projects/G93_COMPILE_FUNCTIONS.md): explicit pure source functions/value methods, shared typed constant evaluation and finite editor work; independent review pending |
 | Member completion | [G92 candidate](projects/G92_INTELLISENSE_MEMBER_COMPLETION.md): compiler-owned builtin metadata, readonly effects and focused editor qualification; independent Golden Wrench review pending |
 | Project/library/native workflow | [Milestone register](roadmap/MILESTONE_REGISTER.md), [library authoring](LOCAL_LIBRARIES.md), [G25](projects/G25_NATIVE_HEADER_IMPORTER.md), [G26](projects/G26_PACKAGE_MAINTENANCE.md), [G27](projects/G27_LIBRARY_AUTHORING.md) |
 | Library modernization and canonical specification | [G88 candidate](projects/G88_STDLIB_PACKAGES_MODERNIZATION.md); former G91 scope absorbed; focused review corrections completed locally, Golden Wrench re-review pending |

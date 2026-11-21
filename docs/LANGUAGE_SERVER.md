@@ -1,5 +1,22 @@
 # Minimal VOID language server (Phase 10)
 
+G93 `compile func` declarations and constant calls use the compiler's typed
+expression evaluator, body checker and deterministic numeric kernel. Hover marks
+eligible functions and shows computed numeric constants; completion, documented
+parameter signature help, generic specialization, definitions/references and
+semantic identifier tokens use ordinary compiler records. Enum discriminant
+expressions contribute references too. The existing TextMate keyword rule already
+recognizes `compile`; inactive G87 regions retain their excluded highlighting.
+
+Only required constant contexts execute eligible functions. Opening a file never
+runs startup, ordinary functions, native calls or I/O. Finite per-expression and
+per-analysis work/value budgets protect all requests. Interactive assistance and
+background analysis borrow a per-worker cancellation token; cancellation,
+supersession and shutdown stop constant work at its next step. Existing immutable
+snapshot and input-freshness checks govern publication. Incomplete syntax follows
+the ordinary recovery path and cannot authorize effects or executable IR.
+See [G93 limits and editor evidence](projects/G93_COMPILE_FUNCTIONS.md).
+
 ## Member completion (G92)
 
 Value member probes retain the ordinary compiler receiver, field, property,

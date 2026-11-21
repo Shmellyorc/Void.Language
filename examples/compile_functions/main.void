@@ -1,0 +1,34 @@
+## Multiply a value by itself at compile time or runtime.
+## @param value Input to square.
+## @return The squared value.
+compile func square(value: i32) -> i32:
+    return value * value
+
+value struct dimensions:
+    width: i32
+    height: i32
+
+## Calculate the area of a value rectangle.
+## @return Width times height.
+compile func (d dimensions) area() -> i32:
+    return d.width * d.height
+
+## Sum the integers through a supplied bound.
+## @param maximum Inclusive upper bound.
+## @return The sum, or zero for a negative bound.
+compile func triangular(maximum: i32) -> i32:
+    var total = 0
+    var index = 1
+    for index <= maximum:
+        total += index
+        index += 1
+    return total
+
+const answer = square(8)
+const pixels = dimensions(width = 20, height = 10).area()
+const calculated_sum = triangular(100)
+
+func main() -> i32:
+    var width = 9
+    print(answer, pixels, calculated_sum, square(width))
+    return 0

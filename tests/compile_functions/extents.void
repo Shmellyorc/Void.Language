@@ -1,0 +1,20 @@
+value struct dimensions:
+    width: i32
+    height: i32
+compile func (d dimensions) area() -> i32:
+    return d.width * d.height
+compile func size() -> i32:
+    return dimensions(width = 2, height = 2).area()
+value struct box<t>:
+    value: t
+compile func (b box<t>) get() -> t:
+    return b.value
+compile func (b box<t>) echo<u>(input: u) -> u:
+    return input
+compile func generic_size() -> i32:
+    return box<i32>(value = 4).echo<i32>(box<i32>(value = 4).get())
+value struct table:
+    data: [i32, size()]
+    generic_data: [i32, generic_size()]
+func main():
+    print(table().data.count, table().generic_data.count)

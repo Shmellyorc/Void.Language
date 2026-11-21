@@ -50,8 +50,8 @@ precedence. If a payload lacks equality, comparison is diagnosed at the requesti
 operator; the compiler does not compare padding, inactive payloads or pointers in
 place of unsupported value equality. Constant comparisons support pure built-in
 payload equality, including named and nullable function-value identity. This
-compares function values without calling them. User function calls and custom
-operator calls remain excluded from compile-time constants. G83 supports eligible
+compares function values without calling them. Explicit `compile func` calls are supported in pure constant contexts by G93;
+unmarked function calls and custom operator calls remain excluded. G83 supports eligible
 fixed-array/list/dictionary payload equality through the same ordinary operators;
 recursive structural shapes diagnose. See [collection equality](COLLECTION_EQUALITY.md).
 Collection payloads still do not make an enum an eligible dictionary key.
@@ -66,7 +66,10 @@ enum level(i8):
 ```
 
 All eight fixed-width integer backing types are supported. Ordinary numeric enums
-require unique, explicit decimal discriminants that fit the backing type.
+require unique, explicit pure integer discriminants of the exact backing type.
+Decimal literals retain contextual range checking; G93 permits marked function
+results and supported constant expressions. Discriminants are resolved through
+the ordinary typed constant evaluator, with cycle and resource diagnostics.
 `raw as? level` returns `Some(member)` only when the mathematical value fits and
 is declared, otherwise `None`. `raw as level` performs the same checks and raises
 a source-located runtime conversion failure on rejection. Invalid constant casts
@@ -103,7 +106,8 @@ func main() -> i32:
 Omitted backing types default to `u32`. Omitted flag values receive the next
 power of two above previously used bits; explicit zero consumes no bit. Explicit
 flag discriminants can combine earlier members with `&`, `|`, `^`, `~` and
-parentheses. Duplicate values and exhausted backing widths diagnose. A signed
+parentheses, and use eligible G93 constant calls. Bare earlier flag names retain
+their backing-integer meaning; defaults still choose the next unused bit. Duplicate values and exhausted backing widths diagnose. A signed
 backing type still constrains explicit decimal values; bitwise complement uses
 its full width, including the sign bit.
 
