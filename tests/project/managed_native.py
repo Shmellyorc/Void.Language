@@ -63,11 +63,14 @@ def catalog_text(descriptor, library, adapter, runtime, link, notice, revision="
 
 def no_initializers():
     assert not marker.exists() and not released.exists()
+    assert not (project / marker.name).exists() and not (project / released.name).exists()
 
 
 def reset_markers():
     marker.unlink(missing_ok=True)
     released.unlink(missing_ok=True)
+    (project / marker.name).unlink(missing_ok=True)
+    (project / released.name).unlink(missing_ok=True)
 
 
 def editor(main, helper, text):
@@ -316,11 +319,18 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
     assert digest(base / "before.o") != digest(base / "after.o")
     no_initializers()
 
+    if sys.platform.startswith('linux') and not packaging:
+        from native_staging import verify as verify_staging
+        verify_staging(compiler, clang, project, cwd, environment)
+        reset_markers()
+        no_initializers()
+
     def executed(*args):
         reset_markers()
         run(*args, message="VOID native application payload")
-        assert marker.read_text().splitlines() == ["dependency initialized"]
-        assert released.read_text().splitlines() == ["-2", "23"]
+        working = project if args[0] == compiler and args[1] == 'run' else cwd
+        assert (working / marker.name).read_text().splitlines() == ["dependency initialized"]
+        assert (working / released.name).read_text().splitlines() == ["-2", "23"]
 
     for profile in ("debug", "release"):
         executed(compiler, "run", "--project", project, "--allow-native", "--no-cache", "--profile", profile,
@@ -413,7 +423,7 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
     main.write_text('use pkg/helper\nfunc main():\n    print(helper.value())\n', encoding="utf-8")
     cli("run", status=2, message="--allow-native")
     cli("run", "--allow-native", message="1")
-    assert marker.read_text().splitlines() == ["dependency initialized"]
+    assert (project / marker.name).read_text().splitlines() == ["dependency initialized"]
     reset_markers()
     approved_manifest = manifest.read_text(encoding="utf-8")
     manifest.write_text(approved_manifest.replace(requirement, ""), encoding="utf-8")

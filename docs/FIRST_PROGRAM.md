@@ -36,7 +36,7 @@ voidc build --project . --profile release -o hello
 ```
 
 On Windows use `-o hello.exe` and `.\hello.exe`. A path with spaces must be quoted.
-The default output for this project is `build/hello` (`build/hello.exe` on Windows).
+The default output for this project is `.void/build/hello` (`.void/build/hello.exe` on Windows).
 Output paths are relative to your shell's directory unless absolute.
 
 In VS Code, open **Hello Project** as a trusted folder. Save changes and use

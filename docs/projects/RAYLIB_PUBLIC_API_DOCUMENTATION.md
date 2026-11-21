@@ -1,5 +1,7 @@
 # raylib public parameter names and documentation
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Source parent `7ef5ba6d8354ba295ec0a3d63c320b259cfd326b` (G72).
 Work is isolated on `codex/raylib-public-api-docs`. G73's four-file icon
 candidate and the owner's installed extension retain their prior hashes.

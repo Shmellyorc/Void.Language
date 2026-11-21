@@ -7,7 +7,8 @@ native manifests; output must be new. Use an Ubuntu-built compiler for the floor
 from pathlib import Path
 import argparse, json, os, shutil, subprocess, sys, tempfile
 ROOT = Path(__file__).resolve().parents[1]
-os.environ.setdefault('VOID_CRASH_EVIDENCE',str(ROOT/'docs/voidup/evidence/phase_b/crashes'))
+from engineering_storage import evidence_directory
+os.environ.setdefault('VOID_CRASH_EVIDENCE',str(evidence_directory('voidup-qualification')/'crashes'))
 sys.path.insert(0,str(ROOT/'tests/text_encoding'))
 from crash import run
 

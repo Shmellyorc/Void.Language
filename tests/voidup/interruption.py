@@ -1,10 +1,10 @@
 from pathlib import Path
 import argparse,json,subprocess,tempfile,time
-from support import ROOT,EVIDENCE,Runner,Service,stack,preserve
+from support import ROOT,EVIDENCE,Runner,Service,stack,preserve,scratch_directory
 parser=argparse.ArgumentParser();parser.add_argument('application',type=Path)
 parser.add_argument('--name',default='interruption-1');options=parser.parse_args()
 app=options.application.resolve();runner=Runner(options.name)
-work=Path(tempfile.mkdtemp(prefix='VOIDUP partial download 雪 # % '));root=work/'private'
+work=scratch_directory('VOIDUP partial download 雪 # % ');root=work/'private'
 with Service(ROOT/'build/voidup-fixtures') as server:
  server.stall='/packages/engineering-a.zip';server.stall_after=1048576
  base=[app,'--root',root,'--catalog',server.url,'--ca-file',server.ca,'--timeout-ms','120000']

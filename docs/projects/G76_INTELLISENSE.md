@@ -1,5 +1,7 @@
 # G76 — IntelliSense readability, responsiveness and incremental analysis
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Boss authorized one integrated G76 milestone at baseline
 `b777638c04834fc51bf81017802024cede43d041` on 18 November 2026.
 Implementation and local Linux qualification are complete. This is implementation

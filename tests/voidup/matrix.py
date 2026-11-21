@@ -1,11 +1,11 @@
 """Source application normal/O2 JIT and independent AOT with real HTTPS trust."""
 from pathlib import Path
 import argparse,json,os,tempfile
-from support import ROOT,EVIDENCE,Runner,Service
+from support import ROOT,EVIDENCE,Runner,Service,scratch_directory
 parser=argparse.ArgumentParser();parser.add_argument('compiler',type=Path)
 parser.add_argument('--name',required=True);options=parser.parse_args()
 compiler=options.compiler.resolve();runner=Runner(options.name)
-work=Path(tempfile.mkdtemp(prefix='VOIDUP matrix 雪 # % '))
+work=scratch_directory('VOIDUP matrix 雪 # % ')
 with Service(ROOT/'build/voidup-fixtures') as server:
  for optimized in (False,True):
   flags=[] if optimized else ['--no-opt']

@@ -281,7 +281,7 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
         assert approval_missing.encode() in denied.stderr and b"run 'voidc run .'" in denied.stderr, denied
         assert b'Type approve' not in denied.stderr
     approve_run('run', '.', reuse, status=2, contains=approval_missing.encode())
-    assert not (project/'build/app.exe' if windows else project/'build/app').exists()
+    assert not (project/'.void/build/app.exe' if windows else project/'.void/build/app').exists()
     assert not approvals.exists()
     approve_run('run', '.', reply=b'no', status=2, contains=b'approval declined')
     assert not approvals.exists()

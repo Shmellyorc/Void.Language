@@ -12,6 +12,8 @@ def _workspace(label):
     diagnostics = os.environ.get("VOID_TEST_DIAGNOSTICS_DIR")
     if diagnostics:
         parent = Path(diagnostics).resolve()
+        if parent == Path('/tmp') or parent.is_relative_to('/tmp'):
+            raise ValueError('Retained diagnostics belong under ~/Documents/Void.Language-archives, outside /tmp')
         parent.mkdir(parents=True, exist_ok=True)
     else:
         parent = None

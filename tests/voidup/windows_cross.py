@@ -1,7 +1,10 @@
 """COFF source checks only. These do not establish Windows application support."""
 from pathlib import Path
-import hashlib,json,subprocess,time
-root=Path.cwd();evidence=root/'docs/voidup/evidence/phase_b'
+import hashlib,json,subprocess,time,sys
+root=Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(root/'tools'))
+from engineering_storage import evidence_directory
+evidence=evidence_directory('voidup-qualification')
 output=root/'build/voidup-phaseb-cross';output.mkdir(exist_ok=True)
 sources=['host_abi','host_directory','host_directory_windows','host_process','host_process_windows','host_archive','host_crypto','host_error','application','filesystem']
 record=dict(schema=1,native_execution=False,scope='MinGW x64 source compile only; no Windows VOIDUP JIT/AOT acceptance',commands=[])

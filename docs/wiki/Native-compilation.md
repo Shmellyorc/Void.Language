@@ -25,7 +25,7 @@ voidc emit src/app.void -o hello.o
 
 An object alone is not an executable. Prefer `build` unless you have a deliberate
 manual-linking setup. [CLI commands](https://github.com/Shmellyorc/Void.Language/wiki/CLI-commands) explains profiles and options.
-Without `-o`, a manifest application builds under its root's `build/` directory,
+Without `-o`, a manifest application builds under its root's `.void/build/` directory,
 using the selected entry's stem and the host executable suffix.
 
 ## Keep matching resources

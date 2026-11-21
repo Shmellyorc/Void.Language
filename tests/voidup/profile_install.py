@@ -1,11 +1,11 @@
 """Actual complete signed A/B packages through Debug/strict application AOT."""
 from pathlib import Path
 import argparse,json,os,tempfile
-from support import ROOT,EVIDENCE,Runner,Service
+from support import ROOT,EVIDENCE,Runner,Service,scratch_directory
 parser=argparse.ArgumentParser();parser.add_argument('application',type=Path);parser.add_argument('--name',required=True)
 options=parser.parse_args();runner=Runner(options.name);app=options.application.resolve()
-# Use the private home filesystem, avoiding cumulative retained tmpfs packages.
-work=Path(tempfile.mkdtemp(prefix='VOIDUP profile 雪 # % ',dir=Path.home()));root=work/'private'
+# Disposable fixture data is owned by the harness and cleaned at exit.
+work=scratch_directory('VOIDUP profile 雪 # % ');root=work/'private'
 with Service(ROOT/'build/voidup-fixtures') as server:
  base=[app,'--root',root,'--catalog',server.url,'--ca-file',server.ca,'--timeout-ms','120000']
  for release in ('engineering-a','engineering-b'):

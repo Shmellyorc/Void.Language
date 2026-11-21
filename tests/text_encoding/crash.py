@@ -14,6 +14,7 @@ import threading
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.append(str(ROOT / 'tools'))
 from test_output import output_directory
+from engineering_storage import evidence_directory as retained_evidence_directory
 
 REAL_RUN = subprocess.run
 _RUN_CONTEXT = threading.local()
@@ -40,7 +41,7 @@ def _signal_name(status):
 
 def evidence_directory():
     override = os.environ.get('VOID_CRASH_EVIDENCE')
-    return Path(override) if override else output_directory() / 'crashes'
+    return Path(override) if override else retained_evidence_directory('compiler-crashes')
 
 
 def _sources(command, cwd, source_inputs, environment):

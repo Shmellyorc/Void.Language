@@ -1,10 +1,10 @@
 """Actual bounded partial transfer timeout, exact progress and subsequent lock use."""
 from pathlib import Path
 import argparse,json,tempfile
-from support import ROOT,EVIDENCE,Runner,Service
+from support import ROOT,EVIDENCE,Runner,Service,scratch_directory
 parser=argparse.ArgumentParser();parser.add_argument('application',type=Path);parser.add_argument('--name',default='timeout-1')
 options=parser.parse_args();runner=Runner(options.name);app=options.application.resolve()
-work=Path(tempfile.mkdtemp(prefix='VOIDUP deadline 雪 # % '));root=work/'private'
+work=scratch_directory('VOIDUP deadline 雪 # % ');root=work/'private'
 with Service(ROOT/'build/voidup-fixtures') as server:
  server.stall='/packages/engineering-a.zip';server.stall_after=1048576
  base=[app,'--root',root,'--catalog',server.url,'--ca-file',server.ca,'--timeout-ms','500']

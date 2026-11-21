@@ -1,5 +1,7 @@
 # G80 — User-defined static fields and methods
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Baseline: `d9d9ff017a685abe59736fa088e5e01abf204c93` (G79).
 Scope: one integrated G80 candidate; native Linux x86-64 qualification.
 The current generic static-result correction and its final source evidence are
@@ -238,7 +240,7 @@ extensions were replaced, and nothing was staged, committed, pushed or published
 
 ## Golden Wrench correction — concrete generic static results
 
-The focused review at `/tmp/g80-review-6lo8i4wl/REVIEW.md` identified a P2 defect:
+The focused review at `/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/retained/g80-review-6lo8i4wl/REVIEW.md` identified a P2 defect:
 `keep(utility.echo<i32>(7))`, its inferred-inner variant and a generic-owner variant
 failed VOID2001 in all three profiles. Direct static calls and the equivalent
 nested free-function control passed. All original review inputs, diagnostics,

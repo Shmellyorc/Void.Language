@@ -58,6 +58,8 @@ compile_commands.json
 *.gcno
 .cache/
 **/.void/cache/
+**/.void/run/
+**/.void/build/
 __pycache__/
 *.pyc
 *.tmp

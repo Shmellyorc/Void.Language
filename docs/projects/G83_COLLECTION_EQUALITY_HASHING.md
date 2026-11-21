@@ -1,5 +1,7 @@
 # G83 — Collection Equality & Hashing
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Implementation candidate on accepted G82 baseline
 `ee4cade9a3752562364b1613621fd3ade3bdb3c0`, Linux x86-64, 20 November 2026.
 No staging, commit, push, installation, publication or hosted acceptance is claimed.
@@ -201,7 +203,7 @@ use the unchanged backend; no backend source or native ABI changes are present.
 
 ## Focused correction after independent review
 
-Golden Wrench's preserved review is `/tmp/g83-independent-zq_n9m26/REVIEW.md`.
+Golden Wrench's preserved review is `/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/retained/g83-correction-2kjprh_e/independent-review/REVIEW.md`.
 Its original `depth_24_equality.void` and `depth_48_equality.void`, declaration
 controls, `reproductions.json`, nine additional failures in `repeat.json`, and
 fatal sanitizer traces remain unchanged. These are failures of the reviewed

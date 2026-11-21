@@ -1,5 +1,8 @@
 # Development strategy and current status
 
+Current storage policy: [project artifacts and engineering retention](PROJECT_STORAGE.md).
+It supersedes historical `/tmp` evidence and native-staging instructions.
+
 ## Current project/application work, 13 November 2026
 
 Project manifests, compiler-owned entry discovery, project sessions, application

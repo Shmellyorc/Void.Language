@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <atomic>
 #include <fstream>
+#include <functional>
 #include <sodium.h>
 #include <stdexcept>
 
@@ -231,13 +232,14 @@ File root_directory(const std::filesystem::path& root) {
     return directory;
 }
 
-std::string approved_bytes(int directory, const DynamicClosure::Image& image) {
+std::string approved_bytes(int directory, const DynamicClosure::Image& image,std::size_t limit=image_limit,bool managed=false) {
     File file(openat(directory, image.name.c_str(), O_RDONLY | O_NOFOLLOW | O_NONBLOCK | O_CLOEXEC));
     struct stat before{}, after{};
     if (file.fd < 0 || fstat(file.fd, &before) || !S_ISREG(before.st_mode) || before.st_nlink != 1 ||
-        before.st_size <= 0 || static_cast<std::uint64_t>(before.st_size) > image_limit)
-        denied("artifact", image.name + " is missing, aliased or outside file bounds");
-    auto bytes = read_bounded(file.fd, image_limit);
+        before.st_size < 0 || (!managed && !before.st_size) || static_cast<std::uint64_t>(before.st_size) > limit)
+        denied("artifact", managed?"managed native payload missing or changed: "+image.name:
+            image.name + " is missing, aliased or outside file bounds");
+    auto bytes = read_bounded(file.fd, limit);
     if (fstat(file.fd, &after) || after.st_nlink != 1 || before.st_size != after.st_size ||
         static_cast<std::uint64_t>(after.st_size) != bytes.size())
         denied("artifact", image.name + " changed while captured");
@@ -245,7 +247,7 @@ std::string approved_bytes(int directory, const DynamicClosure::Image& image) {
     char hex[crypto_hash_sha256_BYTES * 2 + 1];
     if (crypto_hash_sha256(hash, reinterpret_cast<const unsigned char*>(bytes.data()), bytes.size()) != 0 ||
         sodium_bin2hex(hex, sizeof hex, hash, sizeof hash) == nullptr || image.sha256 != hex)
-        denied("digest", image.name);
+        denied(managed?"artifact":"digest", managed?"managed native payload identity mismatch: "+image.name:image.name);
     return bytes;
 }
 
@@ -477,6 +479,77 @@ File sealed_image(std::string_view bytes) {
     return file;
 }
 
+// Conventional libraries may contain initializers and system dependencies.
+// Capture every managed image through pinned descriptors, verify its approved
+// digest, then load sealed snapshots in DT_NEEDED order. Project renames and
+// writes after capture cannot replace the bytes passed to the system loader.
+struct ConventionalImage {
+    std::string name;
+    File file;
+    std::vector<std::string> needed;
+};
+
+std::vector<std::string> conventional_dependencies(std::string_view bytes,std::string_view name) {
+    const auto header=read_at<Elf64_Ehdr>(bytes,0);
+    if(std::memcmp(header.e_ident,ELFMAG,SELFMAG) || header.e_ident[EI_CLASS]!=ELFCLASS64 ||
+       header.e_ident[EI_DATA]!=ELFDATA2LSB || header.e_machine!=EM_X86_64 || header.e_type!=ET_DYN ||
+       header.e_phentsize!=sizeof(Elf64_Phdr) || !header.e_phnum || header.e_phnum>128)
+        denied("ELF","invalid conventional native image");
+    std::vector<Elf64_Phdr> loads;
+    Elf64_Phdr dynamic{};
+    for(unsigned n=0;n<header.e_phnum;++n) {
+        auto p=read_at<Elf64_Phdr>(bytes,header.e_phoff+std::uint64_t(n)*sizeof(Elf64_Phdr));
+        if(p.p_offset>bytes.size() || p.p_filesz>bytes.size()-p.p_offset)denied("ELF","invalid native segment");
+        if(p.p_type==PT_LOAD)loads.push_back(p);
+        if(p.p_type==PT_DYNAMIC)dynamic=p;
+    }
+    if(!dynamic.p_filesz || dynamic.p_filesz%sizeof(Elf64_Dyn) || dynamic.p_filesz/sizeof(Elf64_Dyn)>4096)
+        denied("ELF","invalid conventional dynamic table");
+    std::uint64_t strings=0,size=0,soname=0;bool named=false,ended=false;
+    std::vector<std::uint64_t> offsets;
+    for(std::uint64_t at=0;at<dynamic.p_filesz;at+=sizeof(Elf64_Dyn)) {
+        auto item=read_at<Elf64_Dyn>(bytes,dynamic.p_offset+at);
+        if(item.d_tag==DT_NULL){ended=true;break;}
+        if(item.d_tag==DT_STRTAB)strings=item.d_un.d_ptr;
+        if(item.d_tag==DT_STRSZ)size=item.d_un.d_val;
+        if(item.d_tag==DT_SONAME){soname=item.d_un.d_val;named=true;}
+        if(item.d_tag==DT_NEEDED)offsets.push_back(item.d_un.d_val);
+    }
+    if(!ended || !strings || !size || size>image_limit)denied("ELF","missing conventional string table");
+    std::string_view table;
+    for(const auto& p:loads) {
+        if(strings>=p.p_vaddr && strings-p.p_vaddr<=p.p_filesz && size<=p.p_filesz-(strings-p.p_vaddr))
+            table=bytes.substr(p.p_offset+(strings-p.p_vaddr),size);
+    }
+    if(table.empty())denied("ELF","unmapped conventional string table");
+    auto text=[&](std::uint64_t at) {
+        if(at>=table.size())denied("ELF","invalid dependency string");
+        auto end=table.find('\0',at);
+        if(end==table.npos || end==at || end-at>255)denied("ELF","unbounded dependency name");
+        return std::string(table.substr(at,end-at));
+    };
+    if(named && text(soname)!=name)denied("dependency","managed image SONAME differs from its approved filename");
+    std::vector<std::string> result;
+    for(auto at:offsets)result.push_back(text(at));
+    return result;
+}
+
+std::vector<ConventionalImage> conventional_images(const DynamicClosure& plan,const std::filesystem::path& root) {
+    if(sodium_init()<0)denied("digest","SHA-256 provider initialization failed");
+    auto directory=root_directory(root);
+    std::vector<ConventionalImage> result;
+    for(const auto& image:plan.payload()) {
+        auto bytes=approved_bytes(directory.fd,{image.name,image.sha256,{}},DynamicClosure::payload_limit,true);
+        if(bytes.size()!=image.size)denied("artifact","managed payload size differs");
+        // The approval payload also includes license notices. Verify them, but
+        // only ELF shared-library candidates may enter the dependency graph.
+        if(image.name.find(".so")==std::string::npos || !bytes.starts_with(ELFMAG))continue;
+        auto needed=conventional_dependencies(bytes,image.name);
+        result.push_back({image.name,sealed_image(bytes),std::move(needed)});
+    }
+    return result;
+}
+
 void mapping(std::string_view maps, const Mapped& image, const Elf64_Phdr& segment) {
     const auto lo = image.link->l_addr + segment.p_vaddr / page * page;
     const auto end = image.link->l_addr + segment.p_vaddr + segment.p_filesz;
@@ -552,6 +625,10 @@ public:
     std::filesystem::path root;
     CPrimitiveThunk* thunk = nullptr;
     mutable std::atomic<bool> claimed{false};
+#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
+    std::vector<ConventionalImage> sealed_images;
+    std::vector<std::unique_ptr<OsModule>> dependencies;
+#endif
 #if defined(_WIN32) || defined(__linux__)
     // Destroy the adapter first, while its provider still has a reference.
     std::unique_ptr<OsModule> provider, adapter;
@@ -581,17 +658,58 @@ std::shared_ptr<const DynamicBinding> load_dynamic(DynamicClosure::Owner plan, c
         if (plan->target() != target) denied("target", "conventional descriptor does not match this host");
         if (!root.is_absolute() || root != root.lexically_normal())
             denied("path", "conventional loading requires an absolute native directory");
-        verify_managed_payload(*plan, root);
         const auto library = root / utf8_path(plan->library());
         const auto adapter = root / utf8_path(plan->adapter());
         auto result = std::make_shared<DynamicBinding>();
         result->plan = std::move(plan);
         result->root = root;
-        result->provider = std::make_unique<OsModule>(library);
+#if defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)
+        if(!result->plan->payload().empty()) {
+            result->sealed_images=conventional_images(*result->plan,root);
+            auto& images=result->sealed_images;
+            std::vector<unsigned> state(images.size());
+            std::vector<std::unique_ptr<OsModule>> modules(images.size());
+            std::function<void(std::size_t)> load=[&](std::size_t n) {
+                if(state[n]==2)return;
+                if(state[n]==1)denied("dependency","cyclic managed native dependencies");
+                state[n]=1;
+                for(const auto& dependency:images[n].needed)
+                    for(std::size_t k=0;k<images.size();++k)if(images[k].name==dependency)load(k);
+                modules[n]=std::make_unique<OsModule>("/proc/self/fd/"+std::to_string(images[n].file.fd));
+                state[n]=2;
+            };
+            // Validate the complete dependency graph before any initializer.
+            std::function<void(std::size_t)> validate=[&](std::size_t n) {
+                if(state[n]==2)return;
+                if(state[n]==1)denied("dependency","cyclic managed native dependencies");
+                state[n]=1;
+                for(const auto& dependency:images[n].needed)
+                    for(std::size_t k=0;k<images.size();++k)if(images[k].name==dependency)validate(k);
+                state[n]=2;
+            };
+            std::vector<std::size_t> roots;
+            for(std::size_t n=0;n<images.size();++n)
+                if(images[n].name==result->plan->library() || images[n].name==result->plan->adapter())roots.push_back(n);
+            if(roots.size()!=(adapter==library?1u:2u))denied("artifact","missing approved library or adapter");
+            for(auto n:roots)validate(n);
+            std::fill(state.begin(),state.end(),0);
+            for(auto n:roots)load(n);
+            for(std::size_t n=0;n<images.size();++n) {
+                if(images[n].name==result->plan->library())result->provider=std::move(modules[n]);
+                else if(images[n].name==result->plan->adapter())result->adapter=std::move(modules[n]);
+                else result->dependencies.push_back(std::move(modules[n]));
+            }
+            if(!result->provider || (adapter!=library && !result->adapter))denied("artifact","missing approved library or adapter");
+        } else
+#endif
+        {
+            verify_managed_payload(*result->plan,root);
+            result->provider = std::make_unique<OsModule>(library);
+            if(adapter!=library)result->adapter=std::make_unique<OsModule>(adapter);
+        }
         for (const auto& item : result->plan->exports()) result->provider->find(library, item.symbol);
         auto* transport = result->provider.get();
         if (adapter != library) {
-            result->adapter = std::make_unique<OsModule>(adapter);
             transport = result->adapter.get();
         }
         result->thunk = transport->find(adapter, result->plan->dispatch());

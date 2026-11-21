@@ -130,8 +130,31 @@ def workspace(args, root):
     interact(compiler, ["run", "."], project, terminal, contains=b"241")
     output = cli("README JIT without Python", "run", ".", "--reuse-native-approval", environment=no_python)
     assert output.replace("\r\n", "\n") == "241\n", output
+    if sys.platform.startswith('linux'):
+        runs = project / '.void/run'
+        assert runs.stat().st_mode & 0o777 == 0o700 and not list(runs.iterdir())
+        # Reclaim only marked abandoned payloads; preserve user-owned entries.
+        orphan = runs / 'native-abandoned'
+        orphan.mkdir(mode=0o700)
+        (orphan / '.owner').write_text('VOID native run 1\nold.so\n')
+        (orphan / '.owner').chmod(0o600)
+        (orphan / 'old.so').write_bytes(b'abandoned compiler output')
+        notes = runs / 'notes'; notes.mkdir()
+        (notes / 'KEEP').write_text('user data')
+        cli('reclaim abandoned stage', 'run', '.', '--reuse-native-approval')
+        assert not orphan.exists() and (notes / 'KEEP').read_text() == 'user data'
+        entry.write_text('use pkg/raylib as rl\nfunc main() -> i32:\n'
+                         '    if not rl.file_exists("project-relative-marker"):\n'
+                         '        return 29\n    return 0\n', encoding='utf-8')
+        marker = project / 'project-relative-marker'; marker.touch()
+        try:
+            cli('selected project working directory', 'run', '--project', project,
+                '--reuse-native-approval', cwd=root)
+        finally:
+            marker.unlink(); entry.write_text(example, encoding='utf-8')
+        assert not [p for p in runs.iterdir() if p.name.startswith('native-')]
     cli("README AOT without Python", "build", ".", "--reuse-native-approval", environment=no_python)
-    app = project / "build" / ("app.exe" if windows else "app")
+    app = project / ".void/build" / ("app.exe" if windows else "app")
     assert run("README AOT execution", app, environment=no_python).replace("\r\n", "\n") == "241\n"
     approvals = cli("inspect native approval", "native", "approvals", contains="org.voidlang.raylib")
     cli("revoke native approval", "native", "revoke", approvals.split(" | ", 1)[0])

@@ -1,5 +1,7 @@
 # G69 VOID file icons
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 **Current status — 19 November 2026: original blanket HOLD superseded by Boss.**
 The standard language-icon contribution is being qualified on the accepted G76
 baseline `da64cdbb99d535ab86da74521a6fc15bb72d5091`. The original G68

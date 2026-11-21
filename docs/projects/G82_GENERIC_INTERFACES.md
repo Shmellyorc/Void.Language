@@ -1,5 +1,7 @@
 # G82 — Generic structural interfaces
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Baseline: `fa8e9958503ced757cdc3ba30705c363fff0733e` (G81).
 Linux candidate, 20 November 2026. Independent Golden Wrench review and Boss
 integration authorization remain pending. Nothing staged, committed, pushed,

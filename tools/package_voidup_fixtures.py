@@ -6,6 +6,7 @@ every byte, then signs a private catalog using separately held test keys.
 from pathlib import Path
 import argparse, hashlib, json, os, re, shutil, subprocess, time, zipfile
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, Encoding, PublicFormat
+from engineering_storage import evidence_directory
 
 ROOT = Path(__file__).resolve().parents[1]
 DOMAIN = b'VOIDUP CATALOG v1\n'
@@ -110,7 +111,7 @@ def main():
                   catalog_sha256=hashlib.sha256(raw).hexdigest(), releases=releases,
                   sdk_files=['bin/clang-23', 'bin/lld', 'lib/clang/23'],
                   system_prerequisite='Ubuntu 24.04 x86_64 build-essential (C/C++ headers, CRT and system libraries)')
-    (ROOT / 'docs/voidup/evidence/phase_b/real-packages.json').write_text(json.dumps(record, indent=2)+'\n')
+    (evidence_directory('voidup-qualification') / 'real-packages.json').write_text(json.dumps(record, indent=2)+'\n')
     print(json.dumps(record, indent=2))
 
 if __name__ == '__main__':

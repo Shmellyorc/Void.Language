@@ -1,5 +1,7 @@
 # G78 — Enum completeness and flags
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Baseline: `2376e123026e5dd17b9743b6a7b6af2b0a1fd94f`.
 Status: implemented and locally qualified for focused review. This is implementation
 qualification, not an independent review or hosted acceptance. Nothing is staged,

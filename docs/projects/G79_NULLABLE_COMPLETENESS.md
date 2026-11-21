@@ -1,5 +1,7 @@
 # G79 — Nullable type completeness
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Baseline: `6ca2baf0cc667aac2b37852e0c42e96e5a0700e7`.
 Linux x86-64 implementation candidate. The initial qualification below is retained
 as historical evidence; the final review-correction qualification appears at the end.

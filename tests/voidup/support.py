@@ -7,7 +7,9 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
 ROOT = Path(__file__).resolve().parents[2]
-EVIDENCE = ROOT / 'docs/voidup/evidence/phase_b'
+sys.path.insert(0, str(ROOT / 'tools'))
+from engineering_storage import evidence_directory, scratch_directory
+EVIDENCE = evidence_directory('voidup-qualification')
 sys.path.insert(0, str(ROOT / 'tests/text_encoding'))
 from crash import run as preserving_run, preserve
 sys.path.insert(0, str(ROOT / 'tools'))

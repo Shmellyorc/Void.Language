@@ -1,5 +1,7 @@
 # G75 — Debug compiler correctness repair
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 18 November 2026. Boss explicitly authorized the minimum correction to existing
 allocation-elision use bookkeeping, its tests and documentation. G75 feature work
 has not resumed. The accepted sentinel repair is preserved; the authorized

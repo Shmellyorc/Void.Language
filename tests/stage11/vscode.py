@@ -4,7 +4,9 @@ Usage: python3 tests/stage11/vscode.py /path/to/code /path/to/voidls
 from pathlib import Path
 import json, os, subprocess, sys, tempfile
 repo = Path(__file__).resolve().parents[2]
-root = Path(tempfile.mkdtemp(prefix='VOID Stage11 VSCode '))
+sys.path.insert(0, str(repo / 'tools'))
+from engineering_storage import scratch_directory
+root = scratch_directory('VOID Stage11 VSCode ')
 project = root / 'project'; project.mkdir()
 (project / '.vscode').mkdir()
 (project / 'main.void').write_text('use "./game.void" as game\n## Shared score.\nvar score = 0\nfunc main():\n    game.reward()\n    print(score, game.defeated)\n', encoding='utf-8')

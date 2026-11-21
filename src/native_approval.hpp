@@ -34,4 +34,6 @@ public:
 
 std::vector<std::string> native_approvals();
 void revoke_native_approval(std::string_view id);
+// CLI-owned default output directories share the private project storage policy.
+std::filesystem::path project_build_directory(const std::filesystem::path& root);
 }

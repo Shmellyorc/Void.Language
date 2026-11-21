@@ -893,6 +893,15 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             return 0;
         }
         if(command=="run") {
+            struct ApplicationDirectory {
+                std::filesystem::path previous;
+                explicit ApplicationDirectory(const std::filesystem::path& root) {
+                    if(!root.empty()) {previous=std::filesystem::current_path();std::filesystem::current_path(root);}
+                }
+                ~ApplicationDirectory() {
+                    if(!previous.empty()) {std::error_code ignored;std::filesystem::current_path(previous,ignored);}
+                }
+            } working_directory(project?project->root():std::filesystem::path{});
             vd::crash::context(vd::crash::Operation::jit_compile);
             std::unique_ptr<vd::Jit> jit;
             if(!no_cache)jit=std::make_unique<vd::Jit>(vd::DebugCache{project?project->root():std::filesystem::canonical(selected.parent_path().empty()?std::filesystem::path("."):selected.parent_path()),std::string(vd::compiler_build_identity())+(project?":project-selection-v1:"+project->selection_key()+":"+profile_key:"")},vd::ir::Emission::entry);
@@ -919,7 +928,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
 #ifdef _WIN32
                 name+=".exe";
 #endif
-                output=(project?project->root():entry.parent_path())/"build"/name;
+                output=project?vd::project_build_directory(project->root())/name:entry.parent_path()/"build"/name;
             }
             vd::project::require_outside_native_approval_store(*output);
             vd::build_executable(*analysis.program,*output,optimize,argv[0],profile_key,source_debug);

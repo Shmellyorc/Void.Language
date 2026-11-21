@@ -1,7 +1,10 @@
 """Finalize receipts without deleting or relabeling any original failure."""
 from pathlib import Path
-import hashlib,json,platform,subprocess
-ROOT=Path(__file__).resolve().parents[2];E=ROOT/'docs/voidup/evidence/phase_b'
+import hashlib,json,platform,subprocess,sys
+ROOT=Path(__file__).resolve().parents[2]
+sys.path.insert(0,str(ROOT/'tools'))
+from engineering_storage import evidence_directory
+E=evidence_directory('voidup-qualification')
 def digest(path):
     h=hashlib.sha256()
     with path.open('rb') as stream:

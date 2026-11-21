@@ -1,5 +1,7 @@
 # G92 — IntelliSense member completion completeness
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 20 November 2026. Implementation candidate for independent Golden Wrench review.
 Focused readonly corrections are recorded in section 8 and await independent
 re-review. Sections 5–6 preserve the original candidate's artifact/qualification

@@ -1,13 +1,13 @@
 """Actual lock contention, SIGKILL recovery, corruption and durability failures."""
 from pathlib import Path
 import argparse,copy,json,os,subprocess,tempfile,time
-from support import ROOT,EVIDENCE,Runner,Service,stack,preserve
+from support import ROOT,EVIDENCE,Runner,Service,stack,preserve,scratch_directory
 parser=argparse.ArgumentParser();parser.add_argument('application',type=Path)
 parser.add_argument('root',type=Path);parser.add_argument('--name',default='recovery-1')
 options=parser.parse_args();app=options.application.resolve();root=options.root.resolve()
-runner=Runner(options.name);work=Path(tempfile.mkdtemp(prefix='VOIDUP recovery 雪 # % '))
+runner=Runner(options.name);work=scratch_directory('VOIDUP recovery 雪 # % ')
 initial=(root/'control.json').read_bytes();fixtures=ROOT/'build/voidup-fixtures'
-library=Path(tempfile.mkdtemp(prefix='voidup-fault-'))/'fault.so'
+library=scratch_directory('voidup-fault-')/'fault.so'
 runner.run(['cc','-shared','-fPIC',ROOT/'tests/voidup/fsync_fault.c','-ldl','-o',library])
 def state():return json.loads((root/'control.json').read_bytes())
 base=[app,'--root',root]

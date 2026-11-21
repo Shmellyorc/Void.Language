@@ -1,10 +1,10 @@
 from pathlib import Path
 import argparse,json,tempfile
-from support import ROOT,EVIDENCE,Runner,Service
+from support import ROOT,EVIDENCE,Runner,Service,scratch_directory
 parser=argparse.ArgumentParser();parser.add_argument('runner',type=Path)
 parser.add_argument('--name',default='lifetime-1');options=parser.parse_args()
 runner=Runner(options.name);executable=options.runner.resolve()
-work=Path(tempfile.mkdtemp(prefix='VOIDUP lifetime 雪 # % '))
+work=scratch_directory('VOIDUP lifetime 雪 # % ')
 with Service(ROOT/'build/voidup-fixtures') as server:
  for mode in ('normal','o2'):
   args=['--root',work/mode,'--catalog',server.url,'--ca-file',server.ca,'list','--available']

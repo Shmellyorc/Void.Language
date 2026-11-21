@@ -1,5 +1,7 @@
 # G84 — Fallible Constructors
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Candidate based on accepted G83 `cdebc9351de200feff431712f9f11b87bc9c8469`.
 Independent Golden Wrench acceptance and Boss-authorized integration remain pending.
 Linux verification only; Windows and macOS remain unqualified.

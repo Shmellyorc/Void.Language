@@ -1,5 +1,7 @@
 # G81 — General integer bitwise and shift operators
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Accepted baseline: `58eac251838d6f6a63f55b92fd7818a11ed15e28` (G80).
 Linux x86-64 implementation; LLVM/Clang/LLD 23.1.4 exclusively.
 Integration remains subject to independent Golden Wrench source review and Boss
@@ -141,7 +143,7 @@ claimed. No hosted CI or independent-review acceptance is claimed by this report
 
 ## P2 correction — shift-aware pattern lookahead
 
-Golden Wrench's original review (`/tmp/g81-independent-r5o6_n4b/REVIEW.md`)
+Golden Wrench's original review (`/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/retained/g81-independent-r5o6_n4b/REVIEW.md`)
 identified a concrete missing parser integration: pattern lookahead examined one
 angle token, so a call followed by `<<`/`>>` looked like a completed constructor
 pattern. A named `bits << 1 >> 1` expression could also look like generic brackets.
@@ -223,7 +225,7 @@ commit, push, installation, publication or hosted CI has occurred.
 
 ## P1 correction — imported generic static owner selectors
 
-Golden Wrench's focused re-review (`/tmp/g81-focused-rereview-voo1crah/REVIEW.md`)
+Golden Wrench's focused re-review (`/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/retained/g81-focused-rereview-voo1crah/REVIEW.md`)
 confirmed the P2 correction and exposed a separate frontend crash. An imported
 owner such as `api.factory<i32>` is a field expression whose one child is the
 module qualifier. Static type resolution passed that selector to shared

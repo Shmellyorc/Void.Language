@@ -1,7 +1,7 @@
 """Actual signed A/B install, activation, compiler, LSP and relocation tests."""
 from pathlib import Path
 import argparse, json, os, shutil, tempfile
-from support import ROOT,EVIDENCE,Runner,Service
+from support import ROOT,EVIDENCE,Runner,Service,scratch_directory
 
 parser=argparse.ArgumentParser()
 parser.add_argument('application',type=Path)
@@ -10,7 +10,7 @@ parser.add_argument('--fixtures',type=Path,default=ROOT/'build/voidup-fixtures')
 parser.add_argument('--reuse-work',type=Path,help='retry on an owned retained fixture directory')
 options=parser.parse_args()
 app=options.application.resolve();runner=Runner(options.name)
-work=options.reuse_work or Path(tempfile.mkdtemp(prefix='VOIDUP real A B 雪 # % '))
+work=options.reuse_work or scratch_directory('VOIDUP real A B 雪 # % ')
 root=work/'private root';fixture=work/'arguments.void'
 fixture.write_bytes((Path(__file__).parent/'arguments.void').read_bytes())
 with Service(options.fixtures) as server:

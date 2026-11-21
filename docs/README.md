@@ -1,5 +1,10 @@
 # VOID documentation
 
+- [Project storage and engineering retention](PROJECT_STORAGE.md): project-local
+  artifacts, native staging ownership, cleanup and the archive policy.
+- [2026-11-21 storage correction report](projects/STORAGE_CORRECTION_2026-11-21.md):
+  EDQUOT root cause, verified cleanup, TestGame qualification and remaining limits.
+
 - [G93 pure compile functions candidate](projects/G93_COMPILE_FUNCTIONS.md):
   shared typed constant evaluation, pure value methods, limits and editor evidence.
 

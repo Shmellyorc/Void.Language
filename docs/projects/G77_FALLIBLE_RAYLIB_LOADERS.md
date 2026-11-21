@@ -1,5 +1,7 @@
 # G77 — Fallible raylib resource loaders
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Baseline `713a4492de5583608189f2f5bc374e35708a0cd3` (G69 on G76).
 Native Linux qualification, 19 November 2026. No staging, commit, push,
 publication or user-prefix installation is authorized or performed.

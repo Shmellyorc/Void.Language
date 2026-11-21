@@ -1,5 +1,7 @@
 # G70 local installation and launch readiness
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 Accepted source is G68 `92432510ebfe0844aae4e6285b8c4eff579ad137`. G69 remains
 on hold. The owner's Linux installation and the Star Harbor walkthrough
 passed. Public binary and production VOIDUP distribution are on hold.

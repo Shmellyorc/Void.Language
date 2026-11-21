@@ -1,5 +1,7 @@
 # G75 — CLI experience implementation and qualification
 
+> Storage correction, 2026-11-21: the historical `/tmp` evidence locations in this report have been cleaned. Retained Markdown and original failure records now use the [verified migration inventory](/home/shmellyorc/Documents/Void.Language-archives/storage-correction-2026-11-21/MIGRATION_INVENTORY.md). Redundant generated outputs and disposable fixtures were deleted under the Boss’s updated retention instruction. Historical commands and measurements below are unchanged.
+
 18 November 2026. Baseline: `fdcbeadbdd8a0011751b448afa9fe40e5151ab1f`
 (G74, checkout HEAD and locally recorded `origin/main`; no fetch).
 Boss approved the five stages in the [architecture review](G75_CLI_EXPERIENCE_ARCHITECTURE.md#12-bounded-implementation-stages-after-approval),

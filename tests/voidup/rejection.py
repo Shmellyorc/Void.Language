@@ -1,12 +1,12 @@
 """Authenticated hostile metadata/packages and bounded transport failures."""
 from pathlib import Path
 import argparse, copy, hashlib, io, json, os, tempfile, time, zipfile
-from support import ROOT,EVIDENCE,Runner,Service,encoded,sign
+from support import ROOT,EVIDENCE,Runner,Service,encoded,sign,scratch_directory
 
 parser=argparse.ArgumentParser();parser.add_argument('application',type=Path)
 parser.add_argument('--name',default='rejection-1');options=parser.parse_args()
 app=options.application.resolve();fixtures=ROOT/'build/voidup-fixtures';runner=Runner(options.name)
-work=Path(tempfile.mkdtemp(prefix='VOIDUP rejected 雪 # % '))
+work=scratch_directory('VOIDUP rejected 雪 # % ')
 original=json.loads((fixtures/'www/catalog.json').read_bytes());cases=[]
 with Service(fixtures) as server:
  def attempt(name,document=None,signers=(1,2),overrides=None,command=('install','engineering-a'),floor=0):
