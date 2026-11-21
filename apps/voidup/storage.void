@@ -25,7 +25,7 @@ func up_walk(base: io.private_directory, const parts: [string], count: i64) -> r
             result_dirs.current = child
         else if opened is Err(var cause):
             result_dirs.deinit()
-            return Err(support.up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = "filesystem", native_code = cause.os_code))
+            return Err(support.up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = "filesystem", native_code = cause.os_code))
     return Ok(result_dirs)
 
 func up_file_beneath(base: io.private_directory, relative_name: string) -> result<io.file, support.up_error>:

@@ -30,11 +30,13 @@ using the selected entry's stem and the host executable suffix.
 
 ## Keep matching resources
 
-A source installation supplies `void-native.txt` and a resource-hash manifest
-beside the compiler. Native linking uses those resources and the original pinned
-Clang/LLD 23.1.4 SDK. Keep the installation together; do not replace a missing
+A complete VOIDUP version supplies `void-native.txt`, its resource-hash manifest
+and packaged Clang/LLD 23.1.4 with resource files. Native linking uses those
+matching resources. An advanced source installation instead retains references
+to its original pinned SDK. Both routes still require the declared host C/C++
+headers, CRT and system libraries. Keep the installation together; do not replace a missing
 verified archive with an unrelated ambient system library.
-[Installation](https://github.com/Shmellyorc/Void.Language/wiki/Installation#keep-the-installation-together) explains the layout.
+[Installation](https://github.com/Shmellyorc/Void.Language/wiki/Installation#choose-your-installation-root) explains the layout.
 
 A successful build on one host does not establish portability to another OS,
 architecture or userspace baseline. See [platform limits](https://github.com/Shmellyorc/Void.Language/wiki/Resources-and-status#platform-limits)

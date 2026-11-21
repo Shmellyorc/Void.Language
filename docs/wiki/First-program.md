@@ -1,11 +1,14 @@
 # Create your first application
 
-With [the tools installed](https://github.com/Shmellyorc/Void.Language/wiki/Installation), create a project in a fresh directory:
+With [the tools installed](https://github.com/Shmellyorc/Void.Language/wiki/Installation) and the selected version on your session PATH, create a project in a fresh directory:
 
 ```sh
 voidc new app --name Hello
 cd Hello
 ```
+
+If you have not exported PATH, use `voidup run default voidc --` in place of
+`voidc` in these commands. Installation and project creation use native tools.
 
 This creates `void.project.toml` and `src/app.void`. Replace `src/app.void` with:
 

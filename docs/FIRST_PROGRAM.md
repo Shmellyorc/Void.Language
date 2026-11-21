@@ -1,6 +1,6 @@
 # Your first VOID program
 
-[Install the tools](install/README.md), add their `bin` directory to PATH and
+[Install with VOIDUP](voidup/USAGE.md), export the selected version for your session and
 confirm `voidc --version`. Generate a project and open its starter source:
 
 ```sh

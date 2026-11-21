@@ -5,6 +5,10 @@
 - [2026-11-21 storage correction report](projects/STORAGE_CORRECTION_2026-11-21.md):
   EDQUOT root cause, verified cleanup, TestGame qualification and remaining limits.
 
+- [VOIDUP installation and tool selection](voidup/USAGE.md),
+  [release production](voidup/RELEASE_PRODUCTION.md), and
+  [Python-free developer experience candidate](projects/G94_VOIDUP_PYTHON_FREE_DEVELOPER_EXPERIENCE.md).
+
 - [G93 pure compile functions candidate](projects/G93_COMPILE_FUNCTIONS.md):
   shared typed constant evaluation, pure value methods, limits and editor evidence.
 
@@ -28,7 +32,7 @@ holds in historical records do not govern current work.
 
 ## Canonical documentation
 
-- [Install from source](install/README.md), [first program](FIRST_PROGRAM.md),
+- [Install with VOIDUP](voidup/USAGE.md), [contributor source build](install/README.md), [first program](FIRST_PROGRAM.md),
   [CLI](CLI.md), [compiler/build architecture](SOURCE_COMPILER.md),
   [editor setup](EDITOR_INTEGRATION.md) and [troubleshooting](TROUBLESHOOTING.md).
 - [Creating and composing libraries](LOCAL_LIBRARIES.md#creating-and-composing-libraries),

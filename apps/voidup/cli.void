@@ -5,6 +5,7 @@ use convert
 
 struct up_options:
     status: string = "auto"
+    output_format: string = "json"
     root_path: string
     catalog_url: string
     ca_file: string
@@ -62,6 +63,13 @@ func up_parse(const operands: [string]) -> result<up_options, support.up_error>:
             position += 1
         if position != operands.count:
             return Err(support.up_fail("list accepts only --available", "arguments", 2))
+    else if options.command == "env":
+        if position < operands.count:
+            if position + 2 != operands.count or operands[position] != "--format":
+                return Err(support.up_fail("env accepts --format json, sh, powershell or vscode", "arguments", 2))
+            options.output_format = operands[position + 1]
+            if options.output_format != "json" and options.output_format != "sh" and options.output_format != "powershell" and options.output_format != "vscode":
+                return Err(support.up_fail("unknown environment format", "arguments", 2))
     else if options.command == "which":
         if position + 1 != operands.count:
             return Err(support.up_fail("which requires voidc or voidls", "arguments", 2))
@@ -95,4 +103,4 @@ func up_parse(const operands: [string]) -> result<up_options, support.up_error>:
     return Ok(options)
 
 func up_help() -> string:
-    return "VOIDUP 0.1 engineering — private 2-of-3 test trust roots\n\nGlobal options (before command):\n  --root ABSOLUTE-PATH  Dedicated per-user root\n  --catalog HTTPS-URL   Explicit private catalog endpoint\n  --ca-file PEM         Explicit replacement TLS roots\n  --timeout-ms N        100..120000, default 30000\n  --status MODE         auto|plain|off; default auto uses terminal stderr\n\nCommands:\n  --help | --version\n  list [--available]\n  install RELEASE [--activate]\n  default RELEASE\n  rollback\n  which <voidc|voidls>\n  verify RELEASE\n  doctor\n  run <RELEASE|default> <voidc|voidls> -- <literal arguments...>\n\nPublished versions are retained. No pruning, self-update, PATH or shell changes.\n"
+    return "VOIDUP 0.1 engineering — private 2-of-3 test trust roots\n\nGlobal options (before command):\n  --root ABSOLUTE-PATH  Dedicated per-user root\n  --catalog HTTPS-URL   Explicit private catalog endpoint\n  --ca-file PEM         Explicit replacement TLS roots\n  --timeout-ms N        100..120000, default 30000\n  --status MODE         auto|plain|off; default auto uses terminal stderr\n\nCommands:\n  --help | --version\n  list [--available]\n  install RELEASE [--activate]\n  default RELEASE\n  rollback\n  which <voidc|voidls>\n  env [--format json|sh|powershell|vscode]\n  verify RELEASE\n  doctor\n  run <RELEASE|default> <voidc|voidls> -- <literal arguments...>\n\nPublished versions are retained. No pruning, self-update or automatic PATH/shell changes.\nEnvironment exports select a verified version for this session; refresh after switching.\n"

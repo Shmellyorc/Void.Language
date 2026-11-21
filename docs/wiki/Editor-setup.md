@@ -26,6 +26,13 @@ server bundles and other editor adapters.
 
 ## Select the tools and project
 
+For a VOIDUP installation, run `voidup env --format vscode` and merge the
+printed `void.server.path` and `void.compiler.path` keys into settings. This
+selects both tools from the verified active prefix without requiring the editor
+to inherit terminal PATH. After switching or rolling back, regenerate those
+paths and use **VOID: Restart Language Server**. A PATH export also selects a
+specific version; restart the editor after changing its inherited environment.
+
 Open one trusted local folder containing your [project manifest](https://github.com/Shmellyorc/Void.Language/wiki/Projects-and-modules).
 If tools are installed outside discovery paths, use workspace settings like:
 

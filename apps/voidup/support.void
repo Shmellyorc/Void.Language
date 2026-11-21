@@ -131,14 +131,14 @@ func up_io<t>(outcome: result<t, io.error>) -> result<t, up_error>:
     if outcome is Ok(var item):
         return Ok(item)
     if outcome is Err(var cause):
-        return Err(up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = "filesystem", native_code = cause.os_code, cleanup_code = cause.cleanup_code, progress = cause.bytes_transferred))
+        return Err(up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = "filesystem", native_code = cause.os_code, cleanup_code = cause.cleanup_code, progress = cause.bytes_transferred))
     return Err(up_fail("invalid result adapter"))
 
 func up_sys<t>(outcome: result<t, system_error.error>) -> result<t, up_error>:
     if outcome is Ok(var item):
         return Ok(item)
     if outcome is Err(var cause):
-        return Err(up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = "host", native_code = cause.os_code))
+        return Err(up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = "host", native_code = cause.os_code))
     return Err(up_fail("invalid result adapter"))
 
 func up_txt<t>(outcome: result<t, text.error>) -> result<t, up_error>:
@@ -159,7 +159,7 @@ func up_os<t>(outcome: result<t, os.error>) -> result<t, up_error>:
     if outcome is Ok(var item):
         return Ok(item)
     if outcome is Err(var cause):
-        return Err(up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = cause.native_domain, native_code = cause.os_code))
+        return Err(up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = cause.native_domain, native_code = cause.os_code))
     return Err(up_fail("invalid result adapter"))
 
 func up_clock<t>(outcome: result<t, time.error>) -> result<t, up_error>:
@@ -180,7 +180,7 @@ func up_http<t>(outcome: result<t, http.error>) -> result<t, up_error>:
     if outcome is Ok(var item):
         return Ok(item)
     if outcome is Err(var cause):
-        return Err(up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), phase = string(cause.phase), status = cause.status, native_domain = cause.native_domain, native_code = cause.native_code, cleanup_code = cause.cleanup_code, progress = cause.downloaded))
+        return Err(up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, phase = cause.phase.name, status = cause.status, native_domain = cause.native_domain, native_code = cause.native_code, cleanup_code = cause.cleanup_code, progress = cause.downloaded))
     return Err(up_fail("invalid result adapter"))
 
 func up_hex<t>(outcome: result<t, hex.error>) -> result<t, up_error>:

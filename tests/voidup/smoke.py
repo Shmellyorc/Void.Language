@@ -41,10 +41,13 @@ assert b'private' in run(['--version']).stdout
 assert b'rollback' in run(['--help']).stdout
 failure=run(['--invalid-雪'],2);assert diagnostic(failure)['operation']=='arguments'
 run(['run','default','voidc','missing-separator'],2)
+for args in (['env','--format'], ['env','--format','unknown'], ['env','extra']):
+ run(args,2)
 if os.name!='nt':
  with tempfile.TemporaryDirectory(prefix='VOIDUP CI 雪 # % ') as temporary:
   root=Path(temporary).resolve()/'private'
   run(['--root',root,'doctor']);run(['--root',root,'list'])
+  failure=run(['--root',root,'env'],1);assert diagnostic(failure)['operation']=='environment'
   state=json.loads((root/'control.json').read_bytes());assert state['serial']==0 and state['current']==''
   run(['--root',root,'doctor'])
   failure=run(['--root',root,'which','voidc'],1);assert diagnostic(failure)['operation']=='which'

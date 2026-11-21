@@ -1362,63 +1362,37 @@ MaintenanceReport add_verified_raylib(const fs::path& requested, const BundledRa
     source.emplace(receipt_name,std::move(receipt));
 
     return add_dependency_impl(requested, {"raylib", bundle.source, {}, false, edit_token}, [&] {
-        constexpr auto preparer_name="raylib-prepare.py";
+        constexpr auto preparer_name="raylib-prepare.void";
         const auto preparer=read_project_input(bundle.source.parent_path()/preparer_name,65536);
         if(sha256(preparer)!=bundle.preparer_sha256)
             throw std::runtime_error("Bundled raylib preparation tool does not match this compiler. Reinstall the matching compiler resources.");
-        // Find Python through absolute PATH entries only. Never run a program
-        // selected from the consumer or execute a script from installed sources.
-        llvm::SmallVector<llvm::StringRef> entries;
-        const auto search = llvm::sys::Process::GetEnv("PATH").value_or("");
-#ifdef _WIN32
-        llvm::StringRef(search).split(entries, ';');
-        constexpr auto name = "python.exe";
-#else
-        llvm::StringRef(search).split(entries, ':');
-        constexpr auto name = "python3";
-#endif
-        const auto cwd=fs::current_path();
-        entries.erase(std::remove_if(entries.begin(),entries.end(),[&](auto entry) {
-            const auto path=utf8_path(entry.str());
-            return !path.is_absolute() || path.lexically_normal()==cwd;
-        }),entries.end());
-        if(entries.empty())throw std::runtime_error("Bundled raylib preparation needs Python 3.12 or newer on PATH.");
-        const auto python=llvm::sys::findProgramByName(name,entries);
-        if(!python)throw std::runtime_error("Bundled raylib preparation needs Python 3.12 or newer on PATH.");
-
-        llvm::SmallString<128> temp;
-        if(auto error=llvm::sys::fs::createUniqueDirectory("void-raylib",temp))throw std::system_error(error);
-        const auto scratch=utf8_path(temp.str().str());
-        const auto catalog=scratch/"catalog";
-        try {
-            // Stage verified bytes before invoking Python or Clang. Neither
+        ProjectFiles files{{".void/",""},{std::string(verified_raylib_catalog)+"/",""}};
+        with_project_scratch(inspect_creation_root(requested),[&](const fs::path& scratch,const ProjectDirectoryReader& reader) {
+            const auto catalog=scratch/"catalog";
+            // Stage verified bytes before invoking the native VOID utility or Clang. Neither
             // process reads executable inputs from the package or installation.
             std::map<std::string,std::string_view> inputs{{"raylib/",""},{preparer_name,preparer}};
             for(const auto& [name,bytes]:source)inputs.emplace("raylib/"+name,bytes);
-            publish_project_directory(inspect_creation_root(scratch),"inputs",inputs,
+            publish_project_directory(reader.inspect(scratch),"inputs",inputs,
                 [&](const fs::path& directory,const ProjectDirectoryReader& reader) {
                     const auto staged=read_package_directory(directory,reader);
                     if(staged.size()!=inputs.size() || !std::equal(staged.begin(),staged.end(),inputs.begin(),
                         [](const auto& left,const auto& right) {return left.first==right.first && left.second==right.second;}))
                         throw std::runtime_error("Bundled raylib preparation inputs changed during staging.");
-                });
-            std::vector<std::string> args{*python,"-I","-B",path_utf8(scratch/"inputs"/preparer_name),"--bundled",
-                "--voidc",path_utf8(compiler),"--clang",path_utf8(clang),"--managed-catalog",path_utf8(catalog)};
-            if(sanitize)args.emplace_back("--sanitize");
+                },{},reader);
+            // Reuse the compiler's ordinary VOID application host. The utility
+            // is a compiler resource authenticated above, never a package script.
+            std::vector<std::string> args{path_utf8(compiler),"run",path_utf8(scratch/"inputs"/preparer_name),
+                "--no-cache","--",path_utf8(scratch/"inputs/raylib"),path_utf8(compiler),path_utf8(clang),
+                path_utf8(catalog),path_utf8(scratch/"inputs"/preparer_name),sanitize?"1":"0"};
             const std::vector<llvm::StringRef> refs(args.begin(),args.end());
             std::string error;
             if(llvm::sys::ExecuteAndWait(args.front(),refs,std::nullopt,{},240,0,&error)!=0)
                 throw std::runtime_error("Bundled raylib preparation failed. "+error);
-            ProjectFiles files{{".void/",""},{std::string(verified_raylib_catalog)+"/",""}};
-            for(auto& [path,bytes]:read_package_directory(catalog))
+            for(auto& [path,bytes]:read_package_directory(catalog,reader))
                 files.emplace(std::string(verified_raylib_catalog)+"/"+path,std::move(bytes));
-            fs::remove_all(scratch);
-            return files;
-        } catch(...) {
-            std::error_code ignored;
-            fs::remove_all(scratch,ignored);
-            throw;
-        }
+        });
+        return files;
     },{},false,nullptr,{},&source);
 }
 

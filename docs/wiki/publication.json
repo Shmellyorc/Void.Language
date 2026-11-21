@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "source_baseline": "553fe3f028ca3ce55d950c0bfe61b8d4503f13b3",
+  "source_baseline": "cc89906a2133eeead625b7167d1881562d1ef1bd",
   "wiki": "https://github.com/Shmellyorc/Void.Language/wiki",
   "files": [
     {
@@ -29,7 +29,7 @@
     },
     {
       "file": "Editor-setup.md",
-      "sha256": "ddb6a8336bcddeeac95731678852f65c07a4f275909bef545f3ae56a8a7ff596",
+      "sha256": "69ec704c8672063c78271ce7115636d384dcd60d48908c5176c285ac2cc2c56c",
       "role": "page",
       "route": "https://github.com/Shmellyorc/Void.Language/wiki/Editor-setup"
     },
@@ -47,7 +47,7 @@
     },
     {
       "file": "First-program.md",
-      "sha256": "d1a0909e85def8817c5f4a272e55a5fc2da3a57efcb02d225b5b99a843e62564",
+      "sha256": "76a80b23a2219ca5d21841e52576e7a1d9ad7fb3ee65f36fb7fb4432cf238bd7",
       "role": "page",
       "route": "https://github.com/Shmellyorc/Void.Language/wiki/First-program"
     },
@@ -71,7 +71,7 @@
     },
     {
       "file": "Installation.md",
-      "sha256": "01509c04a0cebfb1c1532dd59a288d4641a4b8c22fe4421a1590bbd66505808f",
+      "sha256": "152129996e2823767af363f75ddf8806f4eaf096376ac4fb88498dea5f528f2a",
       "role": "page",
       "route": "https://github.com/Shmellyorc/Void.Language/wiki/Installation"
     },
@@ -95,13 +95,13 @@
     },
     {
       "file": "Native-compilation.md",
-      "sha256": "f7846c127c4e8274ef43aeb86564af34fdf0abb8a36dd8813e806d4bae51ff74",
+      "sha256": "1073d7474d7a749e83dcb0e9f35882cb7efd3ac15d6201df54de5c6810210c86",
       "role": "page",
       "route": "https://github.com/Shmellyorc/Void.Language/wiki/Native-compilation"
     },
     {
       "file": "Packages-and-raylib.md",
-      "sha256": "c05e178b9eefd4af41373e47f60be27eebdd217b44a10659c0bd6acbbd406bd8",
+      "sha256": "97fcfd15541b7e63a7e996ecad8b6996e00e2180216ea7c89219cbb1d1fd5460",
       "role": "page",
       "route": "https://github.com/Shmellyorc/Void.Language/wiki/Packages-and-raylib"
     },
@@ -113,7 +113,7 @@
     },
     {
       "file": "Resources-and-status.md",
-      "sha256": "86fb5c0db33b5e051298c577b8dfadab8bac88fe9682db2878d9994b56945ceb",
+      "sha256": "c652a8bca4338981afbd0d33bd8a6daf21c822a243328dcac2e523ba8d61028a",
       "role": "page",
       "route": "https://github.com/Shmellyorc/Void.Language/wiki/Resources-and-status"
     },
@@ -137,7 +137,7 @@
     },
     {
       "file": "Troubleshooting.md",
-      "sha256": "6ae69cf3321ec517200dc2ab96bd8c7412d55a8d805aecff53a8033e14c15bf4",
+      "sha256": "fa31dfdd8bd95881af6d1bd86aa03475f789c735ed9a3cffd06ce8d4cd378caf",
       "role": "page",
       "route": "https://github.com/Shmellyorc/Void.Language/wiki/Troubleshooting"
     },

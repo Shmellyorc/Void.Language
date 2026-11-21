@@ -1,0 +1,48 @@
+## Create the local catalog for the values-header tutorial in NATIVE_LIBRARIES.md.
+## This records artifact identities; choosing the catalog and granting native
+## execution consent remain separate explicit compiler operations.
+use io as files
+use os as host
+use crypto as crypt
+use encoding/hex as hex
+use console as terminal
+
+func checked<t, e>(value: result<t, e>) -> result<t, string>:
+    if value is Ok(var item):
+        return Ok(item)
+    if value is Err(var reason):
+        return Err(reason.message)
+    return Err("invalid checked result")
+
+func identity(directory: string, name: string) -> result<string, string>:
+    var bytes = checked(files.read_bytes(directory + "/" + name, 16777216))?
+    with checked(crypt.sha256())? as hash:
+        var updated = checked(hash.update(bytes))?
+        return Ok("{bytes.count}:" + hex.encode(checked(hash.finish())?))
+
+func make_catalog(directory: string) -> result<bool, string>:
+    var descriptor = identity(directory, "provider.descriptor")?
+    var library = identity(directory, "libvalues.so")?
+    var license = identity(directory, "VOID-MIT-LICENSE.txt")?
+    var plan = "format=1\n[native]\nid=\"org.example.values\"\nversion=\"1.0.0\"\nabi=3\n"
+    plan += "target=\"x86_64-unknown-linux-gnu\"\nrevision=\"values-example-1\"\n"
+    plan += "descriptor=\"provider.descriptor\"\ndescriptor-identity=\"" + descriptor + "\"\n"
+    plan += "library=\"libvalues.so\"\nadapter=\"libvalues.so\"\n[native.runtime]\n"
+    plan += "\"libvalues.so\"=\"" + library + "\"\n[native.link]\n[native.notices]\n"
+    plan += "\"VOID-MIT-LICENSE.txt\"=\"" + license + "\"\n"
+    var written = checked(files.write_text(directory + "/void.native.toml", plan, files.open_mode.create_new))?
+    return Ok(written == plan.byte_length)
+
+func main() -> i32:
+    var arguments = checked(host.args())
+    if arguments is Ok(var values):
+        if values.count == 1:
+            var outcome = make_catalog(values[0])
+            if outcome is Ok(var complete):
+                if complete:
+                    return 0
+            if outcome is Err(var reason):
+                var reported = terminal.stderr.write(reason + "\n")
+            return 1
+    var reported = terminal.stderr.write("usage: catalog /absolute/tutorial/catalog\n")
+    return 2

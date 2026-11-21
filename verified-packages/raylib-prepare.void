@@ -1,0 +1,292 @@
+## Compiler-owned raylib preparation. Consumes only the staged, hash-checked
+## source snapshot. This utility never generates public bindings or grants consent.
+use io as files
+use os as host
+use process as proc
+use path as paths
+use text as txt
+use crypto as crypt
+use archive as zip
+use net/http as http
+use encoding/hex as hex
+use console as terminal
+
+func checked<t, e>(value: result<t, e>) -> result<t, string>:
+    if value is Ok(var item):
+        return Ok(item)
+    if value is Err(var reason):
+        return Err(reason.message + " [" + reason.kind.name + "]")
+    return Err("invalid checked operation")
+
+func digest(const bytes: [u8]) -> result<string, string>:
+    with checked(crypt.sha256())? as hash:
+        var updated = checked(hash.update(bytes))?
+        return Ok(hex.encode(checked(hash.finish())?))
+
+func file_digest(value: string) -> result<string, string>:
+    with checked(files.open(value))? as input_file:
+        with checked(crypt.sha256())? as hash:
+            var extent = checked(input_file.length())?
+            if extent < 0 or extent > 1073741824:
+                return Err("preparation hash input exceeds bound")
+            var total: i64 = 0
+            for true:
+                var block = checked(input_file.read_bytes(262144))?
+                if block.count == 0:
+                    break
+                total += block.count
+                if total > extent:
+                    return Err("preparation hash input grew")
+                var updated = checked(hash.update(block))?
+            if total != extent:
+                return Err("preparation hash input changed size")
+            return Ok(hex.encode(checked(hash.finish())?))
+
+func read(value: string) -> result<[u8], string>:
+    return checked(files.read_bytes(value, 16777216))
+
+func write(value: string, const bytes: [u8]) -> result<bool, string>:
+    var count = checked(files.write_bytes(value, bytes, files.open_mode.create_new))?
+    if count != bytes.count:
+        return Err("incomplete preparation write")
+    return Ok(true)
+
+func replace(value: string, before: string, after: string) -> result<string, string>:
+    return checked(txt.replace(value, before, after))
+
+func child_environment() -> [string]:
+    var entries: [string]
+    # Preserve the selected native Windows SDK and sanitizer configuration.
+    # Never inherit TAR_OPTIONS, PYTHON*, loader overrides or a consumer PATH.
+    for name in ["HOME", "USERPROFILE", "SYSTEMROOT", "WINDIR", "TMPDIR", "TMP", "TEMP", "INCLUDE", "LIB", "LIBPATH", "VCToolsInstallDir", "VCINSTALLDIR", "WindowsSdkDir", "WindowsSDKVersion", "ASAN_OPTIONS", "UBSAN_OPTIONS"]:
+        if host.env(name) is Ok(var value):
+            entries.push(name + "=" + value)
+    if host.platform() == "windows":
+        if host.env("SYSTEMROOT") is Ok(var windows_root):
+            entries.push("PATH=" + windows_root + "/System32")
+    else:
+        entries.push("PATH=/usr/bin:/bin")
+    return entries
+
+func capture(executable: string, const arguments: [string], cwd: string, maximum: i64 = 65536) -> result<[u8], string>:
+    var output = checked(proc.capture(executable, arguments, child_environment(), cwd,
+        proc.capture_options(stdout_limit = maximum, stderr_limit = 65536, total_limit = maximum + 65536, timeout_ms = 180000)))?
+    if output.outcome != proc.capture_end.complete or not output.exited or output.status.signaled or output.status.code != 0:
+        if string.from_utf8(output.stderr) is Ok(var message):
+            var reported = terminal.stderr.write(message)
+        return Err("native preparation child failed: " + executable)
+    return Ok(output.stdout)
+
+func decoded(const bytes: [u8]) -> result<string, string>:
+    if string.from_utf8(bytes) is Ok(var value):
+        return Ok(value)
+    return Err("preparation input is not UTF-8")
+
+func identity(value: string) -> result<string, string>:
+    var bytes = read(value)?
+    return Ok("{bytes.count}:" + digest(bytes)?)
+
+func catalog_line(directory: string, name: string) -> result<string, string>:
+    return Ok("\"" + name + "\" = \"" + identity(directory + "/" + name)? + "\"\n")
+
+func prepare(const arguments: [string]) -> result<bool, string>:
+    # Arguments are supplied by voidc from its own admitted snapshot and native
+    # manifest. This is an internal resource interface, not a package script API.
+    if arguments.count != 6:
+        return Err("expected INPUTS COMPILER CLANG CATALOG PREPARER SANITIZE")
+    var inputs = arguments[0]
+    var compiler = arguments[1]
+    var clang = arguments[2]
+    var catalog = arguments[3]
+    var preparer = arguments[4]
+    var sanitize = arguments[5] == "1"
+    if arguments[5] != "0" and not sanitize:
+        return Err("invalid sanitizer mode")
+    if host.architecture() != "x86_64" or (host.platform() != "linux" and host.platform() != "windows"):
+        return Err("bundled raylib supports GNU/Linux x86-64 and Windows x64 MSVC")
+    var windows = host.platform() == "windows"
+    if windows and sanitize:
+        return Err("sanitized Windows raylib preparation is unavailable")
+    var native = inputs + "/native"
+    var scratch = checked(paths.parent(catalog))?
+    var stage = scratch + "/stage"
+    # The parent is compiler-created private scratch. The capability prevents
+    # adopting an existing stage and retains private classification on outputs.
+    with checked(files.create_private_directory(stage))? as stage_cap:
+        var version = decoded(capture(clang, ["--version"], stage)?)?
+        if not txt.starts_with(version, "clang version 23.1.4 "):
+            return Err("bundled raylib requires Clang 23.1.4")
+        var compiler_version = capture(compiler, ["--version"], stage)?
+        var asset = "raylib-6.0_linux_amd64.tar.gz"
+        var release = "raylib-6.0_linux_amd64"
+        var expected = "b64ba618a19e7da9e9c0e09bb398ecfd477a77d2d7231901bafc8739d27c08d2"
+        var size: i64 = 1793706
+        var dependency = "libraylib.so.600"
+        var upstream_library = "libraylib.so.6.0.0"
+        var provider = "libvoid_raylib.so"
+        var descriptor = "raylib-linux.descriptor"
+        var target = "x86_64-unknown-linux-gnu sysv-x64"
+        if windows:
+            asset = "raylib-6.0_win64_msvc16.zip"
+            release = "raylib-6.0_win64_msvc16"
+            expected = "c93c7dc74576e00e3ee57fa2bd5fd109fbfc5aca87e12046dd7ec2c2268b3f78"
+            size = 2597715
+            dependency = "raylib.dll"
+            upstream_library = dependency
+            provider = "void_raylib.dll"
+            descriptor = "raylib-windows.descriptor"
+            target = "x86_64-pc-windows-msvc msvc-x64"
+        var remote = "https://github.com/raysan5/raylib/releases/download/6.0/" + asset
+        var announced = terminal.stderr.write("Fetching pinned raylib 6.0: " + remote + "\n")
+        var archive_path = stage + "/" + asset
+        with checked(http.open_client())? as client:
+            var response = checked(client.get(remote, http.request_options(redirects = http.redirect_policy.safe,
+                max_redirects = 5, decoding = http.content_decoding.raw, max_encoded_bytes = size,
+                max_decoded_bytes = size, max_buffer_bytes = size, total_timeout_ms = 30000)))?
+            if response.info.status != 200 or response.info.content_decoded or response.bytes.count != size or digest(response.bytes)? != expected:
+                return Err("raylib release asset SHA-256/size mismatch")
+            var saved = write(archive_path, response.bytes)?
+        var verified = terminal.stderr.write("Verified release asset SHA-256 " + expected + "\n")
+        if windows:
+            var found: {string: bool}
+            with checked(files.open(archive_path))? as input_file:
+                with checked(zip.open_zip(input_file, zip.zip_limits(archive_bytes = size, entries = 4096, expanded_bytes = 67108864)))? as reader:
+                    for true:
+                        var header = checked(reader.next())?
+                        if header.eof:
+                            break
+                        var selected = ""
+                        for candidate in [dependency, "raylibdll.lib"]:
+                            if header.name == release + "/lib/" + candidate and not header.directory:
+                                selected = candidate
+                        var payload: [u8]
+                        for not header.directory:
+                            var block = checked(reader.read(262144))?
+                            if block.count == 0:
+                                break
+                            if selected != "":
+                                if payload.count + block.count > 16777216:
+                                    return Err("raylib member exceeds preparation bound")
+                                for byte in block:
+                                    payload.push(byte)
+                        if selected != "":
+                            var saved = write(stage + "/" + selected, payload)?
+                            found[selected] = true
+            if not found.contains(dependency) or not found.contains("raylibdll.lib"):
+                return Err("pinned raylib ZIP is missing its libraries")
+        else:
+            # The existing archive module deliberately admits ZIP only. GNU tar
+            # reads one named member from the SHA-256-pinned upstream tarball to
+            # bounded stdout; it never extracts paths or executes archive hooks.
+            var library = capture("/usr/bin/tar", ["--extract", "--to-stdout", "--gzip", "--file", archive_path,
+                "--", release + "/lib/" + upstream_library], stage, 8388608)?
+            var saved = write(stage + "/" + dependency, library)?
+        var source_names = ["raylib_provider.h", "raylib_provider.c", "raylib_api.h", "raylib_api.c", "raylib_parity.h", "raylib_api.descriptor.inc", "raylib_callbacks.inc"]
+        var thunk_bytes: [u8]
+        for name in source_names:
+            var bytes = read(native + "/" + name)?
+            for byte in bytes:
+                thunk_bytes.push(byte)
+        for byte in (file_digest(clang)? + file_digest(preparer)?).to_utf8():
+            thunk_bytes.push(byte)
+        for byte in compiler_version:
+            thunk_bytes.push(byte)
+        if windows:
+            for byte in digest(read(stage + "/raylibdll.lib")?)?.to_utf8():
+                thunk_bytes.push(byte)
+        var mode = "ordinary"
+        if sanitize:
+            mode = "sanitized"
+        for byte in mode.to_utf8():
+            thunk_bytes.push(byte)
+        var fixture_bytes = read(inputs + "/upstream/raylib.h")?
+        for byte in read(stage + "/" + dependency)?:
+            fixture_bytes.push(byte)
+        var plan = checked(files.read_text(native + "/raylib.descriptor.in"))?
+        var extra_lines = checked(txt.split(checked(files.read_text(native + "/raylib_api.descriptor.inc"))?, "\n"))?
+        var resources = ""
+        var records = ""
+        var bindings = ""
+        var in_bindings = false
+        for line in extra_lines:
+            if line == "":
+                continue
+            if txt.starts_with(line, "resource "):
+                resources += line + "\n"
+            else:
+                if txt.starts_with(line, "bind "):
+                    in_bindings = true
+                if in_bindings:
+                    bindings += line + "\n"
+                else:
+                    records += line + "\n"
+        var callback_position = txt.index_of(plan, "callback ")
+        if callback_position < 0:
+            return Err("invalid checked descriptor callback marker")
+        plan = checked(txt.substring(plan, 0, callback_position))? + resources + checked(txt.substring(plan, callback_position))?
+        plan = replace(plan, "void-c-primitive 3 3", "void-c-primitive 4 3")?
+        plan = replace(plan, "c_bool:bool\n", "c_bool:bool c_char:i8\n")?
+        var bind_position = txt.index_of(plan, "bind ")
+        if bind_position < 0:
+            return Err("invalid checked descriptor binding marker")
+        plan = checked(txt.substring(plan, 0, bind_position))? + records + checked(txt.substring(plan, bind_position))? + bindings
+        plan = replace(plan, "@TARGET@", target)?
+        plan = replace(plan, "@THUNK@", digest(thunk_bytes)?)?
+        plan = replace(plan, "@FIXTURE@", digest(fixture_bytes)?)?
+        var long_type = "i64"
+        if windows:
+            long_type = "i32"
+        plan = replace(plan, "@LONG@", long_type)?
+        var descriptor_written = write(stage + "/" + descriptor, plan.to_utf8())?
+        var bound = capture(compiler, ["native-bind", stage + "/" + descriptor, "raylib_api.h", "-o", stage + "/raylib_checked.c"], stage)?
+        for name in ["raylib_provider.c", "raylib_api.c"]:
+            var copied = write(stage + "/" + name, read(native + "/" + name)?)?
+        var native_include = checked(paths.relative(native, stage))?
+        var upstream_include = checked(paths.relative(inputs + "/upstream", stage))?
+        var flags = ["-std=c11", "-shared", "-fuse-ld=lld", "-O2", "-Wall", "-Wextra", "-Werror", "-I" + native_include, "-I" + upstream_include, "-DVOID_RAYLIB_API_CALLBACKS=1"]
+        if windows:
+            for flag in ["--target=x86_64-pc-windows-msvc", "-DUSE_LIBTYPE_SHARED", "-fms-runtime-lib=static", "-Wl,/Brepro"]:
+                flags.push(flag)
+        else:
+            for flag in ["-fPIC", "-fvisibility=hidden", "-Wl,-rpath,$ORIGIN"]:
+                flags.push(flag)
+            if sanitize:
+                flags.push("-fsanitize=address,undefined")
+                flags.push("-fno-sanitize-recover=all")
+        for name in ["raylib_provider.c", "raylib_api.c", "raylib_checked.c"]:
+            flags.push(name)
+        var link_input = dependency
+        if windows:
+            link_input = "raylibdll.lib"
+        flags.push(stage + "/" + link_input)
+        flags.push("-o")
+        flags.push(stage + "/" + provider)
+        var compiled = capture(clang, flags, stage)?
+        with checked(files.create_private_directory(catalog))? as catalog_cap:
+            for name in [descriptor, provider, dependency]:
+                var copied = write(catalog + "/" + name, read(stage + "/" + name)?)?
+            var license_written = write(catalog + "/RAYLIB-LICENSE.txt", read(inputs + "/upstream/LICENSE")?)?
+            var triple_parts = checked(txt.split(target, " "))?
+            var metadata = "format = 1\n[native]\nid = \"org.voidlang.raylib\"\nversion = \"6.0.0\"\nabi = 3\n"
+            metadata += "target = \"" + triple_parts[0] + "\"\nrevision = \"raylib-6.0-api-v4-physical\"\n"
+            metadata += "descriptor = \"" + descriptor + "\"\ndescriptor-identity = \"" + identity(catalog + "/" + descriptor)? + "\"\n"
+            metadata += "library = \"" + provider + "\"\nadapter = \"" + provider + "\"\n\n[native.runtime]\n"
+            metadata += catalog_line(catalog, provider)? + catalog_line(catalog, dependency)? + "\n[native.link]\n"
+            if windows:
+                var copied = write(catalog + "/raylibdll.lib", read(stage + "/raylibdll.lib")?)?
+                metadata += catalog_line(catalog, "raylibdll.lib")?
+            metadata += "\n[native.notices]\n" + catalog_line(catalog, "RAYLIB-LICENSE.txt")?
+            var metadata_written = write(catalog + "/void.native.toml", metadata.to_utf8())?
+    return Ok(true)
+
+func main() -> i32:
+    var arguments = checked(host.args())
+    if arguments is Ok(var values):
+        var outcome = prepare(values)
+        if outcome is Ok(var done):
+            return 0
+        if outcome is Err(var reason):
+            var reported = terminal.stderr.write("raylib preparation: " + reason + "\n")
+    else if arguments is Err(var reason):
+        var reported = terminal.stderr.write(reason + "\n")
+    return 1

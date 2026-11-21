@@ -251,9 +251,10 @@ claim is made.
 Source installation grants no native authority. Native declaration advice names
 providers and refers to the package's existing README/preparation instructions.
 D4's application requirements, selected catalog, descriptor verification and
-`--allow-native` remain separate. No installation scripts, binary downloads or
-native builds run during add/tidy. Raylib's existing `prepare.py` and catalog
-metadata already describe its preparation; no additional TOML format is needed.
+`--allow-native` remain separate. Ordinary source acquisition runs no package scripts or native builds. The
+compiler-owned bundled raylib path explicitly prepares its pinned native provider
+using a reviewed VOID resource; unchanged add reuses its verified catalog.
+See [raylib](../verified-packages/raylib/README.md). Tidy grants no execution consent.
 
 The earlier design discussion in this document is historical. The rules in this
 section describe the implemented G26 workflow; see

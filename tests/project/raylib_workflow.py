@@ -63,6 +63,30 @@ def workspace(args, root):
     def cli(label, *argv, **options):
         return run(label, compiler, *argv, **options)
 
+    if args.first_add_only:
+        cli("new first-add consumer", "new", "app", "--name", "TestGame", cwd=root)
+        storage = project / ".void"
+        # Let voidc create .void with its native private ACL on Windows.
+        sentinel = project / "user.txt"
+        sentinel.write_text("preserve user storage", encoding="utf-8")
+        cli("first add without Python", "add", "raylib", environment=dict(env, PATH="."),
+            contains="Verified release asset SHA-256")
+        catalog = project / "libs/raylib/.void/native"
+        metadata = tomllib.loads((catalog / "void.native.toml").read_text(encoding="utf-8"))["native"]
+        assert metadata["id"] == "org.voidlang.raylib" and metadata["abi"] == 3
+        identities = {metadata["descriptor"]: metadata["descriptor-identity"]}
+        for role in ("runtime", "link", "notices"):
+            identities.update(metadata[role])
+        for name, identity in identities.items():
+            extent, digest = identity.split(":", 1)
+            payload = (catalog / name).read_bytes()
+            assert len(payload) == int(extent) and sha256(payload).hexdigest() == digest, name
+        cli("first-add lock and catalog verify", "resolve", "--project", ".", "--locked")
+        assert sentinel.read_text(encoding="utf-8") == "preserve user storage"
+        assert not list(storage.glob("acquire-*")), "Successful first add retained acquisition scratch"
+        print("First-add catalog readback, identities, locked resolution and private scratch cleanup passed", flush=True)
+        return
+
     local = root / "local_library"
     cli("create local source package", "new", local, "--kind", "library", cwd=root)
     cli("register local package", "package", "install", "local_lib", "--dir", local, cwd=root)
@@ -81,12 +105,8 @@ def workspace(args, root):
     original_manifest = manifest.read_bytes()
     cli("unlisted name has no acquisition", "add", "unknown", status=2, contains="registered or bundled")
     project_path = dict(env, PATH=".")
-    cli("project PATH cannot select an interpreter", "add", "raylib", environment=project_path,
-        status=1, contains="Python 3.12")
-    assert manifest.read_bytes() == original_manifest
-    assert not (project / "void.lock").exists() and not (project / "libs").exists()
-
-    prepared = cli("add raylib and auto-prepare", "add", "raylib", contains="Verified release asset SHA-256")
+    prepared = cli("first add without Python or ambient tool selection", "add", "raylib",
+        environment=project_path, contains="Verified release asset SHA-256")
     print(prepared, end="", flush=True)
     installed = project / "libs/raylib"
     catalog = installed / ".void/native"
@@ -113,7 +133,8 @@ def workspace(args, root):
     assert (installed / "src/raylib_native.void").read_text(encoding="utf-8").splitlines()[1] == 'native "org.voidlang.raylib"'
     entry = project / "src/app.void"
     readme = (installed / "README.md").read_text(encoding="utf-8")
-    example, = re.findall(r"```void\n(.*?)```", readme, re.S)
+    example, = [block for block in re.findall(r"```void\n(.*?)```", readme, re.S)
+                if "gen_image_color(16, 16" in block]
     assert example
     entry.write_text(example, encoding="utf-8")
     # Imports, checks, JIT and AOT use the prepared catalog without Python.
@@ -252,10 +273,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("compiler", type=Path)
     parser.add_argument("--keep", type=Path, help="Use a new directory and retain the consumer for editor tests")
-    parser.add_argument("--window", action="store_true")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--window", action="store_true")
+    mode.add_argument("--first-add-only", action="store_true",
+                      help="Focused native Windows/Linux first-add and catalog-readback regression")
     parser.add_argument("--scratch", type=Path, help="Existing private directory for the temporary developer project")
     args = parser.parse_args()
     args.compiler = args.compiler.resolve()
+    if args.first_add_only and os.name != "nt":
+        import resource
+        resource.setrlimit(resource.RLIMIT_STACK, (1048576, 1048576))
+        resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     if args.keep:
         args.keep.mkdir()
         workspace(args, args.keep.resolve())

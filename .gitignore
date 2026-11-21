@@ -59,6 +59,7 @@ compile_commands.json
 .cache/
 **/.void/cache/
 **/.void/run/
+**/.void/acquire-*/
 **/.void/build/
 __pycache__/
 *.pyc

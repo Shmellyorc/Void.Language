@@ -1,11 +1,25 @@
 # Pinned raylib package consumer
 
-Copy this directory outside the compiler checkout. After Boss pushes the package,
-run `python3 configure.py --rev FULL_LOWERCASE_COMMIT_SHA`, then follow the
-[package setup guide](../../verified-packages/raylib/README.md).
-`--origin HTTPS_URL` supports the disposable real Git qualification. The manifest
-imports `pkg/raylib` from `verified-packages/raylib`; native catalog approval stays
-with the application and operator.
+Copy this directory outside the compiler checkout and open a terminal there.
+With a matching complete toolchain selected, use the native project commands:
+
+```sh
+voidc init . --name "Raylib package consumer"
+voidc add raylib
+voidc tidy --check
+voidc check .
+voidc run .
+```
+
+Review the native provider at the interactive prompt before approving execution.
+The [package setup guide](../../verified-packages/raylib/README.md) describes host
+libraries, pinned release preparation and consent. Python and CMake are not needed
+for this consumer workflow. `init` preserves the example's existing sources;
+`add` installs the bundled library and its locked native provider.
+
+The retained `configure.py` is an internal qualification fixture for explicit
+immutable Git pins and disposable HTTPS origins. Tests use it to exercise that
+separate acquisition path; ordinary users can use the native commands above.
 
 The examples use the only supported numeric-unit spellings, including `camera_3d`
 and `begin_mode_3d`. Partial value construction works locally and at global scope:

@@ -42,7 +42,7 @@ std::filesystem::path bundled_raylib_source(const std::filesystem::path& executa
     const auto installed=(executable.parent_path()/"../share/void/verified-packages/raylib").lexically_normal();
     const auto complete=[](const std::filesystem::path& source) {
         return std::filesystem::is_regular_file(source/"SOURCE_ORIGIN.txt") &&
-               std::filesystem::is_regular_file(source.parent_path()/"raylib-prepare.py");
+               std::filesystem::is_regular_file(source.parent_path()/"raylib-prepare.void");
     };
     if(complete(installed))return installed;
     const auto build=vd::utf8_path(VOID_RAYLIB_BUILD_ROOT);

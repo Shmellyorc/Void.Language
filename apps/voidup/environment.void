@@ -1,0 +1,37 @@
+use "./support.void" as support
+use text
+use json as codec
+use os
+
+struct up_paths:
+    schema: i32 = 1
+    root: string
+    release_id: string
+    build_identity: string
+    bin: string
+    voidc: string
+    voidls: string
+
+func up_environment_text(paths: up_paths, output_format: string) -> result<string, support.up_error>:
+    if output_format == "json":
+        return support.up_json(codec.stringify(paths))
+    if output_format == "vscode":
+        var settings: {string: string}
+        settings["void.compiler.path"] = paths.voidc
+        settings["void.server.path"] = paths.voidls
+        return support.up_json(codec.stringify(settings))
+    # A PATH entry cannot represent the platform's separator. Quoting cannot
+    # repair this; JSON/editor paths and verified `run` remain usable instead.
+    var separator = ":"
+    if os.platform() == "windows":
+        separator = ";"
+    if text.contains(paths.bin, separator):
+        return Err(support.up_fail("installation path contains the PATH separator; use env --format vscode or run", "environment"))
+    var quoted = ""
+    if output_format == "sh":
+        if os.platform() == "windows":
+            return Err(support.up_fail("sh export is supported on Unix hosts; use powershell on Windows", "environment"))
+        quoted = support.up_txt(text.replace(paths.bin, "'", "'\"'\"'"))?
+        return Ok("export PATH='" + quoted + "':\"$PATH\"")
+    quoted = support.up_txt(text.replace(paths.bin, "'", "''"))?
+    return Ok("$env:PATH = '" + quoted + separator + "' + $env:PATH")

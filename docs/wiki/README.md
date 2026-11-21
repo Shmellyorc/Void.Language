@@ -6,7 +6,8 @@ in [the G89 report](../projects/G89_GITHUB_WIKI_OVERHAUL.md).
 
 ## Source and publication set
 
-The accepted source baseline is G88 `553fe3f028ca3ce55d950c0bfe61b8d4503f13b3`.
+The accepted source baseline for the current installation correction is G93
+`8025d23f471c65a0f4bcc00f91189afff1d06ff3`.
 The canonical language contract is [the Language Bible](../LANGUAGE_BIBLE.md);
 these pages explain it through small examples rather than repeat the specification.
 The previous 16-file draft inventory is preserved in the engineering evidence and
@@ -70,16 +71,33 @@ the retained provider fixture rather than pretending one is universally availabl
 
 ## Live state observed during preparation
 
-Read-only checks on 20 November 2026 found `has_wiki: true`, but the public Wiki
-URL redirected to the repository and `git ls-remote` of the Wiki URL returned
-“Repository not found.” No published page or Wiki Git history was retrievable.
-This is compatible with an uninitialized Wiki; it is not proof that no private or
-historical content exists. The evidence contains the responses and original drafts.
-No page was created and no Wiki setting was changed.
+Read-only checks on 21 November 2026 retrieved the public Wiki, whose default
+branch is `master` and observed HEAD is
+`4862b9fa11d1af0e712f92c1ad71946466db06cb`. Installation still leads with Python
+source building. The read-only clone is disposable. Preimage hashes, the seven-page diff and the
+current export are retained under
+`~/Documents/Void.Language-archives/g94-continuation-2026-11-21/wiki-review/`;
+the original page bytes also remain in the preserved G94 archive.
+The earlier inaccessible state remains in the original G89 report. No live page
+was changed.
+
+For publication preparation against that snapshot, the existing exporter also
+emits the complete review diff, preimage hashes and changed-file allowlist:
+
+```sh
+python3 -B tools/wiki/prepare.py --output /absolute/fresh/private/wiki-export \
+  --live-snapshot /absolute/clean/wiki-clone
+```
+
+`live-review.json` and `review.diff` are repository-side review artifacts, never
+Wiki pages. Recheck the live HEAD and every replacement preimage before any
+authorized publication. Preserve unknown files; the correction should publish
+only its changed page allowlist after the corresponding source/docs are integrated.
 
 ## Publication procedure — after separate authorization only
 
-G89 authorizes preparation, not publication. Independent review must complete,
+The current assignment authorizes preparation and correction scope, with
+independent review before integration/publication. Independent review must complete,
 and Boss must separately authorize any repository integration and Wiki
 publication. The following describes future work; none of its remote writes has
 been performed by preparation.
@@ -103,8 +121,8 @@ been performed by preparation.
    covers that replacement. If remote contents differ from the reviewed state,
    review the new differences before proceeding. Never use a mirror or deletion
    sweep to make the live Wiki match the local directory.
-5. Copy **only** the 26 files listed in the approved publication inventory from
-   the export's `pages/`. Verify destination hashes, inspect the complete diff,
+5. Copy **only** the reviewed changed files from the 26-file publication inventory,
+   taking their bytes from the export's `pages/`. Verify destination hashes, inspect the complete diff,
    and run `git diff --check`. Do not copy the repository-only README, JSON
    manifests, receipts or engineering report. Stage the exact allowlisted paths
    and make the authorized Wiki commit on its discovered default branch.

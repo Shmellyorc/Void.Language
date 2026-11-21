@@ -1,5 +1,10 @@
 # Install VOID from source
 
+This is the contributor/advanced build workflow. [VOIDUP](../voidup/USAGE.md) is
+the primary toolchain manager; its public bootstrap/catalog publication is still
+pending. Building the compiler locally has separate prerequisites from using a
+complete authenticated toolchain.
+
 Start with your native platform: [Linux x64](linux.md), [Windows x64](windows.md),
 [macOS ARM64](macos.md). The complete LLVM **23.1.4** development SDK and Python
 **3.12+** are required. A Clang-only installer is insufficient.

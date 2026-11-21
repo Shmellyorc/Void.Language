@@ -637,6 +637,37 @@ void with_project_stage(const CreationRoot& directory, const ProjectDirectoryRea
 }
 }
 
+void with_project_scratch(const CreationRoot& root, const VerifyProjectDirectory& action) {
+    if (!named(root.path,".void")) {
+        try {
+            publish_project_directory(root,".void",{},[](const auto&,const auto&){});
+        } catch (const CreationCollision&) {
+            // A concurrent creator must pass the same admission below.
+        }
+    }
+    named(root.path,".void",true);
+    Parent workspace(root.path/".void");
+    if (inspect_creation_root(root.path).identity != root.identity)
+        throw std::runtime_error("Project root changed before preparation.");
+#ifdef _WIN32
+    native_windows::PrivateAccess access;
+    access.verify(workspace.handle.value);
+#else
+    const auto info=identity(workspace.handle);
+    if (info.st_uid != geteuid() || (info.st_mode & 0777) != 0700)
+        throw std::runtime_error("Project preparation requires an owned private .void directory.");
+#endif
+    with_project_stage({workspace.path,workspace.identity_key()}, {},
+        [&](const Parent&, [[maybe_unused]] Node& staged, const fs::path& stage, bool&) {
+#ifdef _WIN32
+            const native_windows::DirectoryReservation reservation{stage,staged.handle.value,nullptr};
+            action(stage,staged_reader(reservation));
+#else
+            action(stage,{});
+#endif
+        });
+}
+
 void publish_project_directory(const CreationRoot& directory, const std::string& leaf,
                                const std::map<std::string, std::string_view>& files,
                                const VerifyProjectDirectory& verify,

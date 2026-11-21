@@ -18,7 +18,7 @@ func up_report(failure: support.up_error) -> i32:
 func main() -> i32:
     var operands = os.args()
     if operands is Err(var cause):
-        return up_report(support.up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_code = cause.os_code))
+        return up_report(support.up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_code = cause.os_code))
     if operands is Ok(var values):
         var parsed = cli.up_parse(values)
         if parsed is Err(var cause):

@@ -4,8 +4,8 @@ import argparse, copy, hashlib, io, json, os, tempfile, time, zipfile
 from support import ROOT,EVIDENCE,Runner,Service,encoded,sign,scratch_directory
 
 parser=argparse.ArgumentParser();parser.add_argument('application',type=Path)
-parser.add_argument('--name',default='rejection-1');options=parser.parse_args()
-app=options.application.resolve();fixtures=ROOT/'build/voidup-fixtures';runner=Runner(options.name)
+parser.add_argument('--name',default='rejection-1');parser.add_argument('--fixtures',type=Path,default=ROOT/'build/voidup-fixtures');options=parser.parse_args()
+app=options.application.resolve();fixtures=options.fixtures.resolve();runner=Runner(options.name)
 work=scratch_directory('VOIDUP rejected 雪 # % ')
 original=json.loads((fixtures/'www/catalog.json').read_bytes());cases=[]
 with Service(fixtures) as server:

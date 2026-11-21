@@ -7,6 +7,12 @@ see [CLI status](https://github.com/Shmellyorc/Void.Language/wiki/CLI-commands#i
 
 ## Check the selected installation
 
+For a VOIDUP root, begin with `voidup list`, `voidup doctor`,
+`voidup which voidc` and `voidup which voidls`. Include the same `--root` option
+you used during installation. `voidup run default voidc -- --version` shows the
+manager-selected build. After switching, refresh `voidup env --format sh` (or
+`powershell`) and editor paths from `voidup env --format vscode`.
+
 On Unix:
 
 ```sh
@@ -24,6 +30,9 @@ Avoid including credentials or private source unnecessarily.
 
 | Symptom | Useful next step |
 | --- | --- |
+| Catalog unavailable or no public bootstrap | No verified public VOIDUP download/catalog is available yet. Use the availability section in [Installation](https://github.com/Shmellyorc/Void.Language/wiki/Installation#check-availability-first); do not substitute test credentials or an invented endpoint. |
+| Signature, inventory or replay check fails | Keep the diagnostic and root. Check clock and the supplied matching catalog/bootstrap; do not weaken verification or delete trust metadata to force an update. |
+| Download interrupted | Repeat the same VOIDUP install command. `doctor` reports retained transactions; the current version stays selected until successful activation. |
 | SDK/dependency setup fails | Read `source-install.json` and adjacent logs in the chosen build directory. Follow the native [installation guide](https://github.com/Shmellyorc/Void.Language/wiki/Installation). |
 | Standard imports cannot resolve | Keep the installed prefix together. Remove a stale `VOID_STDLIB_ROOT` override unless you deliberately need matching external sources. |
 | No main, ambiguous main or wrong source root | Check the [manifest/source selection](https://github.com/Shmellyorc/Void.Language/wiki/Projects-and-modules); do not rename files blindly. |

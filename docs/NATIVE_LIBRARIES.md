@@ -161,33 +161,8 @@ mkdir "$G25_DEMO/catalog"
   -o "$G25_DEMO/catalog/libvalues.so"
 cp "$G25_DEMO/app/src/ffi/provider.descriptor" "$G25_DEMO/catalog/"
 cp "$G25_ROOT/LICENSE" "$G25_DEMO/catalog/VOID-MIT-LICENSE.txt"
-export G25_DEMO
-python3 - <<'PY'
-from pathlib import Path
-from hashlib import sha256
-import os
-p=Path(os.environ['G25_DEMO'])/'catalog'
-def identity(name):
-    data=(p/name).read_bytes()
-    return f'{len(data)}:{sha256(data).hexdigest()}'
-(p/'void.native.toml').write_text(f'''format=1
-[native]
-id="org.example.values"
-version="1.0.0"
-abi=3
-target="x86_64-unknown-linux-gnu"
-revision="g25-example-1"
-descriptor="provider.descriptor"
-descriptor-identity="{identity('provider.descriptor')}"
-library="libvalues.so"
-adapter="libvalues.so"
-[native.runtime]
-"libvalues.so"="{identity('libvalues.so')}"
-[native.link]
-[native.notices]
-"VOID-MIT-LICENSE.txt"="{identity('VOID-MIT-LICENSE.txt')}"
-''')
-PY
+# The small VOID example hashes the prepared artifacts and writes a new catalog.
+voidc run "$G25_ROOT/examples/native/catalog.void" -- "$G25_DEMO/catalog"
 cat >> "$G25_DEMO/app/void.project.toml" <<'TOML'
 
 [native-requirements.values]

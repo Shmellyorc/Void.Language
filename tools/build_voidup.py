@@ -5,7 +5,7 @@ decisions remain in apps/voidup/*.void. Requires a matching built voidc and its
 native manifests; output must be new. Use an Ubuntu-built compiler for the floor.
 """
 from pathlib import Path
-import argparse, json, os, shutil, subprocess, sys, tempfile
+import argparse, hashlib, json, os, platform, shutil, subprocess, sys, tempfile
 ROOT = Path(__file__).resolve().parents[1]
 from engineering_storage import evidence_directory
 os.environ.setdefault('VOID_CRASH_EVIDENCE',str(evidence_directory('voidup-qualification')/'crashes'))
@@ -54,9 +54,23 @@ def main():
         (prefix/'build.stderr').write_bytes(result.stderr)
         if result.returncode:raise SystemExit(result.returncode)
     shutil.copytree(options.licenses,prefix/'share/void/licenses',symlinks=False)
-    (prefix/'build.json').write_text(json.dumps(dict(schema=1,compiler=str(compiler),
+    def digest(path):
+        state=hashlib.sha256()
+        with path.open('rb') as source:
+            for block in iter(lambda:source.read(1048576),b''):state.update(block)
+        return state.hexdigest()
+    version=subprocess.check_output([str(compiler),'--version'],text=True)
+    if 'LLVM 23.1.4\n' not in version:
+        raise RuntimeError('bootstrap compiler must use LLVM 23.1.4')
+    source_inputs=sorted((ROOT/'apps/voidup').glob('*.void'))+sorted((ROOT/'stdlib').rglob('*.void'))
+    receipt=dict(schema=1,compiler=str(compiler),compiler_sha256=digest(compiler),
+        compiler_version=version,host=dict(system=platform.system(),machine=platform.machine(),libc=platform.libc_ver()),
         source=str(ROOT/'apps/voidup/main.void'),optimized=not options.no_opt,
-        production_trust=False),indent=2)+'\n')
+        source_sha256={str(path.relative_to(ROOT)):digest(path) for path in source_inputs},
+        files={path.relative_to(prefix).as_posix():dict(bytes=path.stat().st_size,sha256=digest(path))
+            for path in sorted(prefix.rglob('*')) if path.is_file()},
+        production_trust=False,public_distribution_qualified=False)
+    (prefix/'build.json').write_text(json.dumps(receipt,indent=2)+'\n')
     print(prefix/'bin/voidup')
 
 if __name__=='__main__':main()

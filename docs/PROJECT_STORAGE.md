@@ -15,6 +15,7 @@ Compiler-owned project storage is:
 
 | Location | Ownership and lifetime |
 | --- | --- |
+| `.void/acquire-<random>/` | Invocation-owned package preparation; private checked inputs and outputs. |
 | `.void/cache/v1/` | Existing validated JIT cache; optional, private, reusable. |
 | `.void/run/native-<random>/` | One native invocation; private payload and `.owner` lease. |
 | `.void/build/<entry>` | Default manifest application executable and its managed native payload. Explicit `-o` remains relative to the caller. |
@@ -34,6 +35,12 @@ loaded from those sealed descriptors in dependency order. License notices are
 verified but never executed. Replacing a project or staged file after capture
 cannot replace a loaded image. The conventional system-library loader contract
 remains in effect. Windows retains its private staged DLL loader contract.
+
+Package preparation reuses the project directory publisher's exclusive private
+staging and identity checks. An existing `.void` must be owned, private and
+unaliased; it is never chmodded. Success and recoverable failure remove the
+invocation's acquisition leaf. A substituted leaf is preserved. Hard-killed
+acquisition leaves carry no later reclamation authority and require manual review.
 
 ## Cleanup ownership
 

@@ -47,6 +47,10 @@ public:
 
 using VerifyProjectDirectory = std::function<void(const std::filesystem::path&, const ProjectDirectoryReader&)>;
 
+// Invocation-owned private scratch below the project's .void directory. Reuses
+// the directory publisher's identity checks and cleans only its exclusive leaf.
+void with_project_scratch(const CreationRoot&, const VerifyProjectDirectory&);
+
 std::optional<std::string> read_dependency_lock(const std::filesystem::path&);
 bool publish_dependency_lock(const CreationRoot&, const std::optional<std::string>& previous,
                              std::string_view desired, const std::function<void()>& recheck);

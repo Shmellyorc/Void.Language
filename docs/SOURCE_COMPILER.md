@@ -92,7 +92,8 @@ still require an explicit host adapter; [async contracts](ASYNC.md) remain intac
 Dynamic native linking is the default; supported static linking is optional.
 Library source acquisition grants no native-provider authority.
 
-For onboarding, start with [source installation](install/README.md),
+For onboarding, start with [VOIDUP installation](voidup/USAGE.md); compiler
+contributors use the separate [source build](install/README.md). Continue with
 [your first program](FIRST_PROGRAM.md), [creating and composing libraries](LOCAL_LIBRARIES.md#creating-and-composing-libraries)
 and the [CLI reference](CLI.md). The dated implementation records below retain
 their original qualification limits; current feature guides supersede historical

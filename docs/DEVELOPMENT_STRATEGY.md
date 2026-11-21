@@ -41,6 +41,7 @@ shared. Current API guides determine behavior; proposals record design history.
 | Language/compiler and entry semantics | [Source compiler](SOURCE_COMPILER.md), [CLI](CLI.md), [language guide](LANGUAGE_BIBLE.md) |
 | LLVM migration | [Compatibility](llvm23/COMPATIBILITY.md), [acceptance](llvm23/ACCEPTANCE.md); historical hosted checkpoint is distinct from this repair |
 | HTTP | [Current engineering](net/http/CURRENT_ENGINEERING.md), [accepted hosted scope](net/http/ACCEPTANCE.md) |
+| VOIDUP / Python-free developer experience | [G94 candidate](projects/G94_VOIDUP_PYTHON_FREE_DEVELOPER_EXPERIENCE.md): verified session/editor exports, native package preparation and Wiki publication preparation; private Linux qualification, independent review pending, public channel unpublished |
 | VOIDUP A/B | [Phase A](voidup/REPORT.md), [Phase B](voidup/PHASE_B_REPORT.md), [integration](voidup/INTEGRATION_REPORT.md); private Linux engineering retained |
 | VOIDUP CI repair scope | [LLVM selector and sanitizer investigation](voidup/INTEGRATION_REPORT.md#llvm-2314-ci-repair); that record's native evidence and strict libsodium limits are distinct from later project/compiler qualification |
 | Performance | [Integrated qualification](compiler-health/INTEGRATED_PERFORMANCE_QUALIFICATION.md), with original incidents and regressions retained |

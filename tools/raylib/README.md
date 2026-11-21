@@ -39,8 +39,14 @@ Run the documentation-only regression without building the compiler:
 python3 tests/project/raylib_documentation.py --docs-only
 ```
 
-The separate compiler resource `verified-packages/raylib-prepare.py`
-assembles a checked native catalog. For a local review build, invoke it
+The separate compiler resource `verified-packages/raylib-prepare.void`
+assembles the consumer catalog through native VOID tooling. `voidc add raylib`
+stages and authenticates it with the bundled source snapshot before hosting it.
+It uses native HTTP, SHA-256, ZIP and process APIs; Linux tar.gz decoding uses
+`/usr/bin/tar` with bounded stdout after full asset authentication.
+
+The retained internal maintenance helper `verified-packages/raylib-prepare.py`
+can prepare custom qualification inputs. For a local review build, invoke it
 with `--voidc`, `--clang`, `--header`, `--library`, `--license` and a fresh
 `--managed-catalog` directory. Windows also needs `--import-library`.
 Use `--sanitize` with the instrumented Linux Runtime. The supplied

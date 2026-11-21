@@ -6,7 +6,13 @@ package also needs a verified provider and separate permission to execute it.
 
 ## Add the bundled package
 
-After [installing the tools](https://github.com/Shmellyorc/Void.Language/wiki/Installation), create a fresh application:
+After [installing the tools](https://github.com/Shmellyorc/Void.Language/wiki/Installation), you can add the bundled library to a fresh application.
+
+The bundled raylib preparer is written in VOID. First add uses pinned HTTPS
+release bytes, SHA-256 checks and the selected Clang/LLD; it needs no Python or
+CMake. Linux additionally uses native tar/gzip for the official tar.gz asset.
+Windows uses the VOID ZIP reader. Later imports and builds reuse the locked
+provider. Host development and device libraries remain platform requirements.
 
 ```sh
 voidc new app --name PixelDemo

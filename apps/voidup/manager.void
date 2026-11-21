@@ -1,3 +1,4 @@
+use "./environment.void" as exports
 use "./presentation.void" as presentation
 use "./support.void" as support
 use "./model.void" as model
@@ -26,7 +27,7 @@ struct up_context:
 
 func up_say(message: string) -> result<bool, support.up_error>:
     if console.stdout.write(message + "\n") is Err(var cause):
-        return Err(support.up_error(message = cause.message, operation = "stdout", kind = string(cause.kind), native_domain = "console", native_code = cause.os_code, progress = cause.bytes_transferred))
+        return Err(support.up_error(message = cause.message, operation = "stdout", kind = cause.kind.name, native_domain = "console", native_code = cause.os_code, progress = cause.bytes_transferred))
     return Ok(true)
 
 func up_cached_catalog(context: up_context, digest: string) -> result<model.up_catalog, support.up_error>:
@@ -62,7 +63,7 @@ func up_stage(context: up_context) -> result<io.private_directory, support.up_er
             return Ok(directory)
         if created is Err(var cause):
             if not (cause.kind is io.error_kind.already_exists):
-                return Err(support.up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = "filesystem", native_code = cause.os_code))
+                return Err(support.up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = "filesystem", native_code = cause.os_code))
     return Err(support.up_fail("exclusive transaction name collisions", "transaction"))
 
 func up_cache_catalog(context: up_context, digest: string, const raw_catalog: [u8], const raw_signatures: [u8]) -> result<bool, support.up_error>:
@@ -76,7 +77,7 @@ func up_cache_catalog(context: up_context, digest: string, const raw_catalog: [u
             return Ok(true)
     if found is Err(var cause):
         if not (cause.kind is io.error_kind.not_found):
-            return Err(support.up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = "filesystem", native_code = cause.os_code))
+            return Err(support.up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = "filesystem", native_code = cause.os_code))
     with up_stage(context)? as pending:
         var first = support.up_write_new(pending, "catalog.json", raw_catalog)?
         var second = support.up_write_new(pending, "catalog.sig", raw_signatures)?
@@ -91,7 +92,7 @@ func up_cache_inventory(context: up_context, release: model.up_release, const ra
             return Ok(true)
     if found is Err(var cause):
         if not (cause.kind is io.error_kind.not_found):
-            return Err(support.up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = "filesystem", native_code = cause.os_code))
+            return Err(support.up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = "filesystem", native_code = cause.os_code))
     with up_stage(context)? as pending:
         var written = support.up_write_new(pending, "inventory.json", raw_inventory)?
         return support.up_publication(pending.publish(context.metadata_cap, "i-" + release.inventory_sha256), "inventory-publication")
@@ -184,7 +185,7 @@ func up_install(context: up_context) -> result<bool, support.up_error>:
     else:
         if existing is Err(var cause):
             if not (cause.kind is io.error_kind.not_found):
-                return Err(support.up_error(message = cause.message, operation = cause.operation, kind = string(cause.kind), native_domain = "filesystem", native_code = cause.os_code))
+                return Err(support.up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = "filesystem", native_code = cause.os_code))
         with up_stage(context)? as transaction:
             with support.up_io(transaction.create_directory("payload"))? as payload:
                 with support.up_io(transaction.create_file("package.zip"))? as package:
@@ -269,6 +270,20 @@ func up_dispatch(context: up_context, writer: io.directory_lock) -> result<i32, 
     else if command_name == "verify":
         var checked = up_verify_version(context, context.options.release_id)?
         var printed = up_say("verified " + context.options.release_id)?
+    else if command_name == "env":
+        var selected_id = context.control_state.current
+        if selected_id == "":
+            return Err(support.up_fail("no default toolchain is selected", "environment"))
+        var checked = up_verify_version(context, selected_id)?
+        var record = up_record(context, selected_id)?
+        var bin_path = context.options.root_path + "/toolchains/" + selected_id + "/bin"
+        var suffix = ""
+        if os.platform() == "windows":
+            suffix = ".exe"
+        var paths = exports.up_paths(root = context.options.root_path, release_id = selected_id,
+            build_identity = record.release.build_identity, bin = bin_path,
+            voidc = bin_path + "/voidc" + suffix, voidls = bin_path + "/voidls" + suffix)
+        var printed = up_say(exports.up_environment_text(paths, context.options.output_format)?)?
     else if command_name == "which":
         var selected_id = context.control_state.current
         if selected_id == "":

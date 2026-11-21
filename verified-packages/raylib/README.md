@@ -215,11 +215,15 @@ ABI. Use matching VOID tools and the configured Clang/LLD 23.1.4 toolchain.
 On Windows, use an x64 Visual Studio Native Tools environment so Clang can
 find the Windows SDK and C libraries.
 
-The first add needs Python 3.12 or newer on PATH and HTTPS access to the
-pinned official raylib 6.0 release. The compiler uses its installed
-preparation tool to verify the release and build the checked native provider.
-Subsequent imports, checks, runs and builds use the locked source and
-prepared provider. They do not invoke Python or regenerate the bindings.
+The first add needs HTTPS access to the pinned official raylib 6.0 release.
+The compiler hosts its reviewed VOID preparation resource, verifies the exact
+release size/SHA-256 and builds the checked native provider with its configured
+Clang/LLD 23.1.4. Python, CMake and binding generators are not consumer dependencies.
+Linux first preparation uses `/usr/bin/tar` and gzip to read one named library
+from the verified tar.gz asset; Windows uses VOID's ZIP reader. Keep the host
+C/C++ development libraries required by the selected platform available.
+Subsequent imports, checks, runs and builds reuse the locked source and prepared
+provider. They do not download, regenerate bindings or repeat preparation.
 
 ```sh
 voidc new app --name MyGame

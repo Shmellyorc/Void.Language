@@ -10,7 +10,7 @@ parser.add_argument('--fixtures',type=Path,default=ROOT/'build/voidup-fixtures')
 parser.add_argument('--reuse-work',type=Path,help='retry on an owned retained fixture directory')
 options=parser.parse_args()
 app=options.application.resolve();runner=Runner(options.name)
-work=options.reuse_work or scratch_directory('VOIDUP real A B 雪 # % ')
+work=options.reuse_work or scratch_directory("VOIDUP real A B 雪 ' $() # % ")
 root=work/'private root';fixture=work/'arguments.void'
 fixture.write_bytes((Path(__file__).parent/'arguments.void').read_bytes())
 with Service(options.fixtures) as server:
@@ -20,6 +20,15 @@ with Service(options.fixtures) as server:
  run('doctor');run('list');run('list','--available')
  run('install','engineering-a','--activate',timeout=900)
  run('verify','engineering-a');run('which','voidc');run('which','voidls')
+ exported=json.loads(run('env').stdout)
+ assert exported['release_id']=='engineering-a'
+ settings=json.loads(run('env','--format','vscode').stdout)
+ assert settings['void.compiler.path']==exported['voidc'] and settings['void.server.path']==exported['voidls']
+ if os.name!='nt':
+  shell=run('env','--format','sh').stdout.decode()
+  observed=runner.run(['/bin/sh','-c',shell+'\nprintf "%s" "$PATH"'],cwd=work,env=dict(os.environ,PATH='/retained'))
+  assert observed.stdout.decode()==exported['bin']+':/retained'
+ run('env','--format','powershell')
  run('install','engineering-b','--activate',timeout=900)
  run('verify','engineering-b');run('list');run('doctor')
  forwarded=['','two words','"quote"','tail\\','雪😀','--looks-like-option','$(touch SHOULD_NOT_EXIST)']
@@ -41,6 +50,7 @@ with Service(options.fixtures) as server:
   lsp=run('run',release,'voidls','--','--entry',fixture,input=payload)
   assert b'"id":1' in lsp.stdout.replace(b' ',b'') and b'"capabilities"' in lsp.stdout,lsp.stdout
  run('rollback');assert json.loads((root/'control.json').read_bytes())['current']=='engineering-a'
+ assert json.loads(run('env').stdout)['release_id']=='engineering-a'
  run('run','default','voidc','--','--version');run('default','engineering-b')
  run('install','engineering-b','--activate')
  run('default','absent',expected=1)

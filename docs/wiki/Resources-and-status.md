@@ -12,7 +12,8 @@ The language includes typed functions, value and managed structs, constructors a
 fallible initialization, tagged/numeric enums and flags, generic interfaces,
 collections, nullable values/results, static members, custom iteration,
 structured async work, conditional compilation and audited native interoperability.
-Start at [Language basics](https://github.com/Shmellyorc/Void.Language/wiki/Language-basics) and follow the next-step links.
+Explicit pure `compile func` declarations and value methods support bounded
+constant evaluation. Start at [Language basics](https://github.com/Shmellyorc/Void.Language/wiki/Language-basics) and follow the next-step links.
 
 The [standard library](https://github.com/Shmellyorc/Void.Language/wiki/Standard-library) provides 29 source modules.
 [Packages and raylib](https://github.com/Shmellyorc/Void.Language/wiki/Packages-and-raylib) explains the verified native package
@@ -23,7 +24,7 @@ impose limits on an operation even when its declaration exists.
 
 | Topic | Current boundary |
 | --- | --- |
-| `compile func` | Planned; conditional source selection is implemented, compile-time function declaration/execution is not. |
+| Public VOIDUP distribution | Native manager implemented; no verified public bootstrap or production catalog. Linux private installation evidence only; Windows/macOS installation remains unqualified. |
 | Further IntelliSense completion improvements | Planned; current assistance and recovery have documented limits. |
 | Compact `if condition: return` | Deferred; write an indented body. |
 | Implicit async main or detached source tasks | Unavailable; use the explicit host and structured groups. |

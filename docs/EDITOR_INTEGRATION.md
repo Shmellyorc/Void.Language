@@ -1,5 +1,15 @@
 # VOID editor integration (Phase 11)
 
+## Select a VOIDUP toolchain
+
+After [VOIDUP installation](voidup/USAGE.md), run `voidup env --format vscode`
+and merge the printed `void.server.path` and `void.compiler.path` into editor
+settings. This explicitly selects matching native executables from the verified
+version. The extension uses its existing explicit-path and PATH discovery; it
+does not read or modify VOIDUP control state. A graphical VS Code/VSCodium window
+may not inherit your terminal PATH. After switching or rolling back, regenerate
+these paths and restart the server. Install a matching prepared VSIX separately.
+
 ## Local crash diagnostics (G90)
 
 In VS Code or VSCodium, enable `void.crashDiagnostics.enabled` in user/machine

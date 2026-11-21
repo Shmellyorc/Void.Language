@@ -61,6 +61,68 @@ std::string read(const fs::path& file) {
     return {std::istreambuf_iterator<char>(input),{}};
 }
 
+void preparation_scratch(const fs::path& root) {
+    const auto project=inspect_creation_root(root);
+    fs::path scratch;
+    with_project_scratch(project,[&](const auto& stage,const auto& reader) {
+        scratch=stage;
+        check(stage.parent_path()==root/".void","Preparation escaped project storage");
+        publish_project_directory(reader.inspect(stage),"inputs",{{"source","checked bytes"}},
+            [](const auto&,const auto&){},{},reader);
+        check(read(stage/"inputs/source")=="checked bytes","Preparation lost staged inputs");
+        const ProjectFiles expected{{"provider.descriptor","checked descriptor"},{"provider.dll","checked provider"}};
+        publish_project_directory(reader.inspect(stage),"catalog",
+            {{"provider.descriptor","checked descriptor"},{"provider.dll","checked provider"}},
+            [](const auto&,const auto&){},{},reader);
+#ifdef _WIN32
+        // The acquisition reservation stays live through catalog recapture.
+        // A default reader tries to repin its DELETE-open ancestor and fails.
+        bool sharing_violation=false;
+        try { (void)read_package_directory(stage/"catalog"); }
+        catch(const std::exception& error) {
+            sharing_violation=std::string_view(error.what()).find("Windows error 32")!=std::string_view::npos;
+        }
+        check(sharing_violation,"Default catalog reader did not exercise the reserved-ancestor sharing conflict");
+#endif
+        check(read_package_directory(stage/"catalog",reader)==expected,
+              "Reserved catalog recapture lost or changed prepared files");
+#ifdef _WIN32
+        const auto renamed=MoveFileExW(stage.c_str(),(stage.parent_path()/"unexpected rename").c_str(),0);
+        const auto rename_error=GetLastError();
+        check(!renamed && rename_error==ERROR_SHARING_VIOLATION,
+              "Catalog recapture weakened the active acquisition reservation");
+#endif
+    });
+    check(!fs::exists(scratch),"Successful preparation retained scratch");
+    std::ofstream(root/".void/user.txt")<<"keep";
+    fails([&]{with_project_scratch(project,[&](const auto& stage,const auto&) {
+        scratch=stage;
+        std::ofstream(stage/"partial")<<"partial output";
+        throw std::runtime_error("preparer failed");
+    });});
+    check(!fs::exists(scratch) && read(root/".void/user.txt")=="keep",
+          "Failed preparation removed user data or retained its scratch");
+#ifndef _WIN32
+    fs::permissions(root/".void",fs::perms::group_write,fs::perm_options::add);
+    fails([&]{with_project_scratch(project,[](const auto&,const auto&){});});
+    fs::permissions(root/".void",fs::perms::group_write,fs::perm_options::remove);
+    fs::rename(root/".void",root/"saved");
+    fs::create_directory_symlink(root/"saved",root/".void");
+    fails([&]{with_project_scratch(project,[](const auto&,const auto&){});});
+    check(read(root/"saved/user.txt")=="keep","Preparation followed an aliased workspace");
+    fs::remove(root/".void");
+    fs::rename(root/"saved",root/".void");
+    // A substituted stage never grants cleanup authority over the replacement.
+    fails([&]{with_project_scratch(project,[&](const auto& stage,const auto&) {
+        scratch=stage;
+        fs::rename(stage,root/".void/displaced");
+        fs::create_directory(stage);
+        std::ofstream(stage/"user.txt")<<"replacement";
+    });});
+    check(read(scratch/"user.txt")=="replacement","Preparation erased a substituted stage");
+#endif
+}
+
 #if defined(_WIN32) || defined(__linux__)
 void application_publication(const fs::path& root) {
     const auto parent=inspect_creation_root(root);
@@ -138,6 +200,9 @@ int main(int argc,char** argv) {
 
     try {
         Fixture fixture;
+        const auto preparation=fixture.root/"preparation";
+        fs::create_directory(preparation);
+        preparation_scratch(preparation);
         auto root=fixture.root/"existing";
         fs::create_directory(root);
         fails<std::system_error>([&]{plan_creation(root,{},fail_entropy);});
