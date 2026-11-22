@@ -15,6 +15,9 @@
 - [G96 public installer candidate](projects/G96_VOIDUP_PUBLIC_INSTALLER.md):
   authenticated first install, platform bootstraps, production trust preparation
   and native qualification limits.
+- [VOIDUP production readiness](projects/VOIDUP_PRODUCTION_READINESS.md):
+  support-floor builds, reproducible packages, platform integration, distribution
+  preparation and the remaining independent/native/publication boundaries.
 
 - [G93 pure compile functions candidate](projects/G93_COMPILE_FUNCTIONS.md):
   shared typed constant evaluation, pure value methods, limits and editor evidence.

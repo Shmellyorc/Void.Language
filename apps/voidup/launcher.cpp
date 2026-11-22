@@ -12,6 +12,9 @@
 #include <chrono>
 #ifdef _WIN32
 #define NOMINMAX
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0A00
+#endif
 #include <windows.h>
 #include <shlobj.h>
 #else
@@ -37,6 +40,16 @@
 namespace fs = std::filesystem;
 namespace {
 void require(bool ok, const char* message) { if (!ok) throw std::runtime_error(message); }
+fs::path native_path(const fs::path& path) {
+#ifdef _WIN32
+    auto value=fs::absolute(path).lexically_normal().make_preferred().wstring();
+    if(value.rfind(L"\\\\?\\",0)==0)return value;
+    if(value.rfind(L"\\\\",0)==0)return L"\\\\?\\UNC\\"+value.substr(2);
+    return L"\\\\?\\"+value;
+#else
+    return path;
+#endif
+}
 #ifndef _WIN32
 struct descriptor {
     int fd=-1;explicit descriptor(int value):fd(value){}~descriptor(){if(fd>=0)close(fd);}
@@ -95,9 +108,9 @@ fs::path default_root() {
 #endif
 }
 void safe(const fs::path& path, bool directory, bool private_mode=true) {
-    require(!fs::is_symlink(fs::symlink_status(path)),"Refusing a linked integration path");
+    require(!fs::is_symlink(fs::symlink_status(native_path(path))),"Refusing a linked integration path");
 #ifdef _WIN32
-    auto attributes=GetFileAttributesW(path.c_str());require(attributes!=INVALID_FILE_ATTRIBUTES && !(attributes&FILE_ATTRIBUTE_REPARSE_POINT),"Refusing a reparse integration path");
+    auto attributes=GetFileAttributesW(native_path(path).c_str());require(attributes!=INVALID_FILE_ATTRIBUTES && !(attributes&FILE_ATTRIBUTE_REPARSE_POINT),"Refusing a reparse integration path");
     require(directory?bool(attributes&FILE_ATTRIBUTE_DIRECTORY):!(attributes&FILE_ATTRIBUTE_DIRECTORY),"Unexpected integration file type");
     // VOIDUP pins ordinary no-reparse directories; new children inherit ACLs.
     (void)private_mode;
@@ -116,14 +129,14 @@ void directory(const fs::path& path,bool exclusive=false) {
         require(child.fd>=0&&!fstat(child.fd,&s)&&S_ISDIR(s.st_mode),"Unsafe integration directory");return;
     }
 #endif
-    auto created=fs::create_directory(path);require(created||!exclusive,"Cannot exclusively create integration directory");
+    auto created=fs::create_directory(native_path(path));require(created||!exclusive,"Cannot exclusively create integration directory");
     safe(path,true);
 }
 struct integration_lock {
 #ifdef _WIN32
     HANDLE file=INVALID_HANDLE_VALUE;
     explicit integration_lock(const fs::path& root) {
-        file=CreateFileW((root/"writer.lock").c_str(),GENERIC_READ|GENERIC_WRITE,0,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr);
+        file=CreateFileW(native_path(root/"writer.lock").c_str(),GENERIC_READ|GENERIC_WRITE,0,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr);
         require(file!=INVALID_HANDLE_VALUE,"VOIDUP is busy; retry setup");
     }
     ~integration_lock(){if(file!=INVALID_HANDLE_VALUE)CloseHandle(file);}
@@ -147,15 +160,15 @@ std::string read(const fs::path& path, std::size_t limit) {
         std::string result;char bytes[8192];for(;;){auto n=::read(file.fd,bytes,sizeof bytes);if(n<0&&errno==EINTR)continue;require(n>=0,"Cannot read retained bootstrap");if(!n)break;result.append(bytes,n);require(result.size()<=limit,"Retained bootstrap grew beyond its bound");}return result;
     }
 #endif
-    require(fs::file_size(path)<=limit,"Integration input exceeds its bound");
-    std::ifstream in(path,std::ios::binary);require(bool(in),"Cannot open integration input");
+    require(fs::file_size(native_path(path))<=limit,"Integration input exceeds its bound");
+    std::ifstream in(native_path(path),std::ios::binary);require(bool(in),"Cannot open integration input");
     std::string result;char buffer[8192];
     while(in){in.read(buffer,sizeof buffer);auto count=std::size_t(in.gcount());require(count<=limit-result.size(),"Integration input grew beyond its bound");result.append(buffer,count);}
     require(in.eof()&&!in.bad(),"Cannot read integration input");return result;
 }
 void write_new(const fs::path& path,const std::string& bytes,bool executable=false) {
 #ifdef _WIN32
-    HANDLE f=CreateFileW(path.c_str(),GENERIC_WRITE,0,nullptr,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,nullptr);
+    HANDLE f=CreateFileW(native_path(path).c_str(),GENERIC_WRITE,0,nullptr,CREATE_NEW,FILE_ATTRIBUTE_NORMAL,nullptr);
     require(f!=INVALID_HANDLE_VALUE,"Cannot exclusively create integration file");DWORD written=0;
     bool ok=WriteFile(f,bytes.data(),DWORD(bytes.size()),&written,nullptr) && written==bytes.size() && FlushFileBuffers(f);CloseHandle(f);
     require(ok,"Cannot complete integration file");
@@ -167,7 +180,7 @@ void write_new(const fs::path& path,const std::string& bytes,bool executable=fal
 }
 void replace(const fs::path& source,const fs::path& destination) {
 #ifdef _WIN32
-    require(MoveFileExW(source.c_str(),destination.c_str(),MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH),"Cannot publish integration file");
+    require(MoveFileExW(native_path(source).c_str(),native_path(destination).c_str(),MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH),"Cannot publish integration file");
 #else
     descriptor from(parent_descriptor(source)),to(parent_descriptor(destination));
     require(!renameat(from.fd,source.filename().c_str(),to.fd,destination.filename().c_str()),"Cannot publish integration file");
@@ -180,6 +193,31 @@ std::wstring quote(const std::wstring& value) {
     for(auto c:value){if(c==L'\\'){++slashes;continue;}if(c==L'\"')out.append(slashes*2+1,L'\\');else out.append(slashes,L'\\');slashes=0;out+=c;}
     out.append(slashes*2,L'\\');return out+L'\"';
 }
+#endif
+#ifdef _WIN32
+struct native_handle {
+    HANDLE value=nullptr;
+    explicit native_handle(HANDLE handle):value(handle){}
+    ~native_handle(){if(value&&value!=INVALID_HANDLE_VALUE)CloseHandle(value);}
+    native_handle(const native_handle&)=delete;
+    native_handle& operator=(const native_handle&)=delete;
+};
+struct process_attributes {
+    LPPROC_THREAD_ATTRIBUTE_LIST list=nullptr;
+    process_attributes() {
+        SIZE_T size=0;InitializeProcThreadAttributeList(nullptr,1,0,&size);
+        require(size>0,"Cannot size launcher process attributes");
+        list=static_cast<LPPROC_THREAD_ATTRIBUTE_LIST>(HeapAlloc(GetProcessHeap(),0,size));
+        require(list!=nullptr,"Cannot allocate launcher process attributes");
+        if(!InitializeProcThreadAttributeList(list,1,0,&size)){
+            HeapFree(GetProcessHeap(),0,list);list=nullptr;
+            throw std::runtime_error("Cannot initialize launcher process attributes");
+        }
+    }
+    ~process_attributes(){if(list){DeleteProcThreadAttributeList(list);HeapFree(GetProcessHeap(),0,list);}}
+    process_attributes(const process_attributes&)=delete;
+    process_attributes& operator=(const process_attributes&)=delete;
+};
 #endif
 // Editor tasks and LSP clients signal the directly spawned proxy. Keep its
 // redirected manager/compiler descendants in one group and relay cancellation.
@@ -232,9 +270,20 @@ int run(const fs::path& executable,const std::vector<std::string>& args) {
 #ifdef _WIN32
     auto wide=[](const std::string& s){auto n=MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,s.data(),int(s.size()),nullptr,0);require(n||s.empty(),"Invalid UTF-8 argument");std::wstring w(n,L'\0');MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,s.data(),int(s.size()),w.data(),n);return w;};
     auto command=quote(executable.wstring());for(const auto& a:args)command+=L" "+quote(wide(a));
-    STARTUPINFOW si{};si.cb=sizeof si;PROCESS_INFORMATION pi{};
-    require(CreateProcessW(executable.c_str(),command.data(),nullptr,nullptr,TRUE,0,nullptr,nullptr,&si,&pi),"Cannot launch native VOIDUP");
-    CloseHandle(pi.hThread);WaitForSingleObject(pi.hProcess,INFINITE);DWORD code=1;GetExitCodeProcess(pi.hProcess,&code);CloseHandle(pi.hProcess);return int(code);
+    // Creation-time assignment avoids the orphan window between starting a
+    // suspended process and assigning it. This job handle is never inherited.
+    native_handle job(CreateJobObjectW(nullptr,nullptr));require(job.value!=nullptr,"Cannot create launcher job");
+    JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits{};limits.BasicLimitInformation.LimitFlags=JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+    require(SetInformationJobObject(job.value,JobObjectExtendedLimitInformation,&limits,sizeof limits),"Cannot configure launcher job");
+    process_attributes attributes;
+    require(UpdateProcThreadAttribute(attributes.list,0,PROC_THREAD_ATTRIBUTE_JOB_LIST,&job.value,sizeof job.value,nullptr,nullptr),"Cannot assign launcher job at process creation");
+    STARTUPINFOEXW si{};si.StartupInfo.cb=sizeof si;si.lpAttributeList=attributes.list;PROCESS_INFORMATION pi{};
+    si.StartupInfo.dwFlags=STARTF_USESTDHANDLES;
+    si.StartupInfo.hStdInput=GetStdHandle(STD_INPUT_HANDLE);si.StartupInfo.hStdOutput=GetStdHandle(STD_OUTPUT_HANDLE);si.StartupInfo.hStdError=GetStdHandle(STD_ERROR_HANDLE);
+    require(CreateProcessW(executable.c_str(),command.data(),nullptr,nullptr,TRUE,EXTENDED_STARTUPINFO_PRESENT,nullptr,nullptr,&si.StartupInfo,&pi),"Cannot launch native VOIDUP");
+    native_handle process(pi.hProcess),thread(pi.hThread);
+    require(WaitForSingleObject(process.value,INFINITE)==WAIT_OBJECT_0,"Cannot wait for native VOIDUP");
+    DWORD code=1;require(GetExitCodeProcess(process.value,&code),"Cannot read native VOIDUP exit code");return int(code);
 #else
     std::vector<char*> argv{const_cast<char*>(executable.c_str())};for(const auto& a:args)argv.push_back(const_cast<char*>(a.c_str()));argv.push_back(nullptr);
     cancellation_scope cancellation(!isatty(STDIN_FILENO)&&!isatty(STDERR_FILENO));
@@ -273,17 +322,43 @@ void copy_profile_access(int source,int target,const struct stat& original) {
 #endif
 void integrate_path(const fs::path& bin) {
 #ifdef _WIN32
-    HKEY key{};require(RegCreateKeyExW(HKEY_CURRENT_USER,L"Environment",0,nullptr,0,KEY_QUERY_VALUE|KEY_SET_VALUE,nullptr,&key,nullptr)==ERROR_SUCCESS,"Cannot open per-user environment");
-    DWORD type=REG_EXPAND_SZ,size=0;auto status=RegQueryValueExW(key,L"Path",nullptr,&type,nullptr,&size);
-    require((status==ERROR_SUCCESS||status==ERROR_FILE_NOT_FOUND)&&size<=65534&&(type==REG_SZ||type==REG_EXPAND_SZ),"Invalid per-user PATH");
-    std::wstring value(size/sizeof(wchar_t),L'\0');if(size)require(RegQueryValueExW(key,L"Path",nullptr,&type,reinterpret_cast<BYTE*>(value.data()),&size)==ERROR_SUCCESS,"Cannot read per-user PATH");
-    while(!value.empty()&&value.back()==L'\0')value.pop_back();auto candidate=bin.wstring();require(candidate.find(L';')==candidate.npos,"Install root contains the PATH separator");
-    bool present=false;std::size_t start=0;while(start<=value.size()){auto end=value.find(L';',start);auto part=value.substr(start,end-start);if(_wcsicmp(part.c_str(),candidate.c_str())==0)present=true;if(end==value.npos)break;start=end+1;}
-    if(!present){value=candidate+(value.empty()?L"":L";"+value);require(value.size()<32767,"Per-user PATH is too long");require(RegSetValueExW(key,L"Path",0,type,reinterpret_cast<const BYTE*>(value.c_str()),DWORD((value.size()+1)*sizeof(wchar_t)))==ERROR_SUCCESS,"Cannot save per-user PATH");}
-    RegCloseKey(key);DWORD_PTR ignored{};SendMessageTimeoutW(HWND_BROADCAST,WM_SETTINGCHANGE,0,reinterpret_cast<LPARAM>(L"Environment"),SMTO_ABORTIFHUNG,5000,&ignored);
+    struct registry_key {HKEY value=nullptr;~registry_key(){if(value)RegCloseKey(value);}} key;
+    require(RegCreateKeyExW(HKEY_CURRENT_USER,L"Environment",0,nullptr,0,KEY_QUERY_VALUE|KEY_SET_VALUE,nullptr,&key.value,nullptr)==ERROR_SUCCESS,"Cannot open per-user environment");
+    DWORD type=REG_EXPAND_SZ,size=0;
+    constexpr auto flags=RRF_RT_REG_SZ|RRF_RT_REG_EXPAND_SZ|RRF_NOEXPAND;
+    auto status=RegGetValueW(key.value,nullptr,L"Path",flags,&type,nullptr,&size);
+    require((status==ERROR_SUCCESS||status==ERROR_FILE_NOT_FOUND)&&size<=65534&&size%sizeof(wchar_t)==0,"Invalid per-user PATH");
+    std::wstring value;
+    if(status==ERROR_SUCCESS){
+        value.resize(size/sizeof(wchar_t)+1,L'\0');DWORD capacity=DWORD(value.size()*sizeof(wchar_t));
+        require(RegGetValueW(key.value,nullptr,L"Path",flags,&type,value.data(),&capacity)==ERROR_SUCCESS,"Cannot read per-user PATH");
+        value.resize(capacity/sizeof(wchar_t));while(!value.empty()&&value.back()==L'\0')value.pop_back();
+        require(value.find(L'\0')==value.npos,"Per-user PATH contains an embedded terminator");
+    } else type=REG_EXPAND_SZ;
+    auto candidate=bin.wstring();require(candidate.find(L';')==candidate.npos,"Install root contains the PATH separator");
+    auto comparable=[&](std::wstring part){
+        if(part.size()>=2&&part.front()==L'"'&&part.back()==L'"')part=part.substr(1,part.size()-2);
+        if(type==REG_EXPAND_SZ){
+            auto length=ExpandEnvironmentStringsW(part.c_str(),nullptr,0);require(length>0&&length<=32767,"Cannot compare expanded PATH entry");
+            std::wstring expanded(length,L'\0');auto written=ExpandEnvironmentStringsW(part.c_str(),expanded.data(),length);
+            require(written>0&&written<=length,"PATH environment changed; retry setup");expanded.resize(written-1);part=std::move(expanded);
+        }
+        std::replace(part.begin(),part.end(),L'/',L'\\');
+        part=fs::path(part).lexically_normal().wstring();
+        while(part.size()>3&&part.back()==L'\\')part.pop_back();return part;
+    };
+    auto expected=comparable(candidate);bool present=false;std::size_t start=0;
+    while(start<=value.size()){
+        auto end=value.find(L';',start);auto part=comparable(value.substr(start,end-start));
+        if(_wcsicmp(part.c_str(),expected.c_str())==0)present=true;
+        if(end==value.npos)break;start=end+1;
+    }
+    if(!present){value=candidate+(value.empty()?L"":L";"+value);require(value.size()<32767,"Per-user PATH is too long");require(RegSetValueExW(key.value,L"Path",0,type,reinterpret_cast<const BYTE*>(value.c_str()),DWORD((value.size()+1)*sizeof(wchar_t)))==ERROR_SUCCESS,"Cannot save per-user PATH");}
+    DWORD_PTR ignored{};SendMessageTimeoutW(HWND_BROADCAST,WM_SETTINGCHANGE,0,reinterpret_cast<LPARAM>(L"Environment"),SMTO_ABORTIFHUNG,5000,&ignored);
 #else
     auto location=home();safe(location,true,false);int dir=open(location.c_str(),O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);require(dir>=0,"Cannot open home for PATH integration");
-    auto line="\n# VOIDUP terminal tools\nexport PATH="+shell_quote(bin.string())+":\"$PATH\"\n";
+    auto legacy="\n# VOIDUP terminal tools\nexport PATH="+shell_quote(bin.string())+":\"$PATH\"\n";
+    auto line="\n# VOIDUP terminal tools\ncase \":${PATH-}:\" in\n  *:"+shell_quote(bin.string())+":*) ;;\n  *) export PATH="+shell_quote(bin.string())+"${PATH:+:\"$PATH\"} ;;\nesac\n";
     require(bin.string().find(':')==std::string::npos,"Install root contains the PATH separator");
     std::vector<std::string> profiles{".profile",".bashrc",".zshenv"};
     for(const auto& optional:{".bash_profile",".bash_login"})if(fs::exists(location/optional))profiles.emplace_back(optional);
@@ -293,6 +368,9 @@ void integrate_path(const fs::path& bin) {
         else {require(!fstat(source.fd,&old)&&S_ISREG(old.st_mode)&&old.st_nlink==1&&old.st_size<=1048576,"Refusing an unsafe shell profile");
             char buffer[8192];for(;;){auto n=::read(source.fd,buffer,sizeof buffer);if(n<0&&errno==EINTR)continue;require(n>=0,"Cannot read shell profile");if(!n)break;bytes.append(buffer,n);require(bytes.size()<=1048576,"Shell profile grew beyond its bound");}}
         if(bytes.find(line)!=std::string::npos)continue;
+        // Migrate only our exact previous snippet, preserving other contents.
+        auto previous=bytes.find(legacy);
+        if(previous!=std::string::npos)bytes.erase(previous,legacy.size());
         auto temporary=".voidup-profile-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
         descriptor output(openat(dir,temporary.c_str(),O_WRONLY|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC,0666));require(output.fd>=0,"Cannot stage shell profile");
         if(exists){descriptor writable(openat(dir,name.c_str(),O_WRONLY|O_NOFOLLOW|O_NONBLOCK|O_CLOEXEC));require(writable.fd>=0,"Shell profile is not writable");struct stat current{};require(!fstat(writable.fd,&current)&&current.st_dev==old.st_dev&&current.st_ino==old.st_ino,"Shell profile changed; retry setup");copy_profile_access(source.fd,output.fd,old);}
@@ -340,21 +418,21 @@ int run_main(int argc,char** argv) try {
 #endif
     directory(root/"bootstraps");directory(root/"bin");auto retained=root/"bootstraps"/VOIDUP_BOOTSTRAP_ID;
     auto marker=root/"bin/voidup-integration.txt";
-    if(!fs::exists(marker)){
-        require(fs::is_empty(root/"bin"),"Refusing to adopt unrelated integration files");write_new(marker,"VOIDUP platform integration v1\n");
+    if(!fs::exists(native_path(marker))){
+        require(fs::is_empty(native_path(root/"bin")),"Refusing to adopt unrelated integration files");write_new(marker,"VOIDUP platform integration v1\n");
     } else {safe(marker,false);require(read(marker,128)=="VOIDUP platform integration v1\n","Unknown integration marker");}
-    if(!fs::exists(retained)) {
-        require(std::distance(fs::directory_iterator(root/"bootstraps"),fs::directory_iterator{})<64,"Retained bootstrap copy limit reached");
+    if(!fs::exists(native_path(retained))) {
+        require(std::distance(fs::directory_iterator(native_path(root/"bootstraps")),fs::directory_iterator{})<64,"Retained bootstrap copy limit reached");
         auto pending=root/"bootstraps"/(std::string(VOIDUP_BOOTSTRAP_ID)+".pending-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()));directory(pending,true);
         std::size_t total=0,count=0;
-        for(const auto& item:fs::recursive_directory_iterator(bundle)) {
-            require(!item.is_symlink(),"Bootstrap packages must contain no links");auto destination=pending/fs::relative(item.path(),bundle);
+        for(const auto& item:fs::recursive_directory_iterator(native_path(bundle))) {
+            require(!item.is_symlink(),"Bootstrap packages must contain no links");auto destination=pending/item.path().lexically_relative(native_path(bundle));
             if(item.is_directory()){directory(destination);continue;}
             require(item.is_regular_file()&&++count<=10000,"Unexpected bootstrap member");auto bytes=read(item.path(),128*1024*1024);total+=bytes.size();require(total<=512*1024*1024,"Bootstrap copy exceeds local limit");
             write_new(destination,bytes,item.path().parent_path()==self.parent_path());
         }
 #ifdef _WIN32
-        require(MoveFileW(pending.c_str(),retained.c_str()),"Cannot publish retained bootstrap");
+        require(MoveFileW(native_path(pending).c_str(),native_path(retained).c_str()),"Cannot publish retained bootstrap");
 #else
         descriptor parent(parent_descriptor(pending));
 #ifdef __APPLE__
@@ -367,11 +445,11 @@ int run_main(int argc,char** argv) try {
     } else {
         safe(retained,true);
         std::size_t source_count=0,target_count=0;
-        for(const auto& item:fs::recursive_directory_iterator(bundle)) {
-            require(!item.is_symlink(),"Bootstrap source contains a link");auto target=retained/fs::relative(item.path(),bundle);safe(target,item.is_directory());
+        for(const auto& item:fs::recursive_directory_iterator(native_path(bundle))) {
+            require(!item.is_symlink(),"Bootstrap source contains a link");auto target=retained/item.path().lexically_relative(native_path(bundle));safe(target,item.is_directory());
             if(item.is_regular_file())require(read(item.path(),128*1024*1024)==read(target,128*1024*1024),"Retained bootstrap differs; refusing replacement");++source_count;
         }
-        for(const auto& item:fs::recursive_directory_iterator(retained)){(void)item;++target_count;}
+        for(const auto& item:fs::recursive_directory_iterator(native_path(retained))){(void)item;++target_count;}
         require(source_count==target_count,"Unexpected retained bootstrap contents");
     }
     auto copied=read(self,16*1024*1024);
@@ -380,7 +458,7 @@ int run_main(int argc,char** argv) try {
 #ifdef _WIN32
         target+=".exe";
 #endif
-        if(fs::exists(target))safe(target,false);auto temporary=target;temporary+=".new-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());write_new(temporary,copied,true);replace(temporary,target);
+        if(fs::exists(native_path(target)))safe(target,false);auto temporary=target;temporary+=".new-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());write_new(temporary,copied,true);replace(temporary,target);
     }
 #ifndef _WIN32
     root_still_visible();

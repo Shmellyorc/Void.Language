@@ -4,7 +4,7 @@ Installs actual compiler build outputs, materializes an LLVM subset, inventories
 every byte, then signs a private catalog using separately held test keys.
 """
 from pathlib import Path
-import argparse, hashlib, json, os, re, shutil, subprocess, time, zipfile
+import argparse, hashlib, json, os, platform, re, shutil, subprocess, sys, time, zipfile
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, Encoding, PublicFormat
 from engineering_storage import evidence_directory
 
@@ -22,6 +22,13 @@ def sha(path):
             h.update(block)
     return h.hexdigest()
 
+def write_member(archive,path,name,epoch,executable=False,directory=False):
+    info=zipfile.ZipInfo(name,time.gmtime(epoch)[:6]);info.create_system=3
+    info.external_attr=((0o40755 if directory else 0o100755 if executable else 0o100644)<<16)|(0x10 if directory else 0)
+    # Native curated ZIP directories have zero sizes/CRC. Deflating an empty
+    # directory produces two compressed bytes and correctly fails admission.
+    archive.writestr(info,b'' if directory else path.read_bytes(),compress_type=zipfile.ZIP_STORED if directory else zipfile.ZIP_DEFLATED,compresslevel=1)
+
 def sign(catalog_bytes, key_dir, signers=(1, 2)):
     signatures = []
     public_keys = re.findall(r'"([0-9a-f]{64})"', (ROOT/'apps/voidup/trust_keys.void').read_text())
@@ -33,6 +40,8 @@ def sign(catalog_bytes, key_dir, signers=(1, 2)):
     return encoded(dict(schema=1, signatures=signatures))
 
 def produce(build, release_id, output, sdk, host=HOST, configuration=None):
+    expected={('Linux','x86_64'):HOST,('Windows','amd64'):'windows-x86_64',('Windows','x86_64'):'windows-x86_64',('Darwin','arm64'):'macos-aarch64-14.0'}.get((platform.system(),platform.machine().lower()))
+    if host!=expected:raise ValueError('Toolchain host differs from the native producer')
     prefix = output / 'producer' / release_id
     if prefix.exists():
         raise RuntimeError(f'refusing to replace producer directory: {prefix}')
@@ -56,7 +65,7 @@ def produce(build, release_id, output, sdk, host=HOST, configuration=None):
     version = subprocess.check_output([str(prefix / 'bin'/('voidc'+suffix)), '--version'], text=True)
     identity = re.search(r'Build identity: ([0-9a-f]{64})', version).group(1)
     (prefix / 'sdk/bin').mkdir(parents=True)
-    tools=[('clang.exe','clang.exe'),('lld-link.exe','lld-link.exe')] if suffix else [('clang-23','clang'),('lld','ld.lld')]
+    tools=[('clang.exe','clang.exe'),('lld-link.exe','lld-link.exe')] if suffix else [('clang','clang'),('ld64.lld','ld64.lld')] if sys.platform=='darwin' else [('clang-23','clang'),('lld','ld.lld')]
     for original, name in tools:
         shutil.copy2(sdk / 'bin' / original, prefix / 'sdk/bin' / name)
     shutil.copytree(sdk / 'lib/clang/23', prefix / 'sdk/lib/clang/23', symlinks=False)
@@ -64,7 +73,21 @@ def produce(build, release_id, output, sdk, host=HOST, configuration=None):
     lines = native.read_text().splitlines()
     assert lines[0] == 'VOID native 23.1.4 v2'
     lines[1:3] = ['../sdk/bin/clang.exe', '../sdk/bin/lld-link.exe'] if suffix else ['../sdk/bin/clang', '../sdk/bin/ld.lld']
+    if suffix:lines.append('-fuse-ld=lld')
+    native_audit={}
+    if sys.platform=='darwin':
+        from voidup_macos import relocate,relocate_manifest,driver_wrapper
+        lines=relocate_manifest(lines)
+        wrapper=prefix/'sdk/bin/void-clang';wrapper.write_text(driver_wrapper());wrapper.chmod(0o755)
+        origins={prefix/'bin'/name:prefix/'bin'/name for name in ['voidc','voidls']}
+        origins.update({prefix/'sdk/bin'/name:sdk/'bin'/original for original,name in tools})
+        native_audit=relocate(prefix,origins,[prefix,sdk,build,ROOT/'.toolchains'])
     native.write_text('\n'.join(lines) + '\n')
+    if sys.platform!='darwin':
+        from voidup_dependencies import audit
+        images=[prefix/'bin'/('voidc'+suffix),prefix/'bin'/('voidls'+suffix)]+[prefix/'sdk/bin'/name for _,name in tools]
+        if not suffix:images+=[p for p in (prefix/'lib/void').glob('*.so*') if p.is_file()]
+        native_audit=audit(prefix,sdk,images)
     (prefix / 'toolchain.json').write_bytes(encoded(dict(schema=1, release_id=release_id,
         host=host, build_identity=identity, llvm_version='23.1.4')))
     paths = sorted(prefix.rglob('*'), key=lambda p: (not p.is_dir(), len(p.relative_to(prefix).parts), p.as_posix()))
@@ -82,11 +105,16 @@ def produce(build, release_id, output, sdk, host=HOST, configuration=None):
             members.append(dict(name=name, size=size, sha256='' if path.is_dir() else sha(path),
                                 executable=executable, directory=path.is_dir()))
             expanded += size
-            archive.write(path, name)
+            epoch=int(os.environ.get('SOURCE_DATE_EPOCH','315532800'))
+            if not 315532800<=epoch<=4354819199:raise ValueError('SOURCE_DATE_EPOCH must fit the ZIP timestamp range')
+            write_member(archive,path,name,epoch,executable,path.is_dir())
     inventory = output / 'www/inventories' / (release_id + '.json')
     inventory.parent.mkdir(parents=True, exist_ok=True)
     inventory.write_bytes(encoded(dict(schema=1, release_id=release_id, host=host,
         build_identity=identity, expanded_bytes=expanded, members=members)))
+    (output/(release_id+'.package.json')).write_bytes(encoded(dict(schema=1,host=host,
+        build_identity=identity,archive_bytes=artifact.stat().st_size,expanded_bytes=expanded,
+        native_dependency_audit=native_audit,source_date_epoch=epoch)))
     return dict(id=release_id, host=host, build_identity=identity,
         artifact_url='packages/' + artifact.name, artifact_bytes=artifact.stat().st_size,
         artifact_sha256=sha(artifact), inventory_url='inventories/' + inventory.name,

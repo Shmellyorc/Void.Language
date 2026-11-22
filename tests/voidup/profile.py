@@ -48,5 +48,19 @@ with tempfile.TemporaryDirectory(prefix='voidup-profile-') as directory:
         after = [state(profile) for profile in profiles]
         assert before == after, {'before': before, 'after': after}
         assert all(profile.read_text().startswith('# preserve developer settings\n') for profile in profiles)
+    # Login/interactive startup may source several managed profiles. Repeated
+    # sourcing must preserve unrelated entries and add exactly one tools path.
+    for initial in ('/usr/bin:/bin', '', str(home/'bin')+':/usr/bin'):
+        result=subprocess.run(['/bin/sh','-c','. "$HOME/.profile"; . "$HOME/.bashrc"; . "$HOME/.profile"; printf "%s" "$PATH"'],
+                              env=dict(os.environ,HOME=str(home),PATH=initial),capture_output=True,text=True,check=True)
+        parts=result.stdout.split(':')
+        assert parts.count(str(home/'bin'))==1 and '' not in parts,parts
+        assert [x for x in parts if x!=str(home/'bin')]==[x for x in initial.split(':') if x and x!=str(home/'bin')],parts
+    # Migrate the exact G96 export while keeping surrounding user bytes/access.
+    quoted="'"+str(home/'bin').replace("'", "'\"'\"'")+"'"
+    profiles[0].write_text('# preserve developer settings\n\n# VOIDUP terminal tools\nexport PATH='+quoted+':"$PATH"\n# after managed export\n')
+    subprocess.run([str(binary),str(home/'bin')],env=dict(os.environ,HOME=str(home)),check=True,timeout=20)
+    contents=profiles[0].read_text()
+    assert contents.count('# VOIDUP terminal tools')==1 and '# after managed export\n' in contents
 print('PASS: profile owner/group/mode, named ACL and absent ACL preserved; idempotent retry')
 print('Supplementary-group ownership exercised:', group != os.getgid())

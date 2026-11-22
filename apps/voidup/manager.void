@@ -236,7 +236,7 @@ func up_environment(context: up_context, release_id: string) -> [string]:
     var environment: [string] = []
     # Preserve consent policy/storage and the user's desktop session. Stable
     # proxies must behave like the selected compiler for these OS inputs.
-    for name in ["HOME", "USERPROFILE", "SYSTEMROOT", "WINDIR", "TMPDIR", "TMP", "TEMP", "LANG", "LC_ALL", "TERM", "CI", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_STATE_HOME", "XDG_RUNTIME_DIR", "DISPLAY", "WAYLAND_DISPLAY", "XAUTHORITY", "DBUS_SESSION_BUS_ADDRESS"]:
+    for name in ["HOME", "USERPROFILE", "SYSTEMROOT", "WINDIR", "PROGRAMDATA", "TMPDIR", "TMP", "TEMP", "LANG", "LC_ALL", "TERM", "CI", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_STATE_HOME", "XDG_RUNTIME_DIR", "DISPLAY", "WAYLAND_DISPLAY", "XAUTHORITY", "DBUS_SESSION_BUS_ADDRESS"]:
         if os.env(name) is Ok(var item):
             environment.push(name + "=" + item)
     # Compiler/loader overrides and caller PATH never select executables or SDKs.

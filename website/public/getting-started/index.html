@@ -26,12 +26,38 @@
       <h1 class="page-title">Start exploring <span class="gradient">VOID.</span></h1>
       <p class="section-lead">The VOID compiler is in active development. There are no public builds available yet.</p>
     </div>
-    <p>Developers with a source checkout can follow the <a href="#source-installation">source installation workflow</a>. Start with the prerequisites for <a href="#linux">Linux x64</a>, <a href="#windows">Windows x64</a> or <a href="#macos">macOS ARM64</a>.</p>
+    <p>The <a href="#voidup">VOIDUP installer</a> is being prepared. Developers with a source checkout can follow the <a href="#source-installation">source installation workflow</a>. Start with the prerequisites for <a href="#linux">Linux x64</a>, <a href="#windows">Windows x64</a> or <a href="#macos">macOS ARM64</a>.</p>
     <div class="features-grid">
       <a class="topic-card" href="/docs/syntax/"><h2>Learn the language</h2><p>Start with Syntax Basics. Read a small program and see how its input becomes a result.</p></a>
       <a class="topic-card" href="/examples/"><h2>Explore examples</h2><p>Browse verified VOID programs by topic and follow each one from source to output.</p></a>
       <a class="topic-card" href="/roadmap/"><h2>See the roadmap</h2><p>See which features work today, what is being tested and what is planned.</p></a>
     </div>
+  </section>
+  <section id="voidup" class="section container installation" aria-labelledby="voidup-heading">
+    <header class="install-intro">
+      <p class="eyebrow">VOIDUP</p>
+      <h2 id="voidup-heading">Download, install, start coding</h2>
+      <p>VOIDUP will install the latest compatible stable VOID release and make the compiler and language server available in a new terminal. Running the installer will not require Python, Node.js, CMake or a separate LLVM installation.</p>
+    </header>
+    <div class="install-platforms">
+      <section class="start-card install-platform" aria-labelledby="voidup-linux-heading">
+        <h3 id="voidup-linux-heading">Linux x64</h3>
+        <p>Ubuntu 24.04 or a compatible system.</p>
+        <p>Download not available yet.</p>
+      </section>
+      <section class="start-card install-platform" aria-labelledby="voidup-windows-heading">
+        <h3 id="voidup-windows-heading">Windows x64</h3>
+        <p>Per-user installation with terminal PATH integration.</p>
+        <p>Download not available yet.</p>
+      </section>
+      <section class="start-card install-platform" aria-labelledby="voidup-macos-heading">
+        <h3 id="voidup-macos-heading">macOS ARM64</h3>
+        <p>Apple Silicon. Native distribution testing is still in progress.</p>
+        <p>Download not available yet.</p>
+      </section>
+    </div>
+    <p>VOIDUP verifies signed release metadata and downloaded toolchains. Installing VOID does not approve native libraries: the compiler asks for your consent when a project needs it.</p>
+    <p>Native application builds also need the platform's C/C++ development files. These are separate from the installer requirements.</p>
   </section>
   <section id="source-installation" class="section container installation" aria-labelledby="installation-heading">
     <header class="install-intro">

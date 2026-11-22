@@ -1,5 +1,7 @@
 use "./model.void" as model
 use "./transport.void" as transport
+use "./cli.void" as cli
+use path
 use net/http as http
 
 func ordered(first: string, second: string, expected: i32) -> bool:
@@ -15,6 +17,18 @@ func redirect_allowed(source: string, destination: string) -> bool:
     return false
 
 func main() -> i32:
+    if cli.up_parse(["--help"]) is Ok(var options):
+        if path.filename(options.working_directory) is Ok(var leaf):
+            if leaf == "":
+                if path.root(options.working_directory) is Ok(var cwd_root):
+                    if options.working_directory != cwd_root:
+                        return 23
+                else:
+                    return 24
+        else:
+            return 25
+    else:
+        return 26
     if not ordered("1.10.0", "1.9.0", 1) or not ordered("2.0.0", "1.999.999", 1) or not ordered("1.0.0", "1.0.0", 0) or not ordered("1.0.1", "1.1.0", -1):
         return 10
     for version in ["1.0", "01.2.3", "1.2.3-beta", "1.2.3+build", "1.2.-1", "1.2.3.4", "1.2.9999999999"]:

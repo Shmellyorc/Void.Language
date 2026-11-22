@@ -1,4 +1,4 @@
-"""Build the VOID source application and a relocatable Linux bootstrap prefix.
+"""Build the VOID source application and its native platform bootstrap prefix.
 
 This development tool does no installation, trust or activation work. All such
 decisions remain in apps/voidup/*.void. Requires a matching built voidc and its
@@ -23,10 +23,12 @@ def main():
     options=parser.parse_args()
     if not options.licenses.is_dir():
         parser.error('--licenses must name the matching existing compiler license directory')
-    if sys.platform not in ('linux','win32'):
-        raise SystemExit('Native macOS bootstrap dependency relocation/complete payload qualification remains required; no distributable bundle is produced')
+    if (platform.system(),platform.machine().lower()) not in [('Linux','x86_64'),('Windows','amd64'),('Windows','x86_64'),('Darwin','arm64')]:
+        raise SystemExit('Use a native supported x64 Linux/Windows or ARM64 macOS build environment')
     suffix='.exe' if os.name=='nt' else ''
     compiler=options.compiler.resolve();prefix=options.prefix.resolve()
+    version=subprocess.check_output([str(compiler),'--version'],text=True)
+    if 'LLVM 23.1.4\n' not in version:raise RuntimeError('bootstrap compiler must use LLVM 23.1.4')
     prefix.mkdir(mode=0o700)  # Exclusive: never replace an existing application.
     (prefix/'bin').mkdir();(prefix/'lib/void').mkdir(parents=True)
     with tempfile.TemporaryDirectory(prefix='voidup-build-') as folder:
@@ -59,13 +61,21 @@ def main():
             production=config['trust']=='production'
             (source/'trust_keys.void').write_text('const up_key_ids: [string] = '+json.dumps([k['id'] for k in config['keys']])+'\nconst up_public_keys: [string] = '+json.dumps([k['public'] for k in config['keys']])+'\n')
             (source/'distribution.void').write_text('const up_official_catalog: string = '+json.dumps(config['catalog'])+'\nconst up_production: bool = '+str(production).lower()+'\nconst up_source_enabled: bool = true\nconst up_trust_label: string = '+json.dumps('production 2-of-3 trust' if production else 'private engineering test trust; not for public distribution')+'\n')
-        command=[driver,'build',source/'main.void','-o',prefix/'bin'/('voidup'+suffix)]
+        # Native compilation uses the local producer scratch directory. Publish
+        # completed files into the requested prefix afterwards, which may be a
+        # normal writable network share. This also keeps linker scratch local.
+        compiled=staging/('voidup'+suffix)
+        command=[driver,'build',source/'main.void','-o',compiled]
         if options.no_opt:command.append('--no-opt')
         result=run(list(map(str,command)),cwd=ROOT,capture_output=True,
                    source_inputs=(ROOT/'apps/voidup',),timeout=900)
         (prefix/'build.stdout').write_bytes(result.stdout)
         (prefix/'build.stderr').write_bytes(result.stderr)
         if result.returncode:raise SystemExit(result.returncode)
+        shutil.copy2(compiled,prefix/'bin'/('voidup'+suffix))
+        if sys.platform=='darwin':
+            from voidup_macos import relocate
+            relocate(prefix,{prefix/'bin/voidup':prefix/'bin/voidup'},[ROOT/'.toolchains',compiler.parent,prefix],dependency_directory='lib/void')
         # The small launcher delegates every toolchain operation to native
         # VOIDUP. It only retains this bootstrap and integrates the user's PATH.
         compiled_source_sha256={path.name:hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(source.glob('*.void'))}
@@ -76,15 +86,29 @@ def main():
                 identity_state.update(item.name.encode());identity_state.update(hashlib.sha256(item.read_bytes()).digest())
         identity=identity_state.hexdigest()
         clang=Path(lines[1]);clangxx=clang.with_name('clang-cl.exe' if os.name=='nt' else 'clang++')
-        target=prefix/'bin'/('voidup-init'+suffix)
+        target=staging/('voidup-init'+suffix)
         if os.name=='nt':
             launch=[clangxx,'/nologo','/std:c++17','/EHsc','/MT','/O2','/clang:-fuse-ld=lld',f'/DVOIDUP_BOOTSTRAP_ID="{identity}"',ROOT/'apps/voidup/launcher.cpp',f'/Fe:{target}','/link','/STACK:1048576','advapi32.lib','shell32.lib','ole32.lib','user32.lib']
         else:
-            launch=[clangxx,'--no-default-config','-std=c++17','-O2',f'--ld-path={clang.with_name("ld.lld")}',f'-DVOIDUP_BOOTSTRAP_ID="{identity}"',ROOT/'apps/voidup/launcher.cpp','-o',target]
+            platform_flags=[f'--ld-path={clang.with_name("ld.lld")}']
+            if sys.platform=='darwin':
+                sdk=subprocess.check_output(['/usr/bin/xcrun','--show-sdk-path'],text=True).strip()
+                apple=Path(subprocess.check_output(['/usr/bin/xcrun','--find','clang++'],text=True).strip())
+                headers=Path(sdk)/'usr/include/c++/v1'
+                if not (headers/'stop_token').is_file():headers=apple.parent.parent/'include/c++/v1'
+                if not (headers/'stop_token').is_file():raise ValueError('Select Xcode 26+ vendor libc++ headers')
+                platform_flags=['-stdlib=libc++','-nostdinc++','-isystem',str(headers),'-isysroot',sdk,'-mmacosx-version-min=14.0','-arch','arm64']
+            launch=[clangxx,'--no-default-config','-std=c++17','-O2',*platform_flags,f'-DVOIDUP_BOOTSTRAP_ID="{identity}"',ROOT/'apps/voidup/launcher.cpp','-o',target]
         subprocess.run(list(map(str,launch)),check=True,cwd=staging)
+        shutil.copy2(target,prefix/'bin'/target.name)
         dependency_audit={}
         for name in ['voidup','voidup-init']:
             binary=prefix/'bin'/(name+suffix)
+            if sys.platform=='darwin':
+                from voidup_macos import inspect
+                dependency_audit[name]=inspect(binary)
+                if any(not d.startswith(('/usr/lib/','/System/Library/','@loader_path/')) for d in dependency_audit[name]['dependencies']):raise ValueError('Unrelocated macOS bootstrap dependency')
+                continue
             inspector=clang.with_name('llvm-readobj.exe' if os.name=='nt' else 'llvm-readelf')
             flags=['--coff-imports'] if os.name=='nt' else ['--dynamic','--version-info']
             inspection=subprocess.check_output([str(inspector),*flags,str(binary)],text=True)
@@ -96,9 +120,6 @@ def main():
         with path.open('rb') as source:
             for block in iter(lambda:source.read(1048576),b''):state.update(block)
         return state.hexdigest()
-    version=subprocess.check_output([str(compiler),'--version'],text=True)
-    if 'LLVM 23.1.4\n' not in version:
-        raise RuntimeError('bootstrap compiler must use LLVM 23.1.4')
     source_inputs=sorted((ROOT/'apps/voidup').glob('*.void'))+[ROOT/'apps/voidup/launcher.cpp']+sorted((ROOT/'stdlib').rglob('*.void'))
     receipt=dict(schema=1,compiler=str(compiler),compiler_sha256=digest(compiler),
         compiler_version=version,host=dict(system=platform.system(),machine=platform.machine(),libc=platform.libc_ver()),

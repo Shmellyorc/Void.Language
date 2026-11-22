@@ -7,12 +7,13 @@ Python, CMake and a separately installed LLVM are not installer requirements.
 
 ## Availability
 
-**G96 is a review candidate, not a public release.** Production public keys have
+**G96 is integrated engineering infrastructure, not a public release.** Production public keys have
 not been enrolled and the official catalog/installers have not been published.
 Do not distribute the engineering bootstrap: it uses test trust. The Linux
 first-install journey has been exercised with authenticated test releases. See
-[the G96 report](../projects/G96_VOIDUP_PUBLIC_INSTALLER.md) for the exact native
-Windows/macOS qualification limits and remaining publication work.
+[the production-readiness report](../projects/VOIDUP_PRODUCTION_READINESS.md) for
+current support-floor measurements, native Windows/macOS limits and remaining
+publication work. The G96 report retains its original evidence.
 
 The following is the prepared end-user workflow, verified with isolated Linux
 test releases. There are no public download links to these unpublished assets.
@@ -26,9 +27,9 @@ published release once it is available.
 - Windows x64: extract `voidup-windows-x86_64.zip`, then open `Install VOID.cmd`.
   The Windows packaging and per-user PATH route require the native qualification
   recorded in the report before public availability is claimed.
-- macOS: bootstrap production fails closed until dependency relocation, complete
-  toolchain packaging and native first-install qualification are finished. No
-  macOS download is advertised.
+- macOS: ARM64 bootstrap/relocation recipes are prepared for native qualification.
+  Public preparation remains unavailable pending native execution, OS signing,
+  notarization and distribution acceptance. No download is advertised.
 
 The installer downloads, verifies, installs and activates the latest compatible
 **stable** release. No catalog URL or release ID is needed. Open a **new terminal**:
@@ -47,12 +48,13 @@ or rolling back does not require regenerating shell exports or editor paths.
 Full installed-inventory verification on those launches remains an intentional
 cost; G96 does not introduce another cache or change verification policy.
 
-Linux integration appends one quoted PATH entry, preserving existing contents,
+Linux integration maintains a guarded, quoted PATH entry, preserving other contents,
 to `.profile`, `.bashrc` and `.zshenv`, plus existing Bash login profiles. Ordinary
 shared directories and writable profiles are supported. Existing profile contents,
 owner/group identities, mode bits and access ACLs are preserved; symbolic-link substitution and files the
 OS does not permit writing are refused. Bash terminal discovery is exercised; other shells need their own native
-qualification. Windows integration prepares an HKCU user-PATH update and environment
+qualification. Repeated sourcing does not duplicate the managed PATH entry.
+Windows integration prepares an HKCU user-PATH update and environment
 notification; it does not change machine PATH. Existing terminals retain their old
 environment. `--no-path` on the bootstrap skips profile/registry changes.
 

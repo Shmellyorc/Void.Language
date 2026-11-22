@@ -21,7 +21,14 @@ struct up_options:
     working_directory: string
 
 func up_parse(const operands: [string]) -> result<up_options, support.up_error>:
-    var options = up_options(working_directory = support.up_io(path.absolute("."))?)
+    var working_directory = support.up_io(path.absolute("."))?
+    # Lexical absolute(".") retains an empty final component. Native process
+    # paths use the directory itself; preserve drive/filesystem roots verbatim.
+    var directory_root = support.up_io(path.root(working_directory))?
+    if working_directory != directory_root:
+        if support.up_io(path.filename(working_directory))? == "":
+            working_directory = support.up_io(path.parent(working_directory))?
+    var options = up_options(working_directory = working_directory)
     var position: i64 = 0
     var seen_options: {string: bool}
     for position < operands.count:

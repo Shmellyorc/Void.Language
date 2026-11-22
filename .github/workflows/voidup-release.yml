@@ -84,6 +84,7 @@ jobs:
             ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/release/www/packages/*.zip
             ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/release/www/inventories/*.json
             ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/release/*.release.json
+            ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/release/*.package.json
             ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/release/voidup-*
             ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/evidence/voidup-production-prepared.json
           if-no-files-found: error

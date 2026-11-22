@@ -20,6 +20,9 @@ on:
         default: false
 permissions:
   contents: read
+concurrency:
+  group: voidup-production-publication
+  cancel-in-progress: false
 jobs:
   publish:
     if: inputs.publish
@@ -57,8 +60,28 @@ jobs:
       - name: Assemble exact qualified assets and verify the offline threshold signatures
         run: |
           set -euo pipefail
-          python tools/voidup_release.py assemble --inputs "$RUNNER_TEMP/prepared" --public-config "$PUBLIC_CONFIG" --version "$RELEASE_VERSION" --output "$RUNNER_TEMP/assets"
+          python tools/voidup_release.py assemble --inputs "$RUNNER_TEMP/prepared" --public-config "$PUBLIC_CONFIG" --source-sha "$PREPARED_SOURCE_SHA" --version "$RELEASE_VERSION" --output "$RUNNER_TEMP/assets"
           python tools/voidup_release.py verify --public-config "$PUBLIC_CONFIG" --catalog "$SIGNED_CATALOG" --assets "$RUNNER_TEMP/assets" --version "$RELEASE_VERSION"
+      - name: Verify the existing mutable channel and its authenticated freshness floor
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/voidup-stable" > "$RUNNER_TEMP/channel.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          channel=json.loads((Path(os.environ['RUNNER_TEMP'])/'channel.json').read_bytes())
+          assert channel.get('immutable') is False, 'Create the mutable channel before enabling immutable version releases'
+          assets={a['name'] for a in channel['assets']}
+          pair={'catalog.json','catalog.json.sig'}
+          assert not assets & pair or pair <= assets, 'Incomplete stable metadata pair requires operator recovery'
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('VOIDUP_PREVIOUS_CATALOG='+str(bool(assets & pair)).lower()+'\n')
+          PY
+      - name: Reject catalog rollback, removed revocations and rewritten release identities
+        if: env.VOIDUP_PREVIOUS_CATALOG == 'true'
+        run: |
+          set -euo pipefail
+          gh release download voidup-stable --pattern 'catalog.json*' --dir "$RUNNER_TEMP/previous"
+          python tools/voidup_release.py verify --public-config "$PUBLIC_CONFIG" --catalog "$SIGNED_CATALOG" --assets "$RUNNER_TEMP/assets" --version "$RELEASE_VERSION" --previous "$RUNNER_TEMP/previous/catalog.json"
       - name: Publish immutable version payloads before the stable catalog
         run: |
           set -euo pipefail
@@ -72,9 +95,6 @@ jobs:
       - name: Publish authenticated stable metadata last
         run: |
           set -euo pipefail
-          if ! gh release view voidup-stable >/dev/null 2>&1; then
-            gh release create voidup-stable --target "$PREPARED_SOURCE_SHA" --title 'VOIDUP authenticated stable channel' --notes 'Signed catalog and threshold signature envelope. Immutable payloads are in versioned releases.' --latest=false
-          fi
           cp "$SIGNED_CATALOG" "$RUNNER_TEMP/catalog.json"
           cp "$SIGNED_CATALOG.sig" "$RUNNER_TEMP/catalog.json.sig"
           gh release upload voidup-stable "$RUNNER_TEMP/catalog.json" "$RUNNER_TEMP/catalog.json.sig" --clobber

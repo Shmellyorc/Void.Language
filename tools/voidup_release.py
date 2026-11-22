@@ -5,6 +5,7 @@ Private-key operations are explicit offline commands. CI uses public inputs only
 """
 import argparse
 import hashlib
+import gzip
 import json
 import os
 from pathlib import Path
@@ -88,8 +89,11 @@ def keygen(args):
 def package(args):
     if not VERSION.fullmatch(args.version):raise ValueError('A numeric stable version is required')
     if not IDENTIFIER.fullmatch(args.release_id):raise ValueError('A safe release identifier is required')
-    if sys.platform not in ('linux','win32'):raise ValueError('Native macOS complete-toolchain packaging remains unqualified; no substitute payload is produced')
-    host='windows-x86_64' if os.name=='nt' else 'linux-x86_64-ubuntu24.04'
+    if sys.platform not in ('linux','win32','darwin'):raise ValueError('A supported native package producer is required')
+    if sys.platform=='linux':
+        floor=__import__('platform').freedesktop_os_release()
+        if floor.get('ID')!='ubuntu' or floor.get('VERSION_ID')!='24.04':raise ValueError('Build production Linux packages on Ubuntu 24.04, not a newer developer host')
+    host='windows-x86_64' if os.name=='nt' else 'macos-aarch64-14.0' if sys.platform=='darwin' else 'linux-x86_64-ubuntu24.04'
     record=produce(args.build.resolve(),args.release_id,args.output.resolve(),args.sdk.resolve(),host=host,configuration=args.configuration)
     record.update(selection={'version':args.version,'channel':'stable'})
     for role,folder,extension in [('artifact','packages','zip'),('inventory','inventories','json')]:
@@ -162,16 +166,23 @@ def verify(args):
     if config['trust']!='production':raise ValueError('Public release requires approved production roots')
     raw=args.catalog.read_bytes();document=authenticate(raw,Path(str(args.catalog)+'.sig').read_bytes(),config)
     now=int(time.time())
-    if document['domain']!='voidup-catalog-v1' or document['schema']!=1 or document['min_manager']!=2 or not document['issued']<=now<document['expires'] or document['expires']-document['issued']>2592000:
+    if document['domain']!='voidup-catalog-v1' or document['schema']!=1 or document['llvm_version']!='23.1.4' or document['min_manager']!=2 or not 0<document['serial']<=9223372036854775807 or not document['issued']<=now<document['expires'] or not 0<document['expires']-document['issued']<=2592000:
         raise ValueError('Catalog identity or freshness rejected')
     if not 1<=len(document['releases'])<=64 or len(document['revoked'])>1024:raise ValueError('Publication catalog exceeds native bounds')
-    seen=set()
+    if len(set(document['revoked']))!=len(document['revoked']) or any(not IDENTIFIER.fullmatch(r) for r in document['revoked']):raise ValueError('Invalid publication revocations')
+    if args.previous:
+        previous=authenticate(args.previous.read_bytes(),Path(str(args.previous)+'.sig').read_bytes(),config)
+        if document['serial']<=previous['serial'] or not set(previous['revoked'])<=set(document['revoked']):raise ValueError('Publication would regress the authenticated serial/revocation floor')
+        prior={(r['host'],r['id']):r for r in previous['releases']}
+        if any((r['host'],r['id']) in prior and r!=prior[(r['host'],r['id'])] for r in document['releases']):raise ValueError('Publication rewrites an existing authenticated release identity')
+    seen=set();identities=set()
     for release in document['releases']:
         selection=release.get('selection') or {}
         if selection.get('channel')!='stable' or not VERSION.fullmatch(selection.get('version','')) or not IDENTIFIER.fullmatch(release['id']):raise ValueError('Invalid stable publication identity')
         key=(release['host'],selection['version'])
-        if key in seen or args.version and selection['version']!=args.version:raise ValueError('Ambiguous or mismatched publication version')
-        seen.add(key)
+        identity=(release['host'],release['id'])
+        if key in seen or identity in identities or args.version and selection['version']!=args.version or release['id'] in document['revoked']:raise ValueError('Ambiguous, revoked or mismatched publication version')
+        seen.add(key);identities.add(identity)
         for role in ('artifact','inventory'):
             extension='zip' if role=='artifact' else 'json'
             expected=OFFICIAL_ASSETS+'v'+selection['version']+'/'+release['id']+'.'+extension
@@ -190,9 +201,20 @@ def bootstrap(args):
     for name in ['voidup','voidup-init']:
         if not (prefix/'bin'/(name+suffix)).is_file():raise ValueError('Missing native bootstrap executable')
     # Only the runnable payload and required notices enter consumer downloads.
-    paths=[p for base in ['bin','lib','share'] for p in (prefix/base).rglob('*') if p.is_file()]
+    paths=sorted(p for base in ['bin','lib','share'] for p in (prefix/base).rglob('*') if p.is_file())
     if any(p.is_symlink() for p in paths):raise ValueError('Bootstrap aliases must be materialized regular files')
+    expected_paths={name for name in receipt['files'] if name.split('/')[0] in ('bin','lib','share')}
+    if expected_paths!={p.relative_to(prefix).as_posix() for p in paths}:raise ValueError('Bootstrap runnable payload has missing or unexpected files')
+    for path in paths:
+        expected=receipt['files'].get(path.relative_to(prefix).as_posix())
+        if expected!={'bytes':path.stat().st_size,'sha256':sha(path)}:
+            raise ValueError('Bootstrap payload differs from its native build receipt: '+path.name)
+    # SOURCE_DATE_EPOCH is the established reproducible-build convention. Do not
+    # encode producer paths, uid/gid, umask or current wall time in downloads.
+    epoch=int(os.environ.get('SOURCE_DATE_EPOCH','315532800'))
+    if not 315532800<=epoch<=4354819199:raise ValueError('SOURCE_DATE_EPOCH must fit the ZIP timestamp range')
     metadata={'schema':1,'host':args.host,'production_trust':receipt['production_trust'],'public_config_sha256':receipt['trust_config_sha256'],'files':{p.relative_to(prefix).as_posix():{'bytes':p.stat().st_size,'sha256':sha(p)} for p in paths}}
+    expanded=sum(p.stat().st_size for p in paths)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     if args.output.exists():raise ValueError('Refusing to replace a prepared bootstrap')
     if args.host=='linux-x86_64':
@@ -209,19 +231,28 @@ __VOIDUP_PAYLOAD__
         header=header.replace('PAYLOAD_LINE',str(len(header.splitlines())+1))
         with args.output.open('xb') as target:
             target.write(header.encode())
-            with tarfile.open(fileobj=target,mode='w|gz',format=tarfile.PAX_FORMAT) as archive:
-                for path in paths:archive.add(path,arcname=path.relative_to(prefix).as_posix(),recursive=False)
+            with gzip.GzipFile(fileobj=target,mode='wb',filename='',mtime=epoch) as compressed:
+                with tarfile.open(fileobj=compressed,mode='w|',format=tarfile.PAX_FORMAT) as archive:
+                    for path in paths:
+                        member=tarfile.TarInfo(path.relative_to(prefix).as_posix());member.size=path.stat().st_size
+                        member.mode=0o755 if path.stat().st_mode&0o111 else 0o644;member.mtime=epoch
+                        with path.open('rb') as source:archive.addfile(member,source)
         args.output.chmod(0o700)
     else:
         if args.host not in ('windows-x86_64','macos-aarch64'):raise ValueError('Unsupported bootstrap host')
         with zipfile.ZipFile(args.output,'x',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
-            for path in paths:archive.write(path,path.relative_to(prefix).as_posix())
+            def member(name,data,executable=False):
+                info=zipfile.ZipInfo(name,time.gmtime(epoch)[:6]);info.create_system=3
+                info.external_attr=(0o100755 if executable else 0o100644)<<16
+                archive.writestr(info,data,compress_type=zipfile.ZIP_DEFLATED,compresslevel=9)
+            for path in paths:member(path.relative_to(prefix).as_posix(),path.read_bytes(),bool(path.stat().st_mode&0o111) or path.suffix.lower()=='.exe')
             if args.host=='windows-x86_64':
-                archive.writestr('Install VOID.cmd','@echo off\r\n"%~dp0bin\\voidup-init.exe" %*\r\nif errorlevel 1 pause\r\n')
+                wrapper='@echo off\r\n"%~dp0bin\\voidup-init.exe" %*\r\nif errorlevel 1 pause\r\n'
+                member('Install VOID.cmd',wrapper);expanded+=len(wrapper.encode())
             else:
-                info=zipfile.ZipInfo('Install VOID.command');info.create_system=3;info.external_attr=0o100700<<16
-                archive.writestr(info,'#!/bin/sh\nset -eu\ncd "$(dirname "$0")"\nexec ./bin/voidup-init "$@"\n')
-    metadata.update(archive_bytes=args.output.stat().st_size,archive_sha256=sha(args.output),expanded_bytes=sum(p.stat().st_size for p in paths),dependencies={'linux-x86_64':['POSIX sh','mktemp','tail','tar with gzip','ELF dependencies measured separately'],'windows-x86_64':['Windows cmd','native PE imports measured separately'],'macos-aarch64':['POSIX sh','native Mach-O dependencies measured separately']}[args.host])
+                wrapper='#!/bin/sh\nset -eu\ncd "$(dirname "$0")"\nexec ./bin/voidup-init "$@"\n'
+                member('Install VOID.command',wrapper,True);expanded+=len(wrapper.encode())
+    metadata.update(archive_bytes=args.output.stat().st_size,archive_sha256=sha(args.output),expanded_bytes=expanded,dependencies={'linux-x86_64':['POSIX sh','mktemp','tail','tar with gzip','ELF dependencies measured separately'],'windows-x86_64':['Windows cmd','native PE imports measured separately'],'macos-aarch64':['POSIX sh','native Mach-O dependencies measured separately']}[args.host])
     exclusive(Path(str(args.output)+'.json'),encoded(metadata));print('Bootstrap prepared; actual compressed and expanded sizes recorded. No publication performed.')
 
 def assemble(args):
@@ -229,29 +260,36 @@ def assemble(args):
     if config['trust']!='production':raise ValueError('Only approved production roots may enter public payload assembly')
     config_hash=sha(args.public_config);prepared=list(args.inputs.rglob('voidup-production-prepared.json'))
     if not prepared:raise ValueError('Missing successful native production-preparation receipts')
-    hosts=set()
+    hosts=set();selected=[];admitted={}
     for path in prepared:
         receipt=json.loads(path.read_text())
-        if receipt['version']!=args.version or receipt['production_public_config_sha256']!=config_hash:raise ValueError('Production preparation differs from the selected version/public roots')
-        if receipt['host'] in hosts:raise ValueError('Duplicate prepared native host')
+        if receipt['status']!='UNSIGNED; NOT PUBLISHED' or receipt['version']!=args.version or receipt['production_public_config_sha256']!=config_hash or receipt['source_sha']!=args.source_sha:
+            raise ValueError('Production preparation differs from the reviewed source, version or public roots')
+        if receipt['host'] not in ('linux-x86_64','windows-x86_64') or receipt['host'] in hosts:raise ValueError('Unknown or duplicate prepared native host')
         if receipt['host']=='windows-x86_64' and not receipt['windows_registry_path_qualified']:raise ValueError('Windows PATH qualification missing')
         hosts.add(receipt['host'])
+        relative=path.relative_to(args.inputs)
+        if len(relative.parts)<2:raise ValueError('Each native receipt must remain in its downloaded artifact directory')
+        artifact_root=args.inputs/relative.parts[0]
+        files=receipt['assets'];bootstrap_name='voidup-'+receipt['host']+('.run' if receipt['host']=='linux-x86_64' else '.zip')
+        release_id='void-'+args.version+'-'+receipt['host']
+        required={bootstrap_name,bootstrap_name+'.json',release_id+'.zip',release_id+'.json',release_id+'.release.json',release_id+'.package.json'}
+        if set(files)!=required:raise ValueError('Native preparation has missing or unexpected release assets')
+        for name,identity in files.items():
+            if not IDENTIFIER.fullmatch(name):raise ValueError('Unsafe prepared asset basename')
+            matches=[p for p in artifact_root.rglob(name) if p.is_file() and not p.is_symlink()]
+            if len(matches)!=1 or name in admitted:raise ValueError('Missing or ambiguous prepared asset')
+            file=matches[0]
+            if identity!={'bytes':file.stat().st_size,'sha256':sha(file)}:raise ValueError('Prepared asset differs from its native receipt')
+            admitted[name]=file
+        metadata=json.loads(admitted[bootstrap_name+'.json'].read_bytes())
+        if metadata['host']!=receipt['host'] or not metadata['production_trust'] or metadata['public_config_sha256']!=config_hash or metadata['archive_sha256']!=sha(admitted[bootstrap_name]) or metadata['archive_bytes']!=admitted[bootstrap_name].stat().st_size:
+            raise ValueError('Bootstrap has different native identity or production roots')
     args.output.mkdir(mode=0o700,exist_ok=False)
-    selected=[]
-    for path in args.inputs.rglob('*'):
-        if not path.is_file():continue
-        bootstrap_metadata=path.name in ('voidup-linux-x86_64.run.json','voidup-windows-x86_64.zip.json')
-        if path.suffix=='.zip' or path.suffix=='.run' or path.name.endswith('.release.json') or path.parent.name=='inventories' or bootstrap_metadata:
-            if path.name.startswith('voidup-') and path.name.endswith('.json'):
-                receipt=json.loads(path.read_text())
-                if 'production_trust' in receipt:
-                    if not receipt['production_trust'] or receipt['public_config_sha256']!=config_hash:raise ValueError('Bootstrap has different or nonproduction public roots')
-                    asset=path.with_suffix('')
-                    if not asset.is_file() or sha(asset)!=receipt['archive_sha256']:raise ValueError('Bootstrap archive differs from preparation receipt')
-            if (args.output/path.name).exists():raise ValueError('Publication asset basename collision')
-            import shutil
-            shutil.copyfile(path,args.output/path.name);selected.append(path.name)
-    exclusive(args.output/'prepared-assets.json',encoded({'schema':1,'hosts':sorted(hosts),'version':args.version,'files':selected}))
+    import shutil
+    for name,path in sorted(admitted.items()):
+        shutil.copyfile(path,args.output/name);selected.append(name)
+    exclusive(args.output/'prepared-assets.json',encoded({'schema':1,'hosts':sorted(hosts),'version':args.version,'source_sha':args.source_sha,'files':selected}))
     print('Qualified unsigned assets assembled. Signed catalog verification is still required before publication.')
 
 def main():
@@ -262,9 +300,9 @@ def main():
     c=s.add_parser('catalog');c.add_argument('--public-config',type=Path,required=True);c.add_argument('--serial',type=int,required=True);c.add_argument('--valid-days',type=int,default=7);c.add_argument('--release',type=Path,action='append',required=True);c.add_argument('--previous',type=Path);c.add_argument('--revoke',action='append',default=[]);c.add_argument('--output',type=Path,required=True);c.set_defaults(action=catalog)
     g=s.add_parser('sign');g.add_argument('--public-config',type=Path,required=True);g.add_argument('--catalog',type=Path,required=True);g.add_argument('--key',action='append',required=True,help='Enrolled ID=private PEM path; offline use only');g.add_argument('--output',type=Path,required=True);g.set_defaults(action=sign_catalog)
     m=s.add_parser('combine');m.add_argument('--public-config',type=Path,required=True);m.add_argument('--catalog',type=Path,required=True);m.add_argument('--endorsement',type=Path,action='append',required=True);m.add_argument('--output',type=Path,required=True);m.set_defaults(action=combine)
-    v=s.add_parser('verify');v.add_argument('--public-config',type=Path,required=True);v.add_argument('--catalog',type=Path,required=True);v.add_argument('--assets',type=Path,required=True);v.add_argument('--version');v.set_defaults(action=verify)
+    v=s.add_parser('verify');v.add_argument('--public-config',type=Path,required=True);v.add_argument('--catalog',type=Path,required=True);v.add_argument('--assets',type=Path,required=True);v.add_argument('--version');v.add_argument('--previous',type=Path);v.set_defaults(action=verify)
     b=s.add_parser('bootstrap');b.add_argument('--prefix',type=Path,required=True);b.add_argument('--host',required=True);b.add_argument('--production',action='store_true');b.add_argument('--output',type=Path,required=True);b.set_defaults(action=bootstrap)
-    f=s.add_parser('assemble');f.add_argument('--inputs',type=Path,required=True);f.add_argument('--public-config',type=Path,required=True);f.add_argument('--version',required=True);f.add_argument('--output',type=Path,required=True);f.set_defaults(action=assemble)
+    f=s.add_parser('assemble');f.add_argument('--inputs',type=Path,required=True);f.add_argument('--source-sha',required=True);f.add_argument('--public-config',type=Path,required=True);f.add_argument('--version',required=True);f.add_argument('--output',type=Path,required=True);f.set_defaults(action=assemble)
     a=p.parse_args();a.action(a)
 
 if __name__=='__main__':main()

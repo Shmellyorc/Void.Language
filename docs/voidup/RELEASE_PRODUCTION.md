@@ -8,7 +8,9 @@ platform bootstrap glue, not another toolchain installer or authentication syste
 **Production is not published.** Boss has not yet provisioned/approved the three
 production public keys. No engineering key may be shipped as production trust.
 See [production trust](PRODUCTION_TRUST.md) for the free offline ceremony and
-[the G96 report](../projects/G96_VOIDUP_PUBLIC_INSTALLER.md) for actual evidence.
+[the production-readiness report](../projects/VOIDUP_PRODUCTION_READINESS.md) for
+current native results, sizes and exact review evidence. The G96 report retains
+its historical accepted implementation evidence.
 
 ## Native builds and trust profiles
 
@@ -63,9 +65,16 @@ cannot relabel a Linux build as Windows/macOS.
 
 The executable is not assumed standalone. Keep its required shared-library aliases
 as ordinary files and preserve matching dependency notices/source material. Record
-ELF/PE dependencies on the declared native host. Current macOS complete payload
-and bootstrap dependency relocation remain unfinished and fail closed; its ZIP
-container recipe is not an availability or native-execution claim.
+ELF/PE dependencies on the declared native host. macOS engineering recipes relocate the admitted dependency closure and resolve
+the consumer's selected Apple SDK through `xcrun`. They remain natively
+**UNQUALIFIED** and excluded from public production preparation/assembly. A ZIP
+recipe or ad-hoc signature is not Gatekeeper/notarization acceptance.
+
+Archive metadata uses `SOURCE_DATE_EPOCH`, defaulting to 1980-01-01 UTC, with
+normalized ownership/modes and sorted members. Identical admitted build inputs
+produce identical archives. This does not claim bit-identical independent
+compiler builds. Bootstrap packaging checks the complete runnable file set against
+its build receipt. Package receipts record installed bytes and native dependencies.
 
 ## Complete toolchains and signed stable metadata
 
@@ -81,8 +90,10 @@ python3 -B tools/voidup_release.py package --build /matching/Release/build \
 ```
 
 Windows uses a native Windows build and an appropriate ID. No cross-produced file
-is native qualification. macOS complete toolchain production is explicitly refused
-until its SDK/libc++/manifest relocation and native journey are completed.
+is native qualification. macOS ARM64 engineering toolchains use `ld64.lld`, retain platform identity
+`macos-aarch64-14.0`, relocate non-system Mach-O dependencies and remove producer
+SDK/header paths from the native manifest. Actual native macOS 14.0 execution
+and distribution acceptance are still required before claiming that support floor.
 
 Each new release descriptor adds an authenticated optional `selection` object:
 
@@ -141,7 +152,8 @@ notification follows [Microsoft's documented WM_SETTINGCHANGE route](https://lea
    inputs, verify the installed compiler/Runtime/stdlib/LSP, and run focused VOIDUP
    first-install/policy checks with ephemeral in-memory engineering keys. Linux and
    Windows prepare complete payloads only after their native checks. The Mac job
-   records its separate incomplete qualification; it produces no public payload.
+   attempts the prepared engineering first-install recipe; it produces no public
+   payload. A workflow file is not evidence of native execution.
 2. Production preparation is opt-in and requires the approved public configuration.
    It emits unsigned version payloads, inventories, bootstrap packages, hashes and
    native qualification receipts. It neither signs with private keys nor publishes.
@@ -161,3 +173,24 @@ approved public roots, exact support-floor payload validation, distribution
 notices/source review, initial bootstrap trust announcement and Boss publication
 approval remain real pre-publication work. See the report for each platform's
 actual status. The workflow is not evidence that those jobs have run.
+
+## Publication inputs and immutable hosting
+
+Preparation receipts bind the exact assets to the source SHA and public-root
+fingerprint. Assembly requires `--source-sha` for the admitted preparation run;
+missing, changed or extra manifest entries are refused before output creation.
+Mac production assembly remains disabled pending native distribution acceptance.
+
+Under separately authorized hosting setup, create the mutable `voidup-stable`
+release **before** enabling GitHub immutable releases. Immutable version releases
+are composed as drafts with all assets attached, then published. The publisher
+requires an existing mutable stable channel and serializes channel updates. It
+authenticates the previous catalog pair, rejects serial/revocation regression and
+release-identity rewrites, then uploads the new matching pair last. An incomplete
+existing pair requires operator recovery rather than treating it as a first release.
+
+See [GitHub's immutable release guidance](https://docs.github.com/en/code-security/concepts/supply-chain-security/immutable-releases).
+No hosting setting or channel was changed during engineering. Website links stay
+unavailable until the exact native artifacts, public roots and publication are
+approved. Use versioned asset links for the downloadable bootstrap; its embedded
+authenticated stable catalog selects the toolchain independently.

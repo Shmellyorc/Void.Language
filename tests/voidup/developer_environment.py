@@ -12,7 +12,7 @@ p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('compiler', type=Path)
 p.add_argument('--source', type=Path, default=ROOT/'apps/voidup')
 a = p.parse_args()
-preserved = ['CI', 'XDG_DATA_HOME', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME',
+preserved = ['CI', 'PROGRAMDATA', 'XDG_DATA_HOME', 'XDG_CONFIG_HOME', 'XDG_CACHE_HOME',
              'XDG_STATE_HOME', 'XDG_RUNTIME_DIR', 'DISPLAY', 'WAYLAND_DISPLAY',
              'XAUTHORITY', 'DBUS_SESSION_BUS_ADDRESS']
 with tempfile.TemporaryDirectory(prefix='voidup-environment-') as directory:

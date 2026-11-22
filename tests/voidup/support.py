@@ -109,6 +109,14 @@ class Service:
         ca = x509.CertificateBuilder().subject_name(subject).issuer_name(subject).public_key(key.public_key()).serial_number(x509.random_serial_number()).not_valid_before(now-datetime.timedelta(days=1)).not_valid_after(now+datetime.timedelta(days=30)).add_extension(x509.BasicConstraints(ca=True,path_length=0),critical=True).sign(key,hashes.SHA256())
         server_key = rsa.generate_private_key(public_exponent=65537,key_size=2048)
         cert = x509.CertificateBuilder().subject_name(x509.Name([x509.NameAttribute(NameOID.COMMON_NAME,'localhost')])).issuer_name(subject).public_key(server_key.public_key()).serial_number(x509.random_serial_number()).not_valid_before(now-datetime.timedelta(days=1)).not_valid_after(now+datetime.timedelta(days=7)).add_extension(x509.SubjectAlternativeName([x509.DNSName('localhost'),x509.IPAddress(ipaddress.ip_address('127.0.0.1'))]),critical=False).add_extension(x509.BasicConstraints(ca=False,path_length=None),critical=True).sign(key,hashes.SHA256())
+        if os.name=='nt':
+            # Reuse the native HTTP fixtures' directly trusted loopback server
+            # pattern. A synthetic separate leaf without a CRL fails Schannel's
+            # required revocation check. Never disable that check or enroll
+            # fixture roots in the real Windows certificate store.
+            server_key=key
+            ca=x509.CertificateBuilder().subject_name(subject).issuer_name(subject).public_key(key.public_key()).serial_number(x509.random_serial_number()).not_valid_before(now-datetime.timedelta(days=1)).not_valid_after(now+datetime.timedelta(days=7)).add_extension(x509.SubjectAlternativeName([x509.DNSName('localhost'),x509.IPAddress(ipaddress.ip_address('127.0.0.1'))]),critical=False).add_extension(x509.BasicConstraints(ca=True,path_length=0),critical=True).sign(key,hashes.SHA256())
+            cert=ca
         self.ca.write_bytes(ca.public_bytes(serialization.Encoding.PEM))
         (directory/'server.pem').write_bytes(cert.public_bytes(serialization.Encoding.PEM))
         private=directory/'server-key.pem'

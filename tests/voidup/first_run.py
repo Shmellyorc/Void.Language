@@ -14,6 +14,7 @@ import shutil
 import zipfile
 import atexit
 import struct
+from contextlib import nullcontext
 
 from support import ROOT, Service, encoded, sign
 from package_voidup_fixtures import produce
@@ -26,9 +27,13 @@ p.add_argument('--licenses',type=Path,required=True)
 p.add_argument('--evidence',type=Path,required=True)
 p.add_argument('--no-evidence',action='store_true',help='Emit only a generic result; retain no guest details or logs')
 p.add_argument('--qualify-user-path',action='store_true',help='Disposable Windows CI user only: exercise and restore HKCU PATH')
+p.add_argument('--reuse-work',type=Path,help='New caller-owned directory retained for developer/editor acceptance')
+p.add_argument('--installation-root',type=Path,help='Native Windows only: new disposable local root when fixture archives use a shared drive')
 a=p.parse_args();a.evidence.mkdir(mode=0o700,exist_ok=True)
-assert sys.platform in ('linux','win32'),'Complete macOS payload production remains unqualified'
+assert sys.platform in ('linux','win32','darwin'),'Use a supported native platform'
+macos=sys.platform=='darwin'
 windows=os.name=='nt';suffix='.exe' if windows else ''
+if a.installation_root and (not windows or a.installation_root.exists()):p.error('--installation-root must be a new disposable native Windows root')
 if a.qualify_user_path and (not windows or not os.environ.get('CI')):p.error('--qualify-user-path requires a disposable Windows CI user')
 registry_before=None
 if a.qualify_user_path:
@@ -56,8 +61,10 @@ def run(argv,*,env=None,cwd=None,expected=0,timeout=900,data=None):
     rows.append({'case':str(argv[0]),'exit':result.returncode,'stdout':result.stdout.decode(errors='replace'),'stderr':result.stderr.decode(errors='replace')})
     return result
 
-with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
+if a.reuse_work:a.reuse_work.mkdir(mode=0o700,parents=True,exist_ok=False)
+with (nullcontext(str(a.reuse_work.resolve())) if a.reuse_work else tempfile.TemporaryDirectory(prefix='voidup-first-run-')) as temporary:
     work=Path(temporary);fixtures=work/'fixtures';fixtures.mkdir(mode=0o700)
+    cases=a.installation_root.parent if a.installation_root else work
     # Existing private engineering keys stay in their original private location.
     # The fixture retains a link only; private bytes are never copied to evidence.
     signer=None
@@ -71,7 +78,7 @@ with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
         keys=[k.public_key().public_bytes(Encoding.Raw,PublicFormat.Raw).hex() for k in private]
         def signer(raw,signers):
             return encoded({'schema':1,'signatures':[{'key_id':f'test-{n}','signature':private[n-1].sign(b'VOIDUP CATALOG v1\n'+raw).hex()} for n in signers]})
-    release=produce(a.build.resolve(),'stable-current',fixtures,a.sdk.resolve(),host='windows-x86_64' if windows else 'linux-x86_64-ubuntu24.04')
+    release=produce(a.build.resolve(),'stable-current',fixtures,a.sdk.resolve(),host='windows-x86_64' if windows else 'macos-aarch64-14.0' if macos else 'linux-x86_64-ubuntu24.04')
     release.update(selection={'channel':'stable','version':'1.10.0'})
     older=dict(release,id='zzz-older',selection={'channel':'stable','version':'1.9.0'})
     wrong_host=dict(release,id='other-host',host='linux-x86_64-ubuntu24.04' if windows else 'windows-x86_64',selection={'channel':'stable','version':'99.0.0'})
@@ -85,10 +92,13 @@ with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
         # Producer tools run before the consumer environment is made Python-free.
         run([sys.executable,'-B',ROOT/'tools/build_voidup.py','--compiler',a.build.resolve()/('voidc'+suffix),'--prefix',bootstrap,'--licenses',a.licenses.resolve(),'--trust-config',config])
         receipt=json.loads((bootstrap/'build.json').read_text())
-        installer=work/('download.zip' if windows else 'download.run')
-        run([sys.executable,'-B',ROOT/'tools/voidup_release.py','bootstrap','--prefix',bootstrap,'--host','windows-x86_64' if windows else 'linux-x86_64','--output',installer])
+        installer=work/('download.zip' if windows or macos else 'download.run')
+        run([sys.executable,'-B',ROOT/'tools/voidup_release.py','bootstrap','--prefix',bootstrap,'--host','windows-x86_64' if windows else 'macos-aarch64' if macos else 'linux-x86_64','--output',installer])
         download_metadata=json.loads(Path(str(installer)+'.json').read_text())
-        if windows:
+        if macos:
+            download=work/'extracted-download'
+            run(['/usr/bin/ditto','-x','-k',installer,download])
+        elif windows:
             download=work/'extracted-download'
             with zipfile.ZipFile(installer) as archive:archive.extractall(download)
         else:
@@ -112,8 +122,8 @@ with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
         environment=dict(os.environ,HOME=str(home),XDG_DATA_HOME=str(home/'data'),PATH=str(minimal))
         environment.pop('VOID_STDLIB_ROOT',None);environment.pop('VOID_NATIVE_CATALOG',None)
         init=download/'bin'/('voidup-init'+suffix)
-        def initializer(path):return [path] if windows else ['/bin/sh',installer]
-        install=work/"private user 雪 ' $() # %" if windows else home/'data/voidup'
+        def initializer(path):return [path] if windows else ['/bin/sh',path.parent.parent/'Install VOID.command'] if macos else ['/bin/sh',installer]
+        install=a.installation_root.resolve() if a.installation_root else work/"private user 雪 ' $() # %" if windows else home/'Library/Application Support/voidup' if macos else home/'data/voidup'
         initial_options=['--root',install,*([] if a.qualify_user_path else ['--no-path'])] if windows else []
         run([*initializer(init),*initial_options,'--ca-file',service.ca],env=environment)
         control=json.loads((install/'control.json').read_text())
@@ -143,7 +153,7 @@ with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
                 elif member.is_file():member.chmod(0o775 if member.stat().st_mode & 0o111 else 0o664)
             install.chmod(0o775)
             run([manager_proxy,'verify',release['id']],env=environment)
-        project=work/'hello';run([compiler_proxy,'new',project],env=environment)
+        project=cases/'hello';run([compiler_proxy,'new',project],env=environment)
         if not windows:project.chmod(0o775)
         run([compiler_proxy,'run','.'],env=environment,cwd=project)
         run([compiler_proxy,'build','.'],env=environment,cwd=project)
@@ -155,7 +165,7 @@ with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
         wire=frames([{'jsonrpc':'2.0','id':1,'method':'initialize','params':{'capabilities':{}}},{'jsonrpc':'2.0','method':'initialized','params':{}},{'jsonrpc':'2.0','id':2,'method':'shutdown'},{'jsonrpc':'2.0','method':'exit'}])
         lsp=run([install/'bin'/('voidls'+suffix),'--project',project],env=environment,data=wire)
         assert any(x.get('id')==1 and x.get('result',{}).get('serverInfo',{}).get('name')=='VOID' for x in unframe(lsp.stdout))
-        if not windows:
+        if sys.platform=='linux':
             # Exercise the accepted F5 consent protocol through the new proxy,
             # including its XDG approval store, phase seal and CI refusal.
             run([sys.executable,'-B',ROOT/'tests/project/native_stdio_approval.py',compiler_proxy],env=environment)
@@ -168,12 +178,39 @@ with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
             assert (home/'.bashrc').stat().st_mode & 0o777 == 0o664
             assert install.stat().st_mode & 0o777 == 0o775
             if profile_acl is not None:assert os.getxattr(home/'.bashrc','system.posix_acl_access')==profile_acl
-        newer=copy.deepcopy(catalog);newer['serial']=101;service.catalog(newer)
+        # Roll out a genuinely different authenticated release identity/payload.
+        # It intentionally reuses this compiler build; this tests the manager's
+        # version transaction, rather than claiming a second compiler build.
+        next_release=produce(a.build.resolve(),'stable-next',fixtures,a.sdk.resolve(),host=release['host'])
+        next_release.update(selection={'channel':'stable','version':'1.11.0'})
+        newer=copy.deepcopy(catalog);newer['serial']=101;newer['releases'].append(next_release);service.catalog(newer)
+        sentinel=project/'user-notes.txt';sentinel.write_text('Preserve developer files\n')
+        service.stall='/packages/stable-next.zip';service.stall_after=1048576
+        owner=subprocess.Popen(list(map(str,[manager_proxy,'--ca-file',service.ca,'update'])),env=environment,stdout=subprocess.PIPE,stderr=subprocess.PIPE,preexec_fn=None if windows else stack)
+        try:
+            assert service.started.wait(60),'Update never reached the controlled partial transfer'
+            run([manager_proxy,'doctor'],env=environment,expected=1)
+            owner.terminate();out,err=owner.communicate(timeout=30)
+            rows.append({'case':'interrupted actual 1 MiB stable-next update','exit':owner.returncode,'stdout':out.decode(errors='replace'),'stderr':err.decode(errors='replace')})
+            assert owner.returncode!=0 and json.loads((install/'control.json').read_text())['current']==release['id']
+            abandoned={p.name for p in (install/'transactions').iterdir()};assert abandoned
+        finally:
+            service.resume.set();service.stall=None
+            if owner.poll() is None:owner.kill();owner.communicate(timeout=30)
         run([manager_proxy,'--ca-file',service.ca,'update'],env=environment)
-        state=json.loads((install/'control.json').read_text());assert state['current']==release['id'] and state['serial']==101
+        state=json.loads((install/'control.json').read_text());assert state['current']==next_release['id'] and state['previous']==release['id'] and state['serial']==101
+        assert abandoned<={p.name for p in (install/'transactions').iterdir()}
+        run([manager_proxy,'rollback'],env=environment)
+        assert json.loads((install/'control.json').read_text())['current']==release['id']
+        run([compiler_proxy,'run','.'],env=environment,cwd=project)
+        run([manager_proxy,'--ca-file',service.ca,'update'],env=environment)
+        run([manager_proxy,'--ca-file',service.ca,'install',next_release['id'],'--activate'],env=environment)
+        run([manager_proxy,'doctor'],env=environment)
+        assert json.loads((install/'control.json').read_text())['current']==next_release['id']
+        assert sentinel.read_text()=='Preserve developer files\n'
         # An unauthenticated first run must not publish tools or touch profiles.
         service.catalog(catalog,signers=(1,))
-        rejected=work/'bad-signature-root'
+        rejected=cases/'bad-signature-root'
         run([*initializer(reinit),'--root',rejected,'--no-path','--ca-file',service.ca],env=environment,expected=1)
         assert not list((rejected/'toolchains').iterdir()) and not (rejected/'bin').exists()
         assert profile_before=={p.name:p.read_bytes() for p in home.iterdir() if p.is_file()}
@@ -183,10 +220,10 @@ with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
         assert json.loads((install/'control.json').read_text())['serial']==101
         ambiguous=copy.deepcopy(newer);ambiguous['serial']=102;ambiguous['releases'].append(dict(release,id='ambiguous'))
         service.catalog(ambiguous)
-        run([*initializer(reinit),'--root',work/'ambiguous-root','--no-path','--ca-file',service.ca],env=environment,expected=1)
+        run([*initializer(reinit),'--root',cases/'ambiguous-root','--no-path','--ca-file',service.ca],env=environment,expected=1)
         absent=copy.deepcopy(newer);absent['serial']=103;absent['releases']=[preview,wrong_host]
         service.catalog(absent)
-        run([*initializer(reinit),'--root',work/'unsupported-root','--no-path','--ca-file',service.ca],env=environment,expected=1)
+        run([*initializer(reinit),'--root',cases/'unsupported-root','--no-path','--ca-file',service.ca],env=environment,expected=1)
         # Unsafe shell profiles remain unchanged; native installation can be
         # retried with --no-path and does not weaken root/inventory admission.
         service.catalog(newer)
@@ -202,7 +239,7 @@ with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
         # automatic version merely because the release ID looks like one.
         legacy_release={k:v for k,v in release.items() if k!='selection'}
         legacy=dict(catalog,serial=90,min_manager=1,releases=[legacy_release]);service.catalog(legacy)
-        native_manager=moved/'bin'/('voidup'+suffix);legacy_root=work/'legacy-root'
+        native_manager=moved/'bin'/('voidup'+suffix);legacy_root=cases/'legacy-root'
         legacy_options=[native_manager,'--root',legacy_root,'--ca-file',service.ca]
         run([*legacy_options,'setup'],env=environment,expected=1)
         run([*legacy_options,'install',release['id'],'--activate'],env=environment)
@@ -214,8 +251,9 @@ with tempfile.TemporaryDirectory(prefix='voidup-first-run-') as temporary:
         try:read_public_config(bad_config)
         except ValueError:pass
         else:raise AssertionError('engineering roots admitted as production trust')
-        summary={'status':'PASS','platform':'Windows x86-64; disposable CI user registry PATH' if a.qualify_user_path else 'Windows x86-64; explicit test root, user registry PATH untouched' if windows else 'Linux x86-64; local host only, not support-floor qualification','consumer_cases':len(rows)-2,'hard_soft_stack_bytes':1048576,'automatic_selection':'1.10.0 over 1.9.0, other-host and preview excluded','installed_compiler_identity':release['build_identity'],'python_cmake_llvm_absent_from_consumer_path':True,'new_terminal_discovery':True,'download_folder_independence':True,'lsp_handshake':True,'native_build_and_run':True,'signature_replay_ambiguity_missing_stable_refusal':True,'safe_profile_preservation':not windows,'user_registry_path_qualified':a.qualify_user_path,'engineering_production_root_separation':True,'bootstrap_files':receipt['files'],'bootstrap_file_bytes':sum(x['bytes'] for x in receipt['files'].values()),'requests':len(service.requests)}
-        summary.update(download_bytes=download_metadata['archive_bytes'],download_expanded_bytes=download_metadata['expanded_bytes'],download_dependencies=download_metadata['dependencies'],native_dependency_audit=receipt['native_dependency_audit'],bootstrap_id=receipt['bootstrap_id'],compiled_manager_source_sha256=receipt['compiled_source_sha256'],producer_source_sha256=receipt['source_sha256'],profile_named_acl_preserved=profile_acl is not None,proxy_editor_consent_qualified=not windows)
+        summary={'status':'PASS','platform':'Windows x86-64; disposable CI user registry PATH' if a.qualify_user_path else 'Windows x86-64; explicit test root, user registry PATH untouched' if windows else 'macOS ARM64; actual producer OS only, no minimum-OS/Gatekeeper claim' if macos else 'Linux x86-64; actual producer userspace, kernel recorded separately','consumer_cases':len(rows)-2,'hard_soft_stack_bytes':1048576,'automatic_selection':'1.10.0 over 1.9.0, other-host and preview excluded','installed_compiler_identity':release['build_identity'],'python_cmake_llvm_absent_from_consumer_path':True,'new_terminal_discovery':True,'download_folder_independence':True,'lsp_handshake':True,'native_build_and_run':True,'signature_replay_ambiguity_missing_stable_refusal':True,'safe_profile_preservation':not windows,'user_registry_path_qualified':a.qualify_user_path,'engineering_production_root_separation':True,'bootstrap_files':receipt['files'],'bootstrap_file_bytes':sum(x['bytes'] for x in receipt['files'].values()),'requests':len(service.requests)}
+        summary.update(download_bytes=download_metadata['archive_bytes'],download_expanded_bytes=download_metadata['expanded_bytes'],download_dependencies=download_metadata['dependencies'],native_dependency_audit=receipt['native_dependency_audit'],bootstrap_id=receipt['bootstrap_id'],compiled_manager_source_sha256=receipt['compiled_source_sha256'],producer_source_sha256=receipt['source_sha256'],profile_named_acl_preserved=profile_acl is not None,proxy_editor_consent_qualified=sys.platform=='linux',toolchain_archive_bytes=release['artifact_bytes'],toolchain_expanded_bytes=json.loads((fixtures/'www/inventories/stable-current.json').read_bytes())['expanded_bytes'],host=__import__('platform').uname()._asdict(),os_release=__import__('platform').freedesktop_os_release() if sys.platform=='linux' else None)
+        summary.update(distinct_stable_release_update='1.10.0 -> 1.11.0; same compiler build, different release/payload identities',rollback_reinstall_recovery=True,interrupted_download_bytes=1048576,abandoned_transactions_preserved=True,user_files_preserved=True)
         if not a.no_evidence:(a.evidence/'first-run-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
         # Retain selected outputs and exact commands with ephemeral paths made
         # explicit. Private keys and disposable packages are never archived.
