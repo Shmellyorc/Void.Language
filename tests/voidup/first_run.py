@@ -14,7 +14,7 @@ import shutil
 import zipfile
 import atexit
 import struct
-from contextlib import nullcontext
+from contextlib import ExitStack, nullcontext
 
 from support import ROOT, Service, encoded, sign
 from package_voidup_fixtures import produce
@@ -29,9 +29,15 @@ p.add_argument('--no-evidence',action='store_true',help='Emit only a generic res
 p.add_argument('--qualify-user-path',action='store_true',help='Disposable Windows CI user only: exercise and restore HKCU PATH')
 p.add_argument('--reuse-work',type=Path,help='New caller-owned directory retained for developer/editor acceptance')
 p.add_argument('--installation-root',type=Path,help='Native Windows only: new disposable local root when fixture archives use a shared drive')
+p.add_argument('--isolate-producer',action='store_true',help='Disposable hosted macOS only: hide build, SDK, providers and source stdlib during consumer checks')
 a=p.parse_args();a.evidence.mkdir(mode=0o700,exist_ok=True)
 assert sys.platform in ('linux','win32','darwin'),'Use a supported native platform'
 macos=sys.platform=='darwin'
+if a.isolate_producer:
+    if not (macos and os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('RUNNER_ENVIRONMENT')=='github-hosted'):
+        p.error('--isolate-producer requires disposable hosted macOS')
+    if not a.build.resolve().is_relative_to(Path(os.environ['RUNNER_TEMP']).resolve()) or a.sdk.resolve()!=ROOT/'.toolchains/llvm-23.1.4':
+        p.error('--isolate-producer requires the focused scratch build and pinned checkout SDK')
 windows=os.name=='nt';suffix='.exe' if windows else ''
 if a.installation_root and (not windows or a.installation_root.exists()):p.error('--installation-root must be a new disposable native Windows root')
 if a.qualify_user_path and (not windows or not os.environ.get('CI')):p.error('--qualify-user-path requires a disposable Windows CI user')
@@ -55,10 +61,16 @@ def stack():
     import resource
     resource.setrlimit(resource.RLIMIT_STACK,(1048576,1048576))
 def run(argv,*,env=None,cwd=None,expected=0,timeout=900,data=None):
+    started=time.monotonic()
     result=subprocess.run(list(map(str,argv)),cwd=cwd or ROOT,env=env,input=data,capture_output=True,timeout=timeout,preexec_fn=None if windows else stack)
+    row={'case':str(argv[0]),'exit':result.returncode,'stdout':result.stdout.decode(errors='replace'),'stderr':result.stderr.decode(errors='replace')}
+    if a.isolate_producer:
+        row.update(argv=list(map(str,argv)),cwd=str(cwd or ROOT),expected_exit=expected,seconds=time.monotonic()-started)
+    rows.append(row)
+    if a.isolate_producer and not a.no_evidence:
+        (a.evidence/'first-run-cases.json').write_text(json.dumps(rows,indent=2)+'\n')
     assert result.returncode==expected,(argv,result.returncode,result.stdout[-2000:],result.stderr[-3000:])
     assert not any(x in result.stderr for x in [b'AddressSanitizer',b'UndefinedBehaviorSanitizer',b'LeakSanitizer'])
-    rows.append({'case':str(argv[0]),'exit':result.returncode,'stdout':result.stdout.decode(errors='replace'),'stderr':result.stderr.decode(errors='replace')})
     return result
 
 if a.reuse_work:a.reuse_work.mkdir(mode=0o700,parents=True,exist_ok=False)
@@ -84,7 +96,7 @@ with (nullcontext(str(a.reuse_work.resolve())) if a.reuse_work else tempfile.Tem
     wrong_host=dict(release,id='other-host',host='linux-x86_64-ubuntu24.04' if windows else 'windows-x86_64',selection={'channel':'stable','version':'99.0.0'})
     preview=dict(release,id='preview',selection={'channel':'preview','version':'99.0.0'})
     now=int(time.time());catalog=dict(schema=1,domain='voidup-catalog-v1',serial=100,issued=now-60,expires=now+86400,min_manager=2,llvm_version='23.1.4',revoked=[],releases=[older,wrong_host,release,preview])
-    with Service(fixtures,signer=signer) as service:
+    with Service(fixtures,signer=signer) as service, ExitStack() as isolation:
         service.catalog(catalog)
         config=work/'public-test-config.json'
         config.write_bytes(encoded({'schema':1,'trust':'engineering','approval':'isolated G96 qualification only','catalog':service.url,'keys':[{'id':f'test-{n+1}','public':k} for n,k in enumerate(keys)]}))
@@ -103,6 +115,14 @@ with (nullcontext(str(a.reuse_work.resolve())) if a.reuse_work else tempfile.Tem
             with zipfile.ZipFile(installer) as archive:archive.extractall(download)
         else:
             download=bootstrap
+        next_payload=None
+        if a.isolate_producer:
+            # Both packages must exist before removing producer inputs. They
+            # share a compiler build but have distinct signed release identities.
+            next_payload=produce(a.build.resolve(),'stable-next',fixtures,a.sdk.resolve(),host=release['host'])
+            from ci.voidup_isolation import hidden_producer_paths
+            isolation.enter_context(hidden_producer_paths([a.build.resolve(),a.sdk.resolve(),
+                ROOT/'.toolchains/http',ROOT/'.toolchains/host',ROOT/'stdlib']))
         home=work/"first user 雪 ' $() # %";home.mkdir(mode=0o775)
         if not windows:
             home.chmod(0o775)
@@ -181,7 +201,7 @@ with (nullcontext(str(a.reuse_work.resolve())) if a.reuse_work else tempfile.Tem
         # Roll out a genuinely different authenticated release identity/payload.
         # It intentionally reuses this compiler build; this tests the manager's
         # version transaction, rather than claiming a second compiler build.
-        next_release=produce(a.build.resolve(),'stable-next',fixtures,a.sdk.resolve(),host=release['host'])
+        next_release=next_payload or produce(a.build.resolve(),'stable-next',fixtures,a.sdk.resolve(),host=release['host'])
         next_release.update(selection={'channel':'stable','version':'1.11.0'})
         newer=copy.deepcopy(catalog);newer['serial']=101;newer['releases'].append(next_release);service.catalog(newer)
         sentinel=project/'user-notes.txt';sentinel.write_text('Preserve developer files\n')
@@ -254,6 +274,7 @@ with (nullcontext(str(a.reuse_work.resolve())) if a.reuse_work else tempfile.Tem
         summary={'status':'PASS','platform':'Windows x86-64; disposable CI user registry PATH' if a.qualify_user_path else 'Windows x86-64; explicit test root, user registry PATH untouched' if windows else 'macOS ARM64; actual producer OS only, no minimum-OS/Gatekeeper claim' if macos else 'Linux x86-64; actual producer userspace, kernel recorded separately','consumer_cases':len(rows)-2,'hard_soft_stack_bytes':1048576,'automatic_selection':'1.10.0 over 1.9.0, other-host and preview excluded','installed_compiler_identity':release['build_identity'],'python_cmake_llvm_absent_from_consumer_path':True,'new_terminal_discovery':True,'download_folder_independence':True,'lsp_handshake':True,'native_build_and_run':True,'signature_replay_ambiguity_missing_stable_refusal':True,'safe_profile_preservation':not windows,'user_registry_path_qualified':a.qualify_user_path,'engineering_production_root_separation':True,'bootstrap_files':receipt['files'],'bootstrap_file_bytes':sum(x['bytes'] for x in receipt['files'].values()),'requests':len(service.requests)}
         summary.update(download_bytes=download_metadata['archive_bytes'],download_expanded_bytes=download_metadata['expanded_bytes'],download_dependencies=download_metadata['dependencies'],native_dependency_audit=receipt['native_dependency_audit'],bootstrap_id=receipt['bootstrap_id'],compiled_manager_source_sha256=receipt['compiled_source_sha256'],producer_source_sha256=receipt['source_sha256'],profile_named_acl_preserved=profile_acl is not None,proxy_editor_consent_qualified=sys.platform=='linux',toolchain_archive_bytes=release['artifact_bytes'],toolchain_expanded_bytes=json.loads((fixtures/'www/inventories/stable-current.json').read_bytes())['expanded_bytes'],host=__import__('platform').uname()._asdict(),os_release=__import__('platform').freedesktop_os_release() if sys.platform=='linux' else None)
         summary.update(distinct_stable_release_update='1.10.0 -> 1.11.0; same compiler build, different release/payload identities',rollback_reinstall_recovery=True,interrupted_download_bytes=1048576,abandoned_transactions_preserved=True,user_files_preserved=True)
+        summary['producer_build_sdk_providers_stdlib_hidden']=a.isolate_producer
         if not a.no_evidence:(a.evidence/'first-run-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
         # Retain selected outputs and exact commands with ephemeral paths made
         # explicit. Private keys and disposable packages are never archived.

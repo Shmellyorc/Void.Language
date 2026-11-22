@@ -2,6 +2,15 @@ name: VOIDUP native first install and release preparation
 on:
   workflow_dispatch:
     inputs:
+      platform:
+        description: Reviewed native qualification scope (macOS is the remaining gap)
+        type: choice
+        default: macos-arm64
+        options:
+          - macos-arm64
+          - linux-x64
+          - windows-x64
+          - all
       prepare_production:
         description: Prepare unsigned production payloads with enrolled public keys
         type: boolean
@@ -19,13 +28,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - {os: ubuntu-24.04, system: Linux, arch: X64}
-          - {os: windows-2022, system: Windows, arch: X64}
-          - {os: macos-15, system: Darwin, arch: ARM64}
+        include: ${{ fromJSON(inputs.platform == 'macos-arm64' && '[{"os":"macos-15","system":"Darwin","arch":"ARM64"}]' || inputs.platform == 'linux-x64' && '[{"os":"ubuntu-24.04","system":"Linux","arch":"X64"}]' || inputs.platform == 'windows-x64' && '[{"os":"windows-2022","system":"Windows","arch":"X64"}]' || '[{"os":"ubuntu-24.04","system":"Linux","arch":"X64"},{"os":"windows-2022","system":"Windows","arch":"X64"},{"os":"macos-15","system":"Darwin","arch":"ARM64"}]') }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 360
+    timeout-minutes: ${{ matrix.system == 'Darwin' && 120 || 360 }}
     env:
+      INSTALL_CI_DRIVER: ${{ matrix.system == 'Darwin' && 'tools/ci/voidup_macos_ci.py' || 'tools/ci/install_smoke.py' }}
       INSTALL_QUALIFICATION_NAME: voidup-release-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.os }}
       INSTALL_EXPECTED_SYSTEM: ${{ matrix.system }}
       INSTALL_EXPECTED_ARCH: ${{ matrix.arch }}
@@ -45,28 +52,100 @@ jobs:
           arch: x64
       - name: Producer-only signing and HTTPS test dependency
         run: python -m pip install cryptography==50.0.2
+      - name: Verify focused macOS CI contracts
+        if: runner.os == 'macOS'
+        run: python tests/ci/voidup_macos_ci_test.py
       - name: Verify native runner identity
-        run: python tools/ci/install_smoke.py identity
+        run: python "${{ env.INSTALL_CI_DRIVER }}" identity
       - name: Prepare declared host prerequisites
-        run: python tools/ci/install_smoke.py host
+        run: python "${{ env.INSTALL_CI_DRIVER }}" host
+      # Identity runs before cache restoration: it still requires a fresh checkout.
+      - name: Restore complete pinned macOS LLVM SDK
+        if: runner.os == 'macOS'
+        id: llvm
+        uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
       - name: Verify pinned LLVM Clang LLD 23.1.4
-        run: python tools/ci/install_smoke.py sdk
+        run: python "${{ env.INSTALL_CI_DRIVER }}" sdk
+      - name: Save verified macOS LLVM SDK
+        if: runner.os == 'macOS' && steps.llvm.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Identify pinned macOS installation dependency profile
+        if: runner.os == 'macOS'
+        id: http
+        run: python tools/ci/voidup_macos_ci.py dependency-identity
+      - name: Restore verified HTTP source archives
+        if: runner.os == 'macOS'
+        id: http-sources
+        uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/http/downloads
+          key: ${{ steps.http.outputs.sources-key }}
+      - name: Restore exact native macOS installation profile
+        if: runner.os == 'macOS'
+        id: http-deps
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.deps-key }}
+      - name: Restore an existing exact complete HTTP profile when available
+        if: runner.os == 'macOS' && steps.http-deps.outputs.cache-hit != 'true'
+        id: http-full-deps
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.full-deps-key }}
       - name: Build matching HTTP and host providers
-        run: python tools/ci/install_smoke.py dependencies
+        # A complete verified HTTP profile is a usable superset; avoid rebuilding
+        # it when the smaller installation-only profile has no cache yet.
+        # Each profile is checked against its own exact seal, with no restore keys.
+        # The actual native provider bootstrap remains mandatory on a cold cache.
+        env:
+          HTTP_DEPS_CACHE_HIT: ${{ steps.http-deps.outputs.cache-hit }}
+          HTTP_FULL_DEPS_CACHE_HIT: ${{ steps.http-full-deps.outputs.cache-hit }}
+        run: python "${{ env.INSTALL_CI_DRIVER }}" dependencies
+      - name: Save verified HTTP source archives
+        if: runner.os == 'macOS' && steps.http-sources.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .toolchains/http/downloads
+          key: ${{ steps.http.outputs.sources-key }}
+      - name: Save verified native macOS installation profile
+        if: runner.os == 'macOS' && steps.http-deps.outputs.cache-hit != 'true' && steps.http-full-deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.deps-key }}
       - name: Configure the existing Release compiler recipe
-        run: python tools/ci/install_smoke.py configure
+        env:
+          HTTP_FULL_DEPS_CACHE_HIT: ${{ steps.http-full-deps.outputs.cache-hit }}
+        run: python "${{ env.INSTALL_CI_DRIVER }}" configure
       - name: Build existing compiler and tooling targets
-        run: python tools/ci/install_smoke.py build
+        run: python "${{ env.INSTALL_CI_DRIVER }}" build
       - name: Compose a private qualification prefix
-        run: python tools/ci/install_smoke.py install
+        run: python "${{ env.INSTALL_CI_DRIVER }}" install
       - name: Verify installed compiler Runtime stdlib and LSP
-        run: python tools/ci/install_smoke.py smoke
+        run: python "${{ env.INSTALL_CI_DRIVER }}" smoke
       - name: Native VOIDUP qualification with ephemeral engineering keys
+        if: runner.os != 'macOS'
         run: python tools/ci/voidup_release.py qualify
+      - name: Native macOS VOIDUP relocation installation update and recovery
+        if: runner.os == 'macOS'
+        run: python tools/ci/voidup_macos_ci.py qualify
       - name: Prepare unsigned production artifacts using public inputs only
         if: inputs.prepare_production && runner.os != 'macOS'
         shell: bash
         run: python tools/ci/voidup_release.py prepare --version "$VOIDUP_RELEASE_VERSION" --public-config "$VOIDUP_PUBLIC_CONFIG"
+      - name: Seal macOS qualification and failure diagnostics
+        if: always() && runner.os == 'macOS'
+        env:
+          INSTALL_PRIOR_JOB_STATUS: ${{ job.status }}
+        run: python tools/ci/voidup_macos_ci.py report
       - name: Retain qualification receipts
         if: always()
         uses: actions/upload-artifact@v6
