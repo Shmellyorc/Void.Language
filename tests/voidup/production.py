@@ -119,5 +119,7 @@ with tempfile.TemporaryDirectory(prefix='voidup-production-fixture-') as folder,
         checks.append('macOS driver wrapper POSIX shell syntax')
 subprocess.run([sys.executable,'-B',str(ROOT/'tests/voidup/macos_relocation.py')],check=True)
 checks.append('Offline macOS relocation, dependency closure, RPATH and strict signature regressions')
+subprocess.run([sys.executable,'-B',str(ROOT/'tests/voidup/macos_launcher.py')],check=True)
+checks.append('Offline extracted macOS launcher, restricted PATH, literal arguments and package integrity')
 print('PASS: '+str(len(checks))+' offline production-boundary checks')
 for label in checks:print('  '+label)

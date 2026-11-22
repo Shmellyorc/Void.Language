@@ -250,7 +250,7 @@ __VOIDUP_PAYLOAD__
                 wrapper='@echo off\r\n"%~dp0bin\\voidup-init.exe" %*\r\nif errorlevel 1 pause\r\n'
                 member('Install VOID.cmd',wrapper);expanded+=len(wrapper.encode())
             else:
-                wrapper='#!/bin/sh\nset -eu\ncd "$(dirname "$0")"\nexec ./bin/voidup-init "$@"\n'
+                wrapper='#!/bin/sh\nset -eu\nlauncher=$0\ncase $launcher in /*) ;; *) launcher=./$launcher ;; esac\nCDPATH= cd "${launcher%/*}/"\nexec ./bin/voidup-init "$@"\n'
                 member('Install VOID.command',wrapper,True);expanded+=len(wrapper.encode())
     metadata.update(archive_bytes=args.output.stat().st_size,archive_sha256=sha(args.output),expanded_bytes=expanded,dependencies={'linux-x86_64':['POSIX sh','mktemp','tail','tar with gzip','ELF dependencies measured separately'],'windows-x86_64':['Windows cmd','native PE imports measured separately'],'macos-aarch64':['POSIX sh','native Mach-O dependencies measured separately']}[args.host])
     exclusive(Path(str(args.output)+'.json'),encoded(metadata));print('Bootstrap prepared; actual compressed and expanded sizes recorded. No publication performed.')
