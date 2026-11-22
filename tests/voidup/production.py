@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import subprocess
 import sys
 import tempfile
 import zipfile
@@ -114,8 +115,9 @@ with tempfile.TemporaryDirectory(prefix='voidup-production-fixture-') as folder,
     assert not any('/producer' in line for line in manifest) and '-framework' in manifest
     checks.append('macOS manifest drops producer SDK/header paths and preserves link inputs')
     if os.name!='nt':
-        import subprocess
         subprocess.run(['/bin/sh','-n'],input=driver_wrapper().encode(),check=True)
         checks.append('macOS driver wrapper POSIX shell syntax')
+subprocess.run([sys.executable,'-B',str(ROOT/'tests/voidup/macos_relocation.py')],check=True)
+checks.append('Offline macOS relocation, dependency closure, RPATH and strict signature regressions')
 print('PASS: '+str(len(checks))+' offline production-boundary checks')
 for label in checks:print('  '+label)

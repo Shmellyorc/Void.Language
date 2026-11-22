@@ -38,6 +38,17 @@ def relocate(prefix, origins, allowed_roots, dependency_directory='sdk/lib/void-
     if sys.platform!='darwin':raise ValueError('Mach-O relocation requires native macOS')
     prefix=Path(prefix).resolve();allowed_roots=[Path(p).resolve() for p in allowed_roots]
     destination=prefix/dependency_directory;records={};copied={};visiting=set()
+    executables=[Path(image).resolve() for image in origins]
+    def internal_rpath(path,image):
+        # Keep already relocatable search paths without editing signed LLVM
+        # binaries. Resolve '..' and symlinks; absolute/ambient/unknown paths
+        # are not portable. A shared dylib may be loaded by any packaged entry.
+        if path=='@loader_path' or path.startswith('@loader_path/'):
+            token='@loader_path';bases=[image.parent]
+        elif path=='@executable_path' or path.startswith('@executable_path/'):
+            token='@executable_path';bases=[p.parent for p in executables]
+        else:return False
+        return bool(bases) and all(Path(str(base)+path[len(token):]).resolve().is_relative_to(prefix) for base in bases)
     def resolve(reference,origin,details,executable):
         def expand(path):
             return path.replace('@loader_path',str(origin.parent)).replace('@executable_path',str(executable.parent))
@@ -68,7 +79,8 @@ def relocate(prefix, origins, allowed_roots, dependency_directory='sdk/lib/void-
             visit(target,library,executable)
             changes+=['-change',reference,'@loader_path/'+os.path.relpath(target,image.parent)]
         if details['identifier']:changes+=['-id','@rpath/'+image.name]
-        for path in details['rpaths']:changes+=['-delete_rpath',path]
+        for path in details['rpaths']:
+            if not internal_rpath(path,image):changes+=['-delete_rpath',path]
         if changes:
             # Path edits invalidate existing signatures. Re-sign only after all
             # edits; this does not create a production signing credential.
@@ -79,6 +91,8 @@ def relocate(prefix, origins, allowed_roots, dependency_directory='sdk/lib/void-
         records[image]=inspect(image);visiting.remove(image)
     for image,origin in origins.items():visit(Path(image),Path(origin).resolve(),Path(origin).resolve())
     for image,details in records.items():
+        for path in details['rpaths']:
+            if not internal_rpath(path,image):raise ValueError('Mach-O RPATH escaped the relocated payload: '+path)
         for reference in details['dependencies']:
             if reference.startswith(SYSTEM):continue
             if not reference.startswith('@loader_path/') or not (image.parent/reference[len('@loader_path/'):]).resolve().is_relative_to(prefix):
