@@ -22,6 +22,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 360
     env:
+      EXPERIMENT_CONFIGURATION: ${{ matrix.configuration }}
+      EXPERIMENT_DIR: ${{ github.workspace }}/build/foundation
       ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
       UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
     steps:
@@ -33,7 +35,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+          sudo apt-get install -y build-essential ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
       - name: Windows native SDK environment
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
@@ -49,8 +51,65 @@ jobs:
           key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
       - name: Install and verify LLVM development SDK
         run: python tools/ci/llvm_sdk.py
+      - name: Identify pinned native HTTP dependencies
+        id: http
+        run: python tools/ci/http_bootstrap.py identity
+      - name: Cache verified HTTP source archives
+        id: http-sources
+        uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/http/downloads
+          key: ${{ steps.http.outputs.sources-key }}
+      - name: Cache native HTTP dependency profile
+        id: http-deps
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.deps-key }}
+      - name: Cache pinned local HTTP fixtures
+        id: http-fixtures
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            .toolchains/http/test-python
+            .toolchains/http/test-certificates
+            .toolchains/http/test-certificates-tools
+          key: ${{ steps.http.outputs.fixtures-key }}
+      - name: Bootstrap and verify HTTP dependencies and fixtures
+        env:
+          HTTP_DEPS_CACHE_HIT: ${{ steps.http-deps.outputs.cache-hit }}
+        run: python tools/ci/http_bootstrap.py bootstrap
+      # Save after verification, so later native compiler/test failures do not
+      # force rebuilding an already verified immutable dependency closure.
+      - name: Save verified HTTP source archives
+        if: steps.http-sources.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .toolchains/http/downloads
+          key: ${{ steps.http.outputs.sources-key }}
+      - name: Save verified native HTTP dependency profile
+        if: steps.http-deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.deps-key }}
+      - name: Save verified local HTTP fixtures
+        if: steps.http-fixtures.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            .toolchains/http/test-python
+            .toolchains/http/test-certificates
+            .toolchains/http/test-certificates-tools
+          key: ${{ steps.http.outputs.fixtures-key }}
+      - name: Bootstrap and verify pinned VOIDUP host providers
+        run: python tools/ci/voidup_bootstrap.py bootstrap
       - name: Configure ${{ matrix.configuration }}
+        if: runner.os != 'macOS'
         run: cmake -S . -B build/${{ matrix.configuration }} -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration == 'Sanitizers' && 'RelWithDebInfo' || matrix.configuration }} -DVOID_SANITIZERS=${{ matrix.configuration == 'Sanitizers' && 'ON' || 'OFF' }} -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}"
+      - name: Configure macOS ${{ matrix.configuration }}
+        if: runner.os == 'macOS'
+        run: cmake -S . -B build/${{ matrix.configuration }} -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.configuration == 'Sanitizers' && 'RelWithDebInfo' || matrix.configuration }} -DVOID_SANITIZERS=${{ matrix.configuration == 'Sanitizers' && 'ON' || 'OFF' }} -DLLVM_DIR="${{ env.LLVM_DIR }}" -DVOID_CLANG="${{ env.VOID_CLANG }}" -DVOID_LINKER="${{ env.VOID_LINKER }}" -DCMAKE_OSX_ARCHITECTURES=arm64 -DCMAKE_OSX_SYSROOT="${{ env.SDKROOT }}" -DCMAKE_OSX_DEPLOYMENT_TARGET="${{ env.MACOSX_DEPLOYMENT_TARGET }}"
       - name: Build ${{ matrix.configuration }}
         run: cmake --build build/${{ matrix.configuration }} --parallel 3
       - name: Execute ${{ matrix.configuration }} tests
@@ -111,6 +170,7 @@ jobs:
         with:
           name: tests-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}
           path: |
+            build/foundation/**
             build/**/Testing/Temporary/LastTest.log
             build/**/CMakeFiles/CMakeConfigureLog.yaml
             build/**/CMakeFiles/CMakeError.log
