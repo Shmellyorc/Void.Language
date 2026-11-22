@@ -26,7 +26,7 @@ class Relocation(unittest.TestCase):
     def setUp(self):
         self.stack = ExitStack()
         self.addCleanup(self.stack.close)
-        self.root = Path(self.stack.enter_context(tempfile.TemporaryDirectory(prefix='VOID Mach-O ')))
+        self.root = Path(self.stack.enter_context(tempfile.TemporaryDirectory(prefix='VOID Mach-O '))).resolve()
         self.prefix, self.sdk = self.root / 'payload', self.root / 'producer-sdk'
         self.records, self.inputs, self.commands = {}, {}, []
         self.reject_edit = self.bad_signature = self.ignore_edits = False
@@ -95,6 +95,95 @@ class Relocation(unittest.TestCase):
         self.assertEqual(image.read_bytes(), before)
         self.assertEqual(result['sdk/bin/clang']['rpaths'], ['@loader_path/../lib'])
         self.assertEqual(self.commands, [['/usr/bin/codesign', '--verify', '--strict', str(image)]])
+
+    def aliased_prefix(self):
+        # Model macOS /var -> /private/var with a real ancestor symlink, not
+        # mocked resolve/relative_to calls. Payload files themselves are regular.
+        private_var = self.root / 'private/var'
+        private_var.mkdir(parents=True)
+        alias = self.root / 'var'
+        try:
+            alias.symlink_to(private_var, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest('This host does not permit fixture directory symlinks')
+        self.prefix = private_var / 'folders/qualification/payload'
+        return alias / 'folders/qualification/payload'
+
+    def test_var_alias_inventory_uses_canonical_image_paths(self):
+        alias = self.aliased_prefix()
+        image, original = self.clang()
+        aliased_image = alias / 'sdk/bin/clang'
+        before = image.read_bytes()
+        self.reject_edit = True
+        for prefix, images in [(alias, {aliased_image: original}),
+                               (self.prefix, {aliased_image: original}),
+                               (alias, {image: original}),
+                               (alias, {image: original, aliased_image: original})]:
+            with self.subTest(prefix=prefix, images=list(images)):
+                self.commands.clear()
+                result = macos.relocate(prefix, images, [self.prefix, self.sdk])
+                self.assertEqual(result, {'sdk/bin/clang': self.records[image]})
+                self.assertEqual(image.read_bytes(), before)
+                self.assertEqual(self.commands, [['/usr/bin/codesign', '--verify', '--strict', str(image)]])
+
+    def test_var_alias_recursive_dependency_inventory_is_relative(self):
+        alias = self.aliased_prefix()
+        library = self.image(self.sdk / 'lib/libneeded.dylib', details(rpaths=['@loader_path']))
+        image, original = self.clang()
+        self.records[image]['dependencies'].append(str(library))
+        result = macos.relocate(alias, {alias / 'sdk/bin/clang': original}, [alias, self.sdk])
+        self.assertEqual(set(result), {'sdk/bin/clang', 'sdk/lib/void-dependencies/libneeded.dylib'})
+        self.assertIn('@loader_path/../lib/void-dependencies/libneeded.dylib', result['sdk/bin/clang']['dependencies'])
+        self.assertEqual(sum('--verify' in c for c in self.commands), 2)
+
+    def test_package_image_escapes_are_rejected_before_apple_commands(self):
+        image, original = self.clang()
+        outside = self.image(self.root / 'outside/clang', details(rpaths=['/producer/lib']))
+        link = self.prefix / 'sdk/bin/escape'
+        directory = self.prefix / 'escape'
+        try:
+            link.symlink_to(outside)
+            directory.symlink_to(outside.parent, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest('This host does not permit fixture symlinks')
+        before = outside.read_bytes()
+        for escaped in [outside, link, directory / outside.name, self.prefix / '../outside/clang']:
+            with self.subTest(image=escaped), self.assertRaisesRegex(ValueError, 'outside package'):
+                self.relocate(escaped, original)
+            self.assertEqual(self.commands, [])
+            self.assertEqual(outside.read_bytes(), before)
+
+    def test_dependency_copy_symlink_escapes_are_rejected_before_writing(self):
+        for kind in ['directory', 'file']:
+            with self.subTest(kind=kind):
+                self.prefix = self.root / ('payload-' + kind)
+                image, original = self.clang()
+                library = self.image(self.sdk / 'lib/libneeded.dylib', details())
+                self.records[image]['dependencies'].append(str(library))
+                outside = self.root / ('outside-' + kind)
+                outside.mkdir()
+                sentinel = outside / library.name
+                sentinel.write_bytes(b'outside package must not change')
+                destination = self.prefix / 'sdk/lib/void-dependencies'
+                try:
+                    if kind == 'directory':
+                        destination.symlink_to(outside, target_is_directory=True)
+                    else:
+                        destination.mkdir()
+                        (destination / library.name).symlink_to(sentinel)
+                except (OSError, NotImplementedError):
+                    self.skipTest('This host does not permit fixture symlinks')
+                with self.assertRaisesRegex(ValueError, 'outside package'):
+                    self.relocate(image, original)
+                self.assertEqual(sentinel.read_bytes(), b'outside package must not change')
+                self.assertEqual(self.commands, [])
+
+    def test_dependency_directory_cannot_escape_package(self):
+        image, original = self.clang()
+        for destination in ['../outside', str(self.root / 'absolute-outside')]:
+            with self.subTest(destination=destination), self.assertRaisesRegex(ValueError, 'outside package'):
+                self.relocate(image, original, dependency_directory=destination)
+        self.assertEqual(self.commands, [])
 
     def test_unsafe_search_paths_are_removed_not_silently_retained(self):
         for unsafe in ['/opt/homebrew/opt/llvm/lib', '/Users/runner/work/build/lib', str(self.sdk / 'lib'),

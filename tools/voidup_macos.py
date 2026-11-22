@@ -37,8 +37,14 @@ def inspect(image):
 def relocate(prefix, origins, allowed_roots, dependency_directory='sdk/lib/void-dependencies'):
     if sys.platform!='darwin':raise ValueError('Mach-O relocation requires native macOS')
     prefix=Path(prefix).resolve();allowed_roots=[Path(p).resolve() for p in allowed_roots]
-    destination=prefix/dependency_directory;records={};copied={};visiting=set()
-    executables=[Path(image).resolve() for image in origins]
+    def package_path(path):
+        # macOS /var may alias /private/var. Use the same canonical spelling
+        # for package images, copy targets and the final relative inventory.
+        path=Path(path).resolve()
+        if not path.is_relative_to(prefix):raise ValueError('Mach-O path is outside package: '+str(path))
+        return path
+    destination=package_path(prefix/dependency_directory);records={};copied={};visiting=set()
+    executables=[package_path(image) for image in origins]
     def internal_rpath(path,image):
         # Keep already relocatable search paths without editing signed LLVM
         # binaries. Resolve '..' and symlinks; absolute/ambient/unknown paths
@@ -65,13 +71,14 @@ def relocate(prefix, origins, allowed_roots, dependency_directory='sdk/lib/void-
                 raise ValueError('Non-system dependency is outside admitted build/SDK inputs: '+str(candidate))
         raise ValueError('Unresolved Mach-O dependency: '+reference)
     def visit(image,origin,executable):
+        image=package_path(image)
         if image in records:return
         if image in visiting:return
         visiting.add(image);details=inspect(image);changes=[]
         for reference in details['dependencies']:
             if reference.startswith(SYSTEM):continue
             library=resolve(reference,origin,details,executable)
-            target=destination/library.name
+            target=package_path(destination/library.name)
             if target.name in copied and copied[target.name]!=library:
                 if library.read_bytes()!=copied[target.name].read_bytes():raise ValueError('Conflicting Mach-O dependency basenames')
             if target.name not in copied:
@@ -99,7 +106,7 @@ def relocate(prefix, origins, allowed_roots, dependency_directory='sdk/lib/void-
                 raise ValueError('Mach-O dependency escaped the relocated payload')
             if not (image.parent/reference[len('@loader_path/'):]).is_file():raise ValueError('Relocated dependency is missing')
         subprocess.run(['/usr/bin/codesign','--verify','--strict',str(image)],check=True)
-    return {str(p.relative_to(prefix)):d for p,d in records.items()}
+    return {p.relative_to(prefix).as_posix():d for p,d in records.items()}
 
 def driver_wrapper():
     # Native links/imports resolve the consumer's selected Apple SDK. Never
