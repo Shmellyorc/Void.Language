@@ -23,7 +23,7 @@ struct up_error:
     published: bool
     durable: bool
 
-const up_manager_version: i64 = 1
+const up_manager_version: i64 = 2
 const up_metadata_limit: i64 = 8388608
 const up_file_limit: i64 = 1073741824
 const up_package_limit: i64 = 2147483648

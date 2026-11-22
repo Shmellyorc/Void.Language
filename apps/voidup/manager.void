@@ -15,6 +15,7 @@ use process
 use time
 use text
 use json as codec
+use "./distribution.void" as distribution
 
 struct up_context:
     presentation: presentation.up_presentation
@@ -101,6 +102,8 @@ func up_fetch_catalog(context: up_context) -> result<model.up_catalog, support.u
     presentation.up_status(context.presentation, "Fetching", "authenticated metadata")
     if context.options.catalog_url == "":
         return Err(support.up_fail("this command requires an explicit private --catalog HTTPS URL", "arguments", 2))
+    if context.options.catalog_url == distribution.up_official_catalog and not distribution.up_source_enabled:
+        return Err(support.up_fail("official distribution is not enabled in this engineering build; use an isolated authenticated test catalog", "distribution"))
     var checked_origin = transport.up_same_origin(context.options.catalog_url, context.options.catalog_url)?
     with transport.up_client(context.options.ca_file)? as client:
         var raw_catalog = transport.up_fetch(client, context.options.catalog_url, context.options.catalog_url, support.up_metadata_limit, context.options.timeout_ms)?
@@ -131,7 +134,7 @@ func up_record(context: up_context, release_id: string) -> result<model.up_insta
     return Err(support.up_fail("release is not installed", "select"))
 
 func up_equivalent(first: model.up_release, second: model.up_release) -> bool:
-    return first.id == second.id and first.host == second.host and first.build_identity == second.build_identity and first.artifact_bytes == second.artifact_bytes and first.artifact_sha256 == second.artifact_sha256 and first.inventory_bytes == second.inventory_bytes and first.inventory_sha256 == second.inventory_sha256
+    return first.id == second.id and model.up_same_selection(first, second) and first.host == second.host and first.build_identity == second.build_identity and first.artifact_bytes == second.artifact_bytes and first.artifact_sha256 == second.artifact_sha256 and first.inventory_bytes == second.inventory_bytes and first.inventory_sha256 == second.inventory_sha256
 
 func up_installed_manifest(context: up_context, record: model.up_installed) -> result<model.up_inventory, support.up_error>:
     var proof = up_cached_catalog(context, record.catalog_digest)?
@@ -150,7 +153,7 @@ func up_verify_version(context: up_context, release_id: string) -> result<model.
         var verified = inventory.up_verify_prefix(prefix_cap, context.options.root_path + "/toolchains/" + release_id, record.release, manifest)?
     return Ok(manifest)
 
-func up_activate(context: up_context, release_id: string) -> result<bool, support.up_error>:
+func up_activate(context: up_context, release_id: string, announce: bool = true) -> result<bool, support.up_error>:
     presentation.up_status(context.presentation, "Verifying", "selected toolchain")
     var verified = up_verify_version(context, release_id)?
     var now = support.up_clock(time.now_utc())?.seconds
@@ -160,13 +163,26 @@ func up_activate(context: up_context, release_id: string) -> result<bool, suppor
         context.control_state.previous = context.control_state.current
         context.control_state.current = release_id
         context.control_state.last_time = now
-        presentation.up_status(context.presentation, "Selecting", "default toolchain")
+        presentation.up_status(context.presentation, "Activating", "VOID toolchain")
         var saved = storage.up_write_control(context.root_cap, context.control_state)?
-    return up_say("default {release_id}")
+    if announce:
+        return up_say("default {release_id}")
+    return Ok(true)
 
 func up_install(context: up_context) -> result<bool, support.up_error>:
+    var automatic = context.options.release_id == "" or context.options.release_id == "latest"
     var catalog = up_fetch_catalog(context)?
-    var release = model.up_find_release(catalog, context.options.release_id)?
+    var release = model.up_release()
+    if context.options.release_id == "" or context.options.release_id == "latest":
+        release = model.up_latest_stable(catalog)?
+        # Authenticated metadata can retire a release, but an update must not
+        # silently downgrade an already selected newer stable toolchain.
+        for installed in context.control_state.installed:
+            if installed.release.id == context.control_state.current and model.up_release_channel(installed.release) == "stable":
+                if model.up_version_compare(model.up_release_version(release)?, model.up_release_version(installed.release)?)? < 0:
+                    return Err(support.up_fail("latest stable would downgrade the current toolchain; select an explicit release instead", "select"))
+    else:
+        release = model.up_find_release(catalog, context.options.release_id)?
     if model.up_is_revoked(context.control_state.revoked, release.id):
         return Err(support.up_fail("requested release is revoked", "install"))
     var raw_inventory: [u8] = []
@@ -192,11 +208,11 @@ func up_install(context: up_context) -> result<bool, support.up_error>:
                     with transport.up_client(context.options.ca_file)? as client:
                         var target = transport.up_remote(context.options.catalog_url, release.artifact_url)?
                         presentation.up_status(context.presentation, "Downloading", "toolchain artifact")
-                        var downloaded = transport.up_download(client, context.options.catalog_url, target, package, release.artifact_bytes, context.options.timeout_ms)?
+                        var downloaded = transport.up_download(client, context.options.catalog_url, target, package, release.artifact_bytes, context.options.timeout_ms, context.options.package_timeout_ms)?
                     presentation.up_status(context.presentation, "Verifying", "archive members and content")
                     var extracted = inventory.up_extract(package, payload, release, manifest)?
                 # All exact signed members have been hashed and ZIP CRC-checked.
-                presentation.up_status(context.presentation, "Publishing", "verified toolchain")
+                presentation.up_status(context.presentation, "Installing", "verified VOID toolchain")
                 var published = support.up_publication(payload.publish(context.versions_cap, release.id), "toolchain-publication")?
     var registered = false
     for item in context.control_state.installed:
@@ -207,14 +223,20 @@ func up_install(context: up_context) -> result<bool, support.up_error>:
             return Err(support.up_fail("installed release count reached local limit", "install"))
         context.control_state.installed.push(model.up_installed(release = release, catalog_digest = context.control_state.catalog_digest, catalog_serial = catalog.serial))
         var saved = storage.up_write_control(context.root_cap, context.control_state)?
-    var announced = up_say("installed {release.id} build {release.build_identity}")?
+    if not automatic:
+        var announced = up_say("installed {release.id} build {release.build_identity}")?
     if context.options.activate:
-        return up_activate(context, release.id)
+        var activated = up_activate(context, release.id, not automatic)?
+    if automatic:
+        var version = model.up_release_version(release)?
+        return up_say("VOID {version} is ready.")
     return Ok(true)
 
 func up_environment(context: up_context, release_id: string) -> [string]:
     var environment: [string] = []
-    for name in ["HOME", "USERPROFILE", "SYSTEMROOT", "WINDIR", "TMPDIR", "TMP", "TEMP", "LANG", "LC_ALL", "TERM"]:
+    # Preserve consent policy/storage and the user's desktop session. Stable
+    # proxies must behave like the selected compiler for these OS inputs.
+    for name in ["HOME", "USERPROFILE", "SYSTEMROOT", "WINDIR", "TMPDIR", "TMP", "TEMP", "LANG", "LC_ALL", "TERM", "CI", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_STATE_HOME", "XDG_RUNTIME_DIR", "DISPLAY", "WAYLAND_DISPLAY", "XAUTHORITY", "DBUS_SESSION_BUS_ADDRESS"]:
         if os.env(name) is Ok(var item):
             environment.push(name + "=" + item)
     # Compiler/loader overrides and caller PATH never select executables or SDKs.
@@ -259,7 +281,11 @@ func up_dispatch(context: up_context, writer: io.directory_lock) -> result<i32, 
     var command_name = context.options.command
     if command_name == "run":
         return up_run(context, writer)
-    if command_name == "install":
+    if command_name == "setup" or command_name == "update":
+        context.options.release_id = ""
+        context.options.activate = true
+        var installed = up_install(context)?
+    else if command_name == "install":
         var installed = up_install(context)?
     else if command_name == "default":
         var changed = up_activate(context, context.options.release_id)?
@@ -308,7 +334,7 @@ func up_dispatch(context: up_context, writer: io.directory_lock) -> result<i32, 
                 var checked = up_verify_version(context, item.release.id)?
         var pending = support.up_io(io.entries(context.options.root_path + "/transactions", max_entries = 1024))?
         var synchronized = support.up_io(context.root_cap.sync())?
-        var printed = up_say("VOIDUP root verified; host={model.up_host()} trust=2-of-3-private-test-keys serial={context.control_state.serial} current={context.control_state.current} previous={context.control_state.previous} retained-transactions={pending.count}; native linking requires the declared host development SDK")?
+        var printed = up_say("VOIDUP root verified; host={model.up_host()} trust=2-of-3 {distribution.up_trust_label} serial={context.control_state.serial} current={context.control_state.current} previous={context.control_state.previous} retained-transactions={pending.count}; native linking requires the declared host development SDK")?
     return Ok(0)
 
 func up_execute(options: cli.up_options, status: presentation.up_presentation) -> result<i32, support.up_error>:

@@ -2,6 +2,7 @@ use "./support.void" as support
 use json as codec
 use text
 use os
+use convert
 
 struct up_signature:
     key_id: string
@@ -11,8 +12,13 @@ struct up_signature_envelope:
     schema: i64
     signatures: [up_signature]
 
+struct up_release_selection:
+    version: string
+    channel: string
+
 struct up_release:
     id: string
+    selection: up_release_selection?
     host: string
     build_identity: string
     artifact_url: string
@@ -125,6 +131,70 @@ func up_find_release(document: up_catalog, release_id: string) -> result<up_rele
         if item.id == release_id and item.host == up_host():
             return Ok(item)
     return Err(support.up_fail("release is absent for this host", "select"))
+
+func up_stable_version(version: string) -> result<[i64], support.up_error>:
+    var parts = support.up_txt(text.split(version, "."))?
+    if parts.count != 3:
+        return Err(support.up_fail("stable version requires three numeric components", "select"))
+    var numbers: [i64] = []
+    for part in parts:
+        var bytes = part.to_utf8()
+        if bytes.count == 0 or bytes.count > 9 or (bytes.count > 1 and bytes[0] == 48):
+            return Err(support.up_fail("invalid stable version component", "select"))
+        for byte in bytes:
+            if byte < 48 or byte > 57:
+                return Err(support.up_fail("stable versions cannot contain prerelease or build suffixes", "select"))
+        if convert.parse<i64>(part) is Ok(var number):
+            numbers.push(number)
+        else:
+            return Err(support.up_fail("invalid stable version number", "select"))
+    return Ok(numbers)
+
+func up_version_compare(first: string, second: string) -> result<i32, support.up_error>:
+    var a = up_stable_version(first)?
+    var b = up_stable_version(second)?
+    for index in 0..<3:
+        if a[index] < b[index]:
+            return Ok(-1)
+        if a[index] > b[index]:
+            return Ok(1)
+    return Ok(0)
+
+func up_latest_stable(document: up_catalog) -> result<up_release, support.up_error>:
+    var selected = up_release()
+    var versions: {string: bool}
+    for item in document.releases:
+        if item.host != up_host() or up_release_channel(item) != "stable" or up_is_revoked(document.revoked, item.id):
+            continue
+        var version = up_release_version(item)?
+        var checked = up_stable_version(version)?
+        if versions.contains(version):
+            return Err(support.up_fail("ambiguous stable version for this host", "select"))
+        versions[version] = true
+        if selected.id == "":
+            selected = item
+        else if up_version_compare(version, up_release_version(selected)?)? > 0:
+            selected = item
+    if selected.id == "":
+        return Err(support.up_fail("no compatible stable release is available for this host", "select"))
+    return Ok(selected)
+
+func up_release_channel(release: up_release) -> string:
+    if release.selection is Ok(var selection):
+        return selection.channel
+    return ""
+
+func up_release_version(release: up_release) -> result<string, support.up_error>:
+    if release.selection is Ok(var selection):
+        return Ok(selection.version)
+    return Err(support.up_fail("stable release lacks an authenticated version", "select"))
+
+func up_same_selection(first: up_release, second: up_release) -> bool:
+    if first.selection is Ok(var a):
+        if second.selection is Ok(var b):
+            return a.version == b.version and a.channel == b.channel
+        return false
+    return second.selection == null
 
 func up_member_path(member: up_member) -> result<string, support.up_error>:
     if member.directory:

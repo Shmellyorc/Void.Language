@@ -1,152 +1,135 @@
-# Install and select VOID with VOIDUP
+# Install VOID with VOIDUP
 
-VOIDUP is VOID's native toolchain manager. The intended route is to obtain a
-matching VOIDUP bootstrap, install a complete authenticated toolchain, create a
-project and start coding. Installation and ordinary compiler use need no Python
-or CMake. VOIDUP uses a dedicated per-user root, never a generic source-install
-prefix.
+VOIDUP installs the latest compatible stable VOID toolchain automatically. The
+native manager verifies the signed release catalog and every downloaded file,
+installs into a dedicated user directory, and selects the verified toolchain.
+Python, CMake and a separately installed LLVM are not installer requirements.
 
 ## Availability
 
-There is currently **no verified public VOIDUP bootstrap or production catalog**.
-The checked-in manager uses private engineering 2-of-3 test trust roots. Its
-implemented Linux workflow is available for controlled engineering qualification;
-it must not be presented as a production download. Windows and macOS native
-VOIDUP installation remain unqualified. See [release production](RELEASE_PRODUCTION.md)
-for the exact publication work. Until a reviewed public channel exists, developers
-who need tools can use the separate [contributor source build](../install/README.md).
-That build's Python/CMake/SDK requirements are build-system requirements.
+**G96 is a review candidate, not a public release.** Production public keys have
+not been enrolled and the official catalog/installers have not been published.
+Do not distribute the engineering bootstrap: it uses test trust. The Linux
+first-install journey has been exercised with authenticated test releases. See
+[the G96 report](../projects/G96_VOIDUP_PUBLIC_INSTALLER.md) for the exact native
+Windows/macOS qualification limits and remaining publication work.
 
-## Obtain tools and install a version
+The following is the prepared end-user workflow, verified with isolated Linux
+test releases. There are no public download links to these unpublished assets.
 
-Use only a bootstrap and HTTPS catalog supplied for the same reviewed trust set.
-`CATALOG_URL` below means that real supplied endpoint; no public URL is implied.
-`RELEASE_ID` means a host-compatible identifier printed by `list --available`.
+## Download, run, start coding
+
+Obtain the installer for your operating system from the official repository's
+published release once it is available.
+
+- Linux x64: run `sh ./voidup-linux-x86_64.run`.
+- Windows x64: extract `voidup-windows-x86_64.zip`, then open `Install VOID.cmd`.
+  The Windows packaging and per-user PATH route require the native qualification
+  recorded in the report before public availability is claimed.
+- macOS: bootstrap production fails closed until dependency relocation, complete
+  toolchain packaging and native first-install qualification are finished. No
+  macOS download is advertised.
+
+The installer downloads, verifies, installs and activates the latest compatible
+**stable** release. No catalog URL or release ID is needed. Open a **new terminal**:
 
 ```sh
-voidup --version
-voidup --catalog "$CATALOG_URL" list --available
-voidup --catalog "$CATALOG_URL" install RELEASE_ID --activate
+voidc --version
+voidc new Hello
+cd Hello
+voidc run .
+```
+
+The installer exposes stable `voidc`, `voidls` and `voidup` launchers. Moving or
+removing the downloaded installer does not remove the retained manager. The
+launchers use the existing verified native `run` path; selecting another default
+or rolling back does not require regenerating shell exports or editor paths.
+Full installed-inventory verification on those launches remains an intentional
+cost; G96 does not introduce another cache or change verification policy.
+
+Linux integration appends one quoted PATH entry, preserving existing contents,
+to `.profile`, `.bashrc` and `.zshenv`, plus existing Bash login profiles. Ordinary
+shared directories and writable profiles are supported. Existing profile contents,
+owner/group identities, mode bits and access ACLs are preserved; symbolic-link substitution and files the
+OS does not permit writing are refused. Bash terminal discovery is exercised; other shells need their own native
+qualification. Windows integration prepares an HKCU user-PATH update and environment
+notification; it does not change machine PATH. Existing terminals retain their old
+environment. `--no-path` on the bootstrap skips profile/registry changes.
+
+## Update or roll back
+
+```sh
+voidup update
 voidup list
-voidup run default voidc -- --version
+voidup rollback
 voidup doctor
 ```
 
-Global options precede the command. Private TLS qualification can supply
-`--ca-file /absolute/reviewed-ca.pem`; this replaces TLS roots, not release keys.
-Normal distribution uses system TLS trust. Installation checks the catalog's
-Ed25519 threshold signatures and freshness before inventory and package download.
-It verifies the archive hash, every member, permissions and build identity before
-publishing a complete version. The inventory includes `voidc`, `voidls`, Runtime
-and native libraries, standard sources, native manifests, Clang/LLD, Clang resource
-files, package inputs and licenses. A compiler-only archive is not a toolchain.
+`update`, `setup`, a bare manager invocation, `install`, and `install latest`
+select the highest authenticated numeric stable version for the supported host.
+Preview releases, other hosts and revoked releases are excluded. Version order
+comes from signed `selection.version`/`selection.channel` fields, never filenames
+or release IDs. Older signed catalogs without selection metadata remain usable
+with explicit release IDs; automatic selection requires the new metadata.
+Ambiguous or malformed stable versions fail closed. An automatic update cannot
+silently downgrade an already selected newer stable version.
 
-## Roots and prefixes
+`rollback` selects the previous verified installation. Existing versions and
+interrupted transactions are retained. There is no automatic manager self-update,
+key rotation or pruning. Rerunning a newer bootstrap is a separate manager update;
+Windows may require closing active launchers before replacing their executables.
 
-Without `--root`, VOIDUP uses `os.data_dir("voidup")`: the XDG data location on
-Linux, LocalAppData on Windows, and Application Support on macOS. Existing ancestors must satisfy the filesystem ownership policy; missing parents
-are created privately within a bounded depth. To choose another
-location, use `--root /absolute/private/voidup` on **every** invocation. Never point it at an existing `.local`,
-`Program Files`, checkout or manual compiler prefix. It admits or creates its own
-private root and rejects unsafe ownership, links and permissions.
+## Storage and native requirements
 
-The root keeps control/trust metadata, interrupted transactions and immutable
-`toolchains/RELEASE_ID/` prefixes. Keep each prefix's `bin/`, `lib/void/`,
-`share/void/` and `sdk/` together. Do not edit installed files. Standard sources
-and packaged native resources are found relative to the selected compiler.
-No stdlib override or manually assembled LLVM SDK is needed for this layout.
+The default root remains `os.data_dir("voidup")`: XDG user data on Linux,
+LocalAppData on Windows, and Application Support on macOS. It is a dedicated user
+root, never a generic `.local` or manual compiler prefix. Complete immutable
+versions live under `toolchains/`; retained bootstraps and stable launchers live
+under `bootstraps/` and `bin/`. Failed publication is not permission to delete
+arbitrary contents. Retry retains the native trust floor and installed selection.
+Storage follows OS access permissions and retains existing directory modes/ACLs;
+developers do not need to run chmod or configure special ancestor permissions.
+The Linux bootstrap uses a restrictive creation umask for new installer-owned
+files. Signing-key confidentiality remains an explicit, separate requirement.
 
-## Use a terminal or editor
+A complete toolchain includes the compiler, language server, Runtime/native
+resources, stdlib, packaged Clang/LLD and Clang resources, package inputs and
+notices. The bootstrap is **not standalone**: Linux uses the measured system
+ELF runtime and standard extraction utilities. Exact sizes/dependencies are in
+the report. Production Linux binaries must be rebuilt and exercised on the
+supported Ubuntu floor; local developer-host binaries are not those artifacts.
 
-The portable, verified launch route needs no PATH integration:
+Native application linking still needs the declared OS C/C++ development
+headers/CRT/system libraries (`build-essential` on the Ubuntu floor or the matching
+Windows SDK/MSVC tools). This is separate from installing VOID or running ordinary
+JIT projects. Native package execution still requires the compiler's normal
+library consent; installing VOID grants no raylib approval.
 
-```sh
-voidup run default voidc -- new app --name Hello
-cd Hello
-voidup run default voidc -- check .
-voidup run default voidc -- run .
-voidup run default voidc -- build . -o hello
-./hello
-```
+The proxies retain CI policy, XDG storage locations and desktop session variables
+for the selected tools. Compiler/loader overrides and the caller's PATH remain
+excluded. On Unix, redirected editor/LSP cancellation reaches the manager and
+its compiler children; interactive terminals keep their foreground job control.
 
-On Windows use `-o hello.exe` and `./hello.exe`. The child's arguments are literal;
-VOIDUP rechecks the full installed inventory before launch and supplies a bounded
-native environment. A source program's normal exit status is preserved.
+## Advanced and private channels
 
-For direct `voidc`/`voidls` discovery, print and inspect a session export:
-
-```sh
-voidup env --format sh
-```
-
-Paste the resulting `export PATH=...` line into a POSIX shell. PowerShell users
-run `voidup env --format powershell` and paste that output. These commands only
-print text. They prepend the verified version's `bin` while preserving the
-existing PATH. They never edit a profile, registry or other installation.
-Shell quoting handles spaces, Unicode, quotes and shell metacharacters. A root
-containing the host PATH separator cannot be exported; use `run` or editor paths.
-The default `voidup env` returns JSON with root, release, build identity and tool
-paths. `voidup which voidc` and `voidup which voidls` print individual paths.
-
-For VS Code or VSCodium:
+Global options precede the native manager command:
 
 ```sh
+voidup --root /absolute/private/voidup --catalog https://your-approved-origin/catalog.json list --available
+voidup --root /absolute/private/voidup --catalog https://your-approved-origin/catalog.json install RELEASE --activate
+voidup run default voidc -- --version
 voidup env --format vscode
 ```
 
-Merge the two printed keys into editor settings, preserving other settings.
-Install the matching prepared VSIX separately; there is no claimed Marketplace
-release. Explicit paths work when a graphical editor did not inherit terminal
-PATH. See [editor setup](../EDITOR_INTEGRATION.md). Direct PATH/editor launches
-are ordinary executable launches; use `voidup run` when verification on each
-launch is required. Environment exports and editor paths select a **specific
-version**. After switching, regenerate them and restart the language server.
+The URL above is an illustrative private endpoint, not a published service.
+Overrides do not change signing keys or bypass the 2-of-3 threshold. `--ca-file`
+changes TLS roots only. Private catalogs retain same-origin HTTPS and no arbitrary
+redirects. The official GitHub release path admits only the specific HTTPS handoff
+to the GitHub release-asset CDN; catalog signatures, exact inventories, byte counts
+and hashes remain mandatory after the handoff.
 
-## Update, switch and roll back
-
-```sh
-voidup --catalog "$CATALOG_URL" list --available
-voidup --catalog "$CATALOG_URL" install NEW_RELEASE_ID
-voidup verify NEW_RELEASE_ID
-voidup default NEW_RELEASE_ID
-voidup list
-voidup rollback
-```
-
-Installing without `--activate` leaves the default unchanged. `default` verifies
-and selects an installed version; `rollback` swaps current and previous, and
-requires a previous selection. Release IDs have no automatic version ordering.
-There is no `update`, `latest`, pruning or manager self-update command. Obtain a
-new reviewed bootstrap separately when the manager itself changes. Old versions
-are retained, and `run RELEASE_ID voidc -- ...` selects one explicitly.
-
-A catalog's anti-replay floor is committed before artifact transfer. Installed
-versions can be verified/selected offline using retained authenticated metadata;
-this is not a fresh revocation lookup. An online catalog refresh retains new
-revocations and refuses a lower serial, altered same-serial bytes, lost revocations
-or a backwards clock. Deleting/restoring the entire root also loses/restores its
-local trust floor; it is not a hardware monotonic counter.
-
-If a transfer is interrupted, rerun the same installation command. The current
-selection remains intact and a complete published version can be verified and
-registered on retry. Partial transactions remain for inspection; `doctor` reports
-them. There is no automatic deletion or aggregate cache quota. Preserve the first
-diagnostic and transaction state when asking for help.
-
-## Host dependencies
-
-The packaged LLVM tools and their resources are toolchain contents. Native
-application linking still requires the declared OS C/C++ headers, CRT and system
-libraries: Ubuntu 24.04 x64 `build-essential`, or the corresponding supported
-Windows SDK/MSVC environment. Apple SDK/libc++ requirements remain platform work;
-there is no qualified macOS payload. Device libraries for a native package may
-add their own requirements. Installing a published toolchain itself requires no
-host development SDK.
-
-`voidc add raylib` now hosts a reviewed VOID preparation resource with pinned
-HTTPS/SHA-256 inputs, existing native binding emission and the selected Clang.
-Linux's official asset is tar.gz: first preparation additionally uses native
-`/usr/bin/tar` and gzip on the declared Ubuntu host. Windows uses the VOID ZIP
-reader. No Python, CMake or source binding generator runs during consumer add.
-Later imports/builds reuse the locked provider; native execution still requires
-separate consent. See [raylib](../../verified-packages/raylib/README.md).
+For offline retention, selection, trust-floor recovery and production operations,
+see [release production](RELEASE_PRODUCTION.md) and
+[production trust enrollment](PRODUCTION_TRUST.md). Until public distribution is
+approved, the separate [contributor source build](../install/README.md) remains
+available; its producer prerequisites are not end-user installer requirements.

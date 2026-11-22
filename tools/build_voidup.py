@@ -5,7 +5,7 @@ decisions remain in apps/voidup/*.void. Requires a matching built voidc and its
 native manifests; output must be new. Use an Ubuntu-built compiler for the floor.
 """
 from pathlib import Path
-import argparse, hashlib, json, os, platform, shutil, subprocess, sys, tempfile
+import argparse, hashlib, json, os, platform, re, shutil, subprocess, sys, tempfile
 ROOT = Path(__file__).resolve().parents[1]
 from engineering_storage import evidence_directory
 os.environ.setdefault('VOID_CRASH_EVIDENCE',str(evidence_directory('voidup-qualification')/'crashes'))
@@ -17,16 +17,20 @@ def main():
     parser.add_argument('--compiler',required=True,type=Path)
     parser.add_argument('--prefix',required=True,type=Path)
     parser.add_argument('--no-opt',action='store_true')
+    parser.add_argument('--trust-config',type=Path,help='Reviewed public root configuration; no private key inputs')
     parser.add_argument('--licenses',required=True,type=Path,
                         help='corresponding compiler component share/void/licenses')
     options=parser.parse_args()
-    if sys.platform!='linux':
-        raise SystemExit('bootstrap packaging is Linux-only; native platform packaging is unqualified')
+    if not options.licenses.is_dir():
+        parser.error('--licenses must name the matching existing compiler license directory')
+    if sys.platform not in ('linux','win32'):
+        raise SystemExit('Native macOS bootstrap dependency relocation/complete payload qualification remains required; no distributable bundle is produced')
+    suffix='.exe' if os.name=='nt' else ''
     compiler=options.compiler.resolve();prefix=options.prefix.resolve()
     prefix.mkdir(mode=0o700)  # Exclusive: never replace an existing application.
     (prefix/'bin').mkdir();(prefix/'lib/void').mkdir(parents=True)
     with tempfile.TemporaryDirectory(prefix='voidup-build-') as folder:
-        staging=Path(folder);driver=staging/'voidc';shutil.copy2(compiler,driver)
+        staging=Path(folder);driver=staging/('voidc'+suffix);shutil.copy2(compiler,driver)
         config=compiler.parent/'void-native.txt'
         lines=config.read_text().splitlines()
         assert lines[0]=='VOID native 23.1.4 v2'
@@ -46,13 +50,46 @@ def main():
                 # loader path is needed at runtime.
                 for alias in library.parent.glob(library.name+'*'):
                     if alias.is_file():shutil.copy2(alias,prefix/'lib/void'/alias.name)
-        command=[driver,'build',ROOT/'apps/voidup/main.void','-o',prefix/'bin/voidup']
+        source=ROOT/'apps/voidup'
+        production=False
+        if options.trust_config:
+            from voidup_release import read_public_config
+            config=read_public_config(options.trust_config)
+            source=staging/'source';shutil.copytree(ROOT/'apps/voidup',source)
+            production=config['trust']=='production'
+            (source/'trust_keys.void').write_text('const up_key_ids: [string] = '+json.dumps([k['id'] for k in config['keys']])+'\nconst up_public_keys: [string] = '+json.dumps([k['public'] for k in config['keys']])+'\n')
+            (source/'distribution.void').write_text('const up_official_catalog: string = '+json.dumps(config['catalog'])+'\nconst up_production: bool = '+str(production).lower()+'\nconst up_source_enabled: bool = true\nconst up_trust_label: string = '+json.dumps('production 2-of-3 trust' if production else 'private engineering test trust; not for public distribution')+'\n')
+        command=[driver,'build',source/'main.void','-o',prefix/'bin'/('voidup'+suffix)]
         if options.no_opt:command.append('--no-opt')
         result=run(list(map(str,command)),cwd=ROOT,capture_output=True,
                    source_inputs=(ROOT/'apps/voidup',),timeout=900)
         (prefix/'build.stdout').write_bytes(result.stdout)
         (prefix/'build.stderr').write_bytes(result.stderr)
         if result.returncode:raise SystemExit(result.returncode)
+        # The small launcher delegates every toolchain operation to native
+        # VOIDUP. It only retains this bootstrap and integrates the user's PATH.
+        compiled_source_sha256={path.name:hashlib.sha256(path.read_bytes()).hexdigest() for path in sorted(source.glob('*.void'))}
+        identity_inputs=[prefix/'bin'/('voidup'+suffix),ROOT/'apps/voidup/launcher.cpp',Path(__file__)]+sorted((prefix/'lib').rglob('*'))+sorted(options.licenses.rglob('*'))
+        identity_state=hashlib.sha256()
+        for item in identity_inputs:
+            if item.is_file():
+                identity_state.update(item.name.encode());identity_state.update(hashlib.sha256(item.read_bytes()).digest())
+        identity=identity_state.hexdigest()
+        clang=Path(lines[1]);clangxx=clang.with_name('clang-cl.exe' if os.name=='nt' else 'clang++')
+        target=prefix/'bin'/('voidup-init'+suffix)
+        if os.name=='nt':
+            launch=[clangxx,'/nologo','/std:c++17','/EHsc','/MT','/O2','/clang:-fuse-ld=lld',f'/DVOIDUP_BOOTSTRAP_ID="{identity}"',ROOT/'apps/voidup/launcher.cpp',f'/Fe:{target}','/link','/STACK:1048576','advapi32.lib','shell32.lib','ole32.lib','user32.lib']
+        else:
+            launch=[clangxx,'--no-default-config','-std=c++17','-O2',f'--ld-path={clang.with_name("ld.lld")}',f'-DVOIDUP_BOOTSTRAP_ID="{identity}"',ROOT/'apps/voidup/launcher.cpp','-o',target]
+        subprocess.run(list(map(str,launch)),check=True,cwd=staging)
+        dependency_audit={}
+        for name in ['voidup','voidup-init']:
+            binary=prefix/'bin'/(name+suffix)
+            inspector=clang.with_name('llvm-readobj.exe' if os.name=='nt' else 'llvm-readelf')
+            flags=['--coff-imports'] if os.name=='nt' else ['--dynamic','--version-info']
+            inspection=subprocess.check_output([str(inspector),*flags,str(binary)],text=True)
+            dependency_audit[name]={'libraries':sorted(set(re.findall(r'Name: ([^\r\n]+)' if os.name=='nt' else r'\(NEEDED\).*\[([^\]]+)\]',inspection))),
+                'abi_versions':sorted(set(re.findall(r'GLIBC(?:XX)?_[0-9.]+',inspection)))}
     shutil.copytree(options.licenses,prefix/'share/void/licenses',symlinks=False)
     def digest(path):
         state=hashlib.sha256()
@@ -62,14 +99,17 @@ def main():
     version=subprocess.check_output([str(compiler),'--version'],text=True)
     if 'LLVM 23.1.4\n' not in version:
         raise RuntimeError('bootstrap compiler must use LLVM 23.1.4')
-    source_inputs=sorted((ROOT/'apps/voidup').glob('*.void'))+sorted((ROOT/'stdlib').rglob('*.void'))
+    source_inputs=sorted((ROOT/'apps/voidup').glob('*.void'))+[ROOT/'apps/voidup/launcher.cpp']+sorted((ROOT/'stdlib').rglob('*.void'))
     receipt=dict(schema=1,compiler=str(compiler),compiler_sha256=digest(compiler),
         compiler_version=version,host=dict(system=platform.system(),machine=platform.machine(),libc=platform.libc_ver()),
         source=str(ROOT/'apps/voidup/main.void'),optimized=not options.no_opt,
         source_sha256={str(path.relative_to(ROOT)):digest(path) for path in source_inputs},
+        compiled_source_sha256=compiled_source_sha256,
+        native_dependency_audit=dependency_audit,
         files={path.relative_to(prefix).as_posix():dict(bytes=path.stat().st_size,sha256=digest(path))
             for path in sorted(prefix.rglob('*')) if path.is_file()},
-        production_trust=False,public_distribution_qualified=False)
+        production_trust=production,public_distribution_qualified=False,
+        bootstrap_id=identity,trust_config_sha256=digest(options.trust_config) if options.trust_config else None)
     (prefix/'build.json').write_text(json.dumps(receipt,indent=2)+'\n')
     print(prefix/'bin/voidup')
 

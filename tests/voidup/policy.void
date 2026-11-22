@@ -1,0 +1,54 @@
+use "./model.void" as model
+use "./transport.void" as transport
+use net/http as http
+
+func ordered(first: string, second: string, expected: i32) -> bool:
+    if model.up_version_compare(first, second) is Ok(var value):
+        return value == expected
+    return false
+
+func redirect_allowed(source: string, destination: string) -> bool:
+    var info = http.response_info(status = 302, version = http.http_version.http1_1,
+        headers = [http.header(name = "Location", value = destination.to_utf8())])
+    if transport.up_redirect(source, info) is Ok(var target):
+        return target == destination
+    return false
+
+func main() -> i32:
+    if not ordered("1.10.0", "1.9.0", 1) or not ordered("2.0.0", "1.999.999", 1) or not ordered("1.0.0", "1.0.0", 0) or not ordered("1.0.1", "1.1.0", -1):
+        return 10
+    for version in ["1.0", "01.2.3", "1.2.3-beta", "1.2.3+build", "1.2.-1", "1.2.3.4", "1.2.9999999999"]:
+        if model.up_stable_version(version) is Ok(var numbers):
+            return 11
+    var current = model.up_release(id = "current", host = model.up_host(), selection = model.up_release_selection(version = "1.10.0", channel = "stable"))
+    var older = model.up_release(id = "zzz-older", host = model.up_host(), selection = model.up_release_selection(version = "1.9.0", channel = "stable"))
+    var preview = model.up_release(id = "preview", host = model.up_host(), selection = model.up_release_selection(version = "99.0.0", channel = "preview"))
+    var document = model.up_catalog(releases = [older, preview, current])
+    if model.up_latest_stable(document) is Ok(var selected):
+        if selected.id != "current":
+            return 12
+    else:
+        return 13
+    document.revoked = ["current"]
+    if model.up_latest_stable(document) is Ok(var selected):
+        if selected.id != "zzz-older":
+            return 14
+    else:
+        return 15
+    var equivalent = model.up_release(selection = model.up_release_selection(version = "1.10.0", channel = "stable"))
+    if not model.up_same_selection(current, equivalent) or model.up_same_selection(current, model.up_release()):
+        return 16
+    if model.up_latest_stable(model.up_catalog(releases = [model.up_release(id = "legacy-99.0.0", host = model.up_host())])) is Ok(var guessed):
+        return 17
+    var source = "https://github.com/Shmellyorc/Void.Language/releases/download/v1.0.0/payload.zip"
+    var cdn = "https://release-assets.githubusercontent.com/github-production-release-asset/123/abc?sig=temporary"
+    if not redirect_allowed(source, cdn):
+        return 20
+    for unsafe in ["http://release-assets.githubusercontent.com/github-production-release-asset/123", "https://evil.example/github-production-release-asset/123", "https://release-assets.githubusercontent.com.evil.example/github-production-release-asset/123", "https://release-assets.githubusercontent.com:444/github-production-release-asset/123", "https://release-assets.githubusercontent.com/other-path/123", "https://release-assets.githubusercontent.com/github-production-release-asset/123#fragment", "https://user:pass@release-assets.githubusercontent.com/github-production-release-asset/123"]:
+        if redirect_allowed(source, unsafe):
+            return 21
+    for unsafe_source in ["https://private.example/catalog.json", "https://github.com/other/repo/releases/download/v1/payload.zip", "https://github.com:444/Shmellyorc/Void.Language/releases/download/v1/payload.zip", "https://release-assets.githubusercontent.com/github-production-release-asset/123"]:
+        if redirect_allowed(unsafe_source, cdn):
+            return 22
+    print("Stable ordering and GitHub redirect trust-boundary vectors passed")
+    return 0

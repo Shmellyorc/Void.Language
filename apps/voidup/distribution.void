@@ -1,0 +1,6 @@
+# Engineering default. Production builders must enroll Boss-approved public
+# roots and generate this module in an isolated source overlay, never in place.
+const up_official_catalog: string = "https://github.com/Shmellyorc/Void.Language/releases/download/voidup-stable/catalog.json"
+const up_production: bool = false
+const up_source_enabled: bool = false
+const up_trust_label: string = "private engineering test trust; not for public distribution"

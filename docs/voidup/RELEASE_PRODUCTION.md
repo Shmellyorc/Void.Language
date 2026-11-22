@@ -1,167 +1,163 @@
-# Produce a VOIDUP release candidate
+# Produce and publish VOIDUP
 
-This is a release-engineering procedure, not a public download announcement.
-The native manager and its authentication/transaction architecture already exist.
-Do not replace them with a script installer. Current source still embeds **test
-trust only**; the Linux producer is an engineering fixture producer. Public
-publication, production trust deployment and native Windows/macOS installation
-qualification have not been completed.
+G96 prepares the existing native manager for a public first-install route. It
+reuses the existing compiler/tooling install components, package producer,
+threshold format, inventory checks and dedicated transactional store. It adds
+platform bootstrap glue, not another toolchain installer or authentication system.
 
-## Build the native manager
+**Production is not published.** Boss has not yet provisioned/approved the three
+production public keys. No engineering key may be shipped as production trust.
+See [production trust](PRODUCTION_TRUST.md) for the free offline ceremony and
+[the G96 report](../projects/G96_VOIDUP_PUBLIC_INSTALLER.md) for actual evidence.
 
-Reuse an admitted matching LLVM/Clang/LLD **23.1.4** build, HTTP providers, host
-providers and their source/recipe receipts. The complete compiler must already
-build on the chosen support-floor host. Reuse `tools/install.py` or the canonical
-[contributor recipes](../install/README.md) to produce those internal inputs.
-Python and CMake here are producer tools, never bootstrap runtime dependencies.
+## Native builds and trust profiles
 
-The existing native build target is sufficient:
+Reuse an admitted matching LLVM/Clang/LLD **23.1.4** compiler, Runtime, HTTP and
+host providers. Producer Python/CMake are build tools, never consumer dependencies.
+Build on the actual support-floor OS; a floor-built compiler invoked on a newer
+host can still link newer system startup/runtime objects.
 
-```sh
-cmake --build /absolute/matching/build --target voidc voidls voidup -j3
-```
-
-It invokes the matching native compiler on `apps/voidup/main.void` and emits
-`BUILD/voidup/voidup` (`voidup.exe` on Windows). A direct equivalent is:
+The existing `voidup` CMake target builds the native manager. The consumer bundle
+uses the same manager with a small C++ platform launcher:
 
 ```sh
-/absolute/matching/voidc build apps/voidup/main.void -o /absolute/fresh/output/voidup
+python3 -B tools/build_voidup.py --compiler /matching/build/voidc \
+  --licenses /matching/compiler-prefix/share/void/licenses \
+  --trust-config release/voidup/production-public-keys.json \
+  --prefix /fresh/bootstrap-prefix
 ```
 
-Use the repository working directory and its matching standard sources. Do not
-run the Windows or macOS result as a release claim without native qualification.
-The source target itself needs no Python driver. To assemble the existing Linux
-bootstrap prefix and its dependency notices, reuse:
+The configuration contains public roots only. Production configuration requires
+the official catalog and refuses the known engineering roots and `test-*` IDs.
+The builder creates an isolated source overlay with enrolled IDs/public bytes;
+it does not change checked-in trust, the signature domain or the 2-of-3 threshold.
+Without the configuration it remains a private engineering build and its built-in
+production source fails closed. Test profiles may embed an isolated HTTPS origin.
+
+The platform launcher delegates setup and all proxy execution to native VOIDUP.
+After a verified installation it retains the bootstrap and exposes stable tools;
+Unix integration uses held directory descriptors and appends quoted profile
+entries, while the Windows branch prepares user-registry PATH integration and
+notification. Toolchain admission, immutable publication, trust-floor retention,
+locking, verification and rollback remain in `apps/voidup/*.void`. Ordinary
+directory/profile access follows the OS permission policy, including shared
+locations. Profile replacement preserves owner/group identities, mode bits and access ACLs without adding
+inherited grants that were absent from the original. Native path/type/identity
+checks remain; signing-key storage keeps its explicit confidentiality contract.
+
+## Downloadable bootstrap packages
 
 ```sh
-python3 -B tools/build_voidup.py \
-  --compiler /absolute/matching/build/voidc \
-  --prefix /absolute/fresh/bootstrap-prefix \
-  --licenses /absolute/matching/compiler-prefix/share/void/licenses
+python3 -B tools/voidup_release.py bootstrap --production \
+  --prefix /fresh/bootstrap-prefix --host linux-x86_64 \
+  --output /fresh/assets/voidup-linux-x86_64.run
 ```
 
-The helper refuses an existing output, compiles the VOID program, sets its
-relative loader path, materializes shared-library aliases, and copies matching
-notices. It now records compiler identity/hash, source and stdlib hashes, producer
-host/libc, output file hashes and explicit nonproduction status in `build.json`.
-Retain the complete prefix; shipping only the executable may lose shared libraries
-and notices. This is a reproducible recipe with receipts, not proof of bit-for-bit
-reproducibility or compatibility with an older OS. Build **inside** the selected
-floor userspace; invoking a floor-built compiler on a newer host links newer CRT
-objects. The current local PikaOS builds are not Ubuntu 24.04 release artifacts.
+Native Windows uses `--host windows-x86_64` and a `.zip` output. Its ZIP contains
+`Install VOID.cmd` and the native binaries. Linux's `.run` is a small extraction
+wrapper invoking the native launcher; it pins standard extraction utilities and
+cleans its exclusively created temporary directory. It does not verify or install
+a toolchain itself. A JSON receipt records exact compressed/expanded bytes and
+payload hashes. Engineering bundles cannot pass `--production`, and a producer
+cannot relabel a Linux build as Windows/macOS.
 
-## Produce complete toolchains with the existing producer
+The executable is not assumed standalone. Keep its required shared-library aliases
+as ordinary files and preserve matching dependency notices/source material. Record
+ELF/PE dependencies on the declared native host. Current macOS complete payload
+and bootstrap dependency relocation remain unfinished and fail closed; its ZIP
+container recipe is not an availability or native-execution claim.
 
-`tools/package_voidup_fixtures.py` already composes the existing CMake `compiler`
-and `tooling` components, materializes symlinks as regular files, includes the
-Clang/LLD subset and Clang resources, rewrites native executable paths relative to
-the version prefix, writes `toolchain.json`, and emits ZIPs plus exact inventories.
-The native Runtime, host and HTTP providers, source receipts/notices, stdlib,
-package definitions and VOID preparer accompany the compiler component.
+## Complete toolchains and signed stable metadata
 
-Its current command is an **engineering-only** A/B qualification recipe:
+`tools/package_voidup_fixtures.py:produce` remains the single package producer.
+G96 adds native Windows executable classification/SDK names while retaining the
+Linux recipe, install components, materialized aliases, SDK resources, immutable
+build identity, exact inventories and ZIP publication. The release entry point is:
 
 ```sh
-python3 -B tools/package_voidup_fixtures.py \
-  --build-a /absolute/floor/build-a --build-b /absolute/floor/build-b \
-  --sdk /absolute/llvm-23.1.4 --output /absolute/private/engineering-fixtures
+python3 -B tools/voidup_release.py package --build /matching/Release/build \
+  --sdk /matching/llvm-23.1.4 --version 0.1.0 \
+  --release-id void-0.1.0-linux-x86_64 --output /fresh/release
 ```
 
-The output must contain the separately held existing engineering test keys at
-`keys/offline-1.pem` and `offline-2.pem`; never print or archive them. The producer
-checks the keys against the embedded public test roots, requires distinct actual
-compiler build identities and produces a freshly signed catalog. Its report destination follows the engineering storage policy under
-`~/Documents/Void.Language-archives/voidup-qualification/`; keep each new
-qualification receipt separate from preserved runs.
-Call its existing `produce(build, release_id, output, sdk)` function from a
-task-owned harness and keep new receipts outside the checkout instead.
+Windows uses a native Windows build and an appropriate ID. No cross-produced file
+is native qualification. macOS complete toolchain production is explicitly refused
+until its SDK/libc++/manifest relocation and native journey are completed.
 
-Before production, adapt this **same producer**, rather than adding another
-release system, for reviewed release IDs, selected hosts, production signing key
-identities and a nonhistorical receipt destination. The existing native inventory
-schema and domain/signature format stay unchanged. Current source's fixed
-`test-1`/`test-2`/`test-3` identities and private-trust diagnostics must become a
-reviewed production trust build; changing only a download URL is insufficient.
-This adaptation and the production key ceremony remain unperformed.
+Each new release descriptor adds an authenticated optional `selection` object:
 
-For each exact host payload, verify:
+```json
+{"selection":{"version":"0.1.0","channel":"stable"}}
+```
 
-- `voidc --version` build identity agrees with signed catalog, inventory and
-  `toolchain.json`; `voidls` comes from the same build.
-- Native manifests and resource hashes resolve entirely within the retained
-  version, except the declared OS C/C++ SDK/CRT/system libraries.
-- All standard modules, compiler package inputs, native libraries, LLVM binaries
-  and `sdk/lib/clang/23` resources and required notices/source are inventoried.
-- Every file has the right executable classification. Private publication accepts
-  neither symlinks nor hard links. Complete verification rejects extra files.
-- The exact bootstrap and installed toolchain run on the stated ABI floor, with
-  checkout/build/producer SDK unavailable. SDK packaging is not host portability.
+Its two fields are required when the object is present. Old schema-1 catalogs and
+retained installation records lack the object: they remain verifiable/selectable
+by explicit ID and can be rolled back, but are never assigned an automatic version
+by guessing from their ID. Published IDs/content/classification stay immutable.
+Automatic selection uses numeric three-part version order, exact host, stable
+channel and retained revocations. New catalogs require manager version 2.
 
-Linux output remains the only implemented producer. Windows packaging must use
-native x64 `/MT`, matching PE/runtime and SDK/resource identities; Apple packaging
-must respect actual SDK/libc++ and ownership/platform restrictions. Existing
-cross-compilation is not native acceptance. Existing redistribution obligations
-in [licensing scope](../release/LICENSING_SCOPE.md) and
-[the G29 payload audit](../release/G29_FIRST_RELEASE_READINESS.md) remain unresolved
-where recorded; this candidate grants no release clearance.
+The offline [trust procedure](PRODUCTION_TRUST.md) prepares an increasing-serial
+catalog, carries authenticated previous revocations, collects independent
+endorsements and combines the threshold envelope over the exact bytes. Do not
+put private keys or signing secrets into CI. Keep expiry at most 30 days and
+refresh the channel before expiry. Manager downgrade/key rotation is not an
+automatic rollback feature; toolchain rollback stays within the current manager.
 
-## Production keys, catalogs and hosting
+`--valid-days` measures the interval from the catalog's `issued` timestamp,
+including its 60-second clock allowance. The 30-day boundary therefore fits the
+same maximum interval enforced by the native manager and publication verifier.
 
-Use three independently controlled, locally managed Ed25519 keypairs and distinct
-reviewed key IDs; retain the 2-of-3 threshold. Private keys stay offline in
-owner-private storage, separate from checkout, CI, build contexts, bootstrap,
-artifacts and evidence archives. Review/publicly authenticate the bootstrap's
-public root keys through the release announcement and an independent trusted
-channel before first use. TLS or a checksum downloaded beside an untrusted
-bootstrap does not establish that initial trust. No paid certificate, developer
-membership or commercial signing service is required by this scheme.
+## GitHub hosting without weakening authentication
 
-Sign **exact** catalog bytes after prefixing `VOIDUP CATALOG v1\n`. Use the
-existing schema-1 envelope; no JSON reserialization after signing. Bind the exact
-inventory byte count/hash, archive byte count/hash, release ID, host and immutable
-compiler build identity. Keep a strictly increasing catalog serial, bounded
-issued/expiry interval (at most 30 days), minimum-manager value and accumulated
-revocations. Preserve prior signing/serial records offline. The native manager
-retains accepted serial/digest/time/revocations before transfer; rollback must
-never roll back that trust floor. Key rotation/root replacement still needs a
-reviewed new bootstrap; there is no automatic root-update protocol.
+The built-in official source is the repository's `voidup-stable` release asset
+`catalog.json`, with the signature envelope at `catalog.json.sig`. That endpoint
+is configured in source; it is **not a published-download claim**.
 
-The existing transport requires one explicitly chosen **HTTPS origin**, no query
-or fragment, no redirects, and same-origin inventory/package references. The
-signature envelope is fetched at `CATALOG_URL + ".sig"`. Publish the artifact and
-inventory first, check their real responses/lengths/hashes, then atomically expose
-the catalog and matching envelope using the existing origin's deployment process.
-A transient catalog/envelope mismatch fails closed; retain the prior valid pair
-for recovery. Never change bytes under an already published release ID.
+Payloads and inventories use immutable versioned GitHub Release assets. Ordinary
+private origins retain same-origin HTTPS and no redirects. For the exact official
+repository release-asset path, the native transport inspects a HEAD response and
+permits only a single HTTPS handoff to
+`release-assets.githubusercontent.com/github-production-release-asset/…` on port
+443. Short-lived CDN queries are permitted only on that validated handoff; userinfo,
+fragments, downgrade, arbitrary hosts/ports and second redirects remain rejected.
 
-Free existing infrastructure can host bytes, but **GitHub Releases browser asset
-URLs redirect**, so they are not directly usable by the current no-redirect
-transport. Workflow-artifact URLs also do not satisfy the catalog contract. No
-VOID origin has been configured or verified to serve production bootstrap,
-catalog, signature, inventories and large archives directly. Hosting that exact
-contract is a remaining deployment dependency; do not silently loosen redirect,
-origin, query, TLS or signature checks to make an arbitrary URL work.
+The final GET/download still disables automatic redirects. Existing bounded
+get/download code checks status, raw representation and exact counts; catalog
+signatures and all signed hashes/inventories remain authoritative after transport.
+Normal metadata/connect/header/read budgets remain 30 seconds. A normal package
+transfer has a bounded one-hour total budget so a large SDK does not require an
+expert timeout flag. An explicit `--timeout-ms` overrides both budgets for tests.
 
-## Qualify before publication
+[GitHub documents](https://docs.github.com/en/rest/releases/assets#get-a-release-asset)
+streaming or redirecting release assets. A read-only HEAD against the existing
+public pinned LLVM asset independently confirmed the specific CDN host/path shape;
+it was not a VOID production-channel demonstration. Windows user-environment
+notification follows [Microsoft's documented WM_SETTINGCHANGE route](https://learn.microsoft.com/en-us/windows/win32/winmsg/wm-settingchange).
 
-Use a fresh private root and 1 MiB hard/soft stacks. Exercise actual HTTPS,
-threshold failures, inventory/artifact tampering, retained serials/revocations,
-private modes, interrupted transfer and retry, default switching/rollback,
-compiler versions, stdlib, project creation/JIT/native build and LSP handshake.
-Verify `env` session/editor outputs and native package first-add with Python
-absent from PATH. Check host development libraries separately from bundled SDK
-contents. Run the exact native claims on each host; preserve all first failures.
+## Prepared manual workflows
 
-The current assignment prepares a review candidate. Independent Golden Wrench
-review precedes integration and publication. Boss retains Git, hosted CI, binary
-installation/release and live Wiki publication authority. The Wiki export's
-preimages and changed-file allowlist must be rechecked against the live remote
-before the reviewed page update. No publication is performed by these commands.
+1. `voidup-release.yml` reuses `tools/ci/install_smoke.py` to build matching native
+   inputs, verify the installed compiler/Runtime/stdlib/LSP, and run focused VOIDUP
+   first-install/policy checks with ephemeral in-memory engineering keys. Linux and
+   Windows prepare complete payloads only after their native checks. The Mac job
+   records its separate incomplete qualification; it produces no public payload.
+2. Production preparation is opt-in and requires the approved public configuration.
+   It emits unsigned version payloads, inventories, bootstrap packages, hashes and
+   native qualification receipts. It neither signs with private keys nor publishes.
+3. Custodians review those exact bytes and source revision offline and return the
+   signed catalog/envelope. Integrating public enrollment/metadata requires Boss's
+   separate Git authorization.
+4. `voidup-publish.yml` is a separate manually authorized operation, disabled unless
+   its explicit `publish` input is true. It admits a successful preparation run,
+   assembles qualified assets, checks the production public-root fingerprint,
+   threshold/freshness and exact payload hashes, refuses an existing immutable
+   version tag, and publishes version assets at the prepared source revision.
+   It uploads the stable catalog/envelope **last**. A transient pair mismatch fails
+   closed; it is never a reason to bypass signatures.
 
-Reference decisions:
-[LLVM unique-directory permissions](https://llvm.org/doxygen/FileSystem_8h.html),
-[GNU tar named members to stdout](https://www.gnu.org/software/tar/manual/html_node/Writing-to-Standard-Output.html),
-[GitHub release asset response semantics](https://docs.github.com/en/rest/releases/assets#get-a-release-asset),
-[Wiki Git publication](https://docs.github.com/en/communities/documenting-your-project-with-wikis/adding-or-editing-wiki-pages).
-Upstream documentation informs implementation; the retained LLVM 23.1.4 source
-headers and local native probes establish applicability to this candidate.
+No workflow was dispatched for G96 local qualification. Native CI execution,
+approved public roots, exact support-floor payload validation, distribution
+notices/source review, initial bootstrap trust announcement and Boss publication
+approval remain real pre-publication work. See the report for each platform's
+actual status. The workflow is not evidence that those jobs have run.

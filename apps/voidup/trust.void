@@ -31,11 +31,11 @@ func up_authenticate(const catalog_bytes: [u8], const envelope_bytes: [u8]) -> r
         seen[endorsement.key_id] = true
         var selected: i64 = -1
         for index in 0..<3:
-            if endorsement.key_id == "test-{index + 1}":
+            if endorsement.key_id == roots.up_key_ids[index]:
                 selected = index as i64
         if selected < 0 or endorsement.signature.to_utf8().count != 128:
             return Err(support.up_fail("unknown signing key or invalid signature size", "authenticate"))
-        var public_key = support.up_hex(hex.decode(roots.up_public_test_keys[selected]))?
+        var public_key = support.up_hex(hex.decode(roots.up_public_keys[selected]))?
         var signature_bytes = support.up_hex(hex.decode(endorsement.signature))?
         if support.up_sys(crypto.verify_ed25519(public_key, signature_bytes, message_bytes))?:
             valid += 1

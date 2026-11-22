@@ -3,15 +3,16 @@ from pathlib import Path
 import argparse,json,tempfile
 from support import ROOT,EVIDENCE,Runner,Service,scratch_directory
 parser=argparse.ArgumentParser();parser.add_argument('application',type=Path);parser.add_argument('--name',default='timeout-1')
+parser.add_argument('--fixtures',type=Path,default=ROOT/'build/voidup-fixtures')
 options=parser.parse_args();runner=Runner(options.name);app=options.application.resolve()
 work=scratch_directory('VOIDUP deadline 雪 # % ');root=work/'private'
-with Service(ROOT/'build/voidup-fixtures') as server:
+with Service(options.fixtures) as server:
  server.stall='/packages/engineering-a.zip';server.stall_after=1048576
  base=[app,'--root',root,'--catalog',server.url,'--ca-file',server.ca,'--timeout-ms','500']
  result=runner.run([*base,'install','engineering-a','--activate'],expected=1,timeout=30)
  diagnostic=json.loads(result.stderr)
  assert diagnostic['progress']==1048576,diagnostic
- assert diagnostic['kind'].endswith('.timeout') and diagnostic['phase'],diagnostic
+ assert diagnostic['kind'].rsplit('.',1)[-1]=='timeout' and diagnostic['phase'],diagnostic
  assert server.started.is_set()
  state=json.loads((root/'control.json').read_bytes())
  assert state['serial']==10 and state['current']=='' and state['installed']==[]

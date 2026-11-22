@@ -1,0 +1,80 @@
+name: VOIDUP publish reviewed signed release
+on:
+  workflow_dispatch:
+    inputs:
+      prepared_run_id:
+        description: Successful approved native production-preparation run
+        required: true
+      version:
+        description: Exact prepared stable version
+        required: true
+      public_config:
+        description: Boss-approved public-only enrollment
+        default: release/voidup/production-public-keys.json
+      signed_catalog:
+        description: Reviewed exact catalog with adjacent .sig in this checkout
+        default: release/voidup/catalog.json
+      publish:
+        description: Boss-authorized production publication
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  publish:
+    if: inputs.publish
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PREPARED_RUN: ${{ inputs.prepared_run_id }}
+      RELEASE_VERSION: ${{ inputs.version }}
+      PUBLIC_CONFIG: ${{ inputs.public_config }}
+      SIGNED_CATALOG: ${{ inputs.signed_catalog }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install cryptography==50.0.2
+      - name: Admit the successful reviewed producer run and retain its source revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$PREPARED_RUN" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$PREPARED_RUN" > "$RUNNER_TEMP/prepared-run.json"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          r=json.loads((Path(os.environ['RUNNER_TEMP'])/'prepared-run.json').read_text())
+          assert r['conclusion']=='success' and r['path']=='.github/workflows/voidup-release.yml'
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('PREPARED_SOURCE_SHA='+r['head_sha']+'\n')
+          PY
+      - name: Download public prepared payloads, never private signing keys
+        run: gh run download "$PREPARED_RUN" --repo "$GITHUB_REPOSITORY" --pattern 'voidup-production-*' --dir "$RUNNER_TEMP/prepared"
+      - name: Assemble exact qualified assets and verify the offline threshold signatures
+        run: |
+          set -euo pipefail
+          python tools/voidup_release.py assemble --inputs "$RUNNER_TEMP/prepared" --public-config "$PUBLIC_CONFIG" --version "$RELEASE_VERSION" --output "$RUNNER_TEMP/assets"
+          python tools/voidup_release.py verify --public-config "$PUBLIC_CONFIG" --catalog "$SIGNED_CATALOG" --assets "$RUNNER_TEMP/assets" --version "$RELEASE_VERSION"
+      - name: Publish immutable version payloads before the stable catalog
+        run: |
+          set -euo pipefail
+          tag="v$RELEASE_VERSION"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo 'Release tag already exists; refusing to replace immutable assets.' >&2
+            exit 1
+          fi
+          gh release create "$tag" "$RUNNER_TEMP"/assets/* --target "$PREPARED_SOURCE_SHA" --draft --title "VOID $RELEASE_VERSION" --notes 'VOIDUP installers and complete authenticated VOID toolchains. See the reviewed installation and native qualification documentation.'
+          gh release edit "$tag" --draft=false
+      - name: Publish authenticated stable metadata last
+        run: |
+          set -euo pipefail
+          if ! gh release view voidup-stable >/dev/null 2>&1; then
+            gh release create voidup-stable --target "$PREPARED_SOURCE_SHA" --title 'VOIDUP authenticated stable channel' --notes 'Signed catalog and threshold signature envelope. Immutable payloads are in versioned releases.' --latest=false
+          fi
+          cp "$SIGNED_CATALOG" "$RUNNER_TEMP/catalog.json"
+          cp "$SIGNED_CATALOG.sig" "$RUNNER_TEMP/catalog.json.sig"
+          gh release upload voidup-stable "$RUNNER_TEMP/catalog.json" "$RUNNER_TEMP/catalog.json.sig" --clobber

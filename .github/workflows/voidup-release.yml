@@ -1,0 +1,90 @@
+name: VOIDUP native first install and release preparation
+on:
+  workflow_dispatch:
+    inputs:
+      prepare_production:
+        description: Prepare unsigned production payloads with enrolled public keys
+        type: boolean
+        default: false
+      version:
+        description: Reviewed numeric stable version
+        default: '0.1.0'
+      public_config:
+        description: Reviewed public-only enrollment in this checkout
+        default: 'release/voidup/production-public-keys.json'
+permissions:
+  contents: read
+jobs:
+  qualify:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-24.04, system: Linux, arch: X64}
+          - {os: windows-2022, system: Windows, arch: X64}
+          - {os: macos-15, system: Darwin, arch: ARM64}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 360
+    env:
+      INSTALL_QUALIFICATION_NAME: voidup-release-${{ github.run_id }}-${{ github.run_attempt }}-${{ matrix.os }}
+      INSTALL_EXPECTED_SYSTEM: ${{ matrix.system }}
+      INSTALL_EXPECTED_ARCH: ${{ matrix.arch }}
+      INSTALL_RUNNER_LABEL: ${{ matrix.os }}
+      MACOSX_DEPLOYMENT_TARGET: '14.0'
+      PYTHONDONTWRITEBYTECODE: '1'
+      VOIDUP_RELEASE_VERSION: ${{ inputs.version }}
+      VOIDUP_PUBLIC_CONFIG: ${{ inputs.public_config }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+        with:
+          arch: x64
+      - name: Producer-only signing and HTTPS test dependency
+        run: python -m pip install cryptography==50.0.2
+      - name: Verify native runner identity
+        run: python tools/ci/install_smoke.py identity
+      - name: Prepare declared host prerequisites
+        run: python tools/ci/install_smoke.py host
+      - name: Verify pinned LLVM Clang LLD 23.1.4
+        run: python tools/ci/install_smoke.py sdk
+      - name: Build matching HTTP and host providers
+        run: python tools/ci/install_smoke.py dependencies
+      - name: Configure the existing Release compiler recipe
+        run: python tools/ci/install_smoke.py configure
+      - name: Build existing compiler and tooling targets
+        run: python tools/ci/install_smoke.py build
+      - name: Compose a private qualification prefix
+        run: python tools/ci/install_smoke.py install
+      - name: Verify installed compiler Runtime stdlib and LSP
+        run: python tools/ci/install_smoke.py smoke
+      - name: Native VOIDUP qualification with ephemeral engineering keys
+        run: python tools/ci/voidup_release.py qualify
+      - name: Prepare unsigned production artifacts using public inputs only
+        if: inputs.prepare_production && runner.os != 'macOS'
+        shell: bash
+        run: python tools/ci/voidup_release.py prepare --version "$VOIDUP_RELEASE_VERSION" --public-config "$VOIDUP_PUBLIC_CONFIG"
+      - name: Retain qualification receipts
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: voidup-qualification-${{ matrix.os }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/evidence
+          retention-days: 14
+          if-no-files-found: error
+      - name: Retain unsigned production payloads without expanded prefixes or private keys
+        if: inputs.prepare_production && runner.os != 'macOS'
+        uses: actions/upload-artifact@v6
+        with:
+          name: voidup-production-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/release/www/packages/*.zip
+            ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/release/www/inventories/*.json
+            ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/release/*.release.json
+            ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/release/voidup-*
+            ${{ runner.temp }}/${{ env.INSTALL_QUALIFICATION_NAME }}/evidence/voidup-production-prepared.json
+          if-no-files-found: error
+          retention-days: 14

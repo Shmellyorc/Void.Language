@@ -49,8 +49,9 @@ class Runner:
         return result
 
 class Service:
-    def __init__(self, fixtures):
+    def __init__(self, fixtures, signer=None):
         self.fixtures = Path(fixtures)
+        self.signer = signer
         self.overrides = {}
         self.stall = None
         self.stall_after = None
@@ -115,7 +116,7 @@ class Service:
     def catalog(self, document, signers=(1,2)):
         raw = encoded(document)
         self.overrides['/catalog.json']=(200,raw,{})
-        self.overrides['/catalog.json.sig']=(200,sign(raw,self.fixtures/'keys',signers),{})
+        self.overrides['/catalog.json.sig']=(200,self.signer(raw,signers) if self.signer else sign(raw,self.fixtures/'keys',signers),{})
     def __enter__(self):
         self.thread.start();return self
     def __exit__(self,*args):

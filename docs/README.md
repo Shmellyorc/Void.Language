@@ -12,6 +12,10 @@
   [release production](voidup/RELEASE_PRODUCTION.md), and
   [Python-free developer experience candidate](projects/G94_VOIDUP_PYTHON_FREE_DEVELOPER_EXPERIENCE.md).
 
+- [G96 public installer candidate](projects/G96_VOIDUP_PUBLIC_INSTALLER.md):
+  authenticated first install, platform bootstraps, production trust preparation
+  and native qualification limits.
+
 - [G93 pure compile functions candidate](projects/G93_COMPILE_FUNCTIONS.md):
   shared typed constant evaluation, pure value methods, limits and editor evidence.
 
