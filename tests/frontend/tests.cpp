@@ -111,6 +111,49 @@ void diagnostics() {
     std::cout << "50+ source diagnostic cases and UTF-8/ABI checks passed\n";
 }
 void programs(const std::filesystem::path& root) {
+    run("func identity(\nvalue: i32,\n) -> i32:\n    return value\nfunc entry(x: i32) -> i32:\n    return identity(x)\n", {{0,0},{5,5}});
+    run(R"(func add(
+    const first: i32,
+    second: i32 = (
+        3 + 4
+    ), # trailing comma and comment
+) -> i32:
+    return first + second
+func entry(
+    x: i32,
+) -> i32:
+    return add(x)
+)", {{0,7},{5,12}});
+    run(R"(interface scaler:
+    func scale(
+        value: i32,
+    ) -> i32
+struct worker:
+func (
+    w worker
+) scale(
+    value: i32,
+) -> i32:
+    return value + 1
+func entry(x: i32) -> i32:
+    var instance = worker()
+    var view: scaler = instance
+    return view.scale(x)
+)", {{0,1},{5,6}});
+    run(R"(func identity<t>(
+    value: t,
+) -> t:
+    return value
+func entry(x: i32) -> i32:
+    var callback: func(
+        i32,
+    ) -> i32 = func(
+        value: i32,
+    ) -> i32:
+        return identity(value + 2)
+    return callback(x)
+)", {{0,2},{5,7}});
+    rejects("func broken(\n    first: i32\n    second: i32\n):\n    pass\n", "Expected ')'", "3:5");
     run("func entry(x: i32) -> i32:\n"
         "\tif x > 0:\n"
         "\t\treturn x\n"

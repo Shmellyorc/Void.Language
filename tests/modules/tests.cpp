@@ -53,6 +53,36 @@ struct Fixture {
     }
 };
 const std::string entry_start = "func entry(x: i32) -> i32:\n    return ";
+void qualified_constructor_types(const fs::path& output) {
+    Fixture f{output / "qualified constructor types"};
+    f.file("records.void", "value struct point:\n    x: i32\nvalue struct unrelated:\n    x: i32\n");
+    f.file("api.void", "use \"/records.void\" as impl\nfunc point(x: i32 = 7) -> impl.point:\n    return impl.point(x = x + 10)\nprivate func hidden(x: i32 = 1) -> impl.point:\n    return impl.point(x = x)\nfunc unrelated() -> i32:\n    return 1\nfunc renamed() -> impl.point:\n    return point()\n");
+    f.file("forward.void", "use \"/api.void\" as api\nfunc point(x: i32 = 7) -> api.point:\n    return api.point(x)\n");
+    const std::string main="use \"/forward.void\" as rl\nuse \"/records.void\" as original\n"
+        "func echo(value: rl.point) -> rl.point:\n    var local: rl.point = value\n    return local\n"
+        "func entry(x: i32) -> i32:\n    var direct: original.point = echo(rl.point(x))\n    var defaulted: rl.point = rl.point()\n    return direct.x + defaulted.x\n";
+    f.file("main.void",main);
+    f.run({{0,27},{5,32},{-4,23}});
+    auto analyzed=vd::analyze_project(f.root/"main.void");
+    require(bool(analyzed.program),"qualified wrapper annotation analysis failed");
+    vd::ToolingIndex index(analyzed.program);
+    const auto definition=index.definition_at("/main.void",main.find("rl.point")+4);
+    require(definition && definition->module=="/records.void","forwarded annotation lost canonical type owner");
+    auto reject=[&](const std::string& imports,const std::string& type) {
+        const auto text=imports+"\nfunc echo(value: "+type+"):\n    pass\nfunc entry(x: i32) -> i32:\n    return x\n";
+        auto result=vd::analyze_project(f.root/"main.void",{{"/main.void",vd::SourceFile("main.void",text)}});
+        require(!result.program && !result.diagnostics.empty(),"invalid forwarded type admitted: "+type);
+    };
+    for(const auto& type:{"api.hidden","api.unrelated","api.renamed","api.point.missing"})
+        reject("use \"/api.void\" as api",type);
+    reject("use \"/api.void\" as api","point");
+    f.file("private_api.void","use \"/records.void\" as impl\nprivate func point() -> impl.point:\n    return impl.point(x = 1)\n");
+    reject("use \"/private_api.void\" as api","api.point");
+    f.file("cycle.void","use \"/cycle_other.void\" as other\nfunc point() -> other.point:\n    return other.point()\n");
+    f.file("cycle_other.void","use \"/cycle.void\" as other\nfunc point() -> other.point:\n    return other.point()\n");
+    reject("use \"/cycle.void\" as api","api.point");
+    std::cout<<"Qualified constructor types: canonical identity, parameters, returns, locals, wrapper defaults, visibility and cycles passed\n";
+}
 void private_linkage(const fs::path& output) {
     Fixture f{output / "private linkage"};
     const std::string helper="private func helper(x: i32) -> i32:\n    return x + 2\n";
@@ -336,6 +366,7 @@ void local_libraries(const fs::path& output) {
 }
 }
 void module_tests(const std::filesystem::path& output) {
+    qualified_constructor_types(output);
     private_linkage(output);
     positives(output); negatives(output); constants(output); local_libraries(output);
     std::cout << "Multi-file ownership, cycles, visibility, paths, diagnostics and native JIT checks passed\n";

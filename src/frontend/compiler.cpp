@@ -266,7 +266,9 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
     std::vector<IndentLevel> indents{{0, 0}};
     std::size_t p = begin ? begin : text.starts_with("\xef\xbb\xbf") ? 3 : 0;
     end=std::min(end,text.size());
-    std::vector<bool> parentheses;
+    unsigned parentheses=0;
+    struct HeaderDelimiter {unsigned parentheses,braces;std::size_t indent;};
+    std::optional<HeaderDelimiter> header_delimiter;
     bool beginning = !begin;unsigned braces=interpolation_depth?1:0;std::size_t line_tokens=0;
     struct LiteralBlock {unsigned braces;std::size_t parent,indent;bool conditional;};std::vector<LiteralBlock> literal_blocks;
     auto emit = [&](TokenKind kind, std::string value, std::size_t offset) { tokens.push_back({kind, std::move(value), offset}); };
@@ -277,6 +279,20 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
             const auto start = p;
             auto prefix = indentation_at(text, start);
             p = prefix.end;
+            if(header_delimiter && prefix.width<=header_delimiter->indent) {
+                auto last=p;while(last<end && (letter(text[last]) || digit(text[last])))++last;
+                const auto word=std::string_view(text).substr(p,last-p);
+                auto next=last;while(next<end && (text[next]==' ' || text[next]=='\t'))++next;
+                const bool value_declaration=word=="value" && text.compare(next,6,"struct")==0;
+                if(word=="func" || word=="property" || word=="interface" || word=="struct" || value_declaration ||
+                   word=="use" || word=="public" || word=="private" || word=="internal" || word=="async" ||
+                   word=="virtual" || word=="override" || word=="compile") {
+                    // An unclosed declaration must not swallow later declarations.
+                    parentheses=header_delimiter->parentheses;braces=header_delimiter->braces;header_delimiter.reset();
+                    if(!tokens.empty() && tokens.back().kind!=TokenKind::newline)emit(TokenKind::newline,"<newline>",start);
+                    line_tokens=tokens.size();
+                }
+            }
             if(!begin && !selection.line(start,prefix,braces!=0)) {
                 while(p<end && text[p]!='\r' && text[p]!='\n')++p;
                 if(p<end && text[p++]=='\r' && p<end && text[p]=='\n')++p;
@@ -406,13 +422,16 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, std::
             p += 2; emit(TokenKind::symbol, pair, start); continue;
         }
         if (std::string("{}[]():,.+-*/%=<>?&|^~").find(c) != std::string::npos) { if(c=='('){
+                // Parameter lists and function types use the same continuation
+                // formatting as calls. The closing ')' restores block layout.
                 auto first=line_tokens;
-                while(first<tokens.size() && (tokens[first].kind==TokenKind::indent || tokens[first].kind==TokenKind::dedent || tokens[first].text=="public" || tokens[first].text=="private" || tokens[first].text=="internal" || tokens[first].text=="virtual" || tokens[first].text=="override" || tokens[first].text=="async"))++first;
-                // A function-type annotation earlier on this line is not a
-                // declaration header for a later ordinary call.
-                const bool header=(!tokens.empty() && tokens.back().text=="func") || (first<tokens.size() && (tokens[first].text=="func" || tokens[first].text=="property" || tokens[first].text=="interface"));
-                const bool continuation=!header;parentheses.push_back(continuation);if(continuation)++braces;
-            }else if(c==')' && !parentheses.empty()){if(parentheses.back() && braces)--braces;parentheses.pop_back();}
+                while(first<tokens.size() && (tokens[first].kind==TokenKind::indent || tokens[first].kind==TokenKind::dedent || tokens[first].text=="public" || tokens[first].text=="private" || tokens[first].text=="internal" || tokens[first].text=="virtual" || tokens[first].text=="override" || tokens[first].text=="async" || tokens[first].text=="compile"))++first;
+                if(!header_delimiter && first<tokens.size() && (tokens[first].text=="func" || tokens[first].text=="property" || tokens[first].text=="interface" || tokens[first].text=="operator")) {
+                    auto line=start;while(line && text[line-1]!='\n' && text[line-1]!='\r')--line;
+                    header_delimiter=HeaderDelimiter{parentheses,braces,indentation_at(text,line).width};
+                }
+                ++parentheses;++braces;
+            }else if(c==')' && parentheses){if(header_delimiter && parentheses==header_delimiter->parentheses+1)header_delimiter.reset();if(braces)--braces;--parentheses;}
             else if(c=='{' && (tokens.empty() || tokens.back().text!="defer"))++braces;else if(c=='}' && braces)--braces;++p; emit(TokenKind::symbol, std::string(1, c), start); continue; }
         error(source, {TokenKind::symbol, "", p}, Code::character, "Unexpected character in source.",
               c == '\t' ? "Use spaces between tokens. Tabs are only allowed in indentation or multiline strings." : "Use supported expressions and lowercase ASCII identifiers; Unicode identifiers and collection/indexing syntax are deferred.");
@@ -997,7 +1016,7 @@ class Parser {
                 for (auto n = begin; n < p; ++n) parameter.default_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
             }
             f.parameters.push_back(std::move(parameter));
-        } while (accept(","));
+        } while (accept(",") && !at(")"));
         need(")"); if (accept("->")) function_result(f);
     }
     void operator_declaration(Structure& owner,std::string visibility) {
@@ -1076,7 +1095,7 @@ class Parser {
     // existing shared Depth guard still counts each source type exactly once.
     VOID_SEMANTIC_HANDLER Type function_type() {
         auto token=take();need("(");std::vector<Type> parameters;
-        if(!at(")"))do{auto readonly=accept("const");auto parameter=type();parameter.readonly=readonly;parameters.push_back(parameter);}while(accept(","));need(")");
+        if(!at(")"))do{auto readonly=accept("const");auto parameter=type();parameter.readonly=readonly;parameters.push_back(parameter);}while(accept(",") && !at(")"));need(")");
         auto result=accept("->")?signature_result():Type(Type::none);
         auto definition=std::make_shared<ir::ValueType>();definition->callable=true;definition->name=definition->identity="func";
         function_types.push_back({token,std::move(parameters),result,definition});Type value(definition);value.nullable=accept("?");return value;
@@ -1350,14 +1369,15 @@ class Parser {
             accept(":");
         } else s.expression=expression();
         bool incomplete_probe=false;
-        if(repair_available() && probe && at("<newline>")) {
+        if(repair_available() && at("<newline>")) {
             // The member can be under `not`, a comparison or a call. Its
             // receiver is still checked by the ordinary semantic probe.
             std::vector<const Expr*> expressions{s.expression.get()};
             while(!expressions.empty()) {
                 const auto* expression=expressions.back();expressions.pop_back();
-                if(expression->kind==Expr::Kind::field && expression->token.text=="_void_editor_cursor_" &&
-                   expression->token.offset==probe->offset){incomplete_probe=true;break;}
+                if(expression->kind==Expr::Kind::field &&
+                   ((probe && expression->token.text=="_void_editor_cursor_" && expression->token.offset==probe->offset) ||
+                    (!probe && expression->token.text.empty()))){incomplete_probe=true;break;}
                 for(const auto& part:expression->parts)expressions.push_back(part.get());
             }
         }
@@ -1834,6 +1854,47 @@ std::pair<Unit*, Structure*> structure_lookup(Unit& unit, Unit& root,
     if (candidates.size() > 1) error(unit.source,token,Code::ambiguous,"Ambiguous imported type '" + name + "'.","Use explicit aliases.");
     return candidates.empty() ? std::pair<Unit*,Structure*>{nullptr,nullptr} : candidates.begin()->second;
 }
+// A qualified constructor wrapper can name its same-named nominal result in
+// annotations. Keep this separate from expression lookup: calls must still run
+// the wrapper (including its defaults), never construct the underlying record.
+std::pair<Unit*, Structure*> annotation_structure_lookup(Unit& unit, Unit& root,
+    const std::map<std::string,std::unique_ptr<Unit>>& units, std::string spelling, const Token& token) {
+    auto* scope=&unit;
+    std::set<const Function*> forwarding;
+    while(true) {
+        auto result=structure_lookup(*scope,root,units,spelling,token);
+        if(result.second) {
+            if(source_visible(result.second->visibility,result.first->identity,unit.identity))return result;
+            return {};
+        }
+        const auto dot=spelling.find('.');
+        if(dot==std::string::npos)return {};
+        auto qualifier=scope->qualifiers.find(spelling.substr(0,dot));
+        if(qualifier==scope->qualifiers.end() || qualifier->second.size()!=1)return {};
+        auto* owner=qualifier->second.front();
+        const auto name=spelling.substr(dot+1);
+        auto found=owner->declarations.find(name);
+        if(found==owner->declarations.end())return {};
+        const auto& function=*found->second;
+        const auto type=function.result;
+        if(!source_visible(function.visibility,owner->identity,unit.identity) ||
+           function.asynchronous || !function.generics.empty() || !function.returns.empty() ||
+           type.nullable || type.readonly || !type.definition ||
+           (type.kind!=Type::unresolved && type.kind!=Type::aggregate && type.kind!=Type::managed_ref))return {};
+        const auto& name_in_result=type.definition->name;
+        if(name_in_result.substr(name_in_result.find_last_of('.')+1)!=name)return {};
+        if(!forwarding.insert(&function).second || forwarding.size()>128)return {};
+        if(type.kind!=Type::unresolved) {
+            auto target=units.find(type.definition->module_identity);
+            if(target==units.end())return {};
+            auto structure=target->second->structure_names.find(name);
+            if(structure==target->second->structure_names.end() || structure->second->definition!=type.definition ||
+               !source_visible(structure->second->visibility,target->first,unit.identity))return {};
+            return {target->second.get(),structure->second};
+        }
+        scope=owner;spelling=name_in_result;
+    }
+}
 VOID_SEMANTIC_HANDLER void editor_type_candidates(const Type& t,Unit& unit,Unit& root,const std::map<std::string,std::unique_ptr<Unit>>& units,const Token& token) {
     auto& probe=*root.editor;
     if(unit.failed_import){probe.result.candidates.clear();probe.result.signature.clear();probe.result.parameters.clear();throw EditorProbeFound{};}
@@ -1841,7 +1902,7 @@ VOID_SEMANTIC_HANDLER void editor_type_candidates(const Type& t,Unit& unit,Unit&
     std::set<std::string> names;
     for(const auto& [id,u]:units)for(const auto& [name,structure]:u->structure_names)names.insert(name);
     for(const auto& name:names)try{
-        auto [owner,structure]=structure_lookup(unit,root,units,qualifier+name,token);
+        auto [owner,structure]=annotation_structure_lookup(unit,root,units,qualifier+name,token);
         if(structure && name.starts_with(probe.prefix) && probe.result.candidates.size()<256)probe.result.candidates.push_back({name,structure->generics.empty()?"type":"generic type",7});
     }catch(const CompilationError&){}catch(const Poison&){}
     throw EditorProbeFound{};
@@ -1870,7 +1931,7 @@ Type resolve_type(Type t, Unit& unit, Unit& root, const std::map<std::string,std
         if(result.nullable && !ir::reference_value(result))error(unit.source,token,Code::unsupported_type,"Only managed references can be nullable.");
         return result;
     }
-    auto [owner, structure] = structure_lookup(unit,root,units,t.definition->name,token); (void)owner;
+    auto [owner, structure] = annotation_structure_lookup(unit,root,units,t.definition->name,token); (void)owner;
     auto location = token; location.offset = t.definition->source_offset; location.text = t.definition->name;
     if (!structure) error(unit.source,location,Code::unsupported_type,"Unsupported type '" + t.definition->name + "'.","Use a numeric type, bool, string or a visible value/managed struct.");
     if(!structure->generics.empty())error(unit.source,token,Code::unsupported_type,"Generic type '"+structure->token.text+"' requires concrete type arguments.");
@@ -9103,18 +9164,22 @@ EditorAssistance editor_assistance_impl(const std::filesystem::path& entry,const
     EditorRecovery physical_recovery{module,{}};
     Diagnostics physical_diagnostics;auto physical=lex(source,physical_diagnostics,0,std::string::npos,0,false,&physical_recovery,&conditions);
     if(physical_diagnostics.failed())return empty;
-    int parentheses=0;
-    for(const auto& t:physical)if(t.offset>=line && t.offset<begin){if(t.text=="(")++parentheses;else if(t.text==")")--parentheses;}
-    if(parentheses<0 || parentheses>32)return empty;
     auto stop=text.find_first_of("\r\n",end);if(stop==std::string::npos)stop=text.size();
-    int missing=parentheses;std::size_t insertion=end;const Token* last=nullptr;
+    // Match across continuation lines. A ')' on this line can close a header
+    // from an earlier line, and an existing later ')' must not be duplicated.
+    std::vector<const Token*> openings;
+    for(const auto& token:physical) {
+        if(token.text=="(")openings.push_back(&token);
+        else if(token.text==")") {if(openings.empty())return empty;openings.pop_back();}
+    }
+    const auto missing=std::count_if(openings.begin(),openings.end(),[&](const auto* token){return token->offset<stop;});
+    if(missing>32)return empty;
+    std::size_t insertion=end;const Token* last=nullptr;
     for(const auto& token:physical) {
         if(token.kind==TokenKind::string && token.offset<end && span(source,token).end>=end){last=&token;insertion=span(source,token).end;}
         if(token.offset<end || token.offset>=stop || token.kind==TokenKind::newline || token.kind==TokenKind::indent || token.kind==TokenKind::dedent || token.kind==TokenKind::end)continue;
-        if(token.text=="(")++missing;else if(token.text==")")--missing;
         last=&token;insertion=span(source,token).end;
     }
-    if(missing<0 || missing>32)return empty;
     // Keep the existing conditional colon and leave comments/literal bytes alone.
     if(last && last->text==":")insertion=last->offset;
     if(missing){if(insertion>stop)return empty;repaired.insert(insertion+std::string_view("_void_editor_cursor_").size()-(end-begin),static_cast<std::size_t>(missing),')');}

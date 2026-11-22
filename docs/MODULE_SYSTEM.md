@@ -209,6 +209,16 @@ Current lookup choices, made explicit for this slice:
    not shadow visible function names or import qualifiers, matching the existing
    no-shadowing rule. Duplicate functions within one file remain errors.
 
+A qualified constructor wrapper also names its same-named nominal result in type
+annotations. For example, a public `func vector2(...) -> native.vector2` in an
+imported `rl` module makes `rl.vector2` usable in return types, parameters and typed
+locals. The annotation retains the original record's identity, visibility and
+native layout. Calls to `rl.vector2(...)` still execute the wrapper and its defaults.
+This applies to non-generic, synchronous wrappers with a single non-nullable
+nominal result of the same name; it does not expose other imported declarations
+or make differently named factory functions into types. Forwarding cycles fail
+with an ordinary type diagnostic.
+
 These choices preserve unambiguous simple names without silently selecting one
 of multiple imported functions. Diagnostics name user-visible functions, aliases
 and VFS paths, not LLVM symbols. Candidate owners are ordered deterministically.

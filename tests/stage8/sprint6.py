@@ -75,9 +75,11 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint6 ') as directory:
     assert 'missing' in run([compiler,'check',source],1).stderr
     source.write_text('interface api:\n    func read() -> i32\nstruct node:\n    value: i32\nfunc (self node) read() -> i32:\n    return 1\nfunc choose(yes = node has api) -> bool:\n    return yes\nfunc entry(input: i32) -> i32:\n    if choose():\n        return 7\n    return 90\n', encoding='utf-8')
     assert run([compiler,'run',source,1,'--no-opt']).stdout.strip()=='7'
-    # Multiline header and generic argument syntax remains outside the contract.
-    for invalid in ['func f(\n    x: i32\n):\n    pass\n','func f<t,\n    u>(x: t):\n    pass\n']:
-        source.write_text(invalid, encoding='utf-8');run([compiler,'check',source],1)
+    # Parameter lists now share call continuation formatting; generic headers
+    # outside parentheses still retain their existing grammar.
+    for valid in ['func f(\n    x: i32\n):\n    pass\n', 'func f(x: i32,\n    y: i32 = 0,\n):\n    pass\n']:
+        source.write_text(valid, encoding='utf-8');run([compiler,'check',source])
+    source.write_text('func f<t,\n    u>(x: t):\n    pass\n', encoding='utf-8');run([compiler,'check',source],1)
     source.write_text('func main() -> i32:\n    return if true:\n        7\n    else:\n        9\n', encoding='utf-8')
     for switches in [[],['--no-opt']]:assert run([compiler,'run',source,*switches],7).stdout==''
 print(f'Sprint 6 process checks passed: {checks}')

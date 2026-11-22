@@ -1,0 +1,26 @@
+use pkg/raylib as rl
+
+func vector(
+    value: rl.vector2,
+) -> rl.vector2:
+    var local: rl.vector2 = value
+    return local
+func rect(
+    value: rl.rectangle,
+) -> rl.rectangle:
+    var local: rl.rectangle = value
+    return local
+func tint(
+    value: rl.color,
+) -> rl.color:
+    var local: rl.color = value
+    return local
+func main() -> i32:
+    var point: rl.vector2 = vector(rl.vector2(3, 4))
+    var bounds: rl.rectangle = rect(rl.rectangle(width = 8))
+    var shade: rl.color = tint(rl.color(r = 9))
+    var copied: rl.vector2 = point
+    if copied.x != 3 or bounds.width != 8 or shade.r != 9 or shade.a != 255:
+        return 1
+    print("qualified types passed")
+    return 0

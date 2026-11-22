@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -19,6 +20,16 @@ var global_3d = rl.camera_3d(fovy = 60)
 var partial_global = rl.camera_2d(zoom = 3)
 var global_vector = rl.vector3(y = 2)
 var global_transform = rl.transform()
+
+func vector_identity(value: rl.vector2) -> rl.vector2:
+    var local: rl.vector2 = value
+    return local
+func rectangle_identity(value: rl.rectangle) -> rl.rectangle:
+    var local: rl.rectangle = value
+    return local
+func color_identity(value: rl.color) -> rl.color:
+    var local: rl.color = value
+    return local
 
 func headless() -> i32:
     var flat = rl.camera_2d()
@@ -33,7 +44,7 @@ func headless() -> i32:
     if selected.fovy != 10 or selected.projection != rl.camera_projection.orthographic.value or selected.up.y != 1:
         return 4
     var local = rl.camera_2d(zoom = 2)
-    var point = rl.vector2(10, 20)
+    var point: rl.vector2 = vector_identity(rl.vector2(10, 20))
     var screen = rl.get_world_to_screen_2d(point, local)
     var world = rl.get_screen_to_world_2d(screen, local)
     if screen.x != 20 or screen.y != 40:
@@ -47,8 +58,10 @@ func headless() -> i32:
     if equivalent.position.x != 4 or equivalent.target.y != 2 or equivalent.fovy != 70:
         return 8
     var identity = rl.matrix()
-    var opaque = rl.color(r = 255)
-    var empty = rl.rectangle(x = 2)
+    var opaque: rl.color = color_identity(rl.color(r = 255))
+    var empty: rl.rectangle = rectangle_identity(rl.rectangle(x = 2))
+    if rl.color_to_int(opaque) != -16776961 or not rl.check_collision_point_rec(point, rl.rectangle(width = 40, height = 40)):
+        return 15
     var forward = rl.ray()
     var miss = rl.ray_collision()
     var bounds = rl.bounding_box()
@@ -124,7 +137,13 @@ def main():
         manifest = project / 'void.project.toml'
         manifest.write_text(manifest.read_text() + '\n[native-requirements.raylib]\nid="org.voidlang.raylib"\nversion="=6.0.0"\nabi=3\n')
         entry = project / 'src/app.void'
-        entry.write_text(SOURCE)
+        constructors = re.findall(r'^func ([a-z0-9_]+)\([^\n]*\) -> native\.\1:',
+            (ROOT / 'verified-packages/raylib/src/raylib.void').read_text(), re.MULTILINE)
+        assert {'vector2', 'rectangle', 'color'} <= set(constructors)
+        results['qualified_constructor_types'] = constructors
+        source = SOURCE + ''.join(f'\nfunc qualified_{name}(value: rl.{name}) -> rl.{name}:\n'
+            f'    var local: rl.{name} = value\n    return local\n' for name in constructors)
+        entry.write_text(source)
         run(compiler, 'tidy', '--project', project)
         run(compiler, 'check', '--project', project)
         modes = ['headless', 'graphics'] if '--graphics' in sys.argv else ['headless']
@@ -137,10 +156,10 @@ def main():
             for mode in modes:
                 result = run(binary, mode)
                 assert 'spellings passed' in result.stdout, result.stdout
-        entry.write_text(SOURCE.replace('camera_2d(zoom = 2)', 'camera_2d(unknown_zoom = 2)'))
+        entry.write_text(source.replace('camera_2d(zoom = 2)', 'camera_2d(unknown_zoom = 2)'))
         rejected = run(compiler, 'check', '--project', project, expected=1)
         assert 'unknown_zoom' in rejected.stderr and 'VOID2004' in rejected.stderr, rejected.stderr
-        entry.write_text(SOURCE)
+        entry.write_text(source)
         results['status'] = 'PASS'
     except BaseException as error:
         results.update(status='FAIL', error=repr(error))

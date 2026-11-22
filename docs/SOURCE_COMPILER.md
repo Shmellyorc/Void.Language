@@ -14,8 +14,21 @@ print(
 
 Spaces within parentheses are continuation formatting, including when a complete
 call is excluded by a conditional region. Existing parenthesized arithmetic,
-conditions and return expressions retain the same rule; declaration/type/generic
-headers keep their existing grammar. This adds no compact single-line `if` syntax.
+conditions and return expressions retain the same rule. Function parameter lists,
+receiver parentheses and function-value type parameters also allow continuation
+lines. Parameter lists accept a trailing comma, including before a closing
+parenthesis on its own line:
+
+```void
+func move(
+    position: rl.vector2,
+    speed: f32 = 1,
+) -> rl.vector2:
+    return rl.vector2(position.x + speed, position.y)
+```
+
+The body starts after the closing parenthesis and colon, with normal indentation.
+This adds no compact single-line `if` syntax or multiline generic `<...>` headers.
 
 The shared lexer consumes `compile if` / `compile else if` / `compile else`
 regions using immutable target and owning-project conditions. It discards directive
