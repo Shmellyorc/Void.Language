@@ -15,17 +15,23 @@ Compiler-owned project storage is:
 
 | Location | Ownership and lifetime |
 | --- | --- |
-| `.void/acquire-<random>/` | Invocation-owned package preparation; private checked inputs and outputs. |
-| `.void/cache/v1/` | Existing validated JIT cache; optional, private, reusable. |
+| `.void/acquire-<random>/` | Invocation-owned package preparation; checked inputs and outputs. |
+| `.void/cache/v1/` | Validated and authenticated JIT cache; optional, reusable. |
 | `.void/run/native-<random>/` | One native invocation; private payload and `.owner` lease. |
 | `.void/build/<entry>` | Default manifest application executable and its managed native payload. Explicit `-o` remains relative to the caller. |
 
-On POSIX, compiler artifact directories require the current account's ownership,
-mode `0700`, and no symlink substitution. Native staged files and the ownership
-record use `0600`, exclusive creation, and descriptor-relative access. Existing
-unsafe directories fail closed; the compiler does not chmod user directories.
-On Windows, project native storage uses protected owner-only DACLs and pinned
-directory handles. Platform qualification must be reported separately.
+Ordinary project, `.void`, cache, run-parent and build directories follow actual
+OS access permissions, including accessible shared workspaces. New ordinary
+directories/files use `0777`/`0666` subject to umask and inherited ACLs; existing
+user directories are not chmod-repaired. Held identity, no-follow/type checks,
+native consent and authenticated cache publication remain mandatory. Cache
+authentication credentials occupy a separate confidential per-user leaf.
+Invocation-owned native run/build leaves remain private: POSIX mode `0700`,
+native payload/ownership records `0600`, and protected Windows DACLs. macOS
+private native leaves clear inherited allow ACLs. Ordinary Windows parents retain
+their inherited access; directory handles remain pinned. See the
+[correction report](projects/UNIFIED_DEVELOPER_EXPERIENCE.md) for Linux evidence
+and pending native Windows/macOS qualification.
 
 Saved approval still binds the exact project, provider, artifacts, binding,
 application, entry and compiler identity. Native payload hashes remain mandatory.
@@ -36,9 +42,9 @@ verified but never executed. Replacing a project or staged file after capture
 cannot replace a loaded image. The conventional system-library loader contract
 remains in effect. Windows retains its private staged DLL loader contract.
 
-Package preparation reuses the project directory publisher's exclusive private
-staging and identity checks. An existing `.void` must be owned, private and
-unaliased; it is never chmodded. Success and recoverable failure remove the
+Package preparation reuses the project directory publisher's exclusive staging
+and identity checks. An existing `.void` follows OS access permissions and path
+integrity checks; it is never chmodded. Success and recoverable failure remove the
 invocation's acquisition leaf. A substituted leaf is preserved. Hard-killed
 acquisition leaves carry no later reclamation authority and require manual review.
 

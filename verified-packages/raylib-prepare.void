@@ -110,9 +110,9 @@ func prepare(const arguments: [string]) -> result<bool, string>:
     var native = inputs + "/native"
     var scratch = checked(paths.parent(catalog))?
     var stage = scratch + "/stage"
-    # The parent is compiler-created private scratch. The capability prevents
-    # adopting an existing stage and retains private classification on outputs.
-    with checked(files.create_private_directory(stage))? as stage_cap:
+    # The parent is compiler-created scratch. Held directory identity and
+    # exclusive creation prevent adopting existing stages or following links.
+    with checked(files.create_directory_handle(stage))? as stage_cap:
         var version = decoded(capture(clang, ["--version"], stage)?)?
         if not txt.starts_with(version, "clang version 23.1.4 "):
             return Err("bundled raylib requires Clang 23.1.4")
@@ -262,7 +262,7 @@ func prepare(const arguments: [string]) -> result<bool, string>:
         flags.push("-o")
         flags.push(stage + "/" + provider)
         var compiled = capture(clang, flags, stage)?
-        with checked(files.create_private_directory(catalog))? as catalog_cap:
+        with checked(files.create_directory_handle(catalog))? as catalog_cap:
             for name in [descriptor, provider, dependency]:
                 var copied = write(catalog + "/" + name, read(stage + "/" + name)?)?
             var license_written = write(catalog + "/RAYLIB-LICENSE.txt", read(inputs + "/upstream/LICENSE")?)?

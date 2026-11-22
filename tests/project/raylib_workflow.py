@@ -64,7 +64,17 @@ def workspace(args, root):
         return run(label, compiler, *argv, **options)
 
     if args.first_add_only:
-        cli("new first-add consumer", "new", "app", "--name", "TestGame", cwd=root)
+        if sys.platform.startswith("linux"):
+            # Ordinary developer folders must not inherit private-store rules.
+            root.chmod(0o775)
+            project.mkdir()
+            project.chmod(0o775)
+            (project / "app.void").write_text('func main():\n    print("first file")\n', encoding="utf-8")
+            cli("run first file in ordinary folder", "run", "app.void", contains="first file")
+            cli("initialize existing ordinary folder", "init")
+            cli("run initialized ordinary folder", "run", ".", contains="first file")
+        else:
+            cli("new first-add consumer", "new", "app", "--name", "TestGame", cwd=root)
         storage = project / ".void"
         # Let voidc create .void with its native private ACL on Windows.
         sentinel = project / "user.txt"
@@ -83,6 +93,20 @@ def workspace(args, root):
             assert len(payload) == int(extent) and sha256(payload).hexdigest() == digest, name
         cli("first-add lock and catalog verify", "resolve", "--project", ".", "--locked")
         assert sentinel.read_text(encoding="utf-8") == "preserve user storage"
+        if sys.platform.startswith("linux"):
+            entry = project / "app.void"
+            original = entry.read_bytes()
+            try:
+                entry.write_text(HEADLESS, encoding="utf-8")
+                cli("raylib JIT in ordinary folder", "run", ".", "--allow-native", "--no-cache",
+                    contains="G59 raylib pixel: 241")
+                executable = root / "headless"
+                cli("raylib AOT in ordinary folder", "build", ".", "--allow-native", "-o", executable)
+                run("raylib AOT execution in ordinary folder", executable, contains="G59 raylib pixel: 241")
+            finally:
+                entry.write_bytes(original)
+            assert root.stat().st_mode & 0o777 == 0o775
+            assert project.stat().st_mode & 0o777 == 0o775
         assert not list(storage.glob("acquire-*")), "Successful first add retained acquisition scratch"
         print("First-add catalog readback, identities, locked resolution and private scratch cleanup passed", flush=True)
         return
@@ -153,7 +177,7 @@ def workspace(args, root):
     assert output.replace("\r\n", "\n") == "241\n", output
     if sys.platform.startswith('linux'):
         runs = project / '.void/run'
-        assert runs.stat().st_mode & 0o777 == 0o700 and not list(runs.iterdir())
+        assert runs.is_dir() and not list(runs.iterdir())
         # Reclaim only marked abandoned payloads; preserve user-owned entries.
         orphan = runs / 'native-abandoned'
         orphan.mkdir(mode=0o700)

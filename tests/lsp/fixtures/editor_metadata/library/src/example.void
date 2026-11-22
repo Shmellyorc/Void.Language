@@ -1,0 +1,3 @@
+## Whether the example is ready.
+public func is_ready() -> bool:
+    return true

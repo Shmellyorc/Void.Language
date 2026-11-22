@@ -52,7 +52,7 @@ with tempfile.TemporaryDirectory(prefix="void-cache-retention-") as temporary:
             if len(path.name) != 64 or path.is_symlink() or not path.is_file():
                 continue
             stat = path.stat()
-            if stat.st_mode & 0o077 or stat.st_nlink != 1:
+            if stat.st_nlink != 1:
                 continue
             data = read(path)
             if (len(data) >= 129 and data[64:128] == path.name.encode()
@@ -65,7 +65,7 @@ with tempfile.TemporaryDirectory(prefix="void-cache-retention-") as temporary:
     first = run()
     if "Debug cache: unavailable" in first.stderr:
         assert not (root / ".void").exists()
-        print("Private persistent cache unavailable on this host; safe bypass passed")
+        print("Persistent cache unavailable on this host; safe bypass passed")
         sys.exit(0)
     original = next(iter(entries().values()))
     initial_bytes, initial_mtime = read(original), original.stat().st_mtime_ns
@@ -102,6 +102,9 @@ with tempfile.TemporaryDirectory(prefix="void-cache-retention-") as temporary:
             run(value=99, hit="miss", fault=fault)
             assert set(entries()) == before, (fault, "failed publication evicted validated history")
             assert not any(p.name.startswith("tmp-") for p in directory.iterdir()), fault
+        edit(0)
+        for fault in ("noatime", "other-owner"):
+            run(value=0, hit="hit", fault=fault)
 
     # Unknown objects are outside eviction authority, even at key-shaped names.
     sentinels = {directory / "tmp-interrupted": b"partial", directory / ("a" * 64): b"corrupt"}

@@ -104,7 +104,7 @@ void preparation_scratch(const fs::path& root) {
           "Failed preparation removed user data or retained its scratch");
 #ifndef _WIN32
     fs::permissions(root/".void",fs::perms::group_write,fs::perm_options::add);
-    fails([&]{with_project_scratch(project,[](const auto&,const auto&){});});
+    with_project_scratch(project,[](const auto&,const auto&){});
     fs::permissions(root/".void",fs::perms::group_write,fs::perm_options::remove);
     fs::rename(root/".void",root/"saved");
     fs::create_directory_symlink(root/"saved",root/".void");

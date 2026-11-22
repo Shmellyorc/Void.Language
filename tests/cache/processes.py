@@ -1,6 +1,7 @@
 """Real CLI processes; disposable private fixtures, no compiler substitute."""
 import concurrent.futures
 import hashlib
+import hmac
 import os
 from pathlib import Path
 import shutil
@@ -28,6 +29,12 @@ with tempfile.TemporaryDirectory(prefix="void-cache-") as temporary:
         directory = root / ".void/cache/v1"
         entry = next(directory.iterdir())
         valid = entry.read_bytes()
+        if os.name != "nt":
+            credential = root / '.void/cache' / f'.authentication-{os.geteuid()}'
+            secret = credential.read_bytes()
+            assert credential.stat().st_mode & 0o777 == 0o600
+            assert len(secret) == 32
+            assert valid[-64:] == hmac.new(secret, b'VOID native cache v2\n' + valid[64:-64], hashlib.sha256).hexdigest().encode()
         interrupted = directory / "tmp-interrupted"
         interrupted.write_bytes(b"partial")
         run(mode="hit")
@@ -35,16 +42,24 @@ with tempfile.TemporaryDirectory(prefix="void-cache-") as temporary:
         for broken in [b"short", valid[:100], valid[:-1], valid[:128] + b"9" + valid[129:]]:
             entry.write_bytes(broken)
             run(mode="miss")
-        # A valid envelope cannot hide an invalid native object.
+        # Even a correctly authenticated envelope cannot hide an invalid object.
         body = valid[64:129] + valid[129:193]
+        body += hmac.new(secret, b'VOID native cache v2\n' + body, hashlib.sha256).hexdigest().encode()
         entry.write_bytes(hashlib.sha256(body).hexdigest().encode() + body)
         run(mode="miss")
         entry.write_bytes(valid)
         run(mode="hit")
-        # Symlink and foreign/shared-writable content is never accepted.
+        # Another shared-directory writer can recompute the public checksum,
+        # but cannot supply a valid authentication tag for changed code.
+        forged = valid[64:-65] + bytes([valid[-65] ^ 1]) + valid[-64:]
+        entry.write_bytes(hashlib.sha256(forged).hexdigest().encode() + forged)
+        run(mode="miss")
+        entry.write_bytes(valid)
+        run(mode="hit")
+        # Ordinary modes retain cache hits; symbolic links remain rejected.
         if os.name != "nt":
             entry.chmod(0o666)
-            run(mode="miss")
+            run(mode="hit")
             entry.chmod(0o600)
             entry.unlink()
             entry.symlink_to(root / "missing")
@@ -113,6 +128,25 @@ with tempfile.TemporaryDirectory(prefix="void-cache-") as temporary:
         warnings = "\n".join(line for line in cached.stderr.splitlines() if not line.startswith("Debug cache:")) + "\n"
         assert warnings == ordinary.stderr, (ordinary, cached)
     if os.name != "nt":
+        # A killed first writer may leave an unpublished credential stage.
+        # A new process creates a complete canonical key and resumes warm hits.
+        credential = root / '.void/cache' / f'.authentication-{os.geteuid()}'
+        # An unsuitable local credential never imposes chmod repair on users.
+        # Persistence can use an automatically protected user-cache credential.
+        credential.chmod(0o644)
+        fallback_env = dict(os.environ, XDG_CACHE_HOME=str(root / 'user-cache'),
+                            HOME=str(root / 'user-cache-home'))
+        run(7, "miss", env=fallback_env)
+        run(7, "hit", env=fallback_env)
+        assert credential.stat().st_mode & 0o777 == 0o644
+        credential.unlink()
+        interrupted_key = credential.parent / '.authentication-stage-interrupted'
+        interrupted_key.write_bytes(b'partial')
+        interrupted_key.chmod(0o600)
+        run(7, "miss")
+        run(7, "hit")
+        assert len(credential.read_bytes()) == 32
+        assert interrupted_key.read_bytes() == b'partial'
         shutil.rmtree(root / ".void")
         (root / ".void").symlink_to(root / "unsafe")
         run(7, "unavailable")

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import {spawn} from 'node:child_process';
 import {crashEnvironment, configureCrashDiagnostics} from './crashDiagnostics';
-import {basename, isAbsolute, join, parse} from 'node:path';
+import {basename, dirname, isAbsolute, join, parse} from 'node:path';
 import {promises as fs, constants} from 'node:fs';
 import {LanguageClient, CloseAction, ErrorAction, State, RevealOutputChannelOn, ServerOptions, LanguageClientOptions} from 'vscode-languageclient/node';
 import type {TextEdit as ProtocolTextEdit} from 'vscode-languageclient/node';
@@ -63,18 +63,38 @@ class ServerManager {
     private warned = new Set<string>();
     private fallback?: string;
     private createdRoot?: string;
+    private metadataTimer?: ReturnType<typeof setTimeout>;
     private readonly diagnostics: DiagnosticLog;
     constructor(private readonly output: vscode.LogOutputChannel, private readonly trace: vscode.LogOutputChannel,
         private readonly bundled: string, private readonly statusBar: vscode.StatusBarItem) {
         this.diagnostics = new DiagnosticLog(output);
     }
-    async refreshProject(): Promise<void> {
+    metadataChanged(uri: vscode.Uri): void {
+        const project = this.project;
+        if (this.disposed || !vscode.workspace.isTrusted || uri.scheme !== 'file') return;
+        if (project && (project.manifestMode
+            ? uri.fsPath !== join(project.root, 'void.project.toml') && uri.fsPath !== join(project.root, 'void.lock')
+            : !inside(dirname(uri.fsPath), project.root))) return;
+        ++this.epoch;
+        if (this.metadataTimer) clearTimeout(this.metadataTimer);
+        // Package edits publish several files. Let their final lock publication
+        // settle before accepting the new compiler-owned dependency context.
+        this.metadataTimer = setTimeout(() => {
+            this.metadataTimer = undefined;
+            void this.refreshProject(true);
+        }, 250);
+    }
+    async refreshProject(automatic = false): Promise<void> {
         await this.serial;
+        if (this.disposed || !vscode.workspace.isTrusted) return;
         try {
+            // A manifest created after opening a standalone file changes the
+            // server mode, which a refresh inside the legacy session cannot do.
+            if (!this.project?.manifestMode) { await this.refresh(true); return; }
             if (!this.client?.isRunning()) throw new Error('Start the VOID language server first.');
-            await this.client.sendRequest('void/refreshProject', {});
+            await this.client.sendRequest('void/reselectProject', {entry: this.project.entryOverride ?? null});
             this.output.info(`Refreshed VOID project ${this.project?.root ?? ''}`);
-        } catch (error) { this.report(`Refresh VOID project: ${String(error)}`, true); }
+        } catch (error) { this.report(`Refresh VOID project: ${String(error)}`, !automatic); }
     }
     async applyQuickFix(offeredEpoch: number, ticket: QuickFixTicket): Promise<boolean> {
         await this.serial;
@@ -535,7 +555,7 @@ class ServerManager {
         }
         catch (e) { this.report(`VOID language server failed to start for ${project.root} (${project.server}): ${String(e)}`, true); await this.stop(); }
     }
-    async dispose(): Promise<void> { this.debugCancellations.forEach(value => value.dispose()); this.debugCancellations.clear(); this.debugArtifacts.clear(); this.disposed = true; await this.serial; await this.stop(); }
+    async dispose(): Promise<void> { if (this.metadataTimer) clearTimeout(this.metadataTimer); this.debugCancellations.forEach(value => value.dispose()); this.debugCancellations.clear(); this.debugArtifacts.clear(); this.disposed = true; await this.serial; await this.stop(); }
     changed(): void { ++this.epoch; }
     status(): {state: string; entry?: string} {
         return {state: this.client?.state === State.Running ? 'running' : 'stopped', entry: this.project?.entry ?? undefined};
@@ -553,6 +573,13 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
     statusBar.command = 'void.selectEntry'; statusBar.text = 'VOID: stopped'; statusBar.show();
     const bundled = join(context.extensionPath, 'server', process.platform === 'win32' ? 'voidls.exe' : 'voidls');
     const current = manager = new ServerManager(output, trace, bundled, statusBar);
+    // This watcher must exist before a server does, and also in standalone
+    // mode, where the source watcher only observes *.void files.
+    const metadata = vscode.workspace.createFileSystemWatcher('**/{void.project.toml,void.lock}');
+    context.subscriptions.push(metadata,
+        metadata.onDidCreate(uri => current.metadataChanged(uri)),
+        metadata.onDidChange(uri => current.metadataChanged(uri)),
+        metadata.onDidDelete(uri => current.metadataChanged(uri)));
     const workflow = creation = new CreationWorkflow(context.workspaceState, bundled, root => current.selectCreatedRoot(root),
         message => current.report(`VOID project creation: ${message}`));
     const libraries = libraryCommands(() => current.librarySelection(), output);
@@ -584,7 +611,14 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         }),
         vscode.workspace.onDidOpenTextDocument(d => { if (d.languageId === 'void' || basename(d.uri.fsPath) === 'void.project.toml') void current.refresh(); }),
         vscode.window.onDidChangeActiveTextEditor(e => { if (e && (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml')) void current.refresh(); }),
-        vscode.workspace.onDidChangeTextDocument(e => { if (e.document.languageId === 'void' || basename(e.document.uri.fsPath) === 'void.project.toml') current.changed(); }),
+        vscode.workspace.onDidChangeTextDocument(e => {
+            const manifest = basename(e.document.uri.fsPath) === 'void.project.toml';
+            if (e.document.languageId === 'void' || manifest) current.changed();
+            // An externally changed open manifest is synchronized separately
+            // from its disk watch. Accept the new context after that buffer
+            // has caught up too, rather than pinning its earlier overlay.
+            if (manifest && !e.document.isDirty) current.metadataChanged(e.document.uri);
+        }),
         vscode.window.onDidChangeVisibleTextEditors(editors => editors.forEach(applyIndentation)),
         vscode.workspace.onDidOpenTextDocument(document => {
             for (const editor of vscode.window.visibleTextEditors) if (editor.document === document) applyIndentation(editor);

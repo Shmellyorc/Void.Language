@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <stdarg.h>
+#include <sys/stat.h>
 
 static void observed(const char* mode) {
     ssize_t (*output)(int,const void*,size_t)=dlsym(RTLD_NEXT,"write");
@@ -22,6 +25,44 @@ static int selected(int fd) {
     path[size]=0;
     size_t length=strlen(directory);
     return !strncmp(path,directory,length) && !strncmp(path+length,"/tmp-",5);
+}
+static int cache_directory(int fd) {
+    const char* directory=getenv("VOID_CACHE_FAULT_DIRECTORY");
+    if(!directory)return 0;
+    char link[64],path[4096];snprintf(link,sizeof(link),"/proc/self/fd/%d",fd);
+    ssize_t size=readlink(link,path,sizeof(path)-1);if(size<0)return 0;
+    path[size]=0;return !strcmp(path,directory);
+}
+int openat(int fd,const char* name,int flags,...) {
+    static int (*real_openat)(int,const char*,int,...);
+    if(!real_openat)real_openat=dlsym(RTLD_NEXT,"openat");
+    mode_t permissions=0;
+    if(flags&O_CREAT){va_list args;va_start(args,flags);permissions=va_arg(args,int);va_end(args);}
+    const char* mode=getenv("VOID_CACHE_FAULT");
+    if(mode && !strcmp(mode,"noatime") && (flags&O_NOATIME) && cache_directory(fd)) {
+        observed(mode);errno=EPERM;return -1;
+    }
+    return real_openat(fd,name,flags,permissions);
+}
+int fstat(int fd,struct stat* information) {
+    static int (*real_fstat)(int,struct stat*);
+    if(!real_fstat)real_fstat=dlsym(RTLD_NEXT,"fstat");
+    int result=real_fstat(fd,information);
+    const char* mode=getenv("VOID_CACHE_FAULT");
+    if(!result && mode && !strcmp(mode,"other-owner")) {
+        const char* directory=getenv("VOID_CACHE_FAULT_DIRECTORY");
+        char link[64],path[4096];snprintf(link,sizeof(link),"/proc/self/fd/%d",fd);
+        ssize_t size=readlink(link,path,sizeof(path)-1);
+        if(directory && size>=0) {
+            path[size]=0;size_t length=strlen(directory),suffix=strlen("/.void/cache/v1");
+            if(length>suffix && !strncmp(path,directory,length-suffix) &&
+               (path[length-suffix]==0 || !strcmp(path+length-suffix,"/.void") ||
+                !strcmp(path+length-suffix,"/.void/cache") || !strncmp(path+length-suffix,"/.void/cache/v1",15))) {
+                observed(mode);information->st_uid=geteuid()+1;
+            }
+        }
+    }
+    return result;
 }
 ssize_t write(int fd,const void* data,size_t size) {
     static ssize_t (*real_write)(int,const void*,size_t);

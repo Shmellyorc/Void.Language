@@ -26,6 +26,7 @@
 #include <linux/fs.h>
 #elif defined(__APPLE__)
 #include <stdio.h>
+#include <sys/acl.h>
 #endif
 #endif
 
@@ -152,9 +153,9 @@ NativeHandle open_node(const fs::path& path, bool directory, bool pin) {
         throw std::runtime_error("Unexpected project staging object type.");
     return handle;
 }
-Node make_directory(const fs::path& path, bool private_stage) {
+Node make_directory(const fs::path& path, bool private_stage, bool confidential=false) {
     std::optional<native_windows::PrivateAccess> access;
-    if(private_stage)access.emplace();
+    if(confidential)access.emplace();
     if(!CreateDirectoryW(path.c_str(),access?&access->attributes:nullptr))
         native_windows::fail("Cannot create project staging directory");
     try {
@@ -284,14 +285,22 @@ struct Node {
     NativeHandle handle;
     bool directory;
 };
-Node make_directory(int parent,std::string name) {
-    if(mkdirat(parent,name.c_str(),0700))system_failure("Cannot create project staging directory");
+Node make_directory(int parent,std::string name,bool confidential=false) {
+    if(mkdirat(parent,name.c_str(),confidential?0700:0777))system_failure("Cannot create project staging directory");
     NativeHandle handle(openat(parent,name.c_str(),dir_flags));
     if(handle.fd<0)throw std::runtime_error("Cannot prove staging directory ownership; retained "+name);
+#ifdef __APPLE__
+    if(confidential) {
+        // Confidential internal records must not inherit a shared allow ACL.
+        auto acl=::acl_init(0);if(!acl)system_failure("Cannot create private staging ACL");
+        auto status=::acl_set_fd_np(handle.fd,acl,ACL_TYPE_EXTENDED);auto code=errno;::acl_free(acl);
+        if(status){errno=code;system_failure("Cannot protect confidential staging directory");}
+    }
+#endif
     return {parent,std::move(name),std::move(handle),true};
 }
 Node make_file(int parent,std::string name) {
-    NativeHandle handle(openat(parent,name.c_str(),O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC,0600));
+    NativeHandle handle(openat(parent,name.c_str(),O_RDWR|O_CREAT|O_EXCL|O_NOFOLLOW|O_CLOEXEC,0666));
     if(handle.fd<0)system_failure("Cannot create staged project file");
     return {parent,std::move(name),std::move(handle),false};
 }
@@ -491,7 +500,7 @@ bool publish_dependency_lock(const CreationRoot& root,const std::optional<std::s
         native_windows::fail("Cannot create project lock workspace");
 #else
     if(flock(parent.handle.fd,LOCK_EX))system_failure("Cannot serialize project lock publication");
-    if(mkdirat(parent.handle.fd,".void",0700) && errno!=EEXIST)system_failure("Cannot create project lock workspace");
+    if(mkdirat(parent.handle.fd,".void",0777) && errno!=EEXIST)system_failure("Cannot create project lock workspace");
 #endif
     Parent workspace(work);
 #ifdef _WIN32
@@ -573,10 +582,10 @@ void publish_git_snapshot(const CreationRoot& root, const std::string& key,
     if (named(work, std::string(git_store_name))) named(work, std::string(git_store_name), true);
     ensure_directory(store);
 #else
-    if (mkdirat(parent.handle.fd, ".void", 0700) && errno != EEXIST) system_failure("Cannot create Git snapshot workspace");
+    if (mkdirat(parent.handle.fd, ".void", 0777) && errno != EEXIST) system_failure("Cannot create Git snapshot workspace");
     Parent workspace(work);
     if (named(work, std::string(git_store_name))) named(work, std::string(git_store_name), true);
-    if (mkdirat(workspace.handle.fd, git_store_name.data(), 0700) && errno != EEXIST)
+    if (mkdirat(workspace.handle.fd, git_store_name.data(), 0777) && errno != EEXIST)
         system_failure("Cannot create Git snapshot store");
 #endif
     publish_project_directory(inspect_creation_root(store), key, files, verify, [&] {
@@ -602,7 +611,7 @@ ProjectDirectoryReader staged_reader(const native_windows::DirectoryReservation&
 #endif
 template<class Work>
 void with_project_stage(const CreationRoot& directory, const ProjectDirectoryReader& parent_reader, Work work,
-                        std::string_view private_child={}) {
+                        std::string_view private_child={}, bool confidential=false) {
     const auto& store = directory.path;
 #ifdef _WIN32
     Parent destination(store,true,parent_reader.reservation);
@@ -614,9 +623,9 @@ void with_project_stage(const CreationRoot& directory, const ProjectDirectoryRea
     const auto temporary = private_child.empty() ? "acquire-" + random_hex() : std::string(private_child);
     const auto stage = store / utf8_path(temporary);
 #ifdef _WIN32
-    auto staged = make_directory(stage, true);
+    auto staged = make_directory(stage, true, confidential);
 #else
-    auto staged = make_directory(destination.handle.fd, temporary);
+    auto staged = make_directory(destination.handle.fd, temporary, confidential);
 #endif
     bool keep = false;
     auto cleanup = [&] {
@@ -649,14 +658,6 @@ void with_project_scratch(const CreationRoot& root, const VerifyProjectDirectory
     Parent workspace(root.path/".void");
     if (inspect_creation_root(root.path).identity != root.identity)
         throw std::runtime_error("Project root changed before preparation.");
-#ifdef _WIN32
-    native_windows::PrivateAccess access;
-    access.verify(workspace.handle.value);
-#else
-    const auto info=identity(workspace.handle);
-    if (info.st_uid != geteuid() || (info.st_mode & 0777) != 0700)
-        throw std::runtime_error("Project preparation requires an owned private .void directory.");
-#endif
     with_project_stage({workspace.path,workspace.identity_key()}, {},
         [&](const Parent&, [[maybe_unused]] Node& staged, const fs::path& stage, bool&) {
 #ifdef _WIN32
@@ -672,7 +673,7 @@ void publish_project_directory(const CreationRoot& directory, const std::string&
                                const std::map<std::string, std::string_view>& files,
                                const VerifyProjectDirectory& verify,
                                const std::function<void()>& recheck,
-                               const ProjectDirectoryReader& parent_reader) {
+                               const ProjectDirectoryReader& parent_reader, bool confidential) {
     std::string_view private_child;
 #ifdef _WIN32
     // NTFS also reserves the target parent during a rename. For a payload
@@ -725,7 +726,7 @@ void publish_project_directory(const CreationRoot& directory, const std::string&
         } catch (const CreationCollision&) {
             verify(directory.path / leaf,parent_reader);
         }
-    }, private_child);
+    }, private_child, confidential);
 }
 
 void publish_application_directory(const CreationRoot& directory, const std::string& leaf,
@@ -867,7 +868,7 @@ struct PackageWriter {
             native_windows::fail("Cannot create package workspace");
 #else
         if(flock(parent.handle.fd,LOCK_EX))system_failure("Cannot serialize package edit");
-        if(mkdirat(parent.handle.fd,".void",0700) && errno!=EEXIST)system_failure("Cannot create package workspace");
+        if(mkdirat(parent.handle.fd,".void",0777) && errno!=EEXIST)system_failure("Cannot create package workspace");
 #endif
         Parent workspace(root.path/".void");
 #ifdef _WIN32
@@ -1043,7 +1044,7 @@ fs::path admit_source_directory(const fs::path& root,const fs::path& requested) 
     return inspect_creation_root(current).path;
 }
 
-void with_user_package_store(const fs::path& path,bool create,const std::function<void(const CreationRoot&)>& action) {
+void with_user_package_store(const fs::path& path,bool create,const std::function<void(const CreationRoot&)>& action, bool confidential) {
     auto status=fs::symlink_status(path);
     if(!fs::exists(status)) {
         if(!create)return;
@@ -1054,7 +1055,7 @@ void with_user_package_store(const fs::path& path,bool create,const std::functio
         for(auto dir=missing.rbegin();dir!=missing.rend();++dir) {
             const auto parent=inspect_creation_root(dir->parent_path());
             try {
-                publish_project_directory(parent,path_utf8(dir->filename()),{},[](const auto&,const auto&){});
+                publish_project_directory(parent,path_utf8(dir->filename()),{},[](const auto&,const auto&){},{},{},confidential && *dir==path);
             } catch(const CreationCollision&) {
                 // Another installer created the directory first.
             }

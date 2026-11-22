@@ -115,6 +115,23 @@ separately authorizes major cleanup. Engineering authorization does not grant
 those permissions. Follow the current assignment's authorization; separate
 authorized work retains its own scope.
 
+## Permanent development installation rule — 21 November 2026
+
+Whenever engineering touches `voidc` or `voidls`, rebuild **both** tools and
+the VS Code extension, then install and verify the matching artifacts at Boss's
+existing development installation paths. Identify those paths and preserve a
+verifiable recovery route before replacing installed artifacts. Verify file
+identities, compiler/server pairing and actual installed extension activation.
+Deploy matching Runtime/standard-library sources, native inventories and bundled
+package preparation resources with the tools; executable-only replacement can
+leave a broken installed developer experience.
+Disposable prefixes, isolated editor profiles and `/tmp` installations do not
+substitute for the real installation. A one-time window reload may activate new
+extension code; subsequent package changes must work without repeated reloads.
+Preserve unrelated settings, source and package state. Follow the current task's
+deployment authorization; this rule does not authorize Git integration or release
+publication.
+
 ## Permanent documentation policy — 20 October 2026
 
 Keep engineering instructions, status and handoffs under `docs/`; use

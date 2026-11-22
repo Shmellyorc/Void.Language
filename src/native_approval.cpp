@@ -1,6 +1,7 @@
 #include "native_approval.hpp"
 #include "frontend/project_digest.hpp"
 #include "frontend/project_native.hpp"
+#include "runtime/host_posix.hpp"
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
 #include "void/path.hpp"
@@ -57,53 +58,28 @@ fs::path store_path() {
     return path;
 }
 
-#ifndef _WIN32
-void require_safe_ancestors(const fs::path& path) {
-    // The account or root must own every existing component. A shared
-    // directory such as /tmp is safe only if the sticky bit protects children.
-    auto current=path.root_path();
-    bool private_ancestor=false;
-    for(const auto& name:path.relative_path()) {
-        current/=name;
-        struct stat info{};
-        if(lstat(current.c_str(), &info)) {
-            if(errno==ENOENT)return; // The controlled publisher creates missing components.
-            throw std::system_error(errno,std::generic_category(),"Cannot inspect native approval path");
-        }
-        if(!S_ISDIR(info.st_mode) || (info.st_uid!=0 && info.st_uid!=geteuid()) ||
-           (!private_ancestor && (info.st_mode & 0022) && !(info.st_mode & S_ISVTX)))
-            throw std::runtime_error("Native approval path has an untrusted directory.");
-        // Mode + ACL mask on a private home exclude other users from all
-        // descendants even if a nested directory's group bits are broader.
-        private_ancestor |= (info.st_mode & 0077)==0;
-    }
-}
-#endif
-
 void require_private_directory(const fs::path& path) {
 #if defined(_WIN32)
-    if(GetDriveTypeW(path.root_path().c_str())!=DRIVE_FIXED)
-        throw std::runtime_error("Native approvals require a private local user directory.");
     auto pins=native_windows::pin_directories(path);
     native_windows::PrivateAccess{}.verify(pins.back().value);
 #else
     const auto root=inspect_creation_root(path);
+    const auto descriptor=open(root.path.c_str(),O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
+    if(descriptor<0)throw std::system_error(errno,std::generic_category(),"Cannot open native approval directory");
+    struct Held {int fd;~Held(){::close(fd);}} held{descriptor};
     struct stat info{};
-    if(lstat(root.path.c_str(), &info) || !S_ISDIR(info.st_mode) || info.st_uid!=geteuid() || (info.st_mode & 0077))
+    if(fstat(descriptor, &info) || !S_ISDIR(info.st_mode) || info.st_uid!=geteuid() || (info.st_mode & 0077) || !host::safe_acl(descriptor))
         throw std::runtime_error("Native approvals require a private user directory.");
 #endif
 }
 
 template<class Action>
 void with_approval_store(const fs::path& path,bool create,const Action& action) {
-#ifndef _WIN32
-    require_safe_ancestors(path);
-#endif
     if(fs::exists(fs::symlink_status(path)) || project_path_alias(path))require_private_directory(path);
     with_user_package_store(path,create,[&](const CreationRoot& root) {
         require_private_directory(root.path);
         action(root);
-    });
+    },true);
 }
 
 std::optional<std::string> read_record(const CreationRoot& root,std::string_view id) {
@@ -177,10 +153,9 @@ struct NativeApproval::Payload {
         auto root=project;
         for(const auto* name:{L".void",L"run"}) {
             root/=name;
-            if(!CreateDirectoryW(root.c_str(),&access.attributes) && GetLastError()!=ERROR_ALREADY_EXISTS)
+            if(!CreateDirectoryW(root.c_str(),nullptr) && GetLastError()!=ERROR_ALREADY_EXISTS)
                 native_windows::fail("Cannot create project artifact directory");
             auto child=native_windows::pin_directories(root);
-            access.verify(child.back().value);
         }
         unsigned scanned=0;
         for(const auto& entry:fs::directory_iterator(root)) {
@@ -274,7 +249,7 @@ struct NativeApproval::Payload {
             (folder?S_ISDIR(info.st_mode):(S_ISREG(info.st_mode) && info.st_nlink==1));
     }
     static int child(int fd,const char* name) {
-        if(mkdirat(fd,name,0700) && errno!=EEXIST)
+        if(mkdirat(fd,name,0777) && errno!=EEXIST)
             throw std::system_error(errno,std::generic_category(),"Cannot create project artifact directory");
         const auto result=openat(fd,name,O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
         if(result<0)throw std::system_error(errno,std::generic_category(),
@@ -285,9 +260,9 @@ struct NativeApproval::Payload {
             throw std::system_error(error,std::generic_category(),
                 "Cannot inspect project artifact directory: "+std::string(name));
         }
-        if(!S_ISDIR(info.st_mode) || info.st_uid!=geteuid() || (info.st_mode&0077)) {
+        if(!S_ISDIR(info.st_mode)) {
             close(result);
-            throw std::runtime_error("Project .void/run storage must be owned by this account, private and unaliased.");
+            throw std::runtime_error("Project .void/run storage must be an accessible real directory.");
         }
         return result;
     }
@@ -361,7 +336,6 @@ struct NativeApproval::Payload {
     }
     Payload(const fs::path& root,const std::map<std::string,std::string>& files) {
         try {
-            require_safe_ancestors(root);
             const auto project=open(root.c_str(),O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
             struct stat info{};
             if(project<0)throw std::system_error(errno,std::generic_category(),
@@ -369,10 +343,6 @@ struct NativeApproval::Payload {
             if(fstat(project,&info)) {
                 const auto error=errno;close(project);
                 throw std::system_error(error,std::generic_category(),"Cannot inspect project artifact root");
-            }
-            if(info.st_uid!=geteuid()) {
-                close(project);
-                throw std::runtime_error("Cannot open owned project artifact root.");
             }
             int dot=-1;
             try {dot=child(project,".void");parent=child(dot,"run");}
@@ -412,6 +382,8 @@ struct NativeApproval::Payload {
             stage=openat(parent,leaf.c_str(),O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
             if(stage<0)throw std::system_error(errno,std::generic_category(),
                 "Cannot open newly created native run storage: "+display(path_utf8(root/".void/run"/leaf)));
+            if(!host::clear_inherited_acl(stage) || !host::safe_acl(stage))
+                throw std::runtime_error("Cannot secure native run storage ACL.");
             if(fstat(stage,&info))throw std::system_error(errno,std::generic_category(),"Cannot inspect native run storage");
             if(info.st_uid!=geteuid() || (info.st_mode&0077) || info.st_dev!=created_identity.st_dev ||
                info.st_ino!=created_identity.st_ino)throw std::runtime_error("Native run storage identity or privacy changed.");
@@ -463,13 +435,11 @@ fs::path project_build_directory(const fs::path& root) {
     auto directory=root;
     for(const auto* name:{L".void",L"build"}) {
         directory/=name;
-        if(!CreateDirectoryW(directory.c_str(),&access.attributes) && GetLastError()!=ERROR_ALREADY_EXISTS)
+        if(!CreateDirectoryW(directory.c_str(),nullptr) && GetLastError()!=ERROR_ALREADY_EXISTS)
             native_windows::fail("Cannot create project build directory");
         auto child=native_windows::pin_directories(directory);
-        access.verify(child.back().value);
     }
 #else
-    require_safe_ancestors(root);
     int parent=open(root.c_str(),O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
     struct stat info{};
     if(parent<0)throw std::system_error(errno,std::generic_category(),"Cannot open project build root: "+display(path_utf8(root)));
@@ -477,13 +447,9 @@ fs::path project_build_directory(const fs::path& root) {
         const auto error=errno;close(parent);
         throw std::system_error(error,std::generic_category(),"Cannot inspect project build root");
     }
-    if(info.st_uid!=geteuid()) {
-        close(parent);
-        throw std::runtime_error("Cannot open owned project build root.");
-    }
     try {
         for(const auto* name:{".void","build"}) {
-            if(mkdirat(parent,name,0700) && errno!=EEXIST)
+            if(mkdirat(parent,name,0777) && errno!=EEXIST)
                 throw std::system_error(errno,std::generic_category(),"Cannot create project build storage");
             const auto child=openat(parent,name,O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
             if(child<0)throw std::system_error(errno,std::generic_category(),"Cannot open project build storage: "+std::string(name));
@@ -491,9 +457,9 @@ fs::path project_build_directory(const fs::path& root) {
                 const auto error=errno;close(child);
                 throw std::system_error(error,std::generic_category(),"Cannot inspect project build storage: "+std::string(name));
             }
-            if(info.st_uid!=geteuid() || (info.st_mode&0077)) {
+            if(!S_ISDIR(info.st_mode)) {
                 close(child);
-                throw std::runtime_error("Project .void/build storage must be owned, private and unaliased.");
+                throw std::runtime_error("Project .void/build storage must be an accessible real directory.");
             }
             close(parent);parent=child;
         }
@@ -580,7 +546,7 @@ void NativeApproval::remember() {
         publish_project_directory(root,id_,{{"approval",pending_}},[&](const fs::path& stage,const ProjectDirectoryReader& reader){
             if(reader.read(stage/"approval",record_limit)!=pending_)
                 throw std::runtime_error("Native approval record changed before publication.");
-        });
+        },{},{},true);
     });
     std::cerr<<"Saved native approval "<<id_<<". Revoke with: voidc native revoke "<<id_<<'\n';
     pending_.clear();

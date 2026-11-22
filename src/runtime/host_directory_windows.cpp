@@ -16,6 +16,7 @@ std::shared_ptr<Node> held(win::Handle handle,std::shared_ptr<Node> ancestor={})
     auto node=std::make_shared<Node>(handle.value);handle.release();node->ancestor=std::move(ancestor);return node;
 }
 struct Directory final : Object {
+    bool private_access=true;
     std::shared_ptr<Node> node,parent;
     std::wstring name;
     ~Directory() override {close();}
@@ -33,10 +34,10 @@ struct Lock final : Object {
 };
 // Every relative name is one validated component, so there are no intermediate
 // reparse points in NtCreateFile's name. Inspect the opened leaf before use.
-win::Handle open_component(HANDLE parent,std::wstring_view name,bool directory,bool create,bool writable,win::PrivateAccess& access,bool lock=false,bool rename_authority=true) {
+win::Handle open_component(HANDLE parent,std::wstring_view name,bool directory,bool create,bool writable,win::PrivateAccess& access,bool lock=false,bool rename_authority=true,bool private_access=true) {
     UNICODE_STRING text{};text.Buffer=const_cast<wchar_t*>(name.data());text.Length=static_cast<USHORT>(name.size()*sizeof(wchar_t));text.MaximumLength=text.Length;
     OBJECT_ATTRIBUTES attributes{};attributes.Length=sizeof(attributes);attributes.RootDirectory=parent;attributes.ObjectName=&text;attributes.Attributes=0x40; // OBJ_CASE_INSENSITIVE
-    if(create)attributes.SecurityDescriptor=&access.descriptor;
+    if(create && private_access)attributes.SecurityDescriptor=&access.descriptor;
     IO_STATUS_BLOCK io{};HANDLE output=INVALID_HANDLE_VALUE;
     auto library=GetModuleHandleW(L"ntdll.dll");if(!library)win::fail();
     using Create=NTSTATUS(NTAPI*)(PHANDLE,ACCESS_MASK,POBJECT_ATTRIBUTES,PIO_STATUS_BLOCK,PLARGE_INTEGER,ULONG,ULONG,ULONG,ULONG,PVOID,ULONG);
@@ -46,7 +47,7 @@ win::Handle open_component(HANDLE parent,std::wstring_view name,bool directory,b
     if(!call || !convert)win::fail(ERROR_PROC_NOT_FOUND);
     // A persistent directory DELETE grant conflicts with the kernel's target
     // open during handle-relative rename. Acquire source DELETE only on demand.
-    ACCESS_MASK rights=READ_CONTROL|SYNCHRONIZE|FILE_READ_ATTRIBUTES|(rename_authority && !directory?DELETE:0)|(directory?FILE_LIST_DIRECTORY:GENERIC_READ);
+    ACCESS_MASK rights=(private_access?READ_CONTROL:0)|SYNCHRONIZE|FILE_READ_ATTRIBUTES|(rename_authority && !directory?DELETE:0)|(directory?FILE_LIST_DIRECTORY:GENERIC_READ);
     if(writable)rights|=GENERIC_WRITE;
     constexpr ULONG synchronous=0x20,open_reparse=0x200000,directory_file=1,non_directory=0x40;
     auto status=call(&output,rights,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,
@@ -55,34 +56,36 @@ win::Handle open_component(HANDLE parent,std::wstring_view name,bool directory,b
     if(status<0)win::fail(convert(status));
     return win::Handle(output);
 }
-win::Handle relative(HANDLE parent,std::wstring_view name,bool directory,bool create,bool writable,win::PrivateAccess& access,bool lock=false,bool rename_authority=true) {
+win::Handle relative(HANDLE parent,std::wstring_view name,bool directory,bool create,bool writable,win::PrivateAccess& access,bool lock=false,bool rename_authority=true,bool private_access=true) {
     if(!win::component(name))win::fail(ERROR_INVALID_NAME);
-    auto handle=open_component(parent,name,directory,create,writable,access,lock,rename_authority);
-    win::information(handle.value,directory);access.verify(handle.value);return handle;
+    auto handle=open_component(parent,name,directory,create,writable,access,lock,rename_authority,private_access);
+    win::information(handle.value,directory);if(private_access)access.verify(handle.value);return handle;
 }
-win::Handle lock_file(HANDLE parent, std::wstring_view name, win::PrivateAccess& access) {
+win::Handle lock_file(HANDLE parent, std::wstring_view name, win::PrivateAccess& access,bool private_access=true) {
     win::Handle file;
-    try {file.value=relative(parent,name,false,true,true,access,true).release();}
+    try {file.value=relative(parent,name,false,true,true,access,true,true,private_access).release();}
     catch(const std::system_error& e) {
         if(e.code().value()!=ERROR_FILE_EXISTS && e.code().value()!=ERROR_ALREADY_EXISTS)throw;
-        file.value=relative(parent,name,false,false,true,access,true).release();
+        file.value=relative(parent,name,false,false,true,access,true,true,private_access).release();
     }
     OVERLAPPED offset{};
     if(!LockFileEx(file.value,LOCKFILE_EXCLUSIVE_LOCK|LOCKFILE_FAIL_IMMEDIATELY,0,MAXDWORD,MAXDWORD,&offset))win::fail();
     return file;
 }
-std::shared_ptr<Directory> root(const std::string& path,bool create) {
-    auto full=win::absolute(path);if(full.size()<=7)win::fail(ERROR_INVALID_NAME);
+std::shared_ptr<Directory> root(const std::string& path,bool create,bool private_access) {
+    auto spelling=path;
+    if(!private_access)while(spelling.size()>3 && (spelling.back()=='/' || spelling.back()=='\\'))spelling.pop_back();
+    auto full=win::absolute(spelling);if(full.size()<=7)win::fail(ERROR_INVALID_NAME);
     win::PrivateAccess access;
-    auto current=held(win::Handle(CreateFileW(full.substr(0,7).c_str(),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr)));
+    auto current=held(win::Handle(CreateFileW(full.substr(0,7).c_str(),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|(private_access?READ_CONTROL:0),FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr)));
     if(current->handle.value==INVALID_HANDLE_VALUE)win::fail();
     win::information(current->handle.value,true);
     for(std::size_t start=7;start<full.size();) {
-        access.verify(current->handle.value,true);
+        if(private_access)access.verify(current->handle.value,true);
         auto end=full.find(L'\\',start);auto name=full.substr(start,end==full.npos?end:end-start);bool last=end==full.npos;
         if(last) {
-            auto opened=relative(current->handle.value,name,true,create,true,access);
-            auto value=std::make_shared<Directory>();value->node=held(std::move(opened),current);value->parent=current;value->name=std::move(name);return value;
+            auto opened=relative(current->handle.value,name,true,create,true,access,false,true,private_access);
+            auto value=std::make_shared<Directory>();value->private_access=private_access;value->node=held(std::move(opened),current);value->parent=current;value->name=std::move(name);return value;
         }
         // Ancestors need not be private; creation and final admission do.
         UNICODE_STRING text{};text.Buffer=name.data();text.Length=static_cast<USHORT>(name.size()*2);text.MaximumLength=text.Length;
@@ -93,7 +96,7 @@ std::shared_ptr<Directory> root(const std::string& path,bool create) {
         auto dll=GetModuleHandleW(L"ntdll.dll");auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
         if(!call || !convert)win::fail(ERROR_PROC_NOT_FOUND);
         // NtCreateFile needs the metadata read right for information() below.
-        auto status=call(&raw,FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL|SYNCHRONIZE,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
+        auto status=call(&raw,FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|(private_access?READ_CONTROL:0)|SYNCHRONIZE,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
         if(status<0)win::fail(convert(status));win::Handle next(raw);win::information(raw,true);
         current=held(std::move(next),current);start=end+1;
     }
@@ -105,7 +108,7 @@ bool same(HANDLE a,HANDLE b) {
     if(!GetFileInformationByHandle(a,&x) || !GetFileInformationByHandle(b,&y))win::fail();
     return x.dwVolumeSerialNumber==y.dwVolumeSerialNumber && x.nFileIndexHigh==y.nFileIndexHigh && x.nFileIndexLow==y.nFileIndexLow;
 }
-win::Handle rename_source(HANDLE directory,win::PrivateAccess& access) {
+win::Handle rename_source(HANDLE directory,win::PrivateAccess& access,bool private_access=true) {
     // An empty native name reopens this held directory itself, without resolving
     // its former name or an absolute path. This is not a public component name.
     wchar_t zero=0;UNICODE_STRING name{};name.Buffer=&zero;
@@ -116,9 +119,9 @@ win::Handle rename_source(HANDLE directory,win::PrivateAccess& access) {
     auto dll=GetModuleHandleW(L"ntdll.dll");if(!dll)win::fail();
     auto call=reinterpret_cast<Create>(GetProcAddress(dll,"NtCreateFile"));auto convert=reinterpret_cast<Convert>(GetProcAddress(dll,"RtlNtStatusToDosError"));
     if(!call || !convert)win::fail(ERROR_PROC_NOT_FOUND);
-    auto status=call(&raw,DELETE|SYNCHRONIZE|FILE_READ_ATTRIBUTES|READ_CONTROL,&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
+    auto status=call(&raw,DELETE|SYNCHRONIZE|FILE_READ_ATTRIBUTES|(private_access?READ_CONTROL:0),&attributes,&io,nullptr,FILE_ATTRIBUTE_NORMAL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,1,1|0x20|0x200000,nullptr,0);
     if(status<0)win::fail(convert(status));win::Handle result(raw);
-    win::information(raw,true);access.verify(raw);
+    win::information(raw,true);if(private_access)access.verify(raw);
     if(!same(directory,raw))win::fail(ERROR_INVALID_PARAMETER);
     return result;
 }
@@ -184,15 +187,15 @@ class SaveStage {
 
     Result verify_directory() const {
         if (!directory.parent) return error(4);
-        auto check = relative(directory.parent->handle.value, directory.name, true, false, false, access);
+        auto check = relative(directory.parent->handle.value, directory.name, true, false, false, access,false,false,directory.private_access);
         if (!same(parent, check.value)) return error(4);
         win::information(parent, true);
-        access.verify(parent);
+        if(directory.private_access)access.verify(parent);
         if (auto code = check.close()) return native_error(code.value());
         return {};
     }
     win::Handle target() const {
-        return relative(parent, name, false, false, false, access, false, false);
+        return relative(parent, name, false, false, false, access, false, false,directory.private_access);
     }
 public:
     SaveStage(Directory& owner, const std::wstring& destination, win::PrivateAccess& security)
@@ -203,7 +206,7 @@ public:
         if (checked.kind) return checked;
         checked = local_save_volume(parent);
         if (checked.kind) return checked;
-        lock.value = lock_file(parent, save_lock_name, access).release();
+        lock.value = lock_file(parent, save_lock_name, access,directory.private_access).release();
         try { previous.value = target().release(); }
         catch (const std::system_error& e) {
             if (e.code().value() != ERROR_FILE_NOT_FOUND) throw;
@@ -213,16 +216,16 @@ public:
     }
 
     Result create() {
-        staged.value = open_component(parent, save_stage_name, false, true, true, access).release();
+        staged.value = open_component(parent, save_stage_name, false, true, true, access,false,true,directory.private_access).release();
         win::information(file(), false);
-        access.verify(file());
+        if(directory.private_access)access.verify(file());
         return {};
     }
 
     Result publish() {
         auto checked = verify_directory();
         if (checked.kind) return checked;
-        auto source = relative(parent, save_stage_name, false, false, false, access, false, false);
+        auto source = relative(parent, save_stage_name, false, false, false, access, false, false,directory.private_access);
         if (!same(file(), source.value)) return native_error(ERROR_INVALID_PARAMETER);
         if (auto code = source.close()) return native_error(code.value());
         const bool replace = previous.value != INVALID_HANDLE_VALUE;
@@ -245,7 +248,7 @@ public:
     Result sync_directory() const { return sync(parent); }
     int remove() const {
         try {
-            auto source = open_component(parent, save_stage_name, false, false, false, access, false, false);
+            auto source = open_component(parent, save_stage_name, false, false, false, access, false, false,directory.private_access);
             if (!same(file(), source.value)) return ERROR_INVALID_PARAMETER;
             if (auto code = source.close()) return code.value();
             FILE_DISPOSITION_INFO disposition{TRUE};
@@ -263,15 +266,15 @@ public:
 Result windows_directory_execute(Request& q) {
     try {
         if(q.operation==file_mode_matches) {
-            if(q.numbers[0]!=0 && q.numbers[0]!=1)return error(6);
-            auto native=filesystem::private_mode_matches(*q.file->file(),q.numbers[0]!=0);
+            if(q.numbers[0]<0 || q.numbers[0]>3)return error(6);
+            auto native=q.numbers[0]<2?filesystem::private_mode_matches(*q.file->file(),q.numbers[0]!=0):filesystem::executable_mode_matches(*q.file->file(),q.numbers[0]==3);
             auto result=error(static_cast<std::int64_t>(native.error),native.os_code);result.number=native.number;return result;
         }
         if(q.operation==file_mode) {
-            if(q.numbers[0]!=0 && q.numbers[0]!=1)return error(6);
-            auto r=filesystem::private_mode(*q.file->file(),q.numbers[0]!=0);return error(static_cast<std::int64_t>(r.error),r.os_code);
+            if(q.numbers[0]<0 || q.numbers[0]>3)return error(6);
+            auto r=q.numbers[0]<2?filesystem::private_mode(*q.file->file(),q.numbers[0]!=0):filesystem::executable_mode(*q.file->file(),q.numbers[0]==3);return error(static_cast<std::int64_t>(r.error),r.os_code);
         }
-        if(q.operation==dir_create || q.operation==dir_admit){q.acquired=root(q.texts[0],q.operation==dir_create);return {};}
+        if(q.operation==dir_create || q.operation==dir_admit){q.acquired=root(q.texts[0],q.operation==dir_create,!q.ordinary_directory);return {};}
         auto d=std::static_pointer_cast<Directory>(q.objects[0]);if(!d->node)return error(7);auto fd=d->node->handle.value;
         if(q.operation==dir_sync)return sync(fd);
         win::PrivateAccess access;
@@ -282,16 +285,16 @@ Result windows_directory_execute(Request& q) {
             return save_atomic(stage,q);
         }
         if(q.operation==dir_child || q.operation==dir_open) {
-            auto name=win::wide(q.texts[0]);auto child=relative(fd,name,true,q.operation==dir_child,true,access);
-            auto value=std::make_shared<Directory>();value->node=held(std::move(child),d->node);value->parent=d->node;value->name=std::move(name);q.acquired=std::move(value);return {};
+            auto name=win::wide(q.texts[0]);auto child=relative(fd,name,true,q.operation==dir_child,true,access,false,true,d->private_access);
+            auto value=std::make_shared<Directory>();value->private_access=d->private_access;value->node=held(std::move(child),d->node);value->parent=d->node;value->name=std::move(name);q.acquired=std::move(value);return {};
         }
         if(q.operation==dir_file) {
             if(q.numbers[0]!=0 && q.numbers[0]!=1)return error(6);bool create=q.numbers[0]==1;
-            auto file=relative(fd,win::wide(q.texts[0]),false,create,create,access);
+            auto file=relative(fd,win::wide(q.texts[0]),false,create,create,access,false,create || d->private_access,d->private_access);
             q.acquired_file=filesystem::adopt_native_handle(file.release(),create);return {};
         }
         if(q.operation==dir_lock) {
-            auto file=lock_file(fd,win::wide(q.texts[0]),access);
+            auto file=lock_file(fd,win::wide(q.texts[0]),access,d->private_access);
             auto value=std::make_shared<Lock>();value->handle.value=file.release();value->parent=d->node;q.acquired=value;return {};
         }
         auto target=std::static_pointer_cast<Directory>(q.objects[1]);if(!target->node)return error(7);
@@ -299,11 +302,11 @@ Result windows_directory_execute(Request& q) {
             auto name=win::wide(q.texts[0]);if(!win::component(name) || !d->parent)return error(4);
             // Another owned alias may have moved this directory. Reject stale
             // parent bookkeeping before mutation, so durability covers both parents.
-            {auto check=relative(d->parent->handle.value,d->name,true,false,false,access,false,false);if(!same(fd,check.value))return error(4);}
-            // Rename the held source identity. Validated ancestor ACLs exclude
-            // untrusted mutation; share-delete permits independent owned aliases.
+            {auto check=relative(d->parent->handle.value,d->name,true,false,false,access,false,false,d->private_access);if(!same(fd,check.value))return error(4);}
+            // Rename the held source identity after checking its named identity;
+            // access to shared workspaces is decided by the OS.
             auto source=d->parent;Result result;
-            {auto identity=rename_source(fd,access);result=rename(identity.value,target->node->handle.value,name,false);}
+            {auto identity=rename_source(fd,access,d->private_access);result=rename(identity.value,target->node->handle.value,name,false);}
             if(result.flag){d->parent=target->node;d->node->ancestor=target->node;d->name.swap(name);}
             return published(result,source->handle.value,target->node->handle.value);
         }
@@ -311,8 +314,8 @@ Result windows_directory_execute(Request& q) {
             if(q.numbers[0]!=0 && q.numbers[0]!=1)return error(6);
             auto name=win::wide(q.texts[1]);if(!win::component(name))return error(4);
             // The borrowed IO handle owns the rename; verify its source name.
-            auto check=relative(fd,win::wide(q.texts[0]),false,false,false,access,false,false);
-            auto file=filesystem::native_handle(*q.file->file());if(!same(file,check.value))return error(4);access.verify(file);check.close();
+            auto check=relative(fd,win::wide(q.texts[0]),false,false,false,access,false,false,d->private_access);
+            auto file=filesystem::native_handle(*q.file->file());if(!same(file,check.value))return error(4);if(d->private_access)access.verify(file);check.close();
             auto ready=sync(file);if(ready.kind)return ready;
             auto result=rename(file,target->node->handle.value,name,q.numbers[0]!=0);
             return published(result,fd,target->node->handle.value);

@@ -401,6 +401,9 @@ add_custom_target(voidup ALL DEPENDS "${voidup_application}")
 include(CTest)
 if(BUILD_TESTING)
   find_package(Python3 3.12 REQUIRED COMPONENTS Interpreter)
+  add_test(NAME project_filesystem_permissions COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/filesystem_permissions.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(project_filesystem_permissions PROPERTIES TIMEOUT 300)
   function(void_add_output_test name)
     add_test(NAME "${name}" COMMAND "${Python3_EXECUTABLE}"
       "${PROJECT_SOURCE_DIR}/tools/test_output.py" "${name}" ${ARGN})
@@ -625,6 +628,9 @@ if(BUILD_TESTING)
   add_test(NAME lsp_editor_recovery COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/editor_recovery.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_editor_recovery PROPERTIES TIMEOUT 180)
+  add_test(NAME lsp_loop_completion COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/loop_completion.py" "$<TARGET_FILE:voidls>")
+  set_tests_properties(lsp_loop_completion PROPERTIES TIMEOUT 60)
   add_test(NAME lsp_project_root_recovery COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/project_root_recovery.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_project_root_recovery PROPERTIES TIMEOUT 180)

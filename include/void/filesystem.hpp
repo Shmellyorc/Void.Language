@@ -89,6 +89,9 @@ std::shared_ptr<File> adopt_descriptor(int descriptor, bool writable);
 int descriptor(const File&);
 Result private_mode(File&, bool executable);
 Result private_mode_matches(File&, bool executable);
+// Ordinary executable classification; no ownership/private-mode admission.
+Result executable_mode(File&, bool executable);
+Result executable_mode_matches(File&, bool executable);
 // Exclusive FileBorrow required. Positioned access preserves the ordinary IO
 // cursor and read buffer on every platform; never wraps a CRT fd around HANDLE.
 Result read_at(File&, std::uint64_t offset, char* output, std::size_t count);

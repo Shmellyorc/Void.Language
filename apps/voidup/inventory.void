@@ -9,14 +9,14 @@ use archive
 use json as codec
 use encoding/hex as hex
 
-func up_identity(prefix_cap: io.private_directory, release: model.up_release) -> result<bool, support.up_error>:
+func up_identity(prefix_cap: io.directory_handle, release: model.up_release) -> result<bool, support.up_error>:
     var raw_identity = support.up_read_owned(prefix_cap, "toolchain.json", 16384)?
     var identity = support.up_json(codec.parse_as<model.up_toolchain_identity>(support.up_text(raw_identity)?, support.up_json_budget()))?
     if identity.schema != 1 or identity.release_id != release.id or identity.host != release.host or identity.build_identity != release.build_identity or identity.llvm_version != "23.1.4":
         return Err(support.up_fail("payload build identity differs from authenticated release", "verify"))
     return Ok(true)
 
-func up_verify_prefix(prefix_cap: io.private_directory, absolute_prefix: string, release: model.up_release, manifest: model.up_inventory) -> result<bool, support.up_error>:
+func up_verify_prefix(prefix_cap: io.directory_handle, absolute_prefix: string, release: model.up_release, manifest: model.up_inventory) -> result<bool, support.up_error>:
     var expected: {string: model.up_member}
     for member in manifest.members:
         expected[member.name] = member
@@ -27,7 +27,7 @@ func up_verify_prefix(prefix_cap: io.private_directory, absolute_prefix: string,
                 pass
         else:
             with storage.up_file_beneath(prefix_cap, relative_name)? as input_file:
-                if not support.up_io(input_file.private_mode_matches(member.executable))?:
+                if not support.up_io(input_file.executable_matches(member.executable))?:
                     return Err(support.up_fail("installed file permission classification mismatch: " + member.name, "verify"))
                 if support.up_hash_file(input_file, member.size)? != member.sha256:
                     return Err(support.up_fail("installed file digest mismatch: " + member.name, "verify"))
@@ -50,7 +50,7 @@ func up_verify_prefix(prefix_cap: io.private_directory, absolute_prefix: string,
             return Err(support.up_fail("installed object kind changed", "verify"))
     return up_identity(prefix_cap, release)
 
-func up_extract(package: io.file, prefix_cap: io.private_directory, release: model.up_release, manifest: model.up_inventory) -> result<bool, support.up_error>:
+func up_extract(package: io.file, prefix_cap: io.directory_handle, release: model.up_release, manifest: model.up_inventory) -> result<bool, support.up_error>:
     if support.up_hash_file(package, release.artifact_bytes)? != release.artifact_sha256:
         return Err(support.up_fail("package SHA-256 mismatch", "package"))
     var expected: {string: model.up_member}
@@ -92,7 +92,7 @@ func up_extract(package: io.file, prefix_cap: io.private_directory, release: mod
                             return Err(support.up_fail("expanded file digest mismatch", "extract"))
                     # Only a file verified against the signed inventory receives
                     # its executable classification. Nothing is executed here.
-                    var classified = support.up_io(output_file.private_mode(member.executable))?
+                    var classified = support.up_io(output_file.set_executable(member.executable))?
                     var flushed = support.up_io(output_file.flush())?
     if consumed.count != manifest.members.count or expanded != manifest.expanded_bytes:
         return Err(support.up_fail("ZIP does not contain the complete signed inventory", "extract"))

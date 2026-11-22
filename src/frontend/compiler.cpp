@@ -1330,9 +1330,10 @@ class Parser {
         }
         return left;
     }
-    Statement conditional(Token token) {
-        Depth guard(depth, source, token, 64);
-        Statement s(Statement::Kind::conditional, std::move(token));
+    // Conditions in if and for share the same editor-only member-hole grammar.
+    // Keep ordinary parsing strict; a completion probe can arrive before the
+    // user has written the colon or an indented body.
+    VOID_SEMANTIC_HANDLER void condition_block(Statement& s) {
         const auto* probe=diagnostics.editor;
         const bool typed_member=peek(2).kind==TokenKind::name && peek(3).kind==TokenKind::newline &&
             !(probe && peek(2).text=="_void_editor_cursor_" && peek(2).offset==probe->offset);
@@ -1348,16 +1349,29 @@ class Parser {
             s.expression->type=Type::boolean;
             accept(":");
         } else s.expression=expression();
-        const auto& condition=*s.expression;
-        const bool incomplete_probe=repair_available() && probe && at("<newline>") &&
-            condition.kind==Expr::Kind::field && condition.token.text=="_void_editor_cursor_" &&
-            condition.token.offset==probe->offset;
+        bool incomplete_probe=false;
+        if(repair_available() && probe && at("<newline>")) {
+            // The member can be under `not`, a comparison or a call. Its
+            // receiver is still checked by the ordinary semantic probe.
+            std::vector<const Expr*> expressions{s.expression.get()};
+            while(!expressions.empty()) {
+                const auto* expression=expressions.back();expressions.pop_back();
+                if(expression->kind==Expr::Kind::field && expression->token.text=="_void_editor_cursor_" &&
+                   expression->token.offset==probe->offset){incomplete_probe=true;break;}
+                for(const auto& part:expression->parts)expressions.push_back(part.get());
+            }
+        }
         if(missing_member || incomplete_probe) {
             Depth block_depth(depth, source, peek(), 64);
             diagnostics.recovery->record();
             newline();
             if(at("<indent>"))s.body=block_body();
         } else s.body=block();
+    }
+    Statement conditional(Token token) {
+        Depth guard(depth, source, token, 64);
+        Statement s(Statement::Kind::conditional, std::move(token));
+        condition_block(s);
         if (accept("else")) {
             if (at("if")) { auto next = take(); s.otherwise.push_back(conditional(next)); }
             else s.otherwise = block();
@@ -1383,7 +1397,10 @@ class Parser {
             s.binder=name();if(accept(","))s.index_binder=name();need("in");s.reverse=accept("reverse");
             s.expression=expression();
             if(at("..") || at("..<")) {s.exclusive=take().text=="..<";s.range_end=expression();}
-        } else if (!at(":")) s.expression = expression();
+        } else if (!at(":")) {
+            condition_block(s);
+            return s;
+        }
         s.body = block(); return s;
     }
     // A deferred body recurses through statement(). Keep unrelated statement
@@ -4856,7 +4873,10 @@ class Semantics {
             s.invalid=false;
         } else if (s.expression) {
             scopes.emplace_back();
-            try { condition(*s.expression); }
+            try {
+                if(s.selection)expression(*s.selection);
+                condition(*s.expression);
+            }
             catch (const CompilationError& failure) { diagnostics.add(failure); }
         }
         ++loops; auto body = sequence(s.body); --loops;
@@ -7073,6 +7093,9 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     }
     }
     auto& root = library_scope ? *library_scope : *units.at(entry);
+    // Every graph entry path (manifest, library, independent editor document
+    // and legacy entry) needs the same context for qualified type completion.
+    root.editor=diagnostics.editor;
     for(auto& [id,u]:units)for(auto& s:u->generic_structures) {
         s.definition->identity=id+"::"+s.token.text;s.definition->module_identity=id;s.definition->visibility=s.visibility;
         if(u->declarations.contains(s.token.text) || !u->structure_names.emplace(s.token.text,&s).second)
@@ -8646,7 +8669,6 @@ std::shared_ptr<const ValidatedAnalysis> validated_project(const std::filesystem
         if (!same) error(anchor.source, {TokenKind::end, "", 0}, Code::import_read,
             "Project sources changed during analysis.", "Retry analysis with a stable filesystem or open document overlays.");
     }
-    first.editor=editor;
     validate_graph(graph.units, first.identity, diagnostics);
     if(editor && editor->operator_context) {
         std::map<std::string,EditorCandidate> candidates;

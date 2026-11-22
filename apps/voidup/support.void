@@ -68,7 +68,7 @@ func up_hash_file(input_file: io.file, expected_size: i64) -> result<string, up_
             return Err(up_fail("file truncated while hashing"))
         return Ok(hex.encode(up_sys(state.finish())?))
 
-func up_read_owned(directory: io.private_directory, name: string, maximum: i64 = up_metadata_limit) -> result<[u8], up_error>:
+func up_read_owned(directory: io.directory_handle, name: string, maximum: i64 = up_metadata_limit) -> result<[u8], up_error>:
     with up_io(directory.open_file(name))? as input_file:
         var extent = up_io(input_file.length())?
         if extent < 0 or extent > maximum:
@@ -78,7 +78,7 @@ func up_read_owned(directory: io.private_directory, name: string, maximum: i64 =
             return Err(up_fail("owned metadata grew beyond its declared extent", name))
         return Ok(output)
 
-func up_write_new(directory: io.private_directory, name: string, const data: [u8]) -> result<bool, up_error>:
+func up_write_new(directory: io.directory_handle, name: string, const data: [u8]) -> result<bool, up_error>:
     with up_io(directory.create_file(name))? as output_file:
         var written = up_io(output_file.write_bytes(data))?
         if written != data.count:

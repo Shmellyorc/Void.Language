@@ -4,6 +4,19 @@
 #include <sys/acl.h>
 #endif
 namespace vd::host {
+// Only for an exclusively created invocation-owned leaf, never an admitted
+// user directory. Darwin allow ACEs can grant access beyond mode 0700.
+inline bool clear_inherited_acl(int fd) {
+#ifdef __APPLE__
+    auto acl=::acl_init(0);
+    if(!acl)return false;
+    const auto status=::acl_set_fd_np(fd,acl,ACL_TYPE_EXTENDED);
+    const auto code=errno;::acl_free(acl);errno=code;
+    return status==0;
+#else
+    (void)fd;return true;
+#endif
+}
 inline bool safe_acl(int fd) {
 #ifdef __APPLE__
     // Darwin extended allow ACEs need not be reflected in st_mode. Reject them

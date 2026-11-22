@@ -63,12 +63,10 @@ def verify(compiler, clang, project, cwd, environment):
         finally:
             runs.chmod(0o700)
         assert b'Permission denied' in result.stderr and b'run' in result.stderr, result.stderr
-    runs.chmod(0o755)
-    try:
-        result = invoke(status=1)
-    finally:
-        runs.chmod(0o700)
-    assert b'private and unaliased' in result.stderr and b'Permission denied' not in result.stderr
+    for mode in (0o755, 0o775):
+        runs.chmod(mode)
+        invoke()
+        assert runs.stat().st_mode & 0o777 == mode
     for mode in ('short-marker', 'eintr-marker'):
         invoke(mode)
         assert not list(runs.iterdir()), mode

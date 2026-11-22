@@ -1,5 +1,8 @@
 # VOID documentation
 
+- [Unified developer experience correction](projects/UNIFIED_DEVELOPER_EXPERIENCE.md):
+  filesystem access, live package discovery, installed toolchain and review evidence.
+
 - [Project storage and engineering retention](PROJECT_STORAGE.md): project-local
   artifacts, native staging ownership, cleanup and the archive policy.
 - [2026-11-21 storage correction report](projects/STORAGE_CORRECTION_2026-11-21.md):

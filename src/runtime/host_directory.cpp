@@ -12,6 +12,7 @@
 #include <linux/magic.h>
 #include <sys/syscall.h>
 #include <sys/vfs.h>
+#include <sys/xattr.h>
 #else
 #include <stdio.h>
 #endif
@@ -30,6 +31,7 @@ struct Descriptor {
     }
 };
 struct Directory final : Object {
+    bool private_access=true;
     std::shared_ptr<Descriptor> fd,parent;
     std::string name;
     ~Directory() override {close();}
@@ -56,17 +58,17 @@ bool component(const std::string& name) {
 bool private_directory(int fd) {
     struct stat info{};return !::fstat(fd,&info) && S_ISDIR(info.st_mode) && info.st_uid==::geteuid() && !(info.st_mode&0077);
 }
-Result private_regular_file(int fd) {
+Result regular_file(int fd,bool private_access) {
     struct stat info{};
     if (::fstat(fd, &info)) return native_error(errno);
-    if (!S_ISREG(info.st_mode) || info.st_uid != ::geteuid() || info.st_nlink != 1 ||
-        (info.st_mode & 0077) || !safe_acl(fd)) return error(2);
+    if (!S_ISREG(info.st_mode) || info.st_nlink != 1 ||
+        (private_access && (info.st_uid != ::geteuid() || (info.st_mode & 0077) || !safe_acl(fd)))) return error(2);
     return {};
 }
-Result lock_file(Lock& lock, int parent, const char* name) {
-    lock.fd = ::openat(parent, name, O_RDWR | O_CREAT | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK, 0600);
+Result lock_file(Lock& lock, int parent, const char* name,bool private_access) {
+    lock.fd = ::openat(parent, name, O_RDWR | O_CREAT | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK, private_access?0600:0666);
     if (lock.fd < 0) return native_error(errno);
-    auto checked = private_regular_file(lock.fd);
+    auto checked = regular_file(lock.fd,private_access);
     if (checked.kind) return checked;
     if (::flock(lock.fd, LOCK_EX | LOCK_NB)) return native_error(errno);
     return {};
@@ -80,7 +82,15 @@ std::shared_ptr<Descriptor> held(int fd) {
     if(fd<0)return {};
     try{return std::make_shared<Descriptor>(fd);}catch(...){::close(fd);throw;}
 }
-std::shared_ptr<Directory> root(const std::string& path,bool create,Result& r) {
+std::shared_ptr<Directory> root(const std::string& requested,bool create,bool private_access,Result& r) {
+    auto path=requested;
+    if(!private_access)while(path.size()>1 && path.back()=='/')path.pop_back();
+    if(!private_access && path=="/" && !create) {
+        auto fd=held(::open("/",O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW));
+        if(!fd){r=native_error(errno);return {};}
+        auto result=std::make_shared<Directory>();result->private_access=false;
+        result->fd=fd;result->parent=std::move(fd);result->name=".";return result;
+    }
     if(path.empty() || path[0]!='/' || path.size()>32768 || path.back()=='/' || path.find('\0')!=std::string::npos || !valid_utf8(path)) {r=error(4);return {};}
     auto current=held(::open("/",O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW));
     if(!current){r=native_error(errno);return {};}
@@ -88,20 +98,54 @@ std::shared_ptr<Directory> root(const std::string& path,bool create,Result& r) {
     while(start<path.size()) {
         auto end=path.find('/',start);auto name=path.substr(start,end==std::string::npos?end:end-start);
         if(!component(name)){r=error(4);return {};}
-        if(!safe_ancestor(current->value)){r=error(2);return {};}
+        if(private_access && !safe_ancestor(current->value)){r=error(2);return {};}
         const bool last=end==std::string::npos;
-        if(last && create && ::mkdirat(current->value,name.c_str(),0700)) {r=native_error(errno);return {};}
+        if(last && create && ::mkdirat(current->value,name.c_str(),private_access?0700:0777)) {r=native_error(errno);return {};}
         auto child=held(::openat(current->value,name.c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW));
         if(!child){r=native_error(errno);return {};}
         if(last) {
-            if(!private_directory(child->value) || !safe_acl(child->value)){r=error(2);return {};}
-            auto result=std::make_shared<Directory>();result->fd=std::move(child);result->parent=std::move(current);result->name=std::move(name);return result;
+            if(private_access && (!private_directory(child->value) || !safe_acl(child->value))){r=error(2);return {};}
+            auto result=std::make_shared<Directory>();result->private_access=private_access;result->fd=std::move(child);result->parent=std::move(current);result->name=std::move(name);return result;
         }
         current=std::move(child);start=end+1;
     }
     r=error(4);return {};
 }
 Result sync(int fd) {if(::fsync(fd))return native_error(errno);return {};}
+Result copy_save_access(int source,int target) {
+    struct stat info{};
+    if (::fstat(source,&info)) return native_error(errno);
+#ifdef __linux__
+    // Preserve named POSIX ACL grants when replacing an existing shared save.
+    constexpr auto attribute="system.posix_acl_access";
+    auto size=::fgetxattr(source,attribute,nullptr,0);
+    if(size<0) {
+        if(errno!=ENODATA && errno!=ENOTSUP)return native_error(errno);
+        // A stage inherits its parent's default ACL. An ACL-free original
+        // must not gain those named grants when it is replaced.
+        if(::fremovexattr(target,attribute) && errno!=ENODATA && errno!=ENOTSUP)
+            return native_error(errno);
+    } else {
+        if(size>65536)return error(12);
+        std::vector<char> acl(static_cast<std::size_t>(size));
+        if(::fgetxattr(source,attribute,acl.data(),acl.size())!=size)return native_error(errno);
+        if(::fsetxattr(target,attribute,acl.data(),acl.size(),0))return native_error(errno);
+    }
+#elif defined(__APPLE__)
+    auto acl=::acl_get_fd_np(source,ACL_TYPE_EXTENDED);
+    if(!acl) {
+        if(errno!=ENOENT && errno!=ENOTSUP)return native_error(errno);
+        // Set an empty ACL to clear any inherited entries on the stage.
+        acl=::acl_init(0);
+        if(!acl)return native_error(errno);
+    }
+    const auto status=::acl_set_fd_np(target,acl,ACL_TYPE_EXTENDED);
+    const auto code=errno;::acl_free(acl);
+    if(status)return native_error(code);
+#endif
+    if(::fchmod(target,info.st_mode&0777))return native_error(errno);
+    return {};
+}
 Result published(const std::shared_ptr<Descriptor>& source,const std::shared_ptr<Descriptor>& target) {
     Result r;r.flag=true;
     auto first=sync(target->value);auto second=sync(source->value);
@@ -120,7 +164,6 @@ int rename_held(int source,const char* name,int target,const char* destination,b
     return ::syscall(SYS_renameat2,source,name,target,destination,replace?0:RENAME_NOREPLACE);
 #endif
 }
-#ifdef __linux__
 constexpr char save_lock_name[] = ".void-save-lock";
 constexpr char save_stage_name[] = ".void-save-stage";
 
@@ -133,7 +176,7 @@ class SaveStage {
 
     Result verify_directory() const {
         if (!directory.parent || !same(parent, directory.parent->value, directory.name)) return error(4);
-        if (!private_directory(parent) || !safe_acl(parent)) return error(2);
+        if (directory.private_access && (!private_directory(parent) || !safe_acl(parent))) return error(2);
         return {};
     }
 public:
@@ -143,33 +186,41 @@ public:
     Result prepare(bool replace) {
         auto checked = verify_directory();
         if (checked.kind) return checked;
+#ifdef __linux__
         struct statfs volume{};
         if (::fstatfs(parent, &volume)) return native_error(errno);
-        if (volume.f_type != XFS_SUPER_MAGIC && volume.f_type != EXT4_SUPER_MAGIC &&
+        if (directory.private_access && volume.f_type != XFS_SUPER_MAGIC && volume.f_type != EXT4_SUPER_MAGIC &&
             volume.f_type != TMPFS_MAGIC) return error(11);
-        checked = lock_file(lock, parent, save_lock_name);
+#endif
+        checked = lock_file(lock, parent, save_lock_name, directory.private_access);
         if (checked.kind) return checked;
-        previous.value = ::openat(parent, name.c_str(), O_RDONLY | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK);
+        previous.value = ::openat(parent, name.c_str(), (directory.private_access?O_RDONLY:O_WRONLY) | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK);
         if (previous.value < 0) return errno == ENOENT ? Result{} : native_error(errno);
         if (!replace) return error(3, EEXIST);
-        return private_regular_file(previous.value);
+        return regular_file(previous.value, directory.private_access);
     }
 
     Result create() {
         staged.value = ::openat(parent, save_stage_name,
-            O_RDWR | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK, 0600);
-        return has_file() ? private_regular_file(staged.value) : native_error(errno);
+            O_RDWR | O_CREAT | O_EXCL | O_CLOEXEC | O_NOFOLLOW | O_NONBLOCK, directory.private_access?0600:0666);
+        if (!has_file()) return native_error(errno);
+        auto checked = regular_file(staged.value, directory.private_access);
+        if (checked.kind || directory.private_access || previous.value < 0) return checked;
+        // Atomic replacement retains the destination's ordinary access bits.
+        // prepare() already asked the OS for write access, including POSIX ACLs.
+        if (!same(previous.value, parent, name)) return error(4, ESTALE);
+        return copy_save_access(previous.value,file());
     }
 
     Result publish() {
         auto checked = verify_directory();
         if (checked.kind) return checked;
         if (!same(staged.value, parent, save_stage_name)) return error(4, ESTALE);
-        checked = private_regular_file(staged.value);
+        checked = regular_file(staged.value, directory.private_access);
         if (checked.kind) return checked;
         if (previous.value >= 0) {
             if (!same(previous.value, parent, name)) return error(4, ESTALE);
-            checked = private_regular_file(previous.value);
+            checked = regular_file(previous.value, directory.private_access);
             if (checked.kind) return checked;
             struct stat owner{}, target{};
             if (::fstat(parent, &owner) || ::fstat(previous.value, &target)) return native_error(errno);
@@ -194,7 +245,6 @@ public:
     int close_target() { return previous.close().value(); }
     int close_lock() { return lock.close().value(); }
 };
-#endif
 }
 #endif
 Result directory_execute(Request& q) {
@@ -204,21 +254,21 @@ Result directory_execute(Request& q) {
     (void)q;return error(11);
 #else
     if(q.operation==file_mode_matches) {
-        if(q.numbers[0]!=0 && q.numbers[0]!=1)return error(6);
-        auto native=filesystem::private_mode_matches(*q.file->file(),q.numbers[0]!=0);
+        if(q.numbers[0]<0 || q.numbers[0]>3)return error(6);
+        auto native=q.numbers[0]<2?filesystem::private_mode_matches(*q.file->file(),q.numbers[0]!=0):filesystem::executable_mode_matches(*q.file->file(),q.numbers[0]==3);
         auto result=error(static_cast<std::int64_t>(native.error),native.os_code);result.number=native.number;return result;
     }
     if(q.operation==file_mode) {
-        if(q.numbers[0]!=0 && q.numbers[0]!=1)return error(6);
-        auto r=filesystem::private_mode(*q.file->file(),q.numbers[0]!=0);return error(static_cast<std::int64_t>(r.error),r.os_code);
+        if(q.numbers[0]<0 || q.numbers[0]>3)return error(6);
+        auto r=q.numbers[0]<2?filesystem::private_mode(*q.file->file(),q.numbers[0]!=0):filesystem::executable_mode(*q.file->file(),q.numbers[0]==3);return error(static_cast<std::int64_t>(r.error),r.os_code);
     }
     if(q.operation==dir_create || q.operation==dir_admit) {
-        Result r;q.acquired=root(q.texts[0],q.operation==dir_create,r);return r;
+        Result r;q.acquired=root(q.texts[0],q.operation==dir_create,!q.ordinary_directory,r);return r;
     }
     auto d=std::static_pointer_cast<Directory>(q.objects[0]);if(!d->fd)return error(7);
     int fd=d->fd->value;
     if(q.operation==dir_save) {
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
         const auto& name = q.texts.front();
         if (!component(name) || name == save_lock_name || name == save_stage_name) return error(4);
         SaveStage stage(*d, name);
@@ -230,26 +280,26 @@ Result directory_execute(Request& q) {
     if(q.operation==dir_sync)return sync(fd);
     if(q.operation==dir_child || q.operation==dir_open) {
         if(!component(q.texts[0]))return error(4);
-        if(q.operation==dir_child && ::mkdirat(fd,q.texts[0].c_str(),0700))return native_error(errno);
+        if(q.operation==dir_child && ::mkdirat(fd,q.texts[0].c_str(),d->private_access?0700:0777))return native_error(errno);
         auto child=held(::openat(fd,q.texts[0].c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW));
         if(!child)return native_error(errno);
-        if(!private_directory(child->value) || !safe_acl(child->value))return error(2);
-        auto value=std::make_shared<Directory>();value->fd=std::move(child);value->parent=d->fd;value->name=q.texts[0];q.acquired=value;return {};
+        if(d->private_access && (!private_directory(child->value) || !safe_acl(child->value)))return error(2);
+        auto value=std::make_shared<Directory>();value->private_access=d->private_access;value->fd=std::move(child);value->parent=d->fd;value->name=q.texts[0];q.acquired=value;return {};
     }
     if(q.operation==dir_file) {
         if(!component(q.texts[0]))return error(4);
         if(q.numbers[0]!=0 && q.numbers[0]!=1)return error(6);
         const bool create=q.numbers[0]==1;
-        int file=::openat(fd,q.texts[0].c_str(),O_CLOEXEC|O_NOFOLLOW|O_NONBLOCK|(create?O_RDWR|O_CREAT|O_EXCL:O_RDONLY),0600);
+        int file=::openat(fd,q.texts[0].c_str(),O_CLOEXEC|O_NOFOLLOW|O_NONBLOCK|(create?O_RDWR|O_CREAT|O_EXCL:O_RDONLY),d->private_access?0600:0666);
         if(file<0)return native_error(errno);
-        auto guard=held(file);auto checked=private_regular_file(file);if(checked.kind)return checked;
+        auto guard=held(file);auto checked=regular_file(file,d->private_access);if(checked.kind)return checked;
         // Transfer directly to the ordinary IO file ledger, retaining identity.
         guard->value=-1;q.acquired_file=filesystem::adopt_descriptor(file,create);return {};
     }
     if(q.operation==dir_lock) {
         if(!component(q.texts[0]))return error(4);
         auto lock=std::make_shared<Lock>();lock->parent=d->fd;
-        auto checked=lock_file(*lock,fd,q.texts[0].c_str());if(checked.kind)return checked;
+        auto checked=lock_file(*lock,fd,q.texts[0].c_str(),d->private_access);if(checked.kind)return checked;
         q.acquired=lock;return {};
     }
     auto target=std::static_pointer_cast<Directory>(q.objects[1]);if(!target->fd)return error(7);
@@ -267,7 +317,7 @@ Result directory_execute(Request& q) {
         if(!component(q.texts[0]) || !component(q.texts[1]) || (q.numbers[0]!=0 && q.numbers[0]!=1))return error(4);
         int file=filesystem::descriptor(*q.file->file());
         if(file<0 || !same(file,fd,q.texts[0]))return error(4);
-        auto checked=private_regular_file(file);if(checked.kind)return checked;
+        auto checked=regular_file(file,d->private_access);if(checked.kind)return checked;
         auto ready=sync(file);if(ready.kind)return ready;
         if(rename_held(fd,q.texts[0].c_str(),target->fd->value,q.texts[1].c_str(),q.numbers[0]!=0))return native_error(errno);
         return published(d->fd,target->fd);

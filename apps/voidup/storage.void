@@ -8,15 +8,15 @@ use random
 use time
 
 struct up_directories:
-    current: io.private_directory
-    held: [io.private_directory]
+    current: io.directory_handle
+    held: [io.directory_handle]
 
 func (self up_directories) deinit():
     for capability in reverse self.held:
         capability.deinit()
     self.held.clear()
 
-func up_walk(base: io.private_directory, const parts: [string], count: i64) -> result<up_directories, support.up_error>:
+func up_walk(base: io.directory_handle, const parts: [string], count: i64) -> result<up_directories, support.up_error>:
     var result_dirs = up_directories(current = base)
     for index in 0..<count:
         var opened = result_dirs.current.open_directory(parts[index])
@@ -28,17 +28,17 @@ func up_walk(base: io.private_directory, const parts: [string], count: i64) -> r
             return Err(support.up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = "filesystem", native_code = cause.os_code))
     return Ok(result_dirs)
 
-func up_file_beneath(base: io.private_directory, relative_name: string) -> result<io.file, support.up_error>:
+func up_file_beneath(base: io.directory_handle, relative_name: string) -> result<io.file, support.up_error>:
     var parts = support.up_path_parts(relative_name)?
     with up_walk(base, parts, parts.count - 1)? as directories:
         return support.up_io(directories.current.open_file(parts[-1]))
 
-func up_new_file_beneath(base: io.private_directory, relative_name: string) -> result<io.file, support.up_error>:
+func up_new_file_beneath(base: io.directory_handle, relative_name: string) -> result<io.file, support.up_error>:
     var parts = support.up_path_parts(relative_name)?
     with up_walk(base, parts, parts.count - 1)? as directories:
         return support.up_io(directories.current.create_file(parts[-1]))
 
-func up_new_directory_beneath(base: io.private_directory, relative_name: string) -> result<bool, support.up_error>:
+func up_new_directory_beneath(base: io.directory_handle, relative_name: string) -> result<bool, support.up_error>:
     var parts = support.up_path_parts(relative_name)?
     with up_walk(base, parts, parts.count - 1)? as directories:
         with support.up_io(directories.current.create_directory(parts[-1]))? as child:
@@ -65,11 +65,11 @@ func up_parents_for(root_path: string) -> result<bool, support.up_error>:
     if missing.count >= 32:
         return Err(support.up_fail("root ancestor depth exceeds limit", "root"))
     for missing_path in reverse missing:
-        with support.up_io(io.create_private_directory(missing_path))? as created:
+        with support.up_io(io.create_directory_handle(missing_path))? as created:
             var synced = support.up_io(created.sync())?
     return Ok(true)
 
-func up_write_control(root_cap: io.private_directory, state: model.up_control) -> result<bool, support.up_error>:
+func up_write_control(root_cap: io.directory_handle, state: model.up_control) -> result<bool, support.up_error>:
     if state.generation >= 9223372036854775806:
         return Err(support.up_fail("control generation exhausted", "control"))
     state.generation += 1
@@ -83,11 +83,11 @@ func up_write_control(root_cap: io.private_directory, state: model.up_control) -
         # Never delete or try to roll back after a published uncertain outcome.
         return support.up_publication(root_cap.publish_file(output_file, name, root_cap, "control.json", true), "control")
 
-func up_root(root_path: string) -> result<io.private_directory, support.up_error>:
+func up_root(root_path: string) -> result<io.directory_handle, support.up_error>:
     if not support.up_io(path.is_absolute(root_path))? or text.contains(root_path, "\n") or text.contains(root_path, "\r"):
         return Err(support.up_fail("root must be an absolute representable native path", "root", 2))
     if support.up_io(io.exists(root_path))?:
-        var existing = support.up_io(io.open_private_directory(root_path))?
+        var existing = support.up_io(io.open_directory(root_path))?
         var marker_bytes = support.up_read_owned(existing, "voidup-root.json", 4096)
         if marker_bytes is Err(var reason):
             existing.deinit()
@@ -99,7 +99,7 @@ func up_root(root_path: string) -> result<io.private_directory, support.up_error
                 return Err(support.up_fail("root marker does not identify VOIDUP", "root"))
         return Ok(existing)
     var parents = up_parents_for(root_path)?
-    var created_root = support.up_io(io.create_private_directory(root_path))?
+    var created_root = support.up_io(io.create_directory_handle(root_path))?
     for leaf in ["toolchains", "transactions", "metadata"]:
         with support.up_io(created_root.create_directory(leaf))? as child:
             var synced = support.up_io(child.sync())?
@@ -109,7 +109,7 @@ func up_root(root_path: string) -> result<io.private_directory, support.up_error
     var synced = support.up_io(created_root.sync())?
     return Ok(created_root)
 
-func up_read_control(root_cap: io.private_directory) -> result<model.up_control, support.up_error>:
+func up_read_control(root_cap: io.directory_handle) -> result<model.up_control, support.up_error>:
     var raw_control = support.up_read_owned(root_cap, "control.json")?
     var state = support.up_json(codec.parse_as<model.up_control>(support.up_text(raw_control)?, support.up_json_budget()))?
     if state.schema != 1 or state.generation < 1 or state.serial < 0 or state.installed.count > 64 or state.revoked.count > 1024:

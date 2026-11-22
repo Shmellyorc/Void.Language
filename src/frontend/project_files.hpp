@@ -47,8 +47,8 @@ public:
 
 using VerifyProjectDirectory = std::function<void(const std::filesystem::path&, const ProjectDirectoryReader&)>;
 
-// Invocation-owned private scratch below the project's .void directory. Reuses
-// the directory publisher's identity checks and cleans only its exclusive leaf.
+// Invocation-owned preparation scratch below the project's .void directory.
+// Uses OS access permissions, held identity and exclusive leaf cleanup.
 void with_project_scratch(const CreationRoot&, const VerifyProjectDirectory&);
 
 std::optional<std::string> read_dependency_lock(const std::filesystem::path&);
@@ -61,7 +61,8 @@ void publish_project_directory(const CreationRoot&, const std::string& leaf,
                                const std::map<std::string, std::string_view>& files,
                                const VerifyProjectDirectory& verify,
                                const std::function<void()>& recheck = {},
-                               const ProjectDirectoryReader& parent_reader = {});
+                               const ProjectDirectoryReader& parent_reader = {},
+                               bool confidential = false);
 void publish_application_directory(const CreationRoot&, const std::string& leaf,
                                    const VerifyProjectDirectory& prepare,
                                    const std::function<void(const std::filesystem::path&)>& verify_replacement);
@@ -82,7 +83,7 @@ void require_no_package_edit(const std::filesystem::path&);
 // operation may roll it back, after checking its saved bytes and directories.
 void recover_package_edit(const CreationRoot&);
 void with_user_package_store(const std::filesystem::path&, bool create,
-                             const std::function<void(const CreationRoot&)>&);
+                             const std::function<void(const CreationRoot&)>&, bool confidential = false);
 void publish_user_registration(const CreationRoot&, const std::string& alias,
                                const std::function<void(const std::filesystem::path&)>& prepare);
 void remove_user_registration(const CreationRoot&, const std::string& alias);

@@ -203,10 +203,10 @@ struct Directory {
     // A candidate supplier permits deterministic genuine collisions in the test;
     // production always uses LLVM's existing random leaf generator.
     using Candidate=fs::path(*)();
-    Directory(const fs::path& root,bool short_path,Candidate candidate=random_leaf) {
+    Directory(const fs::path& root,bool short_path,Candidate candidate=random_leaf,bool confidential=true) {
         pins=pin_directories(root);
         PrivateAccess access;
-        if(short_path)access.verify_root(pins.back().value);
+        // The OS admits the temporary parent; only our exclusive leaf is private.
         for(unsigned attempt=0;attempt<32;++attempt) {
             auto leaf=candidate();
             if(leaf.empty() || leaf!=leaf.filename() || leaf=="." || leaf=="..")
@@ -215,7 +215,7 @@ struct Directory {
             // Count the entire UTF-16 linker path, including filename and NUL.
             if(short_path && (next/L"program.exe").native().size()+1>240)
                 throw std::runtime_error(long_temporary_root_error);
-            if(!CreateDirectoryW(next.c_str(),&access.attributes)) {
+            if(!CreateDirectoryW(next.c_str(),confidential?&access.attributes:nullptr)) {
                 auto error=GetLastError();
                 if(error==ERROR_ALREADY_EXISTS || error==ERROR_FILE_EXISTS)continue;
                 fail("Cannot create private native staging directory",error);
@@ -224,7 +224,7 @@ struct Directory {
             directory=std::move(next);
             try {
                 auto child=pin_directories(directory);
-                access.verify(child.back().value);
+                if(confidential)access.verify(child.back().value);
                 for(auto& h:child)pins.push_back(std::move(h));
             } catch(...) {pins.clear();std::error_code ignored;fs::remove_all(directory,ignored);throw;}
             return;
@@ -279,6 +279,51 @@ inline void copy_checked(const fs::path& from,const fs::path& to,bool executable
             throw std::runtime_error("Native artifact copy contents mismatch.");
         if(!got)break;
     }
+}
+// Derive ordinary output access from its actual parent, while a held artifact
+// denies writes/deletion through ACL publication and the final rename. The
+// invocation's staging directory itself always stays private.
+inline void publish_output(const fs::path& staged,const fs::path& output) {
+    auto parent=pin_directory(output.parent_path());
+    PSECURITY_DESCRIPTOR parent_descriptor=nullptr;
+    const auto status=GetSecurityInfo(parent.value,SE_FILE_OBJECT,DACL_SECURITY_INFORMATION,
+        nullptr,nullptr,nullptr,nullptr,&parent_descriptor);
+    if(status!=ERROR_SUCCESS)fail("Cannot read native output parent access",status);
+    struct LocalDescriptor {
+        PSECURITY_DESCRIPTOR value;
+        ~LocalDescriptor(){LocalFree(value);}
+    } parent_access{parent_descriptor};
+    HANDLE token_value;
+    if(!OpenProcessToken(GetCurrentProcess(),TOKEN_QUERY,&token_value))fail("Cannot read native output identity");
+    Handle token(token_value);
+    PSECURITY_DESCRIPTOR descriptor=nullptr;
+    GENERIC_MAPPING mapping{FILE_GENERIC_READ,FILE_GENERIC_WRITE,FILE_GENERIC_EXECUTE,FILE_ALL_ACCESS};
+    if(!CreatePrivateObjectSecurityEx(parent_access.value,nullptr,&descriptor,nullptr,FALSE,
+        SEF_DACL_AUTO_INHERIT,token.value,&mapping))fail("Cannot derive native output access");
+    struct PrivateDescriptor {
+        PSECURITY_DESCRIPTOR value;
+        ~PrivateDescriptor(){DestroyPrivateObjectSecurity(&value);}
+    } access{descriptor};
+    BOOL present=FALSE,defaulted=FALSE;PACL dacl=nullptr;
+    if(!GetSecurityDescriptorDacl(access.value,&present,&dacl,&defaulted) || !present)
+        fail("Cannot inspect native output access");
+    Handle target(CreateFileW(staged.c_str(),GENERIC_READ|WRITE_DAC|DELETE,FILE_SHARE_READ,
+        nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+    if(target.value==INVALID_HANDLE_VALUE)fail("Cannot hold native output for publication");
+    const auto info=information(target.value);
+    if((info.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) || info.nNumberOfLinks!=1)
+        throw std::runtime_error("Native output is not an ordinary single-link artifact.");
+    const auto changed=SetSecurityInfo(target.value,SE_FILE_OBJECT,
+        DACL_SECURITY_INFORMATION|PROTECTED_DACL_SECURITY_INFORMATION,nullptr,nullptr,dacl,nullptr);
+    if(changed!=ERROR_SUCCESS)fail("Cannot apply native output access",changed);
+    const auto bytes=output.native().size()*sizeof(wchar_t);
+    std::vector<unsigned char> storage(sizeof(FILE_RENAME_INFO)+bytes);
+    auto* rename=reinterpret_cast<FILE_RENAME_INFO*>(storage.data());
+    rename->ReplaceIfExists=TRUE;rename->RootDirectory=nullptr;
+    rename->FileNameLength=static_cast<DWORD>(bytes);
+    std::copy(output.native().begin(),output.native().end(),rename->FileName);
+    if(!SetFileInformationByHandle(target.value,FileRenameInfo,rename,static_cast<DWORD>(storage.size())))
+        fail("Cannot publish native output");
 }
 inline void check_executable(llvm::MemoryBufferRef buffer, bool amd64=false) {
     auto pe=llvm::object::COFFObjectFile::create(buffer);

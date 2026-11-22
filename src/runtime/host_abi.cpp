@@ -62,8 +62,8 @@ struct AcquisitionRollback {
         } catch(...) {error=std::make_error_code(std::errc::io_error);}
     }
 };
-bool factory(unsigned op) {return op==hash_open || op==zip_open || op==dir_create || op==dir_admit || op==dir_child || op==dir_open || op==dir_file || op==dir_lock || op==spawn;}
-bool closing(unsigned op) {return op==hash_close || op==zip_close || op==dir_close || op==lock_close || op==child_close;}
+bool factory(unsigned op) {op=directory_base(op);return op==hash_open || op==zip_open || op==dir_create || op==dir_admit || op==dir_child || op==dir_open || op==dir_file || op==dir_lock || op==spawn;}
+bool closing(unsigned op) {op=directory_base(op);return op==hash_close || op==zip_close || op==dir_close || op==lock_close || op==child_close;}
 std::vector<std::string> strings(Runtime& r,void* input,const NativeArrayElement* element) {
     if(!element || element->bytes!=sizeof(void*) || element->count!=1 || element->fields[0].kind!=12 || element->fields[0].offset)
         throw std::logic_error("Invalid host string array ABI");
@@ -153,7 +153,8 @@ extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,un
         // Allocate the empty owned byte reply before entering any namespace
         // mutation. Publication status can then be returned without allocation.
         runtime.bytes_into(&reply.bytes,{});
-        Request request;request.operation=op;
+        const auto base=directory_base(op);
+        Request request;request.operation=base;request.ordinary_directory=base!=op;
         AcquisitionRollback rollback{runtime,request,rollback_error};
         std::vector<std::shared_ptr<Resource>> resources;
         void* created_key=nullptr;char created_kind=0;unsigned reference=0,number=0;
@@ -173,7 +174,7 @@ extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,un
                 request.bytes.push_back(runtime.byte_array_bytes(runtime.root_word(&value)));
             } else if(c=='a') {
                 request.arrays.push_back(strings(runtime,value,layout->element));
-            } else if(factory(op) && ((op==dir_child || op==dir_open || op==dir_file || op==dir_lock)?reference==2:reference==1)) {
+            } else if(factory(op) && ((base==dir_child || base==dir_open || base==dir_file || base==dir_lock)?reference==2:reference==1)) {
                 created_key=value;created_kind=c;
                 if(!value)throw std::logic_error("Null host acquisition identity");
                 if(auto ledger=NativeLibrary::existing(runtime);ledger && ledger->find(value,true))throw std::logic_error("Duplicate host acquisition");
@@ -203,7 +204,7 @@ extern "C" void vd_host_call(void* output,const vd::host::ReplyLayout* layout,un
                 }
             } else if(op<=verify)result=crypto_execute(request);
             else if(op<=zip_cleanup)result=zip_execute(request);
-            else if(op<=lock_cleanup || op==file_mode_matches || op==dir_save)result=directory_execute(request);
+            else if(op<=lock_cleanup || op==file_mode_matches || op==dir_save || base!=op)result=directory_execute(request);
             else result=process_execute(request);
         }
         if(closing(op) && !resources.empty())NativeLibrary::existing(runtime)->erase(refs[0],resources[0].get());

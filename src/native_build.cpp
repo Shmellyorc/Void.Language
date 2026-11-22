@@ -23,6 +23,11 @@
 #include <set>
 #ifdef _WIN32
 #include "native_windows.hpp"
+#else
+#include "runtime/host_posix.hpp"
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #endif
 #if (defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)) || \
     (defined(_WIN32) && defined(_MSC_VER) && defined(_M_X64))
@@ -112,13 +117,18 @@ struct Staging {
             // path. Generate only the leaf, keeping physical parents literal.
             llvm::sys::fs::createUniquePath(".void-build-%%%%%%%%%%%%%%%%",name,true);
             directory=output.parent_path()/utf8_path(name.str().str()).filename();
-            std::error_code error;
-            if(fs::create_directory(directory,error)) {
-                fs::permissions(directory,fs::perms::owner_all,fs::perm_options::replace,error);
-                if(error){fs::remove(directory);throw std::runtime_error("Cannot secure native staging directory: "+error.message());}
+            if(!::mkdir(directory.c_str(),0700)) {
+                const auto fd=::open(directory.c_str(),O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
+                struct stat held{},named{};
+                const bool secured=fd>=0 && !::fstat(fd,&held) && !::lstat(directory.c_str(),&named) &&
+                    S_ISDIR(held.st_mode) && held.st_uid==::geteuid() && !(held.st_mode&0077) &&
+                    held.st_dev==named.st_dev && held.st_ino==named.st_ino &&
+                    host::clear_inherited_acl(fd) && host::safe_acl(fd);
+                if(fd>=0)::close(fd);
+                if(!secured){fs::remove(directory);throw std::runtime_error("Cannot secure native staging directory ACL.");}
                 return;
             }
-            if(error)throw std::runtime_error("Cannot create native staging directory: "+error.message());
+            if(errno!=EEXIST)throw std::runtime_error("Cannot create native staging directory: "+std::generic_category().message(errno));
         }
         throw std::runtime_error("Cannot reserve a unique native staging directory.");
     }
@@ -130,8 +140,7 @@ void publish(const fs::path& staged,const fs::path& output) {
     // POSIX rename and Windows MoveFileEx replace in one operation. Never remove
     // a good executable first; an executing/locked Windows file leaves it intact.
 #ifdef _WIN32
-    if(!MoveFileExW(staged.c_str(),output.c_str(),MOVEFILE_REPLACE_EXISTING|MOVEFILE_WRITE_THROUGH))
-        throw std::runtime_error("Cannot publish native output (Windows error "+std::to_string(GetLastError())+"): "+path_utf8(output));
+    native_windows::publish_output(staged,output);
 #else
     fs::rename(staged,output);
 #endif
@@ -414,9 +423,6 @@ constexpr auto executable_name = "app.exe";
 #else
 constexpr std::string_view package_header = "VOID application package 1\ntarget x86_64-unknown-linux-gnu\n";
 constexpr auto executable_name = "app";
-constexpr auto directory_mode = fs::perms::owner_all | fs::perms::group_read | fs::perms::group_exec |
-                                fs::perms::others_read | fs::perms::others_exec;
-constexpr auto data_mode = fs::perms::owner_read | fs::perms::owner_write | fs::perms::group_read | fs::perms::others_read;
 #endif
 constexpr auto inventory_name = "void-package.txt";
 constexpr auto metadata_name = "application.meta";
@@ -479,7 +485,6 @@ void write_package_file(const fs::path& path, std::string_view bytes, const proj
     file.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
     file.close();
     if (!file) throw std::runtime_error("Cannot write application package file: " + path_utf8(path));
-    fs::permissions(path, data_mode);
 #endif
 }
 
@@ -542,27 +547,18 @@ void check_package_image(std::string_view bytes) {
 std::string package_inventory(const fs::path& root, bool prepare, const project::ProjectDirectoryReader& reader) {
     std::map<std::string, std::string> rows;
     std::size_t remaining = package_byte_limit;
-#ifndef _WIN32
-    auto mode = [&](const fs::path& path, fs::perms expected) {
-        if (prepare) fs::permissions(path, expected);
-        else if (fs::status(path).permissions() != expected)
-            throw std::runtime_error("Application package permissions changed: " + path_utf8(path));
-    };
-#endif
     auto file = [&](const fs::directory_entry& entry, const std::string& name) {
         if (rows.size() == 128 || !fs::is_regular_file(entry.symlink_status()))
             throw std::runtime_error("Invalid application package file: " + name);
         const auto bytes = reader.read(entry.path(), remaining);
         remaining -= bytes.size();
 #ifndef _WIN32
-        mode(entry.path(), name == executable_name ? directory_mode : data_mode);
+        if (name == executable_name && !llvm::sys::fs::can_execute(path_utf8(entry.path())))
+            throw std::runtime_error("Application package executable is not executable: " + path_utf8(entry.path()));
 #endif
         if (name == executable_name) check_package_image(bytes);
         rows.emplace(name, package_digest(bytes) + '\t' + std::to_string(bytes.size()) + '\t' + name + '\n');
     };
-#ifndef _WIN32
-    mode(root, directory_mode);
-#endif
     bool has_inventory = false;
     for (const auto& entry : fs::directory_iterator(root)) {
         const auto name = path_utf8(entry.path().filename());
@@ -573,8 +569,6 @@ std::string package_inventory(const fs::path& root, bool prepare, const project:
             reader.inspect(entry.path());
             const auto pins=native_windows::pin_directories(entry.path(),reader.reservation);
             std::vector<fs::path> physical_names;
-#else
-            mode(entry.path(), directory_mode);
 #endif
             std::set<std::string> names;
             for (const auto& child : fs::directory_iterator(entry)) {
@@ -612,10 +606,6 @@ ApplicationMetadata::Owner verify_package(const fs::path& directory, const proje
 #endif
     const auto path = root / inventory_name;
     const auto text = reader.read(path, inventory_byte_limit);
-#ifndef _WIN32
-    if (fs::status(path).permissions() != data_mode)
-        throw std::runtime_error("Invalid application package inventory: " + path_utf8(path));
-#endif
     if (!text.starts_with(package_header))
         throw std::runtime_error("Invalid application package inventory: " + path_utf8(path));
     std::istringstream receipt(text);

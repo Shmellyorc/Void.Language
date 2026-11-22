@@ -19,10 +19,10 @@ use json as codec
 struct up_context:
     presentation: presentation.up_presentation
     options: cli.up_options
-    root_cap: io.private_directory
-    versions_cap: io.private_directory
-    metadata_cap: io.private_directory
-    transactions_cap: io.private_directory
+    root_cap: io.directory_handle
+    versions_cap: io.directory_handle
+    metadata_cap: io.directory_handle
+    transactions_cap: io.directory_handle
     control_state: model.up_control
 
 func up_say(message: string) -> result<bool, support.up_error>:
@@ -52,7 +52,7 @@ func up_check_retained(context: up_context) -> result<bool, support.up_error>:
             return Err(support.up_fail("control lost an authenticated revocation", "control"))
     return Ok(true)
 
-func up_stage(context: up_context) -> result<io.private_directory, support.up_error>:
+func up_stage(context: up_context) -> result<io.directory_handle, support.up_error>:
     var transaction_entries = support.up_io(io.entries(context.options.root_path + "/transactions", max_entries = 1024))?
     if transaction_entries.count >= 256:
         return Err(support.up_fail("retained transaction limit reached; no automatic deletion is performed", "transaction"))

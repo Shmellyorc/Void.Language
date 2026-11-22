@@ -12,15 +12,15 @@ func report(label: string, saved: io.save_outcome) -> bool:
         print("{label}: published, cleanup reported native {saved.cleanup_code}")
     return true
 
-func load_configuration(directory: io.private_directory, expected: string) -> result<bool, io.error>:
+func load_configuration(directory: io.directory_handle, expected: string) -> result<bool, io.error>:
     with directory.open_file("configuration.txt")? as input:
         return Ok(input.read_string(expected.byte_length)? == expected and input.length()? == expected.byte_length)
 
-func load_checkpoint(directory: io.private_directory, expected: u32) -> result<bool, io.error>:
+func load_checkpoint(directory: io.directory_handle, expected: u32) -> result<bool, io.error>:
     with directory.open_file("checkpoint.bin")? as input:
         return Ok(input.read<u32>()? == expected and input.length()? == 4)
 
-func save_game(directory: io.private_directory) -> result<i32, io.error>:
+func save_game(directory: io.directory_handle) -> result<i32, io.error>:
     var initial = "volume=60\nplayer=初雪\n"
     var updated = "volume=85\nplayer=初雪\n"
     if not report("Initial configuration", directory.save_text_atomic("configuration.txt", initial)):
@@ -38,7 +38,7 @@ func save_game(directory: io.private_directory) -> result<i32, io.error>:
     return Ok(0)
 
 func exercise(root: string) -> result<i32, io.error>:
-    with io.create_private_directory(root)? as directory:
+    with io.create_directory_handle(root)? as directory:
         return save_game(directory)
 
 func main() -> i32:
@@ -50,5 +50,5 @@ func main() -> i32:
                 Err(var failure):
                     print(failure.message)
                     return 6
-    print("Usage: test_game <new absolute private directory>")
+    print("Usage: test_game <new absolute directory>")
     return 7

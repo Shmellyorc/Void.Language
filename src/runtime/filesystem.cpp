@@ -716,6 +716,36 @@ Result read_at(File& file,std::uint64_t offset,char* output,std::size_t count) {
 #endif
     return result;
 }
+Result executable_mode(File& file, bool executable) {
+    Result result;
+#ifdef _WIN32
+    (void)executable; // Windows execution is controlled by the OS/image format.
+    try { host::win::information(file.handle,false); }
+    catch(const std::system_error& e) {fail(result,e.code());}
+#else
+    struct stat info{};
+    if (::fstat(file.handle,&info)) fail(result,native_error());
+    else if (!S_ISREG(info.st_mode) || info.st_nlink!=1) result.error=ErrorKind::invalid_path;
+    else if (::fchmod(file.handle,executable?(info.st_mode&0777)|S_IXUSR:(info.st_mode&0666))) fail(result,native_error());
+#endif
+    return result;
+}
+
+Result executable_mode_matches(File& file, bool executable) {
+    Result result;
+#ifdef _WIN32
+    (void)executable;
+    try { host::win::information(file.handle,false);result.number=1; }
+    catch(const std::system_error& e) {fail(result,e.code());}
+#else
+    struct stat info{};
+    if (::fstat(file.handle,&info)) fail(result,native_error());
+    else if (!S_ISREG(info.st_mode) || info.st_nlink!=1) result.error=ErrorKind::invalid_path;
+    else result.number=((info.st_mode&0111)!=0)==executable;
+#endif
+    return result;
+}
+
 Result private_mode(File& file, bool executable) {
     Result result;
 #ifdef _WIN32

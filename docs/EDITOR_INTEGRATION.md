@@ -195,7 +195,10 @@ manifest project inside the open folder.
 
 The compiler installs the library under `libs/ALIAS` and updates the manifest
 and lock. Write `use pkg/ALIAS` where you need it. The editor refreshes
-diagnostics and navigation after the change. **VOID: Remove Library** lists
+diagnostics, completion and navigation after the change. Saved manifest and
+lock changes from terminal commands are picked up automatically as well. A
+manifest created while a standalone source is open switches that editor session
+to project mode without restarting VS Code. **VOID: Remove Library** lists
 direct dependencies and asks for confirmation before removing one. Editable
 local copies remain on disk after removal so you can keep any changes to them.
 The user registration is independent of the project dependency.

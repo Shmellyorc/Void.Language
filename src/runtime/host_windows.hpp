@@ -118,15 +118,15 @@ struct PrivateAccess {
         }
     }
 };
-inline std::vector<Handle> pin_directories(const std::wstring& path) {
+inline std::vector<Handle> pin_directories(const std::wstring& path,bool check_access=true) {
     std::vector<Handle> pins;PrivateAccess access;
     auto pin=[&](const std::wstring& name) {
-        Handle h(CreateFileW(name.c_str(),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|READ_CONTROL,FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
+        Handle h(CreateFileW(name.c_str(),FILE_LIST_DIRECTORY|FILE_READ_ATTRIBUTES|(check_access?READ_CONTROL:0),FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,nullptr,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
         if(h.value==INVALID_HANDLE_VALUE)fail();
         BY_HANDLE_FILE_INFORMATION info{};
         if(!GetFileInformationByHandle(h.value,&info))fail();
         if(!(info.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) || (info.dwFileAttributes&FILE_ATTRIBUTE_REPARSE_POINT))fail(ERROR_ACCESS_DENIED);
-        access.verify(h.value,true);pins.push_back(std::move(h));
+        if(check_access)access.verify(h.value,true);pins.push_back(std::move(h));
     };
     pin(path.substr(0,7));
     for(std::size_t start=7;start<path.size();) {

@@ -1802,3 +1802,144 @@ func (self file) private_mode_matches(executable: bool) -> result<bool, error>:
     if reply.kind != 0:
         return Err(_host_error("io.file.private_mode_matches", reply))
     return Ok(reply.number != 0)
+
+
+## Held directory capability using ordinary OS access permissions.
+## Each operation retains native identity and rejects traversal and symbolic links.
+## No ownership, chmod, private ACL or ancestor-mode requirement is imposed.
+struct directory_handle:
+    private _local: bool
+
+private func (self directory_handle) init():
+    pass
+
+## Exclusively create a directory and retain its native identity.
+## Unix creation honors the process umask; Windows inherits the parent's ACL.
+## @param path Absolute UTF-8 path without dot components or symbolic ancestors.
+func create_directory_handle(path: string) -> result<directory_handle, error>:
+    var owner = directory_handle()
+    var reply = _host_directory_create(owner, path)
+    if reply.kind != 0:
+        return Err(_host_error("io.create_directory_handle", reply))
+    return Ok(owner)
+
+## Open an existing directory using OS permissions without changing its mode or ACL.
+## @param path Absolute UTF-8 path without dot components or symbolic ancestors.
+func open_directory(path: string) -> result<directory_handle, error>:
+    var owner = directory_handle()
+    var reply = _host_directory_admit(owner, path)
+    if reply.kind != 0:
+        return Err(_host_error("io.open_directory", reply))
+    return Ok(owner)
+
+## Exclusively create a child using OS permissions.
+func (self directory_handle) create_directory(name: string) -> result<directory_handle, error>:
+    var owner = directory_handle()
+    var reply = _host_directory_child(self, owner, name)
+    if reply.kind != 0:
+        return Err(_host_error("io.directory_handle.create_directory", reply))
+    return Ok(owner)
+
+## Open one existing real child directory without following links.
+## @param name One literal child component.
+## @return Held identity; ancestor namespace changes cannot redirect later child operations.
+func (self directory_handle) open_directory(name: string) -> result<directory_handle, error>:
+    var owner = directory_handle()
+    var reply = _host_directory_open(self, owner, name)
+    if reply.kind != 0:
+        return Err(_host_error("io.directory_handle.open_directory", reply))
+    return Ok(owner)
+
+## Exclusively create a read/write file relative to this directory, without following links.
+## Unix creation honors umask; Windows inherits the parent ACL.
+## @param name One literal child component.
+## @return Ordinary IO file resource retaining the same native identity through verification.
+func (self directory_handle) create_file(name: string) -> result<file, error>:
+    var owner = file(value = name, order = binary.byte_order.little)
+    var reply = _host_directory_file(self, owner, name, 1)
+    if reply.kind != 0:
+        return Err(_host_error("io.directory_handle.create_file", reply))
+    return Ok(owner)
+
+## Open a regular child for reading, without following links.
+## @param name One literal child component.
+## @return Ordinary held IO file; rejects symbolic links and devices; access follows OS permissions.
+func (self directory_handle) open_file(name: string) -> result<file, error>:
+    var owner = file(value = name, order = binary.byte_order.little)
+    var reply = _host_directory_file(self, owner, name, 0)
+    if reply.kind != 0:
+        return Err(_host_error("io.directory_handle.open_file", reply))
+    return Ok(owner)
+
+## Acquire a nonblocking exclusive OS-held lock on a regular child.
+## @param name Stable literal lock-file name; the file remains after release.
+## @return Held lock or busy; never infers ownership from a PID or filename.
+func (self directory_handle) lock(name: string) -> result<directory_lock, error>:
+    var owner = directory_lock()
+    var reply = _host_directory_lock(self, owner, name)
+    if reply.kind != 0:
+        return Err(_host_error("io.directory_handle.lock", reply))
+    return Ok(owner)
+
+## Synchronize this held directory's namespace metadata. Native inability to flush is an error.
+## @return True only after successful native synchronization; unsupported storage fails explicitly.
+func (self directory_handle) sync() -> result<bool, error>:
+    return _host_ok("io.directory_handle.sync", _host_directory_sync(self))
+
+## Publish this held directory under a target using same-volume no-replace rename.
+## @param target Held destination directory.
+## @param name New literal component; an existing destination is never replaced.
+## @return Allocation-free outcome; published true with durable false is an uncertain commit.
+## A native directory flush failure remains uncertain, including on Windows.
+func (self directory_handle) publish(target: directory_handle, name: string) -> publication:
+    return _publication(_host_directory_publish(self, target, name))
+
+## Publish the same held regular file after flush; optionally replace a single control-record name.
+## @param input_file Held source file whose inode must match the named source child.
+## @param source One literal existing source component.
+## @param target Held destination directory on the same volume.
+## @param name Literal destination component.
+## @param replace Allow atomic replacement of the single destination directory entry.
+## @return Allocation-free outcome; published distinguishes post-rename durability failure.
+func (self directory_handle) publish_file(input_file: file, source: string, target: directory_handle, name: string, replace: bool = false) -> publication:
+    return _publication(_host_directory_replace(self, input_file, source, target, name, _flag(replace)))
+
+## Atomically save up to 16 MiB in this directory on supported local filesystems.
+## @param name Literal destination component. The save stage and lock names are reserved.
+## @param bytes Exact bytes to publish, including an empty payload.
+## @param replace Allow replacement of an existing regular file.
+## @return Checked publication, native synchronization and cleanup status.
+func (self directory_handle) save_bytes_atomic(name: string, const bytes: [u8], replace: bool = true) -> save_outcome:
+    var reply = _host_directory_save(self, name, bytes, _flag(replace))
+    return save_outcome(published = reply.flag, synchronized = reply.number != 0,
+        kind = _kind(reply.kind), code = reply.kind, os_code = reply.os_code, cleanup_code = reply.detail)
+
+## Atomically save a string's exact UTF-8 bytes without newline or BOM conversion.
+## @param name Literal destination component in the held directory.
+## @param value UTF-8 text, bounded to 16 MiB before encoding.
+## @param replace Allow replacement of an existing regular file.
+## @return Checked publication, native synchronization and cleanup status.
+func (self directory_handle) save_text_atomic(name: string, value: string, replace: bool = true) -> save_outcome:
+    if value.byte_length > 16777216:
+        return save_outcome(published = false, synchronized = false,
+            kind = error_kind.limit_exceeded, code = 12, os_code = 0, cleanup_code = 0)
+    return self.save_bytes_atomic(name, value.to_utf8(), replace)
+
+## Release the directory capability; independently held children remain valid.
+func (self directory_handle) close() -> result<bool, error>:
+    return _host_ok("io.directory_handle.close", _host_directory_close(self))
+
+func (self directory_handle) deinit():
+    _host_directory_cleanup(self)
+
+## Set or clear executable bits without requiring private file permissions.
+## Unix retains existing read/write bits; Windows validates the held ordinary file.
+func (self file) set_executable(executable: bool = true) -> result<bool, error>:
+    return _host_ok("io.file.set_executable", _host_file_mode(self, 2 + _flag(executable)))
+
+## Check executable/data classification without imposing a private mode or ACL.
+func (self file) executable_matches(executable: bool) -> result<bool, error>:
+    var reply = _host_file_mode_matches(self, 2 + _flag(executable))
+    if reply.kind != 0:
+        return Err(_host_error("io.file.executable_matches", reply))
+    return Ok(reply.number != 0)

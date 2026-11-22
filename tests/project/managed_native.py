@@ -129,6 +129,13 @@ def editor(main, helper, text):
 
 with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
     base = Path(temporary).resolve()
+    user_data = base / 'shared user data'
+    user_data.mkdir()
+    if not windows:
+        base.chmod(0o775)
+        user_data.chmod(0o775)
+    environment['XDG_DATA_HOME'] = str(user_data)
+    environment['LOCALAPPDATA'] = str(user_data)
     cwd = base / "working directory"
     cwd.mkdir()
     marker, released = cwd / "native-init.log", cwd / "native-release.log"

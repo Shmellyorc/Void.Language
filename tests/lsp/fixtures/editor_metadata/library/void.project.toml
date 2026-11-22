@@ -1,0 +1,10 @@
+schema = 1
+[project]
+id = "org.test.editor.metadata.library"
+name = "example"
+version = "0.1.0"
+kind = "library"
+[package]
+id = "org.test.editor.metadata.example"
+name = "example"
+entry = "src/example.void"

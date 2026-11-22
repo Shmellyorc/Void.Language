@@ -24,6 +24,7 @@ struct Object {
     virtual std::error_code quiesce() noexcept {return {};}
 };
 struct Request {
+    bool ordinary_directory=false;
     unsigned operation;
     std::vector<std::string> texts,bytes;
     std::vector<std::vector<std::string>> arrays;

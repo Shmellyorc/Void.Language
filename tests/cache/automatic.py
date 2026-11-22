@@ -51,7 +51,7 @@ with tempfile.TemporaryDirectory(prefix="void-automatic-cache-") as temporary:
         if os.name != "nt":
             optimized.chmod(0o666)
             run()
-            assert optimized.stat().st_mode & 0o077, "unsafe candidate unexpectedly overwritten"
+            assert optimized.stat().st_mode & 0o777 == 0o666, "cache lookup changed ordinary permissions"
             optimized.unlink()
             optimized.symlink_to(root / "missing")
             run()

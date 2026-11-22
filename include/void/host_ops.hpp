@@ -59,6 +59,12 @@ inline constexpr std::array operations = {
 #undef VOID_NET_SYNC
     Operation{io,"_host_dir_save","Dtbs"},
     Operation{archive,"_host_zip_encode","zssss"},
+    Operation{io,"_host_directory_create","Qt"}, Operation{io,"_host_directory_admit","Qt"},
+    Operation{io,"_host_directory_child","QQt"}, Operation{io,"_host_directory_open","QQt"},
+    Operation{io,"_host_directory_file","QFts"}, Operation{io,"_host_directory_lock","QLt"},
+    Operation{io,"_host_directory_sync","Q"}, Operation{io,"_host_directory_publish","QQt"},
+    Operation{io,"_host_directory_replace","QFtQts"}, Operation{io,"_host_directory_close","Q"},
+    Operation{io,"_host_directory_cleanup","Q",true}, Operation{io,"_host_directory_save","Qtbs"},
 };
 enum Code : unsigned {args_count,arg,hash_open,hash_update,hash_final,hash_close,hash_cleanup,verify,
  zip_open,zip_next,zip_read,zip_close,zip_cleanup,dir_create,dir_admit,dir_child,dir_open,dir_file,
@@ -70,7 +76,22 @@ enum Code : unsigned {args_count,arg,hash_open,hash_update,hash_final,hash_close
 #undef VOID_NET_PAIR
 #undef VOID_NET_SYNC
  dir_save,zip_encode,
+ directory_create,directory_admit,directory_child,directory_open,directory_file,directory_lock,
+ directory_sync,directory_publish,directory_replace,directory_close,directory_cleanup,directory_save,
 };
+// Ordinary and explicitly private directory capabilities share identity,
+// publication and cleanup machinery, but have distinct source resource types.
+constexpr unsigned directory_base(unsigned op) {
+    switch(op) {
+    case directory_create:return dir_create;case directory_admit:return dir_admit;
+    case directory_child:return dir_child;case directory_open:return dir_open;
+    case directory_file:return dir_file;case directory_lock:return dir_lock;
+    case directory_sync:return dir_sync;case directory_publish:return dir_publish;
+    case directory_replace:return dir_replace;case directory_close:return dir_close;
+    case directory_cleanup:return dir_cleanup;case directory_save:return dir_save;
+    default:return op;
+    }
+}
 constexpr bool capture_operation(unsigned op) {return op==capture || op==capture_async;}
 constexpr bool network_operation(unsigned op) {return op>=net_parse && op<dir_save;}
 constexpr unsigned network_sync(unsigned op) {
@@ -87,7 +108,7 @@ constexpr unsigned network_sync(unsigned op) {
 constexpr bool asynchronous(unsigned op) {return op==capture_async || network_sync(op)!=op;}
 constexpr std::string_view resource_name(char c) {
     switch(c) {case 'H':return "sha256_state";case 'R':return "zip_reader";case 'D':return "private_directory";
-        case 'L':return "directory_lock";case 'F':return "file";case 'P':return "child";
+        case 'Q':return "directory_handle";case 'L':return "directory_lock";case 'F':return "file";case 'P':return "child";
         case 'S':return "stream";case 'N':return "listener";case 'U':return "socket";default:return {};}
 }
 constexpr std::string_view resource_module(char c) {
