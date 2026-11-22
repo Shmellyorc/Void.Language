@@ -580,6 +580,10 @@ if(BUILD_TESTING)
         "${PROJECT_SOURCE_DIR}/tests/project/debug_scopes.py" "$<TARGET_FILE:voidc>"
         "${LLVM_TOOLS_BINARY_DIR}/llvm-dwarfdump" "${LLVM_TOOLS_BINARY_DIR}/lldb")
       set_tests_properties(project_debug_lexical_scopes PROPERTIES TIMEOUT 120)
+      add_test(NAME project_debug_initializers COMMAND "${Python3_EXECUTABLE}"
+        "${PROJECT_SOURCE_DIR}/tests/project/debug_initializers.py" "$<TARGET_FILE:voidc>"
+        "${LLVM_TOOLS_BINARY_DIR}/llvm-dwarfdump" "${LLVM_TOOLS_BINARY_DIR}/lldb")
+      set_tests_properties(project_debug_initializers PROPERTIES TIMEOUT 120)
       add_test(NAME project_native_stdio_approval COMMAND "${Python3_EXECUTABLE}"
         "${PROJECT_SOURCE_DIR}/tests/project/native_stdio_approval.py" "$<TARGET_FILE:voidc>")
       set_tests_properties(project_native_stdio_approval PROPERTIES TIMEOUT 180)

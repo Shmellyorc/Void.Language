@@ -48,11 +48,25 @@ def verify(server, root, main, good, target):
                 assert any(word == 'point' and role == 'variable' for _, word, role in tokens), (warm, expression, tokens)
                 assert any(word == 'vector2' and role == 'struct' for _, word, role in tokens), (warm, expression, tokens)
                 assert client.process.poll() is None
-            for text, needle in [(good.replace('value: rl.vector2', 'value: rl.', 1), 'value: rl.'),
-                    (good.replace('-> rl.vector2', '-> rl.', 1), '-> rl.'),
-                    (good.replace('local: rl.vector2', 'local: rl.', 1), 'local: rl.')]:
+            annotations = [(good.replace('value: rl.vector2', 'value: rl.', 1), 'value: rl.'),
+                           (good.replace('local: rl.vector2', 'local: rl.', 1), 'local: rl.')]
+            for colon in (':', ''):
+                for suffix in ('', 'vec'):
+                    annotations.append((good.replace('-> rl.vector2:', '-> rl.' + suffix + colon, 1),
+                                        '-> rl.' + suffix))
+                # A parameter probe also needs a retained declaration when its
+                # final colon has not yet been written.
+                annotations.append((good.replace('value: rl.vector2', 'value: rl.', 1)
+                                    .replace('-> rl.vector2:', '-> rl.vector2' + colon, 1), 'value: rl.'))
+            for text, needle in annotations:
                 assert replace(text)
-                assert TYPES <= complete(text, needle), needle
+                wanted = {'vector2'} if needle.endswith('vec') else TYPES
+                assert wanted <= complete(text, needle), (warm, needle, text)
+            # A newly authored header may have neither a colon nor a body yet.
+            for colon in (':', ''):
+                text = good[:good.index('    var local')].replace('-> rl.vector2:', '-> rl.' + colon, 1)
+                assert replace(text)
+                assert TYPES <= complete(text, '-> rl.'), (warm, colon)
             assert not replace(good)
             definition = query(client, 'definition', main, good, 'value: rl.vector', after=True)
             assert definition['uri'].endswith(target), definition
@@ -79,6 +93,16 @@ def run(server, compiler, supplied=None):
         for command in ('check', 'run'):
             result = subprocess.run([compiler, command, '--project', root], capture_output=True, text=True, timeout=30)
             assert result.returncode == 0, result.stderr
+        # Editor recovery must not make the same source legal to the compiler.
+        probe = root / 'strict.void'
+        for ending, code in [('rl.', 'VOID1102'), ('rl.:', 'VOID1102'), ('rl.vec', 'VOID1101')]:
+            broken = good.replace('-> rl.vector2:', '-> ' + ending, 1)
+            probe.write_text(broken)
+            result = subprocess.run([compiler, 'check', '--project', root, '--entry', probe.name],
+                                    capture_output=True, text=True, timeout=30)
+            assert result.returncode == 1 and code in result.stderr, result.stderr
+            assert probe.read_text() == broken
+        probe.unlink()
         verify(server, root, main, good, '/records.void')
     if supplied:
         root = Path(supplied).resolve()

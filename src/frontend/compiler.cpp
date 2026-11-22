@@ -1773,7 +1773,22 @@ public:
             f.token = f.receiver && at("string") ? take() : name();
             f.generics=generic_parameters();
             parameters(f);
-            auto body_begin = p;{FunctionScope scope(parsing_function,f);f.body=block();}
+            auto body_begin = p;{
+                FunctionScope scope(parsing_function,f);
+                // A qualified annotation probe can precede the declaration's
+                // colon (or its body). Retain that header only for completion;
+                // ordinary parsing still owns the missing-colon diagnostic.
+                const auto* probe=diagnostics.editor;
+                const bool annotation_probe=repair_available() && probe && (at("<newline>") || at(":")) &&
+                    std::any_of(type_uses.begin()+use_begin,type_uses.end(),[&](const auto& use) {
+                        return use.qualifier && use.token.text=="_void_editor_cursor_" && use.token.offset==probe->offset;
+                    });
+                if(annotation_probe) {
+                    Depth guard(depth,source,peek(),64);
+                    diagnostics.recovery->record();accept(":");newline();
+                    if(at("<indent>"))f.body=block_body();
+                } else f.body=block();
+            }
             for (auto n = body_begin; n < p; ++n) f.body_syntax += std::to_string(tokens[n].text.size()) + ":" + tokens[n].text;
             f.source_end=peek().offset;
             f.parse_failed = diagnostics.within(source, f.token.offset, peek().offset);

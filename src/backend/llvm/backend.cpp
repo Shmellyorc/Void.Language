@@ -3808,6 +3808,10 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     for(const auto& f:input.functions)if(f.name==input.entry_symbol && f.asynchronous!=input.async_root)throw std::invalid_argument("Async AOT entry requires the explicit scheduler root adapter");
     if (!entry_valid) throw std::invalid_argument("AOT CLI adapter requires entry: i32(i32)");
     auto machine = native_machine();
+    // No-opt AOT must also disable machine scheduling/optimization. Otherwise
+    // a later source line can execute before an earlier local's store, even
+    // when IR optimization is off and the emitted debug locations are exact.
+    if(!optimize)machine->setOptLevel(llvm::CodeGenOptLevel::None);
     check_c_primitive_target(input.c_primitives, machine->getTargetTriple());
     const auto triple = machine->getTargetTriple().str();
 #ifdef VOID_LLVM_RESEARCH
