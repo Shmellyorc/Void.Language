@@ -1406,6 +1406,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         llvm::DISubprogram* subprogram=nullptr;
         std::map<unsigned,const DebugBinding*> debug_bindings;
         std::map<std::string,llvm::DILocalScope*> file_scopes;
+        std::vector<llvm::DILocalScope*> lexical_scopes;
+        const std::vector<DebugScope>* source_scopes=nullptr;
         if(debug) {
             source_file=debug_file(f.source.path);
             std::vector<llvm::Metadata*> debug_types;
@@ -1428,6 +1430,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 const auto& names=input.analysis->debug_bindings();
                 if(auto found=names.find(f.name);found!=names.end())
                     for(const auto& binding:found->second)debug_bindings.emplace(binding.slot,&binding);
+                if(auto found=input.analysis->debug_scopes().find(f.name);found!=input.analysis->debug_scopes().end()) {
+                    source_scopes=&found->second;lexical_scopes.push_back(subprogram);
+                    for(const auto& scope:*source_scopes)
+                        lexical_scopes.push_back(debug->createLexicalBlock(lexical_scopes.at(scope.parent),source_file,scope.begin.line,scope.begin.column));
+                }
             }
         }
         std::vector<llvm::BasicBlock*> blocks;
@@ -1835,7 +1842,20 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         if(fresh)entry->second=debug->createLexicalBlockFile(subprogram,debug_file(loc.path));
                         scope=entry->second;
                     }
-                    b.SetCurrentDebugLocation(llvm::DILocation::get(context,loc.line,loc.column,scope));
+                    if(source_scopes && loc.path==f.source.path) {
+                        const auto position=std::pair{loc.line,loc.column};
+                        // Children follow their parent. Select the deepest containing
+                        // source scope, including distinct sibling/shadowing bodies.
+                        for(std::size_t i=0;i<source_scopes->size();++i) {
+                            const auto& candidate=source_scopes->at(i);
+                            if(position>=std::pair{candidate.begin.line,candidate.begin.column} &&
+                               position<std::pair{candidate.end.line,candidate.end.column})scope=lexical_scopes[i+1];
+                        }
+                    }
+                    // VOID's AOT breakpoints and stepping are source-line oriented.
+                    // Column zero avoids representing a line breakpoint again as an
+                    // inline breakpoint at a lowered member/call token.
+                    b.SetCurrentDebugLocation(llvm::DILocation::get(context,loc.line,0,scope));
                 }
                 if(defer_return_load && &instruction==&f.blocks[n].instructions.back())check_cleanup_return();
                 llvm::Value* v = nullptr;
@@ -3112,14 +3132,15 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     }
                     v=b.CreateStore(value,slots[instruction.a]);
                     if(auto found=debug_bindings.find(instruction.a);found!=debug_bindings.end() &&
-                        loc.path==found->second->source.path && loc.line==found->second->source.line &&
-                        loc.column==found->second->source.column) {
+                        loc.path==found->second->storage_source.path && loc.line==found->second->storage_source.line &&
+                        loc.column==found->second->storage_source.column) {
                         const auto& binding=*found->second;
                         auto* debug_type=debug_value_type(t);
+                        auto* scope=binding.scope?lexical_scopes.at(binding.scope):subprogram;
                         auto* variable=binding.argument?
-                            debug->createParameterVariable(subprogram,binding.name,binding.argument,source_file,binding.source.line,debug_type):
-                            debug->createAutoVariable(subprogram,binding.name,source_file,binding.source.line,debug_type);
-                        auto* location=llvm::DILocation::get(context,binding.source.line,binding.source.column,subprogram);
+                            debug->createParameterVariable(scope,binding.name,binding.argument,source_file,binding.source.line,debug_type):
+                            debug->createAutoVariable(scope,binding.name,source_file,binding.source.line,debug_type);
+                        auto* location=llvm::DILocation::get(context,binding.source.line,0,scope);
                         debug->insertDeclare(slots[instruction.a],variable,debug->createExpression(),location,b.GetInsertBlock());
                         debug_bindings.erase(found);
                     }

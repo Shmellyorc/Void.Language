@@ -24,7 +24,10 @@
     "workspaceContains:void.project.toml",
     "onTaskType:void",
     "onCommand:void.debugProjectProgram",
-    "onCommand:void.debugProjectRoot"
+    "onCommand:void.debugProjectRoot",
+    "onDebugResolve:void",
+    "onDebugInitialConfigurations:void",
+    "onDebugDynamicConfigurations:void"
   ],
   "capabilities": {
     "untrustedWorkspaces": {
@@ -38,7 +41,9 @@
   },
   "contributes": {
     "breakpoints": [
-      {"language": "void"}
+      {
+        "language": "void"
+      }
     ],
     "languages": [
       {
@@ -126,13 +131,27 @@
       {
         "command": "void.resetCreationPrompt",
         "title": "VOID: Reset Project Creation Prompt"
+      },
+      {
+        "command": "void.debugProject",
+        "title": "VOID: Debug Project",
+        "enablement": "isWorkspaceTrusted"
       }
     ],
     "taskDefinitions": [
       {
         "type": "void",
-        "required": ["command"],
-        "properties": {"command": {"type": "string"}, "receipt": {"type": "number"}}
+        "required": [
+          "command"
+        ],
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "receipt": {
+            "type": "number"
+          }
+        }
       }
     ],
     "problemMatchers": [
@@ -160,8 +179,18 @@
     "configuration": {
       "title": "VOID",
       "properties": {
-        "void.crashDiagnostics.enabled": {"type": "boolean", "default": false, "scope": "machine", "description": "Opt in to bounded local compiler/language-server crash evidence. No uploads. Restarting the server applies changes; native programs require an explicit diagnostic launch."},
-        "void.crashDiagnostics.directory": {"type": "string", "default": "", "scope": "machine", "description": "Optional absolute local report directory (private leaf, existing parent). Empty uses VOID_CRASH_DIRECTORY or the platform state directory. Reports contain operation identifiers and binary hashes, never source text or arguments."},
+        "void.crashDiagnostics.enabled": {
+          "type": "boolean",
+          "default": false,
+          "scope": "machine",
+          "description": "Opt in to bounded local compiler/language-server crash evidence. No uploads. Restarting the server applies changes; native programs require an explicit diagnostic launch."
+        },
+        "void.crashDiagnostics.directory": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "Optional absolute local report directory (private leaf, existing parent). Empty uses VOID_CRASH_DIRECTORY or the platform state directory. Reports contain operation identifiers and binary hashes, never source text or arguments."
+        },
         "void.compiler.path": {
           "type": "string",
           "default": "",
@@ -170,14 +199,19 @@
         },
         "void.tasks.profile": {
           "type": "string",
-          "enum": ["debug", "release"],
+          "enum": [
+            "debug",
+            "release"
+          ],
           "default": "debug",
           "scope": "window",
           "description": "Compiler profile used by VOID project commands."
         },
         "void.tasks.runArguments": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "scope": "window",
           "description": "Literal arguments passed to the application by VOID: Run Project."
@@ -209,7 +243,7 @@
           ],
           "default": "off",
           "scope": "window",
-          "description": "Optional protocol trace in Output → VOID LSP Trace. Verbose logs can include source text."
+          "description": "Optional protocol trace in Output \u2192 VOID LSP Trace. Verbose logs can include source text."
         },
         "void.project.root": {
           "type": "string",
@@ -225,13 +259,62 @@
         "editor.tabSize": 4,
         "editor.detectIndentation": false
       }
+    },
+    "debuggers": [
+      {
+        "type": "void",
+        "label": "VOID Project",
+        "languages": [
+          "void"
+        ],
+        "configurationAttributes": {
+          "launch": {
+            "required": [],
+            "properties": {}
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "void",
+            "request": "launch",
+            "name": "VOID: Debug Project"
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "VOID: Debug Project",
+            "description": "Build and debug the compiler-selected VOID application.",
+            "body": {
+              "type": "void",
+              "request": "launch",
+              "name": "VOID: Debug Project"
+            }
+          }
+        ]
+      }
+    ],
+    "viewsWelcome": [
+      {
+        "view": "workbench.debug.welcome",
+        "contents": "[Debug VOID Project](command:void.debugProject)\n[Create VOID Project](command:void.newProject)",
+        "when": "workspaceFolderCount == 1 && isWorkspaceTrusted"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "void.newProject",
+          "when": "view == workbench.explorer.fileView && isWorkspaceTrusted",
+          "group": "navigation"
+        }
+      ]
     }
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "compile": "tsc && node build.cjs",
     "build": "npm run typecheck && npm run compile",
-    "test": "npm run build && node --test out/test/config.test.js out/test/debugBuildReceipt.test.js out/test/diagnosticVersions.test.js out/test/crashDiagnostics.test.js",
+    "test": "npm run build && node --test out/test/config.test.js out/test/debugBuildReceipt.test.js out/test/diagnosticVersions.test.js out/test/crashDiagnostics.test.js out/test/nativeApproval.test.js",
     "test:host": "node out/test/runHost.js",
     "test:metadata": "npm run build && node out/test/runMetadataRefreshHost.js",
     "package": "npm run build && vsce package --no-dependencies --allow-missing-repository --out dist/void-language-0.1.2.vsix",

@@ -47,11 +47,11 @@ try:
   debug=instructions('debug',['--profile','debug'],'');release=instructions('release',['--profile','release'],'');noopt=instructions('release-noopt',['--profile','release','--no-opt'],'');assert debug>release and noopt==debug,(debug,release,noopt)
   for profile in ('debug','release'):
    exe=root/(profile+('.exe' if os.name=='nt' else ''));run([compiler,'build','--project',root,'--profile',profile,'-o',exe],warning='');run([exe],23,warning='')
-  # The cache creates excluded infrastructure after source capture; bootstrap it
-  # before measuring a stable inventory's explicit cold/warm pair.
+  # G95 automatically caches the ordinary Debug run. Bootstrap excluded
+  # infrastructure, then require explicit cache reporting to reuse that entry.
   run([compiler,'run','--project',root,'--profile','debug'],23,warning='')
-  cold=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='');warm=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='')
-  if b'Debug cache: unavailable' not in cold.stderr:assert b'Debug cache: miss' in cold.stderr and b'Debug cache: hit' in warm.stderr,(cold.stderr,warm.stderr)
+  cached=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='');warm=run([compiler,'run','--project',root,'--profile','debug','--cache'],23,warning='')
+  if b'Debug cache: unavailable' not in cached.stderr:assert b'Debug cache: hit' in cached.stderr and b'Debug cache: hit' in warm.stderr,(cached.stderr,warm.stderr)
   else:print('UNQUALIFIED: native persistent disk cache warm hit')
   run([compiler,'run','--project',root,'--cache'],23,warning='')
   # Only native build/emit apply the debug mode; run retains its warning.

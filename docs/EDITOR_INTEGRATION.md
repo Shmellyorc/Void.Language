@@ -29,15 +29,18 @@ The language server verifies the project lock and the package catalog from
 the project. Completions at `rl.`, typed hover, physical-source definitions,
 semantic tokens and diagnostics use the same declarations as the compiler.
 Parameter hints follow the existing documentation policy. Package refresh
-uses the existing watched-file pipeline. To review and save native approval,
-open a regular interactive terminal in the project and run `voidc run .`. [Bundled raylib](NATIVE_LIBRARIES.md#bundled-raylib)
+uses the existing watched-file pipeline. F5, **VOID: Build Project**, and **VOID: Run Project**
+offer an editor review when verified native consent is missing. Select **Approve
+Native Code** only after reviewing the provider and SHA-256 identity. The compiler
+saves consent after its normal input recapture; denial or dismissal stops the workflow.
+An ordinary interactive terminal can also review and save consent with `voidc run .`. [Bundled raylib](NATIVE_LIBRARIES.md#bundled-raylib)
 
 
 ## VS Code project commands
 
 Open a trusted local folder with a selected VOID manifest. **VOID: Check
 Project** checks the saved source, **VOID: Build Project** writes the native
-executable to the project's normal `build/` location, and **VOID: Run Project**
+executable to the project's normal `.void/build/` location, and **VOID: Run Project**
 runs the saved application through the JIT. **VOID: Package Project** invokes
 `voidc package` with the selected profile and writes the normal `dist/`
 application directory. Run `voidc package --verify dist` to verify its inventory.
@@ -51,10 +54,9 @@ arguments as separate strings in `void.tasks.runArguments`. Set
 `voidls`. Save dirty VOID sources and manifests in the selected root before
 launch. The task terminal shows output and the exit status, and compiler
 diagnostics appear in Problems. These tasks use pipes. Run Project, Build
-Project and the F5 Debug build can use an existing approval for the exact
-verified native provider and application. To grant approval or review an
-intentional provider change, open an ordinary interactive terminal in the
-project and run `voidc run .`. Inspect approvals with `voidc native approvals`
+Project and F5 review missing native consent inside the editor and reuse an exact
+saved approval. The terminal alternative is `voidc run .` in an ordinary
+interactive terminal. Inspect approvals with `voidc native approvals`
 and revoke one with `voidc native revoke APPROVAL_ID`. Use an interactive
 terminal for TTY applications. For CI, supply `--allow-native` deliberately
 on the CLI.
@@ -206,9 +208,41 @@ The user registration is independent of the project dependency.
 If the project changed while the picker was open, run the command again.
 For lock or installed view reconciliation, review `voidc tidy --check` and
 run `voidc tidy` explicitly if needed. Adding a native library grants no
-execution approval. Review the provider and approve it with `voidc run .`
-in an ordinary interactive terminal before using the editor's Run, Build or
-F5 commands with that provider.
+execution approval. Run, Build and F5 present the compiler-owned provider
+review when consent is missing. Exact saved approval is reused; a changed identity
+requires fresh review. The terminal alternative remains `voidc run .`.
+
+## Automatic F5 setup
+
+Open a trusted local VOID application project and select **VOID Project** in
+Run and Debug, or run **VOID: Debug Project**. The Run and Debug welcome view
+also links to debugging and **VOID: New Project**; Explorer has a New Project
+button. The compiler still owns project discovery and entry selection.
+
+The VOID debug configuration provider supplies a build task and launch in memory.
+Existing projects need no `launch.json` or `tasks.json`; user-authored files are
+preserved. Built-in starters retain their ready-to-use generated configurations.
+F5 uses Debug, full source information and `--no-opt` with the matching compiler,
+including when the manifest's ordinary Debug build requests O2 or no symbols.
+Ordinary Build/Run commands retain their selected profile. Older compilers retain
+their existing capability-gated behavior and need manifest debug settings.
+
+The compiler's actual successful build and newly published executable are required
+for each F5 invocation. Failed, denied or canceled builds cannot launch an older
+executable. Explicit `debug.onTaskErrors = "debugAnyway"` remains refused.
+
+Native review uses a disposable VS Code picker with the verified provider and
+SHA-256 approval identity. **Deny**, Escape, task cancellation, compiler failure,
+and the compiler's 120-second review timeout stop the attempt. Consent is never
+inferred from workspace trust or a package installation. Ordinary redirected
+CLI commands do not prompt; CI retains its explicit authorization requirement.
+Only the explicitly negotiated editor protocol waits for a bounded response.
+
+For terminal editors, use the existing lightweight `voidc run .` line prompt
+inside a real foreground terminal (`:terminal` in Vim or Neovim). It requires no
+GUI or new terminal dependency. LLDB's native variable commands work from those
+terminals; mouse hover belongs to the editor's DAP client. Vim/Neovim DAP hover
+and VSCodium execution are separate qualification targets.
 
 ## Running a built-in application starter
 
@@ -232,7 +266,8 @@ press **F5**. The generated prelaunch task builds the saved application
 in the Debug profile and then launches it. No manual build is needed,
 even the first time you open the folder. The starter enables full native
 debug information for source breakpoints, stepping and supported scalar
-locals. The general `void.tasks.profile` setting still controls the
+locals. The matching F5 provider also forces full symbols and no optimization
+without editing the manifest. The general `void.tasks.profile` setting still controls the
 ordinary project commands; F5 always chooses Debug.
 
 The starter sets `debug.onTaskErrors` to `abort`. Keep `abort` or `showErrors`
@@ -266,7 +301,9 @@ files.
 
 ## Native AOT source debugging
 
-Set `debug_info = "full"` under `[build.debug]` in `void.project.toml`.
+For manual builds, set `debug_info = "full"` under `[build.debug]` in `void.project.toml`,
+or pass `--debug-info full --no-opt` to a manifest `build`/`emit` invocation.
+The automatic VOID F5 provider supplies these overrides itself.
 Save the project and build its native executable with
 `voidc build --project . --profile debug`. In VS Code, select the
 `debug` value for `void.tasks.profile` and run **VOID: Build Project**.
@@ -294,7 +331,8 @@ On Linux x64, install the official **LLDB DAP** extension and set
 }
 ```
 
-This manual recipe is for projects without a generated prelaunch task.
+This manual recipe remains available for custom launches. The automatic VOID
+configuration builds first without requiring these files.
 The command variables use the selected manifest and entry from `voidls`.
 They require a trusted workspace, a current application selection, saved
 project buffers, the adapter and an existing executable at the normal build
@@ -308,9 +346,17 @@ reads its embedded DWARF. Open the exact executable reported by Build.
 In either debugger, use a file-and-line breakpoint and step past a scalar
 declaration before inspecting it. The manual LLDB
 recipe above is for Linux. The built-in Windows starter uses the
-`cppdbg`/GDB route described above; GDB also works directly. Asynchronous frames,
-captured locals, nested lexical scopes and managed values lack a qualified
-inspection contract.
+`cppdbg`/GDB route described above; GDB also works directly. Unoptimized full debug information includes ordinary numeric and boolean
+parameters and locals in nested branches and loops, with lexical scope exit.
+When paused after initialization, inspect them in Locals, Watch, Debug Console,
+or the debug hover over their source name. A normal editing hover shows type
+information; the paused debug hover shows the current value. Source-line
+breakpoints and stepping use DWARF column zero to avoid a second inline marker
+at a lowered member-call token. Instruction-address breakpoints remain available.
+Asynchronous frames, captured locals, generic functions, managed values, collection
+contents and VOID expression-language evaluation are outside this inspection
+contract. LLDB evaluates its supported native expression syntax; optimized builds
+can omit local-variable locations. See [F5 engineering qualification](F5_DEBUGGING_ENGINEERING.md).
 
 ## First-file project creation (Slice 5)
 

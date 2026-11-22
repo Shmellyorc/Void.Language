@@ -127,6 +127,9 @@ Example: voidc check --project .
         }
         if (command=="build" || command=="emit") {
             options_title();
+            help_rows(std::cout, std::array<HelpRow,1>{{
+                {"--debug-info none|line|full", "Override manifest debug information for this build/emit."}
+            }});
             if (command=="build") help_rows(std::cout, std::array<HelpRow,3>{{
                 {"-o PATH", "Executable output; defaults under build/."},
                 {"--allow-native", "Authorize this manifest invocation only."},

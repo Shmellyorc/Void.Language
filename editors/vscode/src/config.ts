@@ -89,7 +89,7 @@ export async function compilerFileIdentity(compiler: string): Promise<string> {
     const value = await fs.stat(compiler, {bigint: true});
     return `${value.dev}:${value.ino}:${value.size}:${value.mtimeNs}`;
 }
-export async function plainStatusCapability(compiler: string, cwd: string): Promise<string | undefined> {
+export async function plainStatusCapability(compiler: string, cwd: string, capability: 'statusPlain' | 'nativeApprovalStdio' | 'debugInfoOverride' = 'statusPlain'): Promise<string | undefined> {
     try {
         const before = await compilerFileIdentity(compiler);
         const {stdout, stderr} = await promisify(execFile)(compiler, ['--capabilities'],
@@ -101,7 +101,8 @@ export async function plainStatusCapability(compiler: string, cwd: string): Prom
         const supported = !stderr && !!result && typeof result === 'object' &&
             (result as {schema?: unknown}).schema === 1 &&
             (result as {cliPresentation?: unknown}).cliPresentation === 1 &&
-            (result as {statusPlain?: unknown}).statusPlain === true;
+            (capability === 'statusPlain' ? (result as {statusPlain?: unknown}).statusPlain === true :
+                (result as Record<string, unknown>)[capability] === 1);
         return supported ? after : undefined;
     } catch { return undefined; }
 }

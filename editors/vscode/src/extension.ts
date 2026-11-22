@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import {spawn} from 'node:child_process';
+import {randomBytes} from 'node:crypto';
 import {crashEnvironment, configureCrashDiagnostics} from './crashDiagnostics';
 import {basename, dirname, isAbsolute, join, parse} from 'node:path';
 import {promises as fs, constants} from 'node:fs';
@@ -10,7 +11,7 @@ import {CreationWorkflow} from './creationWorkflow';
 import {newProjectCommand} from './newProject';
 import {compilerExecution} from './projectTask';
 import {DebugBuildReceipts} from './debugBuildReceipt';
-import {plainStatusCapability} from './config';
+import {plainStatusCapability, compilerFileIdentity} from './config';
 import {libraryCommands} from './libraryManagement';
 import {createProtocolTrace, DiagnosticLog} from './editorLog';
 import {versionedDiagnostics} from './versionedDiagnostics';
@@ -25,7 +26,7 @@ const debugType = process.arch !== 'x64' ? undefined :
 
 function requireDebugTaskErrorsStop(): void {
     const policy = vscode.workspace.getConfiguration('debug').get('onTaskErrors');
-    if (policy !== 'abort' && policy !== 'showErrors')
+    if (policy === 'debugAnyway')
         throw new Error('Set debug.onTaskErrors to abort or showErrors to prevent launching after a failed VOID build.');
 }
 function samePath(left: unknown, right: string): boolean {
@@ -196,7 +197,7 @@ class ServerManager {
         if (!['debug', 'release'].includes(profile)) throw new Error('Choose debug or release in void.tasks.profile.');
         const args = [command, '--project', project.requestedRoot ?? project.root, '--profile', profile];
         if (project.entryOverride) args.push('--entry', project.entryOverride);
-        if (command === 'run' || command === 'build') args.push('--reuse-native-approval');
+
         if (command === 'run') {
             const runArguments = settings.get<unknown>('tasks.runArguments', []);
             if (!Array.isArray(runArguments) || runArguments.some(argument => typeof argument !== 'string' || argument.includes('\0')))
@@ -209,6 +210,15 @@ class ServerManager {
         if (!vscode.workspace.isTrusted || this.project !== project || this.requestSerial !== selection)
             throw new Error('The editor or selected project changed. Invoke the command again.');
         const capabilityIdentity = await plainStatusCapability(compiler, project.root);
+        const approvalIdentity = (command === 'run' || command === 'build') ?
+            await plainStatusCapability(compiler, project.root, 'nativeApprovalStdio') : undefined;
+        if (command === 'run' || command === 'build') {
+            const forwarded = args.indexOf('--');
+            args.splice(forwarded < 0 ? args.length : forwarded, 0,
+                ...(approvalIdentity ? ['--native-approval-stdio', randomBytes(32).toString('hex')] : ['--reuse-native-approval']));
+        }
+        const debugIdentity = debugBuild ? await plainStatusCapability(compiler, project.root, 'debugInfoOverride') : undefined;
+        if (debugIdentity) args.push('--debug-info', 'full', '--no-opt');
         if (capabilityIdentity) {
             const forwarded = args.indexOf('--');
             args.splice(forwarded < 0 ? args.length : forwarded, 0, '--status', 'plain');
@@ -217,7 +227,12 @@ class ServerManager {
             throw new Error('The editor or selected project changed during compiler capability negotiation.');
         const dirty = this.dirtyProjectDocument(project.root);
         if (dirty) throw new Error(`Save ${basename(dirty.uri.fsPath)} before running a project command. Project commands use saved files.`);
-        return {folder, profile, compiler, args, cwd: project.root, capabilityIdentity};
+        return {folder, profile, compiler, args, cwd: project.root, capabilityIdentity: debugIdentity ?? approvalIdentity ?? capabilityIdentity,
+            verifyApproval: async () => {
+                if (!vscode.workspace.isTrusted || this.project !== project || this.requestSerial !== selection ||
+                    this.dirtyProjectDocument(project.root) || await compilerFileIdentity(compiler) !== approvalIdentity)
+                    throw new Error('The project or compiler changed during native review. Start the workflow again.');
+            }};
     }
     async projectTask(command: ProjectCommand): Promise<vscode.TaskExecution | undefined> {
         if (!vscode.workspace.isTrusted) return;
@@ -290,7 +305,8 @@ class ServerManager {
         const base = tasks.find(task => task.name === debugBuildTask && task.definition.command === 'debugBuild' &&
             task.definition.receipt === undefined && typeof task.scope === 'object' &&
             task.scope.uri.toString() === vscode.workspace.workspaceFolders?.[0]?.uri.toString());
-        this.debugTask = base ? this.resolveDebugBuild(base, id) : undefined;
+        this.debugTask = this.resolveDebugBuild(base ?? new vscode.Task({type: 'void', command: 'debugBuild'},
+            vscode.workspace.workspaceFolders![0], debugBuildTask, 'VOID'), id);
         // Cancellation invalidates only this invocation, never a later receipt.
         const cancellation = token?.onCancellationRequested(() => {
             this.cancelDebugBuild(id);
@@ -335,7 +351,7 @@ class ServerManager {
             if (state.status !== 'ready' || state.root !== project.root || !state.entry || !isAbsolute(state.entry) ||
                 !inside(project.root, state.entry))
                 throw new Error('Resolve project errors or reselect the application entry before debugging.');
-            const program = join(project.root, 'build', parse(state.entry).name + (debugType === 'cppdbg' ? '.exe' : ''));
+            const program = join(project.root, '.void', 'build', parse(state.entry).name + (debugType === 'cppdbg' ? '.exe' : ''));
             // VS Code substitutes command variables before running preLaunchTask.
             if (part === 'program' && !beforeBuild) {
                 const artifact = await fs.stat(program).catch(() => undefined);
@@ -587,6 +603,8 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         vscode.commands.registerCommand('void.addLibrary', () => libraries('add')),
         vscode.commands.registerCommand('void.removeLibrary', () => libraries('remove')),
         vscode.commands.registerCommand('void.newProject', newProjectCommand(bundled)),
+        vscode.commands.registerCommand('void.debugProject', () => vscode.debug.startDebugging(vscode.workspace.workspaceFolders?.[0],
+            {type: 'void', request: 'launch', name: 'VOID: Debug Project'})),
         vscode.commands.registerCommand('void.createProject', () => workflow.create()),
         vscode.commands.registerCommand('void.resetCreationPrompt', () => workflow.reset()),
         vscode.commands.registerCommand('void.selectEntry', () => current.selectEntry()),
@@ -632,8 +650,16 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
         }),
         vscode.workspace.onDidChangeWorkspaceFolders(() => { void current.refresh(true); }),
         vscode.workspace.onDidGrantWorkspaceTrust(() => { void current.refresh(true); }));
-    if (debugType) context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(debugType, {
+    const debugProvider: vscode.DebugConfigurationProvider = {
+        provideDebugConfigurations: () => [{type: 'void', request: 'launch', name: 'VOID: Debug Project'}],
         async resolveDebugConfiguration(_folder, config, token) {
+            if (config.type === 'void' || (!config.type && vscode.window.activeTextEditor?.document.languageId === 'void')) {
+                if (!debugType) throw new Error('VOID debugging currently supports Linux x64 and Windows x64.');
+                config = {...config, type: debugType, request: 'launch', name: config.name ?? 'VOID: Debug Project',
+                    program: '${command:void.debugProjectProgram}', cwd: '${command:void.debugProjectRoot}',
+                    preLaunchTask: debugBuildTask,
+                    ...(debugType === 'lldb-dap' ? {disableASLR: false} : {MIMode: 'gdb'})};
+            }
             if (config.request === 'launch' && config.preLaunchTask === debugBuildTask) {
                 const attempt = await current.beginDebugBuild(token);
                 if(!attempt)return undefined;
@@ -654,7 +680,10 @@ export function activate(context: vscode.ExtensionContext): {ready: () => Promis
             }
             return config;
         }
-    }));
+    };
+    context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider('void', debugProvider),
+        vscode.debug.registerDebugConfigurationProvider('void', {provideDebugConfigurations: debugProvider.provideDebugConfigurations}, vscode.DebugConfigurationProviderTriggerKind.Dynamic));
+    if (debugType) context.subscriptions.push(vscode.debug.registerDebugConfigurationProvider(debugType, debugProvider));
     vscode.window.visibleTextEditors.forEach(applyIndentation);
     void current.refresh();
     return {ready: () => current.refresh(), status: () => current.status(), deactivate};

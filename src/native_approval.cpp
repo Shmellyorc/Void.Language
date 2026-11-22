@@ -8,11 +8,14 @@
 #include "void/project_resolution.hpp"
 #include <llvm/ADT/StringExtras.h>
 #include <llvm/Support/Process.h>
+#include <llvm/Support/JSON.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/ADT/SmallString.h>
 #include <llvm/Support/raw_ostream.h>
 #include <algorithm>
 #include <cerrno>
+#include <chrono>
+#include <thread>
 #include <cstdlib>
 #include <iostream>
 #include <optional>
@@ -27,6 +30,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <unistd.h>
+#include <poll.h>
 #endif
 
 namespace vd {
@@ -120,6 +124,37 @@ bool interactive() {
 #else
     return isatty(STDIN_FILENO) && isatty(STDERR_FILENO) && tcgetpgrp(STDIN_FILENO)==getpgrp();
 #endif
+}
+
+// Explicit, bounded stdio protocol for an editor that presents the compiler's
+// verified identity. Ordinary redirected invocations never enter this path.
+bool confirm_editor(std::string_view label,std::string_view id,const std::string& session) {
+    std::string message;
+    llvm::raw_string_ostream out(message);
+    llvm::json::OStream json(out);
+    json.object([&] {json.attribute("schema",1);json.attribute("session",session);json.attribute("id",std::string(id));json.attribute("provider",std::string(label));});
+    std::cerr<<"\x1eVOID_NATIVE_APPROVAL "<<message<<'\n'<<std::flush;
+    const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(120);
+    std::string response;
+    while(std::chrono::steady_clock::now()<deadline && response.size()<80) {
+        char byte=0;
+#if defined(_WIN32)
+        const auto input=GetStdHandle(STD_INPUT_HANDLE);
+        DWORD available=0,read=0;
+        if(!PeekNamedPipe(input,nullptr,0,nullptr,&available,nullptr))return false;
+        if(!available){std::this_thread::sleep_for(std::chrono::milliseconds(50));continue;}
+        if(!ReadFile(input,&byte,1,&read,nullptr) || read!=1)return false;
+#else
+        pollfd input{STDIN_FILENO,POLLIN,0};
+        const auto ready=poll(&input,1,100);
+        if(ready<0){if(errno==EINTR)continue;return false;}
+        if(!ready)continue;
+        if(::read(STDIN_FILENO,&byte,1)!=1)return false;
+#endif
+        if(byte=='\n')return response=="approve "+std::string(id);
+        response+=byte;
+    }
+    return false;
 }
 
 bool confirm(std::string_view label,std::string_view id) {
@@ -425,7 +460,7 @@ struct NativeApproval::Payload {
 #endif
 };
 
-NativeApproval::NativeApproval(Mode mode):mode_(mode) {}
+NativeApproval::NativeApproval(Mode mode,std::string editor_session):mode_(mode),editor_session_(std::move(editor_session)) {}
 NativeApproval::~NativeApproval() = default;
 
 fs::path project_build_directory(const fs::path& root) {
@@ -517,7 +552,7 @@ fs::path NativeApproval::authorize(const ManagedNativeApprovalSubject& subject,b
     if(!found) {
         if(mode_==Mode::reuse_only)
             throw NativeApprovalRequired(std::string("No saved native approval matches this project and provider.\n")+terminal_review);
-        if(!confirm(label,id))throw NativeApprovalRequired("Native approval declined. No approval was saved.");
+        if(!(mode_==Mode::editor?confirm_editor(label,id,editor_session_):confirm(label,id)))throw NativeApprovalRequired("Native approval declined. No approval was saved.");
         pending_=expected;
     }
     id_=id;
@@ -531,6 +566,14 @@ fs::path NativeApproval::authorize(const ManagedNativeApprovalSubject& subject,b
         payload_->write_file(name,bytes);
     }
     return payload_->path();
+}
+
+void NativeApproval::finish_editor_review() {
+    if(mode_!=Mode::editor)return;
+    // This seal always precedes application/native startup, including projects
+    // with no native requirements and exact saved approvals. The editor stops
+    // interpreting control messages before application stderr can be emitted.
+    std::cerr<<"\x1eVOID_NATIVE_APPROVAL_END "<<editor_session_<<'\n'<<std::flush;
 }
 
 void NativeApproval::remember() {

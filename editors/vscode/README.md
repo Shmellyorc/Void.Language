@@ -80,7 +80,7 @@ Save changed VOID sources and manifests in the selected project before using
 these commands. Tasks use saved files and stop before launch when those buffers
 are dirty. The task terminal shows the compiler and application output and exit
 status. Compiler errors appear in Problems. Build writes the normal native
-output under `build/`. Run uses the JIT. Package invokes `voidc package` and
+output under `.void/build/`. Run uses the JIT. Package invokes `voidc package` and
 writes the compiler's normal `dist/` application directory. Verify it with
 `voidc package --verify dist`. Existing output follows the compiler's refusal
 rules; use the CLI for an explicit replacement or another output directory.
@@ -95,6 +95,26 @@ the editor's **Debug Anyway** override cannot authorize a stale output. Compiler
 and application timing remain separate. G75 override qualification currently
 covers Linux x64; Windows and macOS require native qualification. See the
 [G75 implementation report](https://github.com/Shmellyorc/Void.Language/blob/main/docs/projects/G75_CLI_EXPERIENCE_IMPLEMENTATION.md).
+
+### Press F5
+
+Select **VOID Project** in Run and Debug, or **VOID: Debug Project**. Existing
+application projects need no authored launch/task JSON. The provider builds with
+full symbols and no optimization, then launches through the installed native
+adapter. Run and Debug links to **VOID: New Project** and Explorer includes its
+button. Existing configurations remain intact.
+
+Missing native consent opens a review of the compiler's verified provider and
+SHA-256 identity. **Approve Native Code** resumes the original workflow; Deny,
+Escape or task cancellation stops it. Exact approvals are reused, and changed
+identities require fresh review. Ordinary redirected CLI commands never wait
+for consent; terminal users can use the existing `voidc run .` prompt.
+
+Paused numeric and boolean locals include nested branches/loops. Inspect them
+in Locals, Watch, Debug Console or the debug hover over their name. Source-line
+breakpoints use one gutter marker. Managed/collection displays, captures, async
+locals and VOID expression evaluation remain outside the qualified contract.
+VSCodium and terminal-editor DAP UI require separate qualification.
 
 Syntax highlighting works in Restricted Mode; native execution requires trust.
 Multi-root, virtual/untitled, network/UNC and unrelated projects need separate

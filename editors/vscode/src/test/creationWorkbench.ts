@@ -30,7 +30,7 @@ export async function workbench(port: string) {
     const replies = new Map<number, (value: unknown) => void>();
     socket.addEventListener('message', event => {
         const message = JSON.parse(String(event.data));
-        replies.get(message.id)?.(message.result?.result?.value);
+        replies.get(message.id)?.(Object.hasOwn(message.result ?? {}, 'result') ? message.result.result.value : message.result);
         replies.delete(message.id);
     });
     function send<T>(method: string, params: object): Promise<T> {
@@ -48,7 +48,7 @@ export async function workbench(port: string) {
                 params: {type, key: value, code, windowsVirtualKeyCode, modifiers}}));
     };
     const visible = (needle: string, region: string) => evaluate<number>(
-        `[...document.querySelectorAll(${JSON.stringify(region)})].filter(e => e.getBoundingClientRect().width && e.innerText.includes(${JSON.stringify(needle)})).length`);
+        `[...document.querySelectorAll(${JSON.stringify(region)})].filter(e => e.getBoundingClientRect().width && e.checkVisibility({visibilityProperty:true,opacityProperty:true}) && e.innerText.includes(${JSON.stringify(needle)})).length`);
     const click = async (label: string, region: string) => {
         await until(() => evaluate<boolean>(`(() => {
             const buttons = [...document.querySelectorAll(${JSON.stringify(region + ' .monaco-button, ' + region + ' .monaco-list-row')})];
@@ -59,5 +59,13 @@ export async function workbench(port: string) {
         })()`), Boolean, label);
     };
     const type = (value: string) => send('Input.insertText', {text: value});
-    return {evaluate, visible, click, key, type, close: () => socket.close()};
+    await send('Page.bringToFront', {});
+    return {evaluate, visible, click, key, type,
+        clickAt: async (x: number, y: number) => {
+            for (const type of ['mousePressed', 'mouseReleased'])
+                await send('Input.dispatchMouseEvent', {type, x, y, button: 'left', clickCount: 1});
+        },
+        moveMouse: (x: number, y: number) => send('Input.dispatchMouseEvent', {type: 'mouseMoved', x, y}),
+        screenshot: () => send<{data: string}>('Page.captureScreenshot', {format: 'png'}),
+        close: () => socket.close()};
 }

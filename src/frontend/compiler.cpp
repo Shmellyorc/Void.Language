@@ -8462,18 +8462,52 @@ struct AnalysisAccess {
                 return_components(f);
                 if(!presentation && !f.asynchronous && !f.anonymous && f.generic_origin.empty() && !f.display_adapter &&
                    !f.json_adapter && !f.global_initializer && !f.accessor && valid_editor_identifier(f.token.text)) {
-                    auto binding=[&](const Token& token,unsigned slot,unsigned argument) {
+                    auto binding=[&](const Token& token,unsigned slot,unsigned argument,unsigned scope,const Token* initialization=nullptr) {
                         const auto type=f.locals.at(slot);
                         if(f.captured_locals.contains(slot) || !valid_editor_identifier(token.text) ||
                            !(numeric::number(type) || type==Type::boolean))return;
-                        result->debug_bindings_[f.symbol].push_back({slot,argument,token.text,unit->source.location(token.offset)});
+                        result->debug_bindings_[f.symbol].push_back({slot,argument,token.text,unit->source.location(token.offset),scope,unit->source.location(initialization?initialization->offset:token.offset)});
                     };
                     for(unsigned n=0;n<f.parameters.size();++n)
-                        binding(f.parameters[n].token,f.parameters[n].slot,n+1+unsigned(f.receiver.has_value()));
-                    for(const auto& statement:f.body) {
-                        if(statement.kind==Statement::Kind::variable)binding(statement.token,statement.slot,0);
-                        if(statement.kind==Statement::Kind::destructure && statement.expression->type!=error_type)
-                            for(const auto& local:statement.bindings)binding(local.token,local.slot,0);
+                        binding(f.parameters[n].token,f.parameters[n].slot,n+1+unsigned(f.receiver.has_value()),0);
+                    // Walk authored lexical bodies without adding recursive native frames.
+                    // Each declaration starts a scope through the end of its body: a
+                    // later declaration cannot expose an uninitialized/shadowed slot.
+                    struct Body {const std::vector<Statement>* statements; std::size_t end; unsigned parent;};
+                    std::vector<Body> bodies{{&f.body,f.source_end,0}};
+                    auto& scopes=result->debug_scopes_[f.symbol];
+                    while(!bodies.empty()) {
+                        const auto body=bodies.back();bodies.pop_back();auto scope=body.parent;
+                        const auto& statements=*body.statements;
+                        for(std::size_t n=0;n<statements.size();++n) {
+                            const auto& statement=statements[n];
+                            auto nested=scope;
+                            const auto end=n+1<statements.size()?statements[n+1].token.offset:body.end;
+                            auto enter=[&](std::size_t begin,std::size_t finish,unsigned parent) {
+                                scopes.push_back({parent,unit->source.location(begin),unit->source.location(finish)});
+                                return static_cast<unsigned>(scopes.size());
+                            };
+                            if(statement.kind==Statement::Kind::variable || statement.kind==Statement::Kind::destructure) {
+                                scope=enter(statement.token.offset,body.end,scope);nested=scope;
+                                if(statement.kind==Statement::Kind::variable)binding(statement.token,statement.slot,0,scope);
+                                else if(statement.expression->type!=error_type)
+                                    for(const auto& local:statement.bindings)binding(local.token,local.slot,0,scope);
+                            }
+                            if(!statement.body.empty()) {
+                                // Loop binders initialize at the loop token in lowered IR.
+                                auto child=enter(statement.token.offset,
+                                    statement.otherwise.empty()?end:statement.otherwise.front().token.offset,nested);
+                                if(statement.kind==Statement::Kind::loop && !statement.binder.text.empty()) {
+                                    binding(statement.binder,statement.slot,0,child,&statement.token);
+                                    if(!statement.index_binder.text.empty())binding(statement.index_binder,statement.index_slot,0,child,&statement.token);
+                                }
+                                bodies.push_back({&statement.body,statement.otherwise.empty()?end:statement.otherwise.front().token.offset,child});
+                            }
+                            if(!statement.otherwise.empty()) {
+                                const auto child=enter(statement.otherwise.front().token.offset,end,nested);
+                                bodies.push_back({&statement.otherwise,end,child});
+                            }
+                        }
                     }
                 }
                 if(f.overriding) {Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);}

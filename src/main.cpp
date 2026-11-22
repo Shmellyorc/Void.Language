@@ -635,7 +635,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             return 0;
         }
         if(argc==2 && std::string_view(argv[1])=="--capabilities") {
-            std::cout << "{\"schema\":1,\"cliPresentation\":1,\"statusPlain\":true,\"timingsSchema\":1}\n";
+            std::cout << "{\"schema\":1,\"cliPresentation\":1,\"statusPlain\":true,\"nativeApprovalStdio\":1,\"debugInfoOverride\":1,\"timingsSchema\":1}\n";
             return 0;
         }
         if(argc>=2 && std::string(argv[1])=="help") {
@@ -717,8 +717,9 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
         }
         vd::cli::PresentationOptions presentation_options;
         bool optimize=true,cache=false,no_cache=false,no_opt=false;
-        bool allow_native=false,reuse_native_approval=false;
+        bool allow_native=false,reuse_native_approval=false,editor_native_approval=false;
         bool replace_package=false;
+        std::string editor_approval_session;
         bool positional_only=false;
         bool forwarded=false;
         std::vector<std::string> application_arguments;
@@ -727,7 +728,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
         std::optional<std::string> project_entry;
         std::optional<vd::project::ProfileName> profile;
         std::string profile_key;
-        std::optional<vd::project::DebugInfo> source_debug;
+        std::optional<vd::project::DebugInfo> source_debug,debug_override;
         for(int i=2;i<argc;++i) {
             const std::string arg=argv[i];
             if(arg=="--" && command=="run" && (!operands.empty() || project_root)) {
@@ -760,6 +761,21 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             else if(arg=="--cache") {if(cache)throw UsageError("Duplicate --cache.");cache=true;optimize=false;}
             else if(arg=="--no-cache") {if(no_cache)throw UsageError("Duplicate --no-cache.");no_cache=true;}
             else if(arg=="--allow-native") {if(allow_native)throw UsageError("Duplicate --allow-native.");allow_native=true;}
+            else if(arg=="--debug-info") {
+                if(debug_override || ++i==argc)throw UsageError("Expected one --debug-info none|line|full.");
+                const std::string_view mode=argv[i];
+                if(mode=="none")debug_override=vd::project::DebugInfo::none;
+                else if(mode=="line")debug_override=vd::project::DebugInfo::line;
+                else if(mode=="full")debug_override=vd::project::DebugInfo::full;
+                else throw UsageError("Expected --debug-info none|line|full.");
+            }
+            else if(arg=="--native-approval-stdio") {
+                if(editor_native_approval || ++i==argc)throw UsageError("Expected one --native-approval-stdio session token.");
+                editor_approval_session=argv[i];
+                if(editor_approval_session.size()!=64 || !std::ranges::all_of(editor_approval_session,[](char c){return (c>='0' && c<='9') || (c>='a' && c<='f');}))
+                    throw UsageError("Expected a 64-character lowercase hexadecimal editor session token.");
+                editor_native_approval=true;
+            }
             else if(arg=="--reuse-native-approval") {
                 if(reuse_native_approval)throw UsageError("Duplicate --reuse-native-approval.");
                 reuse_native_approval=true;
@@ -810,8 +826,12 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
         if(command=="package" && !project_mode)throw UsageError("Package requires a manifest-selected application project.");
         if(allow_native && (!project_mode || command=="check"))
             throw UsageError("--allow-native requires a manifest-selected run, build or emit.");
+        if(editor_native_approval && (allow_native || reuse_native_approval || !project_mode || (command!="run" && command!="build")))
+            throw UsageError("--native-approval-stdio requires a manifest-selected run or build without other native authorization flags.");
         if(reuse_native_approval && (allow_native || !project_mode || (command!="run" && command!="build")))
             throw UsageError("--reuse-native-approval requires a manifest-selected run or build without --allow-native.");
+        if(debug_override && (!project_mode || (command!="build" && command!="emit")))
+            throw UsageError("--debug-info requires a manifest-selected build or emit.");
         if(profile && !project_mode)throw UsageError("--profile requires a manifest-selected project context.");
         if(project_entry && !project_mode)throw UsageError("--entry requires a manifest-selected project context.");
         try { presentation.configure(std::move(presentation_options),path,output); }
@@ -823,7 +843,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
         std::shared_ptr<const vd::ProjectAnalysis> project;
         std::filesystem::path selected;
         vd::AnalysisResult analysis;
-        vd::NativeApproval approval(reuse_native_approval?vd::NativeApproval::Mode::reuse_only:vd::NativeApproval::Mode::terminal);
+        vd::NativeApproval approval(editor_native_approval?vd::NativeApproval::Mode::editor:reuse_native_approval?vd::NativeApproval::Mode::reuse_only:vd::NativeApproval::Mode::terminal,editor_approval_session);
         if(project_mode) {
             const bool durable=!allow_native && (command=="run" || command=="build");
             auto result=durable?vd::analyze_manifest_project_with_native_approval(path,project_entry,
@@ -839,6 +859,11 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
                 try{selected_profile=vd::project::resolve_profile(*result.manifest,profile,no_opt,cache,
                     supports_debug?vd::project::ProfileDebugSupport::available:vd::project::ProfileDebugSupport::unavailable);}
                 catch(const std::invalid_argument& error){throw UsageError(error.what());}
+                if(debug_override) {
+                    if(!supports_debug)throw UsageError("Native debug information is unavailable for this target.");
+                    selected_profile.debug_info=*debug_override;
+                    selected_profile.cache_key+=":debug-info-override:"+std::to_string(static_cast<int>(*debug_override));
+                }
                 optimize=selected_profile.optimize;profile_key=selected_profile.cache_key;
                 presentation.configuration(true,selected_profile.name==vd::project::ProfileName::debug?"debug":"release",optimize,
                     selected_profile.debug_info==vd::project::DebugInfo::none?"none":!supports_debug?"unavailable":
@@ -884,6 +909,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
         if(application && operands.size()==2)throw UsageError("Application entries do not accept arguments.");
         vd::require_source_entry(*analysis.program);
         approval.remember();
+        approval.finish_editor_review();
         if(command=="package") {
             if(!output)output=project->root()/"dist";
             vd::project::require_outside_native_approval_store(*output,true);

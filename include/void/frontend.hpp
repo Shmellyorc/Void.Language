@@ -91,10 +91,16 @@ struct AnalyzedReference {
 };
 // Presentation-only metadata. A slot is the same typed slot copied by the
 // frontend lowerer. Argument numbers are one-based; zero denotes a local.
+struct DebugScope {
+    unsigned parent; // Zero is the function scope; child indices are one-based.
+    SourceLocation begin, end; // Half-open source extent.
+};
 struct DebugBinding {
     unsigned slot, argument;
     std::string name;
     SourceLocation source;
+    unsigned scope = 0;
+    SourceLocation storage_source; // Authored initialization site in lowered IR.
 };
 class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis> {
     friend struct AnalysisAccess;
@@ -110,6 +116,7 @@ class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis>
     std::vector<AnalyzedDeclaration> editor_declarations_;
     std::vector<AnalyzedReference> editor_references_;
     std::map<std::string,std::vector<DebugBinding>> debug_bindings_;
+    std::map<std::string,std::vector<DebugScope>> debug_scopes_;
     std::function<ir::Module()> lower_;
     ValidatedAnalysis() = default;
 public:
@@ -129,6 +136,7 @@ public:
     const auto& editor_declarations() const { return editor_declarations_; }
     const auto& editor_references() const { return editor_references_; }
     const auto& debug_bindings() const { return debug_bindings_; }
+    const auto& debug_scopes() const { return debug_scopes_; }
     const std::string& compatibility_contract() const { return contract_; }
     const std::string& constant_contract() const { return constants_; }
     // Lowers the retained validated tree; no filesystem reads or reanalysis.

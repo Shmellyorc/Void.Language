@@ -16,14 +16,15 @@ class NativeApprovalRequired : public std::runtime_error {
 
 class NativeApproval {
 public:
-    enum class Mode { terminal, reuse_only };
+    enum class Mode { terminal, reuse_only, editor };
 private:
     struct Payload;
     const Mode mode_;
     std::unique_ptr<Payload> payload_;
-    std::string id_, pending_;
+    std::string id_, pending_, editor_session_;
 public:
-    explicit NativeApproval(Mode mode);
+    explicit NativeApproval(Mode mode, std::string editor_session = {});
+    void finish_editor_review();
     ~NativeApproval();
     NativeApproval(const NativeApproval&) = delete;
     bool authorized() const { return !id_.empty(); }
