@@ -2,6 +2,7 @@
 #include "void/path.hpp"
 #include "native_cache.hpp"
 #include "target.hpp"
+#include "runtime_bool_abi.hpp"
 #include <llvm/ExecutionEngine/Orc/ObjectTransformLayer.h>
 #include <llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h>
 #include "void/backend.hpp"
@@ -139,6 +140,7 @@ void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_m
     llvm::raw_string_ostream stream(message);
     { observation::Scope timing(observation::Phase::llvm_verification);
       if (llvm::verifyModule(module, &stream)) throw std::runtime_error("invalid LLVM lowering: " + message); }
+    detail::complete_runtime_bool_abi(module);
     if (!optimize) observation::skipped(observation::Phase::llvm_optimization);
     if (optimize) {
         observation::Scope optimization_timing(observation::Phase::llvm_optimization);
@@ -1356,7 +1358,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     if(source_debug!=project::DebugInfo::none) {
         debug=std::make_unique<llvm::DIBuilder>(*module);
         file=debug_file(input.source_path.empty()?input.identity:input.source_path);
-        debug->createCompileUnit(llvm::dwarf::DW_LANG_C,file,"VOID source compiler",source_debug && optimized,"",0,"",
+        debug->createCompileUnit(llvm::dwarf::DW_LANG_C,file,"VOID source compiler",optimized,"",0,"",
             debug_types_enabled?llvm::DICompileUnit::FullDebug:llvm::DICompileUnit::LineTablesOnly);
         module->addModuleFlag(llvm::Module::Warning,"Debug Info Version",llvm::DEBUG_METADATA_VERSION);
         if(source_debug)module->addModuleFlag(llvm::Module::Warning,"Dwarf Version",4);
@@ -1421,7 +1423,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             }
             auto flags=llvm::DISubprogram::SPFlagDefinition;
             if(fn->hasLocalLinkage())flags|=llvm::DISubprogram::SPFlagLocalToUnit;
-            if(source_debug && optimized)flags|=llvm::DISubprogram::SPFlagOptimized;
+            if(optimized)flags|=llvm::DISubprogram::SPFlagOptimized;
             auto* debug_type=debug->createSubroutineType(debug->getOrCreateTypeArray(debug_types));
             subprogram=debug->createFunction(source_file,!f.display_name.empty()?f.display_name:f.source_name.empty()?f.name:f.source_name,fn->getName(),
                 source_file,f.source.line,debug_type,f.source.line,llvm::DINode::FlagPrototyped,flags);
@@ -3631,7 +3633,8 @@ std::shared_ptr<const NativeCode> Jit::compile(const ir::Module& input, const st
     observation::Scope ir_timing(observation::Phase::llvm_ir);
     auto suffix = impl_->canonical ? "__cache" : "__v" + std::to_string(++impl_->serial);
     auto context = std::make_unique<llvm::LLVMContext>();
-    auto module = lower(input, *context, suffix, impl_->jit->getDataLayout(),selected->name);
+    auto module = lower(input, *context, suffix, impl_->jit->getDataLayout(),selected->name,
+                        nullptr,nullptr,nullptr,false,{},optimize);
     module->setDataLayout(impl_->jit->getDataLayout());
     module->setTargetTriple(impl_->jit->getTargetTriple());
     ir_timing.finish();

@@ -773,6 +773,16 @@ if(BUILD_TESTING)
   target_include_directories(void_target_triple SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
   target_link_libraries(void_target_triple PRIVATE void_options ${VOID_LLVM_LIBS})
   add_test(NAME target_triple COMMAND void_target_triple)
+  add_executable(void_runtime_bool_abi tests/toolchain/RuntimeBoolAbi.cpp)
+  target_include_directories(void_runtime_bool_abi SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+  target_link_libraries(void_runtime_bool_abi PRIVATE void_options ${VOID_LLVM_LIBS})
+  add_test(NAME runtime_bool_abi COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/toolchain/runtime_bool_abi.py" "$<TARGET_FILE:void_runtime_bool_abi>"
+    "${VOID_CLANG}")
+  add_test(NAME runtime_bool_execution COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/toolchain/runtime_bool_execution.py" "$<TARGET_FILE:voidc>"
+    "${LLVM_TOOLS_BINARY_DIR}/llvm-dwarfdump${CMAKE_EXECUTABLE_SUFFIX}")
+  set_tests_properties(runtime_bool_abi runtime_bool_execution PROPERTIES TIMEOUT 300)
   if(APPLE)
     add_test(NAME macos_deployment COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/toolchain/macos_deployment.py"
       "$<TARGET_FILE:voidc>" "${CMAKE_OSX_DEPLOYMENT_TARGET}")
