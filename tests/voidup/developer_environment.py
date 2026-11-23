@@ -16,7 +16,9 @@ preserved = ['CI', 'PROGRAMDATA', 'XDG_DATA_HOME', 'XDG_CONFIG_HOME', 'XDG_CACHE
              'XDG_STATE_HOME', 'XDG_RUNTIME_DIR', 'DISPLAY', 'WAYLAND_DISPLAY',
              'XAUTHORITY', 'DBUS_SESSION_BUS_ADDRESS']
 with tempfile.TemporaryDirectory(prefix='voidup-environment-') as directory:
-    work = Path(directory)
+    # This is our existing fixture directory, not an explicit user install root.
+    # Runtime directory admission deliberately rejects symbolic ancestors.
+    work = Path(directory).resolve(strict=True)
     for source in a.source.glob('*.void'):
         shutil.copyfile(source, work/source.name)
     (work/'probe.void').write_text('''use "./manager.void" as manager
@@ -33,7 +35,7 @@ func main() -> i32:
                 print(rendered_environment)
                 return 0
     return 1
-'''.replace('PROBE_DIRECTORY', json.dumps(str(work))))
+'''.replace('PROBE_DIRECTORY', json.dumps(str(work), ensure_ascii=False)))
     environment = dict(os.environ, **{name: '/fixture/'+name for name in preserved},
                        VOID_STDLIB_ROOT=str(ROOT/'stdlib'), LD_PRELOAD='', VOID_NATIVE_CATALOG='/untrusted')
     def limits():
