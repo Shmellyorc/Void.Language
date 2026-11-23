@@ -17,6 +17,9 @@
 #include <stdio.h>
 #endif
 #include <unistd.h>
+#ifdef VOIDUP_DIRECTORY_DIAGNOSTIC
+#include "host_directory_diagnostic.hpp"
+#endif
 #endif
 namespace vd::host {
 #if defined(__linux__) || defined(__APPLE__)
@@ -92,17 +95,40 @@ std::shared_ptr<Directory> root(const std::string& requested,bool create,bool pr
         result->fd=fd;result->parent=std::move(fd);result->name=".";return result;
     }
     if(path.empty() || path[0]!='/' || path.size()>32768 || path.back()=='/' || path.find('\0')!=std::string::npos || !valid_utf8(path)) {r=error(4);return {};}
+#ifdef VOIDUP_DIRECTORY_DIAGNOSTIC
+    const auto origin=directory_diagnostic::snapshot(requested,AT_FDCWD,"/");
+#endif
     auto current=held(::open("/",O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW));
-    if(!current){r=native_error(errno);return {};}
+    if(!current){auto code=errno;
+#ifdef VOIDUP_DIRECTORY_DIAGNOSTIC
+        directory_diagnostic::failure(requested,"open",AT_FDCWD,"/",code,origin);
+#endif
+        r=native_error(code);return {};}
     std::size_t start=1;
     while(start<path.size()) {
         auto end=path.find('/',start);auto name=path.substr(start,end==std::string::npos?end:end-start);
         if(!component(name)){r=error(4);return {};}
         if(private_access && !safe_ancestor(current->value)){r=error(2);return {};}
         const bool last=end==std::string::npos;
-        if(last && create && ::mkdirat(current->value,name.c_str(),private_access?0700:0777)) {r=native_error(errno);return {};}
+        if(last && create) {
+#ifdef VOIDUP_DIRECTORY_DIAGNOSTIC
+            const auto before=directory_diagnostic::snapshot(requested,current->value,name.c_str());
+#endif
+            if(::mkdirat(current->value,name.c_str(),private_access?0700:0777)) {auto code=errno;
+#ifdef VOIDUP_DIRECTORY_DIAGNOSTIC
+                directory_diagnostic::failure(requested,"mkdirat",current->value,name.c_str(),code,before);
+#endif
+                r=native_error(code);return {};}
+        }
+#ifdef VOIDUP_DIRECTORY_DIAGNOSTIC
+        const auto before=directory_diagnostic::snapshot(requested,current->value,name.c_str());
+#endif
         auto child=held(::openat(current->value,name.c_str(),O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW));
-        if(!child){r=native_error(errno);return {};}
+        if(!child){auto code=errno;
+#ifdef VOIDUP_DIRECTORY_DIAGNOSTIC
+            directory_diagnostic::failure(requested,"openat",current->value,name.c_str(),code,before);
+#endif
+            r=native_error(code);return {};}
         if(last) {
             if(private_access && (!private_directory(child->value) || !safe_acl(child->value))){r=error(2);return {};}
             auto result=std::make_shared<Directory>();result->private_access=private_access;result->fd=std::move(child);result->parent=std::move(current);result->name=std::move(name);return result;

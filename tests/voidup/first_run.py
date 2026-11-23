@@ -18,6 +18,7 @@ from contextlib import ExitStack, nullcontext
 
 from support import ROOT, Service, encoded, sign
 from package_voidup_fixtures import produce
+from native_directory_diagnostic import begin as begin_directory_diagnostic, retain as retain_directory_diagnostic
 
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build',type=Path,required=True)
@@ -60,7 +61,7 @@ profile_acl=None
 def stack():
     import resource
     resource.setrlimit(resource.RLIMIT_STACK,(1048576,1048576))
-def run(argv,*,env=None,cwd=None,expected=0,timeout=900,data=None):
+def run(argv,*,env=None,cwd=None,expected=0,timeout=900,data=None,directory_diagnostic=None):
     started=time.monotonic()
     result=subprocess.run(list(map(str,argv)),cwd=cwd or ROOT,env=env,input=data,capture_output=True,timeout=timeout,preexec_fn=None if windows else stack)
     row={'case':str(argv[0]),'exit':result.returncode,'stdout':result.stdout.decode(errors='replace'),'stderr':result.stderr.decode(errors='replace')}
@@ -69,6 +70,8 @@ def run(argv,*,env=None,cwd=None,expected=0,timeout=900,data=None):
     rows.append(row)
     if a.isolate_producer and not a.no_evidence:
         (a.evidence/'first-run-cases.json').write_text(json.dumps(rows,indent=2)+'\n')
+    if directory_diagnostic is not None:
+        retain_directory_diagnostic(result.stderr,directory_diagnostic,a.evidence)
     assert result.returncode==expected,(argv,result.returncode,result.stdout[-2000:],result.stderr[-3000:])
     assert not any(x in result.stderr for x in [b'AddressSanitizer',b'UndefinedBehaviorSanitizer',b'LeakSanitizer'])
     return result
@@ -145,7 +148,8 @@ with (nullcontext(str(a.reuse_work.resolve())) if a.reuse_work else tempfile.Tem
         def initializer(path):return [path] if windows else ['/bin/sh',path.parent.parent/'Install VOID.command'] if macos else ['/bin/sh',installer]
         install=a.installation_root.resolve() if a.installation_root else work/"private user 雪 ' $() # %" if windows else home/'Library/Application Support/voidup' if macos else home/'data/voidup'
         initial_options=['--root',install,*([] if a.qualify_user_path else ['--no-path'])] if windows else []
-        run([*initializer(init),*initial_options,'--ca-file',service.ca],env=environment)
+        diagnostic=begin_directory_diagnostic(home) if macos and a.isolate_producer and not a.no_evidence else None
+        run([*initializer(init),*initial_options,'--ca-file',service.ca],env=environment,directory_diagnostic=diagnostic)
         control=json.loads((install/'control.json').read_text())
         assert control['current']==release['id'] and control['serial']==100
         assert not any('zzz-older.zip' in request or 'preview.zip' in request for request in service.requests)

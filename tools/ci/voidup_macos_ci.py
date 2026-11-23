@@ -18,7 +18,9 @@ class MacQualification(Qualification):
         record['source_sha256'].update({name: digest(ROOT / name) for name in (
             '.github/workflows/voidup-release.yml', 'tools/ci/voidup_macos_ci.py',
             'tools/ci/voidup_isolation.py', 'tests/voidup/first_run.py',
-            'tools/package_voidup_fixtures.py', 'tools/voidup_macos.py')})
+            'tools/package_voidup_fixtures.py', 'tools/voidup_macos.py', 'CMakeLists.txt',
+            'src/runtime/host_directory.cpp', 'src/runtime/host_directory_diagnostic.hpp',
+            'tests/voidup/native_directory_diagnostic.py')})
         self.save('identity.json', record)
 
     def http_plan(self, complete=False):
@@ -84,6 +86,7 @@ class MacQualification(Qualification):
 
     def run(self, label, argv, **kwargs):
         if label == 'configure':
+            argv = [*argv, '-DVOIDUP_DIRECTORY_DIAGNOSTIC=ON']
             cache = self.work / 'thinlto-cache'
             cache.mkdir(exist_ok=True)
             # Reuse ci-link-experiment's Apple ld cache for expensive SDK bitcode
