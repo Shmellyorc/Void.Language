@@ -411,6 +411,12 @@ int run_main(int argc,char** argv) try {
 #else
         "voidup";
 #endif
+#ifdef __APPLE__
+    // Foundation's application-support lookup need not follow an overridden
+    // HOME. Install into the same root that this bootstrap will integrate.
+    if(std::find(args.begin(),args.end(),"--root")==args.end())
+        args.insert(args.begin(),{"--root",root.u8string()});
+#endif
     auto status=run(manager,args);if(status)return status;
     safe(root,true);integration_lock lock(root);
 #ifndef _WIN32
