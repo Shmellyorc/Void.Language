@@ -279,6 +279,80 @@ struct Parent {
     }
     std::string identity_key() const {return key(identity(handle));}
 };
+#ifdef __APPLE__
+// Select only the verified OS prefix at the creation-plan boundary. Parent
+// continues to reject all symbolic components, including those below /var.
+struct MacosCreationTarget {
+    fs::path path;
+    std::optional<Parent> system, private_directory, physical;
+    struct stat alias{};
+    std::string target;
+    static uid_t system_owner() {return 0;}
+    static void require(bool condition,const char* message) {
+        if(!condition)throw std::runtime_error(message);
+    }
+    static bool same(const struct stat& a,const struct stat& b) {
+        return key(a)==key(b) && a.st_mode==b.st_mode && a.st_uid==b.st_uid && a.st_gid==b.st_gid;
+    }
+    static void trusted(const Parent& directory) {
+        const auto info=identity(directory.handle);
+        require(S_ISDIR(info.st_mode) && info.st_uid==system_owner() && !(info.st_mode&0022),
+                "Unsafe macOS creation system directory.");
+#ifdef __APPLE__
+        auto acl=acl_get_fd_np(directory.handle.fd,ACL_TYPE_EXTENDED);
+        if(!acl){require(errno==ENOENT,"Cannot verify macOS creation system ACL.");return;}
+        acl_entry_t entry{};bool safe=true;
+        for(int selected=ACL_FIRST_ENTRY;;selected=ACL_NEXT_ENTRY) {
+            if(acl_get_entry(acl,selected,&entry)){safe=errno==EINVAL;break;}
+            acl_tag_t tag{};
+            if(acl_get_tag_type(entry,&tag) || tag!=ACL_EXTENDED_DENY){safe=false;break;}
+        }
+        acl_free(acl);require(safe,"Unsafe macOS creation system ACL.");
+#endif
+    }
+    struct stat inspect(const Parent& parent,const char* name) const {
+        struct stat info{};
+        if(fstatat(parent.handle.fd,name,&info,AT_SYMLINK_NOFOLLOW))system_failure("Cannot inspect macOS creation system path");
+        return info;
+    }
+    std::string read_target() const {
+        char bytes[4096];auto count=readlinkat(system->handle.fd,"var",bytes,sizeof bytes);
+        if(count<0)system_failure("Cannot read macOS creation system alias");
+        require(count<ssize_t(sizeof bytes),"macOS creation system alias exceeds its bound.");
+        return std::string(bytes,std::size_t(count));
+    }
+    explicit MacosCreationTarget(fs::path requested):path(std::move(requested)) {
+        const fs::path system_root="/";
+        const auto lexical_alias=system_root/"var";
+        const auto relative=path.lexically_relative(lexical_alias);
+        if(relative.empty() || *relative.begin()=="..")return;
+        system.emplace(system_root);trusted(*system);
+        named(system->path,"var",true);
+        alias=inspect(*system,"var");
+        if(S_ISDIR(alias.st_mode))return;
+        if(!S_ISLNK(alias.st_mode)){errno=ENOTDIR;system_failure("macOS creation var is not a directory or system alias");}
+        require(alias.st_uid==system_owner(),"Unsafe macOS creation system alias.");
+        target=read_target();
+        require(target=="private/var" || target==(system_root/"private/var").string(),
+                "Unexpected macOS creation system alias target.");
+        private_directory.emplace(system_root/"private");
+        physical.emplace(system_root/"private/var");
+        trusted(*private_directory);trusted(*physical);
+        path=relative=="."?physical->path:physical->path/relative;
+        verify();
+    }
+    void verify() const {
+        if(!physical)return;
+        named(system->path,"var",true);
+        const auto before=inspect(*system,"var");const auto observed=read_target();const auto after=inspect(*system,"var");
+        require(same(alias,before) && same(before,after) && observed==target,"macOS creation system alias changed.");
+        require(system->identity_key()==Parent::path_key(system->path) &&
+                same(identity(private_directory->handle),inspect(*system,"private")) &&
+                same(identity(physical->handle),inspect(*private_directory,"var")),"macOS creation system directory changed.");
+        trusted(*system);trusted(*private_directory);trusted(*physical);
+    }
+};
+#endif
 struct Node {
     int parent;
     std::string name;
@@ -1229,6 +1303,10 @@ constexpr std::string_view app_editor_settings=R"json({
 
 CreationPlan plan_creation(const fs::path& requested,const CreationOptions& options,CreationEntropy entropy) {
     auto root=absolute_target(requested);
+#ifdef __APPLE__
+    MacosCreationTarget selected(root);
+    root=selected.path;
+#endif
     auto leaf=path_utf8(root.filename());
     auto portable=leaf;
     for(auto& c:portable)if(static_cast<unsigned char>(c)>=128)c='x';
@@ -1263,6 +1341,9 @@ CreationPlan plan_creation(const fs::path& requested,const CreationOptions& opti
     text+='\n';
     auto parsed=parse_manifest(SourceFile(path_utf8(root/manifest_name),std::move(text)));
     if(!parsed.succeeded())throw CompilationError(std::move(parsed.diagnostics));
+#ifdef __APPLE__
+    selected.verify();
+#endif
     return {std::move(parent),std::move(root),std::move(starter),std::move(parsed.manifest),options.nested,options.in_place,options.app_launch};
 }
 

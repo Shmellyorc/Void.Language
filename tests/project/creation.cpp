@@ -61,6 +61,31 @@ std::string read(const fs::path& file) {
     return {std::istreambuf_iterator<char>(input),{}};
 }
 
+#ifdef __APPLE__
+void macos_creation(const fs::path& root) {
+    const auto relative=root.lexically_relative("/private/var");
+    if(relative.empty() || *relative.begin()=="..") {
+        std::cout<<"creation: macOS /var case requires a temporary fixture under /private/var; not exercised\n";
+        return;
+    }
+    const auto alias=fs::path("/var")/relative;
+    CreationOptions options;options.new_directory=true;
+    auto fresh=plan_creation(alias/"alias-project",options);
+    check(fresh.root==root/"alias-project","Creation did not select the physical OS prefix");
+    publish_creation(fresh);
+    check(fs::is_regular_file(fresh.root/"void.project.toml") && fs::is_regular_file(fresh.root/"src/app.void"),
+          "Alias project lost published files");
+    fails<CreationCollision>([&]{plan_creation(alias/"ALIAS-PROJECT",options);});
+    const auto existing=root/"alias-init";fs::create_directory(existing);
+    publish_creation(plan_creation(alias/"alias-init",{}));
+    check(fs::is_regular_file(existing/"void.project.toml"),"Alias init did not publish its manifest");
+    fs::create_directory_symlink(root,root/"user-link");
+    fails([&]{plan_creation(alias/"user-link"/"must-not-exist",options);});
+    check(!fs::exists(root/"must-not-exist"),"Creation followed a user-controlled symlink");
+    std::cout<<"creation: native macOS system-prefix new, init, case collision and user-link rejection passed\n";
+}
+#endif
+
 void preparation_scratch(const fs::path& root) {
     const auto project=inspect_creation_root(root);
     fs::path scratch;
@@ -200,6 +225,9 @@ int main(int argc,char** argv) {
 
     try {
         Fixture fixture;
+#ifdef __APPLE__
+        macos_creation(fixture.root);
+#endif
         const auto preparation=fixture.root/"preparation";
         fs::create_directory(preparation);
         preparation_scratch(preparation);
