@@ -70,6 +70,18 @@ class MacLauncher(unittest.TestCase):
             release.bootstrap(Args(prefix=self.prefix, host='macos-aarch64',
                                    production=False, output=output))
 
+    def assert_bootstrap_output(self, output, operands):
+        fields = output.split(b'\0')
+        self.assertEqual(len(fields), len(operands) + 3)
+        self.assertEqual(fields[-1], b'')
+        self.assertEqual(fields[0], os.fsencode(self.download))
+        # A shell may execute the script through an absolute pathname. Its $0
+        # spelling is incidental; the bundled file identity and $@ are not.
+        bootstrap = self.download / os.fsdecode(fields[1])
+        self.assertTrue(bootstrap.is_file(), fields[1])
+        self.assertTrue(bootstrap.samefile(self.download / 'bin/voidup-init'), fields[1])
+        self.assertEqual(fields[2:-1], [operand.encode() for operand in operands])
+
     def test_extracted_launcher_arguments_cwd_and_exit_status(self):
         arguments = ['', 'two words', '雪😀', "'\"$() ; & # % * ? [x] `", 'ends\\', 'line\nbreak', '--root', 'literal']
         invocations = [
@@ -86,8 +98,28 @@ class MacLauncher(unittest.TestCase):
                                             capture_output=True, timeout=10)
                     self.assertEqual(result.returncode, status, result.stderr)
                     self.assertEqual(result.stderr, b'')
-                    expected = [str(self.download), './bin/voidup-init', *operands]
-                    self.assertEqual(result.stdout, b''.join(s.encode() + b'\0' for s in expected))
+                    self.assert_bootstrap_output(result.stdout, operands)
+
+    def test_output_contract_preserves_bytes_and_bundled_identity(self):
+        operands = ['', '雪😀', 'line\nbreak', 'ends\\']
+        fields = [os.fsencode(self.download), b'./bin/voidup-init',
+                  *[operand.encode() for operand in operands], b'']
+        for name in [b'./bin/voidup-init', os.fsencode(self.download / 'bin/voidup-init')]:
+            with self.subTest(accepted_script_name=name):
+                self.assert_bootstrap_output(b'\0'.join([fields[0], name, *fields[2:]]), operands)
+        decoy = self.unrelated / 'voidup-init'
+        decoy.write_bytes((self.download / 'bin/voidup-init').read_bytes())
+        invalid = {
+            'wrong cwd': [os.fsencode(self.unrelated), *fields[1:]],
+            'different file with identical contents': [fields[0], os.fsencode(decoy), *fields[2:]],
+            'dropped empty argument': [*fields[:2], *fields[3:]],
+            'changed argument byte': [*fields[:3], b'changed', *fields[4:]],
+            'extra argument': [*fields[:-1], b'extra', b''],
+            'missing final NUL': fields[:-1],
+        }
+        for label, bad_fields in invalid.items():
+            with self.subTest(rejected=label), self.assertRaises(AssertionError):
+                self.assert_bootstrap_output(b'\0'.join(bad_fields), operands)
 
     def test_missing_bootstrap_fails_without_running_cwd_decoy(self):
         (self.download / 'bin/voidup-init').unlink()
@@ -95,13 +127,25 @@ class MacLauncher(unittest.TestCase):
         decoy.parent.mkdir()
         decoy.write_text('#!/bin/sh\nprintf cwd-decoy-ran\nexit 0\n')
         decoy.chmod(0o755)
+        # Darwin's native sh returned 1 for this failed exec; Linux dash returns
+        # 127. Compare with the same shell's direct failure, not a generic
+        # nonzero allowance, and retain the missing-file diagnostic and decoy checks.
+        reference = subprocess.run(['/bin/sh', '-c', 'set -eu\nexec ./bin/voidup-init "$@"'],
+                                   cwd=self.download, env=self.env,
+                                   capture_output=True, timeout=10)
+        self.assertNotEqual(reference.returncode, 0, reference.stderr)
+        self.assertEqual(reference.stdout, b'')
+        self.assertIn(b'bin/voidup-init:', reference.stderr)
+        reason = reference.stderr.split(b'bin/voidup-init:', 1)[1]
+        self.assertTrue(reason.strip())
         for command in ([str(self.launcher)], ['/bin/sh', str(self.launcher)]):
             with self.subTest(command=command):
                 result = subprocess.run(command, cwd=self.unrelated, env=self.env,
                                         capture_output=True, timeout=10)
-                self.assertEqual(result.returncode, 127, result.stderr)
+                self.assertEqual(result.returncode, reference.returncode, result.stderr)
                 self.assertEqual(result.stdout, b'')
-                self.assertIn(b'voidup-init', result.stderr)
+                self.assertIn(b'bin/voidup-init:', result.stderr)
+                self.assertTrue(result.stderr.endswith(reason), result.stderr)
 
     def test_package_integrity_modes_and_reproducibility(self):
         metadata = json.loads(Path(str(self.archive) + '.json').read_bytes())
