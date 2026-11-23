@@ -247,6 +247,8 @@ func up_inventory_parse(const raw_inventory: [u8], release: up_release) -> resul
     var required_executables = ["bin/voidc", "bin/voidls", "sdk/bin/clang", "sdk/bin/ld.lld"]
     if os.platform() == "windows":
         required_executables = ["bin/voidc.exe", "bin/voidls.exe", "sdk/bin/clang.exe", "sdk/bin/lld-link.exe"]
+    else if os.platform() == "macos":
+        required_executables = ["bin/voidc", "bin/voidls", "sdk/bin/clang", "sdk/bin/ld64.lld"]
     for executable_name in required_executables:
         if not file_names.contains(executable_name) or not file_names[executable_name]:
             return Err(support.up_fail("required executable absent from inventory", "inventory"))
