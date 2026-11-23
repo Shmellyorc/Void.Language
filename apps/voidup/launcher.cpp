@@ -6,7 +6,9 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <stdexcept>
+#include <system_error>
 #include <string>
 #include <vector>
 #include <chrono>
@@ -32,6 +34,7 @@
 #ifdef __APPLE__
 #include <mach-o/dyld.h>
 #include <copyfile.h>
+#include <sys/acl.h>
 #endif
 #endif
 #ifndef VOIDUP_BOOTSTRAP_ID
@@ -107,6 +110,111 @@ fs::path default_root() {
     auto value=env("XDG_DATA_HOME");return (value.empty()?home()/".local/share":fs::path(value))/"voidup";
 #endif
 }
+#if defined(__APPLE__)
+// Only the default bootstrap root may admit the OS /var alias. The manager
+// receives the resulting physical spelling; Runtime admission remains no-follow.
+struct macos_root_selection {
+    struct pin {int parent;std::string name;std::unique_ptr<descriptor> held;struct stat identity;bool system;};
+    fs::path path;
+    std::vector<pin> pins;
+    std::vector<std::string> names;
+    std::size_t admitted=0;
+    struct stat alias{};
+    std::string target,physical;
+    bool translated=false;
+    static uid_t system_uid() { return 0; }
+    static bool same(const struct stat& a,const struct stat& b) {
+        return a.st_dev==b.st_dev && a.st_ino==b.st_ino && a.st_mode==b.st_mode && a.st_uid==b.st_uid;
+    }
+    static void native(bool ok,const char* message) {
+        if(!ok)throw std::system_error(errno,std::generic_category(),message);
+    }
+    static bool system_acl(int fd) {
+#ifdef __APPLE__
+        auto acl=acl_get_fd_np(fd,ACL_TYPE_EXTENDED);if(!acl)return errno==ENOENT;
+        acl_entry_t entry{};bool safe=true;
+        for(int selected=ACL_FIRST_ENTRY;;selected=ACL_NEXT_ENTRY) {
+            if(acl_get_entry(acl,selected,&entry)){safe=errno==EINVAL;break;}
+            acl_tag_t tag{};
+            if(acl_get_tag_type(entry,&tag) || tag!=ACL_EXTENDED_DENY){safe=false;break;}
+        }
+        acl_free(acl);return safe;
+#else
+        (void)fd;return true; // Linux test model; not a Darwin ACL claim.
+#endif
+    }
+    static void trusted(int fd,const struct stat& info) {
+        require(S_ISDIR(info.st_mode) && info.st_uid==system_uid() && !(info.st_mode&0022) && system_acl(fd),
+                "Unsafe macOS system directory");
+    }
+    bool retain(int parent,const std::string& name,bool system,bool missing=false) {
+        auto held=std::make_unique<descriptor>(-1);
+        held->fd=openat(parent,name.c_str(),O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC);
+        if(held->fd<0) {
+            auto code=errno;
+            if(missing && code==ENOENT) {
+                struct stat visible{};auto status=fstatat(parent,name.c_str(),&visible,AT_SYMLINK_NOFOLLOW);
+                require(status<0 && errno==ENOENT,"Default root ancestor changed; retry setup");
+                return false;
+            }
+            throw std::system_error(code,std::generic_category(),"Cannot open default root ancestor");
+        }
+        struct stat info{};native(!fstat(held->fd,&info),"Cannot inspect default root descriptor");
+        require(S_ISDIR(info.st_mode),"Default root ancestor is not a directory");
+        if(system)trusted(held->fd,info);
+        pins.push_back({parent,name,std::move(held),info,system});return true;
+    }
+    std::string read_target() const {
+        char bytes[4096];auto n=readlinkat(pins.front().held->fd,"var",bytes,sizeof bytes);
+        native(n>=0,"Cannot read macOS system alias");
+        require(n<ssize_t(sizeof bytes),"macOS system alias exceeds its bound");return std::string(bytes,std::size_t(n));
+    }
+    explicit macos_root_selection(const fs::path& requested):path(requested) {
+        const fs::path system_root = "/";
+        auto alias_path=(system_root/"var").string();auto raw=requested.string();
+        if(raw.compare(0,alias_path.size()+1,alias_path+"/")!=0)return;
+        auto suffix=raw.substr(alias_path.size()+1);
+        require(raw.size()<=32768 && raw.find('\0')==std::string::npos,"Invalid default root path");
+        for(std::size_t start=0;start<=suffix.size();) {
+            auto end=suffix.find('/',start);auto name=suffix.substr(start,end==std::string::npos?end:end-start);
+            require(!name.empty() && name!="." && name!=".." && name.find('\\')==std::string::npos,"Invalid default root component");
+            names.push_back(name);if(end==std::string::npos)break;start=end+1;
+        }
+        retain(AT_FDCWD,system_root.string(),true);
+        native(!fstatat(pins.front().held->fd,"var",&alias,AT_SYMLINK_NOFOLLOW),"Cannot inspect macOS system alias");
+        if(S_ISDIR(alias.st_mode))return; // Already physical; no alias exception needed.
+        if(!S_ISLNK(alias.st_mode))throw std::system_error(ENOTDIR,std::generic_category(),"macOS var is not a directory or system alias");
+        require(alias.st_uid==system_uid(),"Refusing a user-controlled macOS system alias");
+        physical=(system_root/"private/var").string();target=read_target();
+        require(target=="private/var" || target==physical,"Unexpected macOS system alias target");
+        retain(pins.front().held->fd,"private",true);
+        retain(pins.back().held->fd,"var",true);
+        path=fs::path(physical)/suffix;translated=true;
+        for(;admitted<names.size();++admitted)if(!retain(pins.back().held->fd,names[admitted],false,true))break;
+        verify();
+    }
+    void complete() {
+        if(!translated)return;
+        verify();
+        for(;admitted<names.size();++admitted)retain(pins.back().held->fd,names[admitted],false);
+        verify();
+    }
+    void verify() const {
+        if(!translated)return;
+        struct stat visible{};
+        native(!fstatat(pins.front().held->fd,"var",&visible,AT_SYMLINK_NOFOLLOW),"Cannot recheck macOS system alias");
+        auto current_target=read_target();struct stat after{};
+        native(!fstatat(pins.front().held->fd,"var",&after,AT_SYMLINK_NOFOLLOW),"Cannot recheck macOS system alias");
+        require(same(alias,visible) && same(visible,after) && current_target==target,"macOS system alias changed; retry setup");
+        for(const auto& saved:pins) {
+            struct stat held{};native(!fstat(saved.held->fd,&held),"Cannot recheck default root descriptor");
+            native(!fstatat(saved.parent,saved.name.c_str(),&visible,AT_SYMLINK_NOFOLLOW),"Cannot recheck default root ancestor");
+            require(same(saved.identity,held) && same(held,visible) && S_ISDIR(visible.st_mode),"Default root ancestor changed; retry setup");
+            if(saved.system)trusted(saved.held->fd,held);
+        }
+    }
+};
+#endif
 void safe(const fs::path& path, bool directory, bool private_mode=true) {
     require(!fs::is_symlink(fs::symlink_status(native_path(path))),"Refusing a linked integration path");
 #ifdef _WIN32
@@ -412,12 +520,19 @@ int run_main(int argc,char** argv) try {
         "voidup";
 #endif
 #ifdef __APPLE__
+    std::unique_ptr<macos_root_selection> selected_root;
     // Foundation's application-support lookup need not follow an overridden
     // HOME. Install into the same root that this bootstrap will integrate.
-    if(std::find(args.begin(),args.end(),"--root")==args.end())
+    if(std::find(args.begin(),args.end(),"--root")==args.end()) {
+        selected_root=std::make_unique<macos_root_selection>(root);root=selected_root->path;
         args.insert(args.begin(),{"--root",root.u8string()});
+        selected_root->verify();
+    }
 #endif
     auto status=run(manager,args);if(status)return status;
+#ifdef __APPLE__
+    if(selected_root)selected_root->complete();
+#endif
     safe(root,true);integration_lock lock(root);
 #ifndef _WIN32
     descriptor anchor(open(root.c_str(),O_RDONLY|O_DIRECTORY|O_NOFOLLOW|O_CLOEXEC));require(anchor.fd>=0,"Cannot retain integration root");installation_fd=anchor.fd;installation_path=root;root_still_visible();
@@ -468,6 +583,9 @@ int run_main(int argc,char** argv) try {
     }
 #ifndef _WIN32
     root_still_visible();
+#endif
+#ifdef __APPLE__
+    if(selected_root)selected_root->verify();
 #endif
     if(path_enabled)integrate_path(root/"bin");
     std::cout<<"VOID is installed. Open a new terminal and run: voidc --version\n";return 0;
