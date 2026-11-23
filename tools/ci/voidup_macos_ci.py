@@ -30,7 +30,9 @@ class MacQualification(Qualification):
         # Installation omits AWS-LC's auxiliary CLI, so it must never masquerade
         # as the complete HTTP test profile. Source archive keys remain shared.
         plan['identity']['voidup_install_only'] = digest(Path(__file__))
-        plan['deps-key'] += '-voidup-install-' + http.key(plan['identity'])
+        # A complete key must not prefix an installation-only cache key:
+        # Actions also searches primary-key prefixes without restore-keys.
+        plan['deps-key'] = 'voidup-install-v1-' + plan['deps-key'] + '-' + http.key(plan['identity'])
         return plan
 
     def selected_http_plan(self):

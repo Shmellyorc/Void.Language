@@ -93,8 +93,18 @@ jobs:
         with:
           path: ${{ steps.http.outputs.prefix }}
           key: ${{ steps.http.outputs.deps-key }}
-      - name: Restore an existing exact complete HTTP profile when available
+      # Legacy installation keys extend the complete key. A prefix lookup must
+      # never extract that stale profile into the cold bootstrap destination.
+      - name: Look up an existing exact complete HTTP profile
         if: runner.os == 'macOS' && steps.http-deps.outputs.cache-hit != 'true'
+        id: http-full-deps-lookup
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.full-deps-key }}
+          lookup-only: true
+      - name: Restore the exact complete HTTP profile
+        if: runner.os == 'macOS' && steps.http-full-deps-lookup.outputs.cache-hit == 'true'
         id: http-full-deps
         uses: actions/cache/restore@v5
         with:
@@ -103,7 +113,8 @@ jobs:
       - name: Build matching HTTP and host providers
         # A complete verified HTTP profile is a usable superset; avoid rebuilding
         # it when the smaller installation-only profile has no cache yet.
-        # Each profile is checked against its own exact seal, with no restore keys.
+        # Each restored profile is checked against its own exact seal. Partial
+        # complete-key matches stay lookup-only, including legacy install keys.
         # The actual native provider bootstrap remains mandatory on a cold cache.
         env:
           HTTP_DEPS_CACHE_HIT: ${{ steps.http-deps.outputs.cache-hit }}

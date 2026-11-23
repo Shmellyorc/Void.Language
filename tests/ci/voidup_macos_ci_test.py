@@ -3,6 +3,7 @@ import copy
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import tempfile
 import unittest
@@ -61,6 +62,8 @@ class MacPlanTests(unittest.TestCase):
         with patch.object(ci.http, 'make_plan', side_effect=lambda _: copy.deepcopy(self.plan)):
             result = self.q.http_plan()
         self.assertNotEqual(result['deps-key'], self.plan['deps-key'])
+        self.assertFalse(result['deps-key'].startswith(self.plan['deps-key']))
+        self.assertFalse(self.plan['deps-key'].startswith(result['deps-key']))
         self.assertEqual(result['sources-key'], self.plan['sources-key'])
         self.assertIn('voidup_install_only', result['identity'])
 
@@ -140,6 +143,175 @@ class MacPlanTests(unittest.TestCase):
             self.q.report()
             self.assertEqual(os.environ['INSTALL_PRIOR_JOB_STATUS'], 'failure')
             report.assert_called_once()
+
+
+class CacheRestoreTests(unittest.TestCase):
+    """Model Actions key matching/extraction; execute the real plan/seal checks.
+
+    Native dependency builds and the external binary verifier are recorded, not
+    executed. The restore gates and lookup-only input come from the real YAML.
+    """
+    def setUp(self):
+        self.scratch = tempfile.TemporaryDirectory()
+        self.addCleanup(self.scratch.cleanup)
+        self.root = Path(self.scratch.name)
+        self.env = patch.dict(os.environ, {'RUNNER_TEMP': str(self.root),
+            'INSTALL_QUALIFICATION_NAME': 'cache-model', 'HTTP_DEPS_CACHE_HIT': '',
+            'HTTP_FULL_DEPS_CACHE_HIT': ''})
+        self.env.start(); self.addCleanup(self.env.stop)
+        with patch.object(install_smoke, 'SYSTEM', 'Darwin'):
+            self.q = ci.MacQualification()
+        self.q.http = self.root / 'http'; self.q.host_prefix = self.root / 'host'
+        self.q.evidence.mkdir(parents=True)
+        self.host = dict(system='Darwin', architecture='arm64', sdk='/native/sdk',
+                         deployment_target='14.0', sdk_sha256='pinned-sdk', cmake='modeled', image_os='macos15')
+        host_patch = patch.object(ci.http, 'host_identity', return_value=self.host)
+        host_patch.start(); self.addCleanup(host_patch.stop)
+        self.install, self.full = self.q.http_plan(), self.q.http_plan(complete=True)
+        # Point only the verifier's destination at disposable storage. All
+        # generated keys/identities still come from the actual recipe and pins.
+        self.root_patch = patch.object(ci.http, 'ROOT', self.root)
+        self.entries = {}; self.downloaded = []; self.lookups = []
+        self.executed = []; self.native_verifications = []
+        text = (ROOT / '.github/workflows/voidup-release.yml').read_text()
+        self.steps = {}
+        for block in re.split(r'(?m)^      - ', text)[1:]:
+            fields = dict(re.findall(r'(?m)^\s+(id|if|uses|path|key|lookup-only): (.+)$', block))
+            if fields.get('uses') == 'actions/cache/restore@v5' and fields.get('id', '').startswith('http-'):
+                self.steps[fields['id']] = fields
+
+    def populate(self, plan):
+        self.q.http.mkdir(parents=True)
+        manifest = self.q.http / 'VOID-HTTP-DEPENDENCIES.json'
+        manifest.write_text(json.dumps(dict(platform='Darwin', architecture='arm64', sdk='/native/sdk',
+            deployment_target='14.0', files={'lib/fixture.a': 'modeled-bytes'})))
+        ci.http.save(self.q.http, 'VOID-HTTP-CI-IDENTITY.json',
+            dict(identity=plan['identity'], manifest_sha256=ci.http.digest(manifest)))
+
+    def restore(self, key, lookup=False):
+        # GitHub tries exact first, then primary-key prefix matches, even with
+        # no restore-keys. Dict insertion order models the newest partial entry.
+        matched = key if key in self.entries else next((k for k in reversed(self.entries) if k.startswith(key)), '')
+        output = {'cache-hit': str(matched == key).lower() if matched else '', 'cache-matched-key': matched}
+        if lookup:
+            self.lookups.append(matched)
+        elif matched:
+            self.populate(self.entries[matched]); self.downloaded.append(matched)
+        return output
+
+    def workflow(self, evict_full_after_lookup=False):
+        outputs = {}
+        for name in ['http-deps', 'http-full-deps-lookup', 'http-full-deps']:
+            step = self.steps[name]
+            execute = True
+            for term in step['if'].split(' && '):
+                if term == "runner.os == 'macOS'":continue
+                match = re.fullmatch(r"steps.([\w-]+).outputs.cache-hit (==|!=) 'true'", term)
+                self.assertIsNotNone(match, term)
+                actual = outputs.get(match[1], {}).get('cache-hit', '')
+                execute = execute and ((actual == 'true') if match[2] == '==' else (actual != 'true'))
+            if not execute:continue
+            field = re.fullmatch(r'\$\{\{ steps.http.outputs.([\w-]+) \}\}', step['key'])[1]
+            key = self.install['deps-key'] if field == 'deps-key' else self.full['deps-key']
+            self.assertEqual(step['path'], '${{ steps.http.outputs.prefix }}')
+            outputs[name] = self.restore(key, step.get('lookup-only', 'false') == 'true')
+            if evict_full_after_lookup and name == 'http-full-deps-lookup':
+                self.entries.pop(self.full['deps-key'], None)
+        os.environ['HTTP_DEPS_CACHE_HIT'] = outputs.get('http-deps', {}).get('cache-hit', '')
+        os.environ['HTTP_FULL_DEPS_CACHE_HIT'] = outputs.get('http-full-deps', {}).get('cache-hit', '')
+        return outputs
+
+    def dependencies(self):
+        def execute(label, argv, **kwargs):
+            self.executed.append(label)
+            if label == 'http-bootstrap':
+                self.assertIn('--macos-install-only', argv); self.populate(self.install)
+        def verify(evidence, label, argv):
+            self.native_verifications.append(list(map(str, argv)))
+            self.assertEqual(argv[-3:], ['Release', 'Darwin', 'arm64'])
+        # Use real verify_prefix (including seal and native-command selection).
+        # The existing provider verifier itself remains unchanged and unmocked
+        # in production; unit execution records its subprocess here.
+        with self.root_patch, patch.object(self.q, 'selected_http_plan', return_value=
+                self.full if os.environ['HTTP_FULL_DEPS_CACHE_HIT'] == 'true' else self.install), \
+                patch.object(self.q, 'run', side_effect=execute), patch.object(ci.http, 'run', side_effect=verify), \
+                patch.object(self.q, 'verify_dependencies'):
+            selected = self.q.selected_http_plan()
+            selected = copy.deepcopy(selected); selected['prefix'] = 'http'
+            with patch.object(self.q, 'selected_http_plan', return_value=selected):self.q.dependencies()
+
+    def test_exact_installation_hit_reuses_and_verifies(self):
+        self.entries[self.install['deps-key']] = self.install
+        self.workflow(); self.dependencies()
+        self.assertEqual(self.downloaded, [self.install['deps-key']]); self.assertEqual(self.lookups, [])
+        self.assertEqual(self.executed, ['host-bootstrap']); self.assertEqual(len(self.native_verifications), 1)
+
+    def test_exact_complete_hit_reuses_its_own_identity(self):
+        self.entries[self.full['deps-key']] = self.full
+        self.entries[self.full['deps-key'] + '-voidup-install-' + '0' * 64] = self.install
+        self.workflow(); self.dependencies()
+        self.assertEqual(self.downloaded, [self.full['deps-key']]); self.assertEqual(self.executed, ['host-bootstrap'])
+        seal = json.loads((self.q.http / 'VOID-HTTP-CI-IDENTITY.json').read_text())
+        self.assertEqual(seal['identity'], self.full['identity']); self.assertEqual(len(self.native_verifications), 1)
+
+    def test_legacy_partial_match_is_not_extracted_and_cold_bootstraps(self):
+        legacy = self.full['deps-key'] + '-voidup-install-' + '0' * 64
+        self.entries[legacy] = self.install
+        outputs = self.workflow()
+        self.assertEqual(outputs['http-full-deps-lookup']['cache-hit'], 'false')
+        self.assertEqual(self.lookups, [legacy]); self.assertFalse(self.q.http.exists())
+        self.dependencies()
+        self.assertEqual(self.downloaded, []); self.assertEqual(self.executed, ['http-bootstrap', 'host-bootstrap'])
+        self.assertEqual(len(self.native_verifications), 1)
+
+    def test_original_direct_restore_reproduces_the_collision(self):
+        legacy = self.full['deps-key'] + '-voidup-install-' + '0' * 64
+        self.entries[legacy] = self.install
+        output = self.restore(self.full['deps-key'])
+        self.assertEqual(output['cache-hit'], 'false'); self.assertTrue(self.q.http.exists())
+        with self.assertRaisesRegex(RuntimeError, 'prefix exists on a cache miss'):self.dependencies()
+        self.assertEqual(self.executed, []); self.assertEqual(self.native_verifications, [])
+
+    def test_genuine_miss_bootstraps_and_seals(self):
+        self.workflow(); self.dependencies()
+        self.assertEqual(self.executed, ['http-bootstrap', 'host-bootstrap'])
+        seal = json.loads((self.q.http / 'VOID-HTTP-CI-IDENTITY.json').read_text())
+        self.assertEqual(seal['identity'], self.install['identity']); self.assertEqual(len(self.native_verifications), 1)
+
+    def test_unexpected_prefix_is_not_adopted_or_removed(self):
+        self.q.http.mkdir(); sentinel = self.q.http / 'unverified'; sentinel.write_text('preserve')
+        self.workflow()
+        with self.assertRaisesRegex(RuntimeError, 'prefix exists on a cache miss'):self.dependencies()
+        self.assertEqual(sentinel.read_text(), 'preserve'); self.assertEqual(self.executed, [])
+
+    def test_exact_key_with_corrupt_manifest_is_rejected(self):
+        self.entries[self.install['deps-key']] = self.install; self.workflow()
+        manifest = self.q.http / 'VOID-HTTP-DEPENDENCIES.json'; manifest.write_text(manifest.read_text() + '\n')
+        with self.assertRaisesRegex(RuntimeError, 'identity/manifest mismatch'):self.dependencies()
+        self.assertEqual(self.executed, []); self.assertEqual(self.native_verifications, [])
+
+    def test_exact_install_key_cannot_adopt_a_complete_profile_seal(self):
+        self.entries[self.install['deps-key']] = self.full; self.workflow()
+        with self.assertRaisesRegex(RuntimeError, 'identity/manifest mismatch'):self.dependencies()
+        self.assertEqual(self.executed, []); self.assertEqual(self.native_verifications, [])
+
+    def test_diagnostic_driver_edit_changes_only_install_identity(self):
+        with patch.object(ci, 'digest', return_value='changed-diagnostic-driver'):
+            changed, full = self.q.http_plan(), self.q.http_plan(complete=True)
+        self.assertNotEqual(changed['deps-key'], self.install['deps-key'])
+        self.assertEqual(full, self.full); self.assertEqual(changed['sources-key'], self.install['sources-key'])
+        self.assertFalse(changed['deps-key'].startswith(full['deps-key']))
+        self.entries[self.install['deps-key']] = self.install; self.install = changed
+        self.workflow(); self.dependencies()
+        self.assertEqual(self.downloaded, []); self.assertEqual(self.executed, ['http-bootstrap', 'host-bootstrap'])
+
+    def test_eviction_between_lookup_and_restore_fails_closed(self):
+        self.entries[self.full['deps-key']] = self.full
+        legacy = self.full['deps-key'] + '-voidup-install-' + '0' * 64
+        self.entries[legacy] = self.install
+        self.workflow(evict_full_after_lookup=True)
+        with self.assertRaisesRegex(RuntimeError, 'prefix exists on a cache miss'):self.dependencies()
+        self.assertEqual(self.executed, []); self.assertEqual(self.native_verifications, [])
 
 
 if __name__ == '__main__':
