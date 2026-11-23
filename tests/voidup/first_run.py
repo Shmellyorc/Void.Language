@@ -19,6 +19,7 @@ from contextlib import ExitStack, nullcontext
 from support import ROOT, Service, encoded, sign
 from package_voidup_fixtures import produce
 from native_directory_diagnostic import begin as begin_directory_diagnostic, retain as retain_directory_diagnostic
+import negative_security as negative
 
 p=argparse.ArgumentParser(description=__doc__)
 p.add_argument('--build',type=Path,required=True)
@@ -232,22 +233,54 @@ with (nullcontext(str(a.reuse_work.resolve())) if a.reuse_work else tempfile.Tem
         run([manager_proxy,'doctor'],env=environment)
         assert json.loads((install/'control.json').read_text())['current']==next_release['id']
         assert sentinel.read_text()=='Preserve developer files\n'
-        # An unauthenticated first run must not publish tools or touch profiles.
+        # Admit only the existing fixture parent independently. Explicit roots
+        # remain literal; append fresh names to its physical spelling afterwards.
+        negative_parent=negative.admitted_parent(cases,compiler_proxy,
+            lambda command: run(command,env=environment),work)
+        control_before_negatives=(install/'control.json').read_bytes()
+        # An unauthenticated first run must reach the authentication gate, not
+        # merely return the same exit code for an unrelated filesystem refusal.
         service.catalog(catalog,signers=(1,))
-        rejected=cases/'bad-signature-root'
-        run([*initializer(reinit),'--root',rejected,'--no-path','--ca-file',service.ca],env=environment,expected=1)
-        assert not list((rejected/'toolchains').iterdir()) and not (rejected/'bin').exists()
+        rejected=negative.fresh_root(negative_parent,'bad-signature-root')
+        failure=run([*initializer(reinit),'--root',rejected,'--no-path','--ca-file',service.ca],env=environment,expected=1)
+        negative.refusal(failure,negative.AUTHENTICATE)
+        negative.rejected_state(rejected)
         assert profile_before=={p.name:p.read_bytes() for p in home.iterdir() if p.is_file()}
+        assert (install/'control.json').read_bytes()==control_before_negatives
+        if macos:
+            # Separate filesystem refusal coverage. It must never be counted as
+            # evidence that the one-signature envelope reached authentication.
+            raw_parent=negative.literal_var_parent(negative_parent)
+            raw_root=negative.fresh_root(raw_parent,'raw-alias-refusal-root')
+            parent_entries={p.name for p in negative_parent.iterdir()}
+            failure=run([*initializer(reinit),'--root',raw_root,'--no-path','--ca-file',service.ca],env=environment,expected=1,directory_diagnostic=diagnostic)
+            negative.filesystem_refusal(failure,raw_root)
+            assert parent_entries=={p.name for p in negative_parent.iterdir()}
+            assert profile_before=={p.name:p.read_bytes() for p in home.iterdir() if p.is_file()}
+            assert (install/'control.json').read_bytes()==control_before_negatives
         # New commands still use the existing authenticated freshness floor.
         service.catalog(catalog)
-        run([manager_proxy,'--ca-file',service.ca,'update'],env=environment,expected=1)
+        failure=run([manager_proxy,'--ca-file',service.ca,'update'],env=environment,expected=1)
+        negative.refusal(failure,('freshness','catalog serial replay'))
         assert json.loads((install/'control.json').read_text())['serial']==101
         ambiguous=copy.deepcopy(newer);ambiguous['serial']=102;ambiguous['releases'].append(dict(release,id='ambiguous'))
         service.catalog(ambiguous)
-        run([*initializer(reinit),'--root',cases/'ambiguous-root','--no-path','--ca-file',service.ca],env=environment,expected=1)
+        ambiguous_root=negative.fresh_root(negative_parent,'ambiguous-root')
+        failure=run([*initializer(reinit),'--root',ambiguous_root,'--no-path','--ca-file',service.ca],env=environment,expected=1)
+        negative.refusal(failure,negative.AMBIGUOUS)
+        negative.rejected_state(ambiguous_root,catalog=ambiguous,
+            raw_catalog=service.overrides['/catalog.json'][1],raw_signatures=service.overrides['/catalog.json.sig'][1])
+        assert profile_before=={p.name:p.read_bytes() for p in home.iterdir() if p.is_file()}
+        assert (install/'control.json').read_bytes()==control_before_negatives
         absent=copy.deepcopy(newer);absent['serial']=103;absent['releases']=[preview,wrong_host]
         service.catalog(absent)
-        run([*initializer(reinit),'--root',cases/'unsupported-root','--no-path','--ca-file',service.ca],env=environment,expected=1)
+        unsupported_root=negative.fresh_root(negative_parent,'unsupported-root')
+        failure=run([*initializer(reinit),'--root',unsupported_root,'--no-path','--ca-file',service.ca],env=environment,expected=1)
+        negative.refusal(failure,negative.UNSUPPORTED)
+        negative.rejected_state(unsupported_root,catalog=absent,
+            raw_catalog=service.overrides['/catalog.json'][1],raw_signatures=service.overrides['/catalog.json.sig'][1])
+        assert profile_before=={p.name:p.read_bytes() for p in home.iterdir() if p.is_file()}
+        assert (install/'control.json').read_bytes()==control_before_negatives
         # Unsafe shell profiles remain unchanged; native installation can be
         # retried with --no-path and does not weaken root/inventory admission.
         service.catalog(newer)
@@ -263,9 +296,12 @@ with (nullcontext(str(a.reuse_work.resolve())) if a.reuse_work else tempfile.Tem
         # automatic version merely because the release ID looks like one.
         legacy_release={k:v for k,v in release.items() if k!='selection'}
         legacy=dict(catalog,serial=90,min_manager=1,releases=[legacy_release]);service.catalog(legacy)
-        native_manager=moved/'bin'/('voidup'+suffix);legacy_root=cases/'legacy-root'
+        native_manager=moved/'bin'/('voidup'+suffix);legacy_root=negative.fresh_root(negative_parent,'legacy-root')
         legacy_options=[native_manager,'--root',legacy_root,'--ca-file',service.ca]
-        run([*legacy_options,'setup'],env=environment,expected=1)
+        failure=run([*legacy_options,'setup'],env=environment,expected=1)
+        negative.refusal(failure,negative.UNSUPPORTED)
+        negative.rejected_state(legacy_root,catalog=legacy,
+            raw_catalog=service.overrides['/catalog.json'][1],raw_signatures=service.overrides['/catalog.json.sig'][1])
         run([*legacy_options,'install',release['id'],'--activate'],env=environment)
         run([*legacy_options,'verify',release['id']],env=environment)
         run([*legacy_options,'run','default','voidc','--','--version'],env=environment)
