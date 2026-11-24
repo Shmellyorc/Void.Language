@@ -11,6 +11,7 @@ from pathlib import Path
 import platform
 import re
 import signal
+import shlex
 import shutil
 import struct
 import subprocess
@@ -318,24 +319,36 @@ class Qualification:
             if not re.search(rb'\b23\.1\.4(?:\D|$)', result.stdout + result.stderr):
                 raise RuntimeError('Pinned LLVM tool version mismatch: ' + name)
         thin = False
+        apple_ld = ''
         decision = dict(requested=self.profile == 'Release', enabled=False,
                         intended_targets='compiler and qualification harness only; Runtime/native resources excluded')
         if self.profile == 'Release':
+            apple_ld = self.run('apple-linker', ['xcrun', '--find', 'ld']).stdout.decode().strip()
+            if not Path(apple_ld).is_absolute() or not Path(apple_ld).is_file():
+                raise RuntimeError('Selected Xcode linker unavailable')
+            decision['linker'] = apple_ld
+            decision['libLTO'] = str(self.sdk / 'lib/libLTO.dylib')
+            if not Path(decision['libLTO']).is_file():
+                raise RuntimeError('Pinned LLVM libLTO unavailable')
             probe = self.work / 'thinlto-probe'
             probe.mkdir()
-            (probe / 'value.cpp').write_text('int answer() { return 23; }\n')
-            (probe / 'main.cpp').write_text('extern int answer(); int main() { return answer()==23 ? 0 : 1; }\n')
+            (probe / 'value.cpp').write_text('#include <stdexcept>\n__attribute__((noinline)) int answer(int n) { if(n!=23) throw std::invalid_argument("stale version"); return n; }\n')
+            (probe / 'main.cpp').write_text('#include <stdexcept>\nextern int answer(int); int main(int argc,char**) { try { answer(argc); } catch(const std::invalid_argument&) { return answer(23)==23 ? 0 : 1; } return 2; }\n')
             try:
                 for stem in ('value', 'main'):
-                    self.run('thin-compile-' + stem, [os.environ['CXX'], '-O2', '-flto=thin', '-isysroot', os.environ['SDKROOT'],
+                    self.run('thin-compile-' + stem, [os.environ['CXX'], '-O3', '-fno-rtti', '-flto=thin', '-stdlib=libc++',
+                        '-nostdinc++', '-isystem', str(Path(os.environ['SDKROOT']) / 'usr/include/c++/v1'), '-isysroot', os.environ['SDKROOT'],
                         '-mmacosx-version-min=14.0', '-c', probe / (stem + '.cpp'), '-o', probe / (stem + '.o')])
-                self.run('thin-link', [os.environ['CXX'], '-fuse-ld=lld', '--ld-path=' + str(lld), '-flto=thin', '-Wl,--thinlto-jobs=2',
+                self.run('thin-link', [os.environ['CXX'], '-fuse-ld=ld', '--ld-path=' + apple_ld, '-flto=thin', '-Wl,-mllvm,-threads=2',
+                    '-Wl,-lto_library,' + decision['libLTO'],
                     '-Wl,-cache_path_lto,' + str(probe / 'cache'), '-isysroot', os.environ['SDKROOT'],
                     '-mmacosx-version-min=14.0', probe / 'main.o', probe / 'value.o', '-o', probe / 'probe'])
                 self.run('thin-native-execution', [probe / 'probe'])
                 thin = True
             except (RuntimeError, subprocess.TimeoutExpired) as error:
-                decision['fallback_reason'] = str(error)
+                decision['failure'] = str(error)
+                save(self.evidence / 'thinlto-decision.json', decision)
+                raise  # This repair must qualify ThinLTO, never a non-LTO fallback.
         decision['enabled'] = thin
         save(self.evidence / 'thinlto-decision.json', decision)
         cache = self.work / 'thinlto-cache'
@@ -349,6 +362,8 @@ class Qualification:
             '-DCMAKE_RANLIB=' + str(self.sdk / 'bin/llvm-ranlib'),
             '-DCMAKE_PROJECT_VoidLanguage_INCLUDE=' + str(POLICY / 'native-targets.cmake'),
             '-DPUBLISH_STAGE_A_THINLTO=' + ('ON' if thin else 'OFF'), '-DPUBLISH_STAGE_A_LLD=' + str(lld),
+            '-DPUBLISH_STAGE_A_APPLE_LD=' + apple_ld,
+            '-DPUBLISH_STAGE_A_LIBLTO=' + str(self.sdk / 'lib/libLTO.dylib'),
             '-DPUBLISH_STAGE_A_LTO_CACHE=' + str(cache)]
         self.run('configure', command, timeout=600)
         selector = '^(' + '|'.join(TESTS) + ')$'
@@ -380,6 +395,30 @@ class Qualification:
             shutil.copyfile(self.build / name, self.evidence / name)
 
     def protocol(self):
+        if self.profile == 'Release':
+            # Relink identical bitcode inputs with the original linker. A
+            # failing control plus a passing corrected link isolates linking
+            # from source changes, lifecycle cleanup and CTest scheduling.
+            commands = self.run('protocol-link-commands', ['ninja', '-C', self.build, '-t', 'commands', 'voidls']).stdout.decode()
+            link = next(line for line in commands.splitlines() if ' -o voidls ' in line)
+            argv = shlex.split(link)[2:-2]  # Ninja's ': && ... && :' wrapper.
+            argv = [arg.replace('-fuse-ld=ld', '-fuse-ld=lld') if arg == '-fuse-ld=ld' else
+                    '--ld-path=' + str(self.sdk / 'bin/ld64.lld') if arg.startswith('--ld-path=') else arg for arg in argv]
+            at = argv.index('-mllvm')
+            if argv[at-1:at+3] != ['-Xlinker', '-mllvm', '-Xlinker', '-threads=2']:
+                raise RuntimeError('Unexpected Apple ThinLTO thread arguments')
+            argv[at-1:at+3] = ['-Xlinker', '--thinlto-jobs=2']
+            control = self.build / 'voidls-lld-control'
+            argv[argv.index('-o') + 1] = str(control)
+            self.run('protocol-lld-link', argv, cwd=self.build)
+            self.run('protocol-lld-control', [sys.executable, '-B', POLICY / 'protocol_repro.py',
+                     ROOT, control, self.evidence / 'protocol-lld-control'], expected=1, timeout=180)
+            records = json.loads((self.evidence / 'protocol-lld-control/pipe-processes.json').read_text())
+            if not any(r['status_before_cleanup'] == -6 and not r['stdin_closed'] and
+                       'uncaught exception of type std::invalid_argument' in r['stderr'] for r in records):
+                raise RuntimeError('Original linker control did not reproduce the diagnosed abort')
+            for label, image in [('lld-control', control), ('corrected', self.build / 'voidls')]:
+                self.run('protocol-unwind-' + label, [self.sdk / 'bin/llvm-objdump', '--unwind-info', image])
         self.run('protocol-independent', [sys.executable, '-B', POLICY / 'protocol_repro.py',
                  ROOT, self.build / 'voidls', self.evidence / 'protocol-independent'], timeout=180,
                  env=dict(os.environ, VOID_CRASH_DIRECTORY=str(self.evidence / 'protocol-crashes')))
