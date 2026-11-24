@@ -381,7 +381,8 @@ class Qualification:
 
     def protocol(self):
         self.run('protocol-independent', [sys.executable, '-B', POLICY / 'protocol_repro.py',
-                 ROOT, self.build / 'voidls', self.evidence / 'protocol-independent'], timeout=180)
+                 ROOT, self.build / 'voidls', self.evidence / 'protocol-independent'], timeout=180,
+                 env=dict(os.environ, VOID_CRASH_DIRECTORY=str(self.evidence / 'protocol-crashes')))
 
     def tests(self):
         selector = '^(' + '|'.join(TESTS) + ')$'

@@ -8,6 +8,7 @@ def retain(self, kind, value, tb):
     if isinstance(value, EOFError) and status is None:
         try:status=self.process.wait(timeout=2)
         except subprocess.TimeoutExpired:pass
+    if status is not None:self.logger.join(timeout=5)
     record=dict(argv=self.process.args,error_type=kind.__name__ if kind else None,error=str(value) if value else None,
                 status_before_cleanup=status,stdin_closed=self.process.stdin.closed,stdout_closed=self.process.stdout.closed)
     try:return original(self,kind,value,tb)
