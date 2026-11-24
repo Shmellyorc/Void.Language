@@ -81,7 +81,7 @@ try:
     for flags in [[],['--no-opt']]:run([compiler,'run',root,'--no-cache',*flags],23,b'IMPORTED\n')
     run([compiler,'build','--project',root,'-o',exe]);run([exe],23,b'IMPORTED\n')
     # Default output belongs to the manifest root, not the nested entry directory.
-    run([compiler,'build',root]);default=root/'build'/('launcher.exe' if os.name=='nt' else 'launcher');assert default.is_file();run([default],23,b'IMPORTED\n')
+    run([compiler,'build',root]);default=root/'.void'/'build'/('launcher.exe' if os.name=='nt' else 'launcher');assert default.is_file();run([default],23,b'IMPORTED\n')
     # Nested malformed manifests still exclude children and reject E crossings.
     write('src/child/void.project.toml','[=roject]');write('src/child/child.void',main)
     run([compiler,'check',root]);run([compiler,'run','--project',root,'--entry','src/child/child.void'],1,contains=b'VOID5009')

@@ -663,12 +663,30 @@ public:
             return finish();
         }
         const auto& root = result.table();
-        fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements"});
         const auto* schema = root.get("schema");
-        if (!schema || !schema->is_integer() || schema->ref<std::int64_t>() != 1) {
-            fail(Code::project_schema, schema ? span(schema->source()) : eof(), "Project schema must be integer 1.",
-                "Add schema = 1, or use a matching compiler for another schema; schema is not the project's semantic version.");
+        if (!schema || !schema->is_integer() || (schema->ref<std::int64_t>() != 1 && schema->ref<std::int64_t>() != 2)) {
+            fail(Code::project_schema, schema ? span(schema->source()) : eof(), "Project schema must be integer 1 or 2.",
+                "Use a matching compiler for another schema; schema is not the project's semantic version.");
             return finish();
+        }
+        manifest_->schema_ = static_cast<unsigned>(schema->ref<std::int64_t>());
+        if (manifest_->schema_ == 1)
+            fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements"});
+        else {
+            fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements", "publish"});
+            if (auto* publishing = table(root, "publish")) {
+                fields(*publishing, "publish", {"target", "default_profile"});
+                if (auto target = text(*publishing, "target", false)) {
+                    if (*target != "linux-x64" && *target != "windows-x64" && *target != "macos-arm64")
+                        fail(Code::project_reserved, span(publishing->get("target")->source()), "Unsupported publishing target.", "Stage A recognizes linux-x64, windows-x64 and macos-arm64 contracts; emission remains unavailable.");
+                    else manifest_->publishing_.target = *target;
+                }
+                if (auto profile = text(*publishing, "default_profile", false)) {
+                    if (*profile != "release" && *profile != "performance" && *profile != "protected")
+                        fail(Code::project_reserved, span(publishing->get("default_profile")->source()), "Unsupported publishing profile.", "Use release, performance or protected; Stage A enables no profile capability.");
+                    else manifest_->publishing_.default_profile = *profile;
+                }
+            }
         }
         auto* project = table(root, "project", true);
         if (!project) return finish();

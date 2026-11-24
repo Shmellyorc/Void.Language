@@ -320,6 +320,11 @@ set(verified_raylib_preparer "${CMAKE_CURRENT_BINARY_DIR}/verified-packages/rayl
 configure_file(verified-packages/raylib-prepare.void "${verified_raylib_preparer}" COPYONLY)
 file(SHA256 "${verified_raylib_preparer}" verified_raylib_preparer_sha256)
 install(FILES "${verified_raylib_preparer}" DESTINATION share/void/verified-packages COMPONENT compiler)
+add_library(void_publish src/publish.cpp src/binary_audit.cpp)
+target_link_libraries(void_publish PUBLIC void_core)
+target_include_directories(void_publish SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+target_compile_options(void_publish PRIVATE ${VOID_LLVM_DEFINITIONS})
+target_link_libraries(void_publish PRIVATE ${VOID_CORE_LLVM_LIBS})
 add_library(voidc_objects OBJECT src/main.cpp src/native_approval.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
 target_compile_definitions(voidc_objects PRIVATE VOID_RAYLIB_BUILD_ROOT="${verified_raylib_build_root}"
   VOID_RAYLIB_SANITIZE=$<BOOL:${VOID_SANITIZERS}>
@@ -331,9 +336,9 @@ target_compile_definitions(voidc_objects PRIVATE VOID_RAYLIB_BUILD_ROOT="${verif
   VOID_RAYLIB_SUBDIR="${verified_raylib_subdirectory}" VOID_RAYLIB_VERSION="${verified_raylib_version}")
 target_compile_definitions(voidc_objects PRIVATE VOID_COMPILER_VERSION="${PROJECT_VERSION}")
 target_include_directories(voidc_objects SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
-target_link_libraries(voidc_objects PRIVATE void_llvm)
-set(cache_identity_inputs "$<TARGET_FILE:void_crash_diagnostics>;$<TARGET_OBJECTS:voidc_objects>;$<TARGET_FILE:void_llvm>;$<TARGET_FILE:void_core>;$<TARGET_FILE:void_runtime>;$<TARGET_FILE:void_native_fixture>")
-set(cache_identity_deps void_crash_diagnostics void_llvm void_core void_runtime void_native_fixture "$<TARGET_OBJECTS:voidc_objects>")
+target_link_libraries(voidc_objects PRIVATE void_llvm void_publish)
+set(cache_identity_inputs "$<TARGET_FILE:void_crash_diagnostics>;$<TARGET_OBJECTS:voidc_objects>;$<TARGET_FILE:void_llvm>;$<TARGET_FILE:void_publish>;$<TARGET_FILE:void_core>;$<TARGET_FILE:void_runtime>;$<TARGET_FILE:void_native_fixture>")
+set(cache_identity_deps void_crash_diagnostics void_llvm void_publish void_core void_runtime void_native_fixture "$<TARGET_OBJECTS:voidc_objects>")
 set(host_identity_inputs ${VOID_HOST_LINK_FILES}
   "${PROJECT_SOURCE_DIR}/third_party/host-versions.json"
   "${PROJECT_SOURCE_DIR}/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json"
@@ -380,7 +385,7 @@ add_library(void_cache_identity STATIC "${CMAKE_CURRENT_BINARY_DIR}/cache-identi
 target_link_libraries(void_cache_identity PRIVATE void_options)
 add_dependencies(void_cache_identity voidc_objects)
 add_executable(voidc $<TARGET_OBJECTS:voidc_objects>)
-target_link_libraries(voidc PRIVATE void_llvm void_cache_identity void_crash_diagnostics)
+target_link_libraries(voidc PRIVATE void_llvm void_publish void_cache_identity void_crash_diagnostics)
 if(WIN32)
   target_link_libraries(voidc PRIVATE advapi32)
 endif()
@@ -441,6 +446,14 @@ if(BUILD_TESTING)
   target_link_libraries(void_project_manifest PRIVATE void_core)
   add_test(NAME project_manifest COMMAND void_project_manifest)
   set_tests_properties(project_manifest PROPERTIES TIMEOUT 60)
+  add_executable(void_publish_foundation tests/project/publish.cpp)
+  target_link_libraries(void_publish_foundation PRIVATE void_publish)
+  add_test(NAME publish_contracts COMMAND void_publish_foundation)
+  set_tests_properties(publish_contracts PROPERTIES TIMEOUT 60)
+  add_test(NAME publish_binary_fixtures COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/project/publish_fixtures.py" "$<TARGET_FILE:void_publish_foundation>"
+    "$<TARGET_FILE:voidc>" "${LLVM_TOOLS_BINARY_DIR}/llvm-readobj${CMAKE_EXECUTABLE_SUFFIX}")
+  set_tests_properties(publish_binary_fixtures PROPERTIES TIMEOUT 60)
   add_test(NAME project_dependencies COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/dependencies.py" "$<TARGET_FILE:voidc>" "${CMAKE_C_COMPILER}")
   set_tests_properties(project_dependencies PROPERTIES TIMEOUT 300)

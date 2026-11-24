@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 compiler = Path(sys.argv[1]).resolve()
 checks = 0
@@ -52,8 +53,9 @@ for command in ('crashes', 'check', 'run', 'build', 'emit', 'init', 'new', 'add'
         assert result.stdout.decode('utf-8').splitlines()[:2] == ['VOID Language Compiler v0.1.0 (development)', 'LLVM 23.1.4']
 
 # Top-level columns come from the command inventory, not literal padding.
-rows = full_help.decode().split('Commands:\n', 1)[1].split('\nOptions:', 1)[0].strip('\n').splitlines()
-assert len(rows) == 16
+help_lines = full_help.decode().splitlines()
+rows = [line for line in help_lines[help_lines.index('Commands:')+1:help_lines.index('Options:')] if line]
+assert len(rows) == 17  # Includes the fail-closed Stage A publish contract.
 assert {re.match(r'  (\S+)( +)(.+)', line).start(3) for line in rows} == {15}
 assert all('\t' not in line for line in rows)
 for command, flags in {'run': ['--cache', '--no-cache'], 'build': ['-o PATH', '--no-opt'],
@@ -167,5 +169,17 @@ with tempfile.TemporaryDirectory(prefix='VOID CLI é # % ') as directory:
     before = output.read_bytes()
     run(['build', source, '-o', output], 1, error='Reinstall the matching', tool=copied)
     assert output.read_bytes() == before
+    if os.name == 'nt':
+        # Windows can briefly retain the just-exited image mapping. Remove only
+        # this owned copy with the same bounded sharing retry used by fixtures.
+        deadline = time.monotonic() + 2
+        while True:
+            try:
+                copied.unlink()
+                break
+            except PermissionError as error:
+                if error.winerror not in (5, 32) or time.monotonic() >= deadline:
+                    raise
+                time.sleep(0.05)
 
 print(f'{checks} CLI process checks passed on {sys.platform}; native output and collision preservation passed')

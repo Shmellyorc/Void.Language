@@ -155,7 +155,7 @@ debug_info = "full"
     check(settings->sources().roots.size() == 2 && settings->sources().exclude.empty(), "source settings");
     check(settings->debug().optimization == Optimization::O2 && settings->release().debug_info == DebugInfo::full, "profile settings");
     good(replace(application, "kind = \"application\"", "kind = \"application\"\nentry = \"game.void\""));
-    for (auto s : {"schema = true", "schema = \"1\"", "schema = 1.0", "schema = 0", "schema = 2"}) bad(replace(application, "schema = 1", s), Code::project_schema);
+    for (auto s : {"schema = true", "schema = \"1\"", "schema = 1.0", "schema = 0", "schema = 3"}) bad(replace(application, "schema = 1", s), Code::project_schema);
     bad(replace(application, "schema = 1\n", ""), Code::project_schema);
     for (auto field : {"id", "name", "version", "kind"}) {
         auto text = application; auto start = text.find(std::string(field) + " = "); auto end = text.find('\n', start); text.erase(start, end - start + 1);

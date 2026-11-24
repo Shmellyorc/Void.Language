@@ -70,6 +70,11 @@ struct NativeRequirement {
     SemanticVersion version;
     unsigned abi = 0;
 };
+// Schema 2 contract only. No optimization, protection or packaging capability
+// is enabled by these defaults; unknown publish fields are rejected.
+struct Publishing {
+    std::optional<std::string> target, default_profile;
+};
 
 inline constexpr std::size_t native_catalog_byte_limit = 32 * 1024;
 inline constexpr std::size_t native_catalog_file_limit = 24;
@@ -109,6 +114,8 @@ class Manifest {
     Profile debug_ = {Optimization::none, DebugInfo::none};
     Profile release_ = {Optimization::O2, DebugInfo::none};
     std::map<std::string, Field> fields_;
+    unsigned schema_ = 1;
+    Publishing publishing_;
     Manifest() = default;
     friend class ManifestParser;
 public:
@@ -128,6 +135,8 @@ public:
     const Profile& debug() const { return debug_; }
     const Profile& release() const { return release_; }
     const auto& fields() const { return fields_; }
+    unsigned schema() const { return schema_; }
+    const Publishing& publishing() const { return publishing_; }
 };
 struct ParseResult {
     std::shared_ptr<const Manifest> manifest;
