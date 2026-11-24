@@ -305,8 +305,18 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
         run(compiler, 'package', '--verify', moved, status=1, message='without aliases')
         hard_link.unlink()
         run(compiler, 'package', '--verify', moved)
+        reserved_files = snapshot(base)
+        reserved_entries = {p.relative_to(base) for p in base.rglob('*')}
         for leaf in ('NUL.txt', 'COM¹', 'stream:name', 'trailing.'):
-            cli('package', '-o', base / leaf, status=1, message='portable directory')
+            # Approval-store containment canonicalizes the output before package
+            # leaf validation. The Windows CRT rejects NUL as a device there.
+            if leaf == 'NUL.txt':
+                text = cli('package', '-o', base / leaf, status=1)
+                assert 'weakly_canonical' in text and r'\\.\NUL' in text, text
+            else:
+                cli('package', '-o', base / leaf, status=1, message='portable directory')
+            assert snapshot(base) == reserved_files
+            assert {p.relative_to(base) for p in base.rglob('*')} == reserved_entries
 
     unowned = base / 'unowned'
     unowned.mkdir()

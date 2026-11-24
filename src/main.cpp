@@ -4,6 +4,8 @@
 #include "void/frontend.hpp"
 #include "void/path.hpp"
 #include "void/native_build.hpp"
+#include "void/publish.hpp"
+#include <llvm/TargetParser/Triple.h>
 #include "void/native_import.hpp"
 #include "void/project_creation.hpp"
 #include "void/project_resolution.hpp"
@@ -635,7 +637,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             return 0;
         }
         if(argc==2 && std::string_view(argv[1])=="--capabilities") {
-            std::cout << "{\"schema\":1,\"cliPresentation\":1,\"statusPlain\":true,\"nativeApprovalStdio\":1,\"debugInfoOverride\":1,\"timingsSchema\":1}\n";
+            std::cout << "{\"schema\":1,\"cliPresentation\":1,\"statusPlain\":true,\"nativeApprovalStdio\":1,\"debugInfoOverride\":1,\"timingsSchema\":1,\"publishContract\":1,\"publishEmission\":false}\n";
             return 0;
         }
         if(argc>=2 && std::string(argv[1])=="help") {
@@ -665,6 +667,17 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
         if(command=="crashes")throw UsageError("Expected crashes run ABSOLUTE-EXECUTABLE [arguments...].");
+        if(command=="publish") {
+            std::vector<std::string_view> args;
+            for(int i=2;i<argc;++i)args.emplace_back(argv[i]);
+            auto request=vd::publish::parse_arguments(args);
+            const llvm::Triple host(LLVM_DEFAULT_TARGET_TRIPLE);
+            const auto target=host.isOSLinux() && host.getArch()==llvm::Triple::x86_64?"linux-x64":
+                host.isOSWindows() && host.getArch()==llvm::Triple::x86_64?"windows-x64":
+                host.isMacOSX() && host.getArch()==llvm::Triple::aarch64?"macos-arm64":"unqualified-host";
+            vd::publish::preflight(request,target);
+            return 1; // Stage A preflight always fails closed.
+        }
         if(command=="add" || command=="remove" || command=="tidy")return maintain_project(command,argc,argv,executable);
         if(command=="resolve")return resolve_project(argc,argv);
         if(command=="deps") {

@@ -1,0 +1,28 @@
+{
+  "baseline": "df33af0a7e8ae75b97d2ab27395a683b69d3994f",
+  "previous_patch_sha256": "e95a62952d0661aa138b4f4e6072fa7e3003dc3a1d800a928358e830e374a1aa",
+  "patch_sha256": "f68ac171876aa438f63ee68a613d00f0e616d74d297d5ce4f56c086dcfca85f1",
+  "patch_bytes": 77671,
+  "source_sha256": {
+    "CMakeLists.txt": "cd974a87b832a85b2c674d34b4a633acf83c48483a8c711083bbfce003ecd351",
+    "include/void/binary_audit.hpp": "b638ed5410842c5ee6444c0eaa8eeb69853a04e4592617ef9ac0b01cee664ecd",
+    "include/void/project.hpp": "a87ba8d5accce0ed310d543210dd2da00e382ecac36df24d9baa677a28ab94f1",
+    "include/void/publish.hpp": "7f3509a6b4474daf0a68630c04e8bceb96b1ccf029f7f0fea1ee85bb6384a168",
+    "src/binary_audit.cpp": "66cd11b82251b5cffcd209ace42003e9901fc94c8651365d7856fe02425f0188",
+    "src/cli_help.hpp": "514bbc72cb4b7d455721fb636f112962a639f8b695c6f856d17de405d7b7e76a",
+    "src/frontend/project.cpp": "fb00d01198a0af3997ede132a90b81f795927719a7af8f4706d190519a8d66f2",
+    "src/main.cpp": "6284028c33383a5acfa17134767f39402a5fb49095b9d3d34cbfc3ee6cadb596",
+    "src/publish.cpp": "8d3cdb13496b3d52e4a9d43e3d6a74f66c53a4505adc9c19f352b1e83115d0fe",
+    "tests/cli/contract.py": "29e99428b11b513cdc199d3b866f1587092f862eac98790170399a2081c55902",
+    "tests/cli/presentation.py": "1504b2221a61c43999380c84d6b8844fd435cdd38c862135dac9517f008b3e32",
+    "tests/project/discovery.py": "54c04cc8f5b76c4da4521e035cf7cd605fc0aacc1da896619f931ad3c4d19ebb",
+    "tests/project/manifest.cpp": "0d555fba1c55afc6bee0b89203c5bdc5334bbf2a4a856e9d1ce154ad39d74042",
+    "tests/project/publish.cpp": "dae7c7b19818ae67d496761af7f09bc214df2fc85f82c0cc081440a7b21bb51c",
+    "tests/project/publish_fixtures.py": "e955574e93769e3cca6d6d0e8b7ec455cef883651cb0a6c2db6f9877322d3e7a",
+    "tests/project/application_packages.py": "f8ac6b27a8625de545c34568f70c16ff9b1fa8847de7b6ef91a05d10d3956253"
+  },
+  "correction_paths": [
+    "tests/project/application_packages.py",
+    "tests/cli/presentation.py"
+  ]
+}

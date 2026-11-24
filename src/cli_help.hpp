@@ -8,11 +8,12 @@
 
 namespace vd::cli {
 using HelpRow = std::pair<std::string_view, std::string_view>;
-inline constexpr std::array<HelpRow, 15> commands{{
+inline constexpr std::array<HelpRow, 16> commands{{
     {"crashes", "Diagnose an explicitly launched native program."},
     {"check", "Check source and imports."},
     {"run", "Compile and run through the JIT."},
     {"build", "Build a native executable."},
+    {"publish", "Validate publication contracts (emission unavailable)."},
     {"emit", "Write a native object."},
     {"init", "Add a project manifest."},
     {"new", "Create a project or manage templates."},
@@ -40,6 +41,8 @@ inline void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
     if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
+    if(command.empty() || command=="publish")out<<"Usage: voidc publish [--project DIR] [--entry RELATIVE.void] [--target linux-x64|windows-x64|macos-arm64] [--profile release|performance|protected] [-o NEW-DIRECTORY]\n"
+      "Stage A: all publishing capabilities are unavailable; no output is created. No native consent, uploads or signing.\n";
     if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
       "       voidc package --verify DIR\n"
       "       voidc package list | voidc package search NAME\n"
@@ -73,7 +76,7 @@ inline void help(const std::string& command = {}, std::string_view nested = {}) 
     std::cout << "VOID Language Compiler v" << VOID_COMPILER_VERSION << " (development)\nLLVM " << LLVM_VERSION_STRING << "\n\n";
     if (command.empty()) {
         std::cout << "Usage: voidc <command> [arguments] [options]\n\nCommands:\n";
-        auto rows = std::array<HelpRow, 16>{};
+        auto rows = std::array<HelpRow, 17>{};
         std::copy(commands.begin(), commands.end(), rows.begin());
         rows.back() = {"help", "Show command help."};
         help_rows(std::cout, rows);
@@ -130,6 +133,7 @@ Example: voidc check --project .
             help_rows(std::cout, std::array<HelpRow,1>{{
                 {"--debug-info none|line|full", "Override manifest debug information for this build/emit."}
             }});
+            std::cout << '\n'; // The following option table has its own column width.
             if (command=="build") help_rows(std::cout, std::array<HelpRow,3>{{
                 {"-o PATH", "Executable output; defaults under build/."},
                 {"--allow-native", "Authorize this manifest invocation only."},

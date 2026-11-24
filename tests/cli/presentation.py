@@ -46,7 +46,7 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
     bad = sources/'bad.void'; bad.write_text('func main() -> i32:\n    return unknown\n')
     reports = root/'reports'; reports.mkdir()
     assert json.loads(run(['--capabilities']).stdout)['statusPlain'] is True
-    default = run(['check',app]); assert default.stdout == b'Source checked successfully\n' and not default.stderr
+    default = run(['check',app]); assert default.stdout == ('Source checked successfully'+os.linesep).encode() and not default.stderr
     for mode in ('auto','off'):
         current=run(['check',app,'--status',mode]);assert current.stdout==default.stdout and current.stderr==default.stderr
     plain=run(['check',app,'--status','plain'])
@@ -108,8 +108,19 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
         assert v['configuration']=={'project_mode':False,'profile':None,'optimization':opt,'debug_info':'none'},v
     _,v,p=timed(['run','--project',project,'--cache'])
     assert v['configuration']=={'project_mode':True,'profile':'debug','optimization':'none','debug_info':'unavailable'},v
-    _,v,p=timed(['package','--project',project,'-o',root/'distribution'])
-    assert v['build']['complete'] and p['package_assembly']['count']==1 and p['publication']['count']>0
+    distribution=root/'distribution'
+    _,v,p=timed(['package','--project',project,'-o',distribution])
+    assert v['build']['complete'] and v['build']['outcome']=='success'
+    assert p['package_assembly']['count']==1 and p['package_assembly']['state']=='complete'
+    if os.name=='nt':
+        # Windows copies into the reserved package stage and publishes the outer
+        # directory inside package_assembly, bypassing native_build::publish.
+        assert p['publication']=={'id':'publication','parent_id':None,'kind':'unavailable',
+                                 'state':'not_reached','duration_us':None,'count':0,'reason':'not_applicable'},p
+    else:
+        assert p['publication']['count']>0 and p['publication']['state']=='complete'
+    run(['package','--verify',distribution])
+    assert subprocess.run([str(distribution/('app.exe' if os.name=='nt' else 'app'))]).returncode==0
     run(['run',app,'--cache'],7)
     r,v,p=timed(['run',app,'--cache'],7)
     if os.name!='nt':
