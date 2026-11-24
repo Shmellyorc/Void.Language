@@ -65,6 +65,22 @@ def snapshot(root):
             for p in sorted(root.rglob('*'))}
 
 
+def macho_dependencies(needed_output, id_output, image):
+    # Pinned llvm-readobj includes LC_ID_DYLIB (LLVM issue #39505).
+    # llvm-objdump --dylib-id selects only that command. Subtract each ID
+    # once, preserving any LC_LOAD_DYLIB with the same name and duplicates.
+    names = re.search(rb'NeededLibraries \[(.*?)\]', needed_output, re.S)
+    lines = id_output.decode().splitlines()
+    if names is None or not lines or lines[0] != str(image) + ':':
+        raise RuntimeError('Malformed LLVM Mach-O dependency oracle')
+    dependencies = [line.strip().decode() for line in names[1].splitlines() if line.strip()]
+    for name in lines[1:]:
+        if name not in dependencies:
+            raise RuntimeError('LLVM Mach-O ID missing from needed-libs oracle')
+        dependencies.remove(name)
+    return sorted(dependencies)
+
+
 def verify_candidate(root=ROOT):
     identity = json.loads((root / 'tools/ci/publisher-stage-a/identity.json').read_text())
     if identity['baseline'] != BASELINE or identity['patch_sha256'] != PATCH_SHA256:
@@ -230,8 +246,10 @@ class Qualification:
             pins = json.loads((ROOT / 'third_party/http-versions.json').read_text())['dependencies']
             self.acquire_sources([pin for pin in pins if pin['name'] in selected], ROOT / '.toolchains/http/downloads')
         if not cached:
+            # Even the primary key can prefix-match without restore-keys.
+            # A non-exact restore is disposable, never a reusable prefix.
             if prefix.exists():
-                raise RuntimeError('HTTP cache miss with existing prefix; no implicit reuse')
+                shutil.rmtree(prefix)
             self.run('http-build', [sys.executable, ROOT / 'tools/setup_http_deps.py', '--profile', self.profile,
                                    '--jobs', '2', '--macos-install-only'], timeout=1800)
         manifest = http.verify_prefix(plan, self.evidence, cached=cached)
@@ -274,7 +292,7 @@ class Qualification:
         seal = prefix / 'VOID-PUBLISHER-CI-IDENTITY.json'
         if not cached:
             if prefix.exists():
-                raise RuntimeError('Host cache miss with existing prefix; no implicit reuse')
+                shutil.rmtree(prefix)
             self.run('host-build', [sys.executable, ROOT / 'tools/setup_host_deps.py', '--profile', self.profile,
                                    '--jobs', '2'], timeout=1200)
         receipt = host.verify_prefix(prefix, self.profile, 'Darwin', 'arm64')
@@ -411,8 +429,10 @@ class Qualification:
                 continue
             if not report['inspected'] or report['architecture'] != 'aarch64' or report['format'] != 'Mach-O':
                 raise RuntimeError('Native Mach-O inspection incomplete: ' + label)
-            names = re.search(rb'NeededLibraries \[(.*?)\]', oracle.stdout, re.S)
-            if names is None or sorted(line.strip().decode() for line in names[1].splitlines() if line.strip()) != sorted(report['dependencies']):
+            dylib_id = self.run(label + '-dylib-id',
+                [self.sdk / 'bin/llvm-objdump', '--macho', '--dylib-id', image])
+            dependencies = macho_dependencies(oracle.stdout, dylib_id.stdout, image)
+            if dependencies != sorted(report['dependencies']):
                 raise RuntimeError('Native dependency declarations differ from pinned LLVM oracle: ' + label)
             if image.parent == root and image.name != 'void-app':
                 if not any(f['code'] == 'forbidden-string' for f in report['findings']):

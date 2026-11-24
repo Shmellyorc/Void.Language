@@ -52,7 +52,13 @@ jobs:
           key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
       - name: Prepare and verify LLVM Clang LLD 23.1.4
         timeout-minutes: 8
+        env:
+          LLVM_CACHE_HIT: ${{ steps.llvm.outputs.cache-hit }}
         run: |
+          # Primary keys can prefix-match even without restore-keys.
+          if [[ "$LLVM_CACHE_HIT" != true ]]; then
+            rm -rf .toolchains/llvm-23.1.4
+          fi
           python -B tools/ci/llvm_sdk.py 2>&1 | tee "$PUBLISH_WORK/llvm-bootstrap.log"
       - name: Save verified complete LLVM SDK before compiler qualification
         if: steps.llvm.outputs.cache-hit != 'true'
