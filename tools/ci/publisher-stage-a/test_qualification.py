@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -18,6 +19,40 @@ spec.loader.exec_module(q)
 
 
 class QualificationGuards(unittest.TestCase):
+    def test_report_renames_preserve_baseline_bytes_and_remove_case_clashes(self):
+        paths = subprocess.check_output(['git', 'ls-files', '-z'], cwd=ROOT).decode().split('\0')
+        for old, new in q.REPORT_RENAMES.items():
+            original = subprocess.check_output(['git', 'show', q.BASELINE + ':' + old], cwd=ROOT)
+            self.assertNotIn(old, paths)
+            self.assertEqual(original, (ROOT / new).read_bytes())
+        folded = [name.casefold() for name in paths if name]
+        self.assertEqual(len(folded), len(set(folded)))
+
+    def test_collect_retains_actual_unstaged_and_staged_changes_before_rejecting(self):
+        for staged in (False, True):
+            with self.subTest(staged=staged), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder) / 'checkout'
+                root.mkdir()
+                def git(*args):
+                    return subprocess.run(['git', *args], cwd=root, check=True,
+                                          stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                git('init')
+                source = root / 'tracked.txt'
+                source.write_text('original\n')
+                git('add', 'tracked.txt')
+                git('-c', 'user.name=Qualification Test', '-c', 'user.email=test@invalid',
+                    '-c', 'commit.gpgsign=false', 'commit', '-m', 'fixture')
+                source.write_text('changed\n')
+                if staged:
+                    git('add', 'tracked.txt')
+                with mock.patch.object(q, 'ROOT', root), mock.patch.object(q, 'verify_candidate', return_value={}):
+                    task = q.Qualification('Release', Path(folder) / 'work')
+                    with self.assertRaisesRegex(RuntimeError, 'checkout differs'):
+                        task.collect()
+                self.assertEqual((task.evidence / 'collect-tracked-paths.stdout').read_text(), 'tracked.txt\n')
+                self.assertIn('+changed', (task.evidence / 'collect-tracked-diff.stdout').read_text())
+                self.assertFalse((task.evidence / 'qualification-summary.json').exists())
+
     def test_reviewed_source_and_patch(self):
         identity = q.verify_candidate()
         with tempfile.TemporaryDirectory() as folder:

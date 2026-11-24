@@ -39,6 +39,13 @@ CI_PATHS = {'.github/workflows/ci-link-experiment.yml',
             'tools/ci/publisher-stage-a/identity.json',
             'tools/ci/publisher-stage-a/candidate.patch',
             'tools/ci/publisher-stage-a/test_qualification.py'}
+# Preserve both historical reports on case-insensitive Mac checkouts.
+REPORT_RENAMES = {
+    'docs/json/evidence/implementation/readonly-Debug.json':
+        'docs/json/evidence/implementation/readonly-final-Debug.json',
+    'docs/json/evidence/implementation/readonly-Release.json':
+        'docs/json/evidence/implementation/readonly-final-Release.json',
+}
 BYTE_LIMIT = 64 * 1024 * 1024
 
 
@@ -156,9 +163,21 @@ class Qualification:
         if os.environ.get('GITHUB_REF') != 'refs/heads/codex/publisher-stage-a-macos-ci':
             raise RuntimeError('Use only the isolated qualification branch')
         self.run('source-baseline', ['git', 'merge-base', '--is-ancestor', BASELINE, head])
-        names = set(self.run('source-inventory', ['git', 'diff', '--name-only', BASELINE, head]).stdout.decode().splitlines())
-        if names != set(identity['source_sha256']) | CI_PATHS:
+        names = set(self.run('source-inventory', ['git', 'diff', '--no-renames', '--name-only', BASELINE, head]).stdout.decode().splitlines())
+        rename_paths = set(REPORT_RENAMES) | set(REPORT_RENAMES.values())
+        if names != set(identity['source_sha256']) | CI_PATHS | rename_paths:
             raise RuntimeError('Commit inventory includes missing or unauthorized changes: ' + repr(names))
+        tracked = self.run('source-paths', ['git', 'ls-files', '-z']).stdout.decode().split('\0')
+        for old, new in REPORT_RENAMES.items():
+            original = self.run('source-report-' + Path(old).stem,
+                                ['git', 'show', BASELINE + ':' + old]).stdout
+            if old in tracked or (ROOT / new).read_bytes() != original:
+                raise RuntimeError('Historical report rename changed content: ' + new)
+        folded = {}
+        for name in filter(None, tracked):
+            if name.casefold() in folded:
+                raise RuntimeError('Case-conflicting tracked paths: ' + folded[name.casefold()] + ', ' + name)
+            folded[name.casefold()] = name
         if self.run('source-clean', ['git', 'status', '--porcelain']).stdout:
             raise RuntimeError('Qualification checkout must be clean')
         self.run('source-reverse-patch', ['git', 'apply', '--check', '--reverse', POLICY / 'candidate.patch'])
@@ -482,9 +501,13 @@ class Qualification:
                 destination = self.evidence / 'collected' / str(index) / path.relative_to(root)
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(path, destination)
+        # Retain actual filenames and patches even when verification fails early.
+        self.run('collect-status', ['git', 'status', '--porcelain=v1'])
+        changed = self.run('collect-tracked-paths', ['git', 'diff', 'HEAD', '--name-only']).stdout
+        self.run('collect-tracked-diff', ['git', 'diff', 'HEAD', '--no-ext-diff', '--binary'])
         identity = verify_candidate()
-        if subprocess.check_output(['git', 'diff', '--name-only'], cwd=ROOT):
-            raise RuntimeError('Tracked qualification sources changed during execution')
+        if changed:
+            raise RuntimeError('Tracked checkout differs from HEAD; see collect-tracked-paths.stdout')
         binaries = json.loads((self.evidence / 'build-identities.json').read_text()) if (self.evidence / 'build-identities.json').exists() else {}
         for name, row in binaries.items():
             if digest(self.build / name) != row['sha256']:
