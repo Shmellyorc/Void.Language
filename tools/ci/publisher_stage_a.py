@@ -38,7 +38,8 @@ CI_PATHS = {'.github/workflows/ci-link-experiment.yml',
             'tools/ci/publisher-stage-a/native-targets.cmake',
             'tools/ci/publisher-stage-a/identity.json',
             'tools/ci/publisher-stage-a/candidate.patch',
-            'tools/ci/publisher-stage-a/test_qualification.py'}
+            'tools/ci/publisher-stage-a/test_qualification.py',
+            'tools/ci/publisher-stage-a/protocol_repro.py'}
 # Preserve both historical reports on case-insensitive Mac checkouts.
 REPORT_RENAMES = {
     'docs/json/evidence/implementation/readonly-Debug.json':
@@ -378,6 +379,10 @@ class Qualification:
                      'void-native.txt', 'void-native-resources.txt'):
             shutil.copyfile(self.build / name, self.evidence / name)
 
+    def protocol(self):
+        self.run('protocol-independent', [sys.executable, '-B', POLICY / 'protocol_repro.py',
+                 ROOT, self.build / 'voidls', self.evidence / 'protocol-independent'], timeout=180)
+
     def tests(self):
         selector = '^(' + '|'.join(TESTS) + ')$'
         result = self.run('active-registration', ['ctest', '--test-dir', self.build, '-R', selector, '--show-only=json-v1'])
@@ -542,7 +547,7 @@ class Qualification:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase', choices=('source', 'http-identity', 'http', 'host-identity', 'host', 'configure', 'build', 'tests', 'native', 'rejections', 'collect'))
+    parser.add_argument('phase', choices=('source', 'http-identity', 'http', 'host-identity', 'host', 'configure', 'build', 'protocol', 'tests', 'native', 'rejections', 'collect'))
     parser.add_argument('--configuration', choices=('Debug', 'Release'), default=os.environ.get('PUBLISH_CONFIGURATION', 'Release'))
     parser.add_argument('--work', type=Path, default=Path(os.environ.get('PUBLISH_WORK') or
                         str(Path(os.environ.get('RUNNER_TEMP', 'build')) / 'publisher-stage-a')))

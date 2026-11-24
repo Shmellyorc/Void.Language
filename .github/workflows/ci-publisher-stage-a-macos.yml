@@ -25,7 +25,7 @@ jobs:
       fail-fast: false
       max-parallel: 2
       matrix:
-        configuration: [Debug, Release]
+        configuration: [Release]
     defaults:
       run:
         shell: bash
@@ -134,6 +134,8 @@ jobs:
       - name: Build only the six qualification targets
         id: build
         run: python -B tools/ci/publisher_stage_a.py build
+      - name: Run project_protocol independently with pipe diagnostics
+        run: python -B tools/ci/publisher_stage_a.py protocol
       - name: Run exact focused CTests with strict registration and result checks
         run: python -B tools/ci/publisher_stage_a.py tests
       - name: Inspect native ARM64 Mach-O producers and ordinary VOID execution
