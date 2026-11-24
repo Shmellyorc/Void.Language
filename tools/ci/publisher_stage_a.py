@@ -460,10 +460,12 @@ class Qualification:
              default_invocations=3, all_targets_profiles_unavailable=True, no_distributable_output=True, approvals_unchanged=True))
 
     def collect(self):
-        before = set(json.loads((self.work / 'existing-receipts.json').read_text())) if (self.work / 'existing-receipts.json').exists() else set()
+        receipt_checkpoint = self.work / 'existing-receipts.json'
+        before = set(json.loads(receipt_checkpoint.read_text())) if receipt_checkpoint.exists() else set()
         roots = [self.build, self.work / 'native', self.work / 'ctest-evidence', self.work / 'thinlto-probe']
         roots += [p for base in ('docs/net/http/evidence', 'docs/voidup/evidence')
-                  for p in (ROOT / base).glob('dependencies-*') if p.relative_to(ROOT).as_posix() not in before]
+                  for p in (ROOT / base).glob('dependencies-*')
+                  if receipt_checkpoint.exists() and p.relative_to(ROOT).as_posix() not in before]
         for path in self.work.glob('*-plan.json'):
             shutil.copyfile(path, self.evidence / path.name)
         for path in self.work.glob('*.log'):
