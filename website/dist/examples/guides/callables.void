@@ -1,9 +1,0 @@
-value struct packet:
-    size: i32
-
-func (unit packet) call(quantity: i32) -> i32:
-    return unit.size * quantity
-
-func entry(quantity: i32) -> i32:
-    var postcards = packet(size = 4)
-    return postcards(quantity)

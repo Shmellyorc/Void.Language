@@ -144,6 +144,30 @@ class MacPlanTests(unittest.TestCase):
             self.assertEqual(os.environ['INSTALL_PRIOR_JOB_STATUS'], 'failure')
             report.assert_called_once()
 
+    def test_report_seals_external_macos_receipts_with_http_receipts(self):
+        base = self.q.work.parent / 'external'
+        areas = {'voidup': base / 'voidup', 'net/http': base / 'http'}
+        mac = areas['voidup'] / 'dependencies-macos-arm64-Release-1/commands.json'
+        linux = areas['voidup'] / 'dependencies-linux-Release-1/commands.json'
+        http = areas['net/http'] / 'dependencies-http-Release-1/commands.json'
+        for command_log in (mac, linux, http):
+            command_log.parent.mkdir(parents=True)
+            command_log.write_text(json.dumps({'receipt': command_log.parent.name}))
+        for name in install_smoke.REQUIRED:
+            self.q.save('check-' + name + '.json', {'status': 'PASS'})
+        self.q.save('voidup-qualification.json', {'status': 'PASS'})
+        with patch.object(install_smoke, 'documentation_evidence', side_effect=areas.__getitem__), \
+                patch.dict(os.environ, {'INSTALL_PRIOR_JOB_STATUS': 'success', 'GITHUB_STEP_SUMMARY': ''}), \
+                patch.object(install_smoke.subprocess, 'check_output') as git:
+            self.q.report()
+        git.assert_not_called()
+        seal = json.loads((self.q.evidence / 'evidence-sha256.json').read_text())
+        for command_log in (mac, http):
+            relative = command_log.relative_to(command_log.parent.parent).as_posix()
+            self.assertEqual((self.q.evidence / relative).read_bytes(), command_log.read_bytes())
+            self.assertEqual(seal[relative], install_smoke.digest(command_log))
+        self.assertFalse((self.q.evidence / linux.parent.name).exists())
+
 
 class CacheRestoreTests(unittest.TestCase):
     """Model Actions key matching/extraction; execute the real plan/seal checks.

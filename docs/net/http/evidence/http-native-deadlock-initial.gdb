@@ -1,1 +1,0 @@
-ptrace: Operation not permitted.

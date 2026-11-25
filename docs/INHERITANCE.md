@@ -8,7 +8,7 @@ ADVANCED_LANGUAGE.md. Arbitrary source downcast syntax remains outside that
 pattern-narrowing contract. Earlier phase-only exclusions below are historical.
 
 Phase 20 implements the owner-approved I1–I8 contract from
-[INHERITANCE_PROPOSAL.md](INHERITANCE_PROPOSAL.md). Actual verification and hosted
+[INHERITANCE_PROPOSAL.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/INHERITANCE_PROPOSAL.md). Actual verification and hosted
 limitations are recorded in WORK_LOG.md. This extends the existing compiler and
 runtime; it does not introduce an interface system or a production GC claim.
 

@@ -1,3 +1,0 @@
-use math
-value struct item:
-    value: f64 = math.sin<f64>(0)

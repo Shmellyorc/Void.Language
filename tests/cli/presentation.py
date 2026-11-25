@@ -7,7 +7,7 @@ import sys
 import tempfile
 
 compiler = Path(sys.argv[1]).resolve()
-schema = json.loads((Path(__file__).resolve().parents[2] / 'docs/schemas/cli-timings-v1.schema.json').read_text())
+schema = json.loads((Path(__file__).resolve().parents[2] / 'schemas/cli-timings-v1.schema.json').read_text())
 checks = 0
 
 

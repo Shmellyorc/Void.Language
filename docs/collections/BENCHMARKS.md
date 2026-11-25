@@ -1,6 +1,6 @@
 # Collections measurements, Linux Release
 
-The [immutable measurements and generated workloads](evidence/benchmark-ci-official-release-1zgqnc53/measurements.json)
+The [immutable measurements and generated workloads](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/collections/evidence/benchmark-ci-official-release-1zgqnc53/measurements.json)
 contain compiler-host hashes, exact inputs, samples, checksums and callback totals.
 The existing `void_channel_benchmark` executable is a generic source runner and
 was reused unchanged. It analyzes/JIT-compiles once, performs separate setup and

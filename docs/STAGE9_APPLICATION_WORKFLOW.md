@@ -33,7 +33,7 @@ status policy and native publication are unchanged. See [RUNTIME_GLOBALS.md](RUN
 Boss authorized all three milestones as one mission. This supersedes Sprint 4's
 mandatory application flag and the research proposal's optional compatibility
 flag. Entry language semantics, native admission and source identities are unchanged.
-[Acceptance and review handoff](stage9/ACCEPTANCE.md) separates local evidence from
+[Acceptance and review handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage9/ACCEPTANCE.md) separates local evidence from
 Boss-controlled native hosted verification.
 
 ## Commands
@@ -83,7 +83,7 @@ Default executable: `<selected-root>/build/<entry-stem>` with `.exe` on Windows.
 An explicit `-o` is caller-relative or absolute. Emit remains object-only.
 Outputs cannot overwrite selected/imported sources or name `.void` files. Existing
 output symlinks, non-files and incorrect physical spelling reject. Physical
-identity catches hard-link collisions. [CI #88's repair](stage9/CI88_WINDOWS_PATH_REPAIR.md)
+identity catches hard-link collisions. [CI #88's repair](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage9/CI88_WINDOWS_PATH_REPAIR.md)
 admits exact OS-registered Windows short directory ancestors; ordinary descendant
 case and output-file spelling stay exact. Directory reparse points reject on
 Windows; POSIX/macOS ancestor-symlink behavior remains unchanged. No complete
@@ -113,10 +113,10 @@ output and call the existing `publish()` unchanged: cross-volume copying precede
 same-parent atomic replacement, with no COPY_ALLOWED fallback. Owned temporary
 paths are removed on success/ordinary failure. Locked destination, failed copy,
 compile, link or permission checks preserve the previous executable. No global
-cwd change or shell expansion occurs. The [permanent Windows engineering record](stage9/WINDOWS_ENGINEERING_RECORD.md)
+cwd change or shell expansion occurs. The [permanent Windows engineering record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage9/WINDOWS_ENGINEERING_RECORD.md)
 records CI #95 native acceptance at `e25816bdb80e3f32613edf77c9cf3258232af966`:
 Windows Debug/Release 160/160 each, 320/320 combined. The blocking investigation
-is RESOLVED; [CI #90's original implementation/evidence](stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md)
+is RESOLVED; [CI #90's original implementation/evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage9/CI90_WINDOWS_NATIVE_LINK_REPAIR.md)
 remains historical. Actual second-volume transfer and a complete seven-job matrix
 are not claimed by this acceptance.
 

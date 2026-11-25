@@ -1,9 +1,9 @@
 """Focused hosted macOS VOIDUP stages; no complete compiler/test matrix."""
+
 import json
 import os
 from pathlib import Path
 import shutil
-import subprocess
 import sys
 
 import http_bootstrap as http
@@ -123,9 +123,7 @@ class MacQualification(Qualification):
         for name in ('.ninja_log', 'build.ninja'):
             if (self.build / name).is_file():
                 shutil.copy2(self.build / name, self.evidence / name.lstrip('.'))
-        for path in (ROOT / 'docs/voidup/evidence').glob('dependencies-macos-*'):
-            if path.is_dir() and not subprocess.check_output(['git', 'ls-files', '--', str(path)], cwd=ROOT):
-                shutil.copytree(path, self.evidence / path.name, dirs_exist_ok=True)
+        self.copy_dependency_receipts('voidup', 'dependencies-macos-*')
         super().report()
 
 

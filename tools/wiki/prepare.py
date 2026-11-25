@@ -35,7 +35,7 @@ def main():
     if args.live_snapshot and args.refresh_inventory:
         parser.error('--live-snapshot requires --output')
     current = inventory()
-    manifest = SOURCE / 'publication.json'
+    manifest = Path(__file__).resolve().parent / 'publication.json'
     if args.refresh_inventory:
         manifest.write_text(json.dumps(current, indent=2) + '\n')
         print(f'Inventory refreshed: {len(current["files"])} publication files')

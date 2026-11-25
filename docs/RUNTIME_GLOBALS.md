@@ -18,12 +18,12 @@ accepted the implementation; Boss authorized the lock at tested commit
 [Final CI 40248573233](https://github.com/Shmellyorc/Void.Language/actions/runs/40248573233),
 `ci-link-experiment.yml`, `mode=thinlto-cache`, passed **7/7 jobs on attempt 1,
 1,407/1,407 CTests**, with hosted Debug editor integration on Linux, Windows and
-macOS. [Official acceptance](stage11/ACCEPTANCE.md) records all platform counts,
+macOS. [Official acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/ACCEPTANCE.md) records all platform counts,
 the separate local Linux 609/609 result and acceptance exclusions.
 
 Boss authorized complete file-level runtime globals on 25 October 2026. This
 contract supersedes the visibility/startup recommendations in the Stage 11 research
-and roadmap. [The Stage 11 handoff](stage11/IMPLEMENTATION.md) describes the
+and roadmap. [The Stage 11 handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/IMPLEMENTATION.md) describes the
 implementation. The earlier locally reproduced LLVM 19.1.7 DSE crash remains
 unexplained: subsequent runs passed without a demonstrated repair, and it did
 not recur in hosted acceptance. The separate local ThinLTO cache/link incident

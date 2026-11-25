@@ -1,8 +1,0 @@
-# Add the odd numbers from 1 through the limit.
-func entry(limit: i32) -> i32:
-    var total = 0
-    var number = 1
-    for number <= limit:
-        total += number
-        number += 2
-    return total

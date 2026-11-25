@@ -317,7 +317,7 @@ Do not request a hosted run for this design document.
 | Bounded recovery | Corrupt/oversized journal, reparse directory, wrong SID/app scope, 65th record, provider substitution all fail closed; no broad store scans |
 | Platform compatibility | Windows Debug/Release + relevant source/LSP/installation closure; unchanged Linux/macOS code and existing regression selection; no claim from Linux tests about Schannel |
 
-[Design validation and exact changed-file inventory](evidence/windows-mtls-design-review.json).
+[Design validation and exact changed-file inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-mtls-design-review.json).
 
 **This assignment's validation:** source/API contract review and documentation
 link/inventory checks only. No native Windows execution was available; no credential

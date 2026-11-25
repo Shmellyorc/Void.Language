@@ -1,3 +1,0 @@
-use math
-func main():
-    var result = math.lerp(true, true, true)

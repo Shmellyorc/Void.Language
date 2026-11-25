@@ -402,7 +402,7 @@ Native dumps/OS retention remain separate policy.
 ## 8. Preserved evidence and corrections
 
 Task-owned evidence is outside the checkout at
-`/home/shmellyorc/Documents/Void.Language-G90-evidence/`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G90-evidence/`.
 It retains raw status/stdout/stderr records, inspectable reports, editor profiles/
 logs, compiler entry controls, raw timing/memory samples and build/test logs.
 `manifest.json` records SHA-256 identities of changed source files, qualification
@@ -437,9 +437,9 @@ crash tests. Existing historical incidents and native acceptance limits remain.
 ## Focused Golden Wrench correction record
 
 The original review and reproductions remain unchanged at
-`/home/shmellyorc/Documents/void-g90-wrench-x6nmwwxw/`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g90-wrench-x6nmwwxw/`.
 Correction evidence is separately retained at
-`/home/shmellyorc/Documents/Void.Language-G90-corrections-evidence/`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G90-corrections-evidence/`.
 The original G90 evidence manifest above describes the pre-correction candidate;
 `manifest.json` in the corrections directory identifies the corrected source,
 profile binaries and follow-up evidence. No earlier failure record was replaced.
@@ -526,10 +526,10 @@ invocation issue. The Daybreak UI interruptions are not compiler test results.
 ## Final focused Windows handler correction
 
 Independent review:
-`/home/shmellyorc/Documents/void-g90-rereview-cbj85rf8/review.json`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g90-rereview-cbj85rf8/review.json`.
 The original Windows fixture and all earlier review/source/evidence records are
 unchanged. Final engineering evidence is separately retained at
-`/home/shmellyorc/Documents/Void.Language-G90-windows-handler-evidence/manifest.json`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G90-windows-handler-evidence/manifest.json`.
 This is a corrected candidate awaiting independent review, not integration approval.
 
 ### API decision and resulting behavior

@@ -3,7 +3,7 @@
 ## Current acceptance checkpoint — 24 October 2026
 
 Implementation, examples and executed coverage are reconciled in
-[final acceptance](ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
+[final acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
 native evidence remain open. Stage 10 is not locked. Earlier dated research and
 progress statements below retain their historical meaning.
 
@@ -31,7 +31,7 @@ statements below; it does not claim implementation or acceptance.
 
 
 **Approved for implementation; Stage 10 acceptance remains open.** The public behavior below is the implemented contract;
-executed coverage and exclusions are recorded in final acceptance. [Main roadmap](../STAGE10_DESIGN.md).
+executed coverage and exclusions are recorded in final acceptance. [Main roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE10_DESIGN.md).
 
 ## One implementation and three uses
 

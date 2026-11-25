@@ -1,6 +1,6 @@
 # OS sprint file inventory
 
-[evidence/inventory.json](evidence/inventory.json) is the exact delivered-file
+[evidence/inventory.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/os/evidence/inventory.json) is the exact delivered-file
 inventory with SHA-256, initial/preserved origin, final Git status and final
 compiler/Runtime/tool hashes. It includes all evidence descendants, excluding
 only the inventory's own self-referential hash and ignored Python bytecode.

@@ -1,4 +1,0 @@
-use "./types.void" as model
-
-func bump(c: model.cell):
-    c.value++

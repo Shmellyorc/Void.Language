@@ -326,7 +326,7 @@ parents, reserved filenames and case collisions are refused. Use a distinct path
 for each invocation. JSON mode emits no new status lines and never puts the
 report on stdout or stderr.
 
-The [version-1 JSON schema](schemas/cli-timings-v1.schema.json) describes actual
+The [version-1 JSON schema](../schemas/cli-timings-v1.schema.json) describes actual
 emitted reports. Durations use a monotonic clock and integer microseconds, rounded
 once at serialization. Scopes are inclusive: nested phases overlap, and adding
 them does not produce the total. Repeated scopes of one category aggregate;

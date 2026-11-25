@@ -1,2 +1,0 @@
-func pair(boxes: i32) -> i32:
-    return boxes * 2

@@ -21,7 +21,7 @@ definition-import statements below are superseded only for this narrow case.
 ## Current acceptance checkpoint — 24 October 2026
 
 Implementation, examples and executed coverage are reconciled in
-[final acceptance](ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
+[final acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
 native evidence remain open. Stage 10 is not locked. Earlier dated research and
 progress statements below retain their historical meaning.
 
@@ -52,7 +52,7 @@ statements below; it does not claim implementation or acceptance.
 is approved. Steps 32–34 implement declarations, exact selection and ordinary-call
 integration under focused Linux acceptance; Steps 35–36 supply captured compounds
 and recursive dictionary-key exclusion. Final-stage acceptance remains open. The contract below preserves ownership and coercion rules.
-[Main roadmap](../STAGE10_DESIGN.md).
+[Main roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE10_DESIGN.md).
 
 ## Complete approved surface
 
@@ -262,7 +262,7 @@ selected operator documentation, navigates glyphs and finds references. Operator
 glyph rename is rejected (changing a glyph changes semantics); parameter/type/field
 renames continue through existing guarded paths. `voidls` never executes an operator
 to resolve hover. Source formatting retains precedence and cannot change a custom
-operation by rewriting operand order. See [TEST_PLAN.md](TEST_PLAN.md).
+operation by rewriting operand order. See [TEST_PLAN.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/TEST_PLAN.md).
 
 ## Step 32 implementation checkpoint — 22 October 2026
 
@@ -278,7 +278,7 @@ IR calls, but source operator selection is not yet implemented.
 Steps 33–36 remain required for source resolution, ordinary-call integration and
 derived inequality, captured-place compounds and recursive dictionary-key
 exclusion. Existing builtin expression behavior remains in force meanwhile. See
-[the recovery ledger](IMPLEMENTATION.md) and engineering/step32-results.json for
+[the recovery ledger](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/IMPLEMENTATION.md) and engineering/step32-results.json for
 actual verification and the exact next source change. This checkpoint does not
 claim a complete operator system or complete Stage 10.
 

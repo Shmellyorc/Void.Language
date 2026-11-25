@@ -25,7 +25,7 @@ no public release, package, commit, push or CI dispatch occurred.
 - [Component-to-license index](REDISTRIBUTION_NOTICES.md), installed as
   `share/void/licenses/REDISTRIBUTION.txt`, includes prominent GNU use notice,
   source/PSL locations and downstream native-program duties.
-- [Machine inventory](NOTICE_INVENTORY.json): 14 new/common entries and 33
+- [Machine inventory](../../cmake/licenses/NOTICE_INVENTORY.json): 14 new/common entries and 33
   retained input entries, with exact source URLs, source/text SHA-256 values,
   unchanged extraction ranges, component/platform and destination mappings.
 
@@ -37,7 +37,7 @@ Conservative common notices do not establish binary inclusion of every source.
 
 ## Focused validation
 
-[Validation receipt](evidence/mit-licensing/validation-attempt1/validation.json)
+[Validation receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/mit-licensing/validation-attempt1/validation.json)
 and adjacent command logs preserve the actual results:
 
 | Check | Result | Measured coverage |
@@ -56,24 +56,24 @@ python3 tests/release/check_licenses.py --build-dir build/llvm23-release --evide
 ```
 
 The existing Release build was reconfigured to regenerate installation rules
-([configure log](evidence/mit-licensing/configure.log)); no compiler/Runtime
+([configure log](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/mit-licensing/configure.log)); no compiler/Runtime
 rebuild or regression campaign ran. Existing install manifests were preserved
 before the temporary installs. Temporary prefixes were removed after assertions;
 the receipt and logs remain. These are focused licensing checks, not a reopening
 of accepted installation or HTTP qualification.
 
 One engineering helper failure is preserved in
-[notice-copy-attempt1.log](evidence/mit-licensing/notice-copy-attempt1.log): the
+[notice-copy-attempt1.log](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/mit-licensing/notice-copy-attempt1.log): the
 leading-comment scanner encountered LLVM `DebugCounter.cpp` / `Locale.cpp`, which
 begin with includes. The scan was corrected to record those under the upstream
 umbrella terms without inventing file notices. The successful extraction log is
 retained separately. There were no failed component-install check groups.
 
-[Preservation/provenance verification](evidence/mit-licensing/preservation-and-provenance.json)
+[Preservation/provenance verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/mit-licensing/preservation-and-provenance.json)
 reconstructed all **10 upstream notice files** byte-for-byte from their recorded
 tagged sources/extraction ranges and confirmed **2,898 pre-existing inputs** and
 the four existing compiler/server/Runtime/fixture build artifacts unchanged.
-[MIT text verification](evidence/mit-licensing/mit-text-verification.json) compares
+[MIT text verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/mit-licensing/mit-text-verification.json) compares
 the complete standard wording against SPDX after substituting the approved
 copyright line and normalizing whitespace/display title. Both checks PASS.
 

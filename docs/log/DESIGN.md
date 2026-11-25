@@ -1,8 +1,8 @@
-# Logging: proposed complete public contract
+# Logging contract
 
 28 October 2026. Baseline **`f9ac49f1558f326129948bc06c829263448b7714`**.
 **Proposal for Golden Wrench and Boss; no implementation authorized.**
-[Source findings and ownership](RESEARCH.md) · [Engineering and acceptance](ROADMAP.md).
+[Source findings and ownership](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/RESEARCH.md) · [Engineering and acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/ROADMAP.md).
 
 ## Public surface
 
@@ -269,4 +269,4 @@ async func entry(input: i32) -> i32:
 
 ## Approval boundary
 
-Approve or revise the two owner choices in [RESEARCH](RESEARCH.md): explicit trusted filesystem ownership/adoption and checked failure/fault policy. The remaining semantics follow existing language/Runtime contracts or the concrete proposed module contract. This document does not authorize implementation, native capability expansion or hosted CI.
+Approve or revise the two owner choices in [RESEARCH](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/RESEARCH.md): explicit trusted filesystem ownership/adoption and checked failure/fault policy. The remaining semantics follow existing language/Runtime contracts or the concrete proposed module contract. This document does not authorize implementation, native capability expansion or hosted CI.

@@ -8,7 +8,7 @@ handles before initialization and publishes complete cells in deterministic orde
 No global contains a generation-owned code address. Failed startup drains native
 providers before dropping handles; Runtime close preserves that same ordering.
 Scalars and reference-bearing globals share the same coordinated path. The
-[global contract](RUNTIME_GLOBALS.md) and [evidence](stage11/IMPLEMENTATION.md)
+[global contract](RUNTIME_GLOBALS.md) and [evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/IMPLEMENTATION.md)
 record lifetime, application isolation and acceptance separately.
 
 
@@ -89,7 +89,7 @@ or a production managed runtime. Existing source syntax, entry behavior, value
 initialization, LLVM 23.1.4 and code-generation leases remain in place.
 
 Phase 23 Stage 2D adds runtime-only reference-bearing private buffers, following
-[ARRAYS_PROPOSAL.md Section 27](ARRAYS_PROPOSAL.md#27-stage-2d-reference-bearing-private-buffer-preparation).
+[ARRAYS_PROPOSAL.md Section 27](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/ARRAYS_PROPOSAL.md#27-stage-2d-reference-bearing-private-buffer-preparation).
 The existing Heap streams immutable capacity through admitted schema reference
 events. Ordered builder writes use registered Frame words, revalidate after polls
 and commit interface pairs atomically. Private null slots remain trace-safe;
@@ -103,7 +103,7 @@ Stage 2E is locked at `3cbe250` / owner-confirmed CI #56. It adds rooted RAII
 read leases and independent physical-value copying; these freeze buffer value
 bytes, not the contents of shared referents. Stage 2F local acceptance, mixed-heap
 alias-guard scaling and pending hosted verification are recorded in
-[ARRAYS_PROPOSAL.md Section 29](ARRAYS_PROPOSAL.md#29-stage-2f-final-runtime-foundation-acceptance-and-review).
+[ARRAYS_PROPOSAL.md Section 29](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/ARRAYS_PROPOSAL.md#29-stage-2f-final-runtime-foundation-acceptance-and-review).
 Source arrays, owned-fixed/growable child copying and later stages remain gated.
 
 ## Stage 3 collection integration
@@ -269,11 +269,12 @@ finite worker still runs after a NativeSafe signal. The gate is outside runtime
 locks and is absent from production and separately linked AOT executables.
 See `WORK_LOG.md` for actual configuration/test results and commands.
 
-Still deferred: managed source syntax/types and initialization, general native
-binding generation, providers without quiescence, public managed entry ABI, LTO
-auditing, statepoints/stack maps, tighter liveness, allocator throughput, automatic
-allocation thresholds, hard real-time collection bounds and production runtime
-claims. Windows/macOS require hosted verification; Linux results do not establish
+Managed source types and initialization, typed C bindings and managed native
+packages are implemented under their current contracts. Remaining boundaries
+include providers without quiescence, a general public managed entry ABI,
+statepoints/stack maps, further allocator/liveness tuning and certified real-time
+collection or production throughput bounds. Later root-lifetime improvements do
+not imply such certification. Windows/macOS require hosted verification; Linux results do not establish
 their ABI/thread scheduling behavior.
 
 

@@ -5,7 +5,7 @@ Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRA
 Phase 20 implements managed inheritance and explicit virtual dispatch under I1–I8. Earlier phase-only exclusions below are historical; P3/P4 remain unchanged. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
 
 Implemented locally using the owner-approved P1–P7 contract in
-[MANAGED_STRUCTS_PROPOSAL.md](MANAGED_STRUCTS_PROPOSAL.md), including P3 deep
+[MANAGED_STRUCTS_PROPOSAL.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/MANAGED_STRUCTS_PROPOSAL.md), including P3 deep
 readonly views and P4 complete-object publication. The owner reports hosted run #28
 passed all seven jobs (35 suites), locking Phase 16. Phase 17 adds approved
 [managed initialization](MANAGED_INITIALIZATION.md); its hosted validation remains

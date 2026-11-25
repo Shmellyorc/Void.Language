@@ -109,7 +109,7 @@ The earlier checkpoint separately exercised pathname replacement
 between sealing and loading.
 [Loader and binding code](../../src/runtime/c_dynamic.cpp) ·
 [Native probes](../../tests/ffi/dynamic.cpp) ·
-[Sealed-image checkpoint](evidence/slice7-g4/checkpoint/linux-run.txt) ·
+[Sealed-image checkpoint](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/linux-run.txt) ·
 [ELF dynamic linking specification](https://refspecs.linuxfoundation.org/elf/gabi4+/ch5.dynamic.html) ·
 [glibc namespace interface](https://man7.org/linux/man-pages/man3/dlopen.3.html) ·
 [memfd seals](https://man7.org/linux/man-pages/man2/memfd_create.2.html) ·
@@ -120,10 +120,10 @@ with `-fno-plt`. It supplied a real `GLOB_DAT` relocation for
 `g4_bias` and kept the thunk's `JUMP_SLOT` release relocation.
 The normal and O2 JIT lifecycle controls ran against that exact
 closure as well.
-[Relocation replay script](evidence/slice7-g4-linux/qualify-got.sh) ·
-[Release replay](evidence/slice7-g4-linux/linux/release-got.txt) ·
-[Debug replay](evidence/slice7-g4-linux/linux/debug-got.txt) ·
-[Strict replay](evidence/slice7-g4-linux/linux/strict-got.txt).
+[Relocation replay script](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/qualify-got.sh) ·
+[Release replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/release-got.txt) ·
+[Debug replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/debug-got.txt) ·
+[Strict replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/strict-got.txt).
 
 ## Compiler, AOT and lifetime
 
@@ -177,19 +177,19 @@ the original double-free reproducer and passes in the same matrices.
 [AOT bootstrap](../../src/runtime/abi.cpp) ·
 [Process controls](../../tests/ffi/dynamic_process.py) ·
 [G3 resource bridge](../../src/runtime/c_resource.cpp) ·
-[G3 original double-free evidence](evidence/slice7-g3-final/original/release-ctest.txt).
+[G3 original double-free evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/original/release-ctest.txt).
 
 ## Local qualification
 
 | Linux x86-64 GNU configuration | Selected tests | Evidence |
 | --- | ---: | --- |
-| Release | 52/52 | [CTest](evidence/slice7-g4-linux/linux/release-ctest.txt) · [Direct output](evidence/slice7-g4-linux/linux/release-LastTest.txt) · [Native linkage](evidence/slice7-g4-linux/linux/release-native-linkage.txt) |
-| Debug | 52/52 | [CTest](evidence/slice7-g4-linux/linux/debug-ctest.txt) · [Direct output](evidence/slice7-g4-linux/linux/debug-LastTest.txt) · [Native linkage](evidence/slice7-g4-linux/linux/debug-native-linkage.txt) |
-| Fatal ASan/UBSan with leak detection | 52/52 | [CTest](evidence/slice7-g4-linux/linux/strict-ctest.txt) · [Direct output](evidence/slice7-g4-linux/linux/strict-LastTest.txt) · [Native linkage](evidence/slice7-g4-linux/linux/strict-native-linkage.txt) |
+| Release | 52/52 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/release-ctest.txt) · [Direct output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/release-LastTest.txt) · [Native linkage](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/release-native-linkage.txt) |
+| Debug | 52/52 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/debug-ctest.txt) · [Direct output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/debug-LastTest.txt) · [Native linkage](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/debug-native-linkage.txt) |
+| Fatal ASan/UBSan with leak detection | 52/52 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/strict-ctest.txt) · [Direct output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/strict-LastTest.txt) · [Native linkage](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/strict-native-linkage.txt) |
 
 All configurations used the pinned Clang 23.1.4 toolchain on
 glibc 2.44 and ran with CTest parallelism 2.
-[Platform receipt](evidence/slice7-g4-linux/linux/platform.txt).
+[Platform receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/platform.txt).
 
 The focused selection includes G1–G4, Runtime source/reload/GC,
 native JIT/AOT regressions and accepted project tests. Strict uses
@@ -199,9 +199,9 @@ UBSan traps in the strict configuration. Its opaque handles come
 from a bounded native pool. Full ASan inside the
 mapped fixture would introduce a sanitizer runtime and load-time
 initialization, which this closure profile does not admit.
-[Reproduction script](evidence/slice7-g4-linux/qualify-linux.sh) ·
-[Strict compile flags](evidence/slice7-g4-linux/linux/strict-compile-flags.json) ·
-[Fatal sanitizer environment](evidence/slice7-g4-linux/linux/strict-sanitizers.txt).
+[Reproduction script](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/qualify-linux.sh) ·
+[Strict compile flags](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/strict-compile-flags.json) ·
+[Fatal sanitizer environment](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/strict-sanitizers.txt).
 
 The negative controls include a genuine C initializer that would
 exit the process with status 121 if executed. Its exact hashed
@@ -225,10 +225,10 @@ test had attempted to enter a program's eager globals from a foreign
 thread. The corrected probe invokes on the application owner thread
 and has other threads observe the native call and request shutdown.
 The corrected four-test Release selection passed.
-[Initial execution](evidence/slice7-g4-linux/original/release-first-ctest.txt) ·
-[Initial AOT dynamic section](evidence/slice7-g4-linux/original/release-first-aot-dynamic.txt) ·
-[Second execution](evidence/slice7-g4-linux/linux/release-replay-ctest.txt) ·
-[Corrected focused run](evidence/slice7-g4-linux/linux/release-focus-corrected-ctest.txt).
+[Initial execution](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/original/release-first-ctest.txt) ·
+[Initial AOT dynamic section](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/original/release-first-aot-dynamic.txt) ·
+[Second execution](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/release-replay-ctest.txt) ·
+[Corrected focused run](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/linux/release-focus-corrected-ctest.txt).
 
 The first 52-test Release and Debug runs reached the existing
 independent-global-program guard in a direct wrong-closure probe.
@@ -236,8 +236,8 @@ The corrected probe uses global-free IR against the same Runtime
 with a live resource. It reaches the closure binding guard directly.
 The independent-global-program rule and parallel test selection were
 preserved.
-[Initial full Release run](evidence/slice7-g4-linux/original/full-first-release-ctest.txt) ·
-[Initial full Debug run](evidence/slice7-g4-linux/original/full-first-debug-ctest.txt).
+[Initial full Release run](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/original/full-first-release-ctest.txt) ·
+[Initial full Debug run](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/original/full-first-debug-ctest.txt).
 
 ## Limits and review boundary
 
@@ -265,9 +265,9 @@ The patch covers 23 source and test paths. Seven amend paths from the
 accepted inventory and 16 are new. The 1,637 other previous paths
 retain their bytes, including the entire G4 checkpoint. HEAD and the
 staged index match the baseline.
-[Exact source patch](evidence/slice7-g4-linux/source.patch) ·
-[Before and after source hashes](evidence/slice7-g4-linux/source-hashes.json) ·
-[Layered Git inventory](evidence/slice7-g4-linux/inventory.txt).
+[Exact source patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/source.patch) ·
+[Before and after source hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/source-hashes.json) ·
+[Layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/inventory.txt).
 
 ## End-of-task temporary workspace cleanup
 
@@ -287,9 +287,9 @@ drive had 24,749,342,720 bytes free before cleanup and
 No Windows guest files were cleaned for this Linux-only slice.
 Unrelated files, installed toolchains, reusable caches and the Git
 index were untouched by cleanup.
-[Linux cleanup receipt](evidence/slice7-g4-linux/host-cleanup.json) ·
-[Storage before](evidence/slice7-g4-linux/storage/storage-before.json) ·
-[Storage after](evidence/slice7-g4-linux/storage/storage-after.json) ·
-[Transfer cleanup](evidence/slice7-g4-linux/storage/transfer-cleanup.json).
+[Linux cleanup receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/host-cleanup.json) ·
+[Storage before](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/storage/storage-before.json) ·
+[Storage after](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/storage/storage-after.json) ·
+[Transfer cleanup](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-linux/storage/transfer-cleanup.json).
 
 Stop for Golden Wrench's independent G4-L review.

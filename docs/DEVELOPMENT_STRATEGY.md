@@ -1,5 +1,14 @@
 # Development strategy and current status
 
+## Current assignment — 25 November 2026
+
+The core language is considered complete for its approved scope. Publishing
+implementation is temporarily suspended for repository cleanup and consistency
+review. This does not authorize another feature stage or production repair.
+Current source contracts and [known issues](KNOWN_ISSUES.md) govern; dated
+proposals and acceptance checkpoints do not reopen superseded approval gates.
+
+
 Current storage policy: [project artifacts and engineering retention](PROJECT_STORAGE.md).
 It supersedes historical `/tmp` evidence and native-staging instructions.
 

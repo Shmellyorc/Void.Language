@@ -1,4 +1,0 @@
-use net/http
-func probe(const exchange: http.transfer):
-    exchange.read_bytes()
-return 0

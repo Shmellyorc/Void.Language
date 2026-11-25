@@ -61,7 +61,7 @@ scratch are separate from the native-link root. After the build, the CI #95
 helper receives the absent root path over UTF-8 stdin and creates it
 exclusively. The workflow exports TMP/TEMP for smoke and CTest only after
 the helper verifies the private DACL, production root admission, effective
-owner access and restricted-token mutation denial. [CI #95 private-root evidence](../stage9/CI93_WINDOWS_TEMP_ROOT_FIXTURE.md)
+owner access and restricted-token mutation denial. [CI #95 private-root evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage9/CI93_WINDOWS_TEMP_ROOT_FIXTURE.md)
 
 The smoke compiles and runs a manifest project in JIT and as an independently
 linked executable. It verifies x64 PE headers and checks direct CRT imports on
@@ -268,7 +268,7 @@ The archive passed CRC testing. A disposable extraction matched all
 47 member SHA-256 values in `_ARCHIVE_MANIFEST.json`. The original hosted
 ZIP is retained verbatim inside it. The complete guest OpenSSL
 `version -a` output is in `windows/probe.log`.
-[Archive and restoration policy](VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records)
+[Archive and restoration policy](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records)
 
 The guest cleanup detached the task-owned junctions and verified that the
 shared SDK and provider targets still existed. It then removed the guest

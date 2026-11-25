@@ -303,7 +303,7 @@ semantics and structured recovery remain unchanged.
 ## Stage 8 Sprint 2 numeric APIs
 
 [The implementation contract](STAGE8_CALLS_NUMERIC.md) and
-[actual acceptance](stage8/SPRINT2_ACCEPTANCE.md) record the current status.
+[actual acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT2_ACCEPTANCE.md) record the current status.
 Boss approved these semantics on 20 October 2026 in [DECISIONS.md](DECISIONS.md).
 All ten numeric types expose exactly four members through the compiler-owned
 prelude; no import or user-defined primitive extension is required or admitted.

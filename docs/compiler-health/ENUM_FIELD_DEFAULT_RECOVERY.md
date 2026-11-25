@@ -282,7 +282,7 @@ that local VSIX into both normal extension stores:
 - Portable VSCodium: `~/.vscode-oss/extensions/void-language.void-language-0.1.2`
 
 The existing portable application is
-`~/Documents/Void.Language-G69-evidence/codium/codium`, previously used for G80–G83
+`~/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G69-evidence/codium/codium`, previously used for G80–G83
 qualification; no second VSCodium application was installed. Earlier qualification
 used development-extension loading. The current check exercised the installed
 extension from its normal store, not the repository development extension.

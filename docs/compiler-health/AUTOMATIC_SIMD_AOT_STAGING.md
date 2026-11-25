@@ -16,10 +16,10 @@ reset, delete, branch or dispatch CI. Suggested commit title:
 
 ## Exact approved scope
 
-[Literal staging manifest](evidence/automatic-simd/STAGING_MANIFEST.txt):
+[Literal staging manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/automatic-simd/STAGING_MANIFEST.txt):
 **160 individual paths**. No directory, wildcard, blanket add or unrelated
-local evidence is selected. The [preparation receipt](evidence/automatic-simd/PREPARATION.json)
-and [source identity](evidence/automatic-simd/SOURCE_IDENTITY.json) give machine-readable counts/hashes.
+local evidence is selected. The [preparation receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/automatic-simd/PREPARATION.json)
+and [source identity](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/automatic-simd/SOURCE_IDENTITY.json) give machine-readable counts/hashes.
 
 | Category | Paths |
 |---|---:|
@@ -68,14 +68,14 @@ run linked above; the preparation-time instructions below remain historical.
 
 ## Evidence, links and exclusions
 
-The [curated bundle](evidence/automatic-simd/README.md) copies **137 existing text
+The [curated bundle](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/automatic-simd/README.md) copies **137 existing text
 artifacts**, 2,347,021 bytes, without rewriting their bytes. It includes balanced
 raw measurements, all three candidate CTest receipts, original failures,
 source/cache proofs, selected optimized IR/disassembly, all eighteen original
 numeric fixture sources, FP/Unicode oracles, and complete archive inventories.
 The two small historical fixture/parser failures remain visible. Full binaries,
 objects, archives, caches and duplicate captures remain local and are identified
-by the [bundle manifest](evidence/automatic-simd/BUNDLE_MANIFEST.json).
+by the [bundle manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/automatic-simd/BUNDLE_MANIFEST.json).
 
 Report publication changes only current-status banners and links; original report
 bytes/hashes remain in the local preparation archive, with before/after hashes in

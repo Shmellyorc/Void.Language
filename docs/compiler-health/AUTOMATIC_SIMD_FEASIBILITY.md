@@ -25,7 +25,7 @@ is justified by these experiments.
 
 ## 1. Evidence and experiment boundaries
 
-The [committed research receipts and archive inventory](evidence/automatic-simd/README.md#research)
+The [committed research receipts and archive inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/automatic-simd/README.md#research)
 contain selected unchanged text evidence and identify the complete original local
 archive at `/home/shmellyorc/.local/state/void-log-performance/simd-gbc5btsk`.
 Binaries, objects and toolchain copies remain local; no measurement was rerun for

@@ -54,16 +54,16 @@ The original strict run reached identical 4,569,189-byte live samples at rounds
 16 and 32, then hit its 10-second connect deadline under instrumentation. Its
 receipt is preserved. The retention workload now explicitly requests 30 seconds
 per connect; public defaults and sanitizer settings are unchanged. The completed
-[strict receipt](evidence/http-tls-corpus-explicit-deadline-strict/commands.json)
+[strict receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-tls-corpus-explicit-deadline-strict/commands.json)
 passes all 256 handshakes and negative peers in 853.85 seconds. Live requested
 allocations plateau at 4,568,514–4,577,208 bytes, sampled peak 30,430,885 bytes,
 against the same 356,340,600-byte client reservation. That run's checkpoint
 reads every 16 rounds are 4,569,214 bytes. The final integrated
 strict repeat passes in 757.63 seconds with 4,568,497–4,569,197 live bytes and
-a 30,430,868-byte sampled peak ([receipt](evidence/http-tls-corpus-final-strict/commands.json)).
+a 30,430,868-byte sampled peak ([receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-tls-corpus-final-strict/commands.json)).
 The final Debug repeat passes in 347.41 seconds, with 42,635,264–45,293,568
 steady RSS and a 45,293,568-byte sampled peak
-([receipt](evidence/http-tls-corpus-final-debug/commands.json)).
+([receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-tls-corpus-final-debug/commands.json)).
 Strict ASan/UBSan/leak checks remain enabled.
 
 **Remaining safety review:** the explicit-material parsing coefficient is

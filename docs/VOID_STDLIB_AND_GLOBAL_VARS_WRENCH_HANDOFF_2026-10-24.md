@@ -29,7 +29,7 @@ Focused current-source checks clarify two review assumptions: nullable
 pattern needs no result-wrapper repair). Zero-argument `main()` accepts no result
 or `i32`; `[string]` parameters are legal ordinary function syntax but not selected
 as application entry (`VOID4001`). These are source/execution facts, not new
-language decisions. [Raw probes](stage10/engineering/closeout/example-native-and-design-probes.json)
+language decisions. [Raw probes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/closeout/example-native-and-design-probes.json)
 and [examples](stage10/EXAMPLES.md) record the exact scope; existing local compiler
 builds were reused. The independent review remains a separate, unmodified record.
 

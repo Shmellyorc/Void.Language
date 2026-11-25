@@ -25,7 +25,7 @@ def main():
     root = Path(__file__).resolve().parents[2]
     evidence = args.evidence_dir.resolve()
     evidence.mkdir(parents=True, exist_ok=True)
-    inventory = json.loads((root / "docs/release/NOTICE_INVENTORY.json").read_text())
+    inventory = json.loads((root / "cmake/licenses/NOTICE_INVENTORY.json").read_text())
     results = []
     commands = []
 
@@ -74,7 +74,7 @@ def main():
             matches(prefix / entry["installed_path"], entry["sha256"])
             checked += 1
         matches(prefix / "share/void/licenses/NOTICE_INVENTORY.json",
-                digest(root / "docs/release/NOTICE_INVENTORY.json"))
+                digest(root / "cmake/licenses/NOTICE_INVENTORY.json"))
         if not common_only:
             for source in (root / "stdlib").rglob("*.void"):
                 matches(prefix / "share/void/stdlib" / source.relative_to(root / "stdlib"),

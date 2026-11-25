@@ -1,2 +1,0 @@
-func with_spare(labels: i32) -> i32:
-    return labels + 1

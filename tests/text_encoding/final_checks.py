@@ -1,4 +1,9 @@
 """Final corrected harness, added cases and rebuilt Unicode helper verification."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 import json
 import os
@@ -8,7 +13,7 @@ from crash import ROOT, run
 
 profile = sys.argv[1]
 build = ROOT / 'build' / ('ci-official-' + profile)
-evidence = ROOT / 'docs/text-encoding/evidence'
+evidence = (documentation_evidence('text-encoding'))
 selected = {'text_encoding_text', 'text_encoding_errors', 'text_encoding_ownership',
             'text_encoding_ir', 'text_encoding_inventory', 'lsp_text_encoding',
             'text_encoding_crash_preservation', 'text_encoding_depth', 'text_encoding_install'}

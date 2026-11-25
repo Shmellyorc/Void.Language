@@ -1,4 +1,0 @@
-use math
-use math as m
-func main():
-    var a = _math_sin<f64>(1.0)

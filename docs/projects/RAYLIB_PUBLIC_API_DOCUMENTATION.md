@@ -207,7 +207,7 @@ release trust retain their existing qualification boundaries.
 
 Review builds, native-catalog copies, test projects, logs, screenshots and
 receipts are in
-`/home/shmellyorc/Documents/Void.Language-RaylibDocs-evidence`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-RaylibDocs-evidence`.
 The owner's G72 compiler/server links, VS Code settings and recovery
 installations passed preservation checks. Candidate tools were used in
 isolated processes. G69 remains on HOLD.
@@ -239,7 +239,7 @@ The original CamelCase converter treated the `D` following a digit as a separate
 word, yielding `camera3_d`, `begin_mode2_d` and `draw_triangle_strip3_d`.
 Public naming now preserves the meaningful numeric-letter unit: `camera_3d`,
 `begin_mode_2d`, `draw_triangle_strip_3d`. The
-[package guide](../../verified-packages/raylib/README.md#camera-construction-and-numeric-unit-names)
+[package guide](../../verified-packages/raylib/README.md#value-construction-and-public-names)
 lists all 14 preferred/compatible pairs. Trailing numbers without a following
 letter, including `vector3`, `compute_sha256` and `load_utf8`, are unchanged.
 
@@ -309,7 +309,7 @@ Compiler/LSP checks cover namespace completion of both spellings, actual source
 hover docs, displayed optional parameters and active named-parameter selection.
 
 Final results and exact changed-file inventory are recorded in
-[evidence/raylib-naming/results.json](evidence/raylib-naming/results.json).
+[evidence/raylib-naming/results.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/raylib-naming/results.json).
 Focused results on the final code:
 
 | Check | Result |

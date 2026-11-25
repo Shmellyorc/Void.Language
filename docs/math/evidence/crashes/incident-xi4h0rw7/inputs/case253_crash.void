@@ -1,3 +1,0 @@
-use math
-func main():
-    var wrong: i32 = math.sin(1.0)

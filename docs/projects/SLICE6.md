@@ -2,8 +2,8 @@
 
 Golden Wrench approved the S6 language contract for local implementation on
 baseline `2f667ea338127b8f91c3136804377ef3fa5218d6`. The pre-approval
-[architecture audit](evidence/slice6/preapproval-audit.txt) and
-[executed baseline probes](evidence/slice6-baseline-audit.json) remain available.
+[architecture audit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/preapproval-audit.txt) and
+[executed baseline probes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-baseline-audit.json) remain available.
 
 ## Implementation
 
@@ -73,14 +73,14 @@ configuration tests passed, including the configured old-server path.
 
 | Configuration | Executed |
 | --- | --- |
-| Linux x86-64 Release | [24/24 focused CTest cases](evidence/slice6/linux/release-ctest.txt), plus [final enum/IR replay](evidence/slice6/linux/release-final-enum.txt) |
-| Linux x86-64 Debug | [24/24 focused CTest cases](evidence/slice6/linux/debug-ctest.txt), plus [final enum/IR replay](evidence/slice6/linux/debug-final-enum.txt) |
-| Linux x86-64 fatal ASan/UBSan | [24/24 focused CTest cases](evidence/slice6/linux/strict-ctest.txt) with an instrumented compiler/runtime and leak detection |
-| Windows 10 x64 build 19045 Release | [23/23 native CTest cases](evidence/slice6/windows-final/Release-ctest.txt) |
-| Windows 10 x64 build 19045 Debug | [23/23 native CTest cases](evidence/slice6/windows-final/Debug-ctest.txt) |
-| VS Code 1.141.0 on Linux | [6 live extension-host checks](evidence/slice6/editor-host.json) and [7 configuration tests](evidence/slice6/editor-config.txt) |
+| Linux x86-64 Release | [24/24 focused CTest cases](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/linux/release-ctest.txt), plus [final enum/IR replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/linux/release-final-enum.txt) |
+| Linux x86-64 Debug | [24/24 focused CTest cases](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/linux/debug-ctest.txt), plus [final enum/IR replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/linux/debug-final-enum.txt) |
+| Linux x86-64 fatal ASan/UBSan | [24/24 focused CTest cases](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/linux/strict-ctest.txt) with an instrumented compiler/runtime and leak detection |
+| Windows 10 x64 build 19045 Release | [23/23 native CTest cases](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/windows-final/Release-ctest.txt) |
+| Windows 10 x64 build 19045 Debug | [23/23 native CTest cases](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/windows-final/Debug-ctest.txt) |
+| VS Code 1.141.0 on Linux | [6 live extension-host checks](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/editor-host.json) and [7 configuration tests](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/editor-config.txt) |
 
-All qualified builds use LLVM 23.1.4. The [Linux runner](evidence/slice6/run-linux.sh)
+All qualified builds use LLVM 23.1.4. The [Linux runner](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/run-linux.sh)
 records the command and sanitizer settings. The evidence contains JUnit output,
 process and LSP payloads, exact tool versions and executable hashes. Windows
 qualification used the existing provider-attested native toolchain. The replay
@@ -103,12 +103,12 @@ CI are outside this executed matrix.
   The malformed IR fixture now supplies a valid source name so it reaches
   the intended validator. Forced GC attaches the test thread to the
   Runtime and enters managed execution before collection. Initial failures
-  remain in the [first](evidence/slice6/release-first-ctest.txt) and
-  [second](evidence/slice6/release-second-ctest.txt) CTest reports.
+  remain in the [first](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/release-first-ctest.txt) and
+  [second](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/release-second-ctest.txt) CTest reports.
 - The managed default reproducer originally returned VOID1106. Checked
   enum and option defaults now enter the existing initializer prelude.
-  The [original](evidence/slice6/linux-managed-default-original.txt) and
-  [corrected](evidence/slice6/linux-managed-default-corrected.txt) Release
+  The [original](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/linux-managed-default-original.txt) and
+  [corrected](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/linux-managed-default-corrected.txt) Release
   command logs preserve the outcome. The final integration test covers
   both field types and independent construction validation.
 - Early sanitizer qualification reused a frontend object whose compilation
@@ -126,27 +126,27 @@ CI are outside this executed matrix.
   forced collection. The process test assumed the POSIX cache was available
   on Windows. The corrected replay checks the native unavailability contract
   and the expected execution result after editing a discriminant. Both
-  [original Release](evidence/slice6/windows-original/Release-ctest.txt) and
-  [original Debug](evidence/slice6/windows-original/Debug-ctest.txt) transcripts
+  [original Release](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/windows-original/Release-ctest.txt) and
+  [original Debug](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/windows-original/Debug-ctest.txt) transcripts
   retain the failure details. The replay verified all 3,258 inputs and used
   the same attested toolchain and provider checks.
 
 ## Source and Git inventory
 
-The [exact implementation patch](evidence/slice6-source.patch) applies to the
+The [exact implementation patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-source.patch) applies to the
 reviewed pre-implementation working tree and covers 24 source, test and
-language documentation paths. [Before and after hashes](evidence/slice6-source-hashes.json)
-and the [layered inventory](evidence/slice6-implementation-inventory.txt)
+language documentation paths. [Before and after hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-source-hashes.json)
+and the [layered inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-implementation-inventory.txt)
 identify the precise source and evidence layers. The earlier
-[859-path audit inventory](evidence/slice6-inventory.txt) remains intact.
+[859-path audit inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-inventory.txt) remains intact.
 The final verification compares HEAD, index entries and earlier evidence bytes.
 
 ## End-of-task temporary workspace cleanup
 
-The [host cleanup inventory](evidence/slice6/host-cleanup-results.json) records
+The [host cleanup inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/host-cleanup-results.json) records
 13 assignment-owned launch screenshots, disposable fixtures,
 scratch scripts and bytecode paths removed after preservation. The
-[Windows cleanup receipt](evidence/slice6/windows-cleanup-results.json) records
+[Windows cleanup receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6/windows-cleanup-results.json) records
 the exact contents removed from both restored-overlay backup directories and
 the two empty test temp directories. Windows `C:` free space went from
 5,304,213,504 to 5,307,506,688 bytes (4.940 to 4.943 GiB).

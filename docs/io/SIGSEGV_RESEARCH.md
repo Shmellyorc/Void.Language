@@ -43,16 +43,16 @@ CI was changed. New files are this report and its separate research receipt.
 
 | Observation | What it establishes |
 |---|---|
-| [Initial Release log](evidence/release-initial-io.txt), lines 25–41; [summary](evidence/release-initial-io-summary.txt) | `io_async_execution` failed after 55.73 s: runner return `-11`, empty captured stdout/stderr. The source check immediately before the runner had succeeded. The selection finished 26/27. |
-| [Debugger attempt 1](evidence/release-gdb-attempt-1.txt) and [attempt 2](evidence/release-gdb-attempt-2.txt) | Both passes completed; four worker threads were created per pass. No crash stack. Logs do not contain the original runner's hash or a failing PC. |
-| [Final receipt](evidence/RECEIPT.md) | Later Debug 63/63, Release 63/63 and strict sanitizer 56/56 selections passed. They remain retries after intervening work, not original first-attempt success. |
+| [Initial Release log](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/release-initial-io.txt), lines 25–41; [summary](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/release-initial-io-summary.txt) | `io_async_execution` failed after 55.73 s: runner return `-11`, empty captured stdout/stderr. The source check immediately before the runner had succeeded. The selection finished 26/27. |
+| [Debugger attempt 1](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/release-gdb-attempt-1.txt) and [attempt 2](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/release-gdb-attempt-2.txt) | Both passes completed; four worker threads were created per pass. No crash stack. Logs do not contain the original runner's hash or a failing PC. |
+| [Final receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/RECEIPT.md) | Later Debug 63/63, Release 63/63 and strict sanitizer 56/56 selections passed. They remain retries after intervening work, not original first-attempt success. |
 | Reconstructed fixture at the reported pathname | `/tmp/VOID io async wire 1icf1laa/main.void` is a reconstruction from the final committed generator, **not a preserved original crash file**. It has 17,032 bytes, SHA-256 `64b6a7abbf71eb627d80a0244acb9a0db061e5f6c6f5d582e38732d510befaab`. Neither original bytes nor an original fixture hash were archived. |
 | Two new direct Release invocations | Both returned 0, in 63.375 s and 61.401 s, with normal and O2 success messages and empty stderr. No crash/core. |
 | One new phase-traced GDB invocation | Both passes returned normally with ASLR enabled. Compilation/invocation markers worked without rebuilding. No crash stack. |
 | Independent output checks | All six resulting little/big-endian files matched the Python oracle, across the two direct runs and the debugger run; each uses all 42 numeric vectors plus Pascal/raw text. |
 
 New results, exact hashes and the debugger transcript are in
-[the research receipt](evidence/sigsegv-research-2026-10-26.json).
+[the research receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/sigsegv-research-2026-10-26.json).
 The existing runner's SHA-256 is
 `b42d5bcd782470be46a5a6009a56b8003fef5e8439e2b93caa04f0b027f3a3b6`.
 Its current modification time is 09:20, after the initial 08:56 selection began. The record has no
@@ -151,7 +151,7 @@ anywhere along this path. The new timing evidence shows why an apparent long
 “execution test” may mostly be compilation.
 
 A concrete, separate historical observation exists:
-[Stage 11's retained stack](../stage11/evidence/llvm-dse-backtrace.txt), lines 4–29,
+[Stage 11's retained stack](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/evidence/llvm-dse-backtrace.txt), lines 4–29,
 stopped in `CallBase::getMemoryEffects` / `DSEPass` during an O2 console compile
 in a Debug host build.
 That establishes an unresolved optimizer-phase failure in this codebase/toolchain,

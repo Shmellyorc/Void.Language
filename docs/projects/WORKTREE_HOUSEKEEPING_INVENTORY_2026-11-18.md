@@ -106,34 +106,34 @@ HOLD. Coordinate the active G70 shell before its move; do not kill it.
 
 | Existing absolute path | Proposed absolute destination | Class |
 | --- | --- | --- |
-| `/home/shmellyorc/Documents/Void.Language-G38` | `/home/shmellyorc/Documents/Void.Language-worktrees/g38-automatic-loop-optimization` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G39` | `/home/shmellyorc/Documents/Void.Language-worktrees/g39-managed-lifetimes` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G45` | `/home/shmellyorc/Documents/Void.Language-worktrees/g45-native-codegen-scaling` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G45U` | `/home/shmellyorc/Documents/Void.Language-worktrees/g45u-machinesinking-proof` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G45V` | `/home/shmellyorc/Documents/Void.Language-worktrees/g45v-host-code` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G46` | `/home/shmellyorc/Documents/Void.Language-worktrees/g46-text-unicode-json` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G46F` | `/home/shmellyorc/Documents/Void.Language-worktrees/g46f-utf8-decode` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G47` | `/home/shmellyorc/Documents/Void.Language-worktrees/g47-sorting-bounds` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G47AOT` | `/home/shmellyorc/Documents/Void.Language-worktrees/g47-aot-poll` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G48` | `/home/shmellyorc/Documents/Void.Language-worktrees/g48-dictionary-collections` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G49` | `/home/shmellyorc/Documents/Void.Language-worktrees/g49-dictionary-probe-reuse` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G50` | `/home/shmellyorc/Documents/Void.Language-worktrees/g50-json-text-construction` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G52` | `/home/shmellyorc/Documents/Void.Language-worktrees/g52-private-list-indexed-reads` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G53` | `/home/shmellyorc/Documents/Void.Language-worktrees/g53-list-write-performance` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G54` | `/home/shmellyorc/Documents/Void.Language-worktrees/g54-file200-runtime-redundancy` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G55` | `/home/shmellyorc/Documents/Void.Language-worktrees/g55-buffer-validation-reuse` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G56` | `/home/shmellyorc/Documents/Void.Language-worktrees/g56-native-code-layout-stability` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G57` | `/home/shmellyorc/Documents/Void.Language-worktrees/g57-text-join-performance` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G58` | `/home/shmellyorc/Documents/Void.Language-worktrees/g58-jit-code-layout-stability` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G59` | `/home/shmellyorc/Documents/Void.Language-worktrees/g59-native-package-workflow` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G60` | `/home/shmellyorc/Documents/Void.Language-worktrees/g60-warm-project-startup` | Uncertain |
-| `/home/shmellyorc/Documents/Void.Language-G61` | `/home/shmellyorc/Documents/Void.Language-worktrees/g61-simple-package-workflow` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G67` | `/home/shmellyorc/Documents/Void.Language-worktrees/g67-vscode-library-management` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G69` | `/home/shmellyorc/Documents/Void.Language-worktrees/g69-void-file-icons` | ON HOLD |
-| `/home/shmellyorc/Documents/Void.Language-G70` | `/home/shmellyorc/Documents/Void.Language-worktrees/g70-local-launch-readiness` | Active |
-| `/home/shmellyorc/Documents/Void.Language-G72` | `/home/shmellyorc/Documents/Void.Language-worktrees/g72-editor-reliability` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-G73` | `/home/shmellyorc/Documents/Void.Language-worktrees/g73-vscode-extension-icon` | Completed |
-| `/home/shmellyorc/Documents/Void.Language-RaylibDocs` | `/home/shmellyorc/Documents/Void.Language-worktrees/raylib-public-api-docs` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G38` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g38-automatic-loop-optimization` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G39` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g39-managed-lifetimes` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G45` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g45-native-codegen-scaling` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G45U` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g45u-machinesinking-proof` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G45V` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g45v-host-code` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G46` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g46-text-unicode-json` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G46F` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g46f-utf8-decode` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G47` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g47-sorting-bounds` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G47AOT` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g47-aot-poll` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G48` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g48-dictionary-collections` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G49` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g49-dictionary-probe-reuse` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G50` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g50-json-text-construction` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G52` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g52-private-list-indexed-reads` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G53` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g53-list-write-performance` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G54` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g54-file200-runtime-redundancy` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G55` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g55-buffer-validation-reuse` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G56` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g56-native-code-layout-stability` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G57` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g57-text-join-performance` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G58` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g58-jit-code-layout-stability` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G59` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g59-native-package-workflow` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G60` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g60-warm-project-startup` | Uncertain |
+| `/home/shmellyorc/Documents/Void.Language-G61` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g61-simple-package-workflow` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G67` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g67-vscode-library-management` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G69` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g69-void-file-icons` | ON HOLD |
+| `/home/shmellyorc/Documents/Void.Language-G70` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g70-local-launch-readiness` | Active |
+| `/home/shmellyorc/Documents/Void.Language-G72` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g72-editor-reliability` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-G73` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g73-vscode-extension-icon` | Completed |
+| `/home/shmellyorc/Documents/Void.Language-RaylibDocs` | `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/raylib-public-api-docs` | Completed |
 
 ## Exact proposed retirements — approval required
 
@@ -164,7 +164,7 @@ normal `git worktree remove PATH`; preserve local branch refs. Do not use force.
 | Absolute path | Reason |
 | --- | --- |
 | `/home/shmellyorc/Documents/Void.Language` | Main integration checkout; active app/compiler-server processes. Git worktree move cannot move the main checkout. |
-| `/home/shmellyorc/Documents/Void.Language-G50-Recovery` | Registered Git worktree also serving as recovery material; ownership/disposition not established. Leave it in place. |
+| `/home/shmellyorc/Documents/Void.Language-worktrees/g50-recovery` | Registered Git worktree also serving as recovery material; ownership/disposition not established. Leave it in place. |
 
 ## Local contents that must survive
 
@@ -314,35 +314,35 @@ relocation does not certify that unfinished changes are merged or obsolete.
 | Absolute path | HEAD | Class | T/U/I |
 | --- | --- | --- | ---: |
 | `/home/shmellyorc/Documents/Void.Language` | `e96b827287cf` | Active | 2/2/824188* |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g38-automatic-loop-optimization` | `1e606f8e5067` | Completed | 4/8/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g39-managed-lifetimes` | `793de66cb8cb` | Completed | 0/0/1 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g45-native-codegen-scaling` | `894e2e8d9930` | Uncertain | 1/1/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g45u-machinesinking-proof` | `894e2e8d9930` | Uncertain | 1/2/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g45v-host-code` | `894e2e8d9930` | Uncertain | 1/3/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g46-text-unicode-json` | `894e2e8d9930` | Uncertain | 5/4/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g46f-utf8-decode` | `894e2e8d9930` | Uncertain | 5/6/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g47-sorting-bounds` | `894e2e8d9930` | Uncertain | 3/7/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g47-aot-poll` | `1831364f0ca4` | Completed | 0/0/971 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g48-dictionary-collections` | `4790a7a52ecf` | Completed | 0/0/1 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g49-dictionary-probe-reuse` | `4790a7a52ecf` | Uncertain | 3/1/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g50-json-text-construction` | `4790a7a52ecf` | Uncertain | 4/2/0 |
-| `/home/shmellyorc/Documents/Void.Language-G50-Recovery` | `4790a7a52ecf` | Uncertain | 4/2/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g52-private-list-indexed-reads` | `771fbfc56b5d` | Completed | 0/0/1 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g53-list-write-performance` | `771fbfc56b5d` | Uncertain | 5/1/1 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g54-file200-runtime-redundancy` | `808d4dce8564` | Completed | 0/0/1 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g55-buffer-validation-reuse` | `808d4dce8564` | Uncertain | 4/1/1 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g56-native-code-layout-stability` | `808d4dce8564` | Uncertain | 1/2/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g57-text-join-performance` | `808d4dce8564` | Uncertain | 3/1/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g58-jit-code-layout-stability` | `808d4dce8564` | Uncertain | 1/1/0 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g59-native-package-workflow` | `1c3cfc4e9bd0` | Completed | 0/0/1 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g60-warm-project-startup` | `dc93b675ed44` | Uncertain | 0/23/3 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g61-simple-package-workflow` | `7a18607ae68f` | Completed | 0/0/1 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g67-vscode-library-management` | `6e1035d06e10` | Completed | 0/0/76 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g69-void-file-icons` | `92432510ebfe` | ON HOLD | 3/3/9353 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g70-local-launch-readiness` | `0ef6baeb130f` | Active | 0/0/9353 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g72-editor-reliability` | `7ef5ba6d8354` | Completed | 0/0/9483 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/g73-vscode-extension-icon` | `3f875c14b420` | Completed | 0/0/9356 |
-| `/home/shmellyorc/Documents/Void.Language-worktrees/raylib-public-api-docs` | `fdcbeadbdd8a` | Completed | 0/0/7 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g38-automatic-loop-optimization` | `1e606f8e5067` | Completed | 4/8/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g39-managed-lifetimes` | `793de66cb8cb` | Completed | 0/0/1 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g45-native-codegen-scaling` | `894e2e8d9930` | Uncertain | 1/1/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g45u-machinesinking-proof` | `894e2e8d9930` | Uncertain | 1/2/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g45v-host-code` | `894e2e8d9930` | Uncertain | 1/3/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g46-text-unicode-json` | `894e2e8d9930` | Uncertain | 5/4/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g46f-utf8-decode` | `894e2e8d9930` | Uncertain | 5/6/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g47-sorting-bounds` | `894e2e8d9930` | Uncertain | 3/7/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g47-aot-poll` | `1831364f0ca4` | Completed | 0/0/971 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g48-dictionary-collections` | `4790a7a52ecf` | Completed | 0/0/1 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g49-dictionary-probe-reuse` | `4790a7a52ecf` | Uncertain | 3/1/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g50-json-text-construction` | `4790a7a52ecf` | Uncertain | 4/2/0 |
+| `/home/shmellyorc/Documents/Void.Language-worktrees/g50-recovery` | `4790a7a52ecf` | Uncertain | 4/2/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g52-private-list-indexed-reads` | `771fbfc56b5d` | Completed | 0/0/1 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g53-list-write-performance` | `771fbfc56b5d` | Uncertain | 5/1/1 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g54-file200-runtime-redundancy` | `808d4dce8564` | Completed | 0/0/1 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g55-buffer-validation-reuse` | `808d4dce8564` | Uncertain | 4/1/1 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g56-native-code-layout-stability` | `808d4dce8564` | Uncertain | 1/2/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g57-text-join-performance` | `808d4dce8564` | Uncertain | 3/1/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g58-jit-code-layout-stability` | `808d4dce8564` | Uncertain | 1/1/0 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g59-native-package-workflow` | `1c3cfc4e9bd0` | Completed | 0/0/1 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g60-warm-project-startup` | `dc93b675ed44` | Uncertain | 0/23/3 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g61-simple-package-workflow` | `7a18607ae68f` | Completed | 0/0/1 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g67-vscode-library-management` | `6e1035d06e10` | Completed | 0/0/76 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g69-void-file-icons` | `92432510ebfe` | ON HOLD | 3/3/9353 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g70-local-launch-readiness` | `0ef6baeb130f` | Active | 0/0/9353 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g72-editor-reliability` | `7ef5ba6d8354` | Completed | 0/0/9483 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/g73-vscode-extension-icon` | `3f875c14b420` | Completed | 0/0/9356 |
+| `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/raylib-public-api-docs` | `fdcbeadbdd8a` | Completed | 0/0/7 |
 
 *Main has the two modified and two new authorized housekeeping Markdown files.
 Its ignored count is the original snapshot; main SDK/build contents were not

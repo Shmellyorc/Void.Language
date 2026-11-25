@@ -1,4 +1,0 @@
-func min<t>(left: t, right: t) -> t:
-    return left
-func sin<t>(value: t) -> t:
-    return value

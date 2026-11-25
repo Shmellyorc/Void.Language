@@ -1,5 +1,0 @@
-struct base:
-    value: i32
-
-virtual func (b base) read() -> i32:
-    return b.value

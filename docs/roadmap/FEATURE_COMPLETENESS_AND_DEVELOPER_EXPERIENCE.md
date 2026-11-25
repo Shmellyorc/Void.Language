@@ -202,7 +202,7 @@ only absent properties. The TestGame example uses bounded UTF-8 input,
 strict parsing, application validation and G06 private-directory saving.
 Large incremental JSON, formatted-date parsing, normalization,
 grapheme handling and collection conveniences remain separate work.
-[JSON configuration API](../json/API.md#explicit-configuration-defaults) · [G09 qualification](../json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults)
+[JSON configuration API](../json/API.md#explicit-configuration-defaults) · [G09 qualification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults)
 
 ### G15 · Named and unnamed multiple returns
 

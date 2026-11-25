@@ -1,4 +1,0 @@
-use "/worker.void" as worker
-const root_bonus = 2
-func entry(x: i32) -> i32:
-    return worker.calculate(x)

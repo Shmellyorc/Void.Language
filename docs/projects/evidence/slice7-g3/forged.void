@@ -1,4 +1,0 @@
-use "/native_resources.void" as ffi
-func entry(value: i32) -> i32:
-    var fake = ffi.box()
-    return ffi.read(fake, value)

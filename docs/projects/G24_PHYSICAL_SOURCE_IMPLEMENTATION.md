@@ -18,7 +18,7 @@ banner/import replacement. Its callback implementation was already incorporated;
 the redundant `src/callbacks.void.inc` maintenance fragment is removed. There are
 757 public-module functions, including helpers, and 772 checked native
 declarations plus 24 record/resource declarations. These are not inflated into
-the upstream count. The unchanged [600-entry inventory](../../verified-packages/raylib/inventory.json)
+the upstream count. The unchanged [600-entry inventory](../../tools/raylib/inventory.json)
 accounts for exactly:
 
 | Exposure | Upstream declarations |

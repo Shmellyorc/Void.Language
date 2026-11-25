@@ -25,7 +25,7 @@ Effective focused native acceptance is **17/17 per profile, 34/34 combined**,
 including 32 public command checks across normal/O2 JIT, independent sync/async
 AOT, forced GC, RSA/ECDSA exact peer identity, negatives, reuse, cancellation,
 active Runtime shutdown and complete owned-credential removal. Original failures
-and final reruns are preserved in the [public receipt](evidence/windows-schannel-acceptance-20261103.json).
+and final reruns are preserved in the [public receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-schannel-acceptance-20261103.json).
 The Windows Digest peer gate removes a fixture dependency cycle while preserving
 the original payload/deadlines and adding full-body checks. Schannel's synchronous
 record-send/cancellation latency boundary remains explicit.
@@ -44,7 +44,7 @@ The [adapter feasibility report](WINDOWS_TLS_ADAPTER_FEASIBILITY.md), baseline
 `5bf1c514cb9c6a52d00a1ee359d5c54af762e8ec`, establishes Windows chain-policy
 verification and exact non-exportable software CNG RSA/ECDSA signing inside one
 AWS-LC transport in Debug/Release. Independent mechanisms precede combined TLS
-1.2/1.3 controls. [Public evidence](evidence/windows-awslc-adapters-20261103.json)
+1.2/1.3 controls. [Public evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-awslc-adapters-20261103.json)
 contains 82 TLS observations and two read-only public-anchor controls: 78 valid
 functional/limitation controls, two inconclusive original proxy controls and
 **two failed identity privacy assertions**. These are not 84 security passes.
@@ -84,7 +84,7 @@ different backends concurrently. Prefer one transport provider and the existing
 driver, conditional on reviewed Windows verification/store-signing adapters or
 explicit Boss contract decisions. Production migration remains HOLD.
 
-The [new receipt](evidence/windows-awslc-provider-20261103.json) preserves original
+The [new receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-awslc-provider-20261103.json) preserves original
 build/fixture failures separately. No production/API/policy/vendor/platform/CI
 change was made. Full Server 2022 Runtime, strict, memory, installation and native
 Windows policy/store acceptance remain open. Stop for Golden Wrench review after
@@ -118,7 +118,7 @@ Public entry points are in [url.void](../../../stdlib/url.void) and
 [net/http.void](../../../stdlib/net/http.void). [User guide](README.md),
 [five runnable examples](../../../examples/net_http/README.md),
 [current implementation](CURRENT_ENGINEERING.md), [approved contract](DESIGN.md)
-and [acceptance roadmap](ROADMAP.md) provide the detailed inventory.
+and [acceptance roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/ROADMAP.md) provide the detailed inventory.
 
 ## Exact dependency decisions
 
@@ -150,26 +150,26 @@ All three Linux prefixes independently verify 167 files.
 
 | Run | Actual result |
 | --- | --- |
-| Original consolidated Release | [382/387](evidence/http-consolidated-tests-release.log), five concrete integration failures preserved |
-| Release repairs | [25/25](evidence/http-final-tests-release.log), including all five original failures |
-| Release after Runtime cost repair | [79/79](evidence/http-reaping-final-tests-release.log), after the completed-task cost correction |
-| Expanded final Release | [92/92](evidence/http-frontend-final-tests-release.log), including broader frontend coverage after the semantic stack repair; all-target rebuild also passes |
-| Held public-source HTTP reload | [Release](evidence/http-reload-owner-tests-release.log), [Debug](evidence/http-final-tests-debug-repaired.log) and [strict](evidence/http-frontend-final-tests-strict.log) pass: cold/hit cache, precise GC while a streaming read is held, old/new generation results, incompatible-layout restart and complete retirement |
-| Expanded final Debug | [105/105](evidence/http-final-tests-debug-repaired.log), including the twelve private-call probes, held reload and all four original Debug repairs; all-target build passes |
-| Original consolidated strict | [374/377](evidence/http-consolidated-tests-strict.log), old stress deadline and old Scope-worker-zero assertions; all three have passing reruns |
-| Strict affected run before frontend split | [80/81](evidence/http-final-tests-strict.log); TLS and Stage6 pass. DNS fixture startup hit a UDP/TCP port collision before native execution; bounded pair acquisition and cleanup controls pass, and the final strict run passes DNS |
-| Expanded final strict | [92/92](evidence/http-frontend-final-tests-strict.log), full ASan/UBSan/leak checks, after frontend and fixture repairs; all-target build passes |
-| Additional final fixture/frontend checks | [Release DNS 1/1](evidence/http-dns-port-final-release.log); channel frontend [Release 1/1](evidence/http-frontend-channel-final-release.log), [Debug 1/1](evidence/http-frontend-channel-final-debug.log), [strict 1/1](evidence/http-frontend-channel-final-strict.log) |
-| Original consolidated Debug | [396/400](evidence/http-consolidated-tests-debug.log), semantic stack pressure in two math tests plus old worker assertions; repairs retain the original 1 MiB stack and nesting limits |
-| Strict TLS corpus | [Final 256 fresh handshakes plus negative peers pass](evidence/http-tls-corpus-final-strict/commands.json), 757.63 s; [earlier explicit-deadline pass](evidence/http-tls-corpus-explicit-deadline-strict/commands.json), 853.85 s. Full ASan/UBSan/leak checks; binary/runtime/provider hashes remain unchanged after the frontend-only rebuild |
-| Post-correction public source | [2 GiB, 9 process checks](evidence/http-reaping-source-2GiB-release/commands.json): normal/O2 JIT and independent normal/O2 AOT |
-| Post-correction native bulk | [2 GiB download + 4 GiB+1 upload](evidence/http-reaping-public-bulk-4GiB-release/commands.json), independent byte count/hash and exact file positions |
-| Final-source clean pinned build | [18 example process checks / 1 CTest](evidence/http-final-clean-examples-release.log), [2/2 LSP CTests](evidence/http-final-clean-lsp-release.log), explicit LLD 23.1.4. [Eight archives/compiler objects and voidls reproduce byte for byte](evidence/http-final-clean-build-identity.json); all eleven native resources verify |
-| Earlier fresh compiler/custom-output control | [18/18 example checks](evidence/http-clean-output-examples-release.log) with Unicode/space/#/% output and adjacent hashed resources. This configuration left `VOID_LINKER` empty and used the default system linker; it is not pinned-LLD acceptance |
+| Original consolidated Release | [382/387](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-consolidated-tests-release.log), five concrete integration failures preserved |
+| Release repairs | [25/25](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-final-tests-release.log), including all five original failures |
+| Release after Runtime cost repair | [79/79](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-reaping-final-tests-release.log), after the completed-task cost correction |
+| Expanded final Release | [92/92](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-frontend-final-tests-release.log), including broader frontend coverage after the semantic stack repair; all-target rebuild also passes |
+| Held public-source HTTP reload | [Release](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-reload-owner-tests-release.log), [Debug](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-final-tests-debug-repaired.log) and [strict](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-frontend-final-tests-strict.log) pass: cold/hit cache, precise GC while a streaming read is held, old/new generation results, incompatible-layout restart and complete retirement |
+| Expanded final Debug | [105/105](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-final-tests-debug-repaired.log), including the twelve private-call probes, held reload and all four original Debug repairs; all-target build passes |
+| Original consolidated strict | [374/377](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-consolidated-tests-strict.log), old stress deadline and old Scope-worker-zero assertions; all three have passing reruns |
+| Strict affected run before frontend split | [80/81](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-final-tests-strict.log); TLS and Stage6 pass. DNS fixture startup hit a UDP/TCP port collision before native execution; bounded pair acquisition and cleanup controls pass, and the final strict run passes DNS |
+| Expanded final strict | [92/92](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-frontend-final-tests-strict.log), full ASan/UBSan/leak checks, after frontend and fixture repairs; all-target build passes |
+| Additional final fixture/frontend checks | [Release DNS 1/1](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-dns-port-final-release.log); channel frontend [Release 1/1](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-frontend-channel-final-release.log), [Debug 1/1](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-frontend-channel-final-debug.log), [strict 1/1](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-frontend-channel-final-strict.log) |
+| Original consolidated Debug | [396/400](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-consolidated-tests-debug.log), semantic stack pressure in two math tests plus old worker assertions; repairs retain the original 1 MiB stack and nesting limits |
+| Strict TLS corpus | [Final 256 fresh handshakes plus negative peers pass](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-tls-corpus-final-strict/commands.json), 757.63 s; [earlier explicit-deadline pass](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-tls-corpus-explicit-deadline-strict/commands.json), 853.85 s. Full ASan/UBSan/leak checks; binary/runtime/provider hashes remain unchanged after the frontend-only rebuild |
+| Post-correction public source | [2 GiB, 9 process checks](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-reaping-source-2GiB-release/commands.json): normal/O2 JIT and independent normal/O2 AOT |
+| Post-correction native bulk | [2 GiB download + 4 GiB+1 upload](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-reaping-public-bulk-4GiB-release/commands.json), independent byte count/hash and exact file positions |
+| Final-source clean pinned build | [18 example process checks / 1 CTest](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-final-clean-examples-release.log), [2/2 LSP CTests](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-final-clean-lsp-release.log), explicit LLD 23.1.4. [Eight archives/compiler objects and voidls reproduce byte for byte](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-final-clean-build-identity.json); all eleven native resources verify |
+| Earlier fresh compiler/custom-output control | [18/18 example checks](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-clean-output-examples-release.log) with Unicode/space/#/% output and adjacent hashed resources. This configuration left `VOID_LINKER` empty and used the default system linker; it is not pinned-LLD acceptance |
 | Managed failures | 1,448 sync and 1,607 async injected failures per optimization mode in each profile; zero managed/native source roots after drain and successful reuse; `http-private-form-faults-PROFILE` receipts |
 
-[Machine-readable reconciliation](evidence/http-final-verification.json), produced
-by [this local script](evidence/final-verification.py), finds a passing latest
+[Machine-readable reconciliation](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-final-verification.json), produced
+by [this local script](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/final-verification.py), finds a passing latest
 available result for all 389 Release, 402 Debug and 379 strict registered names.
 Those are the original consolidated runs plus the explicitly listed focused
 reruns, not three new all-tests executions. Every original failure remains in
@@ -185,12 +185,12 @@ Do not add process checks, injected failures or handshakes to CTest totals.
 
 The Debug ordinary-call frame falls from 22,312 to 2,728 bytes by returning
 through a separate builtin handler before ordinary argument recursion.
-[Exact inputs, flags and frame comparison](evidence/frontend-stack/summary.json)
+[Exact inputs, flags and frame comparison](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/frontend-stack/summary.json)
 preserve the original nesting limits and crash bundles. Shared generated test
 objects now have one CMake producer before either consumer links; all twelve
 private-call tests pass. DNS fixture startup acquires UDP/TCP as a pair, closes
 failed attempts and retries only address-in-use at most 32 times;
-[all three deterministic controls](evidence/dns-port-pair-probe.json) pass.
+[all three deterministic controls](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/dns-port-pair-probe.json) pass.
 These repairs introduce no sanitizer suppression or transport-policy relaxation.
 
 ## Measured memory and performance
@@ -223,12 +223,12 @@ Historical logging optimizer/performance/release holds remain unchanged.
 
 The final-source clean build uses a Unicode/space/`#` CMake output directory.
 Direct external LLD absolute outputs containing `%` reproduce the existing
-[Stage9 toolchain limitation](../../STAGE9_RESEARCH.md#reproduced-lld-output-path-issue);
-the [new control log](evidence/http-clean-pinned-linker-percent-control-build-release.log)
+[Stage9 toolchain limitation](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE9_RESEARCH.md#reproduced-lld-output-path-issue);
+the [new control log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-clean-pinned-linker-percent-control-build-release.log)
 is retained. The existing compiler-owned relative-stage publication and passing
 HTTP install/relocation `%` path tests are unchanged. The raw clean `voidc` has a
 different required cache-build identity because its input paths differ. An
-[isolated link control](evidence/http-final-clean-identity-link.json), changing
+[isolated link control](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-final-clean-identity-link.json), changing
 only that identity archive, reproduces the main compiler byte for byte; no
 production identity was replaced.
 
@@ -250,7 +250,7 @@ production identity was replaced.
    ownership; source file authority; security/policy defaults; and the explicit
    acceptance gaps above. Passing local tests do not close these gates automatically.
 
-[Candidate file/hash inventory](evidence/http-candidate-files.json) identifies the
+[Candidate file/hash inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-candidate-files.json) identifies the
 working-tree source/doc set; it is not staging or authorship attribution.
 [Chronological engineering history](ENGINEERING_HISTORY.md) retains original
 OpenSSL UB, cookie OOM, H2 credit, retry, timeout, source-input build race, worker

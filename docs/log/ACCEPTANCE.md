@@ -1,22 +1,22 @@
 # Logging local acceptance
 
-**Pre-repair acceptance record.** Counts in this original report do not validate the subsequent performance changes. Fresh expanded profile results are being recorded under [evidence/performance-repair](evidence/performance-repair/). Release remains on hold for independent review.
+**Pre-repair acceptance record.** Counts in this original report do not validate the subsequent performance changes. Fresh expanded profile results are being recorded under [evidence/performance-repair](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair). Release remains on hold for independent review.
 
 28 October 2026. Baseline `f9ac49f1558f326129948bc06c829263448b7714`.
-The preserved [DESIGN](DESIGN.md) defines behavior and [ROADMAP](ROADMAP.md)
+The preserved [DESIGN](DESIGN.md) defines behavior and [ROADMAP](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/ROADMAP.md)
 defines acceptance. Boss's implementation authorization supersedes their earlier
 research-only labels. Independent review and native Windows/macOS acceptance are
 not claimed.
 
 **Final local result: 93/93 selected CTests passed**—33 logging outcomes and
 60 adjacent regression outcomes. The source stayed at the recorded
-[validation hashes](evidence/validation-source-freeze.json) throughout these runs.
+[validation hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/validation-source-freeze.json) throughout these runs.
 
 | Profile | Passed | CTest wall time | Receipt |
 | --- | ---: | ---: | --- |
-| Debug | 31/31 | 1469.14 s | [summary](evidence/acceptance-debug-verified.log) |
-| Release | 31/31 | 526.61 s | [summary](evidence/acceptance-release-verified.log) |
-| Strict ASan/UBSan/leaks | 31/31 | 1500.09 s | [summary](evidence/acceptance-strict-verified.log) |
+| Debug | 31/31 | 1469.14 s | [summary](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/log/evidence/acceptance-debug-verified.log) |
+| Release | 31/31 | 526.61 s | [summary](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/log/evidence/acceptance-release-verified.log) |
+| Strict ASan/UBSan/leaks | 31/31 | 1500.09 s | [summary](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/log/evidence/acceptance-strict-verified.log) |
 
 ## Reproducible selection
 
@@ -65,7 +65,7 @@ Each profile runs the same logging selection below. Counts are the harness's
 stated checks or commands, not interchangeable units to sum into a fabricated
 number of independent scenarios. Detailed stdout and timings live in
 `evidence/ctest-{debug,release,strict}-verified.log` and the
-[acceptance index](evidence/acceptance-index.json).
+[acceptance index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/acceptance-index.json).
 
 | CTest | Coverage/count per profile |
 | --- | --- |
@@ -83,10 +83,10 @@ number of independent scenarios. Detailed stdout and timings live in
 
 The seven shipped examples additionally pass **25** source/JIT/O2/independent
 async-AOT commands in isolated directories, including an isolated XDG state path.
-[Compiler-owned API inventory](evidence/public-api.tsv): **83 declarations**
+[Compiler-owned API inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/public-api.tsv): **83 declarations**
 (seven types, 22 enum cases, 21 own fields and 33 public callables), with all
 written parameters documented. The final file/source/tool inventories are under
-[evidence](evidence/), with exact command receipts and immutable failures.
+[evidence](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence), with exact command receipts and immutable failures.
 
 ## Contract-to-test mapping
 
@@ -144,7 +144,7 @@ counted as additional CTests. CMake already omits the duplicate
 still inherits the required hard 1 MiB stack.
 
 See the [final handoff](HANDOFF.md) for exact profile durations, counts and
-limitations, and the [fresh acceptance index](evidence/performance-repair/acceptance-index.json)
+limitations, and the [fresh acceptance index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/acceptance-index.json)
 for all outcomes and executable identities. Sanitizers instrument the compiler,
 Runtime and C++ hosts; generated VOID instructions do not independently receive
 Clang sanitizer passes. Native Windows/macOS remains pending.

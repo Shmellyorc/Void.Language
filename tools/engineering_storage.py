@@ -12,7 +12,13 @@ def evidence_directory(investigation):
     temporary = Path(os.environ.get('TMPDIR', '/tmp')).resolve()
     if root == Path('/tmp') or root.is_relative_to('/tmp') or root == temporary or root.is_relative_to(temporary):
         raise ValueError('Retained engineering evidence must be outside temporary storage')
-    target = root / investigation
+    checkout = Path(__file__).resolve().parents[1]
+    if root == checkout or root.is_relative_to(checkout):
+        raise ValueError("Engineering evidence must be outside the maintained checkout")
+    relative = Path(investigation)
+    if relative.is_absolute() or ".." in relative.parts:
+        raise ValueError("Evidence namespace must be a relative path without parent traversal")
+    target = root / relative
     target.mkdir(mode=0o700, parents=True, exist_ok=True)
     return target
 
@@ -23,3 +29,8 @@ def scratch_directory(prefix):
     directory = TemporaryDirectory(prefix=prefix, dir=output_directory())
     _scratch.append(directory)
     return Path(directory.name)
+
+
+def documentation_evidence(area):
+    """External home shared by legacy qualification writers and CI collectors."""
+    return evidence_directory('qualification/' + area)

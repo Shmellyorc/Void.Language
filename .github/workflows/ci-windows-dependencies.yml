@@ -184,7 +184,7 @@ jobs:
               "b/CMakeFiles/CMakeConfigureLog.yaml", "host/build-host-providers.log",
               "host/verify-dependencies.log",
           )]
-          http = Path("docs/net/http/evidence")
+          http = Path(os.environ.get("VOID_EVIDENCE_ROOT", str(Path.home() / "Documents/Void.Language-archives"))) / "qualification/net/http"
           receipts = sorted(http.glob(f"dependencies-windows-schannel-x86_64-{os.environ['W1_CONFIGURATION']}-*"))
           if receipts:
               streams = [path for path in receipts[-1].iterdir()

@@ -83,7 +83,7 @@ silently replaced by exported keys or an alternate backend.
 
 The official existing complete LLVM SDK archive was reverified, reused locally,
 and its ordinary static development dependencies prepared. No compiler/toolchain
-pin or vendored source was changed. The [public evidence](evidence/windows-schannel-acceptance-20261103.json)
+pin or vendored source was changed. The [public evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-schannel-acceptance-20261103.json)
 contains executable/source hashes, dependency-manifest identities, per-case
 observations, original failures and final reruns.
 

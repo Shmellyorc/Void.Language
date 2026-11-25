@@ -224,7 +224,7 @@ remain separate regression oracles.
 
 ## 8. Qualification evidence and limitations
 
-Evidence root: `/home/shmellyorc/Documents/Void.Language-G93-evidence/`.
+Evidence root: `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G93-evidence/`.
 `identities-and-results.json` records final source/artifact hashes, exact tool
 versions, flags, process checks, editor evidence and the candidate patch hash.
 `candidate.patch` and `candidate-source/` provide the complete unstaged review
@@ -367,7 +367,7 @@ by ordinary typed constant evaluation. The root README is unchanged.
 
 Golden Wrench's independent review returned **CORRECTION REQUIRED** for two P1
 defects. The original record is
-`/home/shmellyorc/Documents/Void.Language-G93-review-20261120/review.json`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G93-review-20261120/review.json`.
 Both original reproductions, their outputs and the reviewed candidate remain
 preserved. This correction is implementation evidence for re-review, not an
 independent acceptance claim.
@@ -401,7 +401,7 @@ combined-depth diagnostic and successful recovery alongside its existing
 cancellation and incomplete-source checks.
 
 Correction evidence is under
-`/home/shmellyorc/Documents/Void.Language-G93-corrections-20261121/`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G93-corrections-20261121/`.
 `identities-and-results.json` records the exact source inventory, compiler/server
 hashes, flags, commands and diagnostic reports; `candidate.patch` and
 `candidate-source/` contain the complete corrected G93 candidate. `corrections.patch`

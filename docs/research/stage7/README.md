@@ -1,6 +1,6 @@
 # Stage 7 research evidence
 
-20 October 2026. Companion to [STAGE7_ROADMAP.md](../../STAGE7_ROADMAP.md).
+20 October 2026. Companion to [STAGE7_ROADMAP.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE7_ROADMAP.md).
 These are bounded baseline experiments, not production Stage 7 implementations
 or a new test framework. No editor profile was installed/modified permanently.
 
@@ -45,8 +45,8 @@ scripts; that remains Stage 7 implementation acceptance.
 From the repository root:
 
 ```sh
-python3 docs/research/stage7/measure_baseline.py --build build/ci-release
-python3 docs/research/stage7/measure_baseline.py --build build/ci-release --examples-only
+python3 tools/research/stage7/measure_baseline.py --build build/ci-release
+python3 tools/research/stage7/measure_baseline.py --build build/ci-release --examples-only
 ```
 
 `baseline-linux-release.json` and `baseline-examples-linux-release.json` contain
@@ -72,7 +72,7 @@ directory, then cleans them. It overwrites `baseline-vscode-linux.json`.
 
 ```sh
 /home/shmellyorc/.nvm/versions/node/v24.19.0/bin/node \
-  docs/research/stage7/run_editor_probe.cjs \
+  tools/research/stage7/run_editor_probe.cjs \
   /usr/share/code/code "$PWD/build/ci-release/voidls"
 ```
 
@@ -126,12 +126,12 @@ XDG_STATE_HOME=/tmp/void-stage7-nvim-state \
 XDG_CACHE_HOME=/tmp/void-stage7-nvim-cache \
 XDG_DATA_HOME=/tmp/void-stage7-nvim-data \
 /tmp/void-stage7-clients/nvim-linux-x86_64/bin/nvim \
-  --headless -u NONE -i NONE -l docs/research/stage7/nvim_probe.lua
+  --headless -u NONE -i NONE -l tools/research/stage7/nvim_probe.lua
 
 # Also set these two environment variables for Vim:
 # VOID_VIM_CLIENT=/tmp/void-stage7-clients/lsp-c741b2f1afb42b9f267824dac4049674908f4a41
 # VOID_VIM_CLIENT_SHA=c741b2f1afb42b9f267824dac4049674908f4a41
-vim -Nu NONE -i NONE -n -es -S docs/research/stage7/vim_probe.vim
+vim -Nu NONE -i NONE -n -es -S tools/research/stage7/vim_probe.vim
 ```
 
 Clean editor startup initially exposed probe setup problems: Neovim tried to

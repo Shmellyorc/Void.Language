@@ -1,4 +1,9 @@
 """Verify synthetic preservation in disposable storage, including editor inputs."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 import hashlib
 import json
@@ -198,7 +203,7 @@ def exercise(root):
 
 
 install()
-legacy = ROOT / 'docs/text-encoding/evidence/synthetic-preservation'
+legacy = (documentation_evidence('text-encoding') / 'synthetic-preservation')
 before = snapshot(legacy)
 previous = os.environ.get('VOID_CRASH_EVIDENCE')
 try:

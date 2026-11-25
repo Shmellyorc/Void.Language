@@ -3,6 +3,11 @@
 No host-prefix cache or ambient-library fallback. HTTP prepares the shared zlib
 first. Private catalog signing and A/B package tests are deliberately separate.
 """
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 import argparse
 import json
 import os
@@ -104,7 +109,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('phase', choices=['bootstrap', 'verify', 'test-plan'])
     parser.add_argument('--configuration', choices=['Debug', 'Release', 'Sanitizers'], default=os.environ.get('EXPERIMENT_CONFIGURATION', 'Release'))
-    parser.add_argument('--evidence', type=Path, default=Path(os.environ.get('EXPERIMENT_DIR', 'build/link-experiment'))/'voidup')
+    parser.add_argument('--evidence', type=Path, default=Path(os.environ['EXPERIMENT_DIR']) / 'voidup' if os.environ.get('EXPERIMENT_DIR') else documentation_evidence('voidup-ci'))
     parser.add_argument('--build', type=Path)
     args = parser.parse_args(); evidence = args.evidence.resolve(); evidence.mkdir(parents=True, exist_ok=True)
     plan = layout(args.configuration); http.save(evidence, 'identity.json', plan)
@@ -116,7 +121,7 @@ def main():
         http.verify_prefix(plan, evidence)
         if (ROOT/plan['host_prefix']).exists():
             raise RuntimeError('Host prefix already exists; refusing implicit reuse (use verify for a local prefix)')
-        before = set((ROOT/'docs/voidup/evidence').glob('dependencies-*'))
+        before = set(((documentation_evidence('voidup'))).glob('dependencies-*'))
         try:
             run(evidence, 'build-host-providers', [sys.executable, ROOT/'tools/setup_host_deps.py', '--profile', plan['profile'], '--jobs', '3'])
         finally:
@@ -126,7 +131,7 @@ def main():
                 for source in base.rglob(name):
                     target=evidence/'provider-builds'/source.relative_to(base)
                     target.parent.mkdir(parents=True, exist_ok=True);shutil.copy2(source,target)
-            for source in set((ROOT/'docs/voidup/evidence').glob('dependencies-*')) - before:
+            for source in set(((documentation_evidence('voidup'))).glob('dependencies-*')) - before:
                 shutil.copytree(source,evidence/'provider-builds'/source.name)
     verify(plan, evidence)
 

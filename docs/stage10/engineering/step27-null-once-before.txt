@@ -1,1 +1,0 @@
-null display allocated before the written RHS expression

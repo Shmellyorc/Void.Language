@@ -5,10 +5,10 @@
 # Stage 8 Sprint 3 — UTF-8 text and recoverable collections
 
 20 October 2026. **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending.**
-[Local acceptance](stage8/SPRINT3_ACCEPTANCE.md) records 435/435 final unique suite
+[Local acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT3_ACCEPTANCE.md) records 435/435 final unique suite
 outcomes, the Release assertion repair and remaining platform/client boundaries. Starting commit verified:
 `483ef87c3ec62c29c2bf1000529b480f0ba5ef2d`; initial worktree was clean.
-[The documentation index](README.md) and [approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md)
+[The documentation index](README.md) and [approval ledger](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/LANGUAGE_COMPLETENESS_APPROVALS.md)
 govern scope. Sprint 1's Windows repair and Sprint 2 contracts must survive.
 
 ## Owner-approved public contract
@@ -134,7 +134,7 @@ Stop after Sprint 3 local acceptance for Wrench review.
 The existing Release build passed **7/7 focused baseline suites**, zero failures,
 43.16 seconds: collection/dictionary/pattern/string source families and Sprint 1/2
 LSP/numeric regressions. This is a baseline, not a fresh Sprint 3 build or acceptance.
-[Machine-readable preparation evidence](stage8/sprint3-preparation.json) records
+[Machine-readable preparation evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/sprint3-preparation.json) records
 the exact command and log hash. No production code has changed.
 
 ## Debug stack regression and repair
@@ -143,13 +143,13 @@ The first Sprint 3 Debug depth check reproduced a SIGSEGV on a rejected 400-call
 nominal chain at 1 MiB. New text/result hint temporaries had expanded the recursive
 anchor frame from the prior Sprint 2 baseline. Cold helper boundaries now keep
 text/result construction and text-index checking off recursive ordinary frames.
-[Measured prologues](stage8/sprint3-stack-frames.json) show anchor **4896 → 3456**,
+[Measured prologues](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/sprint3-stack-frames.json) show anchor **4896 → 3456**,
 method_expression **1888 → 1760** and index_expression **3872 → 2912** bytes on
 local Linux x86-64 Clang Debug. Semantic/parser depth limits and stack reserves
 are unchanged. Debug nominal/numeric/string chains through 124 calls pass; 400-call
 chains reject with nesting diagnostics and retain the later independent error.
 The complete frontend 1 MiB gates and consolidated results belong in
-[acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md).
+[acceptance evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT3_ACCEPTANCE.md).
 
 ## Preserved admission boundaries
 
@@ -165,7 +165,7 @@ are separate from method-call admission. This boundary is not Windows evidence.
 
 ## Repeated traversal measurement
 
-[Focused Release samples](stage8/sprint3-traversal.json) used strings containing
+[Focused Release samples](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/sprint3-traversal.json) used strings containing
 64/1,024/4,096 two-byte scalars. Repeating scalar count 128 times took
 29/385/1,506 microseconds; repeating last-scalar indexing 32 times took
 30/223/845 microseconds. These local samples include ordinary validation/allocation

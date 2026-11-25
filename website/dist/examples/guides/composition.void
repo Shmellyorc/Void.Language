@@ -1,9 +1,0 @@
-value struct reading:
-    degrees: i32
-
-struct station:
-    using latest: reading
-
-func entry(degrees: i32) -> i32:
-    var roof = station(latest = reading(degrees = degrees))
-    return roof.degrees

@@ -67,7 +67,7 @@ pipeline/cache revision.
 All new source snapshots, patch, binaries, exact argv/status/stdout/stderr,
 optimized IR, objects, disassembly, measurements, original failures and receipts
 were retained in the full local archive; selected text receipts and proofs are in
-[this sprint's committed evidence bundle](evidence/automatic-simd/README.md#aot).
+[this sprint's committed evidence bundle](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/automatic-simd/README.md#aot).
 `input-identity.json`, `jit-source-proof.json`, `final-identity.json` and the final
 `manifest.json` identify inputs and outputs. The existing JSON harness also emitted six per-process repository receipts; copies
 are retained under `json-test-receipts`, with originals left in place.

@@ -9,7 +9,7 @@
 ## Current acceptance checkpoint — 24 October 2026
 
 Implementation, examples and executed coverage are reconciled in
-[final acceptance](ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
+[final acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
 native evidence remain open. Stage 10 is not locked. Earlier dated research and
 progress statements below retain their historical meaning.
 
@@ -67,7 +67,7 @@ statements below; it does not claim implementation or acceptance.
   mutation, hosted CI dispatch, publication or root README edit is authorized.
 
 
-**Approved for implementation; Stage 10 acceptance remains open.** See [the roadmap](../STAGE10_DESIGN.md).
+**Approved for implementation; Stage 10 acceptance remains open.** See [the roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE10_DESIGN.md).
 API tables are design signatures; they are not claims that these calls compile
 today. Names below follow VOID spelling and existing `result<T,E>` semantics.
 
@@ -81,7 +81,7 @@ The original input implementation shares `_pendingByte` between scalar, line and
 byte reads, including CR lookahead and invalid UTF-8 continuation handling. Its
 shutdown audit records why default output must not depend on managed singleton
 objects after roots are torn down. Source locations/digests are in
-[EVIDENCE.md](EVIDENCE.md); old audit pass counts are historical, not Stage 10 tests.
+[EVIDENCE.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/EVIDENCE.md); old audit pass counts are historical, not Stage 10 tests.
 
 Use a small set of borrowed standard endpoints and source policy wrappers, with
 low-level checked OS operations in the existing Runtime. Python provides a useful
@@ -371,7 +371,7 @@ flags must be restored rather than globally overwritten.
 
 ## Required integration evidence
 
-The [test plan](TEST_PLAN.md) includes byte-for-byte redirection, shared mixed reads,
+The [test plan](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/TEST_PLAN.md) includes byte-for-byte redirection, shared mixed reads,
 partial transfer faults, EOF/encoding errors, PTY sessions, native Windows console
 probes, concurrent record boundaries, GC while blocked, shutdown drain and normal/
 O2/JIT/AOT parity. Console cannot be marked complete on pipe-only tests or a
@@ -446,7 +446,7 @@ self-pipe wakes poll, but cannot interrupt a write already entered. A determinis
 Linux probe reproduces the resulting retained lease/shutdown wait. Targeted libc
 POSIX AIO cancellation also returns AIO_NOTCANCELED for an entered pipe read.
 Neither is an implemented production transfer path. See
-[the blocker and policy choices](engineering/step24-feasibility.md).
+[the blocker and policy choices](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/step24-feasibility.md).
 
 Boss/Wrench must settle the platform request/capability policy before this adapter
 is extended. No contract weakening, global signal handler, shared descriptor flag

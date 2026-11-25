@@ -13,8 +13,8 @@ review; no production persistence implementation or hosted CI dispatch.
 This follow-up starts at `23e642dc377ff643b6d76f806d84fd1b5f8d60ca` on existing
 `main`, with the same pinned LLVM/Clang/LLD 23.1.4, SDK 10.0.19041.0, static `/MT`
 and independent Debug/Release profiles described below. The original
-[native receipt](evidence/windows-native-schannel-20261103.json) is unchanged.
-The independent [collision receipt](evidence/windows-cng-collision-20261103.json)
+[native receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-native-schannel-20261103.json) is unchanged.
+The independent [collision receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-cng-collision-20261103.json)
 contains 28 final profile/case results, earlier experiments, binary/source hashes,
 public snapshots and before/after inventories. Hashes identify the actual Windows
 working-file bytes; Git normalizes source line endings when committing.
@@ -176,7 +176,7 @@ Do not implement production persistence from the positive handshake alone.
 TLS 1.3 is explicitly unsupported on this Windows 10 host, not verified passing.
 
 The standalone [sources and reproduction instructions](native-schannel/README.md)
-and [compact native receipts](evidence/windows-native-schannel-20261103.json)
+and [compact native receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-native-schannel-20261103.json)
 are the deliverables. Production implementation, public API, existing tests,
 vendored curl, Linux/macOS, workflows and root README are unchanged. This is local
 native feasibility evidence, not independent review or full HTTP acceptance.
@@ -427,7 +427,7 @@ native platform and memory limits, and actual source at these boundaries:
 Read-only checks: curl provenance verifies **1,586 entries and four approved
 corrections**; original Windows artifact identities/receipts remain intact;
 document links and `git diff --check` pass. Evidence is in
-[evidence/windows-mtls-feasibility.json](evidence/windows-mtls-feasibility.json).
+[evidence/windows-mtls-feasibility.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-mtls-feasibility.json).
 No crypto experiment is described as a pass. Existing failed Windows mTLS evidence
 is preserved, not replaced by another ordinary HTTPS test or by Linux results.
 

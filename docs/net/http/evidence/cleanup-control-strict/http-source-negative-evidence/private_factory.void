@@ -1,3 +1,0 @@
-use net/http
-var owner = http.client()
-return 0

@@ -99,4 +99,4 @@ errors retain native codes; invalid arguments and no-draw defaults skip seeding.
 
 Independent oracle, all-mode execution, frontend/IR, lifecycle/GC/fault/entropy,
 LSP, installation, stack and strict profile receipts are indexed in
-[IMPLEMENTATION.md](IMPLEMENTATION.md).
+[IMPLEMENTATION.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/IMPLEMENTATION.md).

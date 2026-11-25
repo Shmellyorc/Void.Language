@@ -1,5 +1,10 @@
 # HTTP Runtime foundations: working-tree engineering
 
+> Current async ownership supersedes the historical root-duration record-retention
+> statements below: completed Work/frame roots retire after quiescence and eligible
+> unobservable Task/group records retire at precise-GC checkpoints. Original
+> measurements retain their dated scope; see [the current retention contract](../../STAGE8_ASYNC_RETENTION.md).
+
 30 October 2026, LLVM/Clang/LLD 23.1.4; baseline `15f7868b`.
 This records the initial foundation experiments. Subsequent approved curl/TLS
 integration, native Task/group retirement, Runtime worker lifetime and real public
@@ -103,12 +108,12 @@ module must not be described as memory-bounded from these foundation tests.
 
 | Check | Actual evidence |
 | --- | --- |
-| Release adjacent CTests | [10/10](evidence/runtime-foundation-release-final-tests.log): native jobs/external completion, IO async/acquisition, async source/parallel/lifecycle, normal/O2 independently linked activation AOT, source retention |
-| Debug native CTests | [2/2](evidence/runtime-foundation-debug-final-tests.log) before the additional cleanup-shield case; subsequent native receipt below covers that added case |
-| Strict native CTests | [2/2](evidence/runtime-foundation-strict-final-tests.log) with ASan/UBSan/leaks before the additional cleanup-shield case; subsequent strict native receipt covers that case |
-| Final external/IO native process stack checks | [Six runs](evidence/runtime-foundation-stack.json), actual child soft/hard 1 MiB limits in Release, Debug and strict; IO's seven existing scenarios retained |
-| Additional cancellation during abandonment | [All three profiles](evidence/runtime-foundation-cleanup-shield.json), ten external lifecycle cases, pre-wait shutdown and 128 MiB pull regression, actual child soft/hard 1 MiB limits |
-| Source result/record distinction | [Full 16 process measurements](evidence/retention-source-results.json) and [summary](evidence/retention-source-summary.json), normal/O2; source repeated awaits and child-running GC retained |
+| Release adjacent CTests | [10/10](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-foundation-release-final-tests.log): native jobs/external completion, IO async/acquisition, async source/parallel/lifecycle, normal/O2 independently linked activation AOT, source retention |
+| Debug native CTests | [2/2](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-foundation-debug-final-tests.log) before the additional cleanup-shield case; subsequent native receipt below covers that added case |
+| Strict native CTests | [2/2](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-foundation-strict-final-tests.log) with ASan/UBSan/leaks before the additional cleanup-shield case; subsequent strict native receipt covers that case |
+| Final external/IO native process stack checks | [Six runs](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/runtime-foundation-stack.json), actual child soft/hard 1 MiB limits in Release, Debug and strict; IO's seven existing scenarios retained |
+| Additional cancellation during abandonment | [All three profiles](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/runtime-foundation-cleanup-shield.json), ten external lifecycle cases, pre-wait shutdown and 128 MiB pull regression, actual child soft/hard 1 MiB limits |
+| Source result/record distinction | [Full 16 process measurements](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/retention-source-results.json) and [summary](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/retention-source-summary.json), normal/O2; source repeated awaits and child-running GC retained |
 
 The native pull fixture performs 128 one-MiB result operations while retaining
 the first task handle. Forced GC after every pull reports **1,048,640..1,048,640
@@ -136,17 +141,17 @@ actual transport stacks remain part of final integration.
 ## Preserved failures and corrections
 
 - The first new-target build reported no make rule before CMake regeneration;
-  [original log](evidence/runtime-foundation-release-build-first.log) retained.
+  [original log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-foundation-release-build-first.log) retained.
 - The retention observer includes the Runtime implementation after frontend
   headers. Its first updated build exposed `vd::Diagnostic` shadowing the internal
   diagnostic in `NativeCompletion::State`; explicit `::Diagnostic` fixes the
-  lookup. [Original compiler errors](evidence/runtime-foundation-retention-observer-build.log)
-  and [repaired build](evidence/runtime-foundation-retention-observer-build-fixed.log)
+  lookup. [Original compiler errors](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-foundation-retention-observer-build.log)
+  and [repaired build](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-foundation-retention-observer-build-fixed.log)
   are retained. These are ordinary compiler errors, not a process crash.
 - A subsequent measurement accidentally invoked the old observer binary after
-  that failed build. [Those observations are explicitly excluded](evidence/retention-first/EXCLUDED.txt),
+  that failed build. [Those observations are explicitly excluded](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/retention-first/EXCLUDED.txt),
   with its old binary hash retained; they do not count as new acceptance.
-- The rebuilt observer then [failed its historical result-retention assertion](evidence/runtime-foundation-retention-current-first.log):
+- The rebuilt observer then [failed its historical result-retention assertion](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-foundation-retention-current-first.log):
   it expected one live result for every historical native Task. The current
   observer separately reports scheduler-rooted results, generated frame reference
   counts and native records. Assertions bound live scalar results using actual
@@ -178,6 +183,6 @@ curl correction is now directly vendored and selected by CMake under Boss's
 subsequent filesystem directive; see [current source/build evidence](VENDORED_PROVIDER.md).
 Independent Wrench review remains separate from that authorized implementation.
 
-[Current source/binary hashes and verification summary](evidence/runtime-foundation-verification.json)
+[Current source/binary hashes and verification summary](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/runtime-foundation-verification.json)
 identify this working-tree checkpoint; the earlier provider-only verification
 snapshot remains preserved separately.

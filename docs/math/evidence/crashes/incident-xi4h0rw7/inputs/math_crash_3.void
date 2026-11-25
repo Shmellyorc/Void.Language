@@ -1,2 +1,0 @@
-func main():
-    var value = _math_sin(1.0)

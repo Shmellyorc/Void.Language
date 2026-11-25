@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 """Build pinned static host providers with the approved libsodium backport."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[1] / "tools"))
+from engineering_storage import documentation_evidence
 import argparse, json, os, pathlib, platform, subprocess, sys, tarfile, time, urllib.request
 from verify_host_deps import (SCHEMA, sha, source_tree, prepare_sodium, verify_sodium_copy,
                               recipe_hashes, toolchain, upstream_results, build_identity)
@@ -11,7 +16,7 @@ def main():
  if platform.system()!='Linux' or platform.machine().lower() not in ['x86_64','amd64']:raise SystemExit('Native Linux x64 required')
  base=ROOT/'.toolchains/host';prefix=(a.prefix or base/'prefix'/a.profile).resolve();build=(a.build_dir or base/'build'/a.profile).resolve()
  if prefix.exists() or build.exists():raise SystemExit('Clean provider build required; retain the old prefix/build and select fresh paths')
- evidence=ROOT/'docs/voidup/evidence'/('dependencies-linux-'+a.profile+'-'+str(time.time_ns()));evidence.mkdir(parents=True);build.mkdir(parents=True)
+ evidence=(documentation_evidence('voidup'))/('dependencies-linux-'+a.profile+'-'+str(time.time_ns()));evidence.mkdir(parents=True);build.mkdir(parents=True)
  pins=json.loads((ROOT/'third_party/host-versions.json').read_text());tools=toolchain();cc=pathlib.Path(tools['tools']['clang']['path']);bin=cc.parent
  flags='-g -O0' if a.profile=='Debug' else '-g -O2';link='--ld-path='+str(bin/'ld.lld')
  if a.profile=='strict':flags+=' -fsanitize=address,undefined -fno-omit-frame-pointer';link+=' -fsanitize=address,undefined'

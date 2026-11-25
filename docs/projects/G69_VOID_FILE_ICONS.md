@@ -102,7 +102,7 @@ The preserved `Void.Language-G69-evidence/workbench.mjs` manually sets:
 Consequently the original light-mode custom-extension observation was real; it
 was not a test of unmodified Material Icon Theme. Its receipts, screenshots,
 comparison script, assets and archive are retained unchanged at
-`/home/shmellyorc/Documents/Void.Language-G69-evidence`. The original G69 worktree
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G69-evidence`. The original G69 worktree
 and all six local versions are likewise retained unchanged. The correction does
 not relabel that observation as a pass or claim that every custom extension-only
 mapping wins in every editor version. It removes the blanket requirement to wait
@@ -150,7 +150,7 @@ in `extension-test.log`. Repeating with the qualified G76 server through
 `VOIDLS_TEST_SERVER` passed all 13 tests. No compiler or language-server changes
 were made to accommodate the outdated test binary.
 
-Current structured evidence is [correction.json](evidence/g69/correction.json).
+Current structured evidence is [correction.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g69/correction.json).
 Raw receipts, screenshots, scripts, initial failure, successful logs and the
 uninstalled candidate VSIX remain at `/tmp/void-g69-correction-x0yde37y`.
 Native Windows/macOS remain **UNQUALIFIED**; Linux results do not imply otherwise.

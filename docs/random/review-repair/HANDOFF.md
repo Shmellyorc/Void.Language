@@ -32,7 +32,7 @@ This receipt is separate from the original Sprint 4 acceptance and incident reco
   The total increases from **40 to 61 checks**. Project-scoped working-directory
   handling lets the existing crash capture retain both imported and entry bytes.
 
-[Exact four-file patch](evidence/changes.patch).
+[Exact four-file patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/review-repair/evidence/changes.patch).
 The numerical source, public APIs, seed replay fixtures, native entropy bridge,
 backend, readonly slicing implementation and stack repair are unchanged.
 
@@ -63,7 +63,7 @@ No full test matrix or full random execution-vector matrix was rerun.
 
 The existing Clang/LLVM 19.1.7 profiles rebuilt `voidc`, `voidls`,
 `void_random_host`, `void_tests` and `void_io_runner`. Compiler flags are retained
-in [configuration.json](evidence/configuration.json). Strict options were:
+in [configuration.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/review-repair/evidence/configuration.json). Strict options were:
 
 ```text
 ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87
@@ -79,8 +79,8 @@ as the original acceptance.
 Exact build/test commands, status, durations, JUnit, complete verbose output,
 source hashes and executable hashes are in `evidence/build-*.json`,
 `evidence/test-*.json`, their adjacent logs/XML and
-[FINAL.json](evidence/FINAL.json). [verify.py](verify.py) records the commands.
-The separate [repair manifest](MANIFEST.json) hashes all retained repair files.
+[FINAL.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/review-repair/evidence/FINAL.json). [verify.py](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/review-repair/verify.py) records the commands.
+The separate [repair manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/review-repair/MANIFEST.json) hashes all retained repair files.
 An additional instrumented Debug LSP invocation passed 61 checks; its original
 source/log/receipt are retained under `evidence/additional/`, outside the 36 CTests.
 
@@ -92,9 +92,9 @@ The baseline LSP returned `CONFLICT maximum documentation.` for canonical
 `rng.rand_i32(`. The instrumented reproduction shut down the server cleanly before
 reporting the expected Python assertion. Original probe source, commands, output,
 LSP source/overlay/import bytes, stdin and hashes are retained under
-[baseline evidence](evidence/baseline/MANIFEST.json).
+[baseline evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/review-repair/evidence/baseline/MANIFEST.json).
 
-[preservation-before.json](evidence/preservation-before.json) captured **932
+[preservation-before.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/review-repair/evidence/preservation-before.json) captured **932
 existing random documentation/evidence files** before this repair. Final hashes
 match all 932 files byte for byte, including the historical timeout/SIGKILL,
 sandbox incidents, classifications, manifests and source freezes. No original

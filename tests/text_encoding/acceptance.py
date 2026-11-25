@@ -1,4 +1,9 @@
 """Run the exact selected registered local commands with crash preservation."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import json
@@ -10,7 +15,7 @@ from crash import ROOT, run
 
 profile = sys.argv[1]
 build = ROOT / 'build' / ('ci-official-' + profile)
-evidence = ROOT / 'docs/text-encoding/evidence'
+evidence = (documentation_evidence('text-encoding'))
 pattern = json.loads((evidence / 'selection-debug.json').read_text())['regex']
 selection = run(['ctest', '--test-dir', build, '--show-only=json-v1'], capture_output=True, check=True)
 tests = [test for test in json.loads(selection.stdout)['tests'] if re.match(pattern, test['name'])]

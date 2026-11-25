@@ -185,7 +185,7 @@ Remaining public dependencies are exact:
 Original evidence is retained in
 `~/Documents/Void.Language-archives/g94-voidup-python-free-candidate-2026-11-21.zip`
 under `evidence/`, with the original candidate source under `source/`. The old
-`/home/shmellyorc/Documents/void-g94-evidence-20261121` path in recorded commands
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g94-evidence-20261121` path in recorded commands
 is historical and is not a current reproduction destination. Generated
 installations, keys and binaries are not restoration inputs from this archive.
 The archive SHA-256 is
@@ -514,7 +514,7 @@ docs/wiki/Packages-and-raylib.md
 docs/wiki/README.md
 docs/wiki/Resources-and-status.md
 docs/wiki/Troubleshooting.md
-docs/wiki/publication.json
+tools/wiki/publication.json
 examples/native/catalog.void
 examples/raylib-consumer/README.md
 src/frontend/project_creation.cpp

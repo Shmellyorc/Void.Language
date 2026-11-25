@@ -1,7 +1,0 @@
-func warmer(start: i32) -> func(i32) -> i32:
-    return func(change: i32) -> i32:
-        return start + change
-
-func entry(temperature: i32) -> i32:
-    var adjust = warmer(temperature)
-    return adjust(3)

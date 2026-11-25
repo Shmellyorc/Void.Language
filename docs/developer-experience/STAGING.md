@@ -7,7 +7,7 @@ on `main`. The accepted starting compiler is `175c08c8`, seven-job green run
 
 ## Exact staged scope
 
-**113 exact paths: 15 modified, 98 added.** The [literal staged-path allowlist](staging/STAGED_PATHS.txt)
+**113 exact paths: 15 modified, 98 added.** The [literal staged-path allowlist](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/STAGED_PATHS.txt)
 is authoritative; every path was added individually through a literal NUL-delimited
 pathspec file. No directory, wildcard, blanket add, forced ignored-file add or
 unrelated index entry was selected.
@@ -43,7 +43,7 @@ Only **three** of the original 108 handoff files changed during preparation:
 the requested header and source-independent metadata reporting. The other **105**
 files, including the verified installer, Runtime/native driver diagnostics, README,
 Wiki drafts, examples and original failure evidence, retain their handoff hashes.
-[Complete before/after SHA-256 comparison](staging/QUALIFIED_COMPARISON.json).
+[Complete before/after SHA-256 comparison](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/QUALIFIED_COMPARISON.json).
 
 Key installer/CMake/native/test hashes were checked against the retained final
 Ubuntu receipt. The stopped qualified container also supplied independent byte
@@ -55,7 +55,7 @@ remain untouched. No new optimization or performance qualification occurred.
 ## Actual compiler output
 
 Captured from the rebuilt local Release compiler, status 0 and empty stderr for
-both commands. The [full help capture](staging/cli-help.txt) is:
+both commands. The [full help capture](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/cli-help.txt) is:
 
 ```text
 VOID Language Compiler v0.1.0 (development)
@@ -90,7 +90,7 @@ run propagates an application's process status.
 Documentation: https://voidlang.com/docs/compiler-workflow/
 ```
 
-`voidc --version` ([capture](staging/cli-version.txt)):
+`voidc --version` ([capture](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/cli-version.txt)):
 
 ```text
 VOID Language Compiler v0.1.0 (development)
@@ -115,8 +115,8 @@ The installer and verifier are byte-identical to the accepted final Ubuntu-teste
 versions. Before the final full-name presentation correction, a warm source-build/install
 using the unchanged entry point passed into `/tmp/VOID DX staged install é`. It installed both existing
 CMake components, then verified installed stdlib, optimized/Debug run, native
-build/run, resource hashes and LSP protocol 1. [Command log](staging/installer.txt)
-and [exact installer receipt](staging/source-install.json).
+build/run, resource hashes and LSP protocol 1. [Command log](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/installer.txt)
+and [exact installer receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/source-install.json).
 The earlier fresh-download Ubuntu onboarding record remains unchanged in the
 accepted report; this header correction is not relabeled as a new fresh-host run.
 
@@ -125,9 +125,9 @@ CMake installation of the updated compiler through `cli_install`):
 
 | Native local configuration | Result |
 | --- | --- |
-| Release | 4/4 passed — [CTest](staging/release-ctest.txt) |
-| Debug | 4/4 passed — [CTest](staging/debug-ctest.txt) |
-| Strict RelWithDebInfo, ASan/UBSan/leaks | 4/4 passed — [CTest](staging/strict-ctest.txt) |
+| Release | 4/4 passed — [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/release-ctest.txt) |
+| Debug | 4/4 passed — [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/debug-ctest.txt) |
+| Strict RelWithDebInfo, ASan/UBSan/leaks | 4/4 passed — [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/strict-ctest.txt) |
 
 The four selected tests are `cli_contract`, `cli_install`, `onboarding_examples`
 and the existing `application_workflow_stage9`. The expanded CLI contract now
@@ -136,7 +136,7 @@ controls. No broad compiler/Runtime suite or benchmark was rerun.
 
 All three required entries are inside the ordinary root `BUILD_TESTING` block,
 with commands/timeouts, no OS guard and **no disabled/skip properties**. The
-[actual CTest JSON registration](staging/ctest-registration.json) confirms their
+[actual CTest JSON registration](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/ctest-registration.json) confirms their
 presence in all three local configurations. The existing standard and seven-job
 `ci-link-experiment.yml` compiler workflows build tests and invoke CTest for Linux
 Debug/Release/Sanitizers, Windows Debug/Release and macOS ARM64 Debug/Release.
@@ -156,7 +156,7 @@ The Wiki remains repository drafts with its explicit publication review notes.
 
 Deployment linkage cannot be established from this checkout, so **all ten**
 website source/generated/checker proposals remain unchanged and unstaged. The
-[exact exclusion list](staging/EXCLUDED_WEBSITE_PATHS.txt) is:
+[exact exclusion list](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/EXCLUDED_WEBSITE_PATHS.txt) is:
 
 ```text
 website/dist/docs/compiler-workflow/index.html
@@ -178,7 +178,7 @@ as repository documentation only; no Wiki repository was written.
 
 ## Changed-source and fixture hashes
 
-SHA-256, actual staged bytes. [Machine-readable source/fixture hashes](staging/HASHES.json)
+SHA-256, actual staged bytes. [Machine-readable source/fixture hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/HASHES.json)
 also include every one of the seven `.void` examples.
 
 | Source / regression path | SHA-256 |
@@ -195,7 +195,7 @@ also include every one of the seven `.void` examples.
 | `tests/cli/learning.py` | `7dc311019289e749f6a83b70d0e4fee5f84a83db8a11863797ea30f8b63586f6` |
 | `tests/stage9/workflow.py` | `6a54c5d690796781ee4030a969c38ecd9bc77915b7f80c0b5316bdb3a7b2c202` |
 
-[Final validation](staging/VALIDATION.json) binds exact index paths to the allowlist,
+[Final validation](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/VALIDATION.json) binds exact index paths to the allowlist,
 checks index bytes against the working files and source/fixture hashes, verifies
 staged Markdown targets/anchors, and checks source/fixture/document whitespace.
 All 426 staged Markdown file/directory targets and 17 fragments resolve in the
@@ -206,7 +206,7 @@ are preserved rather than normalized. No source/fixture whitespace failure exist
 
 ## Preservation, blockers and next action
 
-[Preservation receipt](staging/PRESERVATION.json): all 47 original evidence files
+[Preservation receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/staging/PRESERVATION.json): all 47 original evidence files
 are byte-identical; all ten excluded website files are byte-identical; **18,930**
 ignored experimental/evidence paths retain their sizes and mtimes. The ignored
 inventory is local and hashed; no broad deletion, reset or cleanup was performed.

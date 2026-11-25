@@ -27,7 +27,7 @@ Boss explicitly approved all three decisions during Sprint 2 engineering:
   NaN input. Infinite bounds are permitted; in-range signed zero retains its sign.
 
 The implementation below follows these approved semantics; executed acceptance
-is recorded separately in [the evidence](stage8/SPRINT2_ACCEPTANCE.md). Sprint 1
+is recorded separately in [the evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT2_ACCEPTANCE.md). Sprint 1
 is owner-locally accepted; preserve CI #82 repair. Hosted CI is deferred to the
 end of Stage 8 unless Boss explicitly authorizes it sooner. No hosted CI request,
 Git mutation or Sprint 3 progression is authorized. Root README stays unchanged.
@@ -143,7 +143,7 @@ Private/declared-readonly fields were unnecessary and were not implemented.
 Sprints 3–6 remain future work. Sprint 1 discovery, source/VFS admission and CI #82
 Windows path repair are preserved. Hosted verification remains deferred until the
 end of Stage 8; actual Windows/macOS execution is not inferred from local Linux
-results. [The acceptance record](stage8/SPRINT2_ACCEPTANCE.md) distinguishes focused,
+results. [The acceptance record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT2_ACCEPTANCE.md) distinguishes focused,
 consolidated, small-stack and pending platform evidence. Stop for Wrench review.
 
 ## Recursive-frame repair evidence
@@ -153,5 +153,5 @@ reproduced a 1 MiB Debug overflow on deep nominal receiver chains. Numeric-only
 Type/Function work is now outlined into cold helpers; the existing 256-level
 semantic budget and all stack reserves remain unchanged. Valid nominal and numeric
 chains through 124 calls pass; 400-call chains diagnose nesting and still recover
-the later independent error. [Measured Debug frame allocations](stage8/sprint2-stack-frames.json)
+the later independent error. [Measured Debug frame allocations](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/sprint2-stack-frames.json)
 record the Linux Clang prologue evidence; it is not a Windows execution claim.

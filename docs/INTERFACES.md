@@ -230,9 +230,10 @@ the existing GC foundation; this phase does not add a liveness optimizer.
 blanket exclusions above for compile-time type `has`, typed if-expressions,
 multiline calls and string-only interpolation. Existing nominal storage,
 structural conformance, generic specialization, capabilities and checked failure
-rules remain authoritative. Both conditional branches type-check. Formatting and
-numeric/bool/custom string conversion remain deferred. Approval and implementation
-are separate from local acceptance, Wrench review and the final hosted lock.
+rules remain authoritative. Both conditional branches type-check. The later
+[display and formatting contract](stage10/DISPLAY_FORMATTING.md) implements the
+numeric, Boolean and custom display surface; the old string-only exclusion is
+superseded. Qualification remains specific to the recorded revision and platform.
 
 ## Custom iteration (G85)
 

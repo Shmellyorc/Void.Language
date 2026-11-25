@@ -108,7 +108,7 @@ cookie storage, arbitrary URI schemes and public raw sockets are excluded.
 Release measurements for cold/warm JSON requests, one versus four concurrent
 requests, observed peer connections, partial-response close, source check/JIT/AOT
 and unused-import package cost. They impose no arbitrary throughput target.
-[Actual receipts](evidence/http-performance-release/measurements.json) retain
+[Actual receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-performance-release/measurements.json) retain
 versions, sample ranges and concurrent validation load. Multi-GiB source and
 native bulk proofs are separate from these small-request latency samples.
 

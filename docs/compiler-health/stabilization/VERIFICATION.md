@@ -4,9 +4,9 @@ Frozen production source and build identities are recorded in the evidence manif
 
 | Profile | Passed | Failed | Driver seconds | Receipt |
 |---|---:|---:|---:|---|
-| release | 94 | 0 | 289.43 | [acceptance-release-1793118874837282109](../../json/evidence/implementation/acceptance-release-1793118874837282109.json) |
-| debug | 94 | 0 | 980.95 | [acceptance-debug-1793118701113778258](../../json/evidence/implementation/acceptance-debug-1793118701113778258.json) |
-| san | 93 | 0 | 827.64 | [acceptance-san-1793119282860763137](../../json/evidence/implementation/acceptance-san-1793119282860763137.json) |
+| release | 94 | 0 | 289.43 | [acceptance-release-1793118874837282109](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/evidence/implementation/acceptance-release-1793118874837282109.json) |
+| debug | 94 | 0 | 980.95 | [acceptance-debug-1793118701113778258](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/evidence/implementation/acceptance-debug-1793118701113778258.json) |
+| san | 93 | 0 | 827.64 | [acceptance-san-1793119282860763137](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/evidence/implementation/acceptance-san-1793119282860763137.json) |
 
 All three receipts confirm unchanged source and build hashes before/after the pass. Sanitizer means the existing RelWithDebInfo ASan+UBSan configuration, with `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:abort_on_error=0:exitcode=87` and `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. The existing sanitizer selection excludes `lsp_const_recovery_stack`; Debug and Release run it. No test timeout or stack budget was increased.
 

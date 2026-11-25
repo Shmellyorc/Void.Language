@@ -1,3 +1,0 @@
-func calculate(value: i32) -> i32:
-    const final_score = bonus + value
-    return final_score * 2

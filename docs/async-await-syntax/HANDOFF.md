@@ -198,9 +198,9 @@ No standard-library source, backend, scheduler or IR implementation changed.
 | `tests/async/syntax_lsp.py` | Async syntax regression |
 | `tests/async/tests.cpp` | Async syntax regression |
 
-The exact file/hash inventory is in [inventory.json](evidence/inventory.json).
-[Evidence manifest](evidence/manifest.json), [checksums](evidence/SHA256SUMS),
-[compatibility controls](evidence/compatibility.json), acceptance XML/JSON/logs and
+The exact file/hash inventory is in [inventory.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/async-await-syntax/evidence/inventory.json).
+[Evidence manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/async-await-syntax/evidence/manifest.json), [checksums](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/async-await-syntax/evidence/SHA256SUMS),
+[compatibility controls](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/async-await-syntax/evidence/compatibility.json), acceptance XML/JSON/logs and
 compressed reproduction sources/helpers retain input/build identities and all
 attempts. The original compiler-stabilization evidence packet is unchanged.
 

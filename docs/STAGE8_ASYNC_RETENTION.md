@@ -1,4 +1,4 @@
-# Stage 8 Sprint 5 — completed execution-frame retirement
+# Async frame, result and record retirement
 
 Subsequent 30 October 2026 HTTP engineering adds
 [completed result/Work/Handle retirement](net/http/RUNTIME_FOUNDATION.md) using
@@ -8,9 +8,17 @@ in [the current HTTP record](net/http/CURRENT_ENGINEERING.md). The original Spri
 scope, measurements and remaining-limit statements below are historical. No
 whole-Runtime RSS ceiling is claimed.
 
-Status: implemented and locally verified; Wrench review pending; not hosted locked.
-Baseline: `726b34b658f0d939b1da065acb4e9c735ddfa39d`. Sprint 5 only is authorized;
-Sprint 6 and the hosted gate remain deferred. Root README stays unchanged.
+## Current ownership boundary
+
+`src/runtime/async.cpp` releases completed Work and frame roots only after native
+or worker quiescence. A precise-GC checkpoint may reclaim completed Task/group
+bookkeeping when no observable task object, pending relationship, failure or
+active owner still requires it. Repeated await of an observable task remains valid.
+Task lookup uses an index; ready/live work has explicit queues. This is conditional
+reclamation, not a total native/RSS bound or a public weak-reference feature.
+The maintained external async regression verifies unreachable-record retirement
+and held-result/lifetime safety. The measurements below describe the original
+frame-only repair and do not state today's whole scheduler behavior.
 
 ## Measurement and bounded decision
 
@@ -24,7 +32,7 @@ In the baseline, four batches of 128 awaited async children plus a sentinel reta
 was 34,890,840 bytes. The unchanged workload with frame retirement retains the same
 records/results, one live parent execution frame and 10,944 managed payload bytes.
 These canonical Release measurements justify the narrow change.
-[Final acceptance](stage8/SPRINT5_ACCEPTANCE.md) records the complete paired data,
+[Final acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT5_ACCEPTANCE.md) records the complete paired data,
 459/459 local suites and both 1 MiB frontend gates.
 
 The observer separates completed native records, Work/group records and vector

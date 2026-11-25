@@ -1,8 +1,0 @@
-schema = 1
-[=roject]
-id = "org.example.orbit.sources"
-name = "Orbit"
-version = "1.2.3-beta.1+build.7"
-kind = "application"
-[application]
-id = "org.example.orbit"

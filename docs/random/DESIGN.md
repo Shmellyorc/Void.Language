@@ -10,8 +10,8 @@
 
 Boss approved implementation on 26 October 2026 from
 `b374fd30aad70bd27c334150949b2a06481b1b67` with mandatory arity-based names.
-[Research and independent vectors](RESEARCH.md); [mission](ROADMAP.md);
-[implementation and verification](IMPLEMENTATION.md).
+[Research and independent vectors](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/RESEARCH.md); [mission](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/ROADMAP.md);
+[implementation and verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/IMPLEMENTATION.md).
 
 ## 1. Approved API and canonical arity adapter
 

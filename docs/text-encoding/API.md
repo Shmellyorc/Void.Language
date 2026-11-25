@@ -29,7 +29,7 @@ Generated from validated compiler declaration metadata, with zero public documen
 warnings. Every explicit parameter and function return is documented. Non-function
 fields/types/cases have meaningful descriptions; their return column is n/a.
 
-Full machine-readable source/signature/test mapping: [API.tsv](evidence/API.tsv).
+Full machine-readable source/signature/test mapping: [API.tsv](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/evidence/API.tsv).
 Tests refer to module-level suites under `tests/text_encoding/`; types, fields and
 error cases are exercised through their public operations. The focused ASCII suite
 exhaustively checks byte classifiers; ownership concentrates on allocating operations.

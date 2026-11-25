@@ -13,7 +13,7 @@ phase-only equality exclusions below do not describe the current implementation.
 
 The owner-approved [text/collection contract](STAGE8_TEXT_COLLECTIONS.md) supersedes
 the dated get/pop/text-inspection exclusions below. Sprint 3 is locally verified;
-[acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md) records exact results and limits.
+[acceptance evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT3_ACCEPTANCE.md) records exact results and limits.
 Wrench review remains pending. Public policies are approved
 in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
 

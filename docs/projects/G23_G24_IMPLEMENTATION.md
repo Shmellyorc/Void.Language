@@ -31,7 +31,7 @@ An independent RLAPI scan and Clang 23.1.4 AST must agree on all 600 names.
 | Typedefs/macros | 70/46 inventoried; aliases, callbacks, constants and build configuration distinguished |
 | Native symbol probe | All 600 original declarations compile, link and resolve on Linux and Windows x64 |
 
-The [inventory](../../verified-packages/raylib/inventory.json) contains each exact
+The [inventory](../../tools/raylib/inventory.json) contains each exact
 C declaration, binding or blocker, native mapping, ownership and coverage. The
 [ownership contract](../../verified-packages/raylib/OWNERSHIP.md) records allocator,
 extent, parent, transfer, mutation and terminal policies. Address-bearing source
@@ -47,7 +47,7 @@ remain exact C backing storage, and their original ABI is checked independently.
 | Safe typed equivalent | 2 | TraceLog level/text and TextFormat existing VOID formatter |
 | Unavailable VOID API | 0 | No placeholder or silent no-op declaration |
 
-The [600-entry inventory](../../verified-packages/raylib/inventory.json) retains
+The [600-entry inventory](../../tools/raylib/inventory.json) retains
 each exact original `c_declaration`, source name, implementation, native ABI,
 ownership, exposure category, native limitation and coverage. All former 588
 entries retain their original mapping/ownership/implementation metadata (checked

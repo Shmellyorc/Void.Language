@@ -269,7 +269,7 @@ native per-platform/raylib acceptance remains future work.
 ## Implemented trusted-provider foundation
 
 Stage 8 Sprint 4 generalizes admission to a second independently admitted static
-in-memory sink. See [the current contract](STAGE8_APPLICATION_NATIVE.md) for
+in-memory sink. See [the current contract](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE8_APPLICATION_NATIVE.md) for
 approval, implementation/verification status, exact supported operations and
 limitations. `native_sink_project()` and `native_fixture_project()` each select
 one compiled catalog; unknown libraries, symbols and signature/flag substitutions

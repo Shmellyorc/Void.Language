@@ -13,20 +13,20 @@ disabled-feature regressions. The original different dependency failure was:
 the full Linux HTTP profile with OpenSSL 3.5.9 stops during initialization under
 the required Clang 23.1.4 ASan/UBSan/LSan configuration.
 
-[Original full-provider failure](evidence/vendored-full-strict-20261030T142846283644Z/commands.json)
-and [full diagnostic](evidence/vendored-full-strict-20261030T142846283644Z/probe.stderr)
+[Original full-provider failure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-full-strict-20261030T142846283644Z/commands.json)
+and [full diagnostic](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-full-strict-20261030T142846283644Z/probe.stderr)
 show `crypto/stack/stack.c:440` calling `pd_free` through an incompatible function
 pointer type. `property_parse.c:301` defines the typed callback; its typed stack
 wrapper casts it to the generic stack free callback. The diagnostic occurs during
 `RAND_status` invoked by curl initialization, before cookie tests or networking.
 It is not a failure of the reviewed curl enumeration correction.
 
-The [minimal C reproducer](evidence/openssl_strict_init_probe.c) links only the
+The [minimal C reproducer](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/openssl_strict_init_probe.c) links only the
 pinned `libcrypto.a`, libc/platform dependencies and sanitizers. It links neither
 curl nor VOID Runtime. It calls `RAND_status`, then cleanup. The
-[isolated receipt](evidence/openssl-strict-isolation.json) records binary/library
+[isolated receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/openssl-strict-isolation.json) records binary/library
 hashes, exit 1, settings and actual enforced soft/hard 1 MiB stacks. The
-[isolated trace](evidence/openssl-strict-isolation.stderr) reproduces the same
+[isolated trace](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/openssl-strict-isolation.stderr) reproduces the same
 diagnostic. The original official archive SHA-256 is
 `603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a`;
 its pin, commands and original source are independently identified in
@@ -63,8 +63,8 @@ is allowed; calling through the incompatible type is undefined behavior. The
 failure is independent of curl, VOID, stack size and native scheduling. There is
 no evidence here of an LLVM 23 instrumentation defect.
 
-The [callback control source](evidence/callback_type_probe.c) and
-[16-run receipt](evidence/callback-type-controls/results.json) exercise C11/C23,
+The [callback control source](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/callback_type_probe.c) and
+[16-run receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/callback-type-controls/results.json) exercise C11/C23,
 O0/O2 and default/disabled strict aliasing under the unchanged full sanitizer set.
 All eight incompatible calls fail; all eight correctly typed adapter calls pass.
 Each process enforces and records soft/hard 1 MiB stack limits. Disabling strict
@@ -88,10 +88,10 @@ storage. This is an OpenSSL-compatible backend already recognized by the pinned
 curl CMake configuration, not a replacement transport. The authoritative
 `third_party/http-versions.json` OpenSSL pin and production dependency manifest
 remain unchanged. Candidate provenance, immutable source commit and archive
-checksum are in [the acquisition receipt](evidence/tls-review-aws-lc-source.json).
+checksum are in [the acquisition receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/tls-review-aws-lc-source.json).
 The same crypto-only RAND/cleanup reproducer passes with full instrumentation,
 halt-on-error, leak detection and a 1 MiB stack
-([receipt](evidence/tls-review-aws-lc-probe.json)).
+([receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/tls-review-aws-lc-probe.json)).
 
 The candidate is not accepted on that initialization result alone. Actual curl
 TLS, ALPN/HTTP2, authentication, trust, PEM/PKCS12 identity, cancellation, ABI,

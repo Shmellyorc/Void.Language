@@ -1,3 +1,0 @@
-use math
-func main():
-    var wrong: f64 = math.sin(0.5)

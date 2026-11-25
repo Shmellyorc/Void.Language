@@ -1,6 +1,7 @@
 """Installed resource manifest checks only; no native build or platform execution."""
 from contextlib import contextmanager
 import importlib.util
+import json
 import os
 from pathlib import Path
 import tempfile
@@ -81,6 +82,26 @@ def remove_lines(path, predicate):
 
 
 class LayoutTests(unittest.TestCase):
+    def test_report_copies_and_seals_external_http_receipts(self):
+        with installation('Linux') as q:
+            external = q.work.parent / 'external-http'
+            commands = external / 'dependencies-Release-1/commands.json'
+            commands.parent.mkdir(parents=True)
+            commands.write_bytes(b'{"receipt":"external HTTP"}\n')
+            (external / 'dependencies-not-a-directory').touch()
+            for name in smoke.REQUIRED:
+                q.save('check-' + name + '.json', {'status': 'PASS'})
+            with patch.object(smoke, 'documentation_evidence', return_value=external), \
+                    patch.dict(os.environ, {'INSTALL_PRIOR_JOB_STATUS': 'success', 'GITHUB_STEP_SUMMARY': ''}), \
+                    patch.object(smoke.subprocess, 'check_output') as git:
+                q.report()
+            git.assert_not_called()
+            collected = q.evidence / commands.parent.name / commands.name
+            self.assertEqual(collected.read_bytes(), commands.read_bytes())
+            seal = json.loads((q.evidence / 'evidence-sha256.json').read_text())
+            self.assertEqual(seal[collected.relative_to(q.evidence).as_posix()], smoke.digest(commands))
+            self.assertFalse((q.evidence / 'dependencies-not-a-directory').exists())
+
     def test_linux_layout_accepts_shared_resources_and_linker_operands(self):
         with installation('Linux') as q:
             q.layout()

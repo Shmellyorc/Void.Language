@@ -1,3 +1,0 @@
-Building CXX object CMakeFiles/void_stop_token_probe.dir/cmake/probes/StopToken.cpp.o
-Linking CXX executable void_stop_token_probe
-Built target void_stop_token_probe

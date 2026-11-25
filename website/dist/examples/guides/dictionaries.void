@@ -1,5 +1,0 @@
-func entry(lemons: i32) -> i32:
-    var pantry: {string: i32} = {"lemon": lemons}
-    if pantry.get("lemon") is Ok(var quantity):
-        return quantity
-    return 0

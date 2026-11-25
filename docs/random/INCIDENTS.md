@@ -2,7 +2,7 @@
 
 No observed random-engine SIGSEGV, native Windows exception or LLVM optimizer
 crash is claimed. The following distinct failures are preserved, rather than
-silently retried or removed. [Machine index and hash audit](evidence/incidents.json).
+silently retried or removed. [Machine index and hash audit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/evidence/incidents.json).
 
 - `internal-validation/incident-5tv3becw`: graceful internal IR rejection when
   complex const-input slicing embedded readonly paths in physical array element
@@ -27,7 +27,7 @@ A minimal strict check of the same sanitized compiler passed outside the sandbox
 with ASan/UBSan/leak detection and fatal exits retained. Only the 27 affected
 checks were then rerun outside that sandbox. The original 31-test failed run is
 kept separately from its infrastructure-repair receipt. Final results are indexed
-in [the handoff](HANDOFF.md).
+in [the handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/HANDOFF.md).
 
 Signals, native Windows statuses and reserved exits 86/87 remain supported by the
 shared wrapper. Timeout handling retains actual native termination status and

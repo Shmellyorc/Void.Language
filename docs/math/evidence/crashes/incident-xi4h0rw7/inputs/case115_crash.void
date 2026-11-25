@@ -1,4 +1,0 @@
-use math
-func main():
-    var input: i32 = 1
-    var bad = math.acos(input)

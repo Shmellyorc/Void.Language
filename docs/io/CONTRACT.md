@@ -3,7 +3,7 @@
 26 October 2026. Boss authorizes implementation from working-tree baseline
 `084fe1ebf26e3f6376ed3e569e1b6c1a74499b17`. This document records the complete
 intended contract before implementation. The completed [API audit](API.md),
-[handoff](HANDOFF.md) and [local receipt](evidence/RECEIPT.md) now map these
+[handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/HANDOFF.md) and [local receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/RECEIPT.md) now map these
 capabilities to actual source, documentation and executed tests. This is not a
 final acceptance lock.
 

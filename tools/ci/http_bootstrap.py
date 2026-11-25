@@ -4,6 +4,11 @@ Exact cache keys have no fallback. A restored native prefix requires both its
 setup manifest and a seal binding it to the current toolchain/recipe identity.
 The read-only verify phase also accepts existing local setup manifests.
 """
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 import argparse
 import hashlib
 import json
@@ -17,7 +22,7 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[2]
-RECIPES = ('tools/ci/http_bootstrap.py', 'tools/ci/llvm_sdk.py',
+RECIPES = ('tools/engineering_storage.py', 'tools/ci/http_bootstrap.py', 'tools/ci/llvm_sdk.py',
            'tools/setup_http_deps.py', 'tools/setup_http_deps_native.py', 'tools/http_archive.py',
            'tools/verify_http_dependencies.py', 'cmake/HttpDependencies.cmake',
            'cmake/HttpNativeDependencies.cmake', 'cmake/CurlProvider.cmake', 'cmake/CurlProviderFeatures.cmake', 'cmake/CurlProviderObjects.cmake',
@@ -188,7 +193,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('phase', choices=['identity', 'bootstrap', 'verify', 'test-plan'])
     parser.add_argument('--configuration', choices=['Debug', 'Release', 'Sanitizers'], default=os.environ.get('EXPERIMENT_CONFIGURATION', 'Release'))
-    parser.add_argument('--evidence', type=Path, default=Path(os.environ.get('EXPERIMENT_DIR', 'build/link-experiment')) / 'http')
+    parser.add_argument('--evidence', type=Path, default=Path(os.environ['EXPERIMENT_DIR']) / 'http' if os.environ.get('EXPERIMENT_DIR') else documentation_evidence('http-ci'))
     parser.add_argument('--build', type=Path)
     args = parser.parse_args()
     evidence = args.evidence.resolve(); evidence.mkdir(parents=True, exist_ok=True)
@@ -205,7 +210,7 @@ def main():
         cached = os.environ.get('HTTP_DEPS_CACHE_HIT') == 'true'
         prefix = ROOT / plan['prefix']
         built = False
-        before = set((ROOT / 'docs/net/http/evidence').glob('dependencies-*'))
+        before = set(((documentation_evidence('net/http'))).glob('dependencies-*'))
         try:
             if not cached:
                 if prefix.exists():
@@ -221,7 +226,7 @@ def main():
             fixture_preflight(plan, evidence)
             save(evidence, 'bootstrap.json', {'dependency_cache_hit': cached, 'prefix': plan['prefix'], 'result': 'PASS'})
         finally:
-            for path in sorted(set((ROOT / 'docs/net/http/evidence').glob('dependencies-*')) - before):
+            for path in sorted(set(((documentation_evidence('net/http'))).glob('dependencies-*')) - before):
                 shutil.copytree(path, evidence / 'dependency-builds' / path.name, dirs_exist_ok=True)
             # Retain configure diagnostics even when setup cannot produce a prefix.
             roots = [ROOT / plan['prefix'].replace('/prefix/', '/build/')] if built else []

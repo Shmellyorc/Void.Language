@@ -27,8 +27,8 @@ allocator was evaluated on the same Release LLVM 23.1.4 host. The production
 change is discarded and `text_case.cpp` restored exactly to `11e95f4a`; no second
 candidate is launched. All work remains uncommitted for Golden Wrench review.
 [Report](../log/SMALL_FILE_INVESTIGATION.md#bounded-rule-allocation-experiment--4-november-2026-discarded)
-· [Receipt](../log/evidence/small-file-20261104/results.json), `rule_allocation_experiment`
-· [Rejected patch](../log/evidence/small-file-20261104/rule-allocation-candidate.patch).
+· [Receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json), `rule_allocation_experiment`
+· [Rejected patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/rule-allocation-candidate.patch).
 
 Uninstrumented original/candidate/candidate/original controls give six samples
 per version: file200 **20.091 → 19.485 ms**, only **0.605 ms / 3.0%**. Treat that
@@ -57,7 +57,7 @@ memory remain UNKNOWN. No commit/push/CI or installation/HTTP requalification.
 
 **LOG-PERF OPEN; production unchanged at verified `11e95f4a`.**
 [Latest report](../log/SMALL_FILE_INVESTIGATION.md#translation-follow-up--golden-wrench-review-pending)
-· [Evidence](../log/evidence/small-file-20261104/results.json), `translation_followup`.
+· [Evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json), `translation_followup`.
 The byte-array copy proposal remains on hold and was not implemented.
 
 Actual file200 already returns 200 translation aliases, with no replacement
@@ -89,7 +89,7 @@ Installation and HTTP/HTTPS acceptance remain closed.
 **LOG-PERF OPEN / HOLD. No production change or new commit.** The approved
 formatter remains at verified remote commit `11e95f4a6a7d60071bd754008662e88e022fbe16`.
 The [CPU follow-up](../log/SMALL_FILE_INVESTIGATION.md#cpu-follow-up--golden-wrench-review-pending)
-and [receipt](../log/evidence/small-file-20261104/results.json) retain contemporaneous
+and [receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json) retain contemporaneous
 controls, detailed/reduced timers and a separate allocation run. All 16 final
 benchmark processes pass their bounded oracles (276 rows); three harness setup/
 source diagnostic failures and earlier observations remain preserved.
@@ -121,7 +121,7 @@ was independently verified at that exact SHA. No hosted CI was dispatched.
 The dated entries below retain their historical state and evidence.
 
 The separately scoped [small-file report](../log/SMALL_FILE_INVESTIGATION.md) and
-[receipt](../log/evidence/small-file-20261104/results.json) isolate framing,
+[receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json) isolate framing,
 write, flush and close on the same Release/LLVM23 JIT O2 host. Original-runtime
 file200 repeats at **26.806 ms** (FAIL <10); prepared direct I/O is **12.952 ms**.
 Separate phases measure **15.138 ms** for logger writes200, **3.449 ms** for
@@ -161,7 +161,7 @@ The current prepared-file control is 12.195 ms. Text JIT/AOT, 31,224 ownership
 checks, 15 logging byte/UTC checks, 1,688 logging JIT checks and 827 checks per
 AOT mode pass. The initial candidate and failed build diagnostics are retained.
 The report includes the source diff identity, measurements, safety boundary and
-remaining limitations. [Candidate report](../log/BOUNDED_FRAMING_RESULT.md) · [Evidence](../log/evidence/llvm23-framing-20261104/results.json)
+remaining limitations. [Candidate report](../log/BOUNDED_FRAMING_RESULT.md) · [Evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-framing-20261104/results.json)
 
 The smallest next measurement is a bounded small-file/direct-I/O comparison
 separating framing, writes and flush/close costs after candidate review.
@@ -179,7 +179,7 @@ installation handoff, blocker register and acceptance receipt. No CI was dispatc
 All logging investigation changes below remain uncommitted for separate review.
 
 The [concise report](../log/PERFORMANCE_BASELINE_LLVM23.md) and
-[machine-readable results](../log/evidence/llvm23-baseline-20261104/results.json)
+[machine-readable results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-baseline-20261104/results.json)
 record criteria, historical profiling, exact build/source identities, commands,
 wall/CPU samples, throughput, allocation/resource observations and limitations.
 Production code measured was `ffd8920befe04a67e3eaef6aadcdf0233df13563`, with
@@ -230,7 +230,7 @@ attempt 1, at exact commit `ffd8920befe04a67e3eaef6aadcdf0233df13563`.
 Read-only GitHub metadata confirms that every platform completed dependency
 provisioning, Release builds, compiler/tooling component installation, installed
 executable smoke checks and evidence upload. The
-[compact closure receipt](evidence/install-ci-41916674041.json) records the job
+[compact closure receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/install-ci-41916674041.json) records the job
 IDs, artifact IDs/digests, tested SHA and verification boundary.
 
 | Tested hosted environment | Job | Result |
@@ -524,7 +524,7 @@ This section records the preceding sprint. The original Linux qualification hand
 preserved historical snapshot. Boss subsequently committed those 15 Linux records
 at `d52e6b708539dd3026c934c98332c58c8e5e311d`; their former uncommitted status is
 not the initial state of this sprint. This sprint began at that SHA on clean
-`main`, tracking `origin/main`. See [start hashes](evidence/first-install-docs/start.json).
+`main`, tracking `origin/main`. See [start hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/first-install-docs/start.json).
 HEAD, root README, production/Runtime/CMake, licensing and historical acceptance/
 crash evidence remain protected. Only documentation and review evidence are in scope.
 
@@ -540,7 +540,7 @@ The complete Windows report was supplied by Boss in the connected chat
 “Review before continuing,” then explicitly accepted by Golden Wrench there.
 It was recovered from that exact Boss message and copied as supplied, retaining
 host paths, hashes, command descriptions, shadow-install method and both original
-harness failures. [Import provenance](evidence/first-install-docs/windows-import-source.json)
+harness failures. [Import provenance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/first-install-docs/windows-import-source.json)
 identifies the source/acceptance messages and the imported UTF-8 text hash. Only a
 terminal LF is standardized; original Windows file bytes/line endings and private
 raw VM receipts were not accessed. No missing commands, script or results were
@@ -576,19 +576,19 @@ Windows author's reported checks, not a new Linux-side raw-evidence verification
   `main.void` and native CLI workflow, installed stdlib discovery and portability
   limits. Windows developer-host requirements are distinct from fresh provisioning;
   macOS hosted compiler evidence is distinct from source-install acceptance.
-- Prepared [README_LLVM23_CLI.patch](proposals/README_LLVM23_CLI.patch), **unapplied**.
+- Prepared [README_LLVM23_CLI.patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/proposals/README_LLVM23_CLI.patch), **unapplied**.
   It corrects LLVM/Python requirements, points to the maintained complete recipe,
   qualifies the still-supported legacy entry example and uses current `build`.
   Feature/editor/licensing sections and the valid legacy source example are unchanged.
 - Retained all historical Linux/HTTP/LLVM/crash records and existing receipts;
   no prior evidence digest/inventory is rewritten to describe this new sprint.
 
-[Validation results](evidence/first-install-docs/validation.json) and the
-[reproducible checker](evidence/first-install-docs/validate.py) record local links/
+[Validation results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/first-install-docs/validation.json) and the
+[reproducible checker](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/first-install-docs/validate.py) record local links/
 anchors, shell/heredoc syntax, Linux recipe comparison with retained accepted
 argv, exact known smoke-source comparison, Windows identity/provenance, the dry-run
 README patch check and scope/preservation. The
-[sprint inventory](evidence/first-install-docs/inventory.json) lists every changed
+[sprint inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/first-install-docs/inventory.json) lists every changed
 path and digest. Validation is static and source/receipt based: no new compiler,
 CMake configure/build/install, SDK download, Windows command or LSP exchange is
 executed in this documentation sprint. Existing command results remain attached
@@ -695,8 +695,8 @@ machine/VM certification or permission to distribute compiler/dependency binarie
 Initial and final source HEAD: `97aa4e4334f1b9354ba651770b5cf13e74da03d0`,
 branch `main`, tracking `origin/main`. Initial working tree was clean. No applicable
 ancestor/repository `AGENTS.md` was found. All twelve mandatory files were read
-before checks; [initial hashes](evidence/qualification-start.json) and
-[exact examined-file inventory](evidence/examined-files.json) preserve the inputs.
+before checks; [initial hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/qualification-start.json) and
+[exact examined-file inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/examined-files.json) preserve the inputs.
 Additional large files were inspected in relevant sections as marked there.
 
 Boss authorizes Linux source-build dependency inventory, available fresh-environment
@@ -723,8 +723,8 @@ Windows LLVM23 incidents remain separate. None was rerun or causally reclassifie
 The [qualification report](LINUX_CLEAN_HOST_QUALIFICATION.md) contains the complete
 source dependency/install contract, exact successful recipe, observed runtime
 closure, missing-prerequisite classifications and seven first-install guidance gaps.
-[Command receipts](evidence/commands.jsonl), [all-command result index](evidence/results.json)
-and [probe oracles](evidence/checks.jsonl) include passes and failed attempts.
+[Command receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/commands.jsonl), [all-command result index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/results.json)
+and [probe oracles](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/checks.jsonl) include passes and failed attempts.
 
 - PASS: independent initial Git inspection and all mandatory preparation.
 - PASS: new rootless Podman Ubuntu 24.04 x64 userspace, no host mounts or initial
@@ -823,7 +823,7 @@ No further test or repair is needed to complete this report.
 
 All changes are new, **uncommitted and unstaged** documentation/receipt files.
 Tracked source, protected README, historical evidence and HEAD remain unchanged.
-The [final preservation/inventory receipt](evidence/final-inventory.json) records
+The [final preservation/inventory receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/final-inventory.json) records
 Git checks, protected/input hashes and every path below. Its own hash is omitted
 from the digest table to avoid a recursive checksum.
 

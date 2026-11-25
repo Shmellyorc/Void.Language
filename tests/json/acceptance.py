@@ -1,4 +1,9 @@
 """Consolidated local JSON selection; original attempts are never overwritten."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 import sys, os, json, time, hashlib, re, subprocess
 import xml.etree.ElementTree as ET
@@ -8,7 +13,7 @@ from crash import run
 profile=sys.argv[1]
 build=ROOT/'build'/('ci-official-'+profile)
 label=profile+'-'+str(time.time_ns())
-evidence=ROOT/'docs/json/evidence/implementation'
+evidence=(documentation_evidence('json') / 'implementation')
 xml=evidence/('acceptance-'+label+'.xml')
 selection='^(json_.*|core|numeric|frontend|modules|growable_arrays_source|patterns_source|reference_values_source|generics_source|collections_source|lsp_documentation|text_collections_sprint3|numeric_sprint2|text_encoding_crash_preservation)$'
 if len(sys.argv)>2:selection=sys.argv[2]

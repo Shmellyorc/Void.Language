@@ -13,12 +13,12 @@ Boss-authorized staging only. Branch **`main`**, HEAD
 | Excluded files, preserved locally and left untracked | 11,768 |
 | Pre-existing staged changes | 0 |
 
-The [explicit staging manifest](evidence/integrated-performance/STAGING_MANIFEST.txt)
+The [explicit staging manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/integrated-performance/STAGING_MANIFEST.txt)
 lists individual literal paths, including this receipt and the manifest itself.
 No directory, wildcard or blanket add is used. Categories: 17 documentation, 5 fixture, 5 historical patch evidence, 23 production, 10 qualification/instrumentation helpers, 66 text receipts/data/manifest.
 
 Production and fixture hashes exactly match the approved
-[source inventory](../../experiments/integration-qualification/evidence/source-inventory.json).
+[source inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/source-inventory.json).
 No performance patch was reapplied and no production/test/benchmark input changed.
 The preparation changes documentation links and publishes selected evidence only;
 no optimization research, compilation, correctness test or benchmark was run.
@@ -30,7 +30,7 @@ Linux-only scope. The original FILE200 10 ms aim remains unmet and is not a
 Boss-mandated release requirement. [Automatic SIMD](../DEVELOPMENT_STRATEGY.md#future-optimization-automatic-simd--boss-direction-5-november-2026)
 is documented/indexed as future work only; no SIMD implementation is included.
 
-The [artifact scope and publication mapping](evidence/integrated-performance/LOCAL_ARTIFACTS.md)
+The [artifact scope and publication mapping](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md)
 identify local-only binaries, archives, candidate copies and disposable runs.
 Original documents affected by link updates are preserved byte-for-byte locally,
 with original/published hashes recorded. Selected raw JSON/CSV, JUnit, qualification

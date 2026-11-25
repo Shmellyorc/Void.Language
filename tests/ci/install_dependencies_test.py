@@ -1,4 +1,9 @@
 """Installation-only dependency command plans; no downloads or native builds."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 import contextlib
 import importlib.util
 import io
@@ -31,15 +36,16 @@ def plan(system, profile='Release', install_only=False):
         root = Path(directory).resolve()
         (root / 'third_party').mkdir()
         (root / 'third_party/http-versions.json').write_bytes((ROOT / 'third_party/http-versions.json').read_bytes())
-        (root / 'docs/net/http/evidence').mkdir(parents=True)
-        for name in ('tools/setup_http_deps_native.py', 'tools/http_archive.py', 'cmake/http-psl/CMakeLists.txt'):
+        (root / 'evidence').mkdir()
+        for name in ('tools/setup_http_deps_native.py', 'tools/engineering_storage.py', 'tools/http_archive.py', 'cmake/http-psl/CMakeLists.txt'):
             target = root / name
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes((ROOT / name).read_bytes())
         argv = ['setup_http_deps_native.py', '--profile', profile, '--jobs', '3']
         if install_only:
             argv.append('--macos-install-only')
-        with patch.object(native, '__file__', str(root / 'tools/setup_http_deps_native.py')), \
+        with patch.object(native, 'documentation_evidence', return_value=root / 'evidence'), \
+                patch.object(native, '__file__', str(root / 'tools/setup_http_deps_native.py')), \
                 patch.object(native.platform, 'system', return_value=system), \
                 patch.object(native.platform, 'platform', return_value=system + ' command fixture'), \
                 patch.object(native.platform, 'machine', return_value='arm64' if system == 'Darwin' else 'AMD64'), \
@@ -58,6 +64,31 @@ def aws_configure(commands):
 
 
 class DependencyCommandTests(unittest.TestCase):
+    def test_external_evidence_is_shared_by_producer_and_collector(self):
+        from engineering_storage import documentation_evidence
+        parent = ROOT.parent / 'Void.Language-archives'
+        parent.mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix='evidence-path-contract-', dir=parent) as directory, \
+                patch.dict(os.environ, {'VOID_EVIDENCE_ROOT': directory}):
+            produced = native.documentation_evidence('net/http')
+            collected = smoke.documentation_evidence('net/http')
+            self.assertEqual(produced, collected)
+            self.assertFalse(produced.is_relative_to(ROOT))
+            receipt = produced / 'dependencies-test'
+            receipt.mkdir()
+            (receipt / 'result.json').write_text('{"status":"PASS"}')
+            self.assertEqual(list(collected.glob('dependencies-*')), [receipt])
+            self.assertEqual(documentation_evidence('voidup').parent, produced.parent.parent)
+
+    def test_evidence_refuses_checkout_temporary_storage_and_traversal(self):
+        from engineering_storage import documentation_evidence, evidence_directory
+        for root in (ROOT, ROOT / 'docs', Path('/tmp/void-evidence')):
+            with self.subTest(root=root), patch.dict(os.environ, {'VOID_EVIDENCE_ROOT': str(root)}):
+                with self.assertRaises(ValueError):
+                    documentation_evidence('net/http')
+        with self.assertRaises(ValueError):
+            evidence_directory('../escape')
+
     def test_macos_default_retains_tools_and_static_ssl_crypto(self):
         for profile in ('Release', 'Debug', 'strict'):
             with self.subTest(profile=profile):

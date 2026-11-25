@@ -2,7 +2,7 @@
 
 > Publication note: this commit keeps selected text evidence. Full local archives,
 > binaries, candidate trees and disposable runs remain excluded and preserved;
-> see the [artifact scope and original-document hashes](../compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md).
+> see the [artifact scope and original-document hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md).
 > Measurements and conclusions below are unchanged; artifact links are portable.
 
 ## Current Boss disposition — 5 November 2026
@@ -54,8 +54,8 @@ allocator was evaluated on the same Release LLVM 23.1.4 host. The production
 change is discarded and `text_case.cpp` restored exactly to `11e95f4a`; no second
 candidate is launched. All work remains uncommitted for Golden Wrench review.
 [Report](SMALL_FILE_INVESTIGATION.md#bounded-rule-allocation-experiment--4-november-2026-discarded)
-· [Receipt](evidence/small-file-20261104/results.json), `rule_allocation_experiment`
-· [Rejected patch](evidence/small-file-20261104/rule-allocation-candidate.patch).
+· [Receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json), `rule_allocation_experiment`
+· [Rejected patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/rule-allocation-candidate.patch).
 
 Uninstrumented original/candidate/candidate/original controls give six samples
 per version: file200 **20.091 → 19.485 ms**, only **0.605 ms / 3.0%**. Treat that
@@ -84,7 +84,7 @@ memory remain UNKNOWN. No commit/push/CI or installation/HTTP requalification.
 
 **LOG-PERF OPEN; production unchanged at verified `11e95f4a`.**
 [Latest report](SMALL_FILE_INVESTIGATION.md#translation-follow-up--golden-wrench-review-pending)
-· [Evidence](evidence/small-file-20261104/results.json), `translation_followup`.
+· [Evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json), `translation_followup`.
 The byte-array copy proposal remains on hold and was not implemented.
 
 Actual file200 already returns 200 translation aliases, with no replacement
@@ -116,7 +116,7 @@ Installation and HTTP/HTTPS acceptance remain closed.
 **LOG-PERF OPEN / HOLD. No production change or new commit.** The approved
 formatter remains at verified remote commit `11e95f4a6a7d60071bd754008662e88e022fbe16`.
 The [CPU follow-up](SMALL_FILE_INVESTIGATION.md#cpu-follow-up--golden-wrench-review-pending)
-and [receipt](evidence/small-file-20261104/results.json) retain contemporaneous
+and [receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json) retain contemporaneous
 controls, detailed/reduced timers and a separate allocation run. All 16 final
 benchmark processes pass their bounded oracles (276 rows); three harness setup/
 source diagnostic failures and earlier observations remain preserved.
@@ -148,7 +148,7 @@ was independently verified at that exact SHA. No hosted CI was dispatched.
 The dated entries below retain their historical state and evidence.
 
 The separately scoped [small-file report](SMALL_FILE_INVESTIGATION.md) and
-[receipt](evidence/small-file-20261104/results.json) isolate framing,
+[receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json) isolate framing,
 write, flush and close on the same Release/LLVM23 JIT O2 host. Original-runtime
 file200 repeats at **26.806 ms** (FAIL <10); prepared direct I/O is **12.952 ms**.
 Separate phases measure **15.138 ms** for logger writes200, **3.449 ms** for
@@ -188,7 +188,7 @@ The current prepared-file control is 12.195 ms. Text JIT/AOT, 31,224 ownership
 checks, 15 logging byte/UTC checks, 1,688 logging JIT checks and 827 checks per
 AOT mode pass. The initial candidate and failed build diagnostics are retained.
 The report includes the source diff identity, measurements, safety boundary and
-remaining limitations. [Candidate report](BOUNDED_FRAMING_RESULT.md) · [Evidence](evidence/llvm23-framing-20261104/results.json)
+remaining limitations. [Candidate report](BOUNDED_FRAMING_RESULT.md) · [Evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-framing-20261104/results.json)
 
 The smallest next measurement is a bounded small-file/direct-I/O comparison
 separating framing, writes and flush/close costs after candidate review.
@@ -200,7 +200,7 @@ Further small-file investigation remains separately scoped for Golden Wrench rev
 
 **Performance OPEN; release HOLD. Stop for Golden Wrench review before production
 changes.** The [new report](PERFORMANCE_BASELINE_LLVM23.md) and
-[machine-readable measurements](evidence/llvm23-baseline-20261104/results.json)
+[machine-readable measurements](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-baseline-20261104/results.json)
 record fresh Release observations at
 `ffd8920befe04a67e3eaef6aadcdf0233df13563`, pinned LLVM/Clang/LLD 23.1.4.
 The logger source matches the historical measured hash; no implementation changed.
@@ -497,16 +497,16 @@ or require further work; the engineering result does not close that gate.
 | Debug | 88/88 | 2063.22 s |
 | Strict | 87/87 | 2024.84 s |
 
-The [fresh acceptance index](evidence/performance-repair/acceptance-index.json)
+The [fresh acceptance index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/acceptance-index.json)
 contains all 263 outcomes and executable/library hashes. Full logs and exact
-source freezes are in [Release](../compiler-health/evidence/integrated-performance/historical-logging-release-LastTest.txt),
-[Debug](../compiler-health/evidence/integrated-performance/historical-logging-debug-LastTest.txt) and
-[strict](../compiler-health/evidence/integrated-performance/historical-logging-strict-LastTest.txt).
+source freezes are in [Release](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/integrated-performance/historical-logging-release-LastTest.txt),
+[Debug](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/integrated-performance/historical-logging-debug-LastTest.txt) and
+[strict](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/integrated-performance/historical-logging-strict-LastTest.txt).
 All 299 source files match across the three profiles and the current tree; the
 measured source matched the Release freeze before and after isolated measurements.
 The raw Debug/strict manifests additionally include 16/32 generated text-encoding
 cache entries. They remain intact and separately recorded in the
-[source-freeze comparison](evidence/performance-repair/source-freeze-comparison.json);
+[source-freeze comparison](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/source-freeze-comparison.json);
 only those generated cache entries are excluded from cross-profile source equality.
 
 Per profile, the logging native host performs 1,686 checks across JIT modes;
@@ -551,29 +551,29 @@ generated VOID instructions do not independently receive Clang sanitizer passes.
 There is no new logging worker queue, scheduler, native logging formatter or public
 logging API expansion. New Runtime read support is general checked array support.
 The complete path-by-path inventory, including pre-existing changes without an
-authorship claim, is in [CHANGED_FILES.md](evidence/performance-repair/review/CHANGED_FILES.md)
-and [source-inventory.json](evidence/performance-repair/review/source-inventory.json).
+authorship claim, is in [CHANGED_FILES.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/review/CHANGED_FILES.md)
+and [source-inventory.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/review/source-inventory.json).
 
 ## Review package and preserved history
 
-[Review package guide](evidence/performance-repair/review/README.md),
-[all changed source/tests/documents](evidence/performance-repair/review/source.tar.gz),
-[evidence archive](evidence/performance-repair/review/evidence.tar.gz), and
-[archive manifest](evidence/performance-repair/review/manifest.json).
+[Review package guide](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/review/README.md),
+[all changed source/tests/documents](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/review/source.tar.gz),
+[evidence archive](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/review/evidence.tar.gz), and
+[archive manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/review/manifest.json).
 Compiled binaries/objects are not duplicated in the archive; exact identities,
 generated sources and commands are included, and frozen binaries remain in the
 workspace baseline. The source archive includes every modified source/test file,
 new files, the tracked patch and SHA-256 inventory.
 
-The [baseline freeze](evidence/performance-repair/baseline/freeze.json) retains
+The [baseline freeze](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/baseline/freeze.json) retains
 original sources, exact executables and evidence before any repair. The historical
 93/93 acceptance is preserved in the baseline archive and [original acceptance
 record](ACCEPTANCE.md); it is not presented as validation of these changes.
 Every original failure remains under the shared `tests/text_encoding/crash.py`
 workflow, with preserved sources, status, stderr and executable identity. See
-[incident index](evidence/performance-repair/incident-index.json),
-[diagnoses](INCIDENTS.md), [process receipt index](evidence/performance-repair/receipt-index.json)
-and [engineering journal](IMPLEMENTATION.md). A passing retry never replaces a
+[incident index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/incident-index.json),
+[diagnoses](INCIDENTS.md), [process receipt index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/receipt-index.json)
+and [engineering journal](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/IMPLEMENTATION.md). A passing retry never replaces a
 failed original.
 
 Native Windows/macOS execution remains pending, including platform file-sharing,

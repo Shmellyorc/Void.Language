@@ -21,7 +21,7 @@ for the baseline; they do not establish completed native builds or test suites.
 | macOS ARM64 Release | `123350061685` | Same missing declaration |
 
 Original configure success lines and build errors are retained in
-[`evidence/ci40844952491/`](evidence/ci40844952491/).
+[`evidence/ci40844952491/`](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/ci40844952491).
 
 ## Exact corrections and preserved behavior
 
@@ -49,7 +49,7 @@ The protected root README, Windows `/MT` dependency setup, Apple vendor libc++
 pairing, native-link manifest generation, stop-token/ORC checks, frontend/IR,
 Runtime ownership/GC/leases and LLVM 23.1.4 O2 pipeline remain unchanged.
 Exact unchanged-file hashes and source audits are in
-[`source-audit.json`](evidence/ci40844952491/source-audit.json).
+[`source-audit.json`](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/ci40844952491/source-audit.json).
 
 ## Focused local verification
 
@@ -88,7 +88,7 @@ Results:
   (the negative loop performs three writes). The helper was corrected and rerun;
   initial and passing outputs are retained. Production test assertions were not
   changed.
-- [`entropy_smoke.void`](evidence/ci40844952491/entropy_smoke.void) uses the actual
+- [`entropy_smoke.void`](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/ci40844952491/entropy_smoke.void) uses the actual
   OS entropy bridge. Source checking, normal/O2 JIT, and both independently built
   native executables **passed all seven commands** on Linux. Exact commands,
   exit codes and output are in `entropy-smoke.json`.

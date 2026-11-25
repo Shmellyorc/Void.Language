@@ -152,7 +152,7 @@ required. No production ownership inference or optimizer suppression is introduc
 
 ## Bounded measurements and historical incidents
 
-The [reproducible bounded measurements](evidence/metrics/README.md) complete
+The [reproducible bounded measurements](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/metrics/README.md) complete
 **20/20** checked child executions: five representative sources × normal/O2 ×
 LLVM19/23, with three separately timed invocations per compilation. All children
 use actual hard/soft 1 MiB stacks and ASLR remains enabled. Runs are serial after
@@ -166,8 +166,8 @@ before invocation. Execution is the median of three in-process calls. There is
 one compilation sample per point, on PikaOS 4/x86-64, Ryzen 7 1700X, glibc 2.44.
 No confidence interval, cross-platform determinism or LLVM-only causal attribution
 is claimed. Raw phase/CPU/RSS data and exact commands are in
-[results](evidence/metrics/results.json), [comparison CSV](evidence/metrics/comparison.csv)
-and [environment/source identities](evidence/metrics/environment.json).
+[results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/metrics/results.json), [comparison CSV](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/metrics/comparison.csv)
+and [environment/source identities](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/metrics/environment.json).
 
 | Workload | Mode | Compile 19 → 23 (s) | Change | Execution 19 → 23 (ms) | Change |
 |---|---|---:|---:|---:|---:|
@@ -205,7 +205,7 @@ All **3/3 bounded DSE-associated checks pass**:
 | Source-associated logging fixture | LLVM/ORC compilation 7.048 s; three invocations each checksum 12,800; median 8.107 ms |
 
 Exact inputs, source claims, hashes and output are in
-[DSE results](evidence/metrics/dse-results.json). No new SIGSEGV, core or sanitizer
+[DSE results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/metrics/dse-results.json). No new SIGSEGV, core or sanitizer
 finding occurs in these bounded checks. These are retained diagnostic inputs and
 a source-associated fixture, not the original crashing optimizer heap/pass state.
 The original LLVM19 executable/core/preopt/source identities are preserved in
@@ -216,7 +216,7 @@ is introduced.
 
 ## Exact review inputs
 
-[Final inventory](evidence/final-inventory.json) records all **58 migration-modified**
+[Final inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/final-inventory.json) records all **58 migration-modified**
 tracked paths with before/after SHA-256, categorized new documentation/acceptance
 receipts, all nine original dirty-document hashes, protected root README, unchanged
 HEAD/index, all-other-original-tracked-file preservation and original incident

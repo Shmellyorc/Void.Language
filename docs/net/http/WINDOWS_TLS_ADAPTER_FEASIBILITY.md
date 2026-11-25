@@ -15,7 +15,7 @@ These are demonstrated integration limits, not reasons to weaken verification or
 silently remove existing store capabilities. Production migration remains HOLD.
 
 The [sources and reproduction](native-awslc-adapters/README.md) and
-[public native receipts](evidence/windows-awslc-adapters-20261103.json) preserve
+[public native receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-awslc-adapters-20261103.json) preserve
 successes, failed security assertions, inconclusive controls and original fixture
 failures separately. Stop for Golden Wrench review after the authorized research
 commit/push. No implementation sprint is authorized by this report.

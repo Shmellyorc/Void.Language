@@ -50,7 +50,7 @@ provider/host combination; it does not constrain AWS-LC's TLS implementation.
 ## Confirmed native AWS-LC results
 
 The [reusable isolated sources](native-awslc/README.md) and
-[compact receipts](evidence/windows-awslc-provider-20261103.json) record
+[compact receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-awslc-provider-20261103.json) record
 **38 controls per profile, 76 total**, plus **four MultiSSL selection controls**.
 Debug and Release both pass their intended assertions. Some controls deliberately
 record a missing security equivalence, particularly default revocation.

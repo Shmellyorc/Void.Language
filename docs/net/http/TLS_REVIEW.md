@@ -39,7 +39,7 @@ nghttp2, PSL, IDN, compression and Runtime implementation as production. Link
 receipts verify that original OpenSSL headers/libraries are not mixed into the
 candidate. `third_party/curl/` remains authoritative. Production `third_party/http-versions.json` now selects the approved AWS-LC pin.
 Fresh version-qualified prefixes preserve the original OpenSSL builds and failure
-binaries. The [prior pin manifest](evidence/http-versions-before-aws-lc.json) is
+binaries. The [prior pin manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-versions-before-aws-lc.json) is
 retained. Fresh production dependency builds pass Debug, Release and strict;
 whole-provider/Runtime integration is being verified.
 
@@ -52,9 +52,9 @@ production patch-application workflow and requires no manual copying or ZIP.
 
 | Profile | Result |
 | --- | --- |
-| Release | [PASS](evidence/tls-review-Release-20261030T174355197157Z/commands.json) |
-| Debug | [PASS](evidence/tls-review-Debug-20261030T174355207403Z/commands.json) |
-| Strict | [PASS](evidence/tls-review-strict-20261030T174355198528Z/commands.json) |
+| Release | [PASS](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/tls-review-Release-20261030T174355197157Z/commands.json) |
+| Debug | [PASS](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/tls-review-Debug-20261030T174355207403Z/commands.json) |
+| Strict | [PASS](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/tls-review-strict-20261030T174355198528Z/commands.json) |
 
 All three enforce soft/hard 1 MiB stacks for cookie, URL and actual network
 probes. Strict uses full `-fsanitize=address,undefined` on TLS, curl, Runtime and

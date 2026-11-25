@@ -8,9 +8,9 @@ existing atomic string constructor, with work quotas on snapshotting and
 transformation. A leased backing remains stable when an alias grows the live list
 onto a new backing. Final string publication retains the constructor's whole-string
 copy and existing GC/failure behavior. The original proposal follows as historical
-review context. [Current evidence](evidence/llvm23-framing-review-20261104.json)
+review context. [Current evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-framing-review-20261104.json)
 
-**Decision requested.** Keep LOG-PERF open and review one candidate at the logger’s quoting boundary. Before implementation, explicitly disposition the historical crash stop condition and approve the ownership, failure and publication contract below. The complete baseline report is available as a separate document. [Full investigation](PERFORMANCE_BASELINE_LLVM23.md) · [Measurement data](evidence/llvm23-baseline-20261104/results.json) · [Safety refinements and stop condition](HOTPATH_REVIEW.md#mandatory-refinements-retained-for-the-eventual-implementation)
+**Decision requested.** Keep LOG-PERF open and review one candidate at the logger’s quoting boundary. Before implementation, explicitly disposition the historical crash stop condition and approve the ownership, failure and publication contract below. The complete baseline report is available as a separate document. [Full investigation](PERFORMANCE_BASELINE_LLVM23.md) · [Measurement data](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-baseline-20261104/results.json) · [Safety refinements and stop condition](HOTPATH_REVIEW.md#mandatory-refinements-retained-for-the-eventual-implementation)
 
 ## Why this call site
 

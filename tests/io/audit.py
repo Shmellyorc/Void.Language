@@ -2,7 +2,7 @@
 import csv
 from pathlib import Path
 
-inventory = Path(__file__).resolve().parents[2] / 'docs/io/evidence'
+inventory = Path(__file__).resolve().parent / 'fixtures'
 with (inventory / 'API.tsv').open() as source:
     rows = list(csv.DictReader(source, delimiter='\t'))
 assert len(rows) == 149
@@ -30,7 +30,10 @@ def evidence(identity):
     return 'io_execution; io_examples_install; io_kernel; io_ownership'
 
 
-with (inventory / 'API-AUDIT.tsv').open('w') as output:
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
+from engineering_storage import evidence_directory
+with (evidence_directory('io-api-audit') / 'API-AUDIT.tsv').open('w') as output:
     writer = csv.writer(output, delimiter='\t', lineterminator='\n')
     writer.writerow([*rows[0].keys(), 'Registered test evidence', 'Contract and ownership'])
     for row in rows:

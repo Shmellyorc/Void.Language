@@ -1,3 +1,0 @@
-use net/http
-_http_capabilities()
-return 0

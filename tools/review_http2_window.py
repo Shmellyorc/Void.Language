@@ -5,6 +5,11 @@ Recompile exactly http2.c with the matching production command, replace only
 that member in a disposable archive, and independently link the actual native
 HTTP/Runtime test against it. This is review tooling, never a production build.
 """
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[1] / "tools"))
+from engineering_storage import documentation_evidence
 import argparse
 import datetime
 import difflib
@@ -29,7 +34,7 @@ def main():
     args = parser.parse_args()
     build = ROOT / ('build/llvm23-' + args.profile)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
-    evidence = ROOT / f'docs/net/http/evidence/http2-window-review-{args.profile}-{stamp}'
+    evidence = documentation_evidence('net/http') / f'http2-window-review-{args.profile}-{stamp}'
     work = ROOT / f'.toolchains/http2-window-review/{args.profile}-{stamp}'
     evidence.mkdir(parents=True); work.mkdir(parents=True)
     shutil.copy2(build / 'CMakeCache.txt', work / 'CMakeCache.txt')

@@ -181,7 +181,7 @@ existing Node environment completed the build.
 ## Reproduction and evidence
 
 Evidence directory:
-`/home/shmellyorc/Documents/Void.Language-work/g86-7K1cZCXR`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-work/g86-7K1cZCXR`.
 The review archive, SHA-256 receipt and extracted-member verification are stored
 under `/home/shmellyorc/Documents/Void.Language-archives/` as
 `g86-advanced-async-2026-11-20-7K1cZCXR.zip` and adjacent receipts. It embeds the

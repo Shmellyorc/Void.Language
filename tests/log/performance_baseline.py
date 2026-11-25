@@ -3,6 +3,11 @@
 Run once before production edits. The original sources, evidence and executable
 bytes remain available even after the build tree is rebuilt. No ptrace is used.
 """
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 import json
 import os
@@ -29,7 +34,7 @@ with tarfile.open(out / 'sources.tar.gz', 'w:gz') as archive:
             if file.is_file():
                 manifest[str(file.relative_to(h.ROOT))] = h.crash.digest(file)
 with tarfile.open(out / 'original-evidence.tar.gz', 'w:gz') as archive:
-    for path in (h.ROOT / 'docs/log/evidence').iterdir():
+    for path in ((documentation_evidence('log'))).iterdir():
         if path.name != 'performance-repair':
             archive.add(path, arcname=path.name)
 build = h.ROOT / 'build/ci-official-release'

@@ -280,7 +280,7 @@ Stage the same three catalog payload files beside that independent image
 in `native/`. Use the existing Windows isolation helper to test denial
 of source, catalog, installed compiler and original build reads in the
 same child that launches the relocated image. The visible witness uses
-the S7 Win32/GDI capture and process module techniques. [Isolation helper](../../tools/test_platform.py) · [Original visible witness](evidence/slice7-g5/windows/qualify-windows.py)
+the S7 Win32/GDI capture and process module techniques. [Isolation helper](../../tools/test_platform.py) · [Original visible witness](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g5/windows/qualify-windows.py)
 
 The disposable in-process raylib witness linked `void_llvm` and
 `void_runtime`. It used `analyze_manifest_project` with native

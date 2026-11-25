@@ -15,10 +15,10 @@ python3 tests/os/measure.py build/release/void_os_host 'build/release/os measure
 env HOME= python3 tests/os/measure.py build/release/void_os_host 'build/release/os measurement passwd'
 ```
 
-Raw results: [HOME present](evidence/performance-release-home.log),
-[HOME empty, real passwd/NSS fallback](evidence/performance-release-passwd.log).
+Raw results: [HOME present](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/os/evidence/performance-release-home.log),
+[HOME empty, real passwd/NSS fallback](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/os/evidence/performance-release-passwd.log).
 The measured host/compiler hashes are retained in
-[evidence/acceptance-release-os-final-m4kaijj9/receipt.json](evidence/acceptance-release-os-final-m4kaijj9/receipt.json).
+[evidence/acceptance-release-os-final-m4kaijj9/receipt.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/os/evidence/acceptance-release-os-final-m4kaijj9/receipt.json).
 The final inventory also records subsequent test-only host strengthening.
 
 | Layer and operation | First, µs | Repeated mean, µs |

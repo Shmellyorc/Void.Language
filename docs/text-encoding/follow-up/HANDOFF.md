@@ -52,11 +52,11 @@ persistent `docs/text-encoding/evidence/crashes/`; unique directories and readon
 source copies remain. No ignore rule hides future genuine evidence.
 
 The relative-executable omission was demonstrated by a controlled disposable signal
-before repair: [before receipt](relative-executable-before.json). The permanent
+before repair: [before receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/relative-executable-before.json). The permanent
 self-test now uses a relative interpreter path where drives permit and checks its
 exact executable hash. No production crash was invented to justify this harness fix.
 
-[In-memory generator comparison](generator-comparison.json) proves sync, async and
+[In-memory generator comparison](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/generator-comparison.json) proves sync, async and
 error-async generated text matches the authorized committed baseline exactly. No
 comparison `.void` was written. This does **not** recover the lost historical input.
 
@@ -70,7 +70,7 @@ all files in that subtree, this follow-up removed **940 tracked working-tree fil
 (7,504,348 bytes; 221 directories including the root). The deleted files comprise
 440 `.void`, 390 `.py`, 77 `.bin` and 33 `.json` files.
 
-[Compact cleanup evidence](synthetic-cleanup.json) keeps counts, receipt hashes and
+[Compact cleanup evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/synthetic-cleanup.json) keeps counts, receipt hashes and
 classification. The working-tree deletions are unstaged; Boss controls Git. No copy
 or archive of the redundant snapshot tree was retained. Synthetic tests now verify
 all evidence inside disposable storage and leave concise logs only. The permanent
@@ -101,7 +101,7 @@ repeated afterward. Large IO workloads were not repeated for that branch-only fi
 
 ## Integrity and remaining limits
 
-[Completeness evidence](completeness.json) verifies all **2,937** original evidence
+[Completeness evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/completeness.json) verifies all **2,937** original evidence
 and protected-file hashes, all 13 readonly genuine source snapshots, all 14 genuine
 provenance hashes, and the original private executable hash. Original crash receipts,
 research documents and actual incident `incident-splghldg` are untouched. No new

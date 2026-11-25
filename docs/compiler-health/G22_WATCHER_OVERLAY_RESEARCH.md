@@ -91,7 +91,7 @@ added independent compiler-owned analysis of open, unreferenced documents.
 G21 reconciled import removal and actual close with that ownership and
 preserved the watched-deletion observation. The conflict is observable
 even with a truly deleted file and a completely valid dirty overlay.
-[Stage 7](../STAGE7_IMPLEMENTATION.md#synchronization-scheduling-and-lifecycle) ·
+[Stage 7](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE7_IMPLEMENTATION.md#synchronization-scheduling-and-lifecycle) ·
 [Slice 3](../projects/SLICE3.md) ·
 [G13 acceptance](../roadmap/FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md#batch-1-implementation-record)
 

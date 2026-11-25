@@ -102,9 +102,11 @@ The 256 KiB input cap, eight-level value/key limits, source-array limits and bou
 128 errors plus one overflow notice use existing VOID9001. For this parser it means
 a resource limit prevents successful validation, extending the diagnostic-budget
 case in the historical table. Invalid raw UTF-8 is rejected by SourceFile using
-existing VOID1001 before TOML parsing. Physical boundary/entry admission, Runtime
-identity, LSP TOML publication and CLI project commands remain deferred. See the
-[Slice 1 engineering record](projects/SLICE1.md) for actual qualification/limits.
+existing VOID1001 before TOML parsing. The parser-only Slice 1 restrictions are historical. Physical boundary/entry
+admission, project identity, LSP TOML diagnostics and CLI project commands are
+implemented in the current project workflow. See [CLI](CLI.md),
+[language server](LANGUAGE_SERVER.md) and the
+[original Slice 1 record](projects/SLICE1.md) for their distinct scopes.
 
 ## Assigned codes
 
@@ -393,9 +395,10 @@ option/result retain their prior unsupported equality diagnostic. `is` and
 blanket exclusions above for compile-time type `has`, typed if-expressions,
 multiline calls and string-only interpolation. Existing nominal storage,
 structural conformance, generic specialization, capabilities and checked failure
-rules remain authoritative. Both conditional branches type-check. Formatting and
-numeric/bool/custom string conversion remain deferred. Approval and implementation
-are separate from local acceptance, Wrench review and the final hosted lock.
+rules remain authoritative. Both conditional branches type-check. The later
+[display and formatting contract](stage10/DISPLAY_FORMATTING.md) implements the
+numeric, Boolean and custom display surface; the old string-only exclusion is
+superseded. Qualification remains specific to the recorded revision and platform.
 
 
 ## Stage 9 native workflow — 21 October 2026
@@ -423,7 +426,7 @@ Original callable headers are validated once during original parsing, including
 unused generic functions, generic receiver methods and interface requirements.
 Specializations do not revalidate documentation. Warnings retain declaring-module
 ownership across imports and overlays, and cannot poison a reparsed generic header.
-[Local evidence and limitations](DOCUMENTATION_HOVER_IMPLEMENTATION.md).
+[Local evidence and limitations](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/DOCUMENTATION_HOVER_IMPLEMENTATION.md).
 
 Slice 3 assigns **VOID5012** to an owned warning for a selected project profile
 requesting unsupported profile-controlled `debug_info="line"` or `"full"`. It does

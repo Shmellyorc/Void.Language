@@ -293,8 +293,8 @@ explicitly updated; their locks are not silently rewritten to obtain G77.
 
 Structured API/test/editor data, native C controls, raw performance samples,
 artifact/source hashes and limitations are in
-[evidence/g77/results.json](evidence/g77/results.json). Selected successful and
-unsuccessful logs are in [evidence/g77/verification.txt](evidence/g77/verification.txt).
+[evidence/g77/results.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g77/results.json). Selected successful and
+unsuccessful logs are in [evidence/g77/verification.txt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g77/verification.txt).
 All raw fixtures, native controls, screenshots, failing intermediates and the
 VSIX remain under `/tmp/void-g77-hxris3dj`.
 

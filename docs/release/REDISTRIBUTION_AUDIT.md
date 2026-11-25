@@ -2,7 +2,7 @@
 
 **Public release: HOLD.** VOID has no owner-selected public license; the current install omits notices for code actually linked into its tools. GNU library compliance and the final platform payloads also need resolution. This is an engineering evidence review, not legal clearance or permission to publish.
 
-Baseline: `95ce0a76e9a95198cd4fe9d5b6bb4cbfad9bd5c5`. The [audit receipt](evidence/licensing-audit-20261104.json) records exact pins, source/notice hashes, retained install manifests, Linux link recipes and binary hashes, dependency build records, and editor dependencies. Inspection was read-only apart from this report, that receipt and the blocker register. No build, package, CI run or new qualification occurred. Windows/macOS conclusions use repository recipes and retained acceptance; their final binary closures are not independently established here.
+Baseline: `95ce0a76e9a95198cd4fe9d5b6bb4cbfad9bd5c5`. The [audit receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/licensing-audit-20261104.json) records exact pins, source/notice hashes, retained install manifests, Linux link recipes and binary hashes, dependency build records, and editor dependencies. Inspection was read-only apart from this report, that receipt and the blocker register. No build, package, CI run or new qualification occurred. Windows/macOS conclusions use repository recipes and retained acceptance; their final binary closures are not independently established here.
 
 ## Release-readiness decisions
 

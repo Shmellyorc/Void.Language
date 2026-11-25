@@ -6,8 +6,8 @@ A direct debugger reproduction stopped at the same point during the O2 compile
 in `tests/stage10/console.cpp`'s `execution()` group. The generated module has no
 runtime globals. Its LLVM verification had succeeded before optimization.
 
-[Original backtrace](evidence/llvm-dse-backtrace.txt).
-[Captured pre-optimization IR, gzip](evidence/console-preopt.ll.gz).
+[Original backtrace](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/evidence/llvm-dse-backtrace.txt).
+[Captured pre-optimization IR, gzip](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/evidence/console-preopt.ll.gz).
 The uncompressed IR SHA256 is `402019ad2887f892d65f8effa2aa516342d02013d19e54835187d4b0d2fe59e0`.
 
 The identical Debug executable and source later passed all **4,463** console
@@ -34,5 +34,5 @@ gzip -dc docs/stage11/evidence/console-preopt.ll.gz > /tmp/console-preopt.ll
 ```
 
 The source/test file hashes and exact consolidated results are in the
-[source freeze](SOURCE_FREEZE.json) and [local record](ACCEPTANCE.md). A retry is
+[source freeze](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/SOURCE_FREEZE.json) and [local record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/ACCEPTANCE.md). A retry is
 recorded as a retry, not as a clean initial consolidated run.

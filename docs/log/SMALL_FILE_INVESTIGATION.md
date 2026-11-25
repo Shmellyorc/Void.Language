@@ -18,10 +18,10 @@ not exclusive translation attribution. Every candidate file200 sample is above
 pass their 10/20 ms thresholds. Exact equivalence and confidence intervals are
 not established; the recommendation has this host/mode/protocol scope.
 
-[Samples, commands, hashes and scope](evidence/length-dispatch-20261105/results.json) ·
-[Candidate patch](evidence/length-dispatch-20261105/candidate.patch) ·
-[Long-path disassembly excerpt](evidence/length-dispatch-20261105/long-path-extract.txt) ·
-[Static review](evidence/length-dispatch-20261105/static-review.json)
+[Samples, commands, hashes and scope](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/length-dispatch-20261105/results.json) ·
+[Candidate patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/length-dispatch-20261105/candidate.patch) ·
+[Long-path disassembly excerpt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/length-dispatch-20261105/long-path-extract.txt) ·
+[Static review](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/length-dispatch-20261105/static-review.json)
 
 ### Implementation and optimized native path
 
@@ -78,8 +78,8 @@ not evidence of an added per-rule optional check.
 
 The linked component host contains the main operation at `0x23dbac0` and the
 local proof at `0x23dd2d0`, with those same sizes. Its
-[main disassembly](evidence/length-dispatch-20261105/linked-main-disassembly.txt)
-and [helper disassembly](evidence/length-dispatch-20261105/linked-helper-disassembly.txt)
+[main disassembly](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/length-dispatch-20261105/linked-main-disassembly.txt)
+and [helper disassembly](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/length-dispatch-20261105/linked-helper-disassembly.txt)
 are preserved. Different native layout/register assignments remain. The static
 inspection proves execution isolation, not why the old candidate slowed down
 or a guaranteed timing recovery on other hosts.
@@ -89,7 +89,7 @@ or a guaranteed timing recovery on other hosts.
 - Both the focused fixture and existing `text.void` pass **normal/O2 JIT and
   normal/O2 linked AOT** with the candidate. Production controls also pass the
   identical native and normal/O2 JIT byte/status/error oracles. The focused
-  [fixture](evidence/length-dispatch-20261105/translation_no_match.void) covers
+  [fixture](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/length-dispatch-20261105/translation_no_match.void) covers
   distinct/repeated strings, escapes, Unicode, empty and 128/129-byte input,
   unsorted/duplicate/invalid/mutated rules, count mismatches, budgets, aliases,
   large replacements and 257-rule fallback.
@@ -205,9 +205,9 @@ candidate console block had a **20.731 ms median**, failing its ≤20 ms screen.
 Discard conservatively under the approved decision rule. These active-host
 observations do not isolate the cause of the heavy-path movement.
 
-[Complete receipt and samples](evidence/no-match-20261105/results.json) ·
-[Rejected patch](evidence/no-match-20261105/candidate.patch) ·
-[Artifact hashes](evidence/no-match-20261105/SHA256SUMS.json)
+[Complete receipt and samples](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/no-match-20261105/results.json) ·
+[Rejected patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/no-match-20261105/candidate.patch) ·
+[Artifact hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/no-match-20261105/SHA256SUMS.json)
 
 ### Exact candidate and restoration
 
@@ -232,8 +232,8 @@ shared with the general unchanged-result branch. No persistent state or public
 API was added. Leases and heap borrows stayed within their existing lifetime and
 mutex rules; general safepoints and NativeSafe disposal remained in place.
 
-The [focused VOID fixture](evidence/no-match-20261105/translation_no_match.void)
-and [native checks](evidence/no-match-20261105/native-extra.cpp) were experimental
+The [focused VOID fixture](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/no-match-20261105/translation_no_match.void)
+and [native checks](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/no-match-20261105/native-extra.cpp) were experimental
 test artifacts. The VOID fixture was removed from `tests/` on rejection; no
 CMake or existing test source change remains. `git diff --exit-code` confirms
 production translation, logging source, existing ownership tests and CMake are
@@ -276,7 +276,7 @@ One **harness setup failure** is retained: the extra native test initially passe
 64-bit all-ones as i32 -1 to `list_write`, which correctly rejected invalid scalar
 bits. The test was corrected to `0xffffffffu`; production code was not changed.
 The initial source, driver, binary identity and
-[failed output/receipt](evidence/no-match-20261105/initial-harness-failure/receipt.json)
+[failed output/receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/no-match-20261105/initial-harness-failure/receipt.json)
 remain. This was exit 1, not a signal or sanitizer finding. All **47 child-command
 receipts** are preserved: **46 exit 0, one exit 1**. No failed run was erased.
 
@@ -391,7 +391,7 @@ overlap measurements. Uninstrumented blocks run original A, candidate A,
 candidate B, original B, each with one warmup and three samples per cell.
 The pooled column combines the six measured samples per version descriptively;
 it is not a confidence interval. Exact ranges and CPU observations are in the
-[receipt](evidence/small-file-20261104/results.json), `rule_allocation_experiment`.
+[receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json), `rule_allocation_experiment`.
 
 | Whole workload, median ms | Original A | Candidate A | Candidate B | Original B | Pooled original → candidate |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -451,7 +451,7 @@ whole-operation peak live native memory.
 
 ### Concrete candidate and safety boundaries
 
-The [rejected patch](evidence/small-file-20261104/rule-allocation-candidate.patch)
+The [rejected patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/rule-allocation-candidate.patch)
 is retained for review. It changes only the ordered map's native allocator in
 `text_case.cpp`: `std::pmr::map<i32, std::string>` backed by a private resource.
 It adds no persistent cache, shared Runtime contract, API or formatter change.
@@ -525,7 +525,7 @@ peak live memory and tail latency remain UNKNOWN. **Stop for Golden Wrench revie
 **LOG-PERF OPEN; production unchanged at `11e95f4a`.** The byte-array bulk-copy
 proposal is on hold and was not implemented. The five investigation files remain
 uncommitted. This section supersedes earlier proposed next actions while retaining
-their evidence below. [Commands, samples and hashes](evidence/small-file-20261104/results.json)
+their evidence below. [Commands, samples and hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json)
 are under `translation_followup`.
 
 ### Finding: rule preparation, not missing no-escape publication
@@ -773,7 +773,7 @@ scopes. Its translation takes 5.026664 ms. Across those three end-to-end samples
 flush ranges 5.481–8.615 ms and native writes 0.508–0.528 ms. There is no changed
 flush policy: the call remains `fsync` and logger close still flushes then closes.
 The same-sample breakdown and all ranges are in the `cpu_followup` section of the
-[receipt](evidence/small-file-20261104/results.json).
+[receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json).
 
 ### Allocation, roots and synchronization
 
@@ -922,7 +922,7 @@ Dirty-file flush takes about 6–9 ms on this host. Native write routines total
 about 0.5 ms and native close is small. These observations do not justify removing
 flushes, changing durability/error semantics or rewriting the successful formatter.
 
-[Machine-readable samples, commands and hashes](evidence/small-file-20261104/results.json)
+[Machine-readable samples, commands and hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/results.json)
 · [Approved candidate](BOUNDED_FRAMING_RESULT.md)
 · [Unchanged initial baseline](PERFORMANCE_BASELINE_LLVM23.md)
 

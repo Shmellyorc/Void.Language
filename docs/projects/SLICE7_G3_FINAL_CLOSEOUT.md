@@ -19,10 +19,10 @@ assigns `native_` only when dispatch succeeds. The same test source
 and CTest selection then passed with just that change. The production
 descriptor, independent C fixture and target C thunk retain their
 original bytes.
-[Original CTest transcript](evidence/slice7-g3-final/original/release-ctest.txt) ·
-[Exact original probe](evidence/slice7-g3-final/original/probe.cpp.txt) ·
-[Corrective CTest replay](evidence/slice7-g3-final/original/corrected-ctest.txt) ·
-[Replay source and executable hashes](evidence/slice7-g3-final/original/corrected-sha256.txt).
+[Original CTest transcript](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/original/release-ctest.txt) ·
+[Exact original probe](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/original/probe.cpp.txt) ·
+[Corrective CTest replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/original/corrected-ctest.txt) ·
+[Replay source and executable hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/original/corrected-sha256.txt).
 
 ## Acquisition and release ownership
 
@@ -119,11 +119,11 @@ that is safe on the shutdown thread.
 
 | Configuration | Selected CTest cases | Receipt |
 | --- | ---: | --- |
-| Linux x86-64 Release | 14/14 | [CTest](evidence/slice7-g3-final/linux/release-ctest.txt) · [Direct output](evidence/slice7-g3-final/linux/release-LastTest.txt) |
-| Linux x86-64 Debug | 14/14 | [CTest](evidence/slice7-g3-final/linux/debug-ctest.txt) · [Direct output](evidence/slice7-g3-final/linux/debug-LastTest.txt) |
-| Linux x86-64 fatal ASan/UBSan | 14/14 | [CTest](evidence/slice7-g3-final/linux/strict-ctest.txt) · [Direct output](evidence/slice7-g3-final/linux/strict-LastTest.txt) |
-| Windows 10 x64 Release, build 19045 | 14/14 | [CTest](evidence/slice7-g3-final/windows/Release-ctest.txt) · [Direct output](evidence/slice7-g3-final/windows/Release-g3-direct.txt) |
-| Windows 10 x64 Debug, build 19045 | 14/14 | [CTest](evidence/slice7-g3-final/windows/Debug-ctest.txt) · [Direct output](evidence/slice7-g3-final/windows/Debug-g3-direct.txt) |
+| Linux x86-64 Release | 14/14 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/linux/release-ctest.txt) · [Direct output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/linux/release-LastTest.txt) |
+| Linux x86-64 Debug | 14/14 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/linux/debug-ctest.txt) · [Direct output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/linux/debug-LastTest.txt) |
+| Linux x86-64 fatal ASan/UBSan | 14/14 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/linux/strict-ctest.txt) · [Direct output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/linux/strict-LastTest.txt) |
+| Windows 10 x64 Release, build 19045 | 14/14 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/windows/Release-ctest.txt) · [Direct output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/windows/Release-g3-direct.txt) |
+| Windows 10 x64 Debug, build 19045 | 14/14 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/windows/Debug-ctest.txt) · [Direct output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/windows/Debug-g3-direct.txt) |
 
 The focused selection covered G1–G3, reload, GC and analysis using
 `ctest -j 2`, including normal/O2 JIT and independent normal/O2 AOT
@@ -131,15 +131,15 @@ executions. ASan leak detection was enabled and both sanitizers were
 fatal. The existing pinned LLVM RTTI limitation still applies.
 Windows sanitizers, Windows Server 2022, macOS and other architectures
 remain outside this qualification.
-[Linux reproduction script](evidence/slice7-g3-final/qualify-linux.sh) ·
-[Strict instrumentation receipt](evidence/slice7-g3-final/linux/strict-instrumentation.txt).
+[Linux reproduction script](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/qualify-linux.sh) ·
+[Strict instrumentation receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/linux/strict-instrumentation.txt).
 
 Both Windows 10 profiles passed on their first focused parallel run.
 The runner used pinned Clang 23.1.4 and verified all 3,288 input hashes.
 Only the two audit source paths differ from the qualified G3 packet.
 The runner restored the original Windows source tree.
-[Native receipt](evidence/slice7-g3-final/windows/native-results.json) ·
-[Evidence hashes](evidence/slice7-g3-final/windows/preserved-evidence.json).
+[Native receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/windows/native-results.json) ·
+[Evidence hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/windows/preserved-evidence.json).
 
 The retained Windows overlap comparison reproduced the composite
 assertion in G1 and G2. The diagnostic G2 reproduction observed
@@ -148,20 +148,20 @@ lease check in that run. The original unsplit failures do not identify
 which branch failed. G3's original failing overlap and passing
 unchanged parallel retry are retained. This audit leaves the original
 concurrency test and its assertions intact.
-[G1 overlap](evidence/slice7-g3/windows/parallel-g1-overlap-results.json) ·
-[G2 overlap](evidence/slice7-g3/windows/parallel-overlap-results.json) ·
-[Diagnostic replay](evidence/slice7-g3/windows/diagnostic-release-overlap.txt) ·
-[G3 overlap](evidence/slice7-g3/windows/Release-attempt-1-ctest.txt) ·
-[G3 parallel rerun](evidence/slice7-g3/windows/Release-ctest.txt).
+[G1 overlap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/parallel-g1-overlap-results.json) ·
+[G2 overlap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/parallel-overlap-results.json) ·
+[Diagnostic replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/diagnostic-release-overlap.txt) ·
+[G3 overlap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Release-attempt-1-ctest.txt) ·
+[G3 parallel rerun](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Release-ctest.txt).
 
 ## Source and layered Git inventory
 
 The exact source delta is two paths. The inventory verifies the
 previous G3 hashes for all unaffected paths, the old and new hashes
 of both amended paths and the unchanged HEAD and index.
-[Source patch](evidence/slice7-g3-final/source.patch) ·
-[Before and after hashes](evidence/slice7-g3-final/source-hashes.json) ·
-[Layered Git inventory](evidence/slice7-g3-final/inventory.txt).
+[Source patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/source.patch) ·
+[Before and after hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/source-hashes.json) ·
+[Layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/inventory.txt).
 
 ## End-of-task temporary workspace cleanup
 
@@ -171,8 +171,8 @@ paths. Windows cleanup removed seven verified scratch roots and 83
 contained entries, including the restored source overlay's backup,
 empty temp directories and disposable probe files. Both receipts
 list the exact deleted paths.
-[Linux cleanup receipt](evidence/slice7-g3-final/host-cleanup.json) ·
-[Windows cleanup receipt](evidence/slice7-g3-final/windows/cleanup-results.json).
+[Linux cleanup receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/host-cleanup.json) ·
+[Windows cleanup receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3-final/windows/cleanup-results.json).
 
 Windows `C:` had 24,733,876,224 bytes free (23.035 GiB) before
 cleanup and 24,736,034,816 bytes (23.037 GiB) afterward. Cleanup

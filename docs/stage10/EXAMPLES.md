@@ -48,15 +48,15 @@ Fixtures are test inputs; some intentionally return nonzero values or exercise
 failure paths and should be run through their existing assertions.
 
 Local closeout records contain exact commands, output hex and compiler hashes:
-[check/JIT](engineering/closeout/example-attempts.json),
-[native builds and design probes](engineering/closeout/example-native-and-design-probes.json),
-[build provenance](engineering/closeout/example-identities.json). Existing local
+[check/JIT](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/closeout/example-attempts.json),
+[native builds and design probes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/closeout/example-native-and-design-probes.json),
+[build provenance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/closeout/example-identities.json). Existing local
 Debug CI96 and Release Step41 compilers were reused; no fresh compiler build or
 additional full-suite pass is claimed. The example was added after experiment #4.
 Strict ASan/UBSan/leak checking and both JIT modes also pass with the existing
-CI96 sanitizer compiler; [exact environment/output](engineering/closeout/example-strict.json).
+CI96 sanitizer compiler; [exact environment/output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/closeout/example-strict.json).
 Generated application instructions are not equivalently sanitizer-instrumented.
-The [existing example rerun](engineering/closeout/existing-example.json) retains
+The [existing example rerun](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/closeout/existing-example.json) retains
 its exact `23` legacy result in both compiler configurations and JIT modes.
 
 Current application selection accepts zero-argument synchronous `main()` with

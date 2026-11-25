@@ -2,7 +2,7 @@
 
 > Publication note: this commit keeps selected text evidence. Full local archives,
 > binaries, candidate trees and disposable runs remain excluded and preserved;
-> see the [artifact scope and original-document hashes](evidence/integrated-performance/LOCAL_ARTIFACTS.md).
+> see the [artifact scope and original-document hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/integrated-performance/LOCAL_ARTIFACTS.md).
 > Measurements and conclusions below are unchanged; artifact links are portable.
 
 5 November 2026. Local Linux integration handoff for Golden Wrench/Boss review.
@@ -24,13 +24,13 @@ The working implementation was already combined at the start of this assignment;
 no candidate patch was applied again. HEAD remains
 `f3cf240e0b14240d9c7486c8882842bfa7043c63`. All `src`, `include` and `stdlib` files
 match the final internal-repair identity, including the new
-`src/ir/local_cleanup.inc`. [Starting identity and comparison](../../experiments/integration-qualification/evidence/initial-identity.json)
-and [starting tracked patch](../../experiments/integration-qualification/evidence/initial-working-diff.patch)
+`src/ir/local_cleanup.inc`. [Starting identity and comparison](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/initial-identity.json)
+and [starting tracked patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/initial-working-diff.patch)
 freeze the actual base. This assignment changes qualification/documentation only.
 
 The source inventory against HEAD is **23 production files and five test/measurement
 fixtures**. Overlapping files below are one implementation, not layered duplicate
-patches. [Exact inventory](../../experiments/integration-qualification/evidence/source-inventory.json)
+patches. [Exact inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/source-inventory.json)
 contains every path and hash.
 
 | Area | Integrated files and retained behavior |
@@ -75,8 +75,8 @@ or new optimization attempted. A fresh IR control finds **zero fused calls**,
 18 rooted cleanup operations, one compact write and three malformed private
 operations rejected. A fresh syscall-wrapper control retains **400 writes,
 30,000 bytes and two real fsync calls** across warmup and measured FILE200.
-[IR receipt](../../experiments/integration-qualification/evidence/recheck-logging-ir-retained.stdout),
-[durability receipt](../../experiments/integration-qualification/evidence/recheck-durability-proof.stderr).
+[IR receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/recheck-logging-ir-retained.stdout),
+[durability receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/recheck-durability-proof.stderr).
 These supplemental hosts were preserved from the byte-identical accepted source;
 the CMake qualification below rebuilds current targets.
 
@@ -92,9 +92,9 @@ limit. This is a configuration difference, not a skipped or failed test.
 
 | Current integrated profile | Common tests | Boundary tests | Stage 7 diagnostic children |
 | --- | ---: | ---: | --- |
-| Release | [63/63](../../experiments/integration-qualification/evidence/release-junit.xml) | [22/22](../../experiments/integration-qualification/evidence/release-boundary-junit.xml) | 12/12 normal exits |
-| Debug | [63/63](../../experiments/integration-qualification/evidence/debug-junit.xml) | [22/22](../../experiments/integration-qualification/evidence/debug-boundary-junit.xml) | 12/12 normal exits |
-| Strict | [62/62](../../experiments/integration-qualification/evidence/strict-junit.xml) | [22/22](../../experiments/integration-qualification/evidence/strict-boundary-junit.xml) | 12/12 normal exits |
+| Release | [63/63](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/release-junit.xml) | [22/22](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/release-boundary-junit.xml) | 12/12 normal exits |
+| Debug | [63/63](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/debug-junit.xml) | [22/22](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/debug-boundary-junit.xml) | 12/12 normal exits |
+| Strict | [62/62](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/strict-junit.xml) | [22/22](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/strict-boundary-junit.xml) | 12/12 normal exits |
 
 The separately preserved baseline replay also has 12/12 normal child exits:
 **48/48 captured editor processes** across baseline and three current profiles,
@@ -102,7 +102,7 @@ empty child stderr, each with actual 1 MiB limits. This does not prove the old
 uncaptured failure fixed. The original logging host reports **1,690 checks per
 profile**; independently linked normal/O2 logging AOT probes report **828 each**.
 The original text ownership host reports **17,834 checks per profile**.
-[Machine-readable campaign verification](../../experiments/integration-qualification/evidence/qualification-results.json).
+[Machine-readable campaign verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/qualification-results.json).
 
 All execution commands use actual soft **and hard
 1,048,576-byte stacks**, not a virtual-stack estimate. Builds have their ordinary
@@ -130,7 +130,7 @@ The boundary selection adds logging file/console/oracle/cache controls, process
 cache identity, synchronous/async I/O, independently linked I/O AOT, native close
 and shutdown/cancellation, HTTP reload/fault/timeouts and private IR checks.
 Selections, command environments, JUnit XML, stdout/stderr and CTest transcripts
-are retained under [new evidence](../../experiments/integration-qualification/evidence).
+are retained under [new evidence](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/local-experiments/integration-qualification/evidence).
 
 ## Allocation-fault test reconciliation
 
@@ -146,9 +146,9 @@ commits / 1 after acquisition**, plus clean collection and retry.
 The original HEAD translation unit was independently compiled against this
 current ABI, preserving its bytes and the existing probe/ABI objects. It still
 exits **1**, `with allocation failure/root publication`.
-[Fresh original failure](../../experiments/integration-qualification/evidence/advanced-original-current-runtime.stderr),
-[historical original failure](../../experiments/log-integrated/refinement/evidence/advanced-original-run.stderr),
-[historical semantic pass](../../experiments/log-integrated/refinement/evidence/advanced-semantic-run.stdout).
+[Fresh original failure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/advanced-original-current-runtime.stderr),
+[historical original failure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/log-integrated/refinement/evidence/advanced-original-run.stderr),
+[historical semantic pass](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/log-integrated/refinement/evidence/advanced-semantic-run.stdout).
 All three current `advanced_source` tests pass. Each reports acquisition ordinal
 **2** and first-body ordinal **3** in both normal/O2 execution, selected by meaning
 rather than new fixed constants. Those results qualify the semantic test; they do
@@ -176,8 +176,8 @@ the retained baseline and current Release host: all nine invocations per host
 passed, each asserting 256 acknowledged 64 KiB writes, exact 16 MiB output,
 collected managed heap and Runtime shutdown. Its original cold initialization
 and source semantics remain. This does not establish the cause of timing
-variation or erase a slow cohort. [Baseline diagnostic](../../experiments/integration-qualification/evidence/http-baseline-retained/measurements.json),
-[current diagnostic](../../experiments/integration-qualification/evidence/http-integrated/measurements.json).
+variation or erase a slow cohort. [Baseline diagnostic](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/http-baseline-retained/measurements.json),
+[current diagnostic](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/http-integrated/measurements.json).
 
 ## Retained matched performance and memory
 
@@ -185,8 +185,8 @@ No new performance redesign or SIMD benchmark was run. The already matched,
 uninstrumented **LLVM 23.1.4** measurements remain authoritative for their exact
 inputs. The internal baseline already includes refined logging; the earlier
 V1-to-refinement cohort is separate and percentages must not be added.
-[All 1,356 retained observations / 86 cells](../../experiments/internal-performance/evidence/final-whole-workload-raw.json),
-[complete summary](../../experiments/internal-performance/evidence/final-whole-workload-summary.csv),
+[All 1,356 retained observations / 86 cells](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/internal-performance/evidence/final-whole-workload-raw.json),
+[complete summary](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/internal-performance/evidence/final-whole-workload-summary.csv),
 [earlier refined logging](../log/INTEGRATED_LOGGING_REFINEMENT_RESULT.md).
 
 | Whole workload | Matched baseline → retained | Result |
@@ -242,7 +242,7 @@ stringify×20 **499,280 → 331,840**. Layout counts include stack-only expected
 geometry checks, which intentionally remain: mixed sort is nearly unchanged
 (**1,769,453 → 1,769,446**) despite the large native-allocation reduction.
 Instrumentation substantially perturbs elapsed/CPU time.
-[Attribution](../../experiments/internal-performance/evidence/attribution-summary.json).
+[Attribution](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/internal-performance/evidence/attribution-summary.json).
 
 The large index's **9,835 duplicated immutable records → zero**; retained
 index-only requested bytes **10,311,792 → 1,059,178 (−89.73%)**, construction
@@ -272,7 +272,7 @@ The initially guessed baseline HTTP host path was unavailable; the actual retain
 host was then used once. An evidence-verifier helper initially assumed every
 manifest record had a byte count; its special report/test records provide only
 hashes. The helper was corrected and full preservation verification passed.
-[Correction record](../../experiments/integration-qualification/evidence/verification-helper-correction.txt).
+[Correction record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/verification-helper-correction.txt).
 These are qualification-helper corrections, not compiler correctness failures;
 all execution receipts and original inputs are preserved.
 
@@ -302,12 +302,12 @@ fusion disabled. No new source repair or experimental cleanup was necessary.
 The timing/RSS regressions are accepted engineering tradeoffs for retention,
 subject to Boss's disposition; a microbenchmark alone supplies no release gate.
 
-[Final preservation verification](../../experiments/integration-qualification/evidence/preservation-verification.json)
+[Final preservation verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/preservation-verification.json)
 checks the unchanged 180 implementation files, all **2,641 original internal
 artifacts**, all **769 protected logging artifacts**, root README, existing SIMD
 note and Git HEAD/index. New outputs and documentation are indexed by the
-[qualification manifest](../../experiments/integration-qualification/evidence/artifact-manifest.json).
-[Reproduction and exact command receipts](../../experiments/integration-qualification/README.md)
+[qualification manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/evidence/artifact-manifest.json).
+[Reproduction and exact command receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/experiments/integration-qualification/README.md)
 identify the fixed campaign and preserved helper corrections.
 Git staging/commits/pushes/branches, hosted CI and release publication were not
 performed. Root README, historical reports/evidence and unrelated work remain

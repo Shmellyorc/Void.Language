@@ -160,7 +160,7 @@ the fixtures. No assembly is disabled and no production dependency pin changes.
 - [Official archive](https://www.nasm.us/pub/nasm/releasebuilds/2.16.03/win64/nasm-2.16.03-win64.zip)
 - Exact measured archive SHA-256:
   `3ee4782247bcb874378d02f7eab4e294a84d3d15f3f6ee2de2f47a46aa7226e6`
-- [Acquisition record](evidence/ci-preparation/nasm-acquisition.json): downloaded,
+- [Acquisition record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci-preparation/nasm-acquisition.json): downloaded,
   hashed and inspected on Linux; the Windows executable was not run here.
 
 ## Coverage and diagnostics
@@ -193,8 +193,8 @@ native check is converted to success.
 
 ## Local verification and measured cost
 
-[Verification summary](evidence/ci-preparation/verification.json) and
-[workflow checks](evidence/ci-preparation/workflow-validation.json) record:
+[Verification summary](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci-preparation/verification.json) and
+[workflow checks](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci-preparation/workflow-validation.json) record:
 
 - Actionlint **1.7.12** passes; YAML/matrix/order/cache-pair validation passes.
   All seven matrix entries, SDK cache, original build/test/relink commands,
@@ -205,7 +205,7 @@ native check is converted to success.
   Windows cache branches are simulated policy tests, not native execution.
 - **9/9 focused Linux Release CTests** pass in 17.34 s: native HTTP, wire,
   DNS, deadlines, HTTP/URL IR, URL kernel and HTTP/URL LSP.
-  [JUnit](evidence/ci-preparation/linux-focused.xml).
+  [JUnit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci-preparation/linux-focused.xml).
 - All **167 files in each Linux Release/Debug/strict prefix** verify, and the
   pinned fixture modules and certificate executables are available.
 - A new disposable Linux source/build/prefix replica performs a complete Release
@@ -213,12 +213,12 @@ native check is converted to success.
   archives and wheel downloads already present. A real sealed hit takes
   **0.51 s**, recompiles no dependency and refreshes/verifies fixtures.
   Deliberate header corruption fails before fixture setup, then the original
-  bytes are restored. [Timing and negative control](evidence/ci-preparation/bootstrap-timing.json).
+  bytes are restored. [Timing and negative control](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci-preparation/bootstrap-timing.json).
 - The existing configure helper passes locally with Ninja 1.13.2,
   `thinlto-cache`, the newly built prefix and pinned LLVM/Clang/LLD. Only the
   local build/prefix paths were adapted for isolation. Configure takes 15.86 s;
   the ORC probe returns successfully and all 18 HTTP/URL tests are registered
-  among 389 total. [Configure metrics](evidence/ci-preparation/linux-configure/configure.json).
+  among 389 total. [Configure metrics](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci-preparation/linux-configure/configure.json).
 
 The timing host is Linux x86_64/glibc 2.44 on the local Ryzen 7 1700X, not the
 Ubuntu 24.04 hosted image. Cache transfer, uncached downloads and Windows/macOS
@@ -255,7 +255,7 @@ in [the HTTP handoff](HANDOFF.md) and [native platform record](NATIVE_PLATFORMS.
 | `docs/net/http/CI_HANDOFF.md` | Scope, verification, risks and acceptance instructions |
 | `docs/net/http/evidence/ci-preparation/` | Local receipts, JUnit, source/hash inventory and validation results |
 
-[Exact changed-file/hash inventory](evidence/ci-preparation/changed-files.json).
+[Exact changed-file/hash inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci-preparation/changed-files.json).
 Golden Wrench reviews these changes before Boss commits/pushes. After approval,
 Boss selects an approved branch/tag resolving to the **new reviewed commit**
 and dispatches the existing workflow ([CLI ref semantics](https://cli.github.com/manual/gh_workflow_run)):

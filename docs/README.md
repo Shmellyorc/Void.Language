@@ -1,5 +1,12 @@
 # VOID documentation
 
+Current cleanup policy: this tree contains legitimate Markdown only. Schemas,
+license inventories and maintained test inputs live with their operational
+consumers. Generated evidence belongs outside the repository; historical artifact
+links resolve to the recorded Git snapshot. Start with the
+[current known issues](KNOWN_ISSUES.md) for reconciled implementation boundaries.
+
+
 - [Unified developer experience correction](projects/UNIFIED_DEVELOPER_EXPERIENCE.md):
   filesystem access, live package discovery, installed toolchain and review evidence.
 
@@ -46,7 +53,7 @@ holds in historical records do not govern current work.
   [CLI](CLI.md), [compiler/build architecture](SOURCE_COMPILER.md),
   [editor setup](EDITOR_INTEGRATION.md) and [troubleshooting](TROUBLESHOOTING.md).
 - [Creating and composing libraries](LOCAL_LIBRARIES.md#creating-and-composing-libraries),
-  [package add/tidy](CLI.md#source-packages-add-and-tidy) and
+  [package add/tidy](CLI.md#source-packages-add-remove-and-tidy) and
   [G27 implementation and qualification](projects/G27_LIBRARY_AUTHORING.md).
 - [Language specification](LANGUAGE_BIBLE.md), [numeric types](NUMERIC_TYPES.md),
   [modules](MODULE_SYSTEM.md), [strings](STRINGS.md), [value semantics](VALUE_SEMANTICS.md),
@@ -185,34 +192,8 @@ The ordinary CLI entry is synchronous; async examples use the explicit host abov
 
 ## Historical records
 
-[Work log](WORK_LOG.md), [decisions](DECISIONS.md),
-[approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md), module implementation reports
-and Stage 7–11 acceptance records retain original decisions, CI links and failures.
-The [pre-G88 Language Bible](LANGUAGE_BIBLE_HISTORY.md) preserves its complete
-workshop discussion and superseded implementation-status narrative.
-Original proposal bodies remain at their existing `*_PROPOSAL.md` paths, labeled
-historical; API guides above define delivered behavior.
-
-The earlier index, Wrench, Research and strategy checkpoints already exist at
-immutable commit `82e97f541fab7eec760083383569ab9c9ce8f355`:
-[chronology](https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/README.md),
-[Wrench/workshop](https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/WRENCH_CLANKER.md),
-[Research](https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/RESEARCH_CLANKER.md),
-[strategy](https://github.com/Shmellyorc/Void.Language/blob/82e97f541fab7eec760083383569ab9c9ce8f355/docs/DEVELOPMENT_STRATEGY.md).
-The same originals are available offline with `git show <commit>:docs/<file>`.
-Their old toolchain recipes and pending-stage holds are historical, not current
-instructions. No second set of full checkpoint copies is maintained.
-
-## Clanker entry point and permanent documentation policy
-
-Only implement the scope Boss authorizes. Keep engineering instructions and status
-under `docs/`, use this index for navigation, and update the relevant canonical
-contract or implementation report. Preserve unique approvals and evidence when
-consolidating; link to history rather than copying old status into every guide.
-The root README remains protected and requires separate explicit authorization.
-Boss controls Git and hosted acceptance. See [Wrench](WRENCH_CLANKER.md) for the
-shared workflow; old sprint gates do not create fresh authorization requirements.
-
-- [Enums and flags](ENUMS.md): equality, keys, generic payloads, conversions and typed flags.
-
-- [Integer bitwise and shifts](NUMERIC_TYPES.md#integer-bitwise-and-shifts-g81): exact widths, signed shifts, modulo counts and packed-data examples.
+Use Git history for superseded proposals, stage roadmaps, acceptance transcripts
+and the earlier development log. Their retained links identify the recorded source
+revision; they do not impose current approval gates. Current owner choices are
+consolidated in [architectural decisions](DECISIONS.md). Unresolved incidents and
+qualification limits remain in [known issues](KNOWN_ISSUES.md).

@@ -1,8 +1,8 @@
 # Original attempts and corrections
 
 All raw runs, sources and logs are retained in the
-[engineering archive](evidence/implementation-evidence.tar.gz), authenticated by
-its [receipt](evidence/IMPLEMENTATION_ARCHIVE.json). The original raw tree remains
+[engineering archive](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/channel/evidence/implementation-evidence.tar.gz), authenticated by
+its [receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/channel/evidence/IMPLEMENTATION_ARCHIVE.json). The original raw tree remains
 in `build/channel/evidence-raw`. Expected frontend rejections and the deliberate
 old-pruning control are successful negative tests, not compiler failures.
 

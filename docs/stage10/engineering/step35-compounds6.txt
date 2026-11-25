@@ -1,5 +1,0 @@
-Unexpected invalidation diagnostic: /compound.void:12:11: runtime error: Array operation failed
-    items[0] += rhs()
-          ^
-In function /compound.void::entry
-

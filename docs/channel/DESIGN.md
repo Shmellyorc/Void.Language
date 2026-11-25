@@ -1,13 +1,13 @@
-# Proposed `channel` public contract
+# Channel contract
 
 **Implementation authority, 27 October 2026:** Boss approved this architecture
 and settled readonly payloads, reusable clear and one payload type per router.
 The proposal wording below is historical. [Current API](API.md) and
-[implementation handoff](HANDOFF.md) describe the delivered source and evidence.
+[implementation handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/channel/HANDOFF.md) describe the delivered source and evidence.
 
 27 October 2026. Baseline **`72ee05db7e417645d434b3932bfc1e00ffd4ecb6`**.
-**Proposal for Wrench review and Boss approval, not implemented.**
-[Source research](RESEARCH.md), [complete engineering scope](ROADMAP.md).
+This is the delivered channel contract; the original research wording below is historical. Current source and API.md govern implementation.
+[Source research](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/channel/RESEARCH.md), [complete engineering scope](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/channel/ROADMAP.md).
 
 ## Public surface
 

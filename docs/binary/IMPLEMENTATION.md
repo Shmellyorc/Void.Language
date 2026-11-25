@@ -37,8 +37,8 @@ signature-help contract remain unchanged.
 ## Focused verification
 
 Final commands, results and source hashes are recorded alongside this handoff.
-See [the machine-readable results](evidence/verification.json),
-[exact commands](evidence/commands.txt) and [source hashes](evidence/source-sha256.json).
+See [the machine-readable results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/binary/evidence/verification.json),
+[exact commands](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/binary/evidence/commands.txt) and [source hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/binary/evidence/source-sha256.json).
 
 | Linux configuration | Distinct selected suites | Final binary/documentation source recheck |
 |---|---|---|
@@ -54,11 +54,11 @@ helper assignments. Each configuration reports **2,251 ownership assertions**,
 **19 codec-driver processes**, and **zero module documentation warnings**.
 Debug and Release each pass **seven actual 1 MiB stack processes**.
 
-[Debug focused details](evidence/debug-details.log),
-[Debug regressions](evidence/debug-regressions.log),
-[Release final focused details](evidence/release-final-details.log),
-[Release regression details](evidence/release-regressions-details.log), and
-[strict sanitizer details](evidence/sanitizer-details.log) retain exact outputs.
+[Debug focused details](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/binary/evidence/debug-details.log),
+[Debug regressions](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/binary/evidence/debug-regressions.log),
+[Release final focused details](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/binary/evidence/release-final-details.log),
+[Release regression details](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/binary/evidence/release-regressions-details.log), and
+[strict sanitizer details](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/binary/evidence/sanitizer-details.log) retain exact outputs.
 Strict settings are `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and
 `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. The official SDK's
 RTTI-off ABI makes vptr checking unavailable; supported address/undefined checks
@@ -135,7 +135,7 @@ all locked evidence remain unchanged.
 
 The first strict sanitizer test attempt failed **0/9** at LeakSanitizer startup:
 the execution tool's tracing sandbox prevents LSan thread inspection and reports
-ptrace unsupported. [That original output](evidence/sanitizer-sandbox-failure.log)
+ptrace unsupported. [That original output](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/binary/evidence/sanitizer-sandbox-failure.log)
 is retained. Approved execution outside that sandbox passed **10/10** with the
 same strict environment, including the newly built ownership target. No leak or
 undefined-behavior option was disabled to obtain the final pass.

@@ -97,6 +97,11 @@ fit the existing 240-character constraint. This does not alter application cwd.
 
 ## Engineering retention
 
+Repository policy: `docs/` contains legitimate Markdown only. Generated evidence,
+receipts, inventories, logs, snapshots, binaries and temporary investigation data
+stay outside the repository. Git history retains superseded tracked material.
+Follow the current [agent workflow](WRENCH_CLANKER.md#permanent-documentation-policy--25-november-2026).
+
 Retained engineering reports belong in
 `~/Documents/Void.Language-archives/<milestone-or-investigation>/`.
 Markdown reports with concrete measured results are the primary record. Keep

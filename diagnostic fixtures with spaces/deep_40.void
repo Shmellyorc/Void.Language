@@ -1,3 +1,0 @@
-use "./deep_41.void"
-func helper(value: i32) -> i32:
-    return value

@@ -1,3 +1,0 @@
-use "/native_bridge.void" as bridge
-func entry(value: i32) -> i32:
-    return bridge.terminated("embedded\0NUL") as i32

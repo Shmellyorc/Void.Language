@@ -73,9 +73,9 @@ before the verification point. A controlled launch must account for
 loader environment and audit hooks. The probe proves the sealed-image
 and isolated-namespace mechanism for a freestanding fixture. It leaves
 system ABI and sanitizer dependency exceptions unqualified.
-[Linux source](evidence/slice7-g4/checkpoint/linux-mapping.c) ·
-[Reproduction script](evidence/slice7-g4/checkpoint/linux-probe.sh) ·
-[ELF, digests and mapping transcript](evidence/slice7-g4/checkpoint/linux-run.txt) ·
+[Linux source](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/linux-mapping.c) ·
+[Reproduction script](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/linux-probe.sh) ·
+[ELF, digests and mapping transcript](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/linux-run.txt) ·
 [Linux loader](https://man7.org/linux/man-pages/man3/dlopen.3.html) ·
 [File seals](https://man7.org/linux/man-pages/man2/memfd_create.2.html) ·
 [Mapping identity fields](https://man7.org/linux/man-pages/man5/proc_pid_maps.5.html).
@@ -113,16 +113,16 @@ execution. Detecting the mismatch or calling `FreeLibrary` at that
 point cannot undo initializer effects. The stopped design does not
 grant loading authority on the strength of these checks.
 
-[PE imports and exports](evidence/slice7-g4/checkpoint/windows-build.txt) ·
-[Clean map](evidence/slice7-g4/checkpoint/windows-clean.txt) ·
-[Loaded-name collision](evidence/slice7-g4/checkpoint/windows-collision.txt) ·
-[Pinned replacement denial](evidence/slice7-g4/checkpoint/windows-replace.txt) ·
-[DotLocal control](evidence/slice7-g4/checkpoint/redirection-bare.txt) ·
-[Top-level activation control](evidence/slice7-g4/checkpoint/activation-override.txt) ·
-[Dependency redirection and initializer](evidence/slice7-g4/checkpoint/edge-override.txt) ·
-[Clean-default control](evidence/slice7-g4/checkpoint/edge-default.txt) ·
-[Redirected process default](evidence/slice7-g4/checkpoint/process-default-run.txt) ·
-[Native launch scripts](evidence/slice7-g4/checkpoint/windows-probe.cmd) ·
+[PE imports and exports](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/windows-build.txt) ·
+[Clean map](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/windows-clean.txt) ·
+[Loaded-name collision](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/windows-collision.txt) ·
+[Pinned replacement denial](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/windows-replace.txt) ·
+[DotLocal control](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/redirection-bare.txt) ·
+[Top-level activation control](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/activation-override.txt) ·
+[Dependency redirection and initializer](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/edge-override.txt) ·
+[Clean-default control](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/edge-default.txt) ·
+[Redirected process default](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/process-default-run.txt) ·
+[Native launch scripts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/windows-probe.cmd) ·
 [LoadLibraryExW](https://learn.microsoft.com/en-us/windows/win32/api/libloaderapi/nf-libloaderapi-loadlibraryexw) ·
 [DLL search order](https://learn.microsoft.com/en-us/windows/win32/dlls/dynamic-link-library-search-order) ·
 [Activation contexts](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-activateactctx).
@@ -175,11 +175,11 @@ source and evidence path.
 The evidence collector's initial input list included the Linux-only
 source and failed after copying the Windows logs. The exact Windows
 input list then verified the existing copies and wrote their hashes.
-[Collector failure](evidence/slice7-g4/checkpoint/collector-initial-error.txt) ·
-[Collector replay](evidence/slice7-g4/checkpoint/collector-rerun.txt) ·
-[Native evidence hashes](evidence/slice7-g4/checkpoint/preserved-evidence.json) ·
-[Exact probe source patch](evidence/slice7-g4/checkpoint.patch) ·
-[Layered Git inventory](evidence/slice7-g4/inventory.txt).
+[Collector failure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/collector-initial-error.txt) ·
+[Collector replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/collector-rerun.txt) ·
+[Native evidence hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/preserved-evidence.json) ·
+[Exact probe source patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint.patch) ·
+[Layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/inventory.txt).
 
 ## End-of-task temporary workspace cleanup
 
@@ -192,6 +192,6 @@ Linux checkpoint build and source transfer inputs remain available for
 reproduction. There were no disposable host-only files to remove.
 Prior native binaries, source packets, build trees and toolchains
 remain in place. The receipt records the exact deleted paths.
-[Windows cleanup receipt](evidence/slice7-g4/checkpoint/cleanup-results.json).
+[Windows cleanup receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4/checkpoint/cleanup-results.json).
 
 Stop for Golden Wrench's independent G4 architecture review.

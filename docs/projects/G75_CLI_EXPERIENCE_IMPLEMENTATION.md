@@ -48,7 +48,7 @@ qualification workspaces, not distribution of the candidate.
 | 5. VS Code | Bounded resource-independent capability negotiation precedes new compiler flags. Older/invalid responses keep the original argv. Managed F5 requires a matching actual-child receipt and a newly published ordinary executable, rechecks identity before launch, and consumes success once. Pending, failed, cancelled, changed and concurrent attempts cannot borrow another receipt. |
 
 The [CLI reference](../CLI.md#status-and-compiler-timings-g75) documents syntax and
-stream policy. The [JSON schema](../schemas/cli-timings-v1.schema.json) is version 1
+stream policy. The [JSON schema](../../schemas/cli-timings-v1.schema.json) is version 1
 and permits additive fields. Real emitted reports are validated against its
 required fields, types, enums, numeric bounds and nested item definitions.
 Additional semantic assertions cover unavailable data, parent bounds, cache hits,
@@ -329,7 +329,7 @@ project-selection test and workspace-scope matching for nested-project F5.
 | New | `docs/projects/G75_CLI_EXPERIENCE_IMPLEMENTATION.md` |
 | New | `docs/projects/G75_DEBUG_CORRECTNESS_REPAIR.md` |
 | New | `docs/projects/G75_GOLDEN_WRENCH_CORRECTIONS.md` |
-| New | `docs/schemas/cli-timings-v1.schema.json` |
+| New | `schemas/cli-timings-v1.schema.json` |
 | Modified | `editors/vscode/README.md` |
 | Modified | `editors/vscode/package.json` |
 | Modified | `editors/vscode/src/config.ts` |

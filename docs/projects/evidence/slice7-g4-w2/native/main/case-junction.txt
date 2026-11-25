@@ -1,2 +1,0 @@
-C: filesystem=NTFS
-denied before executable load: reparse ancestor

@@ -12,7 +12,7 @@ Documentation-specific LSP and execution tests passed in all seven configuration
 hosted Debug editor integration passed on Linux, Windows and macOS. Local focused
 acceptance remains **57/57**, with additional editor and stack evidence.
 
-[The acceptance record and client/version limits](DOCUMENTATION_HOVER_IMPLEMENTATION.md)
+[The acceptance record and client/version limits](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/DOCUMENTATION_HOVER_IMPLEMENTATION.md)
 retain the exact scope and historical receipts. This is a separately accepted
 tooling/documentation repair. Stage 11's lock and historical LLVM DSE observation
 are preserved. The complete contract below remains in force; no next-stage
@@ -21,7 +21,7 @@ engineering is authorized. This documentation lock awaits Golden Wrench
 
 Boss approved full implementation on 25 October 2026 after Golden Wrench review.
 This bounded repair follows the nine dependencies in
-[the roadmap](DOCUMENTATION_HOVER_ROADMAP.md). The research and roadmap retain their
+[the roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/DOCUMENTATION_HOVER_ROADMAP.md). The research and roadmap retain their
 original proposal status as history. Stage 11 and its evidence remain locked.
 
 Only contiguous declaration `##` lines are collected. Ordinary text describes the

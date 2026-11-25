@@ -124,7 +124,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--build-a', required=True, type=Path)
     parser.add_argument('--build-b', required=True, type=Path)
-    parser.add_argument('--output', type=Path, default=ROOT / 'build/voidup-fixtures')
+    parser.add_argument('--output', type=Path, default=evidence_directory('voidup-fixtures'))
     parser.add_argument('--sdk', type=Path, default=ROOT / '.toolchains/llvm-23.1.4')
     options = parser.parse_args()
     output = options.output.resolve()
