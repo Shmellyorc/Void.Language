@@ -246,8 +246,8 @@ Report inspect(std::string_view bytes, const Policy& policy) {
             report.findings.back()={"limit","Finding budget exceeded; inspection is incomplete.",0};
         }
     };
-    if (policy.revision!=1 || (policy.target!="linux-x64" && policy.target!="windows-x64" && policy.target!="macos-arm64") || policy.forbidden_strings.size()>64) {
-        finding("unsupported-policy","Require policy revision 1 and an existing target spelling; at most 64 canaries."); return report;
+    if ((policy.revision!=1 && policy.revision!=2) || (policy.target!="linux-x64" && policy.target!="windows-x64" && policy.target!="macos-arm64") || policy.forbidden_strings.size()>64) {
+        finding("unsupported-policy","Require policy revision 1 or 2 and an existing target spelling; at most 64 canaries."); return report;
     }
     std::size_t canary_bytes=0;
     for(const auto& s:policy.forbidden_strings) {
@@ -291,24 +291,63 @@ Report inspect(std::string_view bytes, const Policy& policy) {
             for(const auto& dependency:pe->import_directories()) {count(budget);llvm::StringRef name;check(dependency.getName(name));if(name.size()>4096)throw Limited("PE import name budget exceeded.");report.dependencies.push_back(name.str());}
             for(const auto& dependency:pe->delay_import_directories()) {count(budget);llvm::StringRef name;check(dependency.getName(name));if(name.size()>4096)throw Limited("PE delay import name budget exceeded.");report.dependencies.push_back(name.str());}
             report.debug=!pe->debug_directories().empty();
+            report.dynamic_symbols=!pe->import_directories().empty() || !pe->export_directories().empty();
         } else if(auto* m=llvm::dyn_cast<llvm::object::MachOObjectFile>(object.get())) {report.format="Mach-O";macho(*m,bytes,report);}
         else {finding("unsupported-format","Object is outside supported image encodings.");return report;}
         std::size_t sections=0;
         for(const auto& section:object->sections()) {
             count(sections);auto name=checked(section.getName());
             if(section.isDebugSection() || name.starts_with(".debug") || name.starts_with(".zdebug") || name.starts_with("__debug") || name==".gnu_debuglink" || name==".gnu_debugdata") report.debug=true;
+            if(name==".symtab") report.static_symbols=true;
+            if(name==".dynsym" || name=="__export" || name==".edata") report.dynamic_symbols=true;
+            if(name==".eh_frame" || name=="__eh_frame" || name==".pdata") report.unwind=true;
             if(name==".symtab" || name==".dynsym") report.symbols=true;
+            if(policy.revision==2 && llvm::isa<llvm::object::ELFObjectFileBase>(object.get()) &&
+               (llvm::object::ELFSectionRef(section).getFlags() & llvm::ELF::SHF_COMPRESSED))
+                finding("compressed-content","Compressed ELF section is outside the bounded canary decoder; reject for Stage B qualification.");
+            if(policy.revision==2 && name==".comment") finding("compiler-metadata","Development compiler identification section is present.");
             if(!section.isBSS() && !section.isVirtual()) {auto contents=checked(section.getContents());(void)contents;}
         }
+        // Mach-O shares one nlist table between local/debug symbols and dyld's
+        // external definitions/imports. The generic iterator includes both.
+        auto* mach=llvm::dyn_cast<llvm::object::MachOObjectFile>(object.get());
+        std::optional<llvm::MachO::dysymtab_command> dynamic;
+        if(mach) for(const auto& command:mach->load_commands()) if(command.C.cmd==llvm::MachO::LC_DYSYMTAB) {
+            if(dynamic) throw Invalid("Duplicate Mach-O dynamic symbol command.");
+            dynamic=mach->getDysymtabLoadCommand();
+            const auto total=mach->getSymtabLoadCommand().nsyms;
+            const auto& d=*dynamic;
+            if(d.ilocalsym>total || d.nlocalsym>total-d.ilocalsym ||
+               d.iextdefsym>total || d.nextdefsym>total-d.iextdefsym ||
+               d.iundefsym>total || d.nundefsym>total-d.iundefsym ||
+               std::uint64_t(d.ilocalsym)+d.nlocalsym>d.iextdefsym ||
+               std::uint64_t(d.iextdefsym)+d.nextdefsym>d.iundefsym)
+                throw Invalid("Invalid Mach-O dynamic symbol ranges.");
+        }
         std::size_t symbols=0;
-        for(const auto& symbol:object->symbols()) {count(symbols);(void)checked(symbol.getName());report.symbols=true;}
+        for(const auto& symbol:object->symbols()) {
+            count(symbols);(void)checked(symbol.getName());report.symbols=true;
+            bool retained=false;
+            if(mach && dynamic) {
+                const auto index=mach->getSymbolIndex(symbol.getRawDataRefImpl());
+                const auto type=mach->getSymbol64TableEntry(symbol.getRawDataRefImpl()).n_type;
+                const auto& d=*dynamic;
+                retained=(type & llvm::MachO::N_EXT) && !(type & (llvm::MachO::N_STAB | llvm::MachO::N_PEXT)) &&
+                    ((index>=d.iextdefsym && index-d.iextdefsym<d.nextdefsym) ||
+                     (index>=d.iundefsym && index-d.iundefsym<d.nundefsym));
+            }
+            if(retained) report.dynamic_symbols=true;
+            else report.static_symbols=true;
+        }
         report.inspected=true;
         const auto expected=policy.target=="macos-arm64"?"aarch64":"x86_64";
         const auto expected_format=policy.target=="linux-x64"?"ELF":policy.target=="windows-x64"?"PE":"Mach-O";
         if(report.architecture!=expected || report.format!=expected_format) finding("target-mismatch","Image format or architecture differs from policy target.");
         if(policy.reject_debug && report.debug) finding("debug-metadata","Debug sections or external debug declarations are present; compressed contents are not decoded.");
-        if(policy.reject_symbols && report.symbols) finding("symbol-table","Symbol metadata is present; imports/exports are not classified for removal.");
+        if(policy.reject_symbols && (policy.revision==1 ? report.symbols : report.static_symbols)) finding("symbol-table","Symbol metadata is present outside the policy's retained dynamic symbols.");
         if(policy.reject_loader_paths) for(const auto& path:report.loader_paths) { (void)path;finding("loader-path","Declared loader search path is forbidden by this policy."); }
+        if(policy.revision==2 && bytes.find("VOID-PRIVATE-DIAGNOSTICS")!=bytes.npos)
+            finding("private-diagnostic-map","Private diagnostic map signature is present in image bytes.");
         // Scan full bounded bytes, including ordinary data. Offsets only: never
         // echo potentially secret canaries or surrounding source text.
         for(std::size_t i=0;i<policy.forbidden_strings.size();++i) {
@@ -329,6 +368,7 @@ std::string json(const Report& r) {
         out.attribute("schema",r.schema);out.attribute("scope","image-declarations-only");out.attribute("inspected",r.inspected);
         out.attribute("format",r.format);out.attribute("architecture",r.architecture);out.attribute("image_kind",r.image_kind);out.attribute("sha256",r.sha256);out.attribute("interpreter",r.interpreter);
         out.attribute("symbols",r.symbols);out.attribute("debug",r.debug);
+        out.attribute("static_symbols",r.static_symbols);out.attribute("dynamic_symbols",r.dynamic_symbols);out.attribute("unwind",r.unwind);
         auto strings=[&](const char* key,const auto& values){out.attributeArray(key,[&]{for(const auto& v:values)out.value(v);});};
         strings("dependencies",r.dependencies);strings("versions",r.versions);strings("loader_paths",r.loader_paths);
         out.attributeArray("findings",[&]{for(const auto& f:r.findings)out.object([&]{out.attribute("code",f.code);out.attribute("detail",f.detail);out.attribute("offset",f.offset);});});

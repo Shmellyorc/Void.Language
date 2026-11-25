@@ -16,11 +16,11 @@ auto parse(std::string bytes) {return vd::project::parse_manifest(vd::SourceFile
 }
 int main(int argc,char** argv) {
     try {
-        if(argc>=4 && std::string_view(argv[1])=="audit") {
+        if(argc>=4 && (std::string_view(argv[1])=="audit" || std::string_view(argv[1])=="audit-stage-b")) {
             std::ifstream input(argv[3],std::ios::binary|std::ios::ate);
             if(!input || input.tellg()<0 || input.tellg()>std::streamoff(vd::audit::byte_limit))return 2;
             std::string bytes(static_cast<std::size_t>(input.tellg()),'\0');input.seekg(0);input.read(bytes.data(),bytes.size());if(!input)return 2;
-            vd::audit::Policy policy;policy.target=argv[2];for(int i=4;i<argc;++i)policy.forbidden_strings.emplace_back(argv[i]);
+            vd::audit::Policy policy;policy.target=argv[2];if(std::string_view(argv[1])=="audit-stage-b")policy.revision=2;for(int i=4;i<argc;++i)policy.forbidden_strings.emplace_back(argv[i]);
             std::cout<<vd::audit::json(vd::audit::inspect(bytes,policy))<<'\n';return 0;
         }
         if(argc>=3 && std::string_view(argv[1])=="preflight") {
@@ -63,7 +63,7 @@ int main(int argc,char** argv) {
         for(const auto& bytes:{std::string("\x7f" "ELF"),std::string("MZ"),std::string("\xcf\xfa\xed\xfe"),std::string("archive")}) {
             auto report=vd::audit::inspect(bytes,policy);check(!report.inspected && !report.findings.empty(),"malformed/unsupported image rejected");
         }
-        policy.revision=2;check(vd::audit::inspect("",policy).findings.front().code=="unsupported-policy","policy fail closed");
+        policy.revision=3;check(vd::audit::inspect("",policy).findings.front().code=="unsupported-policy","policy fail closed");
         policy.revision=1;policy.target="linux-arm64";
         check(!vd::audit::inspect("",policy).inspected,"unknown policy target fails closed");
         policy.target="linux-x64";
