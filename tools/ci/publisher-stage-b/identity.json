@@ -1,10 +1,11 @@
 {
   "baseline": "df33af0a7e8ae75b97d2ab27395a683b69d3994f",
   "stage_a_baseline": "458f7f1fb26e6c02edade48abf72ec333b059092",
-  "patch_sha256": "bb5fb0ba81959a86e8d08c8cb5fe3a3be3160b618187d46cf6b67c44bfe3a7ef",
-  "stage_b_patch_sha256": "f9699f1c10ab652a625ce7b387044b50744ad94ac7864cda5e623b3175b107e0",
+  "patch_sha256": "2644e3a94758a843bb2ebc3b2ab03c22accc2c83aea5fc41ed1baaa80bdf1f5d",
+  "stage_b_patch_sha256": "19271dce25ca3f69da3f1da1e7f7267a9940422ad344fffd52abc90aa8322b9c",
   "source_sha256": {
-    "CMakeLists.txt": "777bb7c36af3cd975924aa2fb87944fe18eacbcdd30f9f8dd3622e9ca37b0b54",
+    "CMakeLists.txt": "12f4e0eb1e36c970d6081212dd6f555293188d43f3cf9bb7c39fde66bac6b299",
+    "cmake/NativeBuild.cmake": "ff41df5f362dd1cfeb4dd8c4b6498cc7caca97732922272af9794eb3d26ddd94",
     "docs/PUBLISHER_STAGE_B.md": "8b605f98b8e98bc421eb16e31a629fd24d7c9fbf1e6ef6de86244793d1d2e843",
     "include/void/backend.hpp": "8c7a061220d5ec450fc0dd37e1b8f550a6588abe9657b3f2d4f89a3e3d408701",
     "include/void/binary_audit.hpp": "89d862dd5a02eb88aa6ae197231401a1ea5e0e8eb536ffe48139425070599a02",
@@ -16,18 +17,25 @@
     "src/cli_help.hpp": "514bbc72cb4b7d455721fb636f112962a639f8b695c6f856d17de405d7b7e76a",
     "src/cli_presentation.hpp": "a7144923edd3c41b233b853a7d63cdbbcbbf5dbe928a43d660c6161ea27cd52a",
     "src/frontend/project.cpp": "fb00d01198a0af3997ede132a90b81f795927719a7af8f4706d190519a8d66f2",
+    "src/frontend/project_creation.cpp": "4dee31dd990e77fd1dad354403ea5aeb94e79351f8d31e39dc6106ba2c938470",
     "src/main.cpp": "6284028c33383a5acfa17134767f39402a5fb49095b9d3d34cbfc3ee6cadb596",
+    "src/native_build.cpp": "138d55c225c564d9977b67b91076f0043f2738fdea13afdcef04e8baf82fb1c0",
+    "src/native_macos.hpp": "ef8a86c42bc0ab4b638a5f0bfee024b40b1141fa30817ec989441eb1b9c95161",
     "src/private_diagnostics.cpp": "a8cd8b9238bfb80fc496cd49a245a0eb96a3a48a440b5897e9e50a1d3e9ba793",
     "src/publish.cpp": "8d3cdb13496b3d52e4a9d43e3d6a74f66c53a4505adc9c19f352b1e83115d0fe",
     "tests/cli/contract.py": "29e99428b11b513cdc199d3b866f1587092f862eac98790170399a2081c55902",
-    "tests/cli/presentation.py": "d809d1a9c1a156bb1e770ca9b5f6e9ad84f74628690ff4ca11752145538dc874",
-    "tests/project/application_packages.py": "f8ac6b27a8625de545c34568f70c16ff9b1fa8847de7b6ef91a05d10d3956253",
+    "tests/cli/presentation.py": "723ad8590ec6a089f5deaab92306ec3a57755711ba69fdf5544b6001e1955352",
+    "tests/project/application_packages.py": "0cdcdf3fb4b3460812233c4c0099d8644d9b233b8797454a277f46af1cdb0652",
+    "tests/project/creation.cpp": "a250155392c47035905230e8403e8909768adc3b6455855aa73e9adf28d7bb1f",
     "tests/project/discovery.py": "54c04cc8f5b76c4da4521e035cf7cd605fc0aacc1da896619f931ad3c4d19ebb",
+    "tests/project/macos_package_image.cpp": "5cee86f530028bfb8be3390d765f18ce2c16c0727d4b0e5c30d1b39b2f189298",
     "tests/project/manifest.cpp": "0d555fba1c55afc6bee0b89203c5bdc5334bbf2a4a856e9d1ce154ad39d74042",
     "tests/project/private_binary.py": "7dd64d6d399dde46752bce931b696f2b9d9dd96aa8e36aadabecdb1afc36f76d",
     "tests/project/private_diagnostics.cpp": "c584a12710fdbcbe9f7bf0a7897f6f8977e1251ed7b5e8a93622c63ae1da6d1c",
     "tests/project/publish.cpp": "8ee85187d5e7c1a2d2f23d0deac1fd4ab964be2e187473fbd4cef71b5a45120e",
     "tests/project/publish_fixtures.py": "e955574e93769e3cca6d6d0e8b7ec455cef883651cb0a6c2db6f9877322d3e7a"
   },
-  "product_commit": "9f6a4265dccc05220c885c56bd5cab786b67a153"
+  "product_commit": "59755c6a31b2238da992a532b1284d431a4aa4c3",
+  "stage_b_foundation_patch_sha256": "f9699f1c10ab652a625ce7b387044b50744ad94ac7864cda5e623b3175b107e0",
+  "macos_packaging_patch_sha256": "fb956258b3a43d7187f22120d31fb63e0e67f5da6ebb680b2b007791ebfa5b25"
 }

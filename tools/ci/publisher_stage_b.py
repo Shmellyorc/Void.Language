@@ -26,18 +26,20 @@ import http_bootstrap as http
 import verify_host_deps as host
 
 BASELINE = 'df33af0a7e8ae75b97d2ab27395a683b69d3994f'
-PATCH_SHA256 = 'bb5fb0ba81959a86e8d08c8cb5fe3a3be3160b618187d46cf6b67c44bfe3a7ef'
+PATCH_SHA256 = '2644e3a94758a843bb2ebc3b2ab03c22accc2c83aea5fc41ed1baaa80bdf1f5d'
 POLICY = ROOT / 'tools/ci/publisher-stage-b'
 TARGETS = ('voidc', 'voidls', 'void_publish_foundation', 'void_project_header',
            'void_project_manifest', 'void_project_selection', 'void_private_diagnostics',
            'void_runtime_tests', 'void_runtime_generated', 'void_runtime_callbacks', 'void_runtime_failures',
-           'void_runtime_aot_normal', 'void_runtime_aot_optimized', 'void_runtime_invariants')
+           'void_runtime_aot_normal', 'void_runtime_aot_optimized', 'void_runtime_invariants',
+           'void_project_creation', 'void_macos_package_image')
 TESTS = ('publish_contracts', 'publish_binary_fixtures', 'project_manifest_header',
          'project_manifest', 'project_manifest_legacy', 'project_selection',
          'project_discovery_cli', 'project_profiles', 'project_protocol', 'cli_contract',
          'publish_private_diagnostics', 'cli_presentation',
          'runtime_coordination', 'runtime_generated', 'runtime_callbacks', 'runtime_failures',
-         'runtime_aot_normal', 'runtime_aot_optimized', 'runtime_invariants')
+         'runtime_aot_normal', 'runtime_aot_optimized', 'runtime_invariants',
+         'project_creation', 'project_application_package', 'project_macos_package_image')
 CI_PATHS = {'.github/workflows/ci-link-experiment.yml',
             '.github/workflows/ci-publisher-stage-b-macos.yml',
             'tools/ci/publisher_stage_b.py',
@@ -93,8 +95,8 @@ def verify_candidate(root=ROOT):
     identity = json.loads((root / 'tools/ci/publisher-stage-b/identity.json').read_text())
     if identity['baseline'] != BASELINE or identity['patch_sha256'] != PATCH_SHA256:
         raise RuntimeError('Stage B reviewed identity mismatch')
-    if len(identity['source_sha256']) != 24 or any(p.startswith('editors/') for p in identity['source_sha256']):
-        raise RuntimeError('Stage B inventory must contain exactly 24 paths and no editor changes')
+    if len(identity['source_sha256']) != 30 or any(p.startswith('editors/') for p in identity['source_sha256']):
+        raise RuntimeError('Stage B inventory must contain exactly 30 paths and no editor changes')
     if digest(root / 'tools/ci/publisher-stage-b/candidate.patch') != PATCH_SHA256:
         raise RuntimeError('Stage B patch checksum mismatch')
     for name, expected in identity['source_sha256'].items():
@@ -432,6 +434,29 @@ class Qualification:
         self.run('smoke-emit', [compiler, 'emit', root / 'main.void', '-o', root / 'void.o'])
         self.run('smoke-build', [compiler, 'build', root / 'main.void', '-o', root / 'void-app'])
         self.run('smoke-native-execution', [root / 'void-app'], expected=17)
+        package_source = root / 'package-source'
+        self.run('package-new', [compiler, 'new', package_source])
+        manifest = package_source / 'void.project.toml'
+        manifest.write_text(manifest.read_text().replace('[application]\n',
+            '[application]\nresources=["assets/message.txt"]\n'))
+        (package_source / 'assets').mkdir()
+        (package_source / 'assets/message.txt').write_text('macOS packaged resource')
+        (package_source / 'src/app.void').write_text('use os\nuse io\nfunc main() -> i32:\n'
+            '    if os.resource_dir() is Ok(var directory):\n'
+            '        if io.read_text(directory + "/assets/message.txt") is Ok(var text):\n'
+            '            if text == "macOS packaged resource":\n'
+            '                return 17\n'
+            '    return 23\n')
+        packaged = root / 'packaged'
+        self.run('package-build', [compiler, 'package', '--project', package_source,
+                 '--profile', self.profile.lower(), '-o', packaged])
+        self.run('package-verify', [compiler, 'package', '--verify', packaged])
+        package_source.rename(root / 'parked-package-source')
+        moved = root / 'relocated-package'
+        packaged.rename(moved)
+        self.run('package-relocated-verify', [compiler, 'package', '--verify', moved])
+        self.run('package-image-policy', [self.build / 'void_macos_package_image', moved / 'app'])
+        self.run('package-relocated-native-execution', [moved / 'app'], expected=17)
         (root / 'producer.c').write_text('#include <stdio.h>\nconst char *stage_b_canary(void) { return "stage-b-native-canary"; }\nint main(void) { puts(stage_b_canary()); return 0; }\n')
         flags = ['-arch', 'arm64', '-isysroot', os.environ['SDKROOT'], '-mmacosx-version-min=14.0', '-g', '-O0']
         self.run('macho-producer-executable', [os.environ['CC'], *flags, root / 'producer.c', '-o', root / 'producer'])
@@ -548,7 +573,7 @@ class Qualification:
             for path in root.rglob('*'):
                 if not path.is_file() or path.is_symlink():
                     continue
-                wanted = root in (self.work / 'thinlto-probe', self.work / 'private-native') or path.suffix in ('.json', '.log', '.yaml', '.stdout', '.stderr', '.trs') or path.name in (
+                wanted = root in (self.work / 'thinlto-probe', self.work / 'private-native', self.work / 'native') or path.suffix in ('.json', '.log', '.yaml', '.stdout', '.stderr', '.trs') or path.name in (
                     'CMakeCache.txt', 'build.ninja', 'publisher-native-targets.txt', 'producer', 'void-app',
                     'libstage-b.dylib', 'void.o', 'main.void', 'producer.c') or path.name.endswith('.bad-commands')
                 if not wanted:

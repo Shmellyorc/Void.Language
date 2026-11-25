@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 0145d3aca51eae51a327e7b938b96d8e21afd9e9..172ee1f0a2a2956fbcaa6891d92747f1dce7d89f 100644
+index 0145d3aca51eae51a327e7b938b96d8e21afd9e9..b2c8fa63d80501d969701ba4637c09fe9ae48594 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -100,7 +100,7 @@ add_library(void_application_objects OBJECT src/application_metadata.cpp src/pro
@@ -70,6 +70,40 @@ index 0145d3aca51eae51a327e7b938b96d8e21afd9e9..172ee1f0a2a2956fbcaa6891d92747f1
    add_test(NAME project_dependencies COMMAND "${Python3_EXECUTABLE}"
      "${PROJECT_SOURCE_DIR}/tests/project/dependencies.py" "$<TARGET_FILE:voidc>" "${CMAKE_C_COMPILER}")
    set_tests_properties(project_dependencies PROPERTIES TIMEOUT 300)
+@@ -461,6 +484,11 @@ if(BUILD_TESTING)
+   add_test(NAME project_application_package COMMAND "${Python3_EXECUTABLE}"
+     "${PROJECT_SOURCE_DIR}/tests/project/application_packages.py" "$<TARGET_FILE:voidc>" "${VOID_CLANG}")
+   set_tests_properties(project_application_package PROPERTIES TIMEOUT 600)
++  add_executable(void_macos_package_image tests/project/macos_package_image.cpp)
++  target_include_directories(void_macos_package_image SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
++  target_link_libraries(void_macos_package_image PRIVATE void_options LLVMObject LLVMSupport)
++  add_test(NAME project_macos_package_image COMMAND void_macos_package_image)
++  set_tests_properties(project_macos_package_image PROPERTIES TIMEOUT 60)
+   set(VOID_TEST_RAYLIB_ROOT "" CACHE PATH "Approved local raylib 6.0 Linux x86-64 release directory for opt-in tests")
+   if((CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC)) AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
+     add_test(NAME project_package_native COMMAND "${Python3_EXECUTABLE}"
+diff --git a/cmake/NativeBuild.cmake b/cmake/NativeBuild.cmake
+index 17d0f26e1d76f898cf414ff701cf2c06ea4ed8ee..01f89ebc108b032fe64d90d5ea6fd63c2c7ef284 100644
+--- a/cmake/NativeBuild.cmake
++++ b/cmake/NativeBuild.cmake
+@@ -112,13 +112,15 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-install-$<CONFIG>.txt" DESTINA
+ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-resources-install-$<CONFIG>.txt"
+   DESTINATION bin RENAME void-native-resources.txt COMPONENT compiler)
+ 
+-if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$"))
++if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR
++    (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$") OR
++    (WIN32 AND MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$"))
+   # Use the existing compiler install's notice files, with independent hashes
+   # and distinct distribution names for files with the same upstream basename.
+   set(package_notices_build "VOID package notices 1\n")
+   set(package_notices_install "VOID package notices 1\n")
+   set(package_notice_identities "")
+-  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
++  if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR APPLE)
+     set(package_tls_notices
+       "AWS-LC-LICENSE.txt|third_party/http-licenses/aws-lc-5.12.0/LICENSE|http/aws-lc-5.12.0/LICENSE"
+       "AWS-LC-NOTICE.txt|third_party/http-licenses/aws-lc-5.12.0/NOTICE|http/aws-lc-5.12.0/NOTICE")
 diff --git a/docs/PUBLISHER_STAGE_B.md b/docs/PUBLISHER_STAGE_B.md
 new file mode 100644
 index 0000000000000000000000000000000000000000..5727f32b312cb67cf529165e21415737b887cb9b
@@ -344,7 +378,7 @@ index 2074987009f7ab500d5e0d0dd061a0ee31860754..f6a44b4825179d3e39427df2f97d64ba
 +struct Publishing {
 +    std::optional<std::string> target, default_profile;
 +};
-
+ 
  inline constexpr std::size_t native_catalog_byte_limit = 32 * 1024;
  inline constexpr std::size_t native_catalog_file_limit = 24;
 @@ -109,6 +114,8 @@ class Manifest {
@@ -888,7 +922,7 @@ index 876bcdfc7e38fc714652193715ba67412060f14d..607b3a7d2453bc3d556387007d53fcce
 --- a/src/cli_help.hpp
 +++ b/src/cli_help.hpp
 @@ -8,11 +8,12 @@
-
+ 
  namespace vd::cli {
  using HelpRow = std::pair<std::string_view, std::string_view>;
 -inline constexpr std::array<HelpRow, 15> commands{{
@@ -981,6 +1015,40 @@ index 9c250f2c89c13f7a99d4554646cec71aacc47b23..b92f872cdd4012b55115b67757ff088c
          auto* project = table(root, "project", true);
          if (!project) return finish();
          fields(*project, "project", {"id", "name", "version", "kind", "entry"});
+diff --git a/src/frontend/project_creation.cpp b/src/frontend/project_creation.cpp
+index ac57ff8a78f3e9c1a54464ddff85c97e11399bc8..556e90a140df107fa255f6b5ad45ded969adcd69 100644
+--- a/src/frontend/project_creation.cpp
++++ b/src/frontend/project_creation.cpp
+@@ -839,7 +839,7 @@ void publish_application_directory(const CreationRoot& directory, const std::str
+         }
+         keep = true;
+     });
+-#elif defined(__linux__)
++#elif defined(__linux__) || defined(__APPLE__)
+     const auto output = directory.path / utf8_path(leaf);
+     auto collision = [&] {
+         return CreationCollision("Application package destination already exists: " + path_utf8(output));
+@@ -866,7 +866,11 @@ void publish_application_directory(const CreationRoot& directory, const std::str
+         verify_replacement(output);
+         recheck();
+         if (!owns(prior)) throw std::runtime_error("Existing application package changed before replacement.");
++#ifdef __APPLE__
++        if (renameatx_np(package.parent, package.name.c_str(), prior.parent, prior.name.c_str(), RENAME_SWAP))
++#else
+         if (syscall(SYS_renameat2, package.parent, package.name.c_str(), prior.parent, prior.name.c_str(), RENAME_EXCHANGE))
++#endif
+             system_failure("Cannot atomically replace application package");
+         prior.parent = package.parent;
+         prior.name = package.name;
+@@ -877,7 +881,7 @@ void publish_application_directory(const CreationRoot& directory, const std::str
+     });
+ #else
+     (void)directory; (void)leaf; (void)prepare; (void)verify_replacement;
+-    throw std::runtime_error("Application packaging requires Linux x86-64 GNU.");
++    throw std::runtime_error("Application packaging requires Linux or macOS atomic directory publication.");
+ #endif
+ }
+ 
 diff --git a/src/main.cpp b/src/main.cpp
 index 23e82d037a85354474ccaf265e2a2fcfdb3c7b3c..a267f168078c1396f5809a78ea8b376393d7bcbf 100644
 --- a/src/main.cpp
@@ -1021,6 +1089,164 @@ index 23e82d037a85354474ccaf265e2a2fcfdb3c7b3c..a267f168078c1396f5809a78ea8b3763
          if(command=="add" || command=="remove" || command=="tidy")return maintain_project(command,argc,argv,executable);
          if(command=="resolve")return resolve_project(argc,argv);
          if(command=="deps") {
+diff --git a/src/native_build.cpp b/src/native_build.cpp
+index 6151a59385f3e5d50e71e319745352ecb8fc07ff..229b0271947b435ed163c61e006dd03ae8d38a4e 100644
+--- a/src/native_build.cpp
++++ b/src/native_build.cpp
+@@ -10,6 +10,7 @@
+ #include "void/project_resolution.hpp"
+ #include "frontend/project_files.hpp"
+ #include "frontend/project_native.hpp"
++#include "native_macos.hpp"
+ #include <llvm/Object/ELFObjectFile.h>
+ #include <llvm/Support/FileSystem.h>
+ #include <llvm/Support/Path.h>
+@@ -30,7 +31,8 @@
+ #include <unistd.h>
+ #endif
+ #if (defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)) || \
+-    (defined(_WIN32) && defined(_MSC_VER) && defined(_M_X64))
++    (defined(_WIN32) && defined(_MSC_VER) && defined(_M_X64)) || \
++    (defined(__APPLE__) && defined(__aarch64__))
+ #define VOID_APPLICATION_PACKAGING
+ #endif
+ namespace vd {
+@@ -420,6 +422,9 @@ namespace {
+ #ifdef _WIN32
+ constexpr std::string_view package_header = "VOID application package 1\ntarget x86_64-pc-windows-msvc\n";
+ constexpr auto executable_name = "app.exe";
++#elif defined(__APPLE__)
++constexpr std::string_view package_header = "VOID application package 1\ntarget aarch64-apple-darwin\n";
++constexpr auto executable_name = "app";
+ #else
+ constexpr std::string_view package_header = "VOID application package 1\ntarget x86_64-unknown-linux-gnu\n";
+ constexpr auto executable_name = "app";
+@@ -530,6 +535,8 @@ void copy_notices(const fs::path& stage, const char* argv0, const project::Proje
+ void check_package_image(std::string_view bytes) {
+ #ifdef _WIN32
+     native_windows::check_executable({llvm::StringRef(bytes),executable_name},true);
++#elif defined(__APPLE__)
++    native_macos::check_package_image(bytes);
+ #else
+     auto image = llvm::object::ObjectFile::createObjectFile({llvm::StringRef(bytes), executable_name});
+     if (!image) throw std::runtime_error("Invalid application package executable: " + llvm::toString(image.takeError()));
+@@ -685,7 +692,7 @@ void build_application_package(const ProjectAnalysis& project_analysis, const fs
+     }, verify_replacement);
+ #else
+     (void)project_analysis; (void)requested; (void)optimize; (void)argv0; (void)profile; (void)replace;
+-    throw std::runtime_error("Application packaging requires Linux x86-64 GNU or Windows x64 MSVC.");
++    throw std::runtime_error("Application packaging requires Linux x86-64 GNU, Windows x64 MSVC or macOS ARM64.");
+ #endif
+ }
+ 
+@@ -694,7 +701,7 @@ void verify_application_package(const fs::path& directory) {
+     (void)verify_package(directory);
+ #else
+     (void)directory;
+-    throw std::runtime_error("Application packaging requires Linux x86-64 GNU or Windows x64 MSVC.");
++    throw std::runtime_error("Application packaging requires Linux x86-64 GNU, Windows x64 MSVC or macOS ARM64.");
+ #endif
+ }
+ }
+diff --git a/src/native_macos.hpp b/src/native_macos.hpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..d68b517697ed93f5dce1fbbbd3bcce39974cc813
+--- /dev/null
++++ b/src/native_macos.hpp
+@@ -0,0 +1,93 @@
++#pragma once
++#include <llvm/Object/MachO.h>
++#include <stdexcept>
++#include <string_view>
++
++namespace vd::native_macos {
++// Inspect load commands rather than probing system files: modern macOS keeps
++// many OS libraries in the dyld shared cache, without a standalone dylib file.
++// The first package layout uses static third-party archives and OS libraries.
++// Caller-controlled paths and unresolved private dependencies must fail closed.
++inline void check_package_image(std::string_view bytes) {
++    auto image = llvm::object::ObjectFile::createObjectFile({llvm::StringRef(bytes), "app"});
++    if (!image)
++        throw std::runtime_error("Invalid application package executable: " + llvm::toString(image.takeError()));
++    const auto* macho = llvm::dyn_cast<llvm::object::MachOObjectFile>(image->get());
++    if (!macho || !macho->is64Bit() || !macho->isLittleEndian() ||
++        macho->getArch() != llvm::Triple::aarch64 ||
++        macho->getHeader64().cpusubtype != llvm::MachO::CPU_SUBTYPE_ARM64_ALL ||
++        macho->getHeader64().filetype != llvm::MachO::MH_EXECUTE)
++        throw std::runtime_error("Application package requires a macOS ARM64 executable.");
++    auto text = [](const auto& load, std::uint32_t offset) {
++        if (offset >= load.C.cmdsize)
++            throw std::runtime_error("Invalid application package executable load-command string.");
++        const std::string_view storage(load.Ptr + offset, load.C.cmdsize - offset);
++        const auto end = storage.find('\0');
++        if (end == storage.npos || !end)
++            throw std::runtime_error("Invalid application package executable load-command string.");
++        return storage.substr(0, end);
++    };
++    bool macos = false, loader = false;
++    std::uint64_t entry = 0;
++    for (const auto& load : macho->load_commands()) {
++        switch (load.C.cmd) {
++        case llvm::MachO::LC_RPATH:
++        case llvm::MachO::LC_DYLD_ENVIRONMENT:
++            throw std::runtime_error("Application package executable contains an embedded library search path.");
++        case llvm::MachO::LC_LOAD_DYLIB:
++        case llvm::MachO::LC_LOAD_WEAK_DYLIB:
++        case llvm::MachO::LC_REEXPORT_DYLIB:
++        case llvm::MachO::LC_LAZY_LOAD_DYLIB:
++        case llvm::MachO::LC_LOAD_UPWARD_DYLIB: {
++            const auto command = macho->getDylibIDLoadCommand(load);
++            const auto name = text(load, command.dylib.name);
++            // These are the OS-owned shared-cache namespaces, not /usr/local
++            // or arbitrary absolute paths in a compiler/build installation.
++            bool system = name.starts_with("/usr/lib/") || name.starts_with("/System/Library/Frameworks/");
++            auto parts = name.substr(1);
++            while (!parts.empty()) {
++                const auto slash = parts.find('/');
++                const auto part = parts.substr(0, slash);
++                if (part.empty() || part == "." || part == "..") system = false;
++                if (slash == parts.npos) break;
++                parts.remove_prefix(slash + 1);
++                if (parts.empty()) system = false;
++            }
++            if (!system)
++                throw std::runtime_error("Application package executable has an unresolved non-system dependency: " + std::string(name));
++            break;
++        }
++        case llvm::MachO::LC_BUILD_VERSION:
++            if (macho->getBuildVersionLoadCommand(load).platform != llvm::MachO::PLATFORM_MACOS)
++                throw std::runtime_error("Application package executable targets a non-macOS platform.");
++            macos = true;
++            break;
++        case llvm::MachO::LC_VERSION_MIN_MACOSX:
++            macos = true;
++            break;
++        case llvm::MachO::LC_MAIN: {
++            const auto command = macho->getEntryPointCommand(load);
++            if (!command.entryoff || command.entryoff >= bytes.size())
++                throw std::runtime_error("Invalid application package executable entry point.");
++            entry = command.entryoff;
++            break;
++        }
++        case llvm::MachO::LC_LOAD_DYLINKER:
++            if (text(load, macho->getDylinkerCommand(load).name) != "/usr/lib/dyld")
++                throw std::runtime_error("Invalid application package executable dynamic loader.");
++            loader = true;
++            break;
++        }
++    }
++    bool executable_entry = false;
++    for (const auto& load : macho->load_commands()) {
++        if (load.C.cmd != llvm::MachO::LC_SEGMENT_64) continue;
++        const auto segment = macho->getSegment64LoadCommand(load);
++        if ((segment.initprot & llvm::MachO::VM_PROT_EXECUTE) && entry >= segment.fileoff &&
++            entry - segment.fileoff < segment.filesize && segment.filesize - (entry - segment.fileoff) >= 4)
++            executable_entry = true;
++    }
++    if (!macos || !entry || entry % 4 || !executable_entry || !loader)
++        throw std::runtime_error("Application package executable lacks macOS launch metadata.");
++}
++}
 diff --git a/src/private_diagnostics.cpp b/src/private_diagnostics.cpp
 new file mode 100644
 index 0000000000000000000000000000000000000000..6e895944e44163722b9894c33cbc21dbbdddf50d
@@ -1221,12 +1447,12 @@ index 45ae37b11b5d44e82d3ccd46ea3d3c5851ae962a..acc9e28e7f3b02b08355dfd19752d78b
  import sys
  import tempfile
 +import time
-
+ 
  compiler = Path(sys.argv[1]).resolve()
  checks = 0
 @@ -52,8 +53,9 @@ for command in ('crashes', 'check', 'run', 'build', 'emit', 'init', 'new', 'add'
          assert result.stdout.decode('utf-8').splitlines()[:2] == ['VOID Language Compiler v0.1.0 (development)', 'LLVM 23.1.4']
-
+ 
  # Top-level columns come from the command inventory, not literal padding.
 -rows = full_help.decode().split('Commands:\n', 1)[1].split('\nOptions:', 1)[0].strip('\n').splitlines()
 -assert len(rows) == 16
@@ -1252,10 +1478,10 @@ index 45ae37b11b5d44e82d3ccd46ea3d3c5851ae962a..acc9e28e7f3b02b08355dfd19752d78b
 +                if error.winerror not in (5, 32) or time.monotonic() >= deadline:
 +                    raise
 +                time.sleep(0.05)
-
+ 
  print(f'{checks} CLI process checks passed on {sys.platform}; native output and collision preservation passed')
 diff --git a/tests/cli/presentation.py b/tests/cli/presentation.py
-index cd66cbf21d9906974bcdc2490b35c24f49fce33b..7b9f95dc234997f2b0819c68b3f1911d71dcfa57 100644
+index cd66cbf21d9906974bcdc2490b35c24f49fce33b..ef091f2767ad9fb5beef39c659afbd64d34f9765 100644
 --- a/tests/cli/presentation.py
 +++ b/tests/cli/presentation.py
 @@ -5,6 +5,7 @@ import os
@@ -1263,10 +1489,19 @@ index cd66cbf21d9906974bcdc2490b35c24f49fce33b..7b9f95dc234997f2b0819c68b3f1911d
  import sys
  import tempfile
 +import tomllib
-
+ 
  compiler = Path(sys.argv[1]).resolve()
  schema = json.loads((Path(__file__).resolve().parents[2] / 'docs/schemas/cli-timings-v1.schema.json').read_text())
-@@ -46,17 +47,27 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
+@@ -39,24 +40,35 @@ def run(args, status=0, **kwargs):
+ 
+ 
+ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
+-    root = Path(folder)
++    # Package destinations require physical paths; macOS temp dirs may use /var.
++    root = Path(folder).resolve()
+     sources = root/'sources'; sources.mkdir()
+     app = sources/'main.void'; app.write_text('func main() -> i32:\n    return 7\n')
+     legacy = sources/'legacy.void'; legacy.write_text('func entry(value: i32) -> i32:\n    return value\n')
      bad = sources/'bad.void'; bad.write_text('func main() -> i32:\n    return unknown\n')
      reports = root/'reports'; reports.mkdir()
      assert json.loads(run(['--capabilities']).stdout)['statusPlain'] is True
@@ -1282,7 +1517,7 @@ index cd66cbf21d9906974bcdc2490b35c24f49fce33b..7b9f95dc234997f2b0819c68b3f1911d
 -                  ['--timings','--timings-format','json','--timings-output',reports/'missing'/'report.json']):
 +                  ['--timings-output',reports/'unused.json'],['--timings','--timings-format','json','--timings-output',app]):
          run(['check',app,*flags],2)
-
+ 
 +    # Invalid report parents must diagnose an invocation error before manifest
 +    # discovery, without creating directories or changing an existing file.
 +    parent_file=reports/'parent-file';parent_file.write_bytes(b'retained')
@@ -1297,7 +1532,7 @@ index cd66cbf21d9906974bcdc2490b35c24f49fce33b..7b9f95dc234997f2b0819c68b3f1911d
      serial=0
      def timed(args,status=0):
          global serial
-@@ -89,6 +100,9 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
+@@ -89,6 +101,9 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
      assert subprocess.run([str(exe)]).returncode==7
      project=root/'packaged-project'
      run(['new','app',project])
@@ -1307,7 +1542,7 @@ index cd66cbf21d9906974bcdc2490b35c24f49fce33b..7b9f95dc234997f2b0819c68b3f1911d
      # Schema-valid defaults must not pretend that a project profile resolved.
      malformed=root/'malformed-project';malformed.mkdir()
      (malformed/'void.project.toml').write_text('[=invalid manifest]\n')
-@@ -98,7 +112,7 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
+@@ -98,7 +113,7 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
      r,v,p=timed(['run','--project',project,'--profile','release','--cache'],2)
      assert b'--cache requires the debug profile' in r.stderr
      assert v['configuration']=={'project_mode':True,'profile':None,'optimization':None,'debug_info':None},v
@@ -1316,7 +1551,7 @@ index cd66cbf21d9906974bcdc2490b35c24f49fce33b..7b9f95dc234997f2b0819c68b3f1911d
          _,v,p=timed(['check','--project',project,'--profile',profile])
          assert v['configuration']=={'project_mode':True,'profile':profile,'optimization':opt,'debug_info':debug},v
      _,v,p=timed(['check','--project',project,'--profile','release','--no-opt'])
-@@ -107,9 +121,30 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
+@@ -107,9 +122,30 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
          _,v,p=timed(['check',app,*flags])
          assert v['configuration']=={'project_mode':False,'profile':None,'optimization':opt,'debug_info':'none'},v
      _,v,p=timed(['run','--project',project,'--cache'])
@@ -1351,10 +1586,67 @@ index cd66cbf21d9906974bcdc2490b35c24f49fce33b..7b9f95dc234997f2b0819c68b3f1911d
      r,v,p=timed(['run',app,'--cache'],7)
      if os.name!='nt':
 diff --git a/tests/project/application_packages.py b/tests/project/application_packages.py
-index 46c21abfea7364a57a7f7621a130ec89f154d8ec..adce28de1a61b62f25b9448982892e1b52ce972d 100644
+index 46c21abfea7364a57a7f7621a130ec89f154d8ec..f9e305100a8a2bf4a0a314621ae963590fdb4b73 100644
 --- a/tests/project/application_packages.py
 +++ b/tests/project/application_packages.py
-@@ -305,8 +305,18 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
+@@ -2,6 +2,7 @@
+ 
+ from hashlib import sha256
+ import os
++import json
+ from pathlib import Path
+ import platform
+ import shutil
+@@ -17,6 +18,7 @@ sys.path.insert(0, str(root / 'tools'))
+ from test_platform import relocate, windows_isolated_application, windows_package_imports
+ 
+ windows = sys.platform == 'win32'
++macos = sys.platform == 'darwin' and platform.machine().lower() in ('arm64', 'aarch64')
+ executable = 'app.exe' if windows else 'app'
+ replacement_error = 'Windows application packaging cannot replace an existing destination'
+ readobj = Path(sys.argv[2]).resolve().with_name('llvm-readobj.exe')
+@@ -54,7 +56,8 @@ def selected_inputs(package):
+ def exact_inventory(package):
+     lines = (package / 'void-package.txt').read_text().splitlines()
+     assert lines[0] == 'VOID application package 1'
+-    assert lines[1] == 'target ' + ('x86_64-pc-windows-msvc' if windows else 'x86_64-unknown-linux-gnu')
++    target = 'aarch64-apple-darwin' if macos else ('x86_64-pc-windows-msvc' if windows else 'x86_64-unknown-linux-gnu')
++    assert lines[1] == 'target ' + target
+     assert lines[2].startswith('profile project-profile-v2:')
+     files = snapshot(package)
+     del files['void-package.txt']
+@@ -71,8 +74,8 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
+     run(compiler, 'new', project, '--source', 'src/launcher.void')
+     manifest = project / 'void.project.toml'
+     initial = manifest.read_text()
+-    if not (platform.machine().lower() in ('x86_64', 'amd64') and
+-            (windows or (sys.platform.startswith('linux') and platform.libc_ver()[0] == 'glibc'))):
++    if not (macos or (platform.machine().lower() in ('x86_64', 'amd64') and
++            (windows or (sys.platform.startswith('linux') and platform.libc_ver()[0] == 'glibc')))):
+         cli('package', status=1, message='Application packaging requires Linux x86-64 GNU')
+         print('D5 unsupported-platform diagnostic passed')
+         sys.exit(0)
+@@ -220,7 +223,18 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
+     moved_snapshot = snapshot(moved)
+     parked = base / 'parked project'
+     relocate(project, parked)
+-    if not windows:
++    if macos:
++        # Deny source/compiler reads after relocation. The same native process
++        # must find its resources beside itself, without build-tree assistance.
++        sandbox = Path('/usr/bin/sandbox-exec')
++        assert sandbox.is_file(), 'sandbox-exec is required for independent execution qualification'
++        denied = ''.join(f'(deny file-read* (subpath {json.dumps(str(path), ensure_ascii=False)}))\n'
++                         for path in (root, compiler.parent, parked, project))
++        policy = '(version 1)\n(allow default)\n' + denied
++        isolated = [sandbox, '-p', policy]
++        run(*isolated, '/bin/cat', root / 'CMakeLists.txt', status=1)
++        run(*isolated, '/bin/cat', compiler, status=1)
++    elif not windows:
+         bwrap = shutil.which('bwrap')
+         assert bwrap, 'bwrap is required for independent execution qualification'
+         isolated = [bwrap, '--ro-bind', '/', '/', '--dev-bind', '/dev', '/dev', '--proc', '/proc',
+@@ -305,8 +319,18 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
          run(compiler, 'package', '--verify', moved, status=1, message='without aliases')
          hard_link.unlink()
          run(compiler, 'package', '--verify', moved)
@@ -1371,9 +1663,63 @@ index 46c21abfea7364a57a7f7621a130ec89f154d8ec..adce28de1a61b62f25b9448982892e1b
 +                cli('package', '-o', base / leaf, status=1, message='portable directory')
 +            assert snapshot(base) == reserved_files
 +            assert {p.relative_to(base) for p in base.rglob('*')} == reserved_entries
-
+ 
      unowned = base / 'unowned'
      unowned.mkdir()
+@@ -373,7 +397,10 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
+     cli('package', '-o', base / 'locked', '--replace', status=1, message='Stale or tampered void.lock')
+     assert (project / 'void.lock').read_bytes() == lock
+     relocate(project, parked)
+-    if not windows:
++    if macos:
++        run(*isolated, '/bin/cat', project / 'void.project.toml', status=1)
++        run(*isolated, '/bin/cat', project / 'helper/api.void', status=1)
++    elif not windows:
+         run(*isolated, '/usr/bin/test', '!', '-e', project / 'void.project.toml')
+         run(*isolated, '/usr/bin/test', '!', '-e', project / 'helper/api.void')
+     execute(base / 'locked' / executable)
+diff --git a/tests/project/creation.cpp b/tests/project/creation.cpp
+index 917d01fa1d160f570eb2e658abd9a7b8ab694ec6..f07406dc7676b8305bbc2eab7aa51b1cb19c549c 100644
+--- a/tests/project/creation.cpp
++++ b/tests/project/creation.cpp
+@@ -148,7 +148,7 @@ void preparation_scratch(const fs::path& root) {
+ #endif
+ }
+ 
+-#if defined(_WIN32) || defined(__linux__)
++#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
+ void application_publication(const fs::path& root) {
+     const auto parent=inspect_creation_root(root);
+     const auto published=root/"distribution";
+@@ -197,6 +197,19 @@ void application_publication(const fs::path& root) {
+         [&](const auto&) {throw std::logic_error("Admitted replacement");});});
+     lock.reset();
+     check(read(published/"app")=="application bytes","Windows replacement refusal altered output");
++#else
++    fails([&]{publish_application_directory(parent,"distribution",prepare,
++        [&](const auto&) {throw std::runtime_error("Injected replacement admission failure");});});
++    check(read(published/"app")=="application bytes","Rejected replacement altered the existing package");
++    publish_application_directory(parent,"distribution",[&](const auto& stage,const auto&) {
++        std::ofstream(stage/"app")<<"replacement bytes";
++    },[&](const auto& prior) {
++        check(read(prior/"app")=="application bytes","Replacement lost the admitted package");
++    });
++    check(read(published/"app")=="replacement bytes" && !fs::exists(published/"native"),
++          "Atomic replacement retained stale package content");
++    check(std::distance(fs::directory_iterator(root),fs::directory_iterator{})==1,
++          "Replacement left transaction staging");
+ #endif
+     fs::rename(published,root/"renamed after release");
+ }
+@@ -292,7 +305,7 @@ int main(int argc,char** argv) {
+         check(fs::is_regular_file(here/"void.project.toml") && fs::is_regular_file(here/"src/app.void") &&
+               fs::is_regular_file(here/".vscode/launch.json") && fs::is_regular_file(here/".vscode/tasks.json") &&
+               fs::is_regular_file(here/".vscode/settings.json"),"In-place publication lost project files");
+-#if defined(_WIN32) || defined(__linux__)
++#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
+         const auto package_parent=fixture.root/"package parent";
+         fs::create_directory(package_parent);
+         application_publication(package_parent);
 diff --git a/tests/project/discovery.py b/tests/project/discovery.py
 index 77fdf223c6c1f31cb98af2e85f44c832e14ffdc9..7e6274460c39056ebebe5b5ce4c8584fff75916b 100644
 --- a/tests/project/discovery.py
@@ -1387,6 +1733,87 @@ index 77fdf223c6c1f31cb98af2e85f44c832e14ffdc9..7e6274460c39056ebebe5b5ce4c8584f
      # Nested malformed manifests still exclude children and reject E crossings.
      write('src/child/void.project.toml','[=roject]');write('src/child/child.void',main)
      run([compiler,'check',root]);run([compiler,'run','--project',root,'--entry','src/child/child.void'],1,contains=b'VOID5009')
+diff --git a/tests/project/macos_package_image.cpp b/tests/project/macos_package_image.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..2829822deab030e7a56c1e02c94e8faedefa50fc
+--- /dev/null
++++ b/tests/project/macos_package_image.cpp
+@@ -0,0 +1,75 @@
++#include "../../src/native_macos.hpp"
++#include <cstring>
++#include <fstream>
++#include <iostream>
++#include <iterator>
++
++namespace {
++using namespace llvm::MachO;
++template<class T> void append(std::string& bytes, const T& value) {
++    bytes.append(reinterpret_cast<const char*>(&value), sizeof value);
++}
++std::string specimen(std::string_view dependency = "/usr/lib/libSystem.B.dylib",
++                     std::uint32_t platform = PLATFORM_MACOS, bool rpath = false) {
++    std::string commands;
++    segment_command_64 segment{};
++    segment.cmd = LC_SEGMENT_64; segment.cmdsize = sizeof segment;
++    std::memcpy(segment.segname, "__TEXT", 6);
++    segment.vmaddr = 0x100000000; segment.vmsize = 0x4000;
++    segment.maxprot = segment.initprot = VM_PROT_READ | VM_PROT_EXECUTE;
++    append(commands, segment);
++    append(commands, build_version_command{LC_BUILD_VERSION, sizeof(build_version_command), platform, 0x0b0000, 0x0b0000, 0});
++    // The code byte is immediately after the commands; set its file offset below.
++    append(commands, entry_point_command{LC_MAIN, sizeof(entry_point_command), 0, 0});
++    auto string_command = [&](auto command, std::string_view name) {
++        command.cmdsize = (sizeof command + name.size() + 1 + 7) & ~std::size_t(7);
++        append(commands, command);
++        commands.append(name);
++        commands.append(command.cmdsize - sizeof command - name.size(), '\0');
++    };
++    string_command(dylinker_command{LC_LOAD_DYLINKER, 0, sizeof(dylinker_command)}, "/usr/lib/dyld");
++    string_command(dylib_command{LC_LOAD_DYLIB, 0, {sizeof(dylib_command), 0, 0, 0}}, dependency);
++    if (rpath) string_command(rpath_command{LC_RPATH, 0, sizeof(rpath_command)}, "@executable_path/native");
++    const std::uint64_t entry = sizeof(mach_header_64) + commands.size();
++    std::memcpy(commands.data() + sizeof(segment) + sizeof(build_version_command) + offsetof(entry_point_command, entryoff), &entry, sizeof entry);
++    segment.filesize = entry + 4;
++    std::memcpy(commands.data(), &segment, sizeof segment);
++    std::string bytes;
++    append(bytes, mach_header_64{MH_MAGIC_64, CPU_TYPE_ARM64, CPU_SUBTYPE_ARM64_ALL, MH_EXECUTE,
++                               rpath ? 6u : 5u, static_cast<std::uint32_t>(commands.size()), MH_DYLDLINK | MH_PIE, 0});
++    return bytes + commands + std::string(4, '\0');
++}
++void rejects(const std::string& bytes) {
++    try { vd::native_macos::check_package_image(bytes); }
++    catch (const std::runtime_error&) { return; }
++    throw std::runtime_error("Unsafe Mach-O application package image was accepted");
++}
++}
++int main(int argc, char** argv) { try {
++    vd::native_macos::check_package_image(specimen());
++    vd::native_macos::check_package_image(specimen("/System/Library/Frameworks/Foundation.framework/Versions/C/Foundation"));
++    for (auto name : {"@rpath/libsecret.dylib", "@loader_path/libsecret.dylib", "/usr/local/lib/secret.dylib",
++                      "/tmp/libsecret.dylib", "/usr/lib/../../tmp/secret.dylib", "/usr/lib//libSystem.B.dylib",
++                      "/System/Library/Frameworks/../PrivateFrameworks/secret", "/usr/library/secret"})
++        rejects(specimen(name));
++    rejects(specimen("/usr/lib/libSystem.B.dylib", PLATFORM_IOS));
++    rejects(specimen("/usr/lib/libSystem.B.dylib", PLATFORM_MACOS, true));
++    auto wrong = specimen();
++    const auto modify = [&](std::size_t offset, std::uint32_t value) {
++        wrong = specimen(); std::memcpy(wrong.data() + offset, &value, sizeof value); rejects(wrong);
++    };
++    modify(offsetof(mach_header_64, cputype), CPU_TYPE_X86_64);
++    modify(offsetof(mach_header_64, filetype), MH_DYLIB);
++    modify(offsetof(mach_header_64, sizeofcmds), 0xffffffff);
++    modify(sizeof(mach_header_64) + offsetof(segment_command_64, initprot), VM_PROT_READ);
++    rejects(specimen().substr(0, 31));
++    rejects("not a Mach-O executable");
++    for (int i = 1; i < argc; ++i) {
++        std::ifstream file(argv[i], std::ios::binary);
++        if (!file) throw std::runtime_error("Cannot read native image fixture");
++        const std::string bytes{std::istreambuf_iterator<char>(file), {}};
++        vd::native_macos::check_package_image(bytes);
++    }
++    std::cout << "Mach-O package architecture, platform, loader and dependency checks passed\n";
++    return 0;
++} catch (const std::exception& error) { std::cerr << error.what() << '\n'; return 1; } }
 diff --git a/tests/project/manifest.cpp b/tests/project/manifest.cpp
 index 1df6b5c3fda58f9eff22e24d0c085b1277589ed1..138dd80241bb4834f1af57e88109b29fbd2c2969 100644
 --- a/tests/project/manifest.cpp

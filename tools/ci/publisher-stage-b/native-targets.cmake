@@ -8,7 +8,8 @@ function(publisher_stage_b_native_targets)
     voidc_objects void_cache_identity voidc voidls void_publish_foundation
     void_project_header void_project_manifest void_project_selection void_private_diagnostics
     void_runtime_tests void_runtime_generated void_runtime_callbacks void_runtime_failures
-    void_runtime_aot_normal void_runtime_aot_optimized void_runtime_invariants)
+    void_runtime_aot_normal void_runtime_aot_optimized void_runtime_invariants
+    void_project_creation void_macos_package_image)
   set_property(GLOBAL PROPERTY JOB_POOLS publisher_link=1)
   foreach(target IN LISTS targets)
     if(NOT TARGET ${target})
