@@ -2,6 +2,7 @@
 
 from hashlib import sha256
 import os
+import json
 from pathlib import Path
 import platform
 import shutil
@@ -17,6 +18,7 @@ sys.path.insert(0, str(root / 'tools'))
 from test_platform import relocate, windows_isolated_application, windows_package_imports
 
 windows = sys.platform == 'win32'
+macos = sys.platform == 'darwin' and platform.machine().lower() in ('arm64', 'aarch64')
 executable = 'app.exe' if windows else 'app'
 replacement_error = 'Windows application packaging cannot replace an existing destination'
 readobj = Path(sys.argv[2]).resolve().with_name('llvm-readobj.exe')
@@ -54,7 +56,8 @@ def selected_inputs(package):
 def exact_inventory(package):
     lines = (package / 'void-package.txt').read_text().splitlines()
     assert lines[0] == 'VOID application package 1'
-    assert lines[1] == 'target ' + ('x86_64-pc-windows-msvc' if windows else 'x86_64-unknown-linux-gnu')
+    target = 'aarch64-apple-darwin' if macos else ('x86_64-pc-windows-msvc' if windows else 'x86_64-unknown-linux-gnu')
+    assert lines[1] == 'target ' + target
     assert lines[2].startswith('profile project-profile-v2:')
     files = snapshot(package)
     del files['void-package.txt']
@@ -71,8 +74,8 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
     run(compiler, 'new', project, '--source', 'src/launcher.void')
     manifest = project / 'void.project.toml'
     initial = manifest.read_text()
-    if not (platform.machine().lower() in ('x86_64', 'amd64') and
-            (windows or (sys.platform.startswith('linux') and platform.libc_ver()[0] == 'glibc'))):
+    if not (macos or (platform.machine().lower() in ('x86_64', 'amd64') and
+            (windows or (sys.platform.startswith('linux') and platform.libc_ver()[0] == 'glibc')))):
         cli('package', status=1, message='Application packaging requires Linux x86-64 GNU')
         print('D5 unsupported-platform diagnostic passed')
         sys.exit(0)
@@ -220,7 +223,18 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
     moved_snapshot = snapshot(moved)
     parked = base / 'parked project'
     relocate(project, parked)
-    if not windows:
+    if macos:
+        # Deny source/compiler reads after relocation. The same native process
+        # must find its resources beside itself, without build-tree assistance.
+        sandbox = Path('/usr/bin/sandbox-exec')
+        assert sandbox.is_file(), 'sandbox-exec is required for independent execution qualification'
+        denied = ''.join(f'(deny file-read* (subpath {json.dumps(str(path), ensure_ascii=False)}))\n'
+                         for path in (root, compiler.parent, parked, project))
+        policy = '(version 1)\n(allow default)\n' + denied
+        isolated = [sandbox, '-p', policy]
+        run(*isolated, '/bin/cat', root / 'CMakeLists.txt', status=1)
+        run(*isolated, '/bin/cat', compiler, status=1)
+    elif not windows:
         bwrap = shutil.which('bwrap')
         assert bwrap, 'bwrap is required for independent execution qualification'
         isolated = [bwrap, '--ro-bind', '/', '/', '--dev-bind', '/dev', '/dev', '--proc', '/proc',
@@ -383,7 +397,10 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
     cli('package', '-o', base / 'locked', '--replace', status=1, message='Stale or tampered void.lock')
     assert (project / 'void.lock').read_bytes() == lock
     relocate(project, parked)
-    if not windows:
+    if macos:
+        run(*isolated, '/bin/cat', project / 'void.project.toml', status=1)
+        run(*isolated, '/bin/cat', project / 'helper/api.void', status=1)
+    elif not windows:
         run(*isolated, '/usr/bin/test', '!', '-e', project / 'void.project.toml')
         run(*isolated, '/usr/bin/test', '!', '-e', project / 'helper/api.void')
     execute(base / 'locked' / executable)

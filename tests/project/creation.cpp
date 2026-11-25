@@ -148,7 +148,7 @@ void preparation_scratch(const fs::path& root) {
 #endif
 }
 
-#if defined(_WIN32) || defined(__linux__)
+#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
 void application_publication(const fs::path& root) {
     const auto parent=inspect_creation_root(root);
     const auto published=root/"distribution";
@@ -197,6 +197,19 @@ void application_publication(const fs::path& root) {
         [&](const auto&) {throw std::logic_error("Admitted replacement");});});
     lock.reset();
     check(read(published/"app")=="application bytes","Windows replacement refusal altered output");
+#else
+    fails([&]{publish_application_directory(parent,"distribution",prepare,
+        [&](const auto&) {throw std::runtime_error("Injected replacement admission failure");});});
+    check(read(published/"app")=="application bytes","Rejected replacement altered the existing package");
+    publish_application_directory(parent,"distribution",[&](const auto& stage,const auto&) {
+        std::ofstream(stage/"app")<<"replacement bytes";
+    },[&](const auto& prior) {
+        check(read(prior/"app")=="application bytes","Replacement lost the admitted package");
+    });
+    check(read(published/"app")=="replacement bytes" && !fs::exists(published/"native"),
+          "Atomic replacement retained stale package content");
+    check(std::distance(fs::directory_iterator(root),fs::directory_iterator{})==1,
+          "Replacement left transaction staging");
 #endif
     fs::rename(published,root/"renamed after release");
 }
@@ -292,7 +305,7 @@ int main(int argc,char** argv) {
         check(fs::is_regular_file(here/"void.project.toml") && fs::is_regular_file(here/"src/app.void") &&
               fs::is_regular_file(here/".vscode/launch.json") && fs::is_regular_file(here/".vscode/tasks.json") &&
               fs::is_regular_file(here/".vscode/settings.json"),"In-place publication lost project files");
-#if defined(_WIN32) || defined(__linux__)
+#if defined(_WIN32) || defined(__linux__) || defined(__APPLE__)
         const auto package_parent=fixture.root/"package parent";
         fs::create_directory(package_parent);
         application_publication(package_parent);
