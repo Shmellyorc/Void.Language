@@ -14,6 +14,8 @@ compiler, git, readobj = (Path(arg).resolve() for arg in sys.argv[1:])
 windows = sys.platform == 'win32'
 env = dict(os.environ)
 env.pop('VOID_NATIVE_CATALOG', None)
+# Model a local approval session; the explicit CI cases below set CI themselves.
+env.pop('CI', None)
 env.update(GIT_CONFIG_GLOBAL=os.devnull, GIT_CONFIG_NOSYSTEM='1',
            GIT_AUTHOR_NAME='G61 fixture', GIT_AUTHOR_EMAIL='fixture@example.invalid',
            GIT_COMMITTER_NAME='G61 fixture', GIT_COMMITTER_EMAIL='fixture@example.invalid')
@@ -348,10 +350,33 @@ with tempfile.TemporaryDirectory(prefix='void-g61-') as scratch:
     finally:
         alternate.unlink()
     if not windows:
-        with tempfile.TemporaryDirectory(prefix='void-unsafe-data-', dir='/tmp') as unsafe:
-            Path(unsafe).chmod(0o777)
-            interact(compiler, ['run', '.'], project, dict(terminal, XDG_DATA_HOME=unsafe),
-                     status=1, contains=b'untrusted directory')
+        shared = root/'shared data'
+        if sys.platform == 'darwin':
+            shared_env = dict(terminal, HOME=str(shared))
+            parent, namespace = shared/'Library/Application Support', 'VOID'
+        else:
+            shared_env = dict(terminal, XDG_DATA_HOME=str(shared))
+            parent, namespace = shared, 'void'
+        parent.mkdir(parents=True)
+        parent.chmod(0o777)
+        output = interact(compiler, ['run', '.'], project, shared_env, reply=b'approve',
+                          contains=b'Saved native approval')
+        assert b'42' in output.splitlines(), output
+        shared_approvals = parent/namespace/'native-approvals'
+        shared_entry = shared_approvals/approval_id
+        shared_record = shared_entry/'approval'
+        assert parent.stat().st_mode & 0o777 == 0o777
+        for directory in (shared_approvals, shared_entry):
+            assert directory.stat().st_mode & 0o777 == 0o700, directory
+        assert shared_record.is_file() and not shared_record.is_symlink()
+        shared_bytes = shared_record.read_bytes()
+        shared_approvals.chmod(0o777)
+        try:
+            interact(compiler, ['run', '.'], project, shared_env, status=1,
+                     contains=b'Native approvals require a private user directory')
+            assert shared_record.read_bytes() == shared_bytes
+        finally:
+            shared_approvals.chmod(0o700)
 
     for path, replacement, outcome, reply in (
         (catalog_file, catalog_bytes + b'\n# valid catalog edit requires consent\n', b'approval declined', b'no'),
