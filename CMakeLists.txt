@@ -484,6 +484,11 @@ if(BUILD_TESTING)
   add_test(NAME project_application_package COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/application_packages.py" "$<TARGET_FILE:voidc>" "${VOID_CLANG}")
   set_tests_properties(project_application_package PROPERTIES TIMEOUT 600)
+  add_executable(void_macos_package_image tests/project/macos_package_image.cpp)
+  target_include_directories(void_macos_package_image SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+  target_link_libraries(void_macos_package_image PRIVATE void_options LLVMObject LLVMSupport)
+  add_test(NAME project_macos_package_image COMMAND void_macos_package_image)
+  set_tests_properties(project_macos_package_image PROPERTIES TIMEOUT 60)
   set(VOID_TEST_RAYLIB_ROOT "" CACHE PATH "Approved local raylib 6.0 Linux x86-64 release directory for opt-in tests")
   if((CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC)) AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64|AMD64)$")
     add_test(NAME project_package_native COMMAND "${Python3_EXECUTABLE}"

@@ -40,7 +40,8 @@ def run(args, status=0, **kwargs):
 
 
 with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
-    root = Path(folder)
+    # Package destinations require physical paths; macOS temp dirs may use /var.
+    root = Path(folder).resolve()
     sources = root/'sources'; sources.mkdir()
     app = sources/'main.void'; app.write_text('func main() -> i32:\n    return 7\n')
     legacy = sources/'legacy.void'; legacy.write_text('func entry(value: i32) -> i32:\n    return value\n')

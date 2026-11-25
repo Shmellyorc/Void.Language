@@ -112,13 +112,15 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-install-$<CONFIG>.txt" DESTINA
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-resources-install-$<CONFIG>.txt"
   DESTINATION bin RENAME void-native-resources.txt COMPONENT compiler)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$"))
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR
+    (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$") OR
+    (WIN32 AND MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$"))
   # Use the existing compiler install's notice files, with independent hashes
   # and distinct distribution names for files with the same upstream basename.
   set(package_notices_build "VOID package notices 1\n")
   set(package_notices_install "VOID package notices 1\n")
   set(package_notice_identities "")
-  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR APPLE)
     set(package_tls_notices
       "AWS-LC-LICENSE.txt|third_party/http-licenses/aws-lc-5.12.0/LICENSE|http/aws-lc-5.12.0/LICENSE"
       "AWS-LC-NOTICE.txt|third_party/http-licenses/aws-lc-5.12.0/NOTICE|http/aws-lc-5.12.0/NOTICE")

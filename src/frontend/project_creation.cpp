@@ -839,7 +839,7 @@ void publish_application_directory(const CreationRoot& directory, const std::str
         }
         keep = true;
     });
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__APPLE__)
     const auto output = directory.path / utf8_path(leaf);
     auto collision = [&] {
         return CreationCollision("Application package destination already exists: " + path_utf8(output));
@@ -866,7 +866,11 @@ void publish_application_directory(const CreationRoot& directory, const std::str
         verify_replacement(output);
         recheck();
         if (!owns(prior)) throw std::runtime_error("Existing application package changed before replacement.");
+#ifdef __APPLE__
+        if (renameatx_np(package.parent, package.name.c_str(), prior.parent, prior.name.c_str(), RENAME_SWAP))
+#else
         if (syscall(SYS_renameat2, package.parent, package.name.c_str(), prior.parent, prior.name.c_str(), RENAME_EXCHANGE))
+#endif
             system_failure("Cannot atomically replace application package");
         prior.parent = package.parent;
         prior.name = package.name;
@@ -877,7 +881,7 @@ void publish_application_directory(const CreationRoot& directory, const std::str
     });
 #else
     (void)directory; (void)leaf; (void)prepare; (void)verify_replacement;
-    throw std::runtime_error("Application packaging requires Linux x86-64 GNU.");
+    throw std::runtime_error("Application packaging requires Linux or macOS atomic directory publication.");
 #endif
 }
 

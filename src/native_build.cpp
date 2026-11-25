@@ -10,6 +10,7 @@
 #include "void/project_resolution.hpp"
 #include "frontend/project_files.hpp"
 #include "frontend/project_native.hpp"
+#include "native_macos.hpp"
 #include <llvm/Object/ELFObjectFile.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Support/Path.h>
@@ -30,7 +31,8 @@
 #include <unistd.h>
 #endif
 #if (defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)) || \
-    (defined(_WIN32) && defined(_MSC_VER) && defined(_M_X64))
+    (defined(_WIN32) && defined(_MSC_VER) && defined(_M_X64)) || \
+    (defined(__APPLE__) && defined(__aarch64__))
 #define VOID_APPLICATION_PACKAGING
 #endif
 namespace vd {
@@ -420,6 +422,9 @@ namespace {
 #ifdef _WIN32
 constexpr std::string_view package_header = "VOID application package 1\ntarget x86_64-pc-windows-msvc\n";
 constexpr auto executable_name = "app.exe";
+#elif defined(__APPLE__)
+constexpr std::string_view package_header = "VOID application package 1\ntarget aarch64-apple-darwin\n";
+constexpr auto executable_name = "app";
 #else
 constexpr std::string_view package_header = "VOID application package 1\ntarget x86_64-unknown-linux-gnu\n";
 constexpr auto executable_name = "app";
@@ -530,6 +535,8 @@ void copy_notices(const fs::path& stage, const char* argv0, const project::Proje
 void check_package_image(std::string_view bytes) {
 #ifdef _WIN32
     native_windows::check_executable({llvm::StringRef(bytes),executable_name},true);
+#elif defined(__APPLE__)
+    native_macos::check_package_image(bytes);
 #else
     auto image = llvm::object::ObjectFile::createObjectFile({llvm::StringRef(bytes), executable_name});
     if (!image) throw std::runtime_error("Invalid application package executable: " + llvm::toString(image.takeError()));
@@ -685,7 +692,7 @@ void build_application_package(const ProjectAnalysis& project_analysis, const fs
     }, verify_replacement);
 #else
     (void)project_analysis; (void)requested; (void)optimize; (void)argv0; (void)profile; (void)replace;
-    throw std::runtime_error("Application packaging requires Linux x86-64 GNU or Windows x64 MSVC.");
+    throw std::runtime_error("Application packaging requires Linux x86-64 GNU, Windows x64 MSVC or macOS ARM64.");
 #endif
 }
 
@@ -694,7 +701,7 @@ void verify_application_package(const fs::path& directory) {
     (void)verify_package(directory);
 #else
     (void)directory;
-    throw std::runtime_error("Application packaging requires Linux x86-64 GNU or Windows x64 MSVC.");
+    throw std::runtime_error("Application packaging requires Linux x86-64 GNU, Windows x64 MSVC or macOS ARM64.");
 #endif
 }
 }
