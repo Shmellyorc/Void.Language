@@ -924,7 +924,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                                   const std::string& suffix, const llvm::DataLayout& target_layout, const std::string& exported_entry,
                                   std::vector<NominalDescriptor>* host_catalog=nullptr,std::vector<InterfaceWitness>* host_witnesses=nullptr,
                                   llvm_backend::LoweringInventory* inventory=nullptr,
-                                  bool fixed_call_research=false,std::optional<project::DebugInfo> source_debug={},bool optimized=false) {
+                                  bool fixed_call_research=false,std::optional<project::DebugInfo> source_debug={},bool optimized=false,diagnostics::PrivateMap* private_map=nullptr) {
     // Pure default DAGs are outlined into ordinary private typed-IR functions.
     // The normal shared lowerer supplies roots, failure cleanup and native ABI;
     // defaults execute once per element without expanding IR by array extent.
@@ -1871,7 +1871,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         b.CreateCondBr(b.CreateICmpULT(count, b.getInt32(32)), append, limit);
                         b.SetInsertPoint(limit); b.CreateStore(b.getInt32(33), count_address); b.CreateBr(done);
                         b.SetInsertPoint(append);
-                        auto trace = "Called from " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n" +
+                        auto trace = private_map ? private_map->add({diagnostics::Category::call,
+                            f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name),
+                            loc.path,instruction.source_excerpt,"source call",loc.line,loc.column}) :
+                            "Called from " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n" +
                             source_message(loc, instruction.source_excerpt, "source call");
                         auto* frames = b.CreateStructGEP(failure_type, failure, 2);
                         auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), count});
@@ -1884,8 +1887,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     auto* valid = llvm::BasicBlock::Create(context,"numeric_valid",fn);
                     b.CreateCondBr(invalid_value,invalid,valid); b.SetInsertPoint(invalid);
                     if (failure) {
-                        auto message = source_message(loc,instruction.source_excerpt,"runtime error: " + description);
-                        message += "In function " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n";
+                        auto message = private_map ? private_map->add({diagnostics::category(description),
+                            f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name),
+                            loc.path,instruction.source_excerpt,description,loc.line,loc.column}) :
+                            source_message(loc,instruction.source_excerpt,"runtime error: " + description) +
+                            "In function " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n";
                         b.CreateStore(b.CreateGlobalString(message),b.CreateStructGEP(failure_type,failure,0)); return_failure();
                     } else { b.CreateCall(llvm::Intrinsic::getOrInsertDeclaration(module.get(),llvm::Intrinsic::trap)); b.CreateUnreachable(); }
                     b.SetInsertPoint(valid);
@@ -2175,7 +2181,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     auto found = std::find_if(input.globals.begin(), input.globals.end(), [&](const auto& g) { return g.identity == instruction.callee; });
                     auto* storage = value_roots[n].at(values.size());
                     b.CreateCall(module->getOrInsertFunction("vd_global_cell", b.getVoidTy(), b.getPtrTy(), size_type, b.getPtrTy(), b.getPtrTy()),
-                        {storage, llvm::ConstantInt::get(size_type, found - input.globals.begin()), b.CreateGlobalString(found->identity + " declared at " + found->source.path + ":" + std::to_string(found->source.line)), failure});
+                        {storage, llvm::ConstantInt::get(size_type, found - input.globals.begin()), b.CreateGlobalString(private_map ? private_map->add({diagnostics::Category::global,
+                            found->identity,found->source.path,{},"global access",found->source.line,found->source.column}) :
+                            found->identity + " declared at " + found->source.path + ":" + std::to_string(found->source.line)), failure});
                     selected_failure();
                     v = b.CreateLoad(b.getPtrTy(), storage); break;
                 }
@@ -3801,7 +3809,7 @@ std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
 }
 static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
                       bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {},
-                      std::optional<project::DebugInfo> source_debug = {}) {
+                      std::optional<project::DebugInfo> source_debug = {}, diagnostics::PrivateMap* private_map = nullptr) {
     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
     initialize();
     llvm::LLVMContext context;
@@ -3833,7 +3841,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
 #else
                         ,nullptr
 #endif
-                        ,false,source_debug,optimize);
+                        ,false,source_debug,optimize,private_map);
     module->setTargetTriple(machine->getTargetTriple());
     module->setDataLayout(machine->createDataLayout());
     llvm::GlobalVariable* application_record = nullptr;
@@ -4032,6 +4040,12 @@ void emit_async_object(const ir::Module& source,const std::filesystem::path& out
 void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, std::string_view build_inputs,
                  std::optional<project::DebugInfo> source_debug) {
     emit_impl(input,output,optimize,source_program,false,{},false,{},build_inputs,source_debug);
+}
+diagnostics::PrivateMap emit_publication_object(const ir::Module& input, const std::filesystem::path& output,
+                                                bool optimize, std::string_view semantic_inputs_sha256) {
+    diagnostics::PrivateMap map(semantic_inputs_sha256);
+    emit_impl(input,output,optimize,true,false,{},false,{}, {},project::DebugInfo::full,&map);
+    return map;
 }
 void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {
     emit_impl(input,output,optimize,false,true,generation_suffix);
