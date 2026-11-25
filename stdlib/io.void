@@ -1816,6 +1816,7 @@ private func (self directory_handle) init():
 ## Exclusively create a directory and retain its native identity.
 ## Unix creation honors the process umask; Windows inherits the parent's ACL.
 ## @param path Absolute UTF-8 path without dot components or symbolic ancestors.
+## @return A held handle to the new directory, or a checked creation or path error.
 func create_directory_handle(path: string) -> result<directory_handle, error>:
     var owner = directory_handle()
     var reply = _host_directory_create(owner, path)
@@ -1825,6 +1826,7 @@ func create_directory_handle(path: string) -> result<directory_handle, error>:
 
 ## Open an existing directory using OS permissions without changing its mode or ACL.
 ## @param path Absolute UTF-8 path without dot components or symbolic ancestors.
+## @return A held handle to the existing directory, or a checked open or path error.
 func open_directory(path: string) -> result<directory_handle, error>:
     var owner = directory_handle()
     var reply = _host_directory_admit(owner, path)
@@ -1833,6 +1835,8 @@ func open_directory(path: string) -> result<directory_handle, error>:
     return Ok(owner)
 
 ## Exclusively create a child using OS permissions.
+## @param name One literal child component.
+## @return A held handle to the new child, or a checked creation or path error.
 func (self directory_handle) create_directory(name: string) -> result<directory_handle, error>:
     var owner = directory_handle()
     var reply = _host_directory_child(self, owner, name)
@@ -1926,6 +1930,7 @@ func (self directory_handle) save_text_atomic(name: string, value: string, repla
     return self.save_bytes_atomic(name, value.to_utf8(), replace)
 
 ## Release the directory capability; independently held children remain valid.
+## @return True after checked close, or a native close error.
 func (self directory_handle) close() -> result<bool, error>:
     return _host_ok("io.directory_handle.close", _host_directory_close(self))
 
@@ -1935,10 +1940,14 @@ func (self directory_handle) deinit():
 
 ## Set or clear executable bits without requiring private file permissions.
 ## Unix retains existing read/write bits; Windows validates the held ordinary file.
+## @param executable Whether to mark this file as executable.
+## @return True after applying or validating the executable mode, or a checked error.
 func (self file) set_executable(executable: bool = true) -> result<bool, error>:
     return _host_ok("io.file.set_executable", _host_file_mode(self, 2 + _flag(executable)))
 
 ## Check executable/data classification without imposing a private mode or ACL.
+## @param executable Whether to check for an executable file instead of a data file.
+## @return True if the classification matches, or a checked error if inspection fails.
 func (self file) executable_matches(executable: bool) -> result<bool, error>:
     var reply = _host_file_mode_matches(self, 2 + _flag(executable))
     if reply.kind != 0:

@@ -53,6 +53,9 @@ add_dependencies(void_g4_tests void_g4_plan void_g4_competitor void_g4_initializ
 void_add_output_test(ffi_g4_jit_ir "$<TARGET_FILE:void_g4_tests>" "${g4_plan}" "${g4_src}/dynamic.void" "${g4_bin}/native"
   "@VOID_TEST_OUTPUT@/ffi-g4/jit-probes" "$<TARGET_FILE:void_g4_competitor>" "$<TARGET_FILE:void_g4_initializer>")
 set_tests_properties(ffi_g4_jit_ir PROPERTIES TIMEOUT 180)
+# Setup Python can export a loader search path to the job. Positive fixtures
+# need the admitted environment; the explicit negative probe still sets it.
+set_tests_properties(ffi_g4_jit_ir PROPERTIES ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=unset:")
 
 foreach(mode IN ITEMS normal optimized startup)
   set(source "${g4_src}/dynamic.void")
@@ -71,4 +74,5 @@ foreach(mode IN ITEMS normal optimized startup)
   add_test(NAME "ffi_g4_aot_${mode}" COMMAND "${Python3_EXECUTABLE}" "${g4_src}/dynamic_process.py"
     "$<TARGET_FILE:void_g4_aot_${mode}>" "${g4_bin}/native" "${object}.source.txt" "${mode}"
     "$<TARGET_FILE:void_g4_competitor>")
+  set_tests_properties("ffi_g4_aot_${mode}" PROPERTIES ENVIRONMENT_MODIFICATION "LD_LIBRARY_PATH=unset:")
 endforeach()

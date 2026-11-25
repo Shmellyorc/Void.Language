@@ -440,7 +440,7 @@ No production latency/memory ceiling or performance improvement is claimed.
 
 ## Review corrections and focused qualification
 
-The [Golden Wrench review](/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g88-review-k4wp044i/REVIEW.txt)
+The Golden Wrench review
 identified the keyboard-domain regression, incorrect signed-division prose and
 nonexistent automation-event enum reference. These are corrected within G88:
 

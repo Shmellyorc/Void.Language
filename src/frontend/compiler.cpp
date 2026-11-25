@@ -8366,6 +8366,7 @@ struct AnalysisAccess {
             auto expression = [&](const Expr& e, const std::string& owner, const std::map<unsigned,std::string>& locals) { visit_expression(e,owner,locals,owner.find("::$display$")!=std::string::npos || owner.find("::$enum_")!=std::string::npos); };
             visit_expression = [&](const Expr& e, const std::string& owner, const auto& locals, bool implicit) {
                 const bool implicit_site=implicit || e.implicit;
+                const bool collection_kernel=e.target.starts_with("$array.") || e.target.starts_with("$dict.");
                 enum_type_reference(owner,e.enum_type_use.get(),implicit_site);
                 if(auto spec=format_specification(e)) {
                     field(result->contract_,"format-specification");field(result->contract_,owner);field(result->contract_,*spec);
@@ -8373,7 +8374,8 @@ struct AnalysisAccess {
                 }
                 if(!e.qualifier.empty())namespace_reference(owner,e.qualifier_token,implicit_site,e.kind==Expr::Kind::editor_hole);
                 if(!e.source_target.empty()) {
-                    reference(owner,e.source_target,e,*unit,implicit_site,!e.source_target.starts_with("$result::"));if(!e.target.empty())reference(owner,e.target,e,*unit,true);
+                    reference(owner,e.source_target,e,*unit,implicit_site,!e.source_target.starts_with("$result::"));
+                    if(!e.target.empty() && !collection_kernel)reference(owner,e.target,e,*unit,true);
                     if(!implicit_site && e.source_target.starts_with("$display.") && display_hooks.contains(e.target)) {
                         std::set<std::string> names{e.token.text};
                         if(e.token.text=="format") {
@@ -8392,7 +8394,7 @@ struct AnalysisAccess {
                     reference(owner,e.type.definition->identity,e,*unit,true);
                     for(const auto& binding:context.member_catalog->interface_bindings) if(binding.key==e.target)
                         for(const auto& [requirement,route]:binding.methods) {reference(owner,requirement,e,*unit,true);reference(owner,route.second,e,*unit,true);}
-                } else if (!e.target.empty() && e.target!="$interpolation" && e.target!="$hole" && !e.target.starts_with("$array.") && !e.target.starts_with("$dict.")) reference(owner,e.target,e,*unit,implicit_site);
+                } else if (!e.target.empty() && e.target!="$interpolation" && e.target!="$hole" && !collection_kernel) reference(owner,e.target,e,*unit,implicit_site);
                 else if (e.kind == Expr::Kind::name && (!presentation || (e.type!=Type::none && e.type!=error_type)) &&
                          locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit_site,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
                 if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)

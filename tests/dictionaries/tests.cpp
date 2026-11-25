@@ -2,6 +2,7 @@
 #include "void/backend.hpp"
 #include "void/frontend.hpp"
 #include "void/tooling.hpp"
+#include <algorithm>
 #include <cstring>
 #include <iostream>
 using namespace vd;
@@ -9,7 +10,23 @@ using managed_test::require;
 namespace {
 void empty(Runtime& r){Runtime::Attachment a(r);Runtime::Managed m(r);require(r.collect()==Runtime::Collection::completed && !r.snapshot().objects,"dictionary heap/root leak");}
 void diagnostics(){
-    auto metadata=analyze_source({"dictionary-metadata.void","const values: {i32: i32} = {1: 2}\nfunc entry(x: i32) -> i32:\n    return values[1] + values.count as i32\n"});require(metadata.succeeded(),"dictionary constant analysis");for(const auto& d:metadata.program->declarations())if(d.kind==AnalyzedDeclaration::Kind::module_constant)require(d.type.kind==ir::Type::dictionary && !d.value,"dictionary advertised a scalar constant value");for(const auto& r:metadata.program->references())require(!r.to.starts_with("$dict."),"builtin dictionary query advertised a nonexistent source symbol");
+    auto metadata=analyze_source({"dictionary-metadata.void","const values: {i32: i32} = {1: 2}\nfunc entry(x: i32) -> i32:\n    return values[1] + values.count as i32\n"});
+    require(metadata.succeeded(),"dictionary constant analysis");
+    for(const auto& d:metadata.program->declarations())
+        if(d.kind==AnalyzedDeclaration::Kind::module_constant)
+            require(d.type.kind==ir::Type::dictionary && !d.value,"dictionary advertised a scalar constant value");
+    const auto& builtins=metadata.program->editor_declarations();
+    bool count_found=false;
+    for(const auto& r:metadata.program->references()) {
+        if(!r.to.starts_with("$dict."))continue;
+        const auto builtin=std::find_if(builtins.begin(),builtins.end(),[&](const auto& d){return d.identity==r.to;});
+        require(builtin!=builtins.end(),"builtin dictionary query advertised a nonexistent symbol");
+        if(!r.to.starts_with("$dict.count::"))continue;
+        require(builtin->kind==AnalyzedDeclaration::Kind::value_field && builtin->readonly &&
+            builtin->type==ir::Type::i64,"dictionary count metadata differs from the readonly i64 property");
+        count_found=true;
+    }
+    require(count_found,"dictionary count is missing its builtin reference");
     const std::string entry="func entry(x: i32) -> i32:\n";
     for(const auto& text:{
         "    var d = {}\n    return x\n",

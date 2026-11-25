@@ -79,10 +79,12 @@ def verify(root):
     selector = ['--project', project]
     marker = cwd / 'native-init.log'
     released = cwd / 'native-release.log'
+    project_marker = project / marker.name
+    project_released = project / released.name
     run([compiler, 'check', *selector], cwd)
     run([compiler, 'tidy', '--check', *selector], cwd)
     run([compiler, 'run', *selector, '--', 'ignored'], cwd, 2, 'Pass --allow-native')
-    assert not marker.exists()
+    assert not marker.exists() and not project_marker.exists()
     run([compiler, 'run', *selector, '--allow-native', '--', 'ignored'], cwd, 1, 'C dynamic library')
 
     build_c = root / 'independent C sources'
@@ -113,10 +115,10 @@ def verify(root):
     link(library, build_c / 'conventional_fixture.c', dependency)
     link(adapter, build_c / 'conventional_rejection.c', library)
     run([compiler, 'check', *selector], cwd)
-    assert not marker.exists()
+    assert not marker.exists() and not project_marker.exists()
     denied_output = root / ('unauthorized' + exe)
     run([compiler, 'build', *selector, '-o', denied_output], cwd, 2, 'Pass --allow-native')
-    assert not marker.exists() and not denied_output.exists()
+    assert not marker.exists() and not project_marker.exists() and not denied_output.exists()
     # Compile the unchanged generated adapter as well as the fault-injection wrapper.
     pristine = root / adapter.name
     link(pristine, generated, library)
@@ -141,12 +143,20 @@ def verify(root):
         'C signature g4_conventional_scale')
 
     def invoke(args, case, status=0, contains=None, releases=(), initialized=True):
-        marker.unlink(missing_ok=True)
-        released.unlink(missing_ok=True)
+        for path in (marker, released, project_marker, project_released):
+            path.unlink(missing_ok=True)
         run(args, cwd, status, contains)
-        assert marker.exists() == initialized
-        init_log = marker.read_text().splitlines() if initialized else []
-        release_log = released.read_text().splitlines() if released.exists() else []
+        # Manifest-selected JIT runs use the project directory. An independently
+        # launched relocated executable uses the directory of its caller.
+        if args[0] == compiler:
+            init, release = project_marker, project_released
+            assert not marker.exists() and not released.exists(), case
+        else:
+            init, release = marker, released
+            assert not project_marker.exists() and not project_released.exists(), case
+        assert init.exists() == initialized, case
+        init_log = init.read_text().splitlines() if initialized else []
+        release_log = release.read_text().splitlines() if release.exists() else []
         assert init_log == (['dependency initialized'] if initialized else [])
         assert release_log == list(releases), case
         print(f'{case}: initializers={init_log}, released={release_log}', flush=True)
@@ -165,12 +175,12 @@ def verify(root):
         invoke([*jit, 'closed'], mode, 1, 'closed, null or invalid', ('42',))
         invoke([*jit, 'capacity'], mode, 1, 'C byte span outside admitted extent')
         output = root / mode / ('application' + exe)
-        marker.unlink()
+        project_marker.unlink()
         run([compiler, 'build', *selector, '--allow-native', *options, '-o', output], cwd)
-        assert not marker.exists()
+        assert not marker.exists() and not project_marker.exists()
         if mode == 'normal':
             run([compiler, 'build', *selector, '--allow-native', *options, '-o', output], cwd)
-            assert not marker.exists()
+            assert not marker.exists() and not project_marker.exists()
         image_tool = Path(clang).with_name('llvm-readobj' + exe)
         imports = run([image_tool, '--coff-imports' if windows else '--dynamic-table', output], cwd)
         assert 'void_g4_conventional_' not in imports

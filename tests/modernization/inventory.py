@@ -9,12 +9,12 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools/raylib'))
 from enums import verify_enums
 
-report = (ROOT / 'docs/projects/G88_STDLIB_PACKAGES_MODERNIZATION.md').read_text()
+report = (ROOT / 'docs/projects/G88_STDLIB_PACKAGES_MODERNIZATION.md').read_text(encoding='utf-8')
 files = sorted(p for name in ('stdlib', 'verified-packages') for p in (ROOT / name).rglob('*') if p.is_file())
 for file in files:
-    assert '`' + str(file.relative_to(ROOT)) + '`' in report, file
+    assert '`' + file.relative_to(ROOT).as_posix() + '`' in report, file
 for file in (ROOT / 'stdlib').rglob('*.void'):
-    lines = file.read_text().splitlines()
+    lines = file.read_text(encoding='utf-8').splitlines()
     for index, line in enumerate(lines):
         if re.match(r'^(?:async )?(?:func |property |(?:value )?struct |(?:flags )?enum |const )', line):
             assert index and lines[index - 1].startswith('##'), (file, index + 1, line)
@@ -32,12 +32,13 @@ for before, after in [('window_hidden = 128', 'window_hidden = 129'),
     else:
         raise AssertionError(('accepted mismatched provider enum', before))
 bible = ROOT / 'docs/LANGUAGE_BIBLE.md'
-for base, text in ((bible.parent, bible.read_text()), (ROOT / 'docs/projects', report)):
+for base, text in ((bible.parent, bible.read_text(encoding='utf-8')), (ROOT / 'docs/projects', report)):
     for link in re.findall(r'\]\(([^\s)]+)\)', text):
         if '://' in link or link.startswith('#'):
             continue
+        assert not Path(link).is_absolute(), link
         assert (base / link.split('#')[0]).is_file(), link
-history = (ROOT / 'docs/LANGUAGE_BIBLE_HISTORY.md').read_text()
+history = (ROOT / 'docs/LANGUAGE_BIBLE_HISTORY.md').read_text(encoding='utf-8')
 assert '9b7bbff41ba9a49ebc3d35a01fe77a7b5103ee77' in history
 assert hashlib.sha256(history.split('\n---\n\n', 1)[1].encode()).hexdigest() == '3e3eeb7ea8af58b93d2a85a6e630c8960b5d0001bb92794d39edbd2861a50454'
 print(f'G88 inventory: {len(files)} files, public declaration docs, canonical links and 3 provider parity refusals passed')

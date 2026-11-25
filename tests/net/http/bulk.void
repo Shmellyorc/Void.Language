@@ -32,9 +32,9 @@ async func entry(input: i32) -> i32:
                             if extent == @DOWNLOAD@:
                                 return 0
                     else if outcome is Err(var failure):
-                        print("HTTP {failure.kind}, {failure.phase}; sent {failure.uploaded}; received {failure.downloaded}")
+                        print("HTTP {failure.kind as i64}, {failure.phase as i64}; sent {failure.uploaded}; received {failure.downloaded}")
             else if destination_result is Err(var failure):
-                print("IO destination {failure.kind}")
+                print("IO destination {failure.kind as i64}")
     else if source_result is Err(var failure):
-        print("IO source {failure.kind}")
+        print("IO source {failure.kind as i64}")
     return 4

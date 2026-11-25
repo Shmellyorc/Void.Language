@@ -133,7 +133,8 @@ def qualify(root):
         status=None, expected='context-first')
     select = ['--project', project]
     run(cwd, compiler, 'check', *select)
-    run(cwd, compiler, 'run', *select, status=2, expected='Pass --allow-native')
+    denial = 'CI requires explicit --allow-native' if environment.get('CI') else 'Pass --allow-native'
+    run(cwd, compiler, 'run', *select, status=2, expected=denial)
 
     original = source.read_bytes()
     source.write_bytes(original.replace(b'g5.twice(-2, local.step)', b'g5.twice(-2, mix_value)'))

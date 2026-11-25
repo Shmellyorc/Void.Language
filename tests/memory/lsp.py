@@ -148,8 +148,11 @@ func main():
                       if index != active), shown)
 
         replace(header + "    var pending = buffer.read<i32>(")
-        check(query("signatureHelp", "buffer.read<i32>(", len("buffer.read<i32>(")) is None,
-              "parameterless generic read should not invent active-parameter documentation")
+        read_signature = query("signatureHelp", "buffer.read<i32>(", len("buffer.read<i32>("))
+        check(read_signature and read_signature["activeSignature"] == 0
+              and "activeParameter" not in read_signature, read_signature)
+        check(len(read_signature["signatures"]) == 1
+              and read_signature["signatures"][0]["parameters"] == [], read_signature)
 
         for prefix, binding, visible in (
             ('use "./api.void" as api\n', 'var item = api.packet(value = 1)', True),

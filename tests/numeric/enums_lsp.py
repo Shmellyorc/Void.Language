@@ -71,7 +71,10 @@ try:
             duplicate = modes.replace("gone = -128", "gone = 7")
             diagnostics = overlay(client, owner, duplicate, 2)
             error = next(item for item in diagnostics if "Duplicate numeric enum discriminant" in item["message"])
-            assert error["range"]["start"] == point(duplicate, duplicate.rindex("7")), error
+            assert error["range"]["start"] == point(duplicate, duplicate.index("gone =")), error
+            related = error["relatedInformation"]
+            assert len(related) == 1 and related[0]["location"]["uri"] == owner.as_uri(), error
+            assert related[0]["location"]["range"]["start"] == point(duplicate, duplicate.index("ready =")), error
             assert request(client, "textDocument/definition", params) is None
             assert not overlay(client, owner, modes, 3)
             assert request(client, "textDocument/definition", params) == location

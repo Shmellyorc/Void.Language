@@ -86,6 +86,6 @@ with TemporaryDirectory(prefix="VOID async timers ") as directory:
                "async func illegal(delay: time.duration):\n    defer {\n        await time.sleep(delay)\n    }\n", work)
         reject("private", "VOID2003", "3:16", "Unknown imported function 'time._sleep'.",
                "async func illegal():\n    await time._sleep(0, 0)\n", work)
-        reject("type", "VOID2001", "3:22", "Type mismatch: expected /@stdlib/time.void::duration, received i32.",
+        reject("type", "VOID2001", "3:22", "Type mismatch: expected duration, received i32.",
                "async func illegal():\n    await time.sleep(1)\n", work)
         print("Synchronous, cleanup, private primitive and duration diagnostics passed")
