@@ -8,6 +8,7 @@ namespace vd {
 struct InterfaceWitness;
 struct NominalDescriptor;
 namespace project { enum class DebugInfo; }
+namespace diagnostics { class PrivateMap; }
 
 namespace llvm_backend {
 class LoweringInventory;
@@ -18,7 +19,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module&, llvm::LLVMContext&, const
     std::vector<NominalDescriptor>* host_catalog = nullptr,
     std::vector<InterfaceWitness>* host_witnesses = nullptr,
     LoweringInventory* = nullptr, bool fixed_call_research = false,
-    std::optional<project::DebugInfo> = {}, bool optimized = false);
+    std::optional<project::DebugInfo> = {}, bool optimized = false, diagnostics::PrivateMap* = nullptr);
 
 void finish(llvm::Module&, bool optimize, llvm::TargetMachine* analysis_machine = nullptr,
             bool version_loops = false);

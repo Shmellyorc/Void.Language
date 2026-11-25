@@ -22,7 +22,7 @@ using llvm_backend::native_symbol;
 
 static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
                       bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {},
-                      std::optional<project::DebugInfo> source_debug = {}) {
+                      std::optional<project::DebugInfo> source_debug = {}, diagnostics::PrivateMap* private_map = nullptr) {
     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
     detail::initialize_native_target();
     llvm::LLVMContext context;
@@ -54,7 +54,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
 #else
                         ,nullptr
 #endif
-                        ,false,source_debug,optimize);
+                        ,false,source_debug,optimize,private_map);
     module->setTargetTriple(machine->getTargetTriple());
     module->setDataLayout(machine->createDataLayout());
     llvm::GlobalVariable* application_record = nullptr;
@@ -253,6 +253,12 @@ void emit_async_object(const ir::Module& source,const std::filesystem::path& out
 void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, std::string_view build_inputs,
                  std::optional<project::DebugInfo> source_debug) {
     emit_impl(input,output,optimize,source_program,false,{},false,{},build_inputs,source_debug);
+}
+diagnostics::PrivateMap emit_publication_object(const ir::Module& input, const std::filesystem::path& output,
+                                                bool optimize, std::string_view semantic_inputs_sha256) {
+    diagnostics::PrivateMap map(semantic_inputs_sha256);
+    emit_impl(input,output,optimize,true,false,{},false,{}, {},project::DebugInfo::full,&map);
+    return map;
 }
 void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {
     emit_impl(input,output,optimize,false,true,generation_suffix);
