@@ -89,7 +89,7 @@ def windows_main(root, env, completed):
     for code in (0, 1, 17, 86, 87, 139, -2, -1073741819, -1073741571, -2147483645):
         for args in ([PROBE, 'exit', str(code)], [COMPILER, 'crashes', 'run', PROBE, 'exit', str(code)]):
             result = run(args, ordinary)
-            assert result.returncode & 0xffffffff == code & 0xffffffff
+            assert result.returncode & 0xffffffff == code & 0xffffffff, (args, code, result)
             assert not leaf.exists(), (args, result.stderr)
     for args in ([PROBE, 'handled'], [PROBE, 'exit-process'],
                  [COMPILER, 'crashes', 'run', PROBE, 'handled'],

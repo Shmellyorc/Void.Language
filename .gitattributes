@@ -8,5 +8,18 @@
 # The raylib generator verifies the unmodified upstream header and notice bytes.
 /verified-packages/raylib/upstream/** -text -whitespace
 
+# The raylib generator compares its outputs byte for byte.
+/tools/raylib/inventory.json -text
+/verified-packages/raylib/native/raylib_api.c -text
+/verified-packages/raylib/native/raylib_api.h -text
+/verified-packages/raylib/native/raylib_api.descriptor.inc -text
+/verified-packages/raylib/native/raylib_parity.h -text
+
 # Preserve the exact approved curl correction patches.
 /third_party/curl-patches/** -text
+
+# These inventories verify the exact checkout bytes.
+/third_party/tomlplusplus/toml.hpp -text
+/third_party/tomlplusplus/LICENSE -text
+/third_party/tomlplusplus/void-bounds-and-locations.patch -text
+/docs/wiki/*.md -text

@@ -24,6 +24,7 @@ jobs:
     env:
       EXPERIMENT_CONFIGURATION: ${{ matrix.configuration }}
       EXPERIMENT_DIR: ${{ github.workspace }}/build/foundation
+      PYTHONUTF8: '1'
       ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
       UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
     steps:
@@ -32,6 +33,18 @@ jobs:
         with:
           # The pinned Linux LLDB links against Python 3.14.
           python-version: ${{ runner.os == 'Linux' && '3.14' || '3.12' }}
+      - name: Use physical Windows temporary paths for fixtures
+        if: runner.os == 'Windows'
+        shell: python {0}
+        run: |
+          import os
+          from pathlib import Path
+
+          scratch = Path(os.environ['RUNNER_TEMP']).resolve(strict=True) / 'void-foundation'
+          scratch.mkdir()
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as environment:
+              for name in ('TMPDIR', 'TMP', 'TEMP'):
+                  environment.write(f'{name}={scratch}\n')
       - name: Linux development dependencies
         if: runner.os == 'Linux'
         run: |

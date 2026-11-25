@@ -2401,11 +2401,14 @@ if(BUILD_TESTING)
   target_link_libraries(void_sprint6_tests PRIVATE void_llvm void_cache_identity)
   void_add_output_test(ergonomics_sprint6_host "$<TARGET_FILE:void_sprint6_tests>" "${PROJECT_SOURCE_DIR}" "@VOID_TEST_OUTPUT@/sprint6 host fixtures")
   set_tests_properties(ergonomics_sprint6_host PROPERTIES TIMEOUT 180)
-  # The Linux recipes invoke Clang directly and need the Runtime's pinned host
+  # These recipes invoke Clang directly and need the Runtime's pinned host
   # archives after the Runtime and fixture archives.
   set(legacy_aot_host_libraries "")
-  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR WIN32)
     set(legacy_aot_host_libraries ${VOID_HOST_LINK_FILES})
+  endif()
+  if(WIN32)
+    list(APPEND legacy_aot_host_libraries -ladvapi32 -lbcrypt)
   endif()
   add_test(NAME multiple_returns COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/frontend/multiple_returns.py" "$<TARGET_FILE:voidc>"
