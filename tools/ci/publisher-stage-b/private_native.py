@@ -63,7 +63,9 @@ for kind,text in [('sync',sync),('async',async_source),('retained',sync.replace(
    if windows:
     run([tools/'llvm-objcopy.exe','--only-keep-debug',linked,symbols]);run([tools/'llvm-objcopy.exe','--strip-all',linked,final])
    else:
-    run([tools/'dsymutil',linked,'-o',symbols]);run(['xcrun','strip','-S','-x','-o',final,linked])
+    # Apple's -S -x inserts a local N_OPT radr://5614542 marker. Pinned
+    # llvm-strip removes it while retaining symbols referenced by dyld.
+    run([tools/'dsymutil',linked,'-o',symbols]);run([tools/'llvm-strip','--strip-all','-o',final,linked])
     uuids=[run([tools/'llvm-dwarfdump','--uuid',p]) for p in [linked,final,symbols]]
     assert len({re.search(r'UUID: (\S+)',u)[1] for u in uuids})==1,uuids
    p.stdin.write('FINAL\n');p.stdin.flush();stdout,stderr=p.communicate(timeout=60);assert p.returncode==0,(stdout,stderr)
@@ -107,7 +109,7 @@ for kind,text in [('sync',sync),('async',async_source),('retained',sync.replace(
   devobj=private/'dev.o';dev=private/('development'+ext);devfinal=private/('development-stripped'+ext)
   run([emitter,'development',source,devobj,mode,kind]);run([tools/('clang++'+ext),*linker,devobj,'-o',dev,*native[3:]])
   control=subprocess.run([str(dev),'7'],capture_output=True,text=True,timeout=30);assert control.returncode==1 and control.stdout==expected and all(c in control.stderr for c in canaries)
-  run([tools/'llvm-objcopy.exe','--strip-all',dev,devfinal] if windows else ['xcrun','strip','-S','-x','-o',devfinal,dev]);assert any(f['code']=='forbidden-string' for f in audit(devfinal)['findings'])
+  run([tools/'llvm-objcopy.exe','--strip-all',dev,devfinal] if windows else [tools/'llvm-strip','--strip-all','-o',devfinal,dev]);assert any(f['code']=='forbidden-string' for f in audit(devfinal)['findings'])
   contaminated=private/('contaminated'+ext);contaminated.write_bytes(final.read_bytes()+mapfile.read_bytes());assert any(f['code']=='private-diagnostic-map' for f in audit(contaminated)['findings'])
   rows.append(dict(case=kind+'-'+mode,final_sha256=sha(final),linked_sha256=sha(linked),symbols_sha256=sha(symbol_obj),map_sha256=sha(mapfile),build_id=stdout.split()[1],report=report,relative_pc=hex(relative),symbolication=symbolicated,oracle_equal=True,exact_map=True,development_control=True,depth_tokens=33,metadata_reduction_qualified=not windows,retained_debug_directory_rejected=windows))
   (out/'results.json').write_text(json.dumps(rows,indent=2));print(kind,mode,'PASS',flush=True)

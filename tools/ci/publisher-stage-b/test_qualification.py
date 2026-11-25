@@ -119,11 +119,12 @@ class QualificationGuards(unittest.TestCase):
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / name, destination)
             q.verify_candidate(root)
-            source = root / 'src/publish.cpp'
-            source.write_bytes(source.read_bytes() + b'\n// changed candidate\n')
-            with self.assertRaisesRegex(RuntimeError, 'source checksum'):
-                q.verify_candidate(root)
-            shutil.copyfile(ROOT / 'src/publish.cpp', source)
+            for name in ('src/publish.cpp', 'src/cli_presentation.hpp'):
+                source = root / name
+                source.write_bytes(source.read_bytes() + b'\n// changed candidate\n')
+                with self.assertRaisesRegex(RuntimeError, 'source checksum'):
+                    q.verify_candidate(root)
+                shutil.copyfile(ROOT / name, source)
             patch = root / 'tools/ci/publisher-stage-b/candidate.patch'
             patch.write_bytes(patch.read_bytes() + b'\n')
             with self.assertRaisesRegex(RuntimeError, 'patch checksum'):

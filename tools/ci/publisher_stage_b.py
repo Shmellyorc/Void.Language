@@ -26,7 +26,7 @@ import http_bootstrap as http
 import verify_host_deps as host
 
 BASELINE = 'df33af0a7e8ae75b97d2ab27395a683b69d3994f'
-PATCH_SHA256 = '077977def3b5c9e6e19d64ff27653288e4777cb71755f5eff1a9ca7b33b8e891'
+PATCH_SHA256 = '5657c8e77a0c417fcab0b7e97c45e3503f1740d0b5f16191f54e9f9a5781dca3'
 POLICY = ROOT / 'tools/ci/publisher-stage-b'
 TARGETS = ('voidc', 'voidls', 'void_publish_foundation', 'void_project_header',
            'void_project_manifest', 'void_project_selection', 'void_private_diagnostics',
@@ -93,8 +93,8 @@ def verify_candidate(root=ROOT):
     identity = json.loads((root / 'tools/ci/publisher-stage-b/identity.json').read_text())
     if identity['baseline'] != BASELINE or identity['patch_sha256'] != PATCH_SHA256:
         raise RuntimeError('Stage B reviewed identity mismatch')
-    if len(identity['source_sha256']) != 23 or any(p.startswith('editors/') for p in identity['source_sha256']):
-        raise RuntimeError('Stage B inventory must contain exactly 23 paths and no editor changes')
+    if len(identity['source_sha256']) != 24 or any(p.startswith('editors/') for p in identity['source_sha256']):
+        raise RuntimeError('Stage B inventory must contain exactly 24 paths and no editor changes')
     if digest(root / 'tools/ci/publisher-stage-b/candidate.patch') != PATCH_SHA256:
         raise RuntimeError('Stage B patch checksum mismatch')
     for name, expected in identity['source_sha256'].items():

@@ -1,7 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0145d3aca51eae51a327e7b938b96d8e21afd9e9..172ee1f0a2a2956fbcaa6891d92747f1dce7d89f 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -100,7 +100,7 @@
+@@ -100,7 +100,7 @@ add_library(void_application_objects OBJECT src/application_metadata.cpp src/pro
  target_link_libraries(void_application_objects PRIVATE void_options)
  add_library(void_core src/frontend/conditional.cpp src/frontend/project.cpp src/frontend/project_creation.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
  target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
@@ -10,7 +11,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
  find_program(VOID_GIT_EXECUTABLE NAMES git DOC "Trusted Git executable for explicit D3 acquisition")
  if(NOT VOID_GIT_EXECUTABLE)
    set(VOID_GIT_EXECUTABLE "")
-@@ -320,6 +320,11 @@
+@@ -320,6 +320,11 @@ set(verified_raylib_preparer "${CMAKE_CURRENT_BINARY_DIR}/verified-packages/rayl
  configure_file(verified-packages/raylib-prepare.void "${verified_raylib_preparer}" COPYONLY)
  file(SHA256 "${verified_raylib_preparer}" verified_raylib_preparer_sha256)
  install(FILES "${verified_raylib_preparer}" DESTINATION share/void/verified-packages COMPONENT compiler)
@@ -22,7 +23,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
  add_library(voidc_objects OBJECT src/main.cpp src/native_approval.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
  target_compile_definitions(voidc_objects PRIVATE VOID_RAYLIB_BUILD_ROOT="${verified_raylib_build_root}"
    VOID_RAYLIB_SANITIZE=$<BOOL:${VOID_SANITIZERS}>
-@@ -331,9 +336,9 @@
+@@ -331,9 +336,9 @@ target_compile_definitions(voidc_objects PRIVATE VOID_RAYLIB_BUILD_ROOT="${verif
    VOID_RAYLIB_SUBDIR="${verified_raylib_subdirectory}" VOID_RAYLIB_VERSION="${verified_raylib_version}")
  target_compile_definitions(voidc_objects PRIVATE VOID_COMPILER_VERSION="${PROJECT_VERSION}")
  target_include_directories(voidc_objects SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
@@ -35,7 +36,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
  set(host_identity_inputs ${VOID_HOST_LINK_FILES}
    "${PROJECT_SOURCE_DIR}/third_party/host-versions.json"
    "${PROJECT_SOURCE_DIR}/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json"
-@@ -380,7 +385,7 @@
+@@ -380,7 +385,7 @@ add_library(void_cache_identity STATIC "${CMAKE_CURRENT_BINARY_DIR}/cache-identi
  target_link_libraries(void_cache_identity PRIVATE void_options)
  add_dependencies(void_cache_identity voidc_objects)
  add_executable(voidc $<TARGET_OBJECTS:voidc_objects>)
@@ -44,7 +45,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
  if(WIN32)
    target_link_libraries(voidc PRIVATE advapi32)
  endif()
-@@ -441,6 +446,24 @@
+@@ -441,6 +446,24 @@ if(BUILD_TESTING)
    target_link_libraries(void_project_manifest PRIVATE void_core)
    add_test(NAME project_manifest COMMAND void_project_manifest)
    set_tests_properties(project_manifest PROPERTIES TIMEOUT 60)
@@ -71,6 +72,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
    set_tests_properties(project_dependencies PROPERTIES TIMEOUT 300)
 diff --git a/docs/PUBLISHER_STAGE_B.md b/docs/PUBLISHER_STAGE_B.md
 new file mode 100644
+index 0000000000000000000000000000000000000000..5727f32b312cb67cf529165e21415737b887cb9b
 --- /dev/null
 +++ b/docs/PUBLISHER_STAGE_B.md
 @@ -0,0 +1,146 @@
@@ -221,6 +223,7 @@ new file mode 100644
 +- [Apple UUID and dSYM association](https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information)
 +- [Microsoft exact symbol matching](https://learn.microsoft.com/en-us/windows/desktop/dxtecharts/debugging-with-symbols)
 diff --git a/include/void/backend.hpp b/include/void/backend.hpp
+index 83f4621e041ddb101c58f325d20394511a9cff6a..3ea49a8d9ebe309a368e0e8b226797e2f1c51cac 100644
 --- a/include/void/backend.hpp
 +++ b/include/void/backend.hpp
 @@ -2,6 +2,7 @@
@@ -231,7 +234,7 @@ diff --git a/include/void/backend.hpp b/include/void/backend.hpp
  #include <filesystem>
  #include <memory>
  #include <string>
-@@ -38,6 +39,12 @@
+@@ -38,6 +39,12 @@ private:
  void emit_async_object(const ir::Module&, const std::filesystem::path&, bool optimize);
  void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false,
                   std::string_view build_inputs = {}, std::optional<project::DebugInfo> source_debug = {});
@@ -246,6 +249,7 @@ diff --git a/include/void/backend.hpp b/include/void/backend.hpp
  }
 diff --git a/include/void/binary_audit.hpp b/include/void/binary_audit.hpp
 new file mode 100644
+index 0000000000000000000000000000000000000000..74fde873b719356162fb4304a3075810b9905441
 --- /dev/null
 +++ b/include/void/binary_audit.hpp
 @@ -0,0 +1,31 @@
@@ -282,6 +286,7 @@ new file mode 100644
 +}
 diff --git a/include/void/private_diagnostics.hpp b/include/void/private_diagnostics.hpp
 new file mode 100644
+index 0000000000000000000000000000000000000000..e436a78ede49a19bd70a33cc5a45917dd5029da5
 --- /dev/null
 +++ b/include/void/private_diagnostics.hpp
 @@ -0,0 +1,41 @@
@@ -327,9 +332,10 @@ new file mode 100644
 +Category category(std::string_view description);
 +}
 diff --git a/include/void/project.hpp b/include/void/project.hpp
+index 2074987009f7ab500d5e0d0dd061a0ee31860754..f6a44b4825179d3e39427df2f97d64ba702bfd57 100644
 --- a/include/void/project.hpp
 +++ b/include/void/project.hpp
-@@ -70,6 +70,11 @@
+@@ -70,6 +70,11 @@ struct NativeRequirement {
      SemanticVersion version;
      unsigned abi = 0;
  };
@@ -338,10 +344,10 @@ diff --git a/include/void/project.hpp b/include/void/project.hpp
 +struct Publishing {
 +    std::optional<std::string> target, default_profile;
 +};
- 
+
  inline constexpr std::size_t native_catalog_byte_limit = 32 * 1024;
  inline constexpr std::size_t native_catalog_file_limit = 24;
-@@ -109,6 +114,8 @@
+@@ -109,6 +114,8 @@ class Manifest {
      Profile debug_ = {Optimization::none, DebugInfo::none};
      Profile release_ = {Optimization::O2, DebugInfo::none};
      std::map<std::string, Field> fields_;
@@ -350,7 +356,7 @@ diff --git a/include/void/project.hpp b/include/void/project.hpp
      Manifest() = default;
      friend class ManifestParser;
  public:
-@@ -128,6 +135,8 @@
+@@ -128,6 +135,8 @@ public:
      const Profile& debug() const { return debug_; }
      const Profile& release() const { return release_; }
      const auto& fields() const { return fields_; }
@@ -361,6 +367,7 @@ diff --git a/include/void/project.hpp b/include/void/project.hpp
      std::shared_ptr<const Manifest> manifest;
 diff --git a/include/void/publish.hpp b/include/void/publish.hpp
 new file mode 100644
+index 0000000000000000000000000000000000000000..d584c9a15aca7ad9ede650249415afa5961fec88
 --- /dev/null
 +++ b/include/void/publish.hpp
 @@ -0,0 +1,47 @@
@@ -412,9 +419,10 @@ new file mode 100644
 +void preflight(const Request&, std::string_view host);
 +}
 diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+index f1ed23395b2f08e880953547136fdbd7c64d43aa..8e9c1f2e6d7fe3a3893aa1c897ccfc53488c6d46 100644
 --- a/src/backend/llvm/backend.cpp
 +++ b/src/backend/llvm/backend.cpp
-@@ -924,7 +924,7 @@
+@@ -924,7 +924,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                                    const std::string& suffix, const llvm::DataLayout& target_layout, const std::string& exported_entry,
                                    std::vector<NominalDescriptor>* host_catalog=nullptr,std::vector<InterfaceWitness>* host_witnesses=nullptr,
                                    llvm_backend::LoweringInventory* inventory=nullptr,
@@ -423,7 +431,7 @@ diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
      // Pure default DAGs are outlined into ordinary private typed-IR functions.
      // The normal shared lowerer supplies roots, failure cleanup and native ABI;
      // defaults execute once per element without expanding IR by array extent.
-@@ -1871,7 +1871,10 @@
+@@ -1871,7 +1871,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                          b.CreateCondBr(b.CreateICmpULT(count, b.getInt32(32)), append, limit);
                          b.SetInsertPoint(limit); b.CreateStore(b.getInt32(33), count_address); b.CreateBr(done);
                          b.SetInsertPoint(append);
@@ -435,7 +443,7 @@ diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
                              source_message(loc, instruction.source_excerpt, "source call");
                          auto* frames = b.CreateStructGEP(failure_type, failure, 2);
                          auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), count});
-@@ -1884,8 +1887,11 @@
+@@ -1884,8 +1887,11 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                      auto* valid = llvm::BasicBlock::Create(context,"numeric_valid",fn);
                      b.CreateCondBr(invalid_value,invalid,valid); b.SetInsertPoint(invalid);
                      if (failure) {
@@ -449,7 +457,7 @@ diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
                          b.CreateStore(b.CreateGlobalString(message),b.CreateStructGEP(failure_type,failure,0)); return_failure();
                      } else { b.CreateCall(llvm::Intrinsic::getOrInsertDeclaration(module.get(),llvm::Intrinsic::trap)); b.CreateUnreachable(); }
                      b.SetInsertPoint(valid);
-@@ -2175,7 +2181,9 @@
+@@ -2175,7 +2181,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                      auto found = std::find_if(input.globals.begin(), input.globals.end(), [&](const auto& g) { return g.identity == instruction.callee; });
                      auto* storage = value_roots[n].at(values.size());
                      b.CreateCall(module->getOrInsertFunction("vd_global_cell", b.getVoidTy(), b.getPtrTy(), size_type, b.getPtrTy(), b.getPtrTy()),
@@ -460,7 +468,7 @@ diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
                      selected_failure();
                      v = b.CreateLoad(b.getPtrTy(), storage); break;
                  }
-@@ -3801,7 +3809,7 @@
+@@ -3801,7 +3809,7 @@ std::shared_ptr<const NativeCode> Jit::compile_root_probe(bool optimize) {
  }
  static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
                        bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {},
@@ -469,7 +477,7 @@ diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
      if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
      initialize();
      llvm::LLVMContext context;
-@@ -3833,7 +3841,7 @@
+@@ -3833,7 +3841,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
  #else
                          ,nullptr
  #endif
@@ -478,7 +486,7 @@ diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
      module->setTargetTriple(machine->getTargetTriple());
      module->setDataLayout(machine->createDataLayout());
      llvm::GlobalVariable* application_record = nullptr;
-@@ -4033,6 +4041,12 @@
+@@ -4033,6 +4041,12 @@ void emit_object(const ir::Module& input, const std::filesystem::path& output, b
                   std::optional<project::DebugInfo> source_debug) {
      emit_impl(input,output,optimize,source_program,false,{},false,{},build_inputs,source_debug);
  }
@@ -493,6 +501,7 @@ diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
  }
 diff --git a/src/binary_audit.cpp b/src/binary_audit.cpp
 new file mode 100644
+index 0000000000000000000000000000000000000000..189897ebd0584e79684a7619203944906a03ab69
 --- /dev/null
 +++ b/src/binary_audit.cpp
 @@ -0,0 +1,378 @@
@@ -875,10 +884,11 @@ new file mode 100644
 +}
 +}
 diff --git a/src/cli_help.hpp b/src/cli_help.hpp
+index 876bcdfc7e38fc714652193715ba67412060f14d..607b3a7d2453bc3d556387007d53fcceaf3239c1 100644
 --- a/src/cli_help.hpp
 +++ b/src/cli_help.hpp
 @@ -8,11 +8,12 @@
- 
+
  namespace vd::cli {
  using HelpRow = std::pair<std::string_view, std::string_view>;
 -inline constexpr std::array<HelpRow, 15> commands{{
@@ -891,7 +901,7 @@ diff --git a/src/cli_help.hpp b/src/cli_help.hpp
      {"emit", "Write a native object."},
      {"init", "Add a project manifest."},
      {"new", "Create a project or manage templates."},
-@@ -40,6 +41,8 @@
+@@ -40,6 +41,8 @@ inline void usage(std::ostream& out, const std::string& command={}) {
      if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
      if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
      if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
@@ -900,7 +910,7 @@ diff --git a/src/cli_help.hpp b/src/cli_help.hpp
      if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
        "       voidc package --verify DIR\n"
        "       voidc package list | voidc package search NAME\n"
-@@ -73,7 +76,7 @@
+@@ -73,7 +76,7 @@ inline void help(const std::string& command = {}, std::string_view nested = {})
      std::cout << "VOID Language Compiler v" << VOID_COMPILER_VERSION << " (development)\nLLVM " << LLVM_VERSION_STRING << "\n\n";
      if (command.empty()) {
          std::cout << "Usage: voidc <command> [arguments] [options]\n\nCommands:\n";
@@ -909,7 +919,7 @@ diff --git a/src/cli_help.hpp b/src/cli_help.hpp
          std::copy(commands.begin(), commands.end(), rows.begin());
          rows.back() = {"help", "Show command help."};
          help_rows(std::cout, rows);
-@@ -130,6 +133,7 @@
+@@ -130,6 +133,7 @@ Example: voidc check --project .
              help_rows(std::cout, std::array<HelpRow,1>{{
                  {"--debug-info none|line|full", "Override manifest debug information for this build/emit."}
              }});
@@ -917,10 +927,25 @@ diff --git a/src/cli_help.hpp b/src/cli_help.hpp
              if (command=="build") help_rows(std::cout, std::array<HelpRow,3>{{
                  {"-o PATH", "Executable output; defaults under build/."},
                  {"--allow-native", "Authorize this manifest invocation only."},
+diff --git a/src/cli_presentation.hpp b/src/cli_presentation.hpp
+index a06307a7d8960824286ee71946383725f7597dbb..b3bd87fec049536e1ce669879a902ca2c4799467 100644
+--- a/src/cli_presentation.hpp
++++ b/src/cli_presentation.hpp
+@@ -170,6 +170,9 @@ public:
+             // Conservatively require reports outside all selected source trees
+             // and manifest projects. Staging must not change a locked package.
+             auto path=std::filesystem::absolute(*options.output).lexically_normal();
++            std::error_code error;
++            if (!std::filesystem::is_directory(path.parent_path(),error) || error)
++                throw std::invalid_argument("Timing report parent must be an existing directory.");
+             auto source_root=std::filesystem::is_directory(source)?source:std::filesystem::absolute(source).parent_path();
+             source_root=std::filesystem::weakly_canonical(std::filesystem::absolute(source_root));
+             const auto location=std::filesystem::weakly_canonical(path);
 diff --git a/src/frontend/project.cpp b/src/frontend/project.cpp
+index 9c250f2c89c13f7a99d4554646cec71aacc47b23..b92f872cdd4012b55115b67757ff088cf10fa1fe 100644
 --- a/src/frontend/project.cpp
 +++ b/src/frontend/project.cpp
-@@ -663,12 +663,30 @@
+@@ -663,13 +663,31 @@ public:
              return finish();
          }
          const auto& root = result.table();
@@ -933,7 +958,7 @@ diff --git a/src/frontend/project.cpp b/src/frontend/project.cpp
 +            fail(Code::project_schema, schema ? span(schema->source()) : eof(), "Project schema must be integer 1 or 2.",
 +                "Use a matching compiler for another schema; schema is not the project's semantic version.");
              return finish();
-+        }
+         }
 +        manifest_->schema_ = static_cast<unsigned>(schema->ref<std::int64_t>());
 +        if (manifest_->schema_ == 1)
 +            fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements"});
@@ -952,10 +977,12 @@ diff --git a/src/frontend/project.cpp b/src/frontend/project.cpp
 +                    else manifest_->publishing_.default_profile = *profile;
 +                }
 +            }
-         }
++        }
          auto* project = table(root, "project", true);
          if (!project) return finish();
+         fields(*project, "project", {"id", "name", "version", "kind", "entry"});
 diff --git a/src/main.cpp b/src/main.cpp
+index 23e82d037a85354474ccaf265e2a2fcfdb3c7b3c..a267f168078c1396f5809a78ea8b376393d7bcbf 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
 @@ -4,6 +4,8 @@
@@ -967,7 +994,7 @@ diff --git a/src/main.cpp b/src/main.cpp
  #include "void/native_import.hpp"
  #include "void/project_creation.hpp"
  #include "void/project_resolution.hpp"
-@@ -635,7 +637,7 @@
+@@ -635,7 +637,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
              return 0;
          }
          if(argc==2 && std::string_view(argv[1])=="--capabilities") {
@@ -976,7 +1003,7 @@ diff --git a/src/main.cpp b/src/main.cpp
              return 0;
          }
          if(argc>=2 && std::string(argv[1])=="help") {
-@@ -665,6 +667,17 @@
+@@ -665,6 +667,17 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
              throw UsageError("Unknown command: "+command);
          if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
          if(command=="crashes")throw UsageError("Expected crashes run ABSOLUTE-EXECUTABLE [arguments...].");
@@ -996,6 +1023,7 @@ diff --git a/src/main.cpp b/src/main.cpp
          if(command=="deps") {
 diff --git a/src/private_diagnostics.cpp b/src/private_diagnostics.cpp
 new file mode 100644
+index 0000000000000000000000000000000000000000..6e895944e44163722b9894c33cbc21dbbdddf50d
 --- /dev/null
 +++ b/src/private_diagnostics.cpp
 @@ -0,0 +1,94 @@
@@ -1095,6 +1123,7 @@ new file mode 100644
 +}
 diff --git a/src/publish.cpp b/src/publish.cpp
 new file mode 100644
+index 0000000000000000000000000000000000000000..8d11a8205310bca60747e829a0a8c4c1c105ee37
 --- /dev/null
 +++ b/src/publish.cpp
 @@ -0,0 +1,85 @@
@@ -1184,19 +1213,20 @@ new file mode 100644
 +}
 +}
 diff --git a/tests/cli/contract.py b/tests/cli/contract.py
+index 45ae37b11b5d44e82d3ccd46ea3d3c5851ae962a..acc9e28e7f3b02b08355dfd19752d78bfdcd3378 100644
 --- a/tests/cli/contract.py
 +++ b/tests/cli/contract.py
-@@ -9,6 +9,7 @@
+@@ -9,6 +9,7 @@ import shutil
  import subprocess
  import sys
  import tempfile
 +import time
- 
+
  compiler = Path(sys.argv[1]).resolve()
  checks = 0
-@@ -52,8 +53,9 @@
+@@ -52,8 +53,9 @@ for command in ('crashes', 'check', 'run', 'build', 'emit', 'init', 'new', 'add'
          assert result.stdout.decode('utf-8').splitlines()[:2] == ['VOID Language Compiler v0.1.0 (development)', 'LLVM 23.1.4']
- 
+
  # Top-level columns come from the command inventory, not literal padding.
 -rows = full_help.decode().split('Commands:\n', 1)[1].split('\nOptions:', 1)[0].strip('\n').splitlines()
 -assert len(rows) == 16
@@ -1206,7 +1236,7 @@ diff --git a/tests/cli/contract.py b/tests/cli/contract.py
  assert {re.match(r'  (\S+)( +)(.+)', line).start(3) for line in rows} == {15}
  assert all('\t' not in line for line in rows)
  for command, flags in {'run': ['--cache', '--no-cache'], 'build': ['-o PATH', '--no-opt'],
-@@ -167,5 +169,17 @@
+@@ -167,5 +169,17 @@ with tempfile.TemporaryDirectory(prefix='VOID CLI é # % ') as directory:
      before = output.read_bytes()
      run(['build', source, '-o', output], 1, error='Reinstall the matching', tool=copied)
      assert output.read_bytes() == before
@@ -1222,12 +1252,13 @@ diff --git a/tests/cli/contract.py b/tests/cli/contract.py
 +                if error.winerror not in (5, 32) or time.monotonic() >= deadline:
 +                    raise
 +                time.sleep(0.05)
- 
+
  print(f'{checks} CLI process checks passed on {sys.platform}; native output and collision preservation passed')
 diff --git a/tests/cli/presentation.py b/tests/cli/presentation.py
+index cd66cbf21d9906974bcdc2490b35c24f49fce33b..3c20e50e5ee9beb1413d10b6090597cf9d88e200 100644
 --- a/tests/cli/presentation.py
 +++ b/tests/cli/presentation.py
-@@ -46,7 +46,7 @@
+@@ -46,17 +46,27 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
      bad = sources/'bad.void'; bad.write_text('func main() -> i32:\n    return unknown\n')
      reports = root/'reports'; reports.mkdir()
      assert json.loads(run(['--capabilities']).stdout)['statusPlain'] is True
@@ -1236,7 +1267,29 @@ diff --git a/tests/cli/presentation.py b/tests/cli/presentation.py
      for mode in ('auto','off'):
          current=run(['check',app,'--status',mode]);assert current.stdout==default.stdout and current.stderr==default.stderr
      plain=run(['check',app,'--status','plain'])
-@@ -108,8 +108,19 @@
+     assert plain.stdout==default.stdout and b'Checking' in plain.stderr and b'Finished' in plain.stderr and b'\x1b' not in plain.stderr
+     for flags in (['--status','bad'],['--status'],['--status','off','--status','auto'],['--timings','--timings'],
+                   ['--timings-format','text'],['--timings','--timings-format','xml'],['--timings','--timings-format','json'],
+-                  ['--timings-output',reports/'unused.json'],['--timings','--timings-format','json','--timings-output',app],
+-                  ['--timings','--timings-format','json','--timings-output',reports/'missing'/'report.json']):
++                  ['--timings-output',reports/'unused.json'],['--timings','--timings-format','json','--timings-output',app]):
+         run(['check',app,*flags],2)
+
++    # Invalid report parents must diagnose an invocation error before manifest
++    # discovery, without creating directories or changing an existing file.
++    parent_file=reports/'parent-file';parent_file.write_bytes(b'retained')
++    for parent in (reports/'missing', reports/'missing'/'nested', parent_file):
++        result=run(['check',app,'--timings','--timings-format','json',
++                    '--timings-output',parent/'report.json'],2)
++        assert not result.stdout and result.stderr.startswith(
++            b'Invalid invocation: Timing report parent must be an existing directory.'),result
++        assert not (reports/'missing').exists()
++        assert parent_file.read_bytes()==b'retained'
++
+     serial=0
+     def timed(args,status=0):
+         global serial
+@@ -108,8 +118,19 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
          assert v['configuration']=={'project_mode':False,'profile':None,'optimization':opt,'debug_info':'none'},v
      _,v,p=timed(['run','--project',project,'--cache'])
      assert v['configuration']=={'project_mode':True,'profile':'debug','optimization':'none','debug_info':'unavailable'},v
@@ -1259,9 +1312,10 @@ diff --git a/tests/cli/presentation.py b/tests/cli/presentation.py
      r,v,p=timed(['run',app,'--cache'],7)
      if os.name!='nt':
 diff --git a/tests/project/application_packages.py b/tests/project/application_packages.py
+index 46c21abfea7364a57a7f7621a130ec89f154d8ec..adce28de1a61b62f25b9448982892e1b52ce972d 100644
 --- a/tests/project/application_packages.py
 +++ b/tests/project/application_packages.py
-@@ -305,8 +305,18 @@
+@@ -305,8 +305,18 @@ with tempfile.TemporaryDirectory(prefix='VOID D5 packages 雪 % ') as temporary:
          run(compiler, 'package', '--verify', moved, status=1, message='without aliases')
          hard_link.unlink()
          run(compiler, 'package', '--verify', moved)
@@ -1278,13 +1332,14 @@ diff --git a/tests/project/application_packages.py b/tests/project/application_p
 +                cli('package', '-o', base / leaf, status=1, message='portable directory')
 +            assert snapshot(base) == reserved_files
 +            assert {p.relative_to(base) for p in base.rglob('*')} == reserved_entries
- 
+
      unowned = base / 'unowned'
      unowned.mkdir()
 diff --git a/tests/project/discovery.py b/tests/project/discovery.py
+index 77fdf223c6c1f31cb98af2e85f44c832e14ffdc9..7e6274460c39056ebebe5b5ce4c8584fff75916b 100644
 --- a/tests/project/discovery.py
 +++ b/tests/project/discovery.py
-@@ -81,7 +81,7 @@
+@@ -81,7 +81,7 @@ try:
      for flags in [[],['--no-opt']]:run([compiler,'run',root,'--no-cache',*flags],23,b'IMPORTED\n')
      run([compiler,'build','--project',root,'-o',exe]);run([exe],23,b'IMPORTED\n')
      # Default output belongs to the manifest root, not the nested entry directory.
@@ -1294,9 +1349,10 @@ diff --git a/tests/project/discovery.py b/tests/project/discovery.py
      write('src/child/void.project.toml','[=roject]');write('src/child/child.void',main)
      run([compiler,'check',root]);run([compiler,'run','--project',root,'--entry','src/child/child.void'],1,contains=b'VOID5009')
 diff --git a/tests/project/manifest.cpp b/tests/project/manifest.cpp
+index 1df6b5c3fda58f9eff22e24d0c085b1277589ed1..138dd80241bb4834f1af57e88109b29fbd2c2969 100644
 --- a/tests/project/manifest.cpp
 +++ b/tests/project/manifest.cpp
-@@ -155,7 +155,7 @@
+@@ -155,7 +155,7 @@ debug_info = "full"
      check(settings->sources().roots.size() == 2 && settings->sources().exclude.empty(), "source settings");
      check(settings->debug().optimization == Optimization::O2 && settings->release().debug_info == DebugInfo::full, "profile settings");
      good(replace(application, "kind = \"application\"", "kind = \"application\"\nentry = \"game.void\""));
@@ -1307,6 +1363,7 @@ diff --git a/tests/project/manifest.cpp b/tests/project/manifest.cpp
          auto text = application; auto start = text.find(std::string(field) + " = "); auto end = text.find('\n', start); text.erase(start, end - start + 1);
 diff --git a/tests/project/private_binary.py b/tests/project/private_binary.py
 new file mode 100644
+index 0000000000000000000000000000000000000000..594d12be2662fc558874e10aa404c875b5d23ba2
 --- /dev/null
 +++ b/tests/project/private_binary.py
 @@ -0,0 +1,165 @@
@@ -1477,6 +1534,7 @@ new file mode 100644
 +print('Stage B linked-byte canaries, private maps, ABI failure status and development diagnostics passed')
 diff --git a/tests/project/private_diagnostics.cpp b/tests/project/private_diagnostics.cpp
 new file mode 100644
+index 0000000000000000000000000000000000000000..aae0cfb100dd87efd8a8d1e5ae31db9f1350b402
 --- /dev/null
 +++ b/tests/project/private_diagnostics.cpp
 @@ -0,0 +1,106 @@
@@ -1588,6 +1646,7 @@ new file mode 100644
 +} catch(const std::exception& e) {std::cerr<<e.what()<<'\n';return 1;} }
 diff --git a/tests/project/publish.cpp b/tests/project/publish.cpp
 new file mode 100644
+index 0000000000000000000000000000000000000000..43f8010bfbd4d404ed71f3aef8675203a86b059d
 --- /dev/null
 +++ b/tests/project/publish.cpp
 @@ -0,0 +1,80 @@
@@ -1673,6 +1732,7 @@ new file mode 100644
 +}
 diff --git a/tests/project/publish_fixtures.py b/tests/project/publish_fixtures.py
 new file mode 100644
+index 0000000000000000000000000000000000000000..71d423899213d602c8d72fa35a119995045380f3
 --- /dev/null
 +++ b/tests/project/publish_fixtures.py
 @@ -0,0 +1,283 @@
