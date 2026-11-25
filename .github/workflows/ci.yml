@@ -38,10 +38,12 @@ jobs:
         shell: python {0}
         run: |
           import os
+          import tempfile
           from pathlib import Path
 
-          scratch = Path(os.environ['RUNNER_TEMP']).resolve(strict=True) / 'void-foundation'
-          scratch.mkdir()
+          # The Actions work drive and the user's OS temp have different ACLs.
+          temp_root = Path(tempfile.gettempdir()).resolve(strict=True)
+          scratch = Path(tempfile.mkdtemp(prefix='void-foundation-', dir=temp_root))
           with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as environment:
               for name in ('TMPDIR', 'TMP', 'TEMP'):
                   environment.write(f'{name}={scratch}\n')
