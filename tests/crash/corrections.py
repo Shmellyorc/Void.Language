@@ -91,6 +91,10 @@ def windows_main(root, env, completed):
             result = run(args, ordinary)
             assert result.returncode & 0xffffffff == code & 0xffffffff, (args, code, result)
             assert not leaf.exists(), (args, result.stderr)
+    args = [COMPILER, 'crashes', 'run', PROBE, 'args', 'two words', '"quote"', 'tail\\']
+    result = run(args, ordinary)
+    assert result.returncode == 0 and result.stdout.splitlines() == [b'two words', b'"quote"', b'tail\\'], result
+    assert not result.stderr and not leaf.exists(), result
     for args in ([PROBE, 'handled'], [PROBE, 'exit-process'],
                  [COMPILER, 'crashes', 'run', PROBE, 'handled'],
                  [COMPILER, 'crashes', 'run', PROBE, 'exit-process']):

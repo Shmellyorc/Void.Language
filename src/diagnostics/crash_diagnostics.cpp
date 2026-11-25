@@ -174,13 +174,14 @@ bool private_object(int fd, bool directory) {
 // standard streams (plus the worker's context mapping, when present).
 struct WindowsLaunch {
     std::vector<native_windows::Handle> standards;
+    // The attribute list borrows the array until its destruction.
+    std::vector<HANDLE> handles;
     std::vector<unsigned char> storage;
     LPPROC_THREAD_ATTRIBUTE_LIST attributes = nullptr;
     STARTUPINFOEXW startup{};
     bool inherit = false;
     explicit WindowsLaunch(HANDLE extra=nullptr) {
         using native_windows::fail;
-        std::vector<HANDLE> handles;
         if(extra)handles.push_back(extra);
         startup.StartupInfo.cb=sizeof(STARTUPINFOW);
         startup.StartupInfo.dwFlags=STARTF_USESTDHANDLES;
@@ -541,7 +542,7 @@ int execute_external(int argc,char** argv) {
     PROCESS_INFORMATION info{};
     if(!CreateProcessW(utf8_path(argv[0]).c_str(),command.data(),nullptr,nullptr,launch.inherit,
         launch.flags(),nullptr,nullptr,&launch.startup.StartupInfo,&info))
-        throw std::runtime_error("cannot launch diagnostic program");
+        native_windows::fail("Cannot launch diagnostic program");
     native_windows::Handle process(info.hProcess),thread(info.hThread);
     SetConsoleCtrlHandler(collector_console,TRUE);
     // No debugger or target handler: unsupported native exception collection
