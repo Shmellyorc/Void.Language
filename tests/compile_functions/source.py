@@ -12,7 +12,8 @@ def stack():
 def run(args, expected=0, output=None, contains=None):
     p = subprocess.run(list(map(str, args)), capture_output=True, timeout=90,
                        preexec_fn=stack if os.name == 'posix' else None)
-    row = dict(argv=list(map(str, args)), status=p.returncode, stdout=p.stdout.decode(), stderr=p.stderr.decode())
+    row = dict(argv=list(map(str, args)), status=p.returncode,
+               stdout=p.stdout.decode().replace('\r\n', '\n'), stderr=p.stderr.decode())
     row['sources'] = {str(p): p.read_text() for p in map(Path, map(str, args)) if p.suffix == '.void' and p.is_file()}
     records.append(row); report.parent.mkdir(parents=True, exist_ok=True)
     report.write_text(json.dumps(dict(stack_bytes=1048576, records=records), indent=2) + '\n')

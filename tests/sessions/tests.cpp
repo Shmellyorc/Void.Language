@@ -16,8 +16,13 @@ void session_tests(const std::filesystem::path& root) {
     vd::ToolingSession s(root/"main.void");
     {
         struct RestoreDirectory { std::filesystem::path path=std::filesystem::current_path(); ~RestoreDirectory() { std::filesystem::current_path(path); } } restore;
-        vd::ToolingSession relative(std::filesystem::relative(root/"main.void"));
-        std::filesystem::current_path(root);
+        const auto entry=std::filesystem::absolute(root/"main.void");
+        // Windows scratch and the test binary can be on different drives.
+        std::filesystem::current_path(entry.parent_path().parent_path());
+        const auto relative_entry=std::filesystem::relative(entry);
+        check(!relative_entry.empty() && relative_entry.is_relative(),"relative session entry");
+        vd::ToolingSession relative(relative_entry);
+        std::filesystem::current_path(entry.parent_path());
         check(run(relative)->result().succeeded(),"session root changed with working directory");
     }
     auto first=run(s); check(first->result().succeeded() && s.current_index(),"initial analysis");

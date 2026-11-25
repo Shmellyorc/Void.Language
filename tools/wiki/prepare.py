@@ -20,7 +20,7 @@ def inventory():
         'files': [dict(file=p.name, sha256=hashlib.sha256(p.read_bytes()).hexdigest(),
                        role='shared' if p.stem.startswith('_') else 'page',
                        route=None if p.stem.startswith('_') else WIKI + p.stem)
-                  for p in sorted(SOURCE.glob('*.md')) if p.name != 'README.md'],
+                  for p in sorted(SOURCE.glob('*.md'), key=lambda page: page.name) if p.name != 'README.md'],
     }
 
 
