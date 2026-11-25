@@ -39,6 +39,10 @@ class LegacyEditorWorkflowTests(unittest.TestCase):
     def test_failure_collector_reads_pinned_producer_and_current_http_locations(self):
         producer = self.pinned_file('tools/setup_host_deps_native.py').decode()
         producer_path = re.search(r"evidence=ROOT/'([^']+)'/", producer)[1]
+        http_producer = self.pinned_file('tools/setup_http_deps_native.py').decode()
+        http_path = re.search(r"receipt = root / '([^']+)' /", http_producer)[1]
+        self.assertIn('python -B "$legacy/tools/setup_http_deps.py" --profile Debug', WORKFLOW)
+        self.assertIn('ln -s "$GITHUB_WORKSPACE/.toolchains/http/downloads" "$legacy/.toolchains/http/downloads"', WORKFLOW)
         failure_step = WORKFLOW.split('name: Collect bounded failure diagnostics\n', 1)[1]
         script = textwrap.dedent(failure_step.split("<<'PY'\n", 1)[1].split('\n          PY', 1)[0])
         with tempfile.TemporaryDirectory() as folder:
@@ -48,6 +52,7 @@ class LegacyEditorWorkflowTests(unittest.TestCase):
             fixtures = {
                 workspace / self.checkout / producer_path / 'dependencies-macos-arm64-Debug-1/older.json': b'older legacy receipt',
                 workspace / self.checkout / producer_path / 'dependencies-macos-arm64-Debug-2/legacy.json': b'latest legacy receipt',
+                workspace / self.checkout / http_path / 'dependencies-macos-aws-lc-5.12.0-arm64-Debug-1/legacy-http.json': b'legacy HTTP receipt',
                 external / 'qualification/voidup/dependencies-macos-arm64-Debug-3/unrelated.json': b'unrelated external receipt',
                 external / 'qualification/net/http/dependencies-macos-aws-lc-5.12.0-arm64-Debug-1/http.json': b'current HTTP receipt',
             }
@@ -61,6 +66,7 @@ class LegacyEditorWorkflowTests(unittest.TestCase):
             collected = {path.name.split('-', 1)[1]: path.read_bytes()
                          for path in (work / 'failure').iterdir()}
             self.assertEqual(collected, {'legacy.json': b'latest legacy receipt',
+                                         'legacy-http.json': b'legacy HTTP receipt',
                                          'http.json': b'current HTTP receipt'})
 
 

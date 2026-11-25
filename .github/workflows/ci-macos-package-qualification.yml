@@ -193,11 +193,12 @@ jobs:
             legacy="$GITHUB_WORKSPACE/.toolchains/project-editor-legacy"
             test "$(git -C "$legacy" rev-parse HEAD)" = "$PROJECT_EDITOR_LEGACY_SHA"
             printf 'Legacy editor server source %s\n' "$PROJECT_EDITOR_LEGACY_SHA"
-            mkdir -p "$legacy/.toolchains/host"
+            mkdir -p "$legacy/.toolchains/host" "$legacy/.toolchains/http"
             ln -s "$GITHUB_WORKSPACE/.toolchains/llvm-23.1.4" "$legacy/.toolchains/llvm-23.1.4"
-            ln -s "$GITHUB_WORKSPACE/.toolchains/http" "$legacy/.toolchains/http"
+            ln -s "$GITHUB_WORKSPACE/.toolchains/http/downloads" "$legacy/.toolchains/http/downloads"
             ln -s "$GITHUB_WORKSPACE/.toolchains/host/downloads" "$legacy/.toolchains/host/downloads"
-            # The legacy checkout needs its own receipt for its SDK tool paths.
+            # Share verified archives, but build both prefixes with the pinned recipes.
+            python -B "$legacy/tools/setup_http_deps.py" --profile Debug --jobs 2 --macos-install-only
             python -B "$legacy/tools/setup_host_deps.py" --profile Debug --jobs 2
             cmake -S "$legacy" -B "$PACKAGE_WORK/legacy-build" -G Ninja \
               -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=OFF \
@@ -298,8 +299,11 @@ jobs:
               originals.update(receipts)
               logs.extend(receipts)
               # The pinned producer still writes into its own legacy checkout.
-              roots += ((Path(os.environ["GITHUB_WORKSPACE"]) / ".toolchains/project-editor-legacy/docs/voidup/evidence",
-                         f"dependencies-macos-arm64-{profile}-*"),)
+              legacy = Path(os.environ["GITHUB_WORKSPACE"]) / ".toolchains/project-editor-legacy"
+              roots += (
+                  (legacy / "docs/net/http/evidence", f"dependencies-macos-aws-lc-5.12.0-arm64-{profile}-*"),
+                  (legacy / "docs/voidup/evidence", f"dependencies-macos-arm64-{profile}-*"),
+              )
           for parent, pattern in roots:
               receipts = sorted(parent.glob(pattern))
               if receipts:
