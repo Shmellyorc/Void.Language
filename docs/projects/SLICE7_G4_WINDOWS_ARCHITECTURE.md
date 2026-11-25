@@ -37,24 +37,24 @@ with an undocumented native oracle. That remains observational
 evidence rather than a production API dependency. The final native
 runner, executables and DLLs ran from local `C:` paths. The share
 carried source, the transfer bootstrap and the output receipts.
-[Native runner and binary hashes](evidence/slice7-g4-windows/native/native-results.json) ·
-[PE imports, exports and manifest resources](evidence/slice7-g4-windows/native/pe-facts.txt) ·
-[Independent IAT reader](evidence/slice7-g4-windows/probes/loader_probe.cpp).
+[Native runner and binary hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/native-results.json) ·
+[PE imports, exports and manifest resources](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/pe-facts.txt) ·
+[Independent IAT reader](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/probes/loader_probe.cpp).
 
 | Control | Observed result |
 | --- | --- |
-| [Clean process](evidence/slice7-g4-windows/native/probe-clean.txt) | The approved top-level image and dependency owned the expected addresses. The alternate initializer marker was absent. |
-| [Loaded-name collision](evidence/slice7-g4-windows/native/probe-collision.txt) | The approved main mapped. The IAT reused the previously loaded same-name alternate even though the approved dependency was held. |
-| [Late same-name load](evidence/slice7-g4-windows/native/probe-late.txt) | The snapshot saw neither a loaded dependency name nor a redirect. The probe then loaded the competitor before loading the provider, and the provider's IAT used the competitor. This was a controlled ordering change, with no claim of a discovered concurrent race. |
-| [Thread activation redirect](evidence/slice7-g4-windows/native/probe-thread.txt) | No dependency name was loaded beforehand. The approved main mapped and the alternate acquired the IAT slot. Its initializer marker was already `1` at the first post-load observation. |
-| [Push a clean process default](evidence/slice7-g4-windows/native/probe-thread-default.txt) | The clean process default suppressed the thread override in this control. Both mappings matched the held images. |
-| [Push a redirected process default](evidence/slice7-g4-windows/native/probe-process-default.txt) | The executable had the redirect embedded in its default manifest. Pushing that default left the alternate import and initializer in effect. |
-| [Preload approved, then activate the redirect](evidence/slice7-g4-windows/native/probe-preload-thread.txt) | The preloaded good image matched its held file. The later import still bound the alternate, whose marker was `1`. |
-| [Thread guard](evidence/slice7-g4-windows/native/probe-thread-deny.txt) and [process-default guard](evidence/slice7-g4-windows/native/probe-process-deny.txt) | A query for the exact dependency name found the active redirect. The guard stopped before the executable load. Both provider and alternate were absent. |
-| [Data-only image view](evidence/slice7-g4-windows/native/probe-data.txt) | `SEC_IMAGE_NO_EXECUTE` from the held handle exposed the initial marker value `0`. The executable module was absent. A separate ordinary load ran the initializer and changed the marker to `1`. |
-| [Forwarded export](evidence/slice7-g4-windows/native/probe-forward.txt) | Loading the forwarder left the alternate absent. `GetProcAddress` resolved its export into the alternate and the marker was `1` on return. The probe never called the returned address. |
-| [Explicit table](evidence/slice7-g4-windows/native/probe-explicit.txt) | Two known import-free, no-entry images loaded under the clean probe and owned the selected exports. A caller-supplied immutable table supported a C record, byte span, opaque token and one terminal release. |
-| [Fresh startup with approved DLL](evidence/slice7-g4-windows/native/startup-good.txt) and [fresh startup with alternate DLL](evidence/slice7-g4-windows/native/startup-bad.txt) | Both child executable copies had the same SHA-256. The parent matched each suspended child image pathname to its held executable. After resume, first user entry reported `42` with the good dependency and `121` when the alternate had already initialized. |
+| [Clean process](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-clean.txt) | The approved top-level image and dependency owned the expected addresses. The alternate initializer marker was absent. |
+| [Loaded-name collision](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-collision.txt) | The approved main mapped. The IAT reused the previously loaded same-name alternate even though the approved dependency was held. |
+| [Late same-name load](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-late.txt) | The snapshot saw neither a loaded dependency name nor a redirect. The probe then loaded the competitor before loading the provider, and the provider's IAT used the competitor. This was a controlled ordering change, with no claim of a discovered concurrent race. |
+| [Thread activation redirect](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-thread.txt) | No dependency name was loaded beforehand. The approved main mapped and the alternate acquired the IAT slot. Its initializer marker was already `1` at the first post-load observation. |
+| [Push a clean process default](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-thread-default.txt) | The clean process default suppressed the thread override in this control. Both mappings matched the held images. |
+| [Push a redirected process default](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-process-default.txt) | The executable had the redirect embedded in its default manifest. Pushing that default left the alternate import and initializer in effect. |
+| [Preload approved, then activate the redirect](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-preload-thread.txt) | The preloaded good image matched its held file. The later import still bound the alternate, whose marker was `1`. |
+| [Thread guard](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-thread-deny.txt) and [process-default guard](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-process-deny.txt) | A query for the exact dependency name found the active redirect. The guard stopped before the executable load. Both provider and alternate were absent. |
+| [Data-only image view](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-data.txt) | `SEC_IMAGE_NO_EXECUTE` from the held handle exposed the initial marker value `0`. The executable module was absent. A separate ordinary load ran the initializer and changed the marker to `1`. |
+| [Forwarded export](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-forward.txt) | Loading the forwarder left the alternate absent. `GetProcAddress` resolved its export into the alternate and the marker was `1` on return. The probe never called the returned address. |
+| [Explicit table](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/probe-explicit.txt) | Two known import-free, no-entry images loaded under the clean probe and owned the selected exports. A caller-supplied immutable table supported a C record, byte span, opaque token and one terminal release. |
+| [Fresh startup with approved DLL](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/startup-good.txt) and [fresh startup with alternate DLL](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/startup-bad.txt) | Both child executable copies had the same SHA-256. The parent matched each suspended child image pathname to its held executable. After resume, first user entry reported `42` with the good dependency and `121` when the alternate had already initialized. |
 
 The forwarder PE had zero import, delay import and TLS directories
 and a zero entry-point RVA. Its export table still named
@@ -168,7 +168,7 @@ persists through generations and is available to terminal release
 on the shutdown thread. A global mutable table or a thread-local
 lookup that disappears at teardown would violate G3 ownership.
 The checkpoint did not change the existing transport.
-[Explicit C fixture](evidence/slice7-g4-windows/probes/explicit.c) ·
+[Explicit C fixture](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/probes/explicit.c) ·
 [Windows x64 calling convention](https://learn.microsoft.com/en-us/cpp/build/x64-calling-convention).
 
 The initial synthetic provider profile can have zero OS imports
@@ -288,17 +288,17 @@ forwarder command emitted an import library without a DLL.
 The final replay supplied an ordinary object and verified the
 actual PE forwarder. The original compile/link diagnostics and
 the corrected command receipts are retained.
-[Initial link failure](evidence/slice7-g4-windows/native/original/link-explicit.txt) ·
-[First replay PE diagnostic](evidence/slice7-g4-windows/native/first-replay/pe-facts.txt) ·
-[Corrective native replay](evidence/slice7-g4-windows/native/native-results.json) ·
-[Evidence hashes](evidence/slice7-g4-windows/native/preserved-evidence.json).
+[Initial link failure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/original/link-explicit.txt) ·
+[First replay PE diagnostic](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/first-replay/pe-facts.txt) ·
+[Corrective native replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/native-results.json) ·
+[Evidence hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/preserved-evidence.json).
 
 The layered inventory preserves all 1,737 previous paths, including
 the original G4-W failure evidence and the complete G4-L layer.
 The patch contains the standalone probes and evidence helpers.
 HEAD and the staged index match the baseline.
-[Exact probe patch](evidence/slice7-g4-windows/probe.patch) ·
-[Layered Git inventory](evidence/slice7-g4-windows/inventory.txt).
+[Exact probe patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/probe.patch) ·
+[Layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/inventory.txt).
 
 ## End-of-task temporary workspace cleanup
 
@@ -315,6 +315,6 @@ The host transfer share remains available with the raw native
 evidence and reproduction inputs. There were no separate host build
 scratch files to remove. Prior artifacts, personal files, installed
 toolchains, reusable build trees and Git state were untouched.
-[Exact cleanup receipt](evidence/slice7-g4-windows/native/cleanup-results.json).
+[Exact cleanup receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g4-windows/native/cleanup-results.json).
 
 Stop for Golden Wrench and Boss's design approval.

@@ -51,7 +51,7 @@ private/internal visibility and exact matching remain unchanged.
 [The shared calls/numeric contract](STAGE8_CALLS_NUMERIC.md) supersedes older
 ordinary named/default-call exclusions below. Existing constructor, readonly,
 receiver and specialization protections remain. See
-[actual local verification](stage8/SPRINT2_ACCEPTANCE.md) for acceptance status.
+[actual local verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT2_ACCEPTANCE.md) for acceptance status.
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
@@ -212,9 +212,10 @@ and generic bodies through the same specialization path; see ARRAY_OPERATIONS.md
 blanket exclusions above for compile-time type `has`, typed if-expressions,
 multiline calls and string-only interpolation. Existing nominal storage,
 structural conformance, generic specialization, capabilities and checked failure
-rules remain authoritative. Both conditional branches type-check. Formatting and
-numeric/bool/custom string conversion remain deferred. Approval and implementation
-are separate from local acceptance, Wrench review and the final hosted lock.
+rules remain authoritative. Both conditional branches type-check. The later
+[display and formatting contract](stage10/DISPLAY_FORMATTING.md) implements the
+numeric, Boolean and custom display surface; the old string-only exclusion is
+superseded. Qualification remains specific to the recorded revision and platform.
 
 ## Static members of generic owners
 

@@ -1,6 +1,6 @@
 # Worktree management
 
-Use `~/Documents/Void.Language-worktrees/` for future **linked Git worktrees**.
+Use `~/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-worktrees/` for future **linked Git worktrees**.
 Keep the main integration checkout at `~/Documents/Void.Language/`. Git's
 `worktree move` does not move the main checkout. Evidence, archives, recovery
 copies, build directories and personal projects are separate resources; a

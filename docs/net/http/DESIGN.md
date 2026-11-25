@@ -9,7 +9,7 @@ pull-result lifetime is a required implementation dependency, not an accepted
 limitation. Native bulk IO is independently required. The 512 MiB admission
 budget is provisional, never a demonstrated RSS ceiling. In-memory session
 cookies are included; persistent cookie storage/import/export are excluded.
-[Actual engineering progress and blocking evidence](IMPLEMENTATION.md) remain
+[Actual engineering progress and blocking evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/IMPLEMENTATION.md) remain
 separate from approval. Original proposal wording below is preserved as history.
 
 The subsequent [approved source-default adjustment](SOURCE_API_REVIEW.md) makes
@@ -21,7 +21,7 @@ superseded for those four records.
 **Research proposal, 30 October 2026. Not an accepted language or library contract.**
 Baseline `15f7868b0af177f8f7d49c548392c79c7bd921d2`, LLVM 23.1.4.
 Boss authorizes research; Golden Wrench reviews this design before Boss approves
-engineering. [Evidence and source audit](RESEARCH.md), [acceptance roadmap](ROADMAP.md).
+engineering. [Evidence and source audit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/RESEARCH.md), [acceptance roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/ROADMAP.md).
 
 ## 1. Public ownership and boundaries
 

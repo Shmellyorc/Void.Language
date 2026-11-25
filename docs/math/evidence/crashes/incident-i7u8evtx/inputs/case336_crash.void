@@ -1,4 +1,0 @@
-use "./libs/math.void" as mine
-func main():
-    var a = mine.min(true, false)
-    var b = mine.sin("valid")

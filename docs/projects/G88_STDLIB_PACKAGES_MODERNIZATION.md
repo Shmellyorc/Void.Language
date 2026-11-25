@@ -18,6 +18,12 @@ were checked for every top-level public declaration; the missing network/process
 descriptions were supplied. No new frontend, Runtime, scheduler or enum value
 translation framework is introduced.
 
+## Maintained package-preparation inventory
+
+`verified-packages/raylib-prepare.void` is the maintained Python-free raylib
+preparation program added by [G94](G94_VOIDUP_PYTHON_FREE_DEVELOPER_EXPERIENCE.md).
+It is a required package resource, not a generated receipt or obsolete snapshot.
+
 ## Complete standard-library inventory
 
 Every row records an actual source inspection and a decision, including deliberate
@@ -295,8 +301,8 @@ the detailed contracts. Root README and old milestone evidence are unchanged.
 
 ## Qualification and evidence
 
-Evidence root: `/home/shmellyorc/Documents/Void.Language-work/g88-modernization`.
-Private disk-backed fixture root: `/home/shmellyorc/Documents/Void.Language-G88-tmp`.
+Evidence root: `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-work/g88-modernization`.
+Private disk-backed fixture root: `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G88-tmp`.
 Exact commands, environment, exit/output, binary hashes and earlier failures are
 retained by `qualify.py`, the maintained harnesses and editor launch receipts.
 Compiler, server, emitter and native-test children retain 1 MiB soft/hard stacks
@@ -434,7 +440,7 @@ No production latency/memory ceiling or performance improvement is claimed.
 
 ## Review corrections and focused qualification
 
-The [Golden Wrench review](/home/shmellyorc/Documents/void-g88-review-k4wp044i/REVIEW.txt)
+The [Golden Wrench review](/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g88-review-k4wp044i/REVIEW.txt)
 identified the keyboard-domain regression, incorrect signed-division prose and
 nonexistent automation-event enum reference. These are corrected within G88:
 
@@ -446,7 +452,7 @@ nonexistent automation-event enum reference. These are corrected within G88:
   number and event-specific payload; its signature remains unchanged.
 
 Correction evidence root:
-`/home/shmellyorc/Documents/Void.Language-work/g88-review-corrections`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-work/g88-review-corrections`.
 The original review directory and original archive remain untouched. The original
 archive's SHA-256 remains
 `93313492d3c18d21cbb7cbf84e22d096c2e06f35c4c380709789231ddd844812`.

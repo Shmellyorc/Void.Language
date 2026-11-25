@@ -26,7 +26,7 @@ numeric promotions or bool operators. [Rust's overflow treatment](https://doc.ru
 profile-dependent exceptional shifts are not adopted. [LLVM shift instructions](https://llvm.org/docs/LangRef.html#shl-instruction) require masking to
 prevent poison for out-of-range counts. This is bounded use of existing upstream
 semantics, not a backport or dependency change. Links and applicability are in
-[the research record](evidence/g81/research.json).
+[the research record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g81/research.json).
 
 AND/OR/XOR continue requiring identical integer types or the same nominal flags
 type. No enum shifts, bool/float shifts, implicit integer widening, custom shift
@@ -71,9 +71,9 @@ feature-status record and documentation index describe the implemented behavior.
 ## Initial qualification (before the P2 correction)
 
 The original evidence is retained unchanged. Final correction source/artifact
-identities and focused gates are recorded in [corrections.json](evidence/g81/corrections.json).
+identities and focused gates are recorded in [corrections.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g81/corrections.json).
 The following initial results and historical source/artifact identities are recorded in
-[qualification.json](evidence/g81/qualification.json). Raw commands, stdout,
+[qualification.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g81/qualification.json). Raw commands, stdout,
 stderr, generated inputs and unsuccessful runs remain in
 `/tmp/g81-82_6glp5`; maintained regressions are under `tests/bitwise/`.
 
@@ -111,7 +111,7 @@ fatal sanitizer/leak settings are unchanged. No test timeout is extended.
 
 ## Preserved unsuccessful evidence
 
-[The unsuccessful-evidence record](evidence/g81/unsuccessful-evidence.json) retains
+[The unsuccessful-evidence record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g81/unsuccessful-evidence.json) retains
 paths, hashes and classifications. The existing pre-G81 Release artifact rejected
 shift syntax as expected; this is syntax baseline evidence, not a performance
 comparison. The first source fixture accidentally shadowed a function named
@@ -189,7 +189,7 @@ All five originally rejected forms now compile successfully; original controls
 and reproducer files remain unchanged. Both qualified generic-owner and
 method-generic calls execute correctly. Current source/test/executable hashes,
 individual test names/results, original-review hashes and unsuccessful attempts
-are recorded in [corrections.json](evidence/g81/corrections.json).
+are recorded in [corrections.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g81/corrections.json).
 `git diff --check` passes; nothing is staged.
 
 The focused gate includes the new regression, existing G81 integer/model/LSP
@@ -283,7 +283,7 @@ and leak options remain unchanged, with no suppression options. No existing
 The raw correction directory is `/tmp/g81-imported-owners-ln5fgt75`. Existing
 qualification JSON and P2 correction JSON remain unchanged and historical; latest
 source/test/executable identities and focused evidence are in
-[imported_owners.json](evidence/g81/imported_owners.json). Build paths are reused.
+[imported_owners.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g81/imported_owners.json). Build paths are reused.
 The original crash review and all unfavorable evidence remain preserved. The
 first new fixture reused a project-root-visible type name in its imported module,
 violating the existing shadowing contract. Its duplicate-declaration/unknown-member

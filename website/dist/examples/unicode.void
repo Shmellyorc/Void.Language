@@ -1,4 +1,0 @@
-func entry(index: i32) -> i32:
-    const name = "世界"
-    var greeting = "Hello, {name}!"
-    return greeting[index].byte_length as i32

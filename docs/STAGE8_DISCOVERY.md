@@ -22,8 +22,8 @@ within their recorded scope; adapters must continue delegating discovery.
 
 20 October 2026. Sprint 1 is implemented and locally verified (423/423 consolidated suites);
 Boss locally accepted Sprint 1; its CI #82 repair is preserved in the
-[Sprint 2 verification](stage8/SPRINT2_ACCEPTANCE.md). Hosted acceptance is deferred
-until Stage 8 end, including Windows Debug and Release repair execution. The [approval ledger](LANGUAGE_COMPLETENESS_APPROVALS.md) governs scope.
+[Sprint 2 verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT2_ACCEPTANCE.md). Hosted acceptance is deferred
+until Stage 8 end, including Windows Debug and Release repair execution. The [approval ledger](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/LANGUAGE_COMPLETENESS_APPROVALS.md) governs scope.
 No real standard-library modules or new application entry semantics ship here.
 
 ## Source domains and selection
@@ -85,7 +85,7 @@ for the existing canonical-path and symlink checks, rejects reparse points durin
 prefix inspection, and searches using the canonical boundary spelling. It does not
 canonicalize away descendant aliases or permit short-name VFS components below the
 boundary. Exact `main.void` spelling and containment remain required. The policy is
-shared by Debug and Release; [CI #82 repair evidence](stage8/CI82_WINDOWS_REPAIR.md)
+shared by Debug and Release; [CI #82 repair evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/CI82_WINDOWS_REPAIR.md)
 records local coverage and pending Windows verification. Entry parent remains the
 project VFS root. An absent main permits a labelled standalone active-file editor
 selection, including a named unsaved file whose parent exists. An explicit override
@@ -94,7 +94,7 @@ must exist. Selection without a workspace uses the labelled standalone fallback.
 The Windows long-name prefix comparison permits ASCII case equivalence for a
 matching ordinary DOS drive letter only. It adopts the canonical boundary's drive
 spelling before exact prefix comparison, preserving every descendant component,
-unrelated drive and existing UNC/device rules. [CI #85 evidence](stage8/CI85_WINDOWS_EDITOR_REPAIR.md)
+unrelated drive and existing UNC/device rules. [CI #85 evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/CI85_WINDOWS_EDITOR_REPAIR.md)
 records automatic/editor regressions and pending native Debug/Release execution.
 
 On POSIX, equivalent workspace-ancestor spellings (including macOS `/var` and
@@ -102,7 +102,7 @@ On POSIX, equivalent workspace-ancestor spellings (including macOS `/var` and
 stopping at the first canonical workspace match. A matching prefix itself cannot
 be a symlink. Original descendants still undergo the existing alias and exact
 spelling checks; discovery never resolves the whole active path to establish
-containment. [CI #83/#84 repair evidence](stage8/CI84_DISCOVERY_REPAIR.md) covers
+containment. [CI #83/#84 repair evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/CI84_DISCOVERY_REPAIR.md) covers
 the shared Debug/Release implementation and native verification limits.
 
 `voidls --discover <workspace-or-empty> <active-or-empty> <override-or-empty>`
@@ -151,6 +151,6 @@ admission follows from recognizing the standard root.
 
 ## Verification and remaining work
 
-See [acceptance](stage8/ACCEPTANCE.md) for actual commands, results and unsupported
+See [acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/ACCEPTANCE.md) for actual commands, results and unsupported
 client/platform combinations. Do not infer hosted acceptance from local results.
 Sprints 2–6 remain approved future work with their existing narrower design reviews.

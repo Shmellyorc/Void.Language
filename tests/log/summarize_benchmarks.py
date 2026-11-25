@@ -1,10 +1,15 @@
 """Render the bounded observations; raw measurements remain authoritative."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 from statistics import median
 import json
 
 root = Path(__file__).resolve().parents[2]
-evidence = root / 'docs/log/evidence'
+evidence = (documentation_evidence('log'))
 rows = json.loads((evidence / 'benchmarks.json').read_text())
 assert len(rows) == 216 and all(r.get('gc_allocation_budget') == 256 for r in rows)
 modes = ['JIT normal', 'JIT O2', 'AOT normal', 'AOT O2']
@@ -137,5 +142,5 @@ from transport. No fixed throughput target or speculative Runtime optimization
 was introduced. The source-generation and GC-policy choices remain reviewable
 alongside the raw data rather than hidden behind a single throughput number.
 '''
-(root / 'docs/log/BENCHMARKS.md').write_text(text)
+(evidence / 'BENCHMARKS.md').write_text(text)
 print('Rendered 216 normal-GC measurements and memory/operation observations')

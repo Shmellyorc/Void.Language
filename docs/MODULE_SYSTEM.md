@@ -62,7 +62,7 @@ See [runtime globals](RUNTIME_GLOBALS.md) for initialization order, failure and 
 supersedes the historical import/discovery exclusions below. It specifies separate
 standard/project source domains, importer-relative bare quoted imports, bounded
 shared `main.void` selection, metadata completion, source docs and readonly standard
-navigation. [Local acceptance](stage8/ACCEPTANCE.md) records actual verification;
+navigation. [Local acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/ACCEPTANCE.md) records actual verification;
 no hosted lock is implied. Existing snapshot, UTF-16, rename and native safety
 contracts remain in force.
 
@@ -311,7 +311,7 @@ APIs, complete-validation gates, byte spans and exact native contracts remain.
 
 ## Selected application source — Stage 8 Sprint 4
 
-The [application contract](STAGE8_APPLICATION_NATIVE.md) adds executable statements
+The [application contract](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE8_APPLICATION_NATIVE.md) adds executable statements
 only to the explicitly selected source. Their variables live inside a synthetic
 function, not module storage; ordinary declared functions cannot access them.
 Imports remain declaration-only: an imported executable body is a compile-time

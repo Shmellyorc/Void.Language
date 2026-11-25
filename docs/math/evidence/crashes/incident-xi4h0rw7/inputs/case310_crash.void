@@ -1,4 +1,0 @@
-use math
-use math as m
-func main():
-    var a = m._math_sin(1.0)

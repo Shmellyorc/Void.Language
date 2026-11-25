@@ -30,7 +30,7 @@ No production discovery or unit-test behavior changes.
   with Node 24.19.0: TypeScript check, compilation and bundle passed; **4/4 existing
   unit tests passed, zero failed, zero skipped**. This is the actual local Debug
   binary; the local build directory is lowercase and the explicit override is used.
-  [Exact test output](unit-tests.txt).
+  [Exact test output](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/ci87-extension/unit-tests.txt).
 - Confirmed local `CMAKE_BUILD_TYPE=Debug`, generated native link output `-o voidls`,
   no runtime output-directory override, and the workflow's `-G Ninja` / uppercase
   `build/Debug` configuration. The `.exe` suffix is conditional on Windows only.

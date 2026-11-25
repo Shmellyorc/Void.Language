@@ -1,2 +1,0 @@
-ptrace: Operation not permitted.
-The program is not being run.

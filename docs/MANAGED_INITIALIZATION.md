@@ -3,7 +3,7 @@
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
 Implements owner-approved **S1 + MI1–MI7** from
-[MANAGED_INITIALIZATION_PROPOSAL.md](MANAGED_INITIALIZATION_PROPOSAL.md).
+[MANAGED_INITIALIZATION_PROPOSAL.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/MANAGED_INITIALIZATION_PROPOSAL.md).
 Phase 16 is locked: the owner reports run #28 passed all seven jobs, 35 suites
 per configuration. The owner subsequently locks Phase 17 at run #29, all seven jobs
 with 39 suites. Phase 18 adds reference-containing values without changing S1;

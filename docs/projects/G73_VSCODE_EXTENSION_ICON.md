@@ -89,7 +89,7 @@ profile, and every restored file matched the G72 VSIX. Reload the editor
 after restoration. Earlier G72 tool recovery installations remain available.
 
 Logs, screenshot pairs, package audits, export files and desktop receipts
-are under `/home/shmellyorc/Documents/Void.Language-G73-evidence`.
+are under `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G73-evidence`.
 
 ## File icon review
 

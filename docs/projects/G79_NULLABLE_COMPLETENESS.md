@@ -109,7 +109,7 @@ Final-source results (all **38/38**, zero failures/skips):
 | Fatal ASan/UBSan/leaks | 38/38 | 155.43 s |
 
 Each profile ran the same accepted fixtures, including all 81 new compiler/application
-checks. [Qualification JSON](evidence/g79/qualification.json) contains commands,
+checks. [Qualification JSON](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g79/qualification.json) contains commands,
 per-case output, source/test and binary hashes, actual negative exit codes and
 editor observations. Earlier successful and unsuccessful runs remain separately
 identified. The documentation example returns 0 and prints `100`, `0`, `Boss`, `0`.
@@ -132,7 +132,7 @@ settings, active extensions and installed compiler/server are not replaced.
 
 ## Unsuccessful evidence and corrections
 
-[Unsuccessful evidence](evidence/g79/unsuccessful-evidence.json) retains the initial
+[Unsuccessful evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g79/unsuccessful-evidence.json) retains the initial
 unsupported `i32?` baseline, intermediate compiler/build/test failures and harness
 errors. Raw logs remain under `/tmp/g79-gaw4u4as` with recorded hashes.
 
@@ -310,7 +310,7 @@ weakened. Focused Debug and Release runs then passed both relevant tests.
 | Release | **18/18** | 20.40 s |
 | Fatal ASan/UBSan/leaks | **18/18** | 74.46 s |
 
-All profiles report zero failures/skips. The [correction evidence](evidence/g79/corrections.json)
+All profiles report zero failures/skips. The [correction evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g79/corrections.json)
 records exact commands, actual output/exit codes, source/test and compiler/server
 hashes, extended LSP records, the independent review and the Boss's reproduction.
 All 25 original review/evidence files still match their pre-correction checksums.

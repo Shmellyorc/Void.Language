@@ -1,14 +1,14 @@
 > Current authorization: Boss approved the complete contract on 27 October 2026.
 > Copy-returning transforms, NaNs-last ordering and both mutation refinements are
 > settled. Original proposal wording below is historical. See
-> [engineering status](IMPLEMENTATION.md) and the separately approved
-> [generic operator amendment](GENERIC_OPERATORS.md). Local engineering is complete; independent review remains open. See [handoff](HANDOFF.md).
+> [engineering status](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/collections/IMPLEMENTATION.md) and the separately approved
+> [generic operator amendment](GENERIC_OPERATORS.md). Local engineering is complete; independent review remains open. See [handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/collections/HANDOFF.md).
 
 # Collections: proposed API and observable behavior
 
 27 October 2026. Baseline **`bb7244ea029623ddc83acfc163f888a261379051`**.
 **Research proposal, not implementation or Boss approval.**
-[Source findings](RESEARCH.md) · [one engineering sprint](ROADMAP.md)
+[Source findings](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/collections/RESEARCH.md) · [one engineering sprint](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/collections/ROADMAP.md)
 
 ## Recommended scope
 

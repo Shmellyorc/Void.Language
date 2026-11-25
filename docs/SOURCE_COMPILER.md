@@ -121,21 +121,21 @@ Ordinary typed initializer functions and explicit global metadata lower through
 the shared IR validator and LLVM backend. Guarded Runtime cell lookup preserves
 readiness, owner access, GC and value-place semantics. JIT and linked AOT initialize
 before selected entry; checking and tooling never execute startup. See the
-[global contract](RUNTIME_GLOBALS.md) and [engineering record](stage11/IMPLEMENTATION.md).
+[global contract](RUNTIME_GLOBALS.md) and [engineering record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/IMPLEMENTATION.md).
 
 
 The [Stage 8 ergonomics contract](STAGE8_ERGONOMICS.md) and
-[local acceptance](stage8/SPRINT6_ACCEPTANCE.md) describe the current bounded
+[local acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT6_ACCEPTANCE.md) describe the current bounded
 has/if/multiline-call/string-interpolation extensions. Historical phase-only
 exclusions below are superseded by those delivered contracts.
 
-The current [Stage 8 application contract](STAGE8_APPLICATION_NATIVE.md) records
+The current [Stage 8 application contract](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE8_APPLICATION_NATIVE.md) records
 automatic application hosting and real native executable builds; see
 [Stage 9](STAGE9_APPLICATION_WORKFLOW.md).
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
-Stage 3 extends this same pipeline with native `{K: V}` dictionaries; see DICTIONARIES.md for the implemented source/runtime contract, supported keys and deferred result-based get.
+Stage 3 extends this same pipeline with native `{K: V}` dictionaries; see DICTIONARIES.md for the implemented source/runtime contract, supported keys and implemented result-based get.
 
 Phase 22 adds the owner-approved UTF-8 string foundation through this same pipeline.
 See [STRINGS.md](STRINGS.md) for immutable content, escapes, empty/default templates,
@@ -360,7 +360,7 @@ voidls --discover "$void_smoke_dir" "$void_smoke_dir/main.void" ""
 
 Both executions print exactly `VOID installed stdlib OK` followed by LF and exit
 0. Discovery selects that project's `main.void`; it is not a protocol handshake.
-The accepted [LSP wire receipt](release/evidence/lsp-handshake.json) separately
+The accepted [LSP wire receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/lsp-handshake.json) separately
 records initialize/initialized/shutdown/exit and tooling protocol 1. A new
 qualification must perform that real exchange too; compilation/discovery alone
 does not establish server or editor usability. See the
@@ -674,7 +674,8 @@ Source symbols encode their declaring module and function identity before the C
 adapter is added, allowing same-named functions in different modules and helpers
 named `main`, `printf` or `strtoll` without native adapter collisions. Stable
 module identity is implemented; public library/export ABI remains deferred. Generated line
-tables refer to the real input file. Variable debug records are not implemented.
+tables refer to the real input file. Supported native AOT variable debug records follow
+[the debugging contract](F5_DEBUGGING_ENGINEERING.md); JIT debugging is separate.
 
 ## Validation and next phase
 
@@ -779,6 +780,7 @@ this does not grant editor execution, native import trust or hosted acceptance.
 blanket exclusions above for compile-time type `has`, typed if-expressions,
 multiline calls and string-only interpolation. Existing nominal storage,
 structural conformance, generic specialization, capabilities and checked failure
-rules remain authoritative. Both conditional branches type-check. Formatting and
-numeric/bool/custom string conversion remain deferred. Approval and implementation
-are separate from local acceptance, Wrench review and the final hosted lock.
+rules remain authoritative. Both conditional branches type-check. The later
+[display and formatting contract](stage10/DISPLAY_FORMATTING.md) implements the
+numeric, Boolean and custom display surface; the old string-only exclusion is
+superseded. Qualification remains specific to the recorded revision and platform.

@@ -73,7 +73,7 @@ what is deferred is selectable profile-controlled emission. No requested mode is
 claimed as emitted, and `none` does not newly strip baseline records. The emitter
 itself was not changed. Native C++ `/Zi` in the Windows Debug toolchain is unrelated
 to VOID's requested project modes. Defaults span manifest EOF; authored settings
-span their exact TOML value. [Decision record](evidence/slice3-profile-decision.txt).
+span their exact TOML value. [Decision record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice3-profile-decision.txt).
 
 The actual object instruction counts for the fixture's `compute` function are
 O0/O2/release with explicit `--no-opt`: **6/2/6 on Linux, 8/2/8 on Windows 10**.
@@ -168,16 +168,16 @@ Final installed tooling repeats the complete 74-check project wire fixture; exis
     edit. Ran the foreground typing suite alone and retained the overlapping run.
 
 Original logs, fixtures, native receipts and corrective results are in the
-[machine-readable receipt](evidence/slice3-local.json) and its raw artifacts.
+[machine-readable receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice3-local.json) and its raw artifacts.
 No test, sanitizer, security check or dependency pin was disabled.
 
 ## Exact changes and review boundary
 
-- [S3 source delta](evidence/slice3-source.patch): 29 source/documentation paths
+- [S3 source delta](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice3-source.patch): 29 source/documentation paths
   against the accepted S2 working tree.
-- [Combined source diff](evidence/slice3-baseline-source.patch): all 57 source and
+- [Combined source diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice3-baseline-source.patch): all 57 source and
   architecture paths against baseline HEAD.
-- [Complete layered Git inventory](evidence/slice3-inventory.txt): every working-tree
+- [Complete layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice3-inventory.txt): every working-tree
   path, including retained S1/S2 artifacts and new S3 report/evidence files.
 
 Both patches pass reverse checking and exact forward reconstruction in a temporary

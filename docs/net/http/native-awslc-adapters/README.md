@@ -86,7 +86,7 @@ do not substitute broad key/store deletion for the ownership checks. Never set
 
 Disposable builds, JSON progress and original failures stay under ignored
 `.toolchains/native-awslc-adapters/`. Only
-[compacted public evidence](../evidence/windows-awslc-adapters-20261103.json) is a
+[compacted public evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/windows-awslc-adapters-20261103.json) is a
 deliverable. Core compiled C++ and binary hashes match the final runs. Controller
 and CMake changes made later are identified by their historical receipt hashes;
 the collector does not claim every older run executed the final Python source.

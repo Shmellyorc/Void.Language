@@ -1,3 +1,0 @@
-# Preserve exact text artifact bytes covered by the recorded SHA-256 digests.
-# Keep normal text diffs; disable check-in/checkout newline conversion only.
-* -text

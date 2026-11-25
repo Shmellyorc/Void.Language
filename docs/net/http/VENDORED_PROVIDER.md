@@ -29,12 +29,12 @@ Clean native Linux builds of the checked-in source passed:
 
 | Configuration | Receipt |
 | --- | --- |
-| Release | [Commands/results](evidence/vendored-Release-20261030T142520417346Z/commands.json) |
-| Debug | [Commands/results](evidence/vendored-Debug-20261030T142521600374Z/commands.json) |
-| Strict ASan/UBSan/LSan | [Commands/results](evidence/vendored-strict-20261030T142522798761Z/commands.json) |
-| Disabled cookies, strict | [Commands/results](evidence/vendored-no-cookies-20261030T142632076789Z/commands.json) |
-| Disabled HTTP, strict | [Commands/results](evidence/vendored-no-http-20261030T142633300689Z/commands.json) |
-| Second clean Release directory | [Commands/results](evidence/vendored-Release-20261030T142634540925Z/commands.json) |
+| Release | [Commands/results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-Release-20261030T142520417346Z/commands.json) |
+| Debug | [Commands/results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-Debug-20261030T142521600374Z/commands.json) |
+| Strict ASan/UBSan/LSan | [Commands/results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-strict-20261030T142522798761Z/commands.json) |
+| Disabled cookies, strict | [Commands/results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-no-cookies-20261030T142632076789Z/commands.json) |
+| Disabled HTTP, strict | [Commands/results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-no-http-20261030T142633300689Z/commands.json) |
+| Second clean Release directory | [Commands/results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-Release-20261030T142634540925Z/commands.json) |
 
 Each cookie-enabled run checks 12 deterministic allocation failures, successful
 empty and real-cookie states, partial-list cleanup and a host initialization
@@ -87,10 +87,10 @@ After the exact approved HTTP/2 correction, fresh Release, Debug and strict full
 provider builds pass. Two independent Release directories produce byte-identical
 `libcurl.a`, SHA-256
 `1526915123669110951425c89d1cf51e218aeb172f413149149094684b2c5837`.
-Receipts: [Release 1](evidence/vendored-full-Release-20261031T032400962158Z/commands.json),
-[Release 2](evidence/vendored-full-Release-20261031T032429933889Z/commands.json),
-[Debug](evidence/vendored-full-Debug-20261031T032541548470Z/commands.json),
-[strict](evidence/vendored-full-strict-20261031T032402162232Z/commands.json).
+Receipts: [Release 1](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-full-Release-20261031T032400962158Z/commands.json),
+[Release 2](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-full-Release-20261031T032429933889Z/commands.json),
+[Debug](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-full-Debug-20261031T032541548470Z/commands.json),
+[strict](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-full-strict-20261031T032402162232Z/commands.json).
 The current native provider probes are maintained under `tests/net/http/provider/`;
 original historical evidence files remain untouched. Fresh strict disabled-cookie
 and disabled-HTTP configurations also pass. [H2 exact source review](HTTP2_WINDOW_REVIEW.md)

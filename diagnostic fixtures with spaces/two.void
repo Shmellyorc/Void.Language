@@ -1,2 +1,0 @@
-func second() -> i32:
-    return 2

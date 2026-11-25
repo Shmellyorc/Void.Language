@@ -1,4 +1,0 @@
-use math
-func main():
-    var input: i16 = 1
-    var bad = math.trunc(input)

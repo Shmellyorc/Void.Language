@@ -71,18 +71,18 @@ and public completion inventory pass through the actual LSP.
 | Scope | Outcome and evidence |
 | --- | --- |
 | Corrected curl, isolated cookie profile | Debug, Release, strict, disabled cookies and disabled HTTP pass; [five configurations and receipts](VENDORED_PROVIDER.md) |
-| Full provider, Debug | Cookie failure/empty/partial-list/embedding and native URL/provider checks [pass](evidence/vendored-full-Debug-20261030T142845121409Z/commands.json) |
-| Full provider, Release | Same checks [pass](evidence/vendored-full-Release-20261030T142843951621Z/commands.json), with a [second clean build](evidence/vendored-full-Release-20261030T144058199486Z/commands.json) |
+| Full provider, Debug | Cookie failure/empty/partial-list/embedding and native URL/provider checks [pass](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-full-Debug-20261030T142845121409Z/commands.json) |
+| Full provider, Release | Same checks [pass](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-full-Release-20261030T142843951621Z/commands.json), with a [second clean build](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-full-Release-20261030T144058199486Z/commands.json) |
 | Clean full Release archive identity | Both directories produce SHA-256 `59eb3a2120f5ee651e22286137e8afe7bd0d24355bfd0766f3df61326d397b8b` |
 | Full provider, strict | **FAIL** during upstream OpenSSL initialization; [isolated proof and trace](DEPENDENCY_CONFLICT.md) |
-| URL Release | [4/4 CTests](evidence/url-ctest-Release.log): native checks, 10 forged-IR rejections, source check/JIT/O2/AOT, LSP |
-| URL Debug | [3/3 CTests](evidence/url-ctest-Debug.log): native/IR/source, including 7 source processes |
-| URL strict, pure helpers | [7 source processes pass](evidence/url-helpers-strict-halt.log): percent text/bytes and ordered query helpers in JIT/O2/AOT, with halt-on-error sanitizers; this does **not** test parser/provider initialization |
-| URL strict IR | [10 forged-IR rejections pass](evidence/url-ir-strict.log) |
-| Runtime regression, Release | [2/2 native tests](evidence/provider-regression-Release.log) plus [8/8 source/lifecycle/activation/retention tests](evidence/provider-runtime-source-regressions.log) |
-| Runtime regression, Debug/strict | [Debug 2/2](evidence/provider-regression-Debug.log), [strict 2/2](evidence/provider-regression-strict.log) |
-| Native Runtime stack | [Six processes](evidence/vendored-runtime-stack.json), soft/hard 1 MiB enforced and queried before exec, no native failure |
-| Install relocation and independent AOT | [os_install passes](evidence/provider-install-relocation.log), exercising the extended manifest/closure |
+| URL Release | [4/4 CTests](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/url-ctest-Release.log): native checks, 10 forged-IR rejections, source check/JIT/O2/AOT, LSP |
+| URL Debug | [3/3 CTests](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/url-ctest-Debug.log): native/IR/source, including 7 source processes |
+| URL strict, pure helpers | [7 source processes pass](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/url-helpers-strict-halt.log): percent text/bytes and ordered query helpers in JIT/O2/AOT, with halt-on-error sanitizers; this does **not** test parser/provider initialization |
+| URL strict IR | [10 forged-IR rejections pass](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/url-ir-strict.log) |
+| Runtime regression, Release | [2/2 native tests](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/provider-regression-Release.log) plus [8/8 source/lifecycle/activation/retention tests](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/provider-runtime-source-regressions.log) |
+| Runtime regression, Debug/strict | [Debug 2/2](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/provider-regression-Debug.log), [strict 2/2](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/provider-regression-strict.log) |
+| Native Runtime stack | [Six processes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/vendored-runtime-stack.json), soft/hard 1 MiB enforced and queried before exec, no native failure |
+| Install relocation and independent AOT | [os_install passes](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/provider-install-relocation.log), exercising the extended manifest/closure |
 
 The earlier table records foundation checks before native transport work. New
 continuation evidence below supersedes its former "no network requests" status;
@@ -98,7 +98,7 @@ no managed pointers or source callbacks. Finite client/transfer slots, conservat
 leases are implemented; this reservation is **not yet a certified RSS ceiling**.
 Curl callback entry never allocates managed data or waits for a source producer.
 
-The loopback [first real HTTP/2 receipt](evidence/http-native-h2-initial/commands.json)
+The loopback [first real HTTP/2 receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-native-h2-initial/commands.json)
 passes actual TLS ALPN, two simultaneous streams on one allowed connection and a
 2 MiB flow-controlled response. The same process passes HTTP/1.1, duplicate/binary
 headers/body, header-before-body streaming, known/unknown uploads, an 8 MiB pull,
@@ -109,7 +109,7 @@ no file. Test-only HTTP/2 wheels are exact-pinned in
 extracts them into disposable storage. They are not application dependencies.
 
 A real timeout exposed removal-time curl progress callback reentry while the
-transfer mutex was held. The [debugger trace](evidence/http-native-loopback-gdb/native.stdout)
+transfer mutex was held. The [debugger trace](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-native-loopback-gdb/native.stdout)
 is retained. Removal/cleanup now run with that mutex released and publication
 waits for detachment. Further duplex, early-error and cancellation probes are
 under development; the source API and full policy matrix are still unfinished. Native bulk kernels
@@ -124,8 +124,8 @@ root representation, collector or scheduler was introduced. Focused Release
 6/6 and strict 4/4 async/source/lifecycle tests pass. Actual retention observers
 run 16 processes per profile, including O2 and source-worker variants, with at
 most three settled Task records and one group at 128 iterations:
-[Release](evidence/record-retirement-release-results.json),
-[strict](evidence/record-retirement-strict-results.json).
+[Release](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/record-retirement-release-results.json),
+[strict](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/record-retirement-strict-results.json).
 These results address the concrete native metadata leak; sustained **HTTP source**
 streaming still needs its own lifetime and memory proof after source integration.
 
@@ -175,10 +175,10 @@ Final pool join is deferred until that Scope leaves. Original failed logs remain
 
 Focused integrated production results:
 
-- [Release 8/8](evidence/runtime-pool-scoped-drain-tests-Release.log).
-- [Strict 8/8](evidence/runtime-pool-scoped-drain-tests-strict-final.log), full
+- [Release 8/8](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-pool-scoped-drain-tests-Release.log).
+- [Strict 8/8](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-pool-scoped-drain-tests-strict-final.log), full
   ASan/UBSan, leak detection and halt-on-error.
-- [Debug native 3/3](evidence/runtime-pool-scoped-drain-tests-Debug.log).
+- [Debug native 3/3](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/runtime-pool-scoped-drain-tests-Debug.log).
 
 These include actual HTTP, external completion, source IO/acquisition, source
 async, parallel normal/O2, compatible reload/generation leases, allocation
@@ -190,16 +190,16 @@ A strengthened required-h2 fixture detected an incompatible HTTP/2 preface sent
 to a TLS endpoint without h2 ALPN. The native pre-request hook now checks the
 selected protocol through the documented TLS session API before request bytes.
 All three production HTTP fixtures now report zero incompatible requests.
-The original [failed no-send proof](evidence/http2-required-no-send-initial.log)
+The original [failed no-send proof](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http2-required-no-send-initial.log)
 is retained; an eventual response-version error was not sufficient enforcement.
 
 Actual 2 GiB Runtime async pulls preserve a repeatedly awaited first task, while
 unreachable results and native records retire:
 
-- [Release receipt](evidence/http-native-2GiB-Release/commands.json): 129 samples,
+- [Release receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-native-2GiB-Release/commands.json): 129 samples,
   live managed payload 65,634 bytes, 3 Task / 0 explicit group / 1 Work records,
   at most 7 persistent handles, RSS 16,404 KiB throughout the sampled interval.
-- [Strict receipt](evidence/tls-review-aws-lc-2GiB-strict/commands.json): 96 samples,
+- [Strict receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/tls-review-aws-lc-2GiB-strict/commands.json): 96 samples,
   the same live payload and native record counts; RSS 218,636–424,024 KiB,
   ending at 423,412 KiB under ASan. This includes sanitizer allocation overhead;
   it is not a production RSS ceiling.
@@ -240,23 +240,23 @@ of resource map order.
 
 Actual new Release results:
 
-- [Public facade, 9 process checks](evidence/http-source-public-Release/commands.json):
+- [Public facade, 9 process checks](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-source-public-Release/commands.json):
   source check, sync JIT and independently linked AOT in both optimization modes;
   async source normal/O2 with one worker, forced GC and actual 128 MiB pulls.
   Repeated awaits preserve a retained first task/chunk. Sampled post-GC live
   payload stays 208,655–211,727 bytes, with 10 tasks / 2 explicit groups / 1 Work
   and 11 registered Handles. Root drain leaves zero managed objects; Runtime
   shutdown retires the idle driver's null Handle too.
-- [Native file/network fixture](evidence/http-file-queue-fixed-Release/commands.json):
+- [Native file/network fixture](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-file-queue-fixed-Release/commands.json):
   mixed byte/file MIME, zero/known/unknown counts, repeated source-file cursor,
   known short EOF, blocked filesystem cancellation and quiescent close pass.
   A 32 MiB producer whose peer refuses consumption until a second file request
   arrives progresses with one worker. Multipart input and native file output
   progress together on that same worker. The complete native TLS/h1/h2/proxy/
   auth/decoding fixture and 128 MiB Runtime pull checks pass.
-- [Worker/external completion 2/2](evidence/http-file-queue-fixed-runtime-Release.log).
-- Earlier [Debug](evidence/http-file-owner-debug/commands.json) and
-  [strict](evidence/http-file-owner-strict/commands.json) file producer tests pass
+- [Worker/external completion 2/2](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-file-queue-fixed-runtime-Release.log).
+- Earlier [Debug](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-file-owner-debug/commands.json) and
+  [strict](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-file-owner-strict/commands.json) file producer tests pass
   under enforced 1 MiB stacks. Those precede the yielding-queue/download change;
   new Debug/strict builds are running, not yet counted as passes.
 
@@ -278,9 +278,9 @@ focused integration result, not full protocol/platform/memory/performance accept
 ## Consolidated local integration and further close checks
 
 The complete focused set passed with actual 1 MiB inherited stack limits:
-[Release 12/12](evidence/http-source-queue-integration-release.log),
-[Debug 12/12](evidence/http-source-queue-integration-debug.log), and
-[strict 12/12](evidence/http-source-queue-integration-strict.log). Strict retains
+[Release 12/12](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-source-queue-integration-release.log),
+[Debug 12/12](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-source-queue-integration-debug.log), and
+[strict 12/12](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-source-queue-integration-strict.log). Strict retains
 ASan/UBSan, leak detection, halt-on-error and stack traces. The executables were
 rebuilt before those runs, including the existing async/IO regression harnesses.
 The set covers actual HTTP, source JIT/AOT, native URL/provider inspection,
@@ -317,11 +317,11 @@ entered file IO and can finalize queued sink cleanup on the owner after native
 network close, without depending on an occupied worker. Delayed cleanup erases
 only its own ledger resource, preserving a newer client/transfer at a reused key.
 
-The latest [Release native receipt](evidence/http-file-sink-close-current-Release/commands.json)
+The latest [Release native receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-file-sink-close-current-Release/commands.json)
 passes queued upload/sink close while another file operation occupies the only
 worker, native progress during a blocked sink, entered IO drain, exact file
 progress and no IO after close returns. The expanded
-[public source receipt](evidence/http-file-sink-source-Release/commands.json)
+[public source receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-file-sink-source-Release/commands.json)
 passes normal/O2 forced-GC async file download, client close of an active download,
 released file reservations and zero root retention, alongside sync JIT/AOT.
 Expanded Debug/strict checks for this later sink change remain to be run.
@@ -343,9 +343,9 @@ result-shape combinations, including both cleanup controls. The source facade
 retains result-producing explicit close and its async counterpart.
 
 The consolidated cleanup checkpoint passes **13/13 tests in each profile** at
-1 MiB stacks: [Release](evidence/http-cleanup-final-tests-release.log)
-(143.43 s), [Debug](evidence/http-cleanup-final-tests-debug.log) (357.07 s),
-[strict](evidence/http-cleanup-final-tests-strict.log) (328.78 s).
+1 MiB stacks: [Release](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-cleanup-final-tests-release.log)
+(143.43 s), [Debug](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-cleanup-final-tests-debug.log) (357.07 s),
+[strict](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-cleanup-final-tests-strict.log) (328.78 s).
 Strict enables leak detection and halt-on-error ASan/UBSan without suppressions.
 The source suite executes 15 analysis/JIT/native-link processes, including
 independently linked async AOT at normal/O2 and a 128 MiB source pull.
@@ -403,8 +403,8 @@ Task/group/Handle maxima remain 10/2/11. Retained tasks remain repeatedly
 awaitable; all source roots retire, and Runtime shutdown retires the idle driver
 Handle. AOT uses the ordinary Runtime's 256-byte collection budget, rather than
 the forced-GC observer. Exact per-process RSS samples and source/compiler hashes
-are in [the receipt](evidence/http-private-bridge-2GiB-release/commands.json) and
-[measurements](evidence/http-private-bridge-2GiB-release/measurements.json).
+are in [the receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-private-bridge-2GiB-release/commands.json) and
+[measurements](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-private-bridge-2GiB-release/measurements.json).
 This is sustained application proof for that loop, not a universal provider RSS
 ceiling or completion of the remaining memory audit.
 
@@ -456,9 +456,9 @@ The 1,586-file inventory verifies four corrected files and both exact review
 diffs. There is no production patch step or dependency copying for Boss.
 
 Production verification passes **17/17 tests per profile** at 1 MiB stacks:
-[Release](evidence/http2-approved-tests-release.log) (296.38 s),
-[Debug](evidence/http2-approved-tests-debug.log) (561.63 s),
-[strict](evidence/http2-approved-tests-strict.log) (517.92 s).
+[Release](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http2-approved-tests-release.log) (296.38 s),
+[Debug](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http2-approved-tests-debug.log) (561.63 s),
+[strict](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http2-approved-tests-strict.log) (517.92 s).
 These include the previously failing native H2 reservation/credit case, source
 JIT/O2/AOT, allocation failures, LSP, URL, IO acquisition and async lifecycle.
 Strict retains leak detection and halt-on-error ASan/UBSan throughout. The
@@ -494,12 +494,12 @@ sending no HTTP bytes. The driver now records origin request permission and
 actual request/upload progress across hops. Proxy CONNECT traffic alone does
 not count as an origin request. DNS failures/cancellation remain known-unsent;
 post-send framing and timeout failures retain unknown outcome. The failed
-[DNS receipt](evidence/http-dns-before/commands.json) is preserved.
+[DNS receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-dns-before/commands.json) is preserved.
 
 Focused production DNS/native/source checks pass
-[Release](evidence/http-dns-fixed-tests-release.log),
-[Debug 3/3](evidence/http-dns-tests-debug.log) and
-[strict 3/3](evidence/http-dns-tests-strict.log). This completes the current DNS
+[Release](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-dns-fixed-tests-release.log),
+[Debug 3/3](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-dns-tests-debug.log) and
+[strict 3/3](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-dns-tests-strict.log). This completes the current DNS
 pressure regression, not the remaining TLS-material allocation audit.
 
 
@@ -524,7 +524,7 @@ provider's separate 4 KiB per-field bound. Its failed receipt remains. The valid
 independent-budget fixture uses four 2 KiB fields after a 60 KiB header block;
 a separate oversized field now verifies typed limit_exceeded. No provider limit
 or protocol policy was weakened. The original zero-hop failure is also retained.
-Focused [Release wire and full native probes](evidence/http-wire-fixed-tests-release.log)
+Focused [Release wire and full native probes](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-wire-fixed-tests-release.log)
 pass; further profile receipts are recorded as they complete.
 
 
@@ -551,7 +551,7 @@ ASN.1 allocation proof. System-root/native-store and parser worst-case audit
 remain unfinished; no total RSS bound is claimed. This material-input repair does
 not by itself close the complete TLS provider-memory acceptance item.
 
-Release passes [4/4 focused TLS/native/wire/DNS/source tests](evidence/http-tls-snapshot-stable-tests-release.log),
+Release passes [4/4 focused TLS/native/wire/DNS/source tests](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-tls-snapshot-stable-tests-release.log),
 including mutation ownership, input limits and nonregular file rejection. The
 first build was invalidated by an in-place formatting edit concurrent with Clang
 reading its source; it crashed in Lexer::SkipWhitespace. The original log and
@@ -580,7 +580,7 @@ budget, stack limit, optimization or sanitizer option changed. Both original
 math frontend tests pass in the focused Debug run; the expanded profile reruns
 are recorded in the final handoff.
 
-[Frame comparison](evidence/frontend-stack/summary.json) retains both compiler
+[Frame comparison](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/frontend-stack/summary.json) retains both compiler
 inputs and all stack-usage data. The other two original Debug failures are the
 obsolete Scope worker-zero assertions already corrected for the approved Runtime
 pool lifetime.
@@ -589,7 +589,7 @@ The subsequent all-target Debug rebuild exposed a separate Make graph race.
 Observed/unobserved private-call tests shared a generated object, but both
 consumer targets could execute its custom command concurrently after generator
 relinking. That overwrote the generator's invalid-input sentinel, correctly
-failing its existing check. [Original build log](evidence/http-final-build-debug.log)
+failing its existing check. [Original build log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-final-build-debug.log)
 is preserved. Each shared object now has one custom target producer, and both
 executables depend on that producer. The generator's validation remains intact;
 parallel rebuilding and the twelve private-call execution tests verify the
@@ -615,16 +615,16 @@ The first final strict affected run passed 80/81 checks, including the complete
 TLS corpus and the original Stage6 repairs. `http_dns` failed before invoking
 its native binary: the OS-assigned UDP ephemeral port was already used by a TCP
 socket. UDP and TCP allocate their port spaces independently. The unedited
-[run log](evidence/http-final-tests-strict.log) records `EADDRINUSE` from the
+[run log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http-final-tests-strict.log) records `EADDRINUSE` from the
 fixture's second bind.
 
 The fixture now acquires both sockets before starting either server and releases
 its UDP socket on a failed pair. It retries only address-in-use, at most 32
 times; other startup errors propagate. Production DNS/cache/TTL code and all
 peer assertions are unchanged. A deterministic
-[probe](evidence/dns-port-pair-probe.py) checks one collision then success,
+[probe](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/dns-port-pair-probe.py) checks one collision then success,
 32-collision exhaustion, non-collision error propagation and closed socket
-handles; all [three controls pass](evidence/dns-port-pair-probe.json). The final
+handles; all [three controls pass](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/dns-port-pair-probe.json). The final
 profile runs verify the actual c-ares UDP/TCP, IDN, IPv6 and cache behavior.
 
 
@@ -644,7 +644,7 @@ build reproduces the documented external absolute-percent-output failure,
 although the directory exists. The source/object archives remain identical.
 `evidence/http-clean-pinned-linker-percent-control-*-release.log` preserves this
 failure. It is the same class of external output-path constraint documented in
-[Stage9 research](../../STAGE9_RESEARCH.md#reproduced-lld-output-path-issue);
+[Stage9 research](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE9_RESEARCH.md#reproduced-lld-output-path-issue);
 no historical optimizer/scheduler incident is thereby diagnosed or repaired.
 
 The final CMake tool output uses Unicode, spaces and `#` without `%`, with the
@@ -665,5 +665,5 @@ input paths as well as bytes. A read-only byte-zeroing comparison did not
 reconstruct the binary; its result is preserved. An isolated actual relink that
 substitutes only the main cache-identity archive reproduces the main `voidc`
 exactly. The candidate's own binary and identity stay unchanged.
-[Identity and receipts](evidence/http-final-clean-build-identity.json),
-[exact relink control](evidence/http-final-clean-identity-link.json).
+[Identity and receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-final-clean-build-identity.json),
+[exact relink control](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-final-clean-identity-link.json).

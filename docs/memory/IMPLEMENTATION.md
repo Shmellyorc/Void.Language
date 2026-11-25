@@ -58,8 +58,8 @@ parameterless reads return null rather than inventing parameter descriptions.
 ## Tests and final evidence
 
 Final exact commands, accessible test receipts, counts and hashes are retained in
-[the concise receipt](evidence/RECEIPT.md), [machine-readable results](evidence/verification.json),
-[commands](evidence/commands.txt) and [source hashes](evidence/source-sha256.json).
+[the concise receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/memory/evidence/RECEIPT.md), [machine-readable results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/memory/evidence/verification.json),
+[commands](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/memory/evidence/commands.txt) and [source hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/memory/evidence/source-sha256.json).
 
 | Linux configuration | Selected CTests | Final failures/skips |
 |---|---:|---:|

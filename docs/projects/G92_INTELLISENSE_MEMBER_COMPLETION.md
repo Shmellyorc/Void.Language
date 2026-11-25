@@ -133,7 +133,7 @@ The baseline VSCodium probe reached all completion checks and then failed the ne
 
 ## 5. Original candidate source and artifact identities
 
-Evidence root: `/home/shmellyorc/Documents/Void.Language-G92-evidence/`.
+Evidence root: `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G92-evidence/`.
 `baseline-lsp.json`, `baseline-conditions.json`, `baseline-testgame.json` and
 the original editor result/profile directories retain the before observations.
 Final source/test hashes, complete compiler build identities, binary SHA-256s,
@@ -340,7 +340,7 @@ the final harness and fixed source.
 ### Corrected candidate qualification and identities
 
 Correction evidence is under
-`/home/shmellyorc/Documents/Void.Language-G92-evidence/readonly-corrections/`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-G92-evidence/readonly-corrections/`.
 Implementation and test hashes are frozen in `frozen-inputs.json` before the
 Release/sanitizer builds, with no source edits during those builds. This avoids
 the stale-object condition recorded for the original candidate.

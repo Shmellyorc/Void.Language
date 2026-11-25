@@ -152,11 +152,11 @@ slots and an unregistered root.
 
 | Configuration | Final result | Evidence |
 | --- | --- | --- |
-| Linux x64 Release | 45/45 | [CTest](evidence/slice7-g2/linux/release-ctest.txt) · [ABI and process receipt](evidence/slice7-g2/linux/release-artifacts.json) |
-| Linux x64 Debug | 45/45 | [CTest](evidence/slice7-g2/linux/debug-ctest.txt) · [ABI and process receipt](evidence/slice7-g2/linux/debug-artifacts.json) |
-| Linux x64 fatal ASan/UBSan | 45/45 | [CTest](evidence/slice7-g2/linux/strict-ctest.txt) · [ABI and process receipt](evidence/slice7-g2/linux/strict-artifacts.json) |
-| Windows 10 x64 build 19045 Release | 44/44 on serial replay | [CTest](evidence/slice7-g2/windows/Release-ctest.txt) · [Direct JIT and IR](evidence/slice7-g2/windows/Release-g2-direct.txt) · [C ABI](evidence/slice7-g2/windows/Release-g2-c-abi.json) |
-| Windows 10 x64 build 19045 Debug | 44/44 | [CTest](evidence/slice7-g2/windows/Debug-ctest.txt) · [Direct JIT and IR](evidence/slice7-g2/windows/Debug-g2-direct.txt) · [C ABI](evidence/slice7-g2/windows/Debug-g2-c-abi.json) |
+| Linux x64 Release | 45/45 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/linux/release-ctest.txt) · [ABI and process receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/linux/release-artifacts.json) |
+| Linux x64 Debug | 45/45 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/linux/debug-ctest.txt) · [ABI and process receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/linux/debug-artifacts.json) |
+| Linux x64 fatal ASan/UBSan | 45/45 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/linux/strict-ctest.txt) · [ABI and process receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/linux/strict-artifacts.json) |
+| Windows 10 x64 build 19045 Release | 44/44 on serial replay | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/Release-ctest.txt) · [Direct JIT and IR](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/Release-g2-direct.txt) · [C ABI](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/Release-g2-c-abi.json) |
+| Windows 10 x64 build 19045 Debug | 44/44 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/Debug-ctest.txt) · [Direct JIT and IR](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/Debug-g2-direct.txt) · [C ABI](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/Debug-g2-c-abi.json) |
 
 All five configurations executed normal and O2 JIT and independently
 linked normal and O2 AOT. The compiled VOID fixture returned 103 for
@@ -175,8 +175,8 @@ descriptor and object hashes, Clang IR signatures and process output.
 The Windows runner verified 3,278 source packet inputs and restored the
 provider-attested source root. It measured **30.88 GiB** free on C:
 before building.
-[Windows qualification and replay receipt](evidence/slice7-g2/windows/native-results.json) ·
-[Windows preflight](evidence/slice7-g2/windows/storage.json).
+[Windows qualification and replay receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/native-results.json) ·
+[Windows preflight](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/storage.json).
 
 All configurations used pinned Clang/LLVM 23.1.4. The strict build
 instrumented the compiler, Runtime and both independent C units.
@@ -185,9 +185,9 @@ RTTI, so vptr instrumentation remains unavailable. The emitted VOID
 programs use the normal verified LLVM lowering. Supplemental source
 probes rejected native dispatch during eager startup and a readonly
 list passed as an output span on all three Linux profiles.
-[Linux replay](evidence/slice7-g2/qualify-linux.sh) ·
-[Startup probe](evidence/slice7-g2/startup.void) ·
-[Readonly probe](evidence/slice7-g2/readonly.void).
+[Linux replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/qualify-linux.sh) ·
+[Startup probe](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/startup.void) ·
+[Readonly probe](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/readonly.void).
 
 ### Original failures and corrective runs
 
@@ -198,8 +198,8 @@ test now requires that exact diagnostic and the corrective focused run
 passed all three tests. The final matrix also exercises the strengthened
 Runtime request, which takes offset and length from the same transport
 words as the C thunk.
-[First run](evidence/slice7-g2/original/release-first-ctest.txt) ·
-[Corrected focused run](evidence/slice7-g2/linux/release-pre-final-focused.txt).
+[First run](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/original/release-first-ctest.txt) ·
+[Corrected focused run](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/linux/release-pre-final-focused.txt).
 
 The first Windows 10 Release suite passed 43 of 44 tests, including
 all G2 JIT/AOT tests. The existing analysis test reported
@@ -208,15 +208,15 @@ That diagnostic does not isolate which condition fired. The replay
 verified the same source packet and guest overlay hashes, then ran
 the unchanged Release selection with serial CTest scheduling. The
 test's own concurrent callers and assertions were unchanged.
-[Original Windows Release transcript](evidence/slice7-g2/original/windows-original-Release-ctest.txt) ·
-[Original native receipt](evidence/slice7-g2/original/windows-original-native-results.json) ·
-[Release replay harness](evidence/slice7-g2/windows/replay.py).
+[Original Windows Release transcript](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/original/windows-original-Release-ctest.txt) ·
+[Original native receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/original/windows-original-native-results.json) ·
+[Release replay harness](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/replay.py).
 
 ## Source and Git inventory
 
-[Exact source patch](evidence/slice7-g2/source.patch) ·
-[Before and after hashes](evidence/slice7-g2/source-hashes.json) ·
-[Complete layered Git inventory](evidence/slice7-g2/inventory.txt).
+[Exact source patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/source.patch) ·
+[Before and after hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/source-hashes.json) ·
+[Complete layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/inventory.txt).
 
 The exact patch covers 20 source and test paths relative to the accepted
 G1 working tree. It amends ten prior inventory paths, modifies one
@@ -249,8 +249,8 @@ The Linux and Windows reusable build trees, current qualified binaries,
 prior Windows G1 artifacts, source archive, extracted native harness,
 receipts and installed toolchains remain available. Cleanup preserved
 unrelated files, shared dependencies, reusable caches and Git state.
-[Host receipt](evidence/slice7-g2/host-cleanup.json) ·
-[Windows receipt](evidence/slice7-g2/windows/cleanup-results.json).
+[Host receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/host-cleanup.json) ·
+[Windows receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/windows/cleanup-results.json).
 
 Stop for Golden Wrench's independent G2 acceptance. Hosted CI remains
 on strict hold.

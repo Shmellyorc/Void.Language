@@ -6,7 +6,7 @@ integration. Those three corrections are now applied directly there. Independent
 Wrench review remains separate from implementation; it is not a repeated request
 for Boss to apply a patch, move files or approve another ZIP.
 
-The exact [three-file patch](evidence/curl-8.23.0-cookie-oom-candidate.patch) was
+The exact [three-file patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch) was
 also pasted in full in chat, so review does not require access to a local path.
 
 | Input | Immutable identity |
@@ -14,8 +14,8 @@ also pasted in full in chat, so review does not require access to a local path.
 | Official source | curl **8.23.0**, `https://curl.se/download/curl-8.23.0.tar.xz` |
 | Source SHA-256 | `8dadd7d2536a314f982ad05a651b713f426bf7d02cc2c76cffb9796f2218e6c5` |
 | Patch SHA-256 | `6a558dc87faec9bbba68056ee79903dff0c05b5e61ba7b08a513b2e21b817920` |
-| Signed archive | [GPG verification](evidence/curl-archive-signature.log), fingerprint `27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2`; original trust warning preserved |
-| License | Original [curl COPYING](evidence/curl-8.23.0-COPYING.txt), included with the review packet |
+| Signed archive | [GPG verification](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/curl-archive-signature.log), fingerprint `27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2`; original trust warning preserved |
+| License | Original [curl COPYING](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/curl-8.23.0-COPYING.txt), included with the review packet |
 
 Production builds consume `third_party/curl/` directly through
 `cmake/CurlProvider.cmake`. `tools/verify_curl_source.py` verifies all 1,586 retained
@@ -35,19 +35,19 @@ header, symbol name, calling convention or cookie grammar changes.
 
 Actual native evidence:
 
-- [Release](evidence/cookie-Release-20261030T122547143010Z/commands.json),
-  [Debug](evidence/cookie-Debug-20261030T122727912022Z/commands.json) and
-  [strict ASan/UBSan/LSan](evidence/cookie-strict-20261030T122727909757Z/commands.json):
+- [Release](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/cookie-Release-20261030T122547143010Z/commands.json),
+  [Debug](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/cookie-Debug-20261030T122727912022Z/commands.json) and
+  [strict ASan/UBSan/LSan](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/cookie-strict-20261030T122727909757Z/commands.json):
   36 checked allocation-failure outcomes for the candidate, 36 original ambiguous
   outcomes retained, 48 valid-state controls and six embedding controls.
-- [Strict disabled-cookie and disabled-HTTP builds](evidence/cookie-disabled-20261030T123553943957Z/commands.json):
+- [Strict disabled-cookie and disabled-HTTP builds](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/cookie-disabled-20261030T123553943957Z/commands.json):
   both build and return `CURLE_OK`/NULL, including replacing a non-NULL output
   sentinel. Both native probe stacks report actual soft/hard 1,048,576-byte limits.
-- [Original source identities](evidence/cookie-provider-source-identity.json),
+- [Original source identities](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/cookie-provider-source-identity.json),
   signature/key, original failed harness attempts and corrected receipts remain
   preserved. The error-path test uses a deliberately small provider feature set;
   it is not full HTTP/TLS/h2/DNS/PSL acceptance or native Windows/macOS acceptance.
-- [Public header/symbol comparison](evidence/cookie-patch-abi-comparison.json):
+- [Public header/symbol comparison](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/cookie-patch-abi-comparison.json):
   only the three named private source files differ; all 12 public headers and
   the 100 `curl_` public symbol names are identical in the same-feature Linux
   Release static builds. This is not native Windows/macOS ABI acceptance.
@@ -74,5 +74,5 @@ downstream correction. Keep the original source/patch identities and failed
 observations. No provider update or patch removal is automatic.
 
 This record is separate from the full [HTTP engineering mission](AUTHORIZATION.md)
-and [current implementation status](IMPLEMENTATION.md). No HTTP contract weakening
+and [current implementation status](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/IMPLEMENTATION.md). No HTTP contract weakening
 or independent source approval is inferred from the Option 1 ruling.

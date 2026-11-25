@@ -1,9 +1,14 @@
 """Index existing shared-recorder receipts and the final local acceptance selection."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 import hashlib, json, platform, re, subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / 'docs/log/evidence'
+OUT = (documentation_evidence('log'))
 def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 def save(name, value):
@@ -41,8 +46,17 @@ for directory in sorted((OUT / 'crashes').glob('incident-*')):
     record = json.loads((directory / 'receipt.json').read_text())
     for source in record.get('sources', []):
         copy = Path(source['copy'])
+        if copy.is_absolute():
+            # Old receipts keep the recorder's absolute path after relocation.
+            original = next((parent for parent in copy.parents
+                             if parent.name == directory.name and parent.parent.name == 'crashes'), None)
+            if original is None:
+                raise ValueError(f'Preserved copy is outside the recorded incident: {copy}')
+            copy = copy.relative_to(original)
+        copy = (directory / copy).resolve()
+        assert copy.is_relative_to(directory.resolve()), (directory, copy)
         assert digest(copy) == source['preserved_sha256'], (directory, copy)
-    incidents.append({'directory': str(directory.relative_to(ROOT)),
+    incidents.append({'directory': directory.relative_to(OUT).as_posix(),
                       **{key: record.get(key) for key in ['failure_kind', 'command', 'returncode', 'signal', 'timed_out']},
                       'source_snapshots': len(record.get('sources', [])),
                       'stderr_prefix': (directory / 'stderr.bin').read_text(errors='replace')[:700]})
@@ -51,11 +65,11 @@ save('incident-index.json', incidents)
 receipts = []
 for path in sorted(OUT.glob('run-*/receipt.json')):
     record = json.loads(path.read_text())
-    receipts.append({'receipt': str(path.relative_to(ROOT)),
+    receipts.append({'receipt': path.relative_to(OUT).as_posix(),
                      **{key: record.get(key) for key in ['command', 'returncode', 'seconds', 'hard_stack_bytes', 'executable_sha256']}})
 save('receipt-index.json', receipts)
 
-changed = subprocess.check_output(['git', 'diff', '--name-only'], cwd=ROOT, text=True).splitlines()
+changed = subprocess.check_output(['git', 'diff', '--name-only', '--diff-filter=d'], cwd=ROOT, text=True).splitlines()
 untracked = subprocess.check_output(['git', 'ls-files', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
 files = sorted(set(changed + [p for p in untracked if not p.startswith('docs/log/evidence/') and '__pycache__' not in p]))
 save('source-inventory.json', {name: {'bytes': (ROOT / name).stat().st_size, 'sha256': digest(ROOT / name)} for name in files})

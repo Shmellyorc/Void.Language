@@ -10,8 +10,8 @@ in place.
 The original Release audit constructed descriptors, locals, instructions and
 terminators directly and called `vd::ir::validate`. It found nine cases
 admitted incorrectly. The extra unwind fixture demonstrated a tenth.
-[Original execution](evidence/slice6-final-review/linux-original.txt) and
-[unwind execution](evidence/slice6-final-review/linux-original-unwind.txt).
+[Original execution](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/linux-original.txt) and
+[unwind execution](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/linux-original-unwind.txt).
 
 | Storage or operation | Controlling proof |
 | --- | --- |
@@ -61,22 +61,22 @@ enum-valued return in both JIT and independently linked AOT modes.
 
 | Configuration | Focused results and direct IR transcript |
 | --- | --- |
-| Linux x86-64 Release | [20/20 CTest](evidence/slice6-final-review/linux/release-ctest.txt), [direct IR](evidence/slice6-final-review/linux/release-direct-ir.txt) |
-| Linux x86-64 Debug | [20/20 CTest](evidence/slice6-final-review/linux/debug-ctest.txt), [direct IR](evidence/slice6-final-review/linux/debug-direct-ir.txt) |
-| Linux x86-64 fatal ASan/UBSan | [20/20 CTest](evidence/slice6-final-review/linux/strict-ctest.txt), [direct IR](evidence/slice6-final-review/linux/strict-direct-ir.txt) |
-| Windows 10 x64 build 19045 Release | [26/26 native CTest](evidence/slice6-final-review/windows/Release-ctest.txt), [direct IR](evidence/slice6-final-review/windows/Release-direct-ir.txt) |
-| Windows 10 x64 build 19045 Debug | [26/26 native CTest](evidence/slice6-final-review/windows/Debug-ctest.txt), [direct IR](evidence/slice6-final-review/windows/Debug-direct-ir.txt) |
+| Linux x86-64 Release | [20/20 CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/linux/release-ctest.txt), [direct IR](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/linux/release-direct-ir.txt) |
+| Linux x86-64 Debug | [20/20 CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/linux/debug-ctest.txt), [direct IR](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/linux/debug-direct-ir.txt) |
+| Linux x86-64 fatal ASan/UBSan | [20/20 CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/linux/strict-ctest.txt), [direct IR](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/linux/strict-direct-ir.txt) |
+| Windows 10 x64 build 19045 Release | [26/26 native CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/windows/Release-ctest.txt), [direct IR](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/windows/Release-direct-ir.txt) |
+| Windows 10 x64 build 19045 Debug | [26/26 native CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/windows/Debug-ctest.txt), [direct IR](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/windows/Debug-direct-ir.txt) |
 
 The strict build instruments the compiler and Runtime, with fatal ASan and
 UBSan and leak detection enabled. All five profiles use LLVM 23.1.4.
-[Linux build configuration](evidence/slice6-final-review/linux/build-configurations.txt),
-[Linux replay](evidence/slice6-final-review/run-linux.sh).
+[Linux build configuration](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/linux/build-configurations.txt),
+[Linux replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/run-linux.sh).
 
 The Windows run used separate native build trees and verified all 3,259 packet
 inputs against this working tree. Its runner verified restoration of the
 provider-attested source. The direct replays matched the qualified executable
-hashes. [Windows qualification receipt](evidence/slice6-final-review/windows/native-results.json),
-[direct replay receipt](evidence/slice6-final-review/windows/direct-results.json).
+hashes. [Windows qualification receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/windows/native-results.json),
+[direct replay receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/windows/direct-results.json).
 
 Windows sanitizer and editor-host runs, Windows Server 2022, macOS and
 other architectures remain outside this audit's matrix. The existing
@@ -86,7 +86,7 @@ is retained, and the focused native LSP regression was rerun.
 The audit also exercised the failing cleanup path with an enum-valued return.
 A deferred handler prints its marker and the invocation retains the original
 division-by-zero diagnostic in normal and O2 JIT and separately linked AOT on
-all three Linux profiles. [Source fixture](evidence/slice6-final-review/cleanup-failure.void).
+all three Linux profiles. [Source fixture](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/cleanup-failure.void).
 
 The original IR failures and fixtures are preserved. A first source test used
 the wrong defer spelling. The corrected fixture uses the existing call form.
@@ -103,19 +103,19 @@ preserved with this report.
 
 ## Layered inventory
 
-The [exact review patch](evidence/slice6-final-review-source.patch) covers
+The [exact review patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review-source.patch) covers
 11 source and test paths relative to the qualified S6 working tree.
-[Before and after hashes](evidence/slice6-final-review-source-hashes.json)
-and the [complete layered inventory](evidence/slice6-final-review-inventory.txt)
+[Before and after hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review-source-hashes.json)
+and the [complete layered inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review-inventory.txt)
 identify the amended source, new regression and retained earlier evidence.
 The inventory verifies the earlier evidence byte-for-byte and checks the
 index tuples against both the starting index and HEAD.
 
 ## End-of-task temporary workspace cleanup
 
-The [host cleanup receipt](evidence/slice6-final-review/host-cleanup-results.json)
+The [host cleanup receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/host-cleanup-results.json)
 lists 7 disposable screenshots and the duplicate source fixture removed
-from the review workspace. The [Windows cleanup receipt](evidence/slice6-final-review/windows-cleanup-results.json)
+from the review workspace. The [Windows cleanup receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice6-final-review/windows-cleanup-results.json)
 lists the restored-overlay backup and both empty test temp directories removed.
 Windows `C:` had 3,867,406,336 bytes free before cleanup and 3,868,983,296 bytes
 after cleanup (3.602 to 3.603 GiB).

@@ -23,7 +23,7 @@ Image ID: `d9b8c34d61a9b9a3c44cab883d7d2f2619d674966ab520186f799cf32e3e0377`.
 Recorded image digest:
 `sha256:78d4744ead1f5b19b04d0df558ab182a5300903900755e515b2ca4d10eb2044d`.
 Exact preparation/check argv, exit status and output are in
-[command receipts](evidence/commands.jsonl). Raw output remains private under
+[command receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/commands.jsonl). Raw output remains private under
 `$HOME/.local/state/void-preview-qualification/97aa4e43-20261104/`.
 Path bindings in compact receipts are normalized: `VOID_SOURCE` is the inspected
 checkout, `VOID_WORK` the private evidence root, `VOID_LLVM_SDK` the development
@@ -36,7 +36,7 @@ Pristine source is a `git archive` of the recorded HEAD. No dirty documentation,
 existing build outputs or development dependency binaries are transferred.
 The official LLVM archive is transferred as a source-build prerequisite, with
 SHA-256 checked against the repository's pin. HTTP dependencies were built
-inside the container from their declared source archives. All seven archives were fetched afresh (no source-cache hits), verified and built successfully; [dependency receipt](evidence/dependency-build.json) records the 22 child commands and source hashes.
+inside the container from their declared source archives. All seven archives were fetched afresh (no source-cache hits), verified and built successfully; [dependency receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/dependency-build.json) records the 22 child commands and source hashes.
 
 ## Linux x64 source-build contract (read-only inventory)
 
@@ -238,7 +238,7 @@ and moved **only the container's pristine source copy's** stdlib to
 No production source bytes, install manifest or build recipe were repaired.
 Positive checks unset `VOID_STDLIB_ROOT` and `LD_LIBRARY_PATH` and use installed
 `bin` plus `/usr/bin:/bin` on PATH. Clang/LLD stay at their configured SDK paths.
-[Actual inputs](evidence/probe-inputs.json) contain both source texts and hashes:
+[Actual inputs](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/probe-inputs.json) contain both source texts and hashes:
 
 ```void
 func main() -> i32:
@@ -262,31 +262,31 @@ removed application flag or optimization workaround was used.
 
 ## Executed verification and classification
 
-[Every command receipt](evidence/commands.jsonl) retains exact argv, selected
+[Every command receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/commands.jsonl) retains exact argv, selected
 explicit environment, status, output and raw-output hashes. Longer stdout is
 explicitly compacted; unmodified raw stdout/stderr is private. The
-[result index](evidence/results.json) classifies every recorded command and lists
-skips/unknowns. [Probe oracles](evidence/checks.jsonl) preserve the two original
+[result index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/results.json) classifies every recorded command and lists
+skips/unknowns. [Probe oracles](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/checks.jsonl) preserve the two original
 harness failures alongside later corrected checks. No historical evidence was
 removed or rewritten.
 
 | Requirement / command IDs | Result and evidence |
 | --- | --- |
-| Initial checkout / preparation | PASS; clean `main` at recorded HEAD, mandatory-file hashes in [start receipt](evidence/qualification-start.json). |
+| Initial checkout / preparation | PASS; clean `main` at recorded HEAD, mandatory-file hashes in [start receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/qualification-start.json). |
 | Fresh environment / `fresh-container-baseline`, `fresh-isolation-mounts` | PASS; new Ubuntu userspace, no mounts, no initial build tools. Shared host kernel/CPU/network limitation retained. |
 | `fresh-host-packages`, `fresh-environment-versions` | PASS; exit 0. CMake 3.28.3, Ninja 1.11.1, Python 3.12.3, Make 4.3, Perl 5.38.2. GCC/libstdc++ headers 13.3.0; runtime libstdc++6 package 14.2.0; glibc 2.39. |
 | SDK identity / `official-sdk-archive-hash`, `fresh-source-sdk-extract`, `fresh-sdk-provenance-config` | PASS; pinned archive digest, Clang/LLD commit/version, RELEASE, assertions OFF, RTTI NO, x86_64 target. |
-| `fresh-http-source-build`, `fresh-http-prefix-verify` | PASS; all seven fresh sources, 22 child commands exit 0; 167 prefix files verified. [Dependency build](evidence/dependency-build.json). |
+| `fresh-http-source-build`, `fresh-http-prefix-verify` | PASS; all seven fresh sources, 22 child commands exit 0; 167 prefix files verified. [Dependency build](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/dependency-build.json). |
 | `fresh-void-configure` | PASS; exit 0, matching SDK, CA bundle/path found, ORC compiled, linked and executed. This is plain Release, not a repeat of hosted ThinLTO-cache configuration. |
-| `fresh-void-build` | PASS; 264 build actions, exit 0, `voidc`, Runtime, required native/provider closure and `voidls` built. [Warning/marker review](evidence/build-log-review.json). |
+| `fresh-void-build` | PASS; 264 build actions, exit 0, `voidc`, Runtime, required native/provider closure and `voidls` built. [Warning/marker review](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/build-log-review.json). |
 | `fresh-install-compiler`, `fresh-install-tooling` | PASS; both supported CMake component installs exit 0. |
 | `fresh-relocation-source-isolation`, `installed-cli-path-discovery` | PASS; installed prefix relocated, original stdlib unavailable, PATH selects installed compiler/server. |
 | `installed-minimal-check-corrected`, `installed-minimal-run` | PASS; check exits 0 with current success text; run exits 0 with empty stdout/stderr. |
 | `installed-standard-check`, `installed-standard-run` | PASS; check exits 0; run exits 0 and prints exactly `VOID installed stdlib OK` plus newline. |
-| `installed-native-build`, `installed-native-execute` | PASS; build exits 0; real native executable exits 0 and prints the same exact line. SHA-256 in [input/artifact receipt](evidence/probe-inputs.json). |
+| `installed-native-build`, `installed-native-execute` | PASS; build exits 0; real native executable exits 0 and prints the same exact line. SHA-256 in [input/artifact receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/probe-inputs.json). |
 | `installed-server-project-discovery` | PASS; entry `/work/standard/main.void`, root `/work/standard`, `standalone:false`. |
-| `installed-server-handshake` | PASS; real Content-Length framed initialize/initialized/shutdown/exit, protocol 1 advertised, UTF-16 capability, shutdown result null, exit 0, no error response. [Requests and responses](evidence/lsp-handshake.json). No actual editor UI was tested. |
-| `installed-layout-loader-audit` | PASS; 86 installed files/aliases hashed, all 21 installed standard sources match original bytes; six ldd/readelf commands exit 0, no unresolved library. [Installed layout](evidence/installed-layout.json). |
+| `installed-server-handshake` | PASS; real Content-Length framed initialize/initialized/shutdown/exit, protocol 1 advertised, UTF-16 capability, shutdown result null, exit 0, no error response. [Requests and responses](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/lsp-handshake.json). No actual editor UI was tested. |
+| `installed-layout-loader-audit` | PASS; 86 installed files/aliases hashed, all 21 installed standard sources match original bytes; six ldd/readelf commands exit 0, no unresolved library. [Installed layout](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/installed-layout.json). |
 | `negative-missing-http` | PASS expected rejection; configure exits 1 with exact `python3 tools/setup_http_deps.py --profile Release` instruction. Class: missing/incorrectly documented dependency; confirms first-install documentation gap. |
 | `negative-missing-standard-root` | PASS expected rejection; exit 1, VOID3002, unavailable source root and absolute matching-root hint. Class: missing standard-library prerequisite / install-discovery boundary. |
 | `negative-native-manifest` | PASS expected rejection; disposable copied prefix lacks `void-native.txt`, exits 1 naming missing/invalid resource file. Class: native toolchain/packaging prerequisite. |

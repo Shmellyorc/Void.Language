@@ -6,6 +6,11 @@ Only the disposable hosted checkout's stdlib is hidden, and restored in finally,
 to prove installed discovery without a source fallback. Never run on accepted
 local builds. Required failures propagate; receipts are written before assertions.
 """
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 import hashlib
 import json
 import os
@@ -374,6 +379,11 @@ class Qualification:
         finally:
             held.rename(ROOT / 'stdlib')
 
+    def copy_dependency_receipts(self, area, pattern):
+        for path in documentation_evidence(area).glob(pattern):
+            if path.is_dir():
+                shutil.copytree(path, self.evidence / path.name, dirs_exist_ok=True)
+
     def report(self):
         # Run even after dependency/configure/acceptance failure. Never infer PASS
         # from absent records or a skipped Actions step.
@@ -388,9 +398,7 @@ class Qualification:
         identity = self.sdk / 'void-sdk-identity.json'
         if identity.is_file():
             shutil.copy2(identity, self.evidence / 'llvm-sdk-identity.json')
-        for path in (ROOT / 'docs/net/http/evidence').glob('dependencies-*'):
-            if path.is_dir() and not subprocess.check_output(['git', 'ls-files', '--', str(path)], cwd=ROOT):
-                shutil.copytree(path, self.evidence / path.name, dirs_exist_ok=True)
+        self.copy_dependency_receipts('net/http', 'dependencies-*')
         if self.prefix.exists():
             self.save('installed-files.json', {p.relative_to(self.prefix).as_posix(): {'sha256': digest(p), 'bytes': p.stat().st_size}
                 for p in sorted(self.prefix.rglob('*')) if p.is_file()})

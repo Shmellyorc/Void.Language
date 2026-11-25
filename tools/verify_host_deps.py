@@ -3,7 +3,7 @@
 import argparse, hashlib, json, os, pathlib, re, shutil, subprocess, sys, tarfile, tempfile
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 PATCH_ROOT='third_party/host-patches/libsodium-1.0.22'
-RECIPES=('tools/setup_host_deps.py','tools/setup_host_deps_native.py','tools/verify_host_deps.py',
+RECIPES=('tools/engineering_storage.py','tools/setup_host_deps.py','tools/setup_host_deps_native.py','tools/verify_host_deps.py',
          'tools/ci/llvm_sdk.py','cmake/host-sodium.targets','third_party/host-versions.json',
          PATCH_ROOT+'/PROVENANCE.json',PATCH_ROOT+'/asan-alignment.patch')
 SCHEMA=3

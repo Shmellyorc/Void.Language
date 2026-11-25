@@ -1,5 +1,0 @@
-use "./math/calculator.void" as packing
-use "./helpers/numbers.void" as labels
-
-func entry(boxes: i32) -> i32:
-    return labels.with_spare(packing.pair(boxes))

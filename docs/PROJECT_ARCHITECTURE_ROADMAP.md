@@ -122,7 +122,7 @@ Phase 1 documentation work. The initial schema field/default, identity, SemVer,
 lexical path and diagnostic foundation is now implemented as the explicit compiler-
 library API [project.hpp](../include/void/project.hpp) /
 [project.cpp](../src/frontend/project.cpp). The [engineering record](projects/SLICE1.md)
-and [local receipt](projects/evidence/slice1-local.json) separate execution evidence
+and [local receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-local.json) separate execution evidence
 from design approval and remaining platform qualification.
 
 This API consumes an already captured UTF-8 SourceFile and does no file opening,
@@ -164,7 +164,7 @@ Review navigation: [schema](#proposed-manifest-and-identity-model),
 This coordinated plan belongs here because project selection, Runtime identity,
 package resolution, native loading and editor sessions need one dependency order
 and one set of authority boundaries. Existing API guides retain delivered behavior.
-The [decision ledger](DECISIONS.md#8-november-2026--first-class-projects-and-general-c-interop)
+The [decision ledger](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/DECISIONS.md#8-november-2026--first-class-projects-and-general-c-interop)
 records the owner direction; the [documentation index](README.md) links this plan.
 
 ## Status and approved direction

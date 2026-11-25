@@ -18,13 +18,13 @@ qualified below with its incremental-build and platform limits.
 
 Review artifacts:
 
-- [Exact Slice 2 source delta](evidence/slice2-source.patch), against the reviewed
+- [Exact Slice 2 source delta](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice2-source.patch), against the reviewed
   starting working tree rather than treating Slice 1 as new Slice 2 work.
-- [Combined baseline source diff](evidence/slice2-baseline-source.patch), including
+- [Combined baseline source diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice2-baseline-source.patch), including
   the preserved Slice 1 implementation and architecture changes against HEAD.
-- [Receipt](evidence/slice2-local.json), with exact input/binary/evidence hashes,
+- [Receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice2-local.json), with exact input/binary/evidence hashes,
   test commands/results, failures, corrections and platform qualifications.
-- [Complete layered Git inventory](evidence/slice2-inventory.txt), distinguishing
+- [Complete layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice2-inventory.txt), distinguishing
   preserved Slice 1 paths, Slice 1 paths amended by S2, and new S2 paths.
 
 Source patches exclude `docs/projects/` reports/evidence to avoid recursive patches

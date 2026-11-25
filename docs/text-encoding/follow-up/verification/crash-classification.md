@@ -14,23 +14,23 @@ needed. This follow-up preserves the distinction between separate failures.
 
 ## Confirmed Debug repair
 
-[Original receipt](../../evidence/crashes/incident-splghldg/receipt.json) records
+[Original receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/evidence/crashes/incident-splghldg/receipt.json) records
 the exact command, cwd, `-11`/SIGSEGV, empty stdout/stderr, source companions and
 original executable SHA-256
 `f257c677824af8a9feba6c2bf31667dc2a7b9978a8c004109e76c4d411793a3d`.
 The privately archived executable at
 `build/text-encoding-crash-binaries/voidc-before-stack-repair` still matches it.
 All 13 readonly source snapshots and 14 provenance hashes independently matched;
-details and freshly inspected prologues are in [the audit receipt](crash-audit-readonly.json).
+details and freshly inspected prologues are in [the audit receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-readonly.json).
 
-[The exact preserved fixture](../../evidence/crashes/incident-splghldg/inputs/deep-methods_crash.void)
+[The exact preserved fixture](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/evidence/crashes/incident-splghldg/inputs/deep-methods_crash.void)
 is 3,016 bytes, SHA-256
 `73871bef34c030e336699c8e7ff706917428d0450dfa5e7c7b923c9419245b00`.
 It contains 400 `.same()` calls followed by `.inspect() + 1`, then a later
 `missing()` diagnostic. The current semantic-depth generator exactly matches
 its preserved pre-repair generator bytes.
 
-[The retained GDB replay](../../evidence/stack-crash-gdb-before.txt), lines 4–51
+[The retained GDB replay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/evidence/stack-crash-gdb-before.txt), lines 4–51
 and 108, shows recursive `anchor` frames and a fault at `anchor+11` with
 RSP `0x7ffff485bc30`, below the mapped 1 MiB stack start `0x7ffff485c000`.
 This establishes stack exhaustion in frontend hint analysis. It does not locate
@@ -55,7 +55,7 @@ suppression was added by this repair. Rewriting it is unwarranted.
 
 ## Historical evidence limits
 
-[The original filesystem log](../../../io/evidence/release-initial-io.txt), lines
+[The original filesystem log](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/release-initial-io.txt), lines
 25–41, retains the failure at `/tmp/VOID io async wire 1icf1laa/main.void` after
 55.73 seconds. [The research report](../../../io/SIGSEGV_RESEARCH.md), lines
 44–67, explicitly distinguishes original evidence from the 17,032-byte
@@ -66,7 +66,7 @@ subsequently completed its declared five-attempt limit without a crash. This
 audit did not repeat that workload or change GC, workers, LLVM or optimization.
 
 [The optimizer report](../../../stage11/OPTIMIZER_FAILURE.md), lines 3–25, and
-[original backtrace](../../../stage11/evidence/llvm-dse-backtrace.txt), lines
+[original backtrace](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/evidence/llvm-dse-backtrace.txt), lines
 4–29, establish a distinct O2 compile failure in `CallBase::getMemoryEffects`
 through `DSEPass`. The retained compressed preoptimization IR independently
 decodes to its recorded SHA-256
@@ -78,12 +78,12 @@ Identical signal numbers are insufficient to connect these incidents.
 
 The collection-test build failure is a separate **unresolved** observation,
 not an unsupported older-Clang incident. The preserved
-[reproducer metadata](../../../stage10/engineering/collections-clang-crash-repro.cpp.json)
-and [command](../../../stage10/engineering/collections-clang-crash-repro.sh.txt)
+[reproducer metadata](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/collections-clang-crash-repro.cpp.json)
+and [command](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/collections-clang-crash-repro.sh.txt)
 explicitly identify pinned Clang 19.1.7 compiling `tests/stage10/conversion.cpp`
-with O2 and ASan/UBSan. [The original build log](../../../stage10/engineering/collections-san-proof-build.txt),
+with O2 and ASan/UBSan. [The original build log](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/collections-san-proof-build.txt),
 lines 28–37 and 72–73, records BDCE calling `DemandedBits::getDemandedBits` and
-Clang frontend exit 139. [The unchanged retry](../../../stage10/engineering/collections-san-clang-reproduction.txt)
+Clang frontend exit 139. [The unchanged retry](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/engineering/collections-san-clang-reproduction.txt)
 builds and links successfully. This is successful recovery by retry, not a
 demonstrated repair or established root cause. Reading/decompressing the retained
 archive independently verifies both metadata hashes: compressed SHA-256
@@ -91,10 +91,10 @@ archive independently verifies both metadata hashes: compressed SHA-256
 and 2,418,308 decoded bytes with SHA-256
 `02139e5f89a39b5c5d1c7be206ca0da48e9f374f4055ce594685df8f68e2b52c`.
 
-Two further records remain distinct: [the Stage 10 test plan](../../../stage10/TEST_PLAN.md),
+Two further records remain distinct: [the Stage 10 test plan](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/TEST_PLAN.md),
 lines 832–834, retains a Release LLD GVN stack emitted despite overall build
 exit 0; its signal/cause remain **unresolved**, so the stack alone is not counted
-as another proven SIGSEGV. [The Stage 11 implementation record](../../../stage11/IMPLEMENTATION.md),
+as another proven SIGSEGV. [The Stage 11 implementation record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/IMPLEMENTATION.md),
 lines 65–69, separately reports a build reading source during an in-place rewrite;
 the recorded workflow mitigation is atomic file replacement. That engineering
 failure is excluded from acceptance and does not explain the unchanged-input
@@ -111,9 +111,9 @@ Actual registered CTests ran with `ctest -V -j 2` and this exact selection:
 
 | Profile | Result | Wrapper wall time | Exact receipt |
 |---|---|---:|---|
-| Debug | 7/7 passed | 8.983 s | [Command/environment/hashes](crash-audit-debug-result.json), [verbose log](crash-audit-debug.log), [JUnit](crash-audit-debug-junit.xml) |
-| Release | 7/7 passed | 1.868 s | [Command/environment/hashes](crash-audit-release-result.json), [verbose log](crash-audit-release.log), [JUnit](crash-audit-release-junit.xml) |
-| Strict sanitizers | 6/6 passed | 6.328 s | [Command/environment/hashes](crash-audit-sanitizers-result.json), [verbose log](crash-audit-sanitizers.log), [JUnit](crash-audit-sanitizers-junit.xml) |
+| Debug | 7/7 passed | 8.983 s | [Command/environment/hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-debug-result.json), [verbose log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/crash-audit-debug.log), [JUnit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-debug-junit.xml) |
+| Release | 7/7 passed | 1.868 s | [Command/environment/hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-release-result.json), [verbose log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/crash-audit-release.log), [JUnit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-release-junit.xml) |
+| Strict sanitizers | 6/6 passed | 6.328 s | [Command/environment/hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-sanitizers-result.json), [verbose log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/crash-audit-sanitizers.log), [JUnit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-sanitizers-junit.xml) |
 
 The full semantic-depth test processes 34 compiler cases per profile with an
 actual Linux `RLIMIT_STACK` of 1,048,576 bytes, including legal receiver/numeric/

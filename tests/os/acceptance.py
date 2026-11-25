@@ -1,4 +1,9 @@
 """Focused existing CTest selection with immutable per-profile engineering receipts."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 import hashlib
 import json
@@ -12,7 +17,7 @@ import support as h
 profile=sys.argv[1]
 assert profile in ('debug','release','sanitizers')
 build=h.ROOT/'build'/profile
-evidence=h.ROOT/'docs/os/evidence'
+evidence=(documentation_evidence('os'))
 phase='os-final' if '--os-only' in sys.argv else 'full'
 receipt=Path(tempfile.mkdtemp(prefix='acceptance-'+profile+'-'+phase+'-',dir=evidence))
 selection='^(os_.*|lsp_os|io_kernel|io_errors_source|io_errors_async|gc_schemas|gc_buffers|stage11_globals|lsp_stage11_globals|debug_cache|automatic_cache_processes|documentation_execution|lsp_documentation)$'

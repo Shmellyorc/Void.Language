@@ -1,4 +1,0 @@
-use math
-func main():
-    var input: u8 = 1
-    var bad = math.ceil(input)

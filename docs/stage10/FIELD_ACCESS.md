@@ -3,7 +3,7 @@
 ## Current acceptance checkpoint — 24 October 2026
 
 Implementation, examples and executed coverage are reconciled in
-[final acceptance](ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
+[final acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/ACCEPTANCE.md). Step 43 is complete; Step 44 review and required
 native evidence remain open. Stage 10 is not locked. Earlier dated research and
 progress statements below retain their historical meaning.
 
@@ -31,7 +31,7 @@ statements below; it does not claim implementation or acceptance.
 
 
 **Approved for implementation; Stage 10 acceptance remains open.** Existing readonly/reference/initialization
-contracts remain authoritative. [Main roadmap](../STAGE10_DESIGN.md).
+contracts remain authoritative. [Main roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE10_DESIGN.md).
 
 ## Pre-implementation gap and approved spelling
 
@@ -253,4 +253,4 @@ rename obeys existing graph/version/installed-source restrictions. Diagnostics
 include the use span and field declaration, and distinguish private access from
 readonly writes, incomplete construction and ambiguous promotion. Failed dirty
 analysis never reuses a previously accessible result. All editors consume the
-same `voidls` metadata. See [tests](TEST_PLAN.md) for the full cross-product.
+same `voidls` metadata. See [tests](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage10/TEST_PLAN.md) for the full cross-product.

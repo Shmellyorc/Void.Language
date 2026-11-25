@@ -10,7 +10,7 @@ Golden Wrench review is pending; S2 has not started. No staging, commit, push,
 hosted CI, dependency-pin change, security relaxation or binary publication.
 
 This record supplements the preserved [original engineering report](SLICE1.md)
-and [original receipt](evidence/slice1-local.json). Those two files, the original
+and [original receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-local.json). Those two files, the original
 malformed fixture and the already corrected parser/vendor patch are byte-for-byte
 unchanged. All fifteen Phase 1 documentation changes remain: thirteen unchanged
 from the closeout checkpoint; the central roadmap and decision ledger receive
@@ -18,13 +18,13 @@ the new local-continuation/hosted-gate direction.
 
 Review artifacts:
 
-- [Closeout source delta](evidence/slice1-closeout-source.patch): exact changes
+- [Closeout source delta](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-closeout-source.patch): exact changes
   from the captured starting working tree, including newly changed notice files.
-- [Complete Slice 1 source/architecture diff](evidence/slice1-baseline-source.patch):
+- [Complete Slice 1 source/architecture diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-baseline-source.patch):
   exact source and architecture documentation changes against the baseline.
-- [Machine-readable closeout receipt](evidence/slice1-closeout.json): hashes,
+- [Machine-readable closeout receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-closeout.json): hashes,
   commands/results, platform limits, preserved failures and checkpoint inventory.
-- [Exact expanded Git inventory](evidence/slice1-closeout-inventory.txt): every
+- [Exact expanded Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-closeout-inventory.txt): every
   modified/untracked path, including reports, receipts and raw evidence.
 
 Both patches exclude `docs/projects/`, whose reports/evidence are listed separately

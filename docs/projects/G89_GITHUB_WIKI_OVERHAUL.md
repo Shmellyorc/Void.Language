@@ -32,7 +32,7 @@ canonical source specification remains authoritative and unchanged.
 
 The publication set is **24 topic pages and two shared files**, with names,
 absolute Wiki routes and SHA-256 values in
-[`docs/wiki/publication.json`](../wiki/publication.json). The repository-only
+[`tools/wiki/publication.json`](../../tools/wiki/publication.json). The repository-only
 README, example manifest, inventory JSON, engineering report and tools are not
 published. There are no image or asset dependencies.
 
@@ -68,7 +68,7 @@ Automated keyword checks alone do not establish that content boundary.
 ## Documentation and example improvements
 
 There are **34 complete displayed VOID examples**, identified in the
-repository-only [`examples.json`](../wiki/examples.json). The checker extracts
+repository-only [`examples.json`](../../tools/wiki/examples.json). The checker extracts
 actual page bytes; there is no separate handwritten copy of each program that
 could silently diverge. The original hello/learning source examples and root
 README remain unchanged.
@@ -109,7 +109,7 @@ launch was performed in this task.
 
 ## Verification and retained evidence
 
-Evidence root: `/home/shmellyorc/Documents/void-g89-waxdoi8k`.
+Evidence root: `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g89-waxdoi8k`.
 The existing Release build and native catalog were reused without relinking or
 preparing providers. LLVM/Clang/LLD 23.1.4 remains pinned. Compiler/emitter/linker/
 executed native children use 1 MiB soft/hard stacks and zero core limits.
@@ -144,7 +144,7 @@ python3 -B tools/wiki/check.py
 python3 -B tools/wiki/check.py \
   --compiler build/llvm23-release/voidc --build build/llvm23-release \
   --catalog build/g24-physical/catalog-release \
-  --raylib-project /home/shmellyorc/Documents/Void.Language-work/g88-review-corrections/vscode-workspace \
+  --raylib-project /home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-work/g88-review-corrections/vscode-workspace \
   --output /absolute/fresh/private/wiki-check
 python3 -B tests/cli/learning.py build/llvm23-release/voidc build/llvm23-release
 python3 -B tools/wiki/prepare.py --output /absolute/fresh/private/wiki-export
@@ -178,7 +178,7 @@ successful run.
 ### Focused public-content correction
 
 The original independent review is preserved at
-`/home/shmellyorc/Documents/void-g89-independent-review-w38kqp5t/review.json`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g89-independent-review-w38kqp5t/review.json`.
 It returned **CORRECTION REQUIRED** for PUBLIC-1: local testing/qualification
 narrative in Installation, Editor setup and Resources and status. Its independent
 138-command example check, original 12 learning cases, archive replay and other
@@ -207,7 +207,7 @@ texts and their supporting records unchanged. The limits in **Remaining limits**
 still apply; no new native or hosted acceptance is claimed.
 
 Correction evidence root:
-`/home/shmellyorc/Documents/void-g89-public-correction-3uf2d469`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g89-public-correction-3uf2d469`.
 Focused structure/navigation checks retain 24 tutorials, 34 registered programs
 and 115 unique destinations. All code fences, including all 34 VOID programs,
 remain byte-identical to the prior candidate; program bytes also match both the
@@ -225,10 +225,10 @@ compilation, Packages and raylib, and Troubleshooting, plus `publication.json`
 and this report. The exact overall G89 inventory below remains **34 files**.
 
 Corrected local export:
-`/home/shmellyorc/Documents/void-g89-public-correction-3uf2d469/publication-final/pages`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g89-public-correction-3uf2d469/publication-final/pages`.
 Its separate `publication.json` identifies exactly the 26 corrected Markdown files.
 The original export at
-`/home/shmellyorc/Documents/void-g89-waxdoi8k/publication-final/pages` remains intact.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/void-g89-waxdoi8k/publication-final/pages` remains intact.
 
 The complete repeatable procedure is in
 [`docs/wiki/README.md`](../wiki/README.md#publication-procedure--after-separate-authorization-only).
@@ -309,8 +309,8 @@ docs/wiki/Troubleshooting.md
 docs/wiki/Types.md
 docs/wiki/_Footer.md
 docs/wiki/_Sidebar.md
-docs/wiki/examples.json
-docs/wiki/publication.json
+tools/wiki/examples.json
+tools/wiki/publication.json
 tests/cli/learning.py
 tools/wiki/check.py
 tools/wiki/prepare.py

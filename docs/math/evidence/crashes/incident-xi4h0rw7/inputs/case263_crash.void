@@ -1,3 +1,0 @@
-use math
-func main():
-    var result = math.asin(true)

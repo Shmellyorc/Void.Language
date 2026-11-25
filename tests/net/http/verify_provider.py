@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 """Clean builds from checked-in curl; no downloads or patch application."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[3] / "tools"))
+from engineering_storage import documentation_evidence
 import argparse
 import datetime
 import hashlib
@@ -22,7 +27,7 @@ args = parser.parse_args()
 repo = Path(__file__).resolve().parents[3]
 compiler = (args.compiler or repo / (".toolchains/llvm-23.1.4/bin/clang-cl.exe" if os.name == "nt" else ".toolchains/llvm-23.1.4/bin/clang")).resolve()
 stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-receipt = repo / "docs/net/http/evidence" / f"vendored-{'full-' if args.full else ''}{args.profile}-{stamp}"
+receipt = (documentation_evidence('net/http')) / f"vendored-{'full-' if args.full else ''}{args.profile}-{stamp}"
 build = repo / "build/http-vendored-provider" / receipt.name
 receipt.mkdir(parents=True)
 report = {"profile": args.profile, "host": platform.platform(), "commands": [],

@@ -1,8 +1,0 @@
-# Factorial is defined here for non-negative inputs.
-func factorial(number: i32) -> i32:
-    if number <= 1:
-        return 1
-    return number * factorial(number - 1)
-
-func entry(number: i32) -> i32:
-    return factorial(number)

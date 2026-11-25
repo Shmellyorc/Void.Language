@@ -99,7 +99,7 @@ Raylib's README, `prepare.py`, catalog and physical native declarations already
 provide the necessary prerequisites; no new metadata format is needed.
 
 The raylib fixture now uses add/tidy for its existing physical-source workflow.
-Canonical `verified-packages/raylib/` and its [600-entry inventory](../../verified-packages/raylib/inventory.json) are unchanged:
+Canonical `verified-packages/raylib/` and its [600-entry inventory](../../tools/raylib/inventory.json) are unchanged:
 236 direct C ABI functions, 352 ownership/value adapters, ten callback interfaces
 and two restricted typed equivalents for variadic declarations. G5 callback
 invocation/replacement/retirement and shutdown fixtures remain in qualification.

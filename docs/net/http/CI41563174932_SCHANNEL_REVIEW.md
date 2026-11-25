@@ -28,7 +28,7 @@ inspected. Artifact SHA-256 matched GitHub metadata for Debug 13202226262 /
 13201792497 and Release 13198789399 / 13198649628. Unmodified ZIPs and full logs
 remain in `.toolchains/ci41563174932/`. Compact public receipts, original native
 streams, API metadata and hashes are preserved in
-[evidence/ci41563174932](evidence/ci41563174932/). No private key or P12 was
+[evidence/ci41563174932](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci41563174932). No private key or P12 was
 retained in the original artifacts or added here.
 
 Both native stderr streams report, after successful earlier TLS/authentication:
@@ -204,6 +204,6 @@ existing platform acceptance remain required. No native Windows execution was
 available locally and no hosted dispatch was performed.
 
 Changed files are documentation and compact evidence only; exact inventory is
-[evidence/ci41563174932/changed-files.json](evidence/ci41563174932/changed-files.json).
+[evidence/ci41563174932/changed-files.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci41563174932/changed-files.json).
 No source/test/dependency/security relaxation, staging, commit, push, branch,
 CI dispatch or root README modification. **Stop for Golden Wrench review.**

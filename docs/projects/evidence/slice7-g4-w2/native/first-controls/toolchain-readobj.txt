@@ -1,3 +1,0 @@
-LLVM (http://llvm.org/):
-  LLVM version 23.1.4
-  Optimized build.

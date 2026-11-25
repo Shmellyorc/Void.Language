@@ -1,3 +1,0 @@
-func entry(route: i32) -> i32:
-    var stop = "林道駅"
-    return route + (stop.length as i32)

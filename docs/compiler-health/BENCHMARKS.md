@@ -7,7 +7,7 @@ profile, cache and application tables are in the
 
 27 October 2026. Baseline **`1d4ad15f5215838d209e48bb47ac7c3f52b05371`**.
 [Interpretation](REPORT.md), [inventory](ISSUES.md), [repair plan](ROADMAP.md),
-[evidence and extraction](evidence/README.md).
+[evidence and extraction](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/README.md).
 
 ## Method and provenance
 

@@ -1,3 +1,0 @@
-[ 17%] Built target zlibstatic
-[ 85%] Built target LibXml2
-[100%] Built target libzstd_static

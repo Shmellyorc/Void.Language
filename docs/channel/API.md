@@ -92,4 +92,4 @@ Unsubscribe includes event search, an active-registration scan and dictionary
 deletion whose cost depends on retained capacity. Successful removal prunes empty
 topics, including after churn. Clear's source body is one nullable reference
 store; later collection accounts for reclamation. See the measured performance
-and local acceptance limits in [HANDOFF](HANDOFF.md).
+and local acceptance limits in [HANDOFF](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/channel/HANDOFF.md).

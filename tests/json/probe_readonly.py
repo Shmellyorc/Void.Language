@@ -1,11 +1,16 @@
 """Retained, one-shot baseline reproduction and reduction. Not an acceptance test."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 import sys, os, json, resource
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tests/text_encoding'))
 from crash import run, preserve
-os.environ['VOID_CRASH_EVIDENCE']=str(ROOT/'docs/json/evidence/implementation/incidents')
-OUT=ROOT/'docs/json/evidence/implementation'
+os.environ['VOID_CRASH_EVIDENCE']=str((documentation_evidence('json') / 'implementation/incidents'))
+OUT=(documentation_evidence('json') / 'implementation')
 
 def stack():
     resource.setrlimit(resource.RLIMIT_STACK,(1048576,1048576))

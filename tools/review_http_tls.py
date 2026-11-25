@@ -4,6 +4,11 @@
 Linux x86_64 review harness; requires the matching built VOID Runtime and verified
 production non-TLS dependencies. All candidate sources/builds stay disposable.
 """
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[1] / "tools"))
+from engineering_storage import documentation_evidence
 import argparse
 import datetime
 import hashlib
@@ -39,7 +44,7 @@ def main():
     if f"VOID_SANITIZERS:BOOL={expected_sanitizers}\n" not in cache:
         parser.error("Runtime sanitizer profile does not match the candidate review")
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-    evidence = root / f"docs/net/http/evidence/tls-review-{args.profile}-{stamp}"
+    evidence = documentation_evidence('net/http') / f'tls-review-{args.profile}-{stamp}'
     evidence.mkdir()
     base = root / ".toolchains/http/tls-review"
     work = base / f"reproduce-{args.profile}-{stamp}"

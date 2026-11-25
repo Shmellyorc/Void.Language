@@ -1,9 +1,0 @@
-schema=1
-[project]
-id='org.test.lib'
-name='Lib'
-version='1.0.0'
-kind='library'
-[package]
-id='org.test.locations'
-name='locations'

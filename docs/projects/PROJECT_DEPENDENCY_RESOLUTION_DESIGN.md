@@ -281,7 +281,7 @@ ctest --test-dir "$build" --output-on-failure \
 ```
 
 Keep maintained source fixtures and concise replay instructions. Preserve the
-eight retained historical roots listed in the policy. [Configure and install](../SOURCE_COMPILER.md#building-the-compiler) · [Retention policy](VOID_ARCHIVE_AND_RETENTION_POLICY.md#phase-2-local-cleanup)
+eight retained historical roots listed in the policy. [Configure and install](../SOURCE_COMPILER.md#building-the-compiler) · [Retention policy](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#phase-2-local-cleanup)
 
 ## Decisions for Golden Wrench
 

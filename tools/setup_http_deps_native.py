@@ -6,6 +6,11 @@ Windows uses Schannel/WinIDN and static MT archives. macOS uses the same pinned
 unmodified AWS-LC source with curl SecTrust and Apple ICU IDN; SDK/architecture
 and deployment selection are recorded in the prefix identity.
 """
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[1] / "tools"))
+from engineering_storage import documentation_evidence
 import argparse
 import datetime
 import hashlib
@@ -43,13 +48,13 @@ def main():
     cc = root / '.toolchains/llvm-23.1.4/bin' / ('clang-cl.exe' if system == 'Windows' else 'clang')
     cxx = cc if system == 'Windows' else cc.with_name('clang++')
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
-    receipt = root / 'docs/net/http/evidence' / f'dependencies-{bundle}-{args.profile}-{stamp}'; receipt.mkdir()
+    receipt = (documentation_evidence('net/http')) / f'dependencies-{bundle}-{args.profile}-{stamp}'; receipt.mkdir(parents=True, exist_ok=False)
     selected = ['nghttp2', 'c-ares', 'zlib', 'libpsl'] + (['aws-lc'] if system == 'Darwin' else [])
     report = dict(host=platform.platform(), platform=system, architecture=architecture, bundle=bundle,
                   profile=args.profile, pins_sha256=hashlib.sha256(policy_path.read_bytes()).hexdigest(),
                   selected_dependencies=selected, commands=[])
     report['recipe_sha256'] = {name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-                              for name in ('tools/setup_http_deps_native.py', 'tools/http_archive.py', 'cmake/http-psl/CMakeLists.txt')}
+                              for name in ('tools/engineering_storage.py', 'tools/setup_http_deps_native.py', 'tools/http_archive.py', 'cmake/http-psl/CMakeLists.txt')}
     environment = os.environ.copy()
     if args.profile == 'strict':
         environment.update(ASAN_OPTIONS='detect_leaks=1:halt_on_error=1', UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1')

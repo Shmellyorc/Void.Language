@@ -1,4 +1,0 @@
-use math
-use math as m
-func main():
-    var a = math.min(1, 2, 3)

@@ -1,8 +1,13 @@
 # Stabilization measurements
 
+> Current async ownership supersedes the historical root-duration record-retention
+> statements below: completed Work/frame roots retire after quiescence and eligible
+> unobservable Task/group records retire at precise-GC checkpoints. Original
+> measurements retain their dated scope; see [the current retention contract](../../STAGE8_ASYNC_RETENTION.md).
+
 All controlled child processes use a verified 1 MiB stack. Times include process creation and child pre-exec stack setup. Values are wall seconds / CPU seconds / peak RSS MiB, unless stated otherwise. Cold compilation means a fresh process with persistent object reuse bypassed or absent; the OS page cache is not flushed. Each controlled measurement runs serially without overlapping compiler builds or acceptance tests. The desktop and normal background services remain active; load averages and scheduling/fault counters are retained. These are local measurements, not universal CI thresholds.
 
-Frozen Release baseline CLI: `3342a2153fc909a98111207db82a8c7b2736983a5311e33a4f68369ec391a952`. Final build/source/tool identities are in [evidence manifest](evidence/manifest.json). Same source bytes and pinned LLVM 19.1.7 CPU/features/Default native codegen are used on each side. Baseline ordinary runs were uncached; final uncached runs explicitly pass `--no-cache`. `--no-opt` disables IR O2 only.
+Frozen Release baseline CLI: `3342a2153fc909a98111207db82a8c7b2736983a5311e33a4f68369ec391a952`. Final build/source/tool identities are in [evidence manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/stabilization/evidence/manifest.json). Same source bytes and pinned LLVM 19.1.7 CPU/features/Default native codegen are used on each side. Baseline ordinary runs were uncached; final uncached runs explicitly pass `--no-cache`. `--no-opt` disables IR O2 only.
 
 ## Cold DTO ladder
 
@@ -126,5 +131,5 @@ The raw phase/helper receipts separate source analysis, typed lowering plus its 
 
 Final API allocation counters cover root-thread C++ `operator new` calls during each invocation, not arbitrary malloc/all-thread allocation. Quiescent collection and metadata snapshots follow both invocations. Synthetic Runtime receipts isolate frame entry/leave, positional root lookup, scalar layouts, buffer reads/copies, heap-size effects and allocation counts. The existing async retention matrix verifies frame retirement, stable settled catalogs and complete root drain; it does not claim Task/Work records retire before root drain. The Runtime archive is unchanged.
 
-The [audit interpretation](AUDIT.md) records phase attribution, runtime behavior, machine code and remaining costs. Raw commands, status, wall/CPU/RSS, hashes, stdout/stderr, stack limits, faults and scheduling counters are in [measurements.jsonl](evidence/measurements.jsonl). The complete preserved IR and binaries remain in the frozen local evidence tree named in the manifest.
+The [audit interpretation](AUDIT.md) records phase attribution, runtime behavior, machine code and remaining costs. Raw commands, status, wall/CPU/RSS, hashes, stdout/stderr, stack limits, faults and scheduling counters are in [measurements.jsonl](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/stabilization/evidence/measurements.jsonl). The complete preserved IR and binaries remain in the frozen local evidence tree named in the manifest.
 

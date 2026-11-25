@@ -1,8 +1,0 @@
-async func travel(days: i32) -> i32:
-    return days * 2
-
-async func entry(days: i32) -> i32:
-    var estimate = travel(days)
-    var packing = 2
-    var journey = await estimate
-    return journey + packing

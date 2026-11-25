@@ -1929,6 +1929,7 @@ func (self directory_handle) save_text_atomic(name: string, value: string, repla
 func (self directory_handle) close() -> result<bool, error>:
     return _host_ok("io.directory_handle.close", _host_directory_close(self))
 
+## Release the directory capability during deterministic scope cleanup.
 func (self directory_handle) deinit():
     _host_directory_cleanup(self)
 

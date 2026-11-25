@@ -97,7 +97,7 @@ stack limit, validator or LLVM pass was weakened.
 
 [Verification](VERIFICATION.md), [changed-file inventory](CHANGES.md),
 [engineering ledger](IMPLEMENTATION.md), [incident ledger](INCIDENTS.md),
-[portable evidence guide](evidence/README.md) and [manifest](evidence/manifest.json)
+[portable evidence guide](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/stabilization/evidence/README.md) and [manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/stabilization/evidence/manifest.json)
 provide exact source/build/helper/tool hashes, commands, flags, logs and artifacts.
 The manifest indexes 571 measurements, all retained failed attempts, 892 source
 hashes and 26 frozen local compiler/failure images. The original research archives

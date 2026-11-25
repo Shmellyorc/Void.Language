@@ -1,9 +1,0 @@
-value struct bookmark:
-    page: i32
-
-func (mark bookmark) init(chapter_start: i32):
-    mark.page = chapter_start + 1
-
-func entry(start: i32) -> i32:
-    var mark = bookmark(start)
-    return mark.page

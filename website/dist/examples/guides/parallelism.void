@@ -1,7 +1,0 @@
-func square(number: i32) -> i32:
-    return number * number
-
-async func entry(number: i32) -> i32:
-    var first = spawn square(number)
-    var second = spawn square(number + 1)
-    return await first + await second

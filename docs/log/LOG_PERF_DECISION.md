@@ -38,7 +38,7 @@ controls are separate observations; rejected-candidate results do not qualify pr
 
 Accepted file200 also fails in normal JIT and normal/O2 AOT; latest controls
 cover JIT O2. [Accepted performance](BOUNDED_FRAMING_RESULT.md#performance-comparison)
-and [raw criteria](evidence/llvm23-framing-20261104/results.json) retain their scope.
+and [raw criteria](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-framing-20261104/results.json) retain their scope.
 
 ## Findings and uncertainties
 
@@ -78,7 +78,7 @@ Quote200 improved 16.0%, with no observed heavy-path regression. The small
 end-to-end gain triggered the approved discard/stop rule; correctness was not
 the rejection reason. Production was restored exactly.
 
-The [rejected patch](evidence/small-file-20261104/rule-allocation-candidate.patch)
+The [rejected patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/small-file-20261104/rule-allocation-candidate.patch)
 and [record](SMALL_FILE_INVESTIGATION.md#bounded-rule-allocation-experiment--4-november-2026-discarded)
 remain preserved. Targeted ownership, logging and native allocator sanitizer
 checks passed. Broader strict setup failed because its older frontend lacks

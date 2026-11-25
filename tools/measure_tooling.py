@@ -1,7 +1,7 @@
 """Measure Stage 7 queries using the existing research fixture/client harness."""
 import argparse, hashlib, json, pathlib, platform, sys, tempfile
 repo=pathlib.Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(repo/'docs/research/stage7'))
+sys.path.insert(0,str(repo/'tools/research/stage7'))
 import measure_baseline as base
 from lsp_client import Client
 p=argparse.ArgumentParser();p.add_argument('--build',default='build/ci-release');p.add_argument('--repetitions',type=int,default=7);a=p.parse_args()

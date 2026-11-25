@@ -1,5 +1,9 @@
 """Native-only LLVM 23.1.4 stack experiment. Never configures the compiler project."""
 from pathlib import Path
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tools"))
+from engineering_storage import evidence_directory
 import argparse
 import hashlib
 import json
@@ -128,7 +132,7 @@ def classify(returncode, stdout, stderr, depth, frame_bytes, kib, system, negati
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--llvm-bin', type=Path, help='LLVM 23.1.4 bin directory; defaults to PATH')
-    parser.add_argument('--output', type=Path, default=Path('build/phase23-stack-probe'))
+    parser.add_argument('--output', type=Path, default=evidence_directory('phase23-stack-probe'))
     parser.add_argument('--generator', default='Ninja' if shutil.which('ninja') else 'Unix Makefiles')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[3]

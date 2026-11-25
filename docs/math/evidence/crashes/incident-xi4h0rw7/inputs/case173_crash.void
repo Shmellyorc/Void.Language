@@ -1,4 +1,0 @@
-use math
-func main():
-    var input: i64 = 1
-    var bad = math.log2(input)

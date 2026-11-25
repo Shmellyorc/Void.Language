@@ -16,9 +16,9 @@ Exact regex:
 
 | Profile | Result | Seconds | Exact command/environment/hash receipt | Verbose log |
 | --- | --- | ---: | --- | --- |
-| Debug | 7/7 | 8.983 | [JSON](verification/crash-audit-debug-result.json) | [Log](verification/crash-audit-debug.log) |
-| Release | 7/7 | 1.868 | [JSON](verification/crash-audit-release-result.json) | [Log](verification/crash-audit-release.log) |
-| Strict | 6/6 | 6.328 | [JSON](verification/crash-audit-sanitizers-result.json) | [Log](verification/crash-audit-sanitizers.log) |
+| Debug | 7/7 | 8.983 | [JSON](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-debug-result.json) | [Log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/crash-audit-debug.log) |
+| Release | 7/7 | 1.868 | [JSON](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-release-result.json) | [Log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/crash-audit-release.log) |
+| Strict | 6/6 | 6.328 | [JSON](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/crash-audit-sanitizers-result.json) | [Log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/crash-audit-sanitizers.log) |
 
 Full semantic-depth performs 34 cases per profile with Linux RLIMIT_STACK exactly
 1,048,576 bytes. It preserves legal receiver/numeric/string chains through 124,
@@ -38,9 +38,9 @@ One registered run per profile, with this exact regex:
 
 | Profile | Result | Seconds | Exact command/environment receipt | Log | JUnit |
 | --- | --- | ---: | --- | --- | --- |
-| Debug | 4/4 | 242.626 | [JSON](verification/io-debug-result.json) | [Log](verification/io-debug.log) | [XML](verification/io-debug-junit.xml) |
-| Release | 4/4 | 179.827 | [JSON](verification/io-release-result.json) | [Log](verification/io-release.log) | [XML](verification/io-release-junit.xml) |
-| Strict | 4/4 | 264.742 | [JSON](verification/io-sanitizers-result.json) | [Log](verification/io-sanitizers.log) | [XML](verification/io-sanitizers-junit.xml) |
+| Debug | 4/4 | 242.626 | [JSON](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/io-debug-result.json) | [Log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/io-debug.log) | [XML](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/io-debug-junit.xml) |
+| Release | 4/4 | 179.827 | [JSON](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/io-release-result.json) | [Log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/io-release.log) | [XML](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/io-release-junit.xml) |
+| Strict | 4/4 | 264.742 | [JSON](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/io-sanitizers-result.json) | [Log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/io-sanitizers.log) | [XML](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/verification/io-sanitizers-junit.xml) |
 
 Sync execution checks actual source/JIT/O2/independently linked AOT, including 18
 source/file checks, 42 numeric vectors and both endian modes. Async execution checks
@@ -61,10 +61,10 @@ Exact selection:
 ^(text_encoding_crash_preservation|io_crash_preservation)$
 ```
 
-All **2/2 passed** per profile. [Exact commands, environment and final source hashes](preservation-final-commands.json):
-[Debug log](verification/preservation-final-debug.log),
-[Release log](verification/preservation-final-release.log),
-[strict log](verification/preservation-final-sanitizers.log).
+All **2/2 passed** per profile. [Exact commands, environment and final source hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/preservation-final-commands.json):
+[Debug log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/preservation-final-debug.log),
+[Release log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/preservation-final-release.log),
+[strict log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/verification/preservation-final-sanitizers.log).
 Each log records actual CTest commands and six intentional signal events inside
 disposable test storage. The self-tests verify evidence before cleanup and assert
 disposal, unchanged repository inventory, no duplicate capture, non-overwrite,
@@ -86,15 +86,15 @@ compiler/LSP runs; Python-only synthetic self-tests do not claim to instrument V
 
 ## Source and evidence integrity
 
-[completeness.json](completeness.json) records final source hashes, per-group logs
+[completeness.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/completeness.json) records final source hashes, per-group logs
 and JUnit hashes, baseline HEAD and unchanged evidence. All 2,937 original evidence/
 protected files, all 13 genuine source copies and 14 provenance hashes matched;
 the actual incident and original archived executable are intact. Git's index is
 unchanged, root README/stdlib/production sources have no diff, and diff whitespace
-checks pass. [Cleanup evidence](synthetic-cleanup.json) records 940 verified
+checks pass. [Cleanup evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/synthetic-cleanup.json) records 940 verified
 synthetic deletions; the old subtree remains absent after every test profile.
 
-[Generator comparison](generator-comparison.json) proves the current and baseline
+[Generator comparison](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/generator-comparison.json) proves the current and baseline
 sync/async/error-async text match in memory. The historical original temporary
 source was not recovered by that comparison. [Classification](verification/crash-classification.md)
 retains all unresolved distinctions and exact source references. No new genuine

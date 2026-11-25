@@ -8,7 +8,7 @@ closes the HTTP/HTTPS cross-platform acceptance workstream at commit
 completed successfully using **Compiler link experiment**, mode **thinlto-cache**,
 LLVM/Clang/LLD **23.1.4**. Independent read-only GitHub run/job API checks confirm
 all seven job conclusions and each job's Execute tests step are successful.
-[Exact run and job receipt](evidence/ci41815539463-acceptance.json).
+[Exact run and job receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/ci41815539463-acceptance.json).
 
 | Hosted configuration | Result |
 | --- | --- |

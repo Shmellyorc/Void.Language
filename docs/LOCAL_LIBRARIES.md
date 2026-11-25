@@ -259,3 +259,8 @@ See [raylib](../verified-packages/raylib/README.md). Tidy grants no execution co
 The earlier design discussion in this document is historical. The rules in this
 section describe the implemented G26 workflow; see
 [the qualification report](projects/G26_PACKAGE_MAINTENANCE.md).
+
+<a id="future-external-package-manager--boss-direction-21-october-2026"></a>
+
+The earlier external-package direction is historical; current source-package
+workflows are described above. Its [original owner direction](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/LOCAL_LIBRARIES.md#future-external-package-manager--boss-direction-21-october-2026) remains available.

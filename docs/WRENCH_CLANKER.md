@@ -132,15 +132,21 @@ Preserve unrelated settings, source and package state. Follow the current task's
 deployment authorization; this rule does not authorize Git integration or release
 publication.
 
-## Permanent documentation policy — 20 October 2026
+## Permanent documentation policy — 25 November 2026
 
-Keep engineering instructions, status and handoffs under `docs/`; use
-[README.md](README.md) for navigation. The public root README requires Boss's
-separate explicit authorization. Canonical API/architecture documents define
-contracts, implementation reports carry current evidence, and
-[history](README.md#historical-records) preserves earlier instructions/results.
-Do not rewrite old milestone evidence or declare historical defects repaired
-without current evidence.
+`docs/` contains legitimate Markdown documentation only. Keep maintained schemas,
+package metadata, license inventories and test inputs in their operational source
+locations outside `docs/`. Keep current contracts, owner decisions and unresolved
+issues; consolidate duplicated or superseded narrative once those contents are
+accounted for. Git history is the historical archive. The former append-only
+historical documentation policy is superseded by Boss's cleanup direction.
+
+Do not create review Markdown files, evidence directories, inventories, receipts,
+archives or handoff files inside the repository. Return review findings in the
+conversation. Retained engineering material belongs under
+`~/Documents/Void.Language-archives/`; linked worktrees belong under
+`~/Documents/Void.Language-worktrees/`. Use owned disposable scratch outside the
+checkout and clean it on exit. `/tmp` is not retained storage.
 
 ## Permanent engineering evidence and cleanup
 

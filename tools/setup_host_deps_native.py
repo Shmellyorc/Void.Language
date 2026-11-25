@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 """Pinned native Windows/macOS host providers. No ambient provider fallback."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[1] / "tools"))
+from engineering_storage import documentation_evidence
 import argparse, hashlib, json, os, pathlib, platform, shutil, subprocess, sys, tarfile, time, urllib.request
 from verify_host_deps import source_tree, SCHEMA, prepare_sodium, verify_sodium_copy, recipe_hashes, toolchain, upstream_results, build_identity
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -19,7 +24,7 @@ def main():
  prefix=(a.prefix or base/'prefix'/bundle/a.profile).resolve();build=(a.build_dir or base/'build'/bundle/a.profile).resolve()
  if prefix.exists() or build.exists():raise SystemExit('Clean provider build required; retain the old prefix/build and select fresh paths')
  build.mkdir(parents=True)
- evidence=ROOT/'docs/voidup/evidence'/('dependencies-'+bundle+'-'+a.profile+'-'+str(time.time_ns()));evidence.mkdir(parents=True)
+ evidence=(documentation_evidence('voidup'))/('dependencies-'+bundle+'-'+a.profile+'-'+str(time.time_ns()));evidence.mkdir(parents=True)
  pins=json.loads((ROOT/'third_party/host-versions.json').read_text());sources={}
  report={'schema':SCHEMA,'toolchain':toolchain(),'platform':system,'architecture':arch,'profile':a.profile,'pins':pins,'commands':[],
   'recipe_sha256':recipe_hashes()}

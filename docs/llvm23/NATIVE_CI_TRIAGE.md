@@ -90,7 +90,7 @@ All four complete job logs and CTest artifacts were retrieved. Debug/Release nam
 | `async_syntax_aot_spawn_normal` | F2 | AssertionError: (['D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe', 'check', 'D:\\a\\Void.Language\\Void.Language\\tests\\async\\syntax\\spawn.void'], b'Source checked successfully\r\n', b'Source checked successfully\n', b'') |
 | `async_syntax_aot_spawn_optimized` | F2 | AssertionError: (['D:\\a\\Void.Language\\Void.Language\\build\\Debug\\voidc.exe', 'check', 'D:\\a\\Void.Language\\Void.Language\\tests\\async\\syntax\\spawn.void'], b'Source checked successfully\r\n', b'Source checked successfully\n', b'') |
 
-Full original errors: [Debug](evidence/native-ci-40861888611/Windows-X64-Debug.md), [Release](evidence/native-ci-40861888611/Windows-X64-Release.md).
+Full original errors: [Debug](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/Windows-X64-Debug.md), [Release](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/Windows-X64-Release.md).
 
 ### macOS-ARM64 (both Debug and Release)
 
@@ -109,7 +109,7 @@ Full original errors: [Debug](evidence/native-ci-40861888611/Windows-X64-Debug.m
 | `lsp_io_stack` | F7 | ValueError: current limit exceeds maximum limit |
 | `io_kernel` | F10 | invalid native filename escaped UTF-8 validation |
 
-Full original errors: [Debug](evidence/native-ci-40861888611/macOS-ARM64-Debug.md), [Release](evidence/native-ci-40861888611/macOS-ARM64-Release.md).
+Full original errors: [Debug](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/macOS-ARM64-Debug.md), [Release](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/macOS-ARM64-Release.md).
 
 ## Sequential repair checkpoint
 
@@ -160,18 +160,18 @@ execution for their final verdict; they are not marked native passes.
 
 Linux x86-64, Python 3.14.8, official LLVM/Clang/LLD 23.1.4 and existing Unix
 Makefiles builds. Exact host/tool versions and protected-input hashes are in
-[`source-audit.json`](evidence/native-ci-40861888611/source-audit.json).
+[`source-audit.json`](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/source-audit.json).
 No dependency version or runtime package was introduced. Existing Windows zlib
 1.3.2/zstd 1.5.7/LibXml2 2.15.4 `/MT`, DIA and Apple vendor libc++/system-runtime
 selection remain as recorded in the configuration repair.
 
 | Selection | Result | Elapsed | Evidence |
 | --- | --- | --- | --- |
-| Full Release, all registered tests | 369/369; zero failures/skips | 530.50 s | [log](evidence/native-ci-40861888611/local-release.txt), [JUnit](evidence/native-ci-40861888611/local-release.xml) |
-| Focused Debug, all cause families and neighbors | 26/26; zero failures/skips | 399.99 s | [log](evidence/native-ci-40861888611/local-debug.txt), [JUnit](evidence/native-ci-40861888611/local-debug.xml) |
-| Focused ASan/UBSan with fatal findings | 11/11; zero failures/skips | 165.64 s | [log](evidence/native-ci-40861888611/local-strict.txt), [JUnit](evidence/native-ci-40861888611/local-strict.xml) |
-| Final passing-output stack observation, Release / Debug | 7/7 in each; zero failures/skips | 26.17 s / 91.90 s | [Release](evidence/native-ci-40861888611/local-stack-final.xml), [Debug](evidence/native-ci-40861888611/local-stack-final-debug.xml) |
-| Controlled baseline/fixed platform probes | Passed | See output | [reproducer](evidence/native-ci-40861888611/platform_checks.py), [results](evidence/native-ci-40861888611/platform-checks-final.txt) |
+| Full Release, all registered tests | 369/369; zero failures/skips | 530.50 s | [log](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/local-release.txt), [JUnit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/local-release.xml) |
+| Focused Debug, all cause families and neighbors | 26/26; zero failures/skips | 399.99 s | [log](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/local-debug.txt), [JUnit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/local-debug.xml) |
+| Focused ASan/UBSan with fatal findings | 11/11; zero failures/skips | 165.64 s | [log](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/local-strict.txt), [JUnit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/local-strict.xml) |
+| Final passing-output stack observation, Release / Debug | 7/7 in each; zero failures/skips | 26.17 s / 91.90 s | [Release](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/local-stack-final.xml), [Debug](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/local-stack-final-debug.xml) |
+| Controlled baseline/fixed platform probes | Passed | See output | [reproducer](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/platform_checks.py), [results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/platform-checks-final.txt) |
 
 The final stack-reporting addition was made after the full run, then the seven
 affected LSP/install/alias checks were rerun in each configuration. It verifies
@@ -180,7 +180,7 @@ Win32-only closed-peer fixture also prints its actual error code for native
 review; that body cannot be compiled or executed by these Linux runs.
 
 The full Release run contains all **63 distinct original failed test names**.
-[`verification.json`](evidence/native-ci-40861888611/verification.json) reconciles
+[`verification.json`](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/verification.json) reconciles
 each of the 70 platform/name entries (58 Windows + 12 macOS) with its family,
 Linux result and explicitly pending native status. The focused sanitizer
 selection contains 11 registered tests: the existing CMake policy does not
@@ -249,7 +249,7 @@ document's evidence directory.
 ## Modified files and preserved boundaries
 
 The complete changed-path/hash inventory is
-[`source-audit.json`](evidence/native-ci-40861888611/source-audit.json).
+[`source-audit.json`](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/native-ci-40861888611/source-audit.json).
 
 - Build integration: `CMakeLists.txt`, `cmake/NativeBuild.cmake`.
 - Production: `src/runtime/console.cpp`, solely Windows write-error classification.

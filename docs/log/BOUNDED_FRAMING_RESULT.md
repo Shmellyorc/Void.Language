@@ -7,7 +7,7 @@ checks and the heavy framing and console performance screens on this Linux host.
 Small-file logging still fails its absolute screen. This working-tree candidate
 is based on d784c0490d13b8abdca754dfecf99578ab498733. File hashes and the
 two candidate measurements are retained with the receipts. The original
-ffd8920b baseline is preserved byte-for-byte. [Baseline report](PERFORMANCE_BASELINE_LLVM23.md) · [Results](evidence/llvm23-framing-20261104/results.json)
+ffd8920b baseline is preserved byte-for-byte. [Baseline report](PERFORMANCE_BASELINE_LLVM23.md) · [Results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-framing-20261104/results.json)
 
 ## Historical stop condition
 
@@ -25,7 +25,7 @@ and schema-key diagnostic overlays. All 181 original incident files, 61 preserve
 source copies and 20 original flat-builder input paths were hash-verified.
 The later historical capture identified LLVM optimization as the faulting component.
 Its original cause remains unresolved. The current evidence was sufficient to
-proceed under Golden Wrench's current-toolchain disposition. [Current check and hashes](evidence/llvm23-framing-review-20261104.json) · [Preserved classification](CRASH_CLASSIFICATION.md) · [LLVM 23 prior checks](../llvm23/evidence/metrics/dse-results.json)
+proceed under Golden Wrench's current-toolchain disposition. [Current check and hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-framing-review-20261104.json) · [Preserved classification](CRASH_CLASSIFICATION.md) · [LLVM 23 prior checks](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/metrics/dse-results.json)
 
 ## Implementation and safety
 
@@ -151,7 +151,7 @@ The revision2 directory holds candidate.patch, candidate-identity.json,
 host-hashes.json, receipts, exact driver copies and captured output identifying
 the final inputs and binaries. The initial candidate and original baseline
 remain separate. The receipt index and per-cell wall/CPU samples, allocations
-and resource observations are available in the machine-readable report. [Results](evidence/llvm23-framing-20261104/results.json)
+and resource observations are available in the machine-readable report. [Results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/llvm23-framing-20261104/results.json)
 
 The results file records each exact Python invocation, including startup-driver.py. Verification uses
 revision2/verify.py with text, oracles, void_text_audit, void_text_ownership,

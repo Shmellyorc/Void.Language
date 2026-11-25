@@ -24,9 +24,9 @@ from 1,227,131 to 102,577,468 bytes, exceeding the 71,303,366-byte admitted nati
 reservation. Only three 64 KiB application queues were full. The large fixture
 payload is generated incrementally; it is not stored in the client or fixture.
 
-- [Original failed live-allocation proof](evidence/http-h2-resume-before/native.stdout).
-- [Original peer window-credit trace](evidence/http-h2-resume-before/commands.json).
-- [Initial failed RSS-only probe](evidence/http-h2-paused-strict-rss-before/commands.json).
+- [Original failed live-allocation proof](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-h2-resume-before/native.stdout).
+- [Original peer window-credit trace](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-h2-resume-before/commands.json).
+- [Initial failed RSS-only probe](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-h2-paused-strict-rss-before/commands.json).
 
 An early regression assertion conflated RSS with live provider allocations. The
 strict probe now reads ASan's public live-allocation counter and checks actual
@@ -68,18 +68,18 @@ member is independently checked as `http2.c.o`.
 | curl 8.23.0 signed source archive | `8dadd7d2536a314f982ad05a651b713f426bf7d02cc2c76cffb9796f2218e6c5` |
 | Original `lib/http2.c` | `6a9d36f79b772b18cea2d17707fc32fa5dd49493d4bc4e94363bc5cd8ef91fc9` |
 | Corrected `lib/http2.c` | `6237bdfb17bcb6670be046520ab9170a21ef7e946e9149df17f7e56cf6313914` |
-| [Exact review diff](evidence/curl-8.23.0-http2-window-candidate.patch) | `f109b12c2c5b327fb9b2da2b9d302cb111d936097b98ace830ea886db7d4f1a2` |
+| [Exact review diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/curl-8.23.0-http2-window-candidate.patch) | `f109b12c2c5b327fb9b2da2b9d302cb111d936097b98ace830ea886db7d4f1a2` |
 
 ## Verification and reproduction
 
 | Configuration | Result | Evidence |
 | --- | --- | --- |
-| Release native | PASS, including cookie count/byte bounds, double TLS required-h2, three paused 512 MiB responses, four small resumes and fast siblings on one connection | [receipt](evidence/http2-window-review-release-20261030T220108883803Z/commands.json) |
-| Debug native | PASS, including cookie count/byte bounds, double TLS required-h2, three paused 512 MiB responses, four small resumes and fast siblings on one connection | [receipt](evidence/http2-window-review-debug-20261030T220108881738Z/commands.json) |
-| Strict native | PASS, including cookie count/byte bounds, double TLS required-h2, three paused 512 MiB responses, four small resumes and fast siblings on one connection | [receipt](evidence/http2-window-review-strict-20261030T220108891008Z/commands.json) |
-| Release source | 15/15 analysis, normal/O2 JIT, sync AOT and independently linked async AOT process checks | [receipt](evidence/http2-window-review-release-20261030T220108883803Z/source/commands.json) |
-| Debug source | 15/15 analysis, normal/O2 JIT, sync AOT and independently linked async AOT process checks | [receipt](evidence/http2-window-review-debug-20261030T220108881738Z/source/commands.json) |
-| Strict source | 15/15 analysis, normal/O2 JIT, sync AOT and independently linked async AOT process checks | [receipt](evidence/http2-window-review-strict-20261030T215721483292Z/source/commands.json) |
+| Release native | PASS, including cookie count/byte bounds, double TLS required-h2, three paused 512 MiB responses, four small resumes and fast siblings on one connection | [receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http2-window-review-release-20261030T220108883803Z/commands.json) |
+| Debug native | PASS, including cookie count/byte bounds, double TLS required-h2, three paused 512 MiB responses, four small resumes and fast siblings on one connection | [receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http2-window-review-debug-20261030T220108881738Z/commands.json) |
+| Strict native | PASS, including cookie count/byte bounds, double TLS required-h2, three paused 512 MiB responses, four small resumes and fast siblings on one connection | [receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http2-window-review-strict-20261030T220108891008Z/commands.json) |
+| Release source | 15/15 analysis, normal/O2 JIT, sync AOT and independently linked async AOT process checks | [receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http2-window-review-release-20261030T220108883803Z/source/commands.json) |
+| Debug source | 15/15 analysis, normal/O2 JIT, sync AOT and independently linked async AOT process checks | [receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http2-window-review-debug-20261030T220108881738Z/source/commands.json) |
+| Strict source | 15/15 analysis, normal/O2 JIT, sync AOT and independently linked async AOT process checks | [receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http2-window-review-strict-20261030T215721483292Z/source/commands.json) |
 
 All native/execution checks run with 1 MiB stacks. Strict uses
 `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1` and
@@ -129,8 +129,8 @@ The full engineering mission is not complete.
 ## Approved production results
 
 The exact correction is integrated directly in the authoritative tree. Focused
-production integration passes [Release 17/17](evidence/http2-approved-tests-release.log),
-[Debug 17/17](evidence/http2-approved-tests-debug.log) and
-[strict 17/17](evidence/http2-approved-tests-strict.log), including the previously
+production integration passes [Release 17/17](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http2-approved-tests-release.log),
+[Debug 17/17](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http2-approved-tests-debug.log) and
+[strict 17/17](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/net/http/evidence/http2-approved-tests-strict.log), including the previously
 failing live-reservation and peer-credit test. These supersede the review-only
 status; the original failed and isolated-candidate receipts remain intact.

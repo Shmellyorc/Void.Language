@@ -177,7 +177,8 @@ jobs:
             /CMakeLists.txt
             /LICENSE
             /cmake/
-            /docs/net/http/evidence/curl-8.23.0-*-candidate.patch
+            /docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch
+            /docs/net/http/evidence/curl-8.23.0-http2-window-candidate.patch
             /examples/
             /include/
             /src/
@@ -282,7 +283,7 @@ jobs:
               "host/verify-dependencies.log",
           )]
           roots = (
-              (Path("docs/net/http/evidence"), f"dependencies-macos-aws-lc-5.12.0-arm64-{profile}-*"),
+              (Path(os.environ.get("VOID_EVIDENCE_ROOT", str(Path.home() / "Documents/Void.Language-archives"))) / "qualification/net/http", f"dependencies-macos-aws-lc-5.12.0-arm64-{profile}-*"),
               (work / "host/provider-builds", f"dependencies-macos-arm64-{profile}-*"),
           )
           originals = set()
@@ -296,7 +297,8 @@ jobs:
               receipts.extend((work / "editor-evidence").rglob("*.log"))
               originals.update(receipts)
               logs.extend(receipts)
-              roots += ((Path(".toolchains/project-editor-legacy/docs/voidup/evidence"),
+              # The pinned producer still writes into its own legacy checkout.
+              roots += ((Path(os.environ["GITHUB_WORKSPACE"]) / ".toolchains/project-editor-legacy/docs/voidup/evidence",
                          f"dependencies-macos-arm64-{profile}-*"),)
           for parent, pattern in roots:
               receipts = sorted(parent.glob(pattern))

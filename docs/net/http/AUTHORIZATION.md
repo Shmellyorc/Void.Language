@@ -1,5 +1,10 @@
 # 👑🔧⌨️ SACRED GOLDEN WRENCH: VOID NET/HTTP ENGINEERING AUTHORIZED
 
+> Current async ownership supersedes the historical root-duration record-retention
+> statements below: completed Work/frame roots retire after quiescence and eligible
+> unobservable Task/group records retire at precise-GC checkpoints. Original
+> measurements retain their dated scope; see [the current retention contract](../../STAGE8_ASYNC_RETENTION.md).
+
 **BOSS-AUTHORIZED COMPLETE STANDARD-LIBRARY MISSION**
 
 **Baseline:** `15f7868b0af177f8f7d49c548392c79c7bd921d2`

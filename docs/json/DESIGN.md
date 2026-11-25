@@ -3,13 +3,13 @@
 27 October 2026. Baseline `194603ea00eb38aff72b7d6e950865b3a23df92a`.
 **Historical research-stage status:** proposal for Golden Wrench/Boss review.
 The subsequent Boss authorization and current implementation are recorded below.
-[Feasibility and evidence](RESEARCH.md); [complete engineering mission](ROADMAP.md).
+[Feasibility and evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/RESEARCH.md); [complete engineering mission](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/ROADMAP.md).
 
 Implementation authorization, 27 October 2026: Boss approved all three decision
 bundles and this contract. Boss subsequently selected explicit `use json as json`
 for examples with a loop binder named `value`, preserving the existing no-shadowing
 rule. Earlier proposal/approval wording below is historical. See
-[the active engineering record](IMPLEMENTATION.md).
+[the active engineering record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/IMPLEMENTATION.md).
 
 ## 1. Public surface
 
@@ -131,7 +131,7 @@ use the same writer and error rules.
 ## 3. Parser and Unicode behavior
 
 This is a strict Unicode-scalar profile of JSON. The interoperability distinction
-is documented in [RESEARCH](RESEARCH.md#correctness-research-and-policy-choices).
+is documented in [RESEARCH](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/RESEARCH.md#correctness-research-and-policy-choices).
 
 - Accept exactly one value of any of the six kinds. Permit surrounding ASCII
   space, tab, CR and LF. Reject empty input, comments, trailing commas, extra
@@ -460,7 +460,7 @@ publication or snapshot protocol is introduced.
 
 ## 9. Approval boundary
 
-The three decision bundles are listed in [RESEARCH](RESEARCH.md#decisions-for-wrench-and-boss).
+The three decision bundles are listed in [RESEARCH](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/RESEARCH.md#decisions-for-wrench-and-boss).
 Automatic public DTO conversion, distinct parse names, strict duplicates/exact
 numbers and the resource defaults require approval. The implementation must not
 silently drop typed conversion, diagnostics or readonly support to claim a

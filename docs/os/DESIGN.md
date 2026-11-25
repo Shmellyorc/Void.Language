@@ -2,7 +2,7 @@
 
 27 October 2026. Baseline **`0d014e851851203e30d3b376ca99606a67d36a7a`**.
 **Proposed contract for Wrench/Boss review; no implementation authorization.**
-[Research/evidence](RESEARCH.md) · [complete sprint](ROADMAP.md)
+[Research/evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/os/RESEARCH.md) · [complete sprint](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/os/ROADMAP.md)
 
 **Final completeness amendment:** Boss approved the original Windows placement
 and application-resource policies. Those choices are settled below. The original

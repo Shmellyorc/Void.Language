@@ -1,5 +1,10 @@
 # Compiler stabilization and performance investigation
 
+> Current async ownership supersedes the historical root-duration record-retention
+> statements below: completed Work/frame roots retire after quiescence and eligible
+> unobservable Task/group records retire at precise-GC checkpoints. Original
+> measurements retain their dated scope; see [the current retention contract](../STAGE8_ASYNC_RETENTION.md).
+
 **STATUS: COMPILER STABILIZATION COMPLETED / STANDARD-LIBRARY DEVELOPMENT HOLD LIFTED BY BOSS.**
 
 The [await syntax handoff](../async-await-syntax/HANDOFF.md) records completion

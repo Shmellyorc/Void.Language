@@ -2,7 +2,7 @@
 
 `use log` provides checked console/file logging in ordinary VOID source.
 [Approved contract](DESIGN.md), [source](../../stdlib/log.void),
-[engineering history](IMPLEMENTATION.md), [acceptance](ACCEPTANCE.md) and
+[engineering history](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/IMPLEMENTATION.md), [acceptance](ACCEPTANCE.md) and
 [review handoff](HANDOFF.md) separate behavior from verification status.
 
 The default is info, UTC timestamps and stderr, with no file or directory creation.

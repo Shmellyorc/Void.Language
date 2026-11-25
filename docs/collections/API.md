@@ -89,4 +89,4 @@ min/max return empty_collection for empty input. Checked Runtime/allocation/call
 failures use the existing failure channel, preserving completed user effects.
 
 See [the exact behavior contract](DESIGN.md), [runnable example](../../examples/collections_stdlib/main.void),
-[implementation](IMPLEMENTATION.md) and [review handoff](HANDOFF.md).
+[implementation](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/collections/IMPLEMENTATION.md) and [review handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/collections/HANDOFF.md).

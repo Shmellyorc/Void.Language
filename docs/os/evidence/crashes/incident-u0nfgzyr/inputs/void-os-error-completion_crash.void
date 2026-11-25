@@ -1,4 +1,0 @@
-use os
-func main():
-    var issue = os.error()
-    print(issue.message)

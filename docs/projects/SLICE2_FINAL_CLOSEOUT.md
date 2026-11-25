@@ -120,13 +120,13 @@ the original S2 report remain; S3, application metadata, FFI and raylib are unto
 
 ## Exact source and Git inventory
 
-- [Review-only source patch](evidence/slice2-final-review-source.patch): three files,
+- [Review-only source patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice2-final-review-source.patch): three files,
   against the accepted starting S2 tree.
-- [Current combined baseline source patch](evidence/slice2-final-baseline-source.patch):
+- [Current combined baseline source patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice2-final-baseline-source.patch):
   all 41 source/architecture paths against HEAD, including S1 and S2.
-- [Final receipt](evidence/slice2-final-review.json): source, binary, preserved-input
+- [Final receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice2-final-review.json): source, binary, preserved-input
   and raw-evidence hashes, executed commands, results and explicit limitations.
-- [Complete layered Git inventory](evidence/slice2-final-review-inventory.txt): every
+- [Complete layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice2-final-review-inventory.txt): every
   modified/untracked path, its original S1/S2 layer and this review's additions.
 
 Both patches pass reverse checks and exact forward reconstruction in temporary

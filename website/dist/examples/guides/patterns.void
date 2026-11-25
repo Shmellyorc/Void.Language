@@ -1,9 +1,0 @@
-enum departure:
-    on_time
-    delayed(minutes: i32)
-
-func entry(minutes: i32) -> i32:
-    var board = departure.delayed(minutes)
-    return match board:
-        departure.on_time: 0
-        departure.delayed(var wait): wait

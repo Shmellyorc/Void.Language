@@ -11,7 +11,7 @@ The tool requires Python's `unicodedata.unidata_version` and the supplied Perl U
 version to both equal 16.0.0. Full unconditional lower/uppercase mappings come from
 Python's Unicode tables. Cased/Case_Ignorable inversion lists come from Perl's
 Unicode 16.0 generated property data. Input hashes, table counts and the generated
-output hash are in `docs/text-encoding/evidence/unicode.json`. The generated table
+output hash are in `tools/unicode/provenance.json`. The generated table
 is committed source input; users need neither Python nor Perl to build/run VOID.
 
 Authoritative references: [Unicode 16.0](https://www.unicode.org/versions/Unicode16.0.0/),

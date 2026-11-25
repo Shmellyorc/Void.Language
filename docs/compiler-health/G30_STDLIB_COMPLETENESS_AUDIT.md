@@ -73,7 +73,7 @@ an assertion that every declaration was executed in G30.
 | [path](../../stdlib/path.void) | Join/normalize/components/extensions, roots, absolute/relative paths | Native lexical rules, not containment/security proof; reuses `io.error` and existing path kernels. |
 | [os](../../stdlib/os.void) | Application data/config/cache/state locations, home/temp, image/resources, env, platform/arch/PID/bundle and arguments | Returns paths; creates nothing. JIT image/resource queries describe the host. [API](../os/API.md). |
 | [time](../../stdlib/time.void) | Date/time/instant/duration/offset/zone values, validated construction, arithmetic, formatting, wall/monotonic clocks and async sleep | Explicit gap/overlap policy, separate monotonic domain, no general date-string parser. [Formatting contract](../stage10/DISPLAY_FORMATTING.md), [G10 timers](../ASYNC.md#g10-monotonic-timers). |
-| [json](../../stdlib/json.void) | Bounded strict parser, immutable observed DOM, typed conversion, explicit field defaults and compact stringify | Duplicate decoded keys reject; ordered output; public stored-data DTO restrictions and metering. [API](../json/API.md), [G09](../json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults). |
+| [json](../../stdlib/json.void) | Bounded strict parser, immutable observed DOM, typed conversion, explicit field defaults and compact stringify | Duplicate decoded keys reject; ordered output; public stored-data DTO restrictions and metering. [API](../json/API.md), [G09](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults). |
 | [log](../../stdlib/log.void) | Checked global/instantiated logging, filtering/lazy messages, console/files, rotation, recovery, sync/async operations | Per-sink progress, synchronous completion and durable flush; no hidden batching. [API](../log/API.md). |
 | [channel](../../stdlib/channel.void) | Instantiated typed synchronous string-topic publish/subscribe | Built-in event snapshots, explicit tokens, owner-thread use; not a worker queue. [API](../channel/API.md). |
 | [url](../../stdlib/url.void) | HTTP(S) parse/resolve/normalize, component/query encoding/decoding and query construction | Not an arbitrary-scheme URI or filesystem path engine. [HTTP/URL guide](../net/http/README.md). |
@@ -172,7 +172,7 @@ passed and is not added to this count. No optimization candidate was created.
 - **Collections/ownership:** maintained `tests/collections_stdlib/semantics.void`,
   `mutation.void`, `authority.void`, `faults.void` and the host/publication/reload
   controls cover stable ties, error cases, callback mutation, readonly, allocation
-  failure and leases. Their [recorded validation](../collections/VALIDATION.md)
+  failure and leases. Their [recorded validation](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/collections/VALIDATION.md)
   is historical; G30 does not claim a fresh execution of every case.
 - **Installed/editor use:** G29 repair recorded Linux/Windows installed journeys,
   source-denied Windows execution, and real VSIX editor tests. It also corrected

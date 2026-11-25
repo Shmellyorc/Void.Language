@@ -148,7 +148,7 @@ existing `--discover`/`--entry` selection and protocol remain the baseline contr
 
 ## Compiler documentation and result metadata repair
 
-[Contract](DOCUMENTATION_HOVER.md) and [local evidence](DOCUMENTATION_HOVER_IMPLEMENTATION.md)
+[Contract](DOCUMENTATION_HOVER.md) and [local evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/DOCUMENTATION_HOVER_IMPLEMENTATION.md)
 cover the separate Boss-authorized repair after Stage 11. Callable hover/completion
 filters recognized parameter/return tags into description and applicable return
 text. Signature help retains labels/binding metadata but returns null unless the
@@ -176,43 +176,43 @@ snapshot rejection and installed-source protection follow ordinary compiler rule
 Project rename validation excludes installed standard sources from editable overlays
 and rechecks their disk snapshots. Existing Vim rename restrictions remain. The
 separate result/Ok/Err/parameter-documentation hover repair is outside this assignment.
-See [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md) and [verification](stage11/IMPLEMENTATION.md).
+See [RUNTIME_GLOBALS.md](RUNTIME_GLOBALS.md) and [verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage11/IMPLEMENTATION.md).
 
 
 # Stage 7 language service — current contract
 
 Boss authorized Stage 7 production engineering on 20 October 2026.
-[STAGE7_IMPLEMENTATION.md](STAGE7_IMPLEMENTATION.md) is the current protocol,
+[STAGE7_IMPLEMENTATION.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE7_IMPLEMENTATION.md) is the current protocol,
 recovery, rewrite, synchronization and scheduling contract. It supersedes the
 historical Phase 10 exclusions below. Added methods: completion, hover,
 signatureHelp, documentSymbol, workspace/symbol, guarded prepareRename/rename,
 formatting, didSave, watched-file refresh, cancellation and void/refreshProject.
 Initialization exposes `experimental.voidToolingProtocol: 1` and server version
 0.2.0. The same compiler-owned server serves every editor. Local evidence and
-remaining limitations are in [acceptance](stage7/ACCEPTANCE.md); Stage 7 is not locked.
+remaining limitations are in [acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage7/ACCEPTANCE.md); Stage 7 is not locked.
 
 ---
 
 
-**20 October 2026:** [Stage 7 research roadmap](STAGE7_ROADMAP.md) verifies the
+**20 October 2026:** [Stage 7 research roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE7_ROADMAP.md) verifies the
 current source, including later symbol coverage that exceeds the original Phase 10
 summary below. Boss confirms Stage 6 locked at `4139297f` / CI #78. Research is
 complete; Stage 7 implementation is not authorized and no new capability is claimed.
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 
-`voidls` is a synchronous, single-threaded stdio implementation of the
+`voidls` owns a stdio protocol event loop and uses bounded, cancellable background
+analysis/assistance jobs. It implements the
 [Language Server Protocol 3.17](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/).
 It analyzes real `.void` source through the existing compiler and Phase 9
 `ToolingSession`. It never executes source, publishes native code or restarts a host.
 
-## Stage 7 planning goals (not implemented)
+## Historical Stage 7 planning goals (superseded)
 
-Stage 7 should extend this existing compiler-owned LSP 3.17 server into a shared,
-practical editing service for VS Code/VSCodium, Neovim and Vim. **This is planning,
-not Stage 7 implementation authorization.** Stage 6 and its Delivery 5/hosted gates
-continue unchanged. The implemented protocol table below remains the current
-capability contract; future goals do not change it.
+The original Stage 7 goals below are historical. Compiler-owned completion,
+hover, signatures, navigation, guarded rename, formatting and later semantic
+tokens/quick fixes are implemented. Current capability negotiation and the
+feature contracts above govern; old Stage 6 authorization gates are superseded.
 
 Priorities are completion, hover, signature help, rename, formatting, better symbol
 coverage, project handling and responsiveness, with semantic highlighting, code

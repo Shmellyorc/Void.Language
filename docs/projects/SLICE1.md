@@ -5,7 +5,7 @@ Boss authorized bounded engineering after contract/source reconciliation. The
 fifteen preexisting Phase 1 documentation changes remain in the working tree.
 **Implemented and locally qualified on Linux; independent review pending. Native
 Windows/macOS and hosted acceptance are UNQUALIFIED.** No Git integration or
-publication is performed. [Machine-readable receipt](evidence/slice1-local.json).
+publication is performed. [Machine-readable receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-local.json).
 
 ## Delivered foundation and contract confirmation
 
@@ -138,7 +138,7 @@ the first dot, so this is valid; the fixture now tests a real `CON.txt` componen
 and retains the valid spelling as positive coverage. None changes the VFS policy.
 
 The first full qualification exposed a genuine parser defect under mutation:
-[the exact rejected snapshot](evidence/slice1-malformed-header.toml) contains
+[the exact rejected snapshot](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-malformed-header.toml) contains
 `[=roject]`. Header parsing entered parse_key with an invalid key starter. Upstream's
 precondition assertion aborted Debug; fatal UBSan rejected its optimizer assumption
 in strict. Both parser CTests failed in each profile (22 passed, 2 failed); the
@@ -198,8 +198,8 @@ binaries remain ignored local artifacts and are not publication.
 | M | [docs/STAGE9_APPLICATION_WORKFLOW.md](../STAGE9_APPLICATION_WORKFLOW.md) | yes |
 | M | [docs/os/API.md](../os/API.md) | yes |
 | ?? | [docs/projects/SLICE1.md](SLICE1.md) | no |
-| ?? | [docs/projects/evidence/slice1-local.json](evidence/slice1-local.json) | no |
-| ?? | [docs/projects/evidence/slice1-malformed-header.toml](evidence/slice1-malformed-header.toml) | no |
+| ?? | [docs/projects/evidence/slice1-local.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-local.json) | no |
+| ?? | [docs/projects/evidence/slice1-malformed-header.toml](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice1-malformed-header.toml) | no |
 | M | [include/void/diagnostic.hpp](../../include/void/diagnostic.hpp) | no |
 | M | [include/void/path.hpp](../../include/void/path.hpp) | no |
 | ?? | [include/void/project.hpp](../../include/void/project.hpp) | no |

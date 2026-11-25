@@ -375,7 +375,7 @@ and build tree unavailable. Qualification must separately prove that launching
 the installed compiler still has its explicit native-link prerequisites.
 
 License coverage comes from [scope](../release/LICENSING_SCOPE.md),
-[notice inventory](../release/NOTICE_INVENTORY.json) and actual linked contents.
+[notice inventory](../../cmake/licenses/NOTICE_INVENTORY.json) and actual linked contents.
 VOID-original Runtime/application source can use the existing MIT grant; that
 does not relicense LLVM, HTTP libraries, system SDKs or new dependencies.
 Carry libsodium's [license](https://github.com/jedisct1/libsodium/blob/master/LICENSE)

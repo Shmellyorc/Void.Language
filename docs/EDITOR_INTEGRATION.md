@@ -431,7 +431,7 @@ remain delivered legacy behavior alongside the additive S3 project protocol.
 supersedes the historical import/discovery exclusions below. It specifies separate
 standard/project source domains, importer-relative bare quoted imports, bounded
 shared `main.void` selection, metadata completion, source docs and readonly standard
-navigation. [Local acceptance](stage8/ACCEPTANCE.md) records actual verification;
+navigation. [Local acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/ACCEPTANCE.md) records actual verification;
 no hosted lock is implied. Existing snapshot, UTF-16, rename and native safety
 contracts remain in force.
 
@@ -442,8 +442,8 @@ For installing `voidls` with the compiler, start with the
 ## Stage 7 setup — current instructions (20 October 2026)
 
 Production engineering is authorized. This section and
-[STAGE7_IMPLEMENTATION.md](STAGE7_IMPLEMENTATION.md) supersede the historical
-Phase 11 feature exclusions below. See [acceptance](stage7/ACCEPTANCE.md) for exact
+[STAGE7_IMPLEMENTATION.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE7_IMPLEMENTATION.md) supersede the historical
+Phase 11 feature exclusions below. See [acceptance](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage7/ACCEPTANCE.md) for exact
 executed versions; compatibility targets do not establish a tested version range.
 
 All editors share compiler diagnostics, completion, hover, signatures, navigation,
@@ -538,7 +538,7 @@ UI option, with no source parsing. Later explicit client configuration may overr
 it. Third-party signature plugins and custom float lifecycle settings remain
 client-owned. Plaintext may still be styled by a client's preview utilities.
 
-The [implementation handoff](DOCUMENTATION_HOVER_IMPLEMENTATION.md) records exact
+The [implementation handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/DOCUMENTATION_HOVER_IMPLEMENTATION.md) records exact
 executed editor versions, real popup/window checks and remaining platform limits.
 The VS Code host harness accepts `VOID_TEST_CDP_PORT` with an isolated test window
 to inspect the actual parameter-hint DOM; provider-only assertions do not certify
@@ -616,7 +616,7 @@ user's configuration. The server itself is not published or installed system-wid
 ---
 
 
-**20 October 2026:** See the [Stage 7 research roadmap](STAGE7_ROADMAP.md) for
+**20 October 2026:** See the [Stage 7 research roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE7_ROADMAP.md) for
 verified current editor behavior, real Linux Neovim/Vim baseline probes, measured
 latency and the proposed shared-server sprint. Boss confirms Stage 6 locked at
 `4139297f` / CI #78. Research is complete; no Stage 7 production integration or
@@ -630,47 +630,14 @@ basic TextMate highlighting/indentation, and runs the existing `voidls` through
 There is no editor-side parser, resolver, type checker, LSP transport or position
 converter. VS Code and the language client use the server's UTF-16 positions.
 
-## Stage 7 editor goals (planning only)
+## Shared editor architecture
 
-**Future goals, not delivered functionality or Stage 7 authorization.** The existing
-VS Code adapter described below remains the implementation baseline. Stage 6
-continues unchanged through Delivery 5 and owner-controlled hosted acceptance.
-Stage 7 is planned as one cohesive implementation sprint by default, splitting
-only if investigation exposes genuine architectural dependencies, high-risk
-contracts or acceptance problems. Its aim is a practical, developer-ready editing
-experience; it need not implement every optional LSP extension.
-
-| Editor | Stage 7 goals |
-| --- | --- |
-| VS Code / VSCodium | Full-featured extension experience: reliable installation/configuration, native `voidls` discovery and startup; IntelliSense/completion, hover, signature help, navigation, rename, formatting and diagnostics; appropriate semantic highlighting, code actions and workspace features where supported; reliable project selection, document synchronization/refresh and lifecycle; cross-platform testing and packaging. |
-| Neovim | Native LSP integration with shared `voidls`; filetype recognition, syntax highlighting and indentation; working completion, navigation, hover, rename and diagnostics; reproducible configuration examples, documentation and integration tests. |
-| Vim | Integration through an appropriate maintained Vim LSP client; filetype recognition, syntax and indentation; compatible diagnostics, completion and navigation; documented supported Vim versions and required plugins, validated through realistic integration tests. |
-
-Neovim/Vim adapters and their supported versions/plugins are not delivered or
-selected by this update. Choose the Vim client and compatibility matrix after
-checking official documentation and real behavior. Do not assume that passing
-VS Code tests establishes VSCodium, Neovim or Vim compatibility. Verify actual
-client/server attachment, unsaved edit/repair, completion/navigation and other
-advertised features, startup failures, refresh and shutdown/restart on the declared
-supported combinations. Include installable packaging and reproducible setup.
-
-Every editor shares **one authoritative `voidls`** and compiler-owned analysis.
-Filetype/syntax/indentation rules and client configuration are editor integration;
-no editor-specific parser or type checker is allowed. Preserve the server's
-immutable snapshots, diagnostic accuracy, UTF-16 positions, source identities and
-stale-result checks. Better project handling, executable discovery/distribution,
-workspace scope, rename/formatting behavior and optional semantic/code-action
-support need investigation; this plan does not silently change current settings,
-trust, explicit-entry/root or synchronization contracts.
-
-Measure useful compiler/server/editor performance and setup friction, then repair
-demonstrated bottlenecks. Preserve KISS/DRY and LLVM 23.1.4; do not invent speculative
-optimization frameworks, native packages, public FFI, new syntax or automatic
-native hot reload. Research real source and official editor/client documentation
-for architectural or compatibility questions, then use focused development checks
-and consolidated acceptance. See the [canonical workflow and open decisions](DEVELOPMENT_STRATEGY.md#owner-workflow-and-stage-7-planning--19-october-2026).
-The current instructions and limitations below describe the existing extension,
-not a claim that these future goals have been completed.
+The compiler owns completion, hover, signatures, navigation, guarded rename,
+formatting, semantic tokens and supported quick fixes. Clients negotiate guarded
+capabilities and render shared metadata. Save/watched-file refresh and bounded
+background analysis are implemented; source-change notifications do not reload a
+running application. Native AOT debugging follows the supported debug workflow.
+Older Stage 7 planning text is preserved in Git history.
 
 ## Requirements and native build
 
@@ -864,16 +831,13 @@ native executable with execute permissions, and the selected absolute entry. Bui
 voidls first; configuring a directory, a compiler driver or a shell command is not
 supported. Check Output → VOID before using the restart command.
 
-No watcher/save refresh extension is added. External disk changes alone do not
-trigger analysis; restart explicitly rereads disk. In-editor edits use immutable
-session overlays. Full graph analysis is synchronous and disk reads remain non-atomic.
-UTF-8 comments and physical root names work, but Unicode module filenames and
-identifiers retain existing compiler restrictions. Mutable locals/parameters have
-no definition/reference records yet. Syntax highlighting covers only implemented
-keywords, types, decimal literals/operators, comments and quoted import paths;
-it does not promise support for strings, structs, collections, async or other
-Language Bible proposals. Completion, hover, rename, formatting, semantic tokens,
-code actions, debugger, workers and automatic native reload remain deferred.
+Save and watched-file notifications refresh compiler-owned analysis. Unsaved edits
+use immutable overlays and stale results are rejected. Completion, hover,
+signatures, navigation, guarded rename, formatting, semantic tokens and supported
+quick fixes use the shared compiler model. The supported native AOT debugger lane
+is separate from JIT debugging and automatic application reload. Current workspace,
+trust, remote/virtual-document and rename-category limits still apply; a refresh
+notification does not provide incremental compilation or live code replacement.
 
 Official references: [language client architecture](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide),
 [extension-host tests and CLI](https://code.visualstudio.com/api/working-with-extensions/testing-extension),

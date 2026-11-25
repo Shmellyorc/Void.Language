@@ -2,7 +2,7 @@
 
 21 October 2026. **IMPLEMENTED / LOCALLY VERIFIED; Wrench review pending; not hosted locked.**
 Baseline `3d61279237c62157f2ecfff01aa24d6c937f9a0d`.
-[Decisions](DECISIONS.md#21-october-2026--stage-8-sprint-6-owner-approvals).
+[Decisions](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/DECISIONS.md#21-october-2026--stage-8-sprint-6-owner-approvals).
 Approval is separate from implementation and acceptance evidence.
 
 ## Type relationships
@@ -80,7 +80,7 @@ are not part of this sprint.
 
 ## Local acceptance
 
-[Acceptance evidence](stage8/SPRINT6_ACCEPTANCE.md) records 156/156 Debug,
+[Acceptance evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT6_ACCEPTANCE.md) records 156/156 Debug,
 156/156 Release and 156/156 strict ASan/UBSan/leak suites: **468/468 final unique
-outcomes**. Both full 1 MiB frontend gates passed. The [hosted checklist](stage8/FINAL_HOSTED_GATE.md)
+outcomes**. Both full 1 MiB frontend gates passed. The [hosted checklist](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/FINAL_HOSTED_GATE.md)
 separates local checks from the remaining owner-controlled platform/editor gates.

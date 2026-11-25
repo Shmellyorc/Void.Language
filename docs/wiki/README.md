@@ -13,7 +13,7 @@ these pages explain it through small examples rather than repeat the specificati
 The previous 16-file draft inventory is preserved in the engineering evidence and
 Git history. Existing page names are retained; new topics extend that structure.
 
-[publication.json](publication.json) lists exactly **26 publication files**:
+[publication.json](../../tools/wiki/publication.json) lists exactly **26 publication files**:
 24 topic pages plus `_Sidebar.md` and `_Footer.md`, with exact SHA-256 values.
 `Home.md` is the landing page. `README.md`, `examples.json`, `publication.json`,
 reports, source fixtures and verification tools are **not** Wiki pages.

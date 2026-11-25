@@ -166,22 +166,22 @@ fired. The replays supplied no observed wrong result or generation
 lifetime defect. The existing test and its assertions stay intact.
 The G3 Windows matrix uses `ctest -j 2` and records any retry of the
 unchanged selection.
-[Original G2 Release transcript](evidence/slice7-g2/original/windows-original-Release-ctest.txt) ·
-[Parallel comparisons](evidence/slice7-g3/windows/parallel-results.json) ·
-[G2 overlap](evidence/slice7-g3/windows/parallel-overlap-results.json) ·
-[G1 overlap](evidence/slice7-g3/windows/parallel-g1-overlap-results.json) ·
-[Diagnostic transcript](evidence/slice7-g3/windows/diagnostic-release-overlap.txt) ·
-[Diagnostic build receipt](evidence/slice7-g3/windows/diagnostic-results.json).
+[Original G2 Release transcript](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g2/original/windows-original-Release-ctest.txt) ·
+[Parallel comparisons](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/parallel-results.json) ·
+[G2 overlap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/parallel-overlap-results.json) ·
+[G1 overlap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/parallel-g1-overlap-results.json) ·
+[Diagnostic transcript](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/diagnostic-release-overlap.txt) ·
+[Diagnostic build receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/diagnostic-results.json).
 
 ## Qualification
 
 | Native configuration | Selected CTest cases | Evidence |
 | --- | ---: | --- |
-| Linux x86-64 Release | 48/48 | [CTest](evidence/slice7-g3/linux/release-ctest.txt) · [Executable and ABI receipts](evidence/slice7-g3/linux/release-artifacts.json) |
-| Linux x86-64 Debug | 48/48 | [CTest](evidence/slice7-g3/linux/debug-ctest.txt) · [Executable and ABI receipts](evidence/slice7-g3/linux/debug-artifacts.json) |
-| Linux x86-64 fatal ASan/UBSan | 48/48 | [CTest](evidence/slice7-g3/linux/strict-ctest.txt) · [Executable and ABI receipts](evidence/slice7-g3/linux/strict-artifacts.json) |
-| Windows 10 x64 Release, build 19045 | 47/47 on retry | [CTest](evidence/slice7-g3/windows/Release-ctest.txt) · [Direct probes](evidence/slice7-g3/windows/Release-g3-direct.txt) · [Run receipt](evidence/slice7-g3/windows/Release-result.json) |
-| Windows 10 x64 Debug, build 19045 | 47/47 | [CTest](evidence/slice7-g3/windows/Debug-ctest.txt) · [Direct probes](evidence/slice7-g3/windows/Debug-g3-direct.txt) · [Run receipt](evidence/slice7-g3/windows/Debug-result.json) |
+| Linux x86-64 Release | 48/48 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/linux/release-ctest.txt) · [Executable and ABI receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/linux/release-artifacts.json) |
+| Linux x86-64 Debug | 48/48 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/linux/debug-ctest.txt) · [Executable and ABI receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/linux/debug-artifacts.json) |
+| Linux x86-64 fatal ASan/UBSan | 48/48 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/linux/strict-ctest.txt) · [Executable and ABI receipts](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/linux/strict-artifacts.json) |
+| Windows 10 x64 Release, build 19045 | 47/47 on retry | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Release-ctest.txt) · [Direct probes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Release-g3-direct.txt) · [Run receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Release-result.json) |
+| Windows 10 x64 Debug, build 19045 | 47/47 | [CTest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Debug-ctest.txt) · [Direct probes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Debug-g3-direct.txt) · [Run receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Debug-result.json) |
 
 The strict build used fatal ASan and UBSan with leak detection enabled.
 The pinned LLVM toolchain lacks RTTI, which limits vptr
@@ -195,8 +195,8 @@ hashes and restored the trusted Windows source root after the runs.
 The one-case platform difference is the Linux-only manifest authority
 test. Each Windows profile also ran the C fixture and independent AOT
 probes outside CTest.
-[Windows native and source-packet receipt](evidence/slice7-g3/windows/native-results.json) ·
-[Windows evidence hashes](evidence/slice7-g3/windows/preserved-evidence.json).
+[Windows native and source-packet receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/native-results.json) ·
+[Windows evidence hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/preserved-evidence.json).
 
 The separately compiled C fixture and target thunk exercised acquisition,
 inspection, mutation and release. Normal and O2 JIT and the independently
@@ -227,18 +227,18 @@ admission in Managed state. The corrected fixture admits metadata
 while NativeSafe. Both original AOT paths executed the resource
 program and shutdown case successfully. A corrected focused run
 passed all three G3 tests.
-[Original Linux configure](evidence/slice7-g3/original/linux-release-first-configure.txt) ·
-[Original Linux build](evidence/slice7-g3/original/linux-release-first-build.txt) ·
-[Original direct IR trial](evidence/slice7-g3/original/linux-release-first-ctest.txt) ·
-[NativeSafe admission failure](evidence/slice7-g3/original/linux-release-second-ctest.txt) ·
-[First corrected focused run](evidence/slice7-g3/linux/release-corrective-focused.txt) ·
-[Final focused run](evidence/slice7-g3/linux/release-focused.txt).
+[Original Linux configure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/original/linux-release-first-configure.txt) ·
+[Original Linux build](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/original/linux-release-first-build.txt) ·
+[Original direct IR trial](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/original/linux-release-first-ctest.txt) ·
+[NativeSafe admission failure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/original/linux-release-second-ctest.txt) ·
+[First corrected focused run](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/linux/release-corrective-focused.txt) ·
+[Final focused run](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/linux/release-focused.txt).
 
 The first G1 comparator launch failed when a local script named
 `inspect.py` shadowed Python's standard library module. Renaming the
 script to `capture-commands.py` restored the unchanged comparator.
-[Original launcher failure](evidence/slice7-g3/original/windows-comparator-python-shadow.txt) ·
-[Completed G1 overlap comparison](evidence/slice7-g3/windows/parallel-g1-overlap-results.json).
+[Original launcher failure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/original/windows-comparator-python-shadow.txt) ·
+[Completed G1 overlap comparison](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/parallel-g1-overlap-results.json).
 
 The first G3 Windows Release matrix ran alongside Debug and failed
 only the same `analysis` compound assertion. Debug passed its first
@@ -246,14 +246,14 @@ matrix. The Release runner preserved its failed transcript and JUnit
 file and reran the exact full command with `-j 2`. It passed all
 47 tests. The build, selection and assertions were identical. CTest
 scheduled `analysis` first in the retry, while Debug was still active.
-[Original G3 Release matrix](evidence/slice7-g3/windows/Release-attempt-1-ctest.txt) ·
-[Unchanged parallel rerun](evidence/slice7-g3/windows/Release-ctest.txt).
+[Original G3 Release matrix](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Release-attempt-1-ctest.txt) ·
+[Unchanged parallel rerun](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/Release-ctest.txt).
 
 ## Source and Git inventory
 
-[Exact source patch](evidence/slice7-g3/source.patch) ·
-[Before and after hashes](evidence/slice7-g3/source-hashes.json) ·
-[Layered Git inventory](evidence/slice7-g3/inventory.txt).
+[Exact source patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/source.patch) ·
+[Before and after hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/source-hashes.json) ·
+[Layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/inventory.txt).
 
 The patch covers 21 source and test paths relative to the accepted G2
 working tree. It amends nine starting inventory paths, modifies two
@@ -275,7 +275,7 @@ macOS and other architectures remain unqualified.
 Clang reports a misleading-indentation warning at the independent
 release-result assignment in the compact validator switch. The
 assignment runs after the guard.
-[Strict build transcript](evidence/slice7-g3/linux/strict-build.txt).
+[Strict build transcript](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/linux/strict-build.txt).
 
 ## End-of-task temporary workspace cleanup
 
@@ -285,8 +285,8 @@ cleanup removed eight verified G3 scratch roots and 103 contained
 entries, including the temporary source-overlay backup, the
 diagnostic-only replay tree, and the disposable source probes.
 The exact deleted paths are recorded in the receipts.
-[Linux cleanup](evidence/slice7-g3/host-cleanup.json) ·
-[Windows cleanup](evidence/slice7-g3/windows/cleanup-results.json).
+[Linux cleanup](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/host-cleanup.json) ·
+[Windows cleanup](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-g3/windows/cleanup-results.json).
 
 The Windows 10 system drive had 26,198,446,080 bytes free (24.40 GiB)
 before cleanup and 26,252,644,352 bytes free (24.45 GiB) afterward.

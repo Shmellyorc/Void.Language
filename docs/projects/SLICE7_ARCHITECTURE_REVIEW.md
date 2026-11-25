@@ -291,7 +291,7 @@ corresponding source. Reconcile per-platform SDK/CRT, signing and bundled
 dependencies using the existing release review before distribution. The upstream
 raylib license uses zlib/libpng terms. Inventory its actual selected embedded
 and linked dependencies separately. No version or package pin is chosen here.
-[Release inventory](../release/NOTICE_INVENTORY.json) ·
+[Release inventory](../../cmake/licenses/NOTICE_INVENTORY.json) ·
 [Release blockers](../release/PREVIEW_BLOCKERS.md) ·
 [raylib license](https://github.com/raysan5/raylib/blob/master/LICENSE) ·
 [raylib build](https://github.com/raysan5/raylib/blob/master/src/CMakeLists.txt).
@@ -447,7 +447,7 @@ The audit used the retained Linux Release compiler for four read-only
 native/dependency tables returned VOID5008, and the proposed declaration
 returned a syntax error. The existing default-profile debug-info warning is
 present where applicable. These probes do not qualify an FFI implementation.
-[Probe and storage receipt](evidence/slice7-audit.json).
+[Probe and storage receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-audit.json).
 
 The Windows 10 Home guest is build 19045. The initial read-only audit observed
 3.602 GiB free on C:. The separately authorized resize expanded its existing
@@ -458,7 +458,7 @@ both outputs, staging and logs without removing earlier qualification assets.
 No S7 implementation build, raylib launch, native S7 qualification or hosted
 run took place in this audit.
 
-The [layered Git inventory](evidence/slice7-inventory.txt) verifies the 1,112
+The [layered Git inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-inventory.txt) verifies the 1,112
 starting paths and exact index tuples. The review adds its report, receipt and
 inventory only. All S1–S6 source and evidence bytes are preserved.
 
@@ -466,7 +466,7 @@ inventory only. All S1–S6 source and evidence bytes are preserved.
 
 Removed the assignment-owned host workspace `/home/shmellyorc/VM/void-s7-audit.Wbw08GjA`
 after preserving the exact Linux probe inputs and output, storage records and
-starting path hashes. The [audit receipt](evidence/slice7-audit.json) lists
+starting path hashes. The [audit receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-audit.json) lists
 every removed path. No guest cleanup was required. Windows Explorer showed
 **33.8 GiB free** on C: at handoff, consistent with the byte-precise
 post-resize measurement. Earlier qualification binaries, test harnesses,

@@ -97,15 +97,15 @@ limitations. Runner/fixture hashes still matched after execution, as did all
 
 Permanent records, including diagnostic scripts exactly as run:
 
-- [Manifest and attempt budget](evidence/phase-capture-2026-10-26/manifest.json)
-- [Full debugger transcript](evidence/phase-capture-2026-10-26/session.log)
-- [Boundary events](evidence/phase-capture-2026-10-26/events.jsonl)
-- [Process results](evidence/phase-capture-2026-10-26/results.json)
-- [Validated timings, returns and wire oracles](evidence/phase-capture-2026-10-26/summary.json)
-- [GDB script](evidence/phase-capture-2026-10-26/capture.gdb)
-- [Checksum/deadline launcher](evidence/phase-capture-2026-10-26/run-capture.sh)
-- [Static main disassembly](evidence/phase-capture-2026-10-26/main-disassembly.txt)
-- [Evidence hashes](evidence/phase-capture-2026-10-26/sha256.json)
+- [Manifest and attempt budget](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/phase-capture-2026-10-26/manifest.json)
+- [Full debugger transcript](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/io/evidence/phase-capture-2026-10-26/session.log)
+- [Boundary events](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/phase-capture-2026-10-26/events.jsonl)
+- [Process results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/phase-capture-2026-10-26/results.json)
+- [Validated timings, returns and wire oracles](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/phase-capture-2026-10-26/summary.json)
+- [GDB script](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/phase-capture-2026-10-26/capture.gdb)
+- [Checksum/deadline launcher](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/phase-capture-2026-10-26/run-capture.sh)
+- [Static main disassembly](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/phase-capture-2026-10-26/main-disassembly.txt)
+- [Evidence hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/phase-capture-2026-10-26/sha256.json)
 
 Scripts preserve original private paths and a one-run guard. They record this
 bounded experiment; they are not a production framework or authorization to

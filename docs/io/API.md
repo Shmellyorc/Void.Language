@@ -2,9 +2,9 @@
 
 The original filesystem qualification inventoried **149 public declarations** across `io` and
 `path`, including enum cases, metadata/error fields, properties and lifecycle
-methods. [API.tsv](evidence/API.tsv) records each identity, actual source location,
+methods. [API.tsv](../../tests/io/fixtures/API.tsv) records each identity, actual source location,
 written declaration and parameter/return documentation status.
-[API-AUDIT.tsv](evidence/API-AUDIT.tsv) maps every row to registered tests and its
+[API-AUDIT.tsv](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/io/evidence/API-AUDIT.tsv) maps every row to registered tests and its
 ownership contract. These inventories come from compiler-owned source snapshots;
 they are not a second documentation implementation.
 

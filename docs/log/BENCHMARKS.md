@@ -1,12 +1,17 @@
 # Logging bounded measurements
 
-**Historical measurements retained.** These tables are the original pre-repair observations. The immutable isolated baseline and component investigations are under [evidence/performance-repair](evidence/performance-repair/); see [PERFORMANCE_REPAIR.md](PERFORMANCE_REPAIR.md). Final isolated repair tables follow below; the original history is retained.
+> Current async ownership supersedes the historical root-duration record-retention
+> statements below: completed Work/frame roots retire after quiescence and eligible
+> unobservable Task/group records retire at precise-GC checkpoints. Original
+> measurements retain their dated scope; see [the current retention contract](../STAGE8_ASYNC_RETENTION.md).
+
+**Historical measurements retained.** These tables are the original pre-repair observations. The immutable isolated baseline and component investigations are under [evidence/performance-repair](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair); see [PERFORMANCE_REPAIR.md](PERFORMANCE_REPAIR.md). Final isolated repair tables follow below; the original history is retained.
 
 28 October 2026, local Linux x86-64 Release, pinned LLVM/Clang 19.1.7.
 AMD Ryzen 7 1700X, 16 logical CPUs, about 31 GiB RAM. Other local acceptance
 processes ran concurrently; these are bounded observations, not isolated-machine
-throughput qualification. [Environment](evidence/benchmark-environment.json),
-[raw 216 samples](evidence/benchmarks.json), [workloads](../../tests/log/benchmark.void),
+throughput qualification. [Environment](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/benchmark-environment.json),
+[raw 216 samples](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/benchmarks.json), [workloads](../../tests/log/benchmark.void),
 [host](../../tests/log/host.cpp), [measurement driver](../../tests/log/benchmarks_default.py).
 
 Each of 18 workloads has a warmup and three measured repetitions in each of four
@@ -17,13 +22,13 @@ Counts/checksums prevent discarded work; caller message construction, acquisitio
 and final checked close remain inside each execution interval.
 
 The final timing host uses **Runtime(256)**, matching production JIT creation and
-native bootstrap. Its [exact source overlay](evidence/benchmark-default-host.cpp)
+native bootstrap. Its [exact source overlay](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/benchmark-default-host.cpp)
 changes only the test host's Runtime budget (1→256) and resolves its probe include.
 All production libraries, source programs, optimization flags and probe behavior
-are shared. The original [216 collection-at-every-allocation samples](evidence/benchmarks-gc-stress.json)
+are shared. The original [216 collection-at-every-allocation samples](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/benchmarks-gc-stress.json)
 remain separate. An intermediate Runtime(0) experiment disabled automatic GC;
 its completed JIT samples and interrupted AOT samples are preserved separately
-and excluded from the tables below. The [stop journal](evidence/benchmark-unbudgeted-stop.json)
+and excluded from the tables below. The [stop journal](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/benchmark-unbudgeted-stop.json)
 records the measurement correction; it was not a logger failure.
 
 ## Execution wall and CPU time
@@ -167,22 +172,22 @@ alongside the raw data rather than hidden behind a single throughput number.
 ## Mandatory repair: final isolated measurements
 
 The final source matches the Release acceptance freeze before and after every
-measurement. [Environment and exact launch sequence](evidence/performance-repair/final-measurement-environment.json)
+measurement. [Environment and exact launch sequence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/final-measurement-environment.json)
 records isolation, affinity, GC=256, actual hard/soft 1 MiB stacks and compiler
 separation. No build or validation ran concurrently. The desktop remained active.
-[Original-workload raw samples](evidence/performance-repair/final-original.json)
+[Original-workload raw samples](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/final-original.json)
 contain 216 observations across normal/O2 JIT and independent normal/O2 native
 AOT. The VOID workload is unchanged. New C++ byte/count oracles run **after**
 timing; they do not omit any measured work. Their temporary native allocations
 can affect process peak RSS, which is not used to claim a memory improvement.
 
-The [immutable baseline](evidence/performance-repair/baseline/freeze.json) contains
+The [immutable baseline](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/baseline/freeze.json) contains
 source and executable hashes, original sources/results and frozen binaries.
 Each final harness directory contains generated source, production-source hashes,
-compiler/link receipts and executable hashes: [original](evidence/performance-repair/final-original/hashes.json),
-[async](evidence/performance-repair/async-final/hashes.json),
-[framing](evidence/performance-repair/framing-final/hashes.json).
-The [summary JSON](evidence/performance-repair/summary.json) records every warm
+compiler/link receipts and executable hashes: [original](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/final-original/hashes.json),
+[async](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/async-final/hashes.json),
+[framing](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/framing-final/hashes.json).
+The [summary JSON](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/summary.json) records every warm
 observation, first-stage invocation, median/range, CPU time and resource counts.
 The generated executable copies outside the frozen baseline are historical build
 outputs. For a new measurement, rebuild in a private output directory with the
@@ -292,7 +297,7 @@ ordinary async activation around the same synchronous console API.
 
 The final matrix comprises 272 JIT timing, 272 independent AOT timing and 272 AOT
 instrumented observations (first invocation plus three warm samples per cell).
-[Timing AOT](evidence/performance-repair/async-final/void_log_probe_optimized-timing.json)
+[Timing AOT](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/log/evidence/performance-repair/async-final/void_log_probe_optimized-timing.json)
 provides the matching instrumentation-overhead control. The original four-mode
 workload supplies normal-mode performance coverage; this expanded matrix is O2.
 

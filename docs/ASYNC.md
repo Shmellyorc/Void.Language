@@ -89,7 +89,7 @@ the enclosing code lease retain their existing independent lifetimes.
 
 This does not bound total root memory: Task/Work records, result objects, null
 Handle registrations and allocator capacity can still grow with total work.
-[Acceptance and measurements](stage8/SPRINT5_ACCEPTANCE.md) distinguish actual
+[Acceptance and measurements](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT5_ACCEPTANCE.md) distinguish actual
 verification from approvals and remaining platform/owner gates.
 
 

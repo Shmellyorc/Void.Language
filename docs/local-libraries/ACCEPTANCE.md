@@ -2,8 +2,8 @@
 
 21 October 2026. Baseline `9e946c2ecf176637ac67a07fdf86f492768433c6`.
 **Implemented / locally verified; Wrench review and native Windows/macOS pending.**
-[Contract](../LOCAL_LIBRARIES.md), [machine-readable results and hashes](results.json),
-[raw logs](logs/). This evidence is separate from CI #87 and preserves its history.
+[Contract](../LOCAL_LIBRARIES.md), [machine-readable results and hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/local-libraries/results.json),
+[raw logs](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/local-libraries/logs). This evidence is separate from CI #87 and preserves its history.
 
 ## Implementation and invariants
 

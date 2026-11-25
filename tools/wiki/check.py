@@ -31,13 +31,13 @@ def anchors(text):
 
 def structure():
     actual = inventory()
-    assert json.loads((SOURCE / 'publication.json').read_text()) == actual, 'Stale publication inventory'
+    assert json.loads((Path(__file__).resolve().parent / 'publication.json').read_text()) == actual, 'Stale publication inventory'
     files = [row['file'] for row in actual['files']]
     pages = {Path(name).stem for name in files if not name.startswith('_')}
     assert len(pages) == 24 and len(files) == 26
     sidebar = (SOURCE / '_Sidebar.md').read_text()
     assert {unquote(urlsplit(link).path).rsplit('/', 1)[-1] for link in re.findall(r'\]\((https://[^)]+)\)', sidebar)} == pages
-    example_rows = json.loads((SOURCE / 'examples.json').read_text())['examples']
+    example_rows = json.loads((Path(__file__).resolve().parent / 'examples.json').read_text())['examples']
     assert len({row['id'] for row in example_rows}) == len(example_rows)
     expected_blocks = {(row['page'], row['block']) for row in example_rows}
     found_blocks, links, relation_count = set(), set(), {}
@@ -131,7 +131,7 @@ def execute(args, summary):
             assert child.stdout == expected, row
         assert not any(s in child.stderr for s in ('AddressSanitizer', 'LeakSanitizer', 'runtime error:')), row
         return child.stdout
-    rows = json.loads((SOURCE / 'examples.json').read_text())['examples']
+    rows = json.loads((Path(__file__).resolve().parent / 'examples.json').read_text())['examples']
     snippets = {row['id']: re.findall(r'```void\n(.*?)```', (SOURCE / row['page']).read_text(), re.S)[row['block']] for row in rows}
     result['examples'] = {row['id']: dict(source=snippets[row['id']], mode=row['mode']) for row in rows}
     for row in rows:

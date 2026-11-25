@@ -35,4 +35,4 @@ Linux Release, pinned LLVM 19.1.7. Three serialized execution samples per worklo
 
 The original unrolled fixture is retained separately. Source loops reduce its 1024-registration compilation cost without changing the counts or checksums. Both raw runs remain in the engineering archive. No Runtime/event replacement or speculative universal performance target was introduced.
 
-[Implementation handoff](HANDOFF.md).
+[Implementation handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/channel/HANDOFF.md).

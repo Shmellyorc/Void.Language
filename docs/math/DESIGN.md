@@ -9,9 +9,9 @@
 
 26 October 2026. Baseline: `9eaefbd339e2456295911cdecb2460d4143f34b0`.
 **Approved for implementation and independent Golden Wrench source review.**
-[Source findings and decisions](RESEARCH.md); [implementation mission](ROADMAP.md).
+[Source findings and decisions](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/math/RESEARCH.md); [implementation mission](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/math/ROADMAP.md).
 That baseline predates implementation. The current implementation is `stdlib/math.void`;
-[API audit](API.md) and [handoff](HANDOFF.md) record its verification.
+[API audit](API.md) and [handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/math/HANDOFF.md) record its verification.
 
 ## 1. Initial scope
 
@@ -352,7 +352,7 @@ results may vary with library, CPU and optimization; no bit-identical cross-
 platform promise or universal unmeasured ULP bound is made. A fixed Random seed
 does not make a simulation using arbitrary transcendental results bit-identical.
 
-The [roadmap](ROADMAP.md) defines independent reference/tolerance gates. Native
+The [roadmap](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/math/ROADMAP.md) defines independent reference/tolerance gates. Native
 Windows/macOS execution remains required before claiming those platform results.
 Boss approved the API/types, floating/error/rounding policies and interpolation
 behavior listed in RESEARCH.md. Golden Wrench requires primitive-only public

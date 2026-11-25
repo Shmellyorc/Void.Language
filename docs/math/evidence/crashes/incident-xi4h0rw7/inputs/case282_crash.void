@@ -1,3 +1,0 @@
-use math
-func main():
-    var wrong: i32 = math.exp(1.0)

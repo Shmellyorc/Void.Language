@@ -33,7 +33,7 @@ unqualified platform obligations remain separate from functional usability.
 ## Evidence and scope
 
 The investigation read the current [Wrench instructions](../WRENCH_CLANKER.md),
-[strategy](../DEVELOPMENT_STRATEGY.md), [historical completeness audit](../LANGUAGE_COMPLETENESS_AUDIT.md),
+[strategy](../DEVELOPMENT_STRATEGY.md), [historical completeness audit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/LANGUAGE_COMPLETENESS_AUDIT.md),
 [milestone register](../roadmap/MILESTONE_REGISTER.md), [local libraries](../LOCAL_LIBRARIES.md),
 [G26 qualification](../projects/G26_PACKAGE_MAINTENANCE.md), and relevant current
 language, source/compiler, entry, async, collections, generics, native and editor

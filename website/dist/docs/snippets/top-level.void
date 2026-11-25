@@ -1,7 +1,0 @@
-var capacity = 24
-var reserved = 6
-var available = capacity - reserved
-return if available > 0:
-    0
-else:
-    1

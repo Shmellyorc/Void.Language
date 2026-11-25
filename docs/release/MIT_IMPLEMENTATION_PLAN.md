@@ -2,7 +2,7 @@
 
 **Planning only — Golden Wrench review.** Owner selected **MIT** for VOID 2.0. That resolves the license-choice question; the license has not been applied, contributor/provenance questions remain, and redistribution is not authorized by this plan. No source, CMake, license, package or editor metadata changes are made here. No commits, pushes, CI, packaging or publication.
 
-Use the accepted [redistribution audit](REDISTRIBUTION_AUDIT.md), [hashed evidence](evidence/licensing-audit-20261104.json) and [blocker register](PREVIEW_BLOCKERS.md). They remain historical evidence as written, including the audit's earlier unresolved license choice. This plan records the subsequent owner decision without rewriting those findings. Repository baseline: `95ce0a76e9a95198cd4fe9d5b6bb4cbfad9bd5c5`; counts below describe tracked paths at that baseline, not proven copyright ownership.
+Use the accepted [redistribution audit](REDISTRIBUTION_AUDIT.md), [hashed evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/release/evidence/licensing-audit-20261104.json) and [blocker register](PREVIEW_BLOCKERS.md). They remain historical evidence as written, including the audit's earlier unresolved license choice. This plan records the subsequent owner decision without rewriting those findings. Repository baseline: `95ce0a76e9a95198cd4fe9d5b6bb4cbfad9bd5c5`; counts below describe tracked paths at that baseline, not proven copyright ownership.
 
 ## 1. MIT boundary and attribution
 
@@ -53,7 +53,7 @@ The proposed original Runtime/stdlib MIT grant permits covered reuse with MIT no
 
 ## 3. Notice sources and destinations
 
-All paths in the destination column are relative to the install prefix. New repository notice copies are proposed under `third_party/llvm-licenses/23.1.4/` and `third_party/llvm-dependency-licenses/`; libpsl's copy belongs with its existing HTTP notices. Capture source URL, exact revision/archive hash, source path, copied byte range (if extracting a file header), copied-text hash, license route and applicable component in a proposed `docs/release/NOTICE_INVENTORY.json`. Preserve complete legal text and copyright statements; add provenance outside the text. Never substitute a system's generic license or a different SDK version.
+All paths in the destination column are relative to the install prefix. New repository notice copies are proposed under `third_party/llvm-licenses/23.1.4/` and `third_party/llvm-dependency-licenses/`; libpsl's copy belongs with its existing HTTP notices. Capture source URL, exact revision/archive hash, source path, copied byte range (if extracting a file header), copied-text hash, license route and applicable component in a proposed `cmake/licenses/NOTICE_INVENTORY.json`. Preserve complete legal text and copyright statements; add provenance outside the text. Never substitute a system's generic license or a different SDK version.
 
 | Priority / included component | Exact upstream source to retain | Proposed installed destination |
 | --- | --- | --- |

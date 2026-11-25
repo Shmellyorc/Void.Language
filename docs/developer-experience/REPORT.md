@@ -6,7 +6,7 @@ Baseline: accepted AOT-only SIMD commit `175c08c8a0cab0b701ba71365ffcc398a0c9bcf
 then `.gitignore`-only HEAD `d517459d`. The checkout was clean at the start.
 Read-only GitHub inspection independently confirmed [run 42231556437](https://github.com/Shmellyorc/Void.Language/actions/runs/42231556437)
 concluded success at `175c08c8`, with all seven expected Linux, Windows and macOS
-ARM64 jobs green; [retained metadata](evidence/accepted-simd-ci.json).
+ARM64 jobs green; [retained metadata](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/accepted-simd-ci.json).
 This milestone has no new hosted CI result.
 
 ## Implemented and tested
@@ -131,13 +131,13 @@ copied into `/src/void`. The SDK and dependency archives were fetched inside the
 container. It shares the host kernel, CPU and networking; this is not an independent
 machine, VM, older-kernel, lower-ABI or different-CPU qualification.
 
-[Fresh install commands/status/timings](evidence/ubuntu-fresh-source-install.json),
-[LLVM identity](evidence/ubuntu-sdk-identity.json),
-[HTTP build commands and hashes](evidence/ubuntu-http-dependencies.json),
-[fresh input hashes](evidence/ubuntu-fresh-input-hashes.json),
-[final inputs/host](evidence/ubuntu-final-host.json) and
-[final install receipt](evidence/ubuntu-final-source-install.json) are retained.
-Text logs and the [evidence index](evidence/README.md) record both runs, focused
+[Fresh install commands/status/timings](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/ubuntu-fresh-source-install.json),
+[LLVM identity](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/ubuntu-sdk-identity.json),
+[HTTP build commands and hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/ubuntu-http-dependencies.json),
+[fresh input hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/ubuntu-fresh-input-hashes.json),
+[final inputs/host](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/ubuntu-final-host.json) and
+[final install receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/ubuntu-final-source-install.json) are retained.
+Text logs and the [evidence index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/README.md) record both runs, focused
 failures/reruns, loader resolution, PATH, website checks and license validation.
 The first snapshot predates final verifier safeguards and test registration;
 production `src/main.cpp`/`src/native_build.cpp` hashes match final sources. Final
@@ -169,7 +169,7 @@ HTTP 200. The original live pages contained **zero** `--app` occurrences and zer
 LLVM 19.1.7 occurrences. Thus no live flag removal is claimed. The workflow page
 already used LLVM 23.1.4 and automatic entry selection. Live bytes did not match
 checkout files exactly, so the checkout is not asserted to be a verified deployment
-revision. [Per-URL audit](evidence/website-live.json).
+revision. [Per-URL audit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/website-live.json).
 
 Exact local proposal:
 
@@ -196,7 +196,7 @@ No new download/binary/package-manager URL was invented.
 
 ## Original failures and what changed
 
-[Failure inventory](evidence/original-failures.json) and initial CTest logs preserve
+[Failure inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/original-failures.json) and initial CTest logs preserve
 what failed instead of presenting only retries:
 
 - Baseline source audit found stale root README LLVM/Python/entry/license guidance,
@@ -235,7 +235,7 @@ existing [scope](../release/LICENSING_SCOPE.md) and
 [redistribution audit](../release/REDISTRIBUTION_AUDIT.md). No release or legal
 clearance is inferred from successful installation or license-file checks.
 
-[Exact changed paths](evidence/changed-paths.txt) separate source, canonical docs,
+[Exact changed paths](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/developer-experience/evidence/changed-paths.txt) separate source, canonical docs,
 Wiki drafts, proposed website source/generated output and curated text evidence.
 Runtime/frontend/backend/stdlib/headers/workflows and `.gitignore` are unchanged.
 No unrelated work was removed. Git HEAD/branch/index were preserved: no stage,

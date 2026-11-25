@@ -55,7 +55,7 @@ arrays use explicit slices. `numeric_less<t>` orders NaNs last ascending;
 `c.numeric_less<i32>` and explicit map type arguments when inference needs them.
 See the [API and mutation contract](../docs/collections/API.md),
 [runnable example](../examples/collections_stdlib/main.void) and
-[engineering handoff](../docs/collections/HANDOFF.md). Native platform acceptance
+[engineering handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/collections/HANDOFF.md). Native platform acceptance
 and independent Golden Wrench review remain separate gates.
 
 `use os` provides 13 synchronous owner-side queries for data/config/cache/state,
@@ -215,7 +215,7 @@ rejects whitespace, mixed alphabets, malformed padding and nonzero unused bits.
 `use encoding/ascii` provides strict lossless 7-bit conversion, byte predicates and
 ASCII byte casing. NUL is data in every module. Allocation exhaustion follows the
 existing checked Runtime failure channel. See the [text/encoding contract](../docs/text-encoding/CONTRACT.md),
-[API inventory](../docs/text-encoding/API.md) and [engineering record](../docs/text-encoding/IMPLEMENTATION.md).
+[API inventory](../docs/text-encoding/API.md) and [engineering record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/IMPLEMENTATION.md).
 
 
 ## Gameplay randomness
@@ -248,5 +248,5 @@ bounded forms are direct-call syntax, rather than general function overloads.
 
 [Complete contract](../docs/random/DESIGN.md),
 [API inventory](../docs/random/API.md),
-[verification](../docs/random/IMPLEMENTATION.md),
+[verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/random/IMPLEMENTATION.md),
 [replay example](../examples/random/gameplay.void).

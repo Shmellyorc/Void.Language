@@ -4,7 +4,7 @@
 
 The owner-approved [text/collection contract](STAGE8_TEXT_COLLECTIONS.md) supersedes
 the dated get/pop/text-inspection exclusions below. Sprint 3 is locally verified;
-[acceptance evidence](stage8/SPRINT3_ACCEPTANCE.md) records exact results and limits.
+[acceptance evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT3_ACCEPTANCE.md) records exact results and limits.
 Wrench review remains pending. Public policies are approved
 in [DECISIONS.md](DECISIONS.md); hosted CI remains deferred to Stage 8 end.
 
@@ -66,8 +66,8 @@ truncate or restrict ordinary string values.
 `{{`/`}}` denote literal braces. Stage 8 Sprint 6 now admits single-brace
 substitutions containing ordinary single-line string expressions, including
 `"Hello, {name}"`. `\u{7b}` yields a literal brace; decoded escapes are never
-reparsed as interpolation. Numeric/bool/custom display and formatting remain
-deferred; see STAGE8_ERGONOMICS.md. Numeric/bool concatenation, ordering, casts and truthiness are not
+reparsed as interpolation. Numeric, Boolean and custom display/formatting are implemented under
+[the current display contract](stage10/DISPLAY_FORMATTING.md). Numeric/bool concatenation, ordering, casts and truthiness are not
 implicitly introduced by string support.
 
 Const bindings cannot be rebound. Payload immutability applies to all bindings;
@@ -174,9 +174,10 @@ and repair. See WORK_LOG.md for completed commands, results and remaining gates.
 blanket exclusions above for compile-time type `has`, typed if-expressions,
 multiline calls and string-only interpolation. Existing nominal storage,
 structural conformance, generic specialization, capabilities and checked failure
-rules remain authoritative. Both conditional branches type-check. Formatting and
-numeric/bool/custom string conversion remain deferred. Approval and implementation
-are separate from local acceptance, Wrench review and the final hosted lock.
+rules remain authoritative. Both conditional branches type-check. The later
+[display and formatting contract](stage10/DISPLAY_FORMATTING.md) implements the
+numeric, Boolean and custom display surface; the old string-only exclusion is
+superseded. Qualification remains specific to the recorded revision and platform.
 
 ## Explicit nullable strings
 

@@ -78,7 +78,7 @@ or speculative unchecked memory operation was introduced.
 
 ## Evidence identities and reproduction
 
-The [committed global-trial receipts and archive inventory](evidence/automatic-simd/README.md#global)
+The [committed global-trial receipts and archive inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/automatic-simd/README.md#global)
 preserve selected exact text records and identify the complete original local
 archive at `/home/shmellyorc/.local/state/void-log-performance/simd-qualification`.
 Rejected backend copies, binaries and caches remain local. Bare artifact names
@@ -94,7 +94,7 @@ compiler/tool/library identities and **six** recorded production-source hashes
 also matched. See `research-verification.json`. The source fixtures, including
 original invalid/negative controls, were copied without altering the originals.
 The original research directory remains
-[here](evidence/automatic-simd/README.md#research).
+[here](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/compiler-health/evidence/automatic-simd/README.md#research).
 
 Host: Linux x86-64, Ryzen 7 1700X, LLVM host CPU `znver1`, LLVM/Clang/LLD 23.1.4,
 revision `7a941dfb2877a0b8cf30323fefa85ad019e0b0f5`. Baseline compiler binaries and

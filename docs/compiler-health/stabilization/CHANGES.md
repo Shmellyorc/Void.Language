@@ -23,7 +23,7 @@ probe fixture is wider to continue exceeding a Windows stack page after packing.
 - [CMakeLists.txt](../../../CMakeLists.txt)
 - [docs/KNOWN_ISSUES.md](../../../docs/KNOWN_ISSUES.md)
 - [docs/README.md](../../../docs/README.md)
-- [docs/STAGE5_CACHE_PROPOSAL.md](../../../docs/STAGE5_CACHE_PROPOSAL.md)
+- [docs/STAGE5_CACHE_PROPOSAL.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/STAGE5_CACHE_PROPOSAL.md)
 - [docs/WRENCH_CLANKER.md](../../../docs/WRENCH_CLANKER.md)
 - [include/void/backend.hpp](../../../include/void/backend.hpp)
 - [include/void/cache.hpp](../../../include/void/cache.hpp)

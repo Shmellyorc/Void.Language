@@ -21,7 +21,7 @@ filesystem capacity, inode availability, competing allocations and exact peak
 usage cannot be recovered from available evidence**. The original workflow did
 not measure these. We do not invent those values or infer test failures from an
 unexecuted test step. The retained API records and retrieval failure are under
-[evidence/llvm-disk-repair](evidence/llvm-disk-repair/); existing CI evidence is untouched.
+[evidence/llvm-disk-repair](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/llvm-disk-repair); existing CI evidence is untouched.
 
 ## Measurements and budget
 

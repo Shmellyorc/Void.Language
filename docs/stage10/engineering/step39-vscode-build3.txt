@@ -1,4 +1,0 @@
-
-> void-language@0.1.0 compile
-> tsc && node build.cjs
-

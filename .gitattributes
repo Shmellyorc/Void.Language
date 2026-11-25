@@ -1,11 +1,12 @@
 # Preserve the exact bytes covered by curl's upstream/provenance digests.
 # Keep ordinary text diffs; disable checkout/check-in newline conversion only.
 /third_party/curl/** -text
-/docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch -text
-/docs/net/http/evidence/curl-8.23.0-http2-window-candidate.patch -text
 
 # Preserve the approved host patch and provenance bytes on every checkout.
 /third_party/host-patches/** -text
 
 # The raylib generator verifies the unmodified upstream header and notice bytes.
 /verified-packages/raylib/upstream/** -text -whitespace
+
+# Preserve the exact approved curl correction patches.
+/third_party/curl-patches/** -text

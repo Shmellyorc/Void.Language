@@ -24,7 +24,7 @@ retains its one connection and resets individual streams.
 Cold time includes peer startup/lazy Python protocol imports and the first
 handshake. HTTP/1 batches serialize on their single connection; HTTP/2 uses real
 multiplexing. Close time is native abort-to-quiescent completion, not source task
-publication latency. [Full measurements](evidence/http-performance-release/measurements.json)
+publication latency. [Full measurements](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-performance-release/measurements.json)
 include process CPU, compiler identity, compilation ranges and sizes. An original
 run with server Nagle enabled is preserved separately; its 42 ms H2 batch time
 was fixture latency, not removed by a production workaround.
@@ -42,7 +42,7 @@ existing IO file (16 MiB) with one worker. JIT compilation is excluded. The
 baseline is an actual disposable build of commit
 `15f7868b0af177f8f7d49c548392c79c7bd921d2`, not a reconstructed old algorithm linked
 against incompatible current headers. Its archive/harness identity is in
-[the comparison summary](evidence/http-io-comparison-summary.json). Git archive
+[the comparison summary](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-io-comparison-summary.json). Git archive
 was read without checkout, branch/index/history mutation or root README edits.
 
 | Unprofiled loop | CPU median seconds | CPU range seconds | Wall median seconds |
@@ -73,14 +73,14 @@ including slower concurrent-load samples, remain in evidence.
 The final public native bulk run downloads 2,147,483,648 bytes and uploads
 4,294,967,297 bytes from a sparse file, with independent count and SHA-256
 `153014c024b3db9a126b40397ded44c0b708efde6f5c89f22407e4089160850a`.
-[Receipt](evidence/http-reaping-public-bulk-4GiB-release/commands.json) separates source
+[Receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-reaping-public-bulk-4GiB-release/commands.json) separates source
 checking, async object emission, native linking and execution, with RSS samples.
 Its emitted object/executable are 2,434,192/10,106,360 bytes. The final run takes 6.494 seconds execution, 8.56 process CPU seconds and
 10,580–11,200 KiB steady RSS. The earlier identical logical workload took 5.983
 seconds, 7.5 CPU seconds and 10,496–11,028 KiB; both receipts remain available.
 
 The public source 2 GiB async-pull proof runs normal/O2 JIT and independently
-linked normal/O2 AOT. [Final receipt](evidence/http-reaping-source-2GiB-release/commands.json)
+linked normal/O2 AOT. [Final receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-reaping-source-2GiB-release/commands.json)
 includes exact source/compiler identities, forced-GC Task/Work/Handle observations
 and per-process RSS. Holding the first task demonstrates repeatable await while
 later results and native records retire. Native bulk and source loops establish
@@ -90,5 +90,5 @@ The unused-import comparison executes check/JIT/build/native in both optimizatio
 modes three times. Its ordinary native executable is 1,844,104–1,844,144 bytes;
 adding an unused HTTP import produces 1,946,448–1,952,032 bytes. No network operation
 is invoked. Linux Release dependency regular files total about 24.6 MB, separately
-from compiler/runtime artifacts. [Raw size/compilation measurements](evidence/http-performance-release/measurements.json)
+from compiler/runtime artifacts. [Raw size/compilation measurements](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/net/http/evidence/http-performance-release/measurements.json)
 preserve actual samples. No Windows/macOS or machine-independent speed claim is made.

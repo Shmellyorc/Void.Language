@@ -183,7 +183,7 @@ build system was introduced.
 
 ## Verification and evidence
 
-Evidence root: `/home/shmellyorc/Documents/Void.Language-work/g87-conditional`.
+Evidence root: `/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-work/g87-conditional`.
 The checked-in harnesses and task-local `qualify.py` / `run-editor.py` preserve exact
 commands, environment, binary hashes, original failures and protocol/editor receipts.
 Builds use the existing `build/llvm23-debug`, `build/llvm23-release` and
@@ -330,11 +330,11 @@ tests/conditional/tests.cpp
 
 Golden Wrench returned **CORRECTION REQUIRED** for two P2 defects. Original review
 and reproductions remain at
-`/home/shmellyorc/Documents/Void.Language-work/g87-independent-review-g370ou41/`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-work/g87-independent-review-g370ou41/`.
 The original candidate archive and SHA-256
 `815850434471a7f97555465258b8427471c563731b2efa60c4833435ca32456b` remain unchanged.
 New correction evidence is under
-`/home/shmellyorc/Documents/Void.Language-work/g87-corrections/`, including copied
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-work/g87-corrections/`, including copied
 original reproduction records and the complete review. No assertion or sanitizer
 setting was weakened.
 

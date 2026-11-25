@@ -60,7 +60,8 @@ short-circuiting does not make a cyclic declaration graph valid. Pure arithmetic
 on an unexecuted right operand is not evaluated, so `false and 1 / 0 > 0` and
 `true or 1 % 0 > 0` are valid. Type errors and unresolved names there still fail.
 Imports must precede constants and functions; constants and functions can otherwise
-be interspersed. Runtime module variables remain unsupported.
+be interspersed. Runtime module variables and initialization are implemented under
+[the runtime globals contract](RUNTIME_GLOBALS.md).
 
 ## Project and import lookup
 

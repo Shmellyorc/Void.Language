@@ -70,9 +70,9 @@ durations are inclusive and must not be summed as exclusive CPU time.
 
 Raw inputs, binaries, measurements, profiling output and intermediate build logs
 remain under `/tmp/void-g76-56i5xfx0`. Selected original and final evidence is
-preserved in [results.json](evidence/g76/results.json),
-[verification.txt](evidence/g76/verification.txt) and the
-[actual editor screenshot](evidence/g76/workbench.png). Windows/macOS execution
+preserved in [results.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g76/results.json),
+[verification.txt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g76/verification.txt) and the
+[actual editor screenshot](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g76/workbench.png). Windows/macOS execution
 remains unqualified.
 
 ## Implementation
@@ -550,8 +550,8 @@ claim that additional threads alone remove input/editor cost is made.
 
 Selected original failures, checkpoint logs, debugger results, native checks,
 complete samples and corrected source/binary hashes are preserved in
-[freshness-results.json](evidence/g76/freshness-results.json) and
-[freshness-verification.txt](evidence/g76/freshness-verification.txt). Full raw
+[freshness-results.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g76/freshness-results.json) and
+[freshness-verification.txt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g76/freshness-verification.txt). Full raw
 before/after evidence remains at `/tmp/void-g76-freshness-j_ii4ckz`. The original
 Golden Wrench evidence and prior G76 evidence have not been removed or overwritten.
 

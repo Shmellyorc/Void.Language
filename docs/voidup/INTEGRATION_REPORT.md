@@ -324,9 +324,9 @@ packed evidence/index/diff/inventory files. Final Git audit: **10 modified,
 unexpected changed path. The source patch reconstructs all eleven postimages
 from the baseline; archive/member hashes, all nine new local links, Python syntax,
 protected inputs and literal allowlist/NUL correspondence pass verification. The current allowlist is
-[commit-paths.txt](evidence/ci-42446206797/commit-paths.txt), with the equivalent
-literal [NUL list](evidence/ci-42446206797/commit-paths.nul) and
-[hash inventory](evidence/ci-42446206797/commit-inventory.json).
+[commit-paths.txt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42446206797/commit-paths.txt), with the equivalent
+literal [NUL list](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42446206797/commit-paths.nul) and
+[hash inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42446206797/commit-inventory.json).
 
 | Source path | Exact purpose |
 | --- | --- |
@@ -342,16 +342,16 @@ literal [NUL list](evidence/ci-42446206797/commit-paths.nul) and
 | `editors/vscode/src/test/runHost.ts` | Use the repaired download caller while retaining all GUI assertions/modes. |
 | `editors/vscode/src/test/config.test.ts` | Add real child lifecycle, retry exhaustion/original error and non-retry controls to the existing unit suite. |
 
-Actual complete review diffs are [source.patch](evidence/ci-42446206797/source.patch)
-and [documentation.patch](evidence/ci-42446206797/documentation.patch).
-The [per-file restoration index](evidence/ci-42446206797/original-ci-index.json)
+Actual complete review diffs are [source.patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42446206797/source.patch)
+and [documentation.patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42446206797/documentation.patch).
+The [per-file restoration index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42446206797/original-ci-index.json)
 records the final hosted logs, metadata and diagnostic ZIPs with their original
 digests. The full original bundle is recoverable from commit
 `a642ce746a62a7646d06d42d9f87931813aaa812`. The
-[retention policy](../projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records)
+[retention policy](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records)
 identifies the selected failure records and recovery procedure.
-[Local verification](evidence/ci-42446206797/local-verification.tar.gz) and its
-[index](evidence/ci-42446206797/local-verification-index.json) retain original
+[Local verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42446206797/local-verification.tar.gz) and its
+[index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42446206797/local-verification-index.json) retain original
 failures, all source revisions, controls, builds, complete/repeated tests, SDK/ABI,
 source-package and GUI evidence. Generated records are packed rather than adding
 thousands of loose Source Control paths. Built editor VSIX artifact ZIPs from
@@ -401,16 +401,16 @@ The earlier integration and cleanup inventories below are retained historical
 records: they were already present in this baseline. They are not the pending
 file list for this follow-up. Native Windows Release/Debug verification is complete
 for the stated local environment; hosted seven-configuration acceptance remains
-unqualified. Its [historical exact allowlist](evidence/ci-42377496702/commit-paths.txt)
+unqualified. Its [historical exact allowlist](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42377496702/commit-paths.txt)
 describes that earlier repair, not the active CI #42446206797 inventory. Original failures and corrective reruns are separated below.
 
 **Historical commit inventory after the earlier source-control cleanup:**
-[REPAIR_COMMIT_PATHS.txt](REPAIR_COMMIT_PATHS.txt) and
-[REPAIR_COMMIT_INVENTORY.json](REPAIR_COMMIT_INVENTORY.json).
+[REPAIR_COMMIT_PATHS.txt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/REPAIR_COMMIT_PATHS.txt) and
+[REPAIR_COMMIT_INVENTORY.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/REPAIR_COMMIT_INVENTORY.json).
 Earlier `COMMIT_PATHS.*` and `PENDING_PATHS.*` lists describe their historical
 review scopes and must not be used for this commit. Generated raw evidence is
-preserved in the [verified archive](evidence/repair-raw-evidence-2026-11-07.tar.xz)
-with a [per-file restoration index](evidence/repair-raw-evidence-2026-11-07.json).
+preserved in the [verified archive](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz)
+with a [per-file restoration index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.json).
 A link fragment on that archive names the original repository-relative member;
 extract into a fresh directory to inspect those records. Directly linked retained
 summaries, source diffs and original CI ZIPs remain individual files.
@@ -429,7 +429,7 @@ failures, measurements or historical CI identities.
 
 The complete Phase A/B implementation is prepared for the existing seven-job **Compiler link experiment** workflow. No staging, commit, branch, push, hosted dispatch or binary publication was performed. The obsolete/default workflow, root README, TCP/UDP handoff and existing website changes are preserved. This is local integration evidence; Windows/macOS and hosted seven-job acceptance are not claimed.
 
-The exact per-file commit inventory is [COMMIT_PATHS.txt](COMMIT_PATHS.txt), with an equivalent literal NUL-delimited [COMMIT_PATHS.nul](COMMIT_PATHS.nul). [COMMIT_INVENTORY.json](COMMIT_INVENTORY.json) records intended paths and hashes, exclusions, ignored-but-intended evidence, baseline checks and the suggested title/command. It includes every retained Phase A/B failure and source snapshot, including the OS assertion incident explicitly referenced by `REPORT.md`. The inventory rejects unclassified changed paths, compiled outputs, key/archive candidates and symlinks. Directory shorthand below describes scope; staging uses individual file names only.
+The exact per-file commit inventory is [COMMIT_PATHS.txt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/COMMIT_PATHS.txt), with an equivalent literal NUL-delimited [COMMIT_PATHS.nul](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/COMMIT_PATHS.nul). [COMMIT_INVENTORY.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/COMMIT_INVENTORY.json) records intended paths and hashes, exclusions, ignored-but-intended evidence, baseline checks and the suggested title/command. It includes every retained Phase A/B failure and source snapshot, including the OS assertion incident explicitly referenced by `REPORT.md`. The inventory rejects unclassified changed paths, compiled outputs, key/archive candidates and symlinks. Directory shorthand below describes scope; staging uses individual file names only.
 
 | Included scope | Exact inventory coverage |
 | --- | --- |
@@ -517,9 +517,9 @@ podman exec voidup-portability-ubuntu ctest --test-dir build/voidup-integration-
 python3 tools/voidup_integration_inventory.py
 ```
 
-Debug and strict used their matching build directories/provider profiles; strict tests explicitly set `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. The captured configure/build logs, provider command JSON, CTest JUnit and [original/repair result mapping](evidence/integration/test-results-original-and-repairs.json) define exact scope and failures. This was a focused local run, not the entire existing CTest suite or a hosted seven-job execution.
+Debug and strict used their matching build directories/provider profiles; strict tests explicitly set `ASAN_OPTIONS=detect_leaks=1:halt_on_error=1:exitcode=87` and `UBSAN_OPTIONS=halt_on_error=1:print_stacktrace=1:exitcode=86`. The captured configure/build logs, provider command JSON, CTest JUnit and [original/repair result mapping](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/integration/test-results-original-and-repairs.json) define exact scope and failures. This was a focused local run, not the entire existing CTest suite or a hosted seven-job execution.
 
-The [integration evidence index](evidence/integration/INDEX.json) binds the report and literal inventory. Its audit rechecks the original Phase A and Phase B evidence indexes, the initial dirty/untracked-file hashes and the default workflow hash. Only `CMakeLists.txt` and the portable harness evidence-output adjustment changed among preexisting dirty/untracked files; the selected workflow/disk helper and new integration files are additional intended changes. The six website files retain their exact initial hashes. `git diff --check` passes and the Git staging area remains unchanged.
+The [integration evidence index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/integration/INDEX.json) binds the report and literal inventory. Its audit rechecks the original Phase A and Phase B evidence indexes, the initial dirty/untracked-file hashes and the default workflow hash. Only `CMakeLists.txt` and the portable harness evidence-output adjustment changed among preexisting dirty/untracked files; the selected workflow/disk helper and new integration files are additional intended changes. The six website files retain their exact initial hashes. `git diff --check` passes and the Git staging area remains unchanged.
 
 **Recommendation: RETAIN this local integration for Boss-controlled staging/commit and the selected native CI run.** The exact intended count and every path are recorded in `COMMIT_INVENTORY.json`/`COMMIT_PATHS.nul`; all unlisted paths remain excluded. Do not promote Windows/macOS or hosted acceptance before their actual results. No binary publication or private-key deployment is authorized or performed. Stop here for Golden Wrench/Boss review.
 
@@ -570,9 +570,9 @@ Original artifacts are retained byte-for-byte:
 
 | Artifact | Scope | ZIP SHA-256 |
 | --- | --- | --- |
-| [13558653075.zip](evidence/llvm23-repair/original-ci/13558653075.zip) | Windows Debug diagnostics | `8a4dd5d9e49ccd8240d6b18bf1e85af914054c34487cc7938579cc7f9b853d13` |
-| [13558638061.zip](evidence/llvm23-repair/original-ci/13558638061.zip) | Windows Release diagnostics | `9ee4f916532e9e3763270c421162feca809aed33ff07b33bcd3b9e2226d878a0` |
-| [13558802832.zip](evidence/llvm23-repair/original-ci/13558802832.zip) | Linux Sanitizers diagnostics | `65a37d6dd16cc349da545638afa465ef33a64bf8c6ba661a06f69d066e7c3ad4` |
+| [13558653075.zip](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/original-ci/13558653075.zip) | Windows Debug diagnostics | `8a4dd5d9e49ccd8240d6b18bf1e85af914054c34487cc7938579cc7f9b853d13` |
+| [13558638061.zip](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/original-ci/13558638061.zip) | Windows Release diagnostics | `9ee4f916532e9e3763270c421162feca809aed33ff07b33bcd3b9e2226d878a0` |
+| [13558802832.zip](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/original-ci/13558802832.zip) | Linux Sanitizers diagnostics | `65a37d6dd16cc349da545638afa465ef33a64bf8c6ba661a06f69d066e7c3ad4` |
 
 Selected `.log`, `.json` and `.trs` members are also extracted under their artifact
 IDs. Original failed results remain unchanged; neither artifact is a repaired run.
@@ -603,7 +603,7 @@ A Linux cross-target C object compiled by the actual pinned 23.1.4 Clang with
 `/MT` emits `/DEFAULTLIB:libcmt.lib /DEFAULTLIB:oldnames.lib`. C objects need not
 carry C++'s `MT_StaticRelease` mismatch tag. The provider check therefore requires
 static CRT directives and rejects dynamic/debug CRT directives. The same real cross-target probe accepts `/MT` and rejects `/MD` and `/MTd`
-using the production ABI validator ([commands/results](evidence/llvm23-repair/coff-abi.json)).
+using the production ABI validator ([commands/results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/coff-abi.json)).
 This object probe is not a native Windows build or a libsodium ABI acceptance result.
 
 The source archives, hashes, upstream trees, licensing materials and `/MT` policy
@@ -617,7 +617,7 @@ All six workflow files, CMake configuration/dependency files, SDK/HTTP/VOIDUP
 bootstrap scripts, install helper and tracked non-Markdown source paths were
 scanned. Active configuration already pins 23.1.4; the four standalone script
 defaults above were the remaining explicit 19 selections. The final
-[scan](evidence/llvm23-repair/active-old-toolchain-scan.txt) has no matches in
+[scan](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/active-old-toolchain-scan.txt) has no matches in
 tracked active non-Markdown paths (excluding docs, third-party material and
 website). CMake still requires exact LLVM 23.1.4 and matching Clang/LLD.
 The selected seven-job workflow and obsolete/default workflow are unchanged.
@@ -646,10 +646,10 @@ verification and actual Clang **23.1.4**:
 | PikaOS x64, existing instrumented build, fatal rerun | 73 PASS / **14 FAIL** / 87, zero skips | Adds `box_easy2`, `secretbox_easy2`; `misuse` passes |
 | Ubuntu **24.04.5** x64 container, fresh configure/build | 74 PASS / **13 FAIL** / 87, zero skips | `box_easy2` fails instead of `box_seal` |
 
-The [failure manifest](evidence/llvm23-repair/sanitizer-failures.json) records all
+The [failure manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/sanitizer-failures.json) records all
 three exact sets and the actual local diagnostics. Per-test logs, summaries and
-status files are retained in [PikaOS evidence](evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/llvm23-repair/local-original-strict)
-and [Ubuntu evidence](evidence/llvm23-repair/ubuntu-strict/).
+status files are retained in [PikaOS evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/llvm23-repair/local-original-strict)
+and [Ubuntu evidence](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/ubuntu-strict).
 
 Observed causes:
 
@@ -684,7 +684,7 @@ strict-provider pass can be claimed.
 ### Reproduction and focused validation
 
 Run from the checkout root. The actual Ubuntu commands and timings are retained
-in [ubuntu-strict/commands.json](evidence/llvm23-repair/ubuntu-strict/commands.json).
+in [ubuntu-strict/commands.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/ubuntu-strict/commands.json).
 The container supplies Ubuntu userspace, not a separate kernel or physical host.
 
 ```sh
@@ -705,7 +705,7 @@ options and `make check -j2`. Build succeeds; check exits 2 with 13/87 failures.
 No provider installation is performed by this isolated reproduction.
 
 Additional checks and their exact commands/statuses are recorded in
-[evidence](evidence/llvm23-repair/). Linux .NET MSBuild guard fixtures pass a matching
+[evidence](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair). Linux .NET MSBuild guard fixtures pass a matching
 selector and reject four mismatches before any compiler execution. They exercise
 the XML guard only, without Visual C++ imports or native Windows tools.
 The final build/CTest table below distinguishes rebuilt configurations from the
@@ -755,7 +755,7 @@ are preserved. Timings are observations, not performance claims or thresholds.
 Fresh replay drivers are retained alongside the logs (`documentation_audit.py`,
 `msbuild_guard.py`, `coff_abi.py`, `ubuntu_sodium.py`).
 
-The [first-review changed-file/evidence inventory](evidence/llvm23-repair/changed-files.json)
+The [first-review changed-file/evidence inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/changed-files.json)
 lists exact paths, status and content hashes, including ignored diagnostics that
 an ordinary staging command could omit. Nothing is staged. No private signing
 keys, generated native objects/binaries, build directories or unrelated files
@@ -787,7 +787,7 @@ branch, push, hosted dispatch, binary publication or root README edit occurred.
 ## Libsodium source correction proposal
 
 7 November 2026, Golden Wrench **REVISE** follow-up. The
-[actual three-file source diff](evidence/llvm23-repair/review/libsodium-candidate.patch)
+[actual three-file source diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/libsodium-candidate.patch)
 is **PROPOSED / NOT APPLIED**. No active recipe reads this patch. The installed
 providers, pristine source cache, archive hash and `third_party/host-versions.json`
 remain unchanged. The only experimental source edit is to a test harness in a
@@ -818,8 +818,8 @@ substitutes NULL under ASan on both refs, and neither inspected `sodium_memzero`
 body adds a zero-length early return. No complete released three-class fix was
 found. These findings apply to those refs, not to all possible future upstream work.
 
-[Compared-file URLs/hashes](evidence/llvm23-repair/review/upstream/compared-files.json)
-and [the exact upstream commit](evidence/llvm23-repair/review/upstream/alignment-fix.json)
+[Compared-file URLs/hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/upstream/compared-files.json)
+and [the exact upstream commit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/upstream/alignment-fix.json)
 record provenance. The upstream alignment commit is dated 8 April 2026; its
 preimages match this pinned source despite being on another branch. Do not infer
 inclusion from its date or release number alone. Moving to floating master would
@@ -846,12 +846,12 @@ failure counts remain recorded; neither run is a full candidate pass. Original
 hosted **13/87**, PikaOS **14/87** and Ubuntu **13/87** failures remain separate
 in the preceding first-review record. Detailed new test logs, `.trs` files,
 commands, environments and exact sets are in
-[guard-results.json](evidence/llvm23-repair/review/guard-results.json),
-[guard-only](evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/llvm23-repair/review/guard-only), and
-[ubuntu-guard-only](evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/llvm23-repair/review/ubuntu-guard-only).
+[guard-results.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/guard-results.json),
+[guard-only](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/llvm23-repair/review/guard-only), and
+[ubuntu-guard-only](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/llvm23-repair/review/ubuntu-guard-only).
 
 `patch --dry-run --batch --fuzz=0 -p1` accepts every candidate hunk against the
-pristine pin. [Provider integrity](evidence/llvm23-repair/review/pristine-providers.json)
+pristine pin. [Provider integrity](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/pristine-providers.json)
 verifies the unchanged archives and all 678 libsodium / 1,796 libarchive source
 files. The retained toolchain/rejection suite passes **10/10**. The existing
 Windows selector and rejection implementation is byte-identical to the candidate
@@ -899,15 +899,15 @@ reduction, not renaming the copies to another documentation extension:
 
 Actual review artifacts:
 
-- [Documentation revision diff](evidence/llvm23-repair/review/documentation-revision.patch):
+- [Documentation revision diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/documentation-revision.patch):
   exact delta from the previously reviewed local tree, including all 22 removals.
-- [Final documentation diff against HEAD](evidence/llvm23-repair/review/documentation-final.patch):
+- [Final documentation diff against HEAD](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/documentation-final.patch):
   complete cumulative proposed Markdown changes at retained paths.
-- [Retained build-source diff](evidence/llvm23-repair/review/windows-and-build-source.patch)
-  and the separate [unapplied libsodium source proposal](evidence/llvm23-repair/review/libsodium-candidate.patch).
-- [Move/provenance ledger](evidence/llvm23-repair/review/documentation-moves.json),
-  [link/preservation checks](evidence/llvm23-repair/review/documentation-validation.json),
-  and [exact current file inventory](evidence/llvm23-repair/review/changed-files.json).
+- [Retained build-source diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/windows-and-build-source.patch)
+  and the separate [unapplied libsodium source proposal](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/libsodium-candidate.patch).
+- [Move/provenance ledger](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/documentation-moves.json),
+  [link/preservation checks](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/documentation-validation.json),
+  and [exact current file inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/review/changed-files.json).
 
 The prior audit results and failure evidence are retained as first-review
 snapshots, rather than overwritten as if they described this revision. The root
@@ -936,10 +936,10 @@ transport, dependency pin or workflow change is part of this delta.
 
 ### Integrated source and identity
 
-The [actual integration source diff](evidence/llvm23-repair/integration-2026-11-07/integrated-source.patch),
-[documentation delta](evidence/llvm23-repair/integration-2026-11-07/documentation-integration.patch),
-[exact approved dependency patch](evidence/llvm23-repair/integration-2026-11-07/libsodium-approved.patch)
-and [per-file inventory](evidence/llvm23-repair/integration-2026-11-07/changed-files.json)
+The [actual integration source diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/integrated-source.patch),
+[documentation delta](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/documentation-integration.patch),
+[exact approved dependency patch](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/libsodium-approved.patch)
+and [per-file inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/changed-files.json)
 are review artifacts, not summaries in place of source. The two integration diffs
 replay against disposable copies of the preceding reviewed working tree and
 reproduce every resulting byte. Prior Windows/source and documentation review
@@ -1005,7 +1005,7 @@ bind the actual link archives through existing rules.
 
 Old Release/Debug/strict prefixes and build trees were retained under
 `.toolchains/host/retained/pre-approved-backport-2026-11-07/`, with original receipt
-hashes in [the retention mapping](evidence/llvm23-repair/integration-2026-11-07/retained-original-prefixes.json).
+hashes in [the retention mapping](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/retained-original-prefixes.json).
 Fresh default prefixes were built from source. All three old receipts reject;
 a separate CMake probe rejects an old receipt before configuring link dependencies.
 No old archive or evidence was overwritten to obtain a passing result.
@@ -1033,7 +1033,7 @@ The final notice/package audit passes **5/5 groups**: 53 source inventory entrie
 Linux compiler (51 notices/25 stdlib sources), Linux tooling (17/25), Windows
 compiler file rules (17) and Windows tooling file rules (13). The Windows groups
 exercise file installation rules on Linux, **not native Windows execution**.
-See [the exact package audit](evidence/llvm23-repair/integration-2026-11-07/license-package-fixed/validation.json).
+See [the exact package audit](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/license-package-fixed/validation.json).
 
 ### Actual local results
 
@@ -1100,12 +1100,12 @@ ASAN_SYMBOLIZER_PATH=<verified LLVM 23.1.4 SDK>/bin/llvm-symbolizer
 ```
 
 The actual running strict CTest environment was captured in
-[fatal-environment.json](evidence/llvm23-repair/integration-2026-11-07/strict/fatal-environment.json).
+[fatal-environment.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict/fatal-environment.json).
 Raw source/vector results, receipt IDs, exact compiler commands/statuses and
 installed reconstruction records are indexed by
-[qualification-summary.json](evidence/llvm23-repair/integration-2026-11-07/qualification-summary.json).
-[Ubuntu commands and raw evidence](evidence/llvm23-repair/integration-2026-11-07/ubuntu-integrated/)
-and [strict fault-control diagnostics](evidence/llvm23-repair/integration-2026-11-07/strict-controls/results.json)
+[qualification-summary.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/qualification-summary.json).
+[Ubuntu commands and raw evidence](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/ubuntu-integrated)
+and [strict fault-control diagnostics](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/strict-controls/results.json)
 are separate from the focused CTest counts.
 
 Representative actual commands (the linked command JSON retains full absolute
@@ -1155,7 +1155,7 @@ integration is present but native compile, SDK/link behavior, tests and filesyst
 semantics remain unverified. Both platforms remain **UNQUALIFIED** until actual
 native execution is reviewed. No hosted seven-job acceptance is declared.
 
-[Preservation validation](evidence/llvm23-repair/integration-2026-11-07/preservation-final.json)
+[Preservation validation](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/preservation-final.json)
 compares the 81,290 protected inputs from the accepted experiment, accounting for
 378 old-prefix files retained at their new paths. Only the twelve authorized
 tracked integration paths changed; two permanent patch/policy files were added.
@@ -1164,7 +1164,7 @@ website or workflow change occurred. The current documentation revision is
 retained except these scoped report/toolchain/notice updates; no Markdown files
 were added or removed. The historical Stage 4 CI commit/run identity in
 `ADVANCED_LANGUAGE.md` remains unchanged. The
-[review validation](evidence/llvm23-repair/integration-2026-11-07/review-validation.json)
+[review validation](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/llvm23-repair/integration-2026-11-07/review-validation.json)
 records exact diff replay and local link checks.
 
 **RETAIN** this controlled local source/receipt/package integration for Golden
@@ -1212,10 +1212,10 @@ The complete captured bootstrap log records the names, totals and exit-2 failure
 Seven raw job logs and eleven original diagnostic ZIP artifacts were downloaded
 read-only. Every ZIP SHA-256 matches GitHub's published artifact digest. Original
 bytes and selected text diagnostics are retained under
-[evidence/ci-42369685905/](evidence/ci-42369685905/), with the
-[final status/failure summary](evidence/ci-42369685905/ci-summary.json),
-[download hashes](evidence/ci-42369685905/downloads.json), and
-[exact artifact metadata](evidence/ci-42369685905/artifacts.json).
+[evidence/ci-42369685905/](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905), with the
+[final status/failure summary](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905/ci-summary.json),
+[download hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905/downloads.json), and
+[exact artifact metadata](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905/artifacts.json).
 The connector log-save request exceeded its 64,000-byte code limit; full logs were
 then saved with read-only `gh api` downloads. No hosted action was dispatched.
 
@@ -1227,7 +1227,7 @@ Cancelled jobs retain their actual incomplete scope.
 
 ### Minimal source correction and applicable checks
 
-The [actual new source diff](evidence/ci-42369685905/portable-wait.patch) is exactly:
+The [actual new source diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905/portable-wait.patch) is exactly:
 
 ```diff
 - q=request(wait);
@@ -1255,7 +1255,7 @@ suite remains 10/10 and dependency admission/rejection remains 18 checks per
 profile. Strict retains fatal ASan/UBSan/leak options and the pinned symbolizer.
 The original ambiguous-source failures are expected controls, not hidden passing
 compilations. Full commands, statuses and outputs are in
-[local-results.json](evidence/ci-42369685905/local-results.json) and the per-profile
+[local-results.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905/local-results.json) and the per-profile
 logs/receipts.
 
 All three schema-3 provider prefixes were reverified against the same accepted
@@ -1264,7 +1264,7 @@ static libraries and zlib closure. The pristine source caches and original
 libsodium/libarchive archive hashes still match their pins. The accepted repair
 source/package files and all 3,123 indexed prior integration evidence files
 matched their recorded hashes before this append-only report update. See
-[accepted-repairs-present.json](evidence/ci-42369685905/accepted-repairs-present.json).
+[accepted-repairs-present.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905/accepted-repairs-present.json).
 The earlier Release/Debug/fatal-strict **87/87 upstream target** results remain
 retained and bound to the unchanged receipts; those full provider builds/tests
 were not redundantly repeated for this test-only call-site edit. The two upstream
@@ -1276,7 +1276,7 @@ Linux compiler/tooling components and Windows notice file rules. Release's
 installed test again reconstructed the packaged applied source outside the
 checkout, rejected a corrupted patch, and exercised relocated normal/O2 JIT and
 independent AOT. Windows file-rule checks do not constitute native acceptance.
-The [current package results](evidence/ci-42369685905/license-package/validation.json)
+The [current package results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905/license-package/validation.json)
 retain their exact scope. No sanitizer weakening, suppression, test removal,
 pin/hash change or ambient LLVM selection was introduced.
 
@@ -1285,9 +1285,9 @@ pin/hash change or ambient LLVM selection was introduced.
 The old `docs/voidup/COMMIT_PATHS.*` predates the current backport and omits its new
 patch/provenance files. Its historical contents and evidence indexes are preserved.
 For this pending integration, use the new exact
-[PENDING_PATHS.txt](evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/ci-42369685905/PENDING_PATHS.txt),
-[literal NUL-delimited allowlist](evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/ci-42369685905/PENDING_PATHS.nul), and
-[PENDING_INVENTORY.json](evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/ci-42369685905/PENDING_INVENTORY.json).
+[PENDING_PATHS.txt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/ci-42369685905/PENDING_PATHS.txt),
+[literal NUL-delimited allowlist](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/ci-42369685905/PENDING_PATHS.nul), and
+[PENDING_INVENTORY.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz#docs/voidup/evidence/ci-42369685905/PENDING_INVENTORY.json).
 The inventory covers every current intended modified/new file: accepted LLVM
 selection/rejection helpers and tests, both provider recipes/verifier, backport
 and provenance, CMake identity/package rules, source-package tests, accepted
@@ -1310,8 +1310,8 @@ Git-visible change. Root README, workflows, compiler/Runtime production source,
 Phase A/B application source and all prior evidence are unchanged in this follow-up.
 Exact counts and every intended/excluded path are in the machine-readable inventory.
 The current cumulative
-[pending source diff](evidence/ci-42369685905/integration-repair-pending-source.patch)
-and [documentation diff](evidence/ci-42369685905/documentation-pending.patch) include
+[pending source diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905/integration-repair-pending-source.patch)
+and [documentation diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42369685905/documentation-pending.patch) include
 the previously accepted pending work as well as this correction; the separate
 one-line patch identifies this assignment's production-source delta (a test only).
 
@@ -1340,9 +1340,9 @@ branch, hosted dispatch, LLVM 19 use or binary publication occurred.
 
 7 November 2026. Boss requested a reviewable pending tree, without losing accepted
 repairs or historical results. **The current exact commit list is
-[REPAIR_COMMIT_PATHS.txt](REPAIR_COMMIT_PATHS.txt), with a
-[literal NUL-delimited copy](REPAIR_COMMIT_PATHS.nul) and
-[per-file classes/hashes](REPAIR_COMMIT_INVENTORY.json).** It supersedes all earlier
+[REPAIR_COMMIT_PATHS.txt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/REPAIR_COMMIT_PATHS.txt), with a
+[literal NUL-delimited copy](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/REPAIR_COMMIT_PATHS.nul) and
+[per-file classes/hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/REPAIR_COMMIT_INVENTORY.json).** It supersedes all earlier
 staging lists. No staging, commit, push, branch or hosted dispatch occurred.
 
 | Git file count | Before | After |
@@ -1381,8 +1381,8 @@ individual Git paths. No original evidence file was deleted or moved.
 
 To preserve complete access without thousands of loose commit paths, those
 5,727 records are stored losslessly in the
-[raw-evidence archive](evidence/repair-raw-evidence-2026-11-07.tar.xz), with an
-[exact restoration index](evidence/repair-raw-evidence-2026-11-07.json).
+[raw-evidence archive](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.tar.xz), with an
+[exact restoration index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/repair-raw-evidence-2026-11-07.json).
 It reduces 100,968,237 raw bytes to 5,990,576
 archive bytes. Identical contents/modes share earlier-member hardlinks; timestamps
 are normalized to zero. The archive contains only validated repository-relative
@@ -1422,7 +1422,7 @@ reconstruction, package audits and two upstream oracle limitations are preserved
 no unnecessary rebuild or full-suite rerun was performed for ignore/evidence
 maintenance. Native Windows/macOS candidate execution remains **UNQUALIFIED**.
 
-The [cleanup verification record](evidence/source-control-cleanup-2026-11-07.json)
+The [cleanup verification record](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/source-control-cleanup-2026-11-07.json)
 contains actual before/after counts, source-preservation checks, reference checks,
 archive results and the original-to-final classification. The old loose allowlist
 and original results remain accessible through the archive and local ignored
@@ -1458,14 +1458,14 @@ zero remaining failed names and zero remaining skipped names.
 
 ### Review artifacts and exact changes
 
-The [source diff](evidence/ci-42377496702/source.patch) contains the following
-eleven source/build/test changes. The [documentation diff](evidence/ci-42377496702/documentation.patch)
-contains this report revision. The [original CI index](evidence/ci-42377496702/original-ci-index.json)
+The [source diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42377496702/source.patch) contains the following
+eleven source/build/test changes. The [documentation diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42377496702/documentation.patch)
+contains this report revision. The [original CI index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42377496702/original-ci-index.json)
 records all seven job logs, twelve diagnostic ZIPs and metadata. All 27 members
 were read back and SHA-256 verified. Recover the original bundle from the
-audited commit using the [retention procedure](../projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records).
-The [local verification archive](evidence/ci-42377496702/local-verification.tar.gz)
-and [index](evidence/ci-42377496702/local-verification-index.json) preserve actual
+audited commit using the [retention procedure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records).
+The [local verification archive](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42377496702/local-verification.tar.gz)
+and [index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42377496702/local-verification-index.json) preserve actual
 commands, original failures, native probes, receipts, XML results and reruns.
 
 | File | Demonstrated defect and correction |
@@ -1719,9 +1719,9 @@ the VM. Earlier emulated probes are not native acceptance evidence.
 
 The final allowlist contains **21 paths: 12 tracked modifications and nine new
 review artifacts**, with zero staged paths. See the exact
-[readable allowlist](evidence/ci-42377496702/commit-paths.txt),
-[NUL-delimited allowlist](evidence/ci-42377496702/commit-paths.nul) and
-[per-file inventory](evidence/ci-42377496702/commit-inventory.json).
+[readable allowlist](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42377496702/commit-paths.txt),
+[NUL-delimited allowlist](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42377496702/commit-paths.nul) and
+[per-file inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42377496702/commit-inventory.json).
 The eleven source paths are listed above; the twelfth tracked path is this
 report. The nine new artifacts are the original/local archive-index pairs,
 source/documentation patches, both allowlists and the inventory JSON.
@@ -1904,20 +1904,20 @@ three approved postimages, original archives/licenses and tampered-patch
 rejection. Provider inputs and package rules remain unchanged after that audit;
 frozen installed execution verifies the updated Runtime checksum too.
 
-The [source diff](evidence/ci-42427327049/source.patch) and
-[documentation diff](evidence/ci-42427327049/documentation.patch) contain the actual
-reviewable changes. The [original hosted index](evidence/ci-42427327049/original-ci-index.json)
-records the completed run. The [retention procedure](../projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records)
+The [source diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42427327049/source.patch) and
+[documentation diff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42427327049/documentation.patch) contain the actual
+reviewable changes. The [original hosted index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42427327049/original-ci-index.json)
+records the completed run. The [retention procedure](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/VOID_ARCHIVE_AND_RETENTION_POLICY.md#restoring-historical-records)
 identifies the selected failure records and how to recover the original bundle.
-[Local native/Linux evidence](evidence/ci-42427327049/local-verification.tar.gz)
-([index](evidence/ci-42427327049/local-verification-index.json)) preserves commands,
+[Local native/Linux evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42427327049/local-verification.tar.gz)
+([index](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42427327049/local-verification-index.json)) preserves commands,
 source preimages, original local failures and corrected outcomes. Raw records
 also remain in `build/ci-42427327049/` and
 `/home/shmellyorc/VM/ci-42427327049/`; generated binaries, keys, caches and UI
 screenshots are excluded from the commit inventory.
 
-Exact intended paths are in the [allowlist](evidence/ci-42427327049/commit-paths.txt)
-and [hashed inventory](evidence/ci-42427327049/commit-inventory.json):six tracked
+Exact intended paths are in the [allowlist](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42427327049/commit-paths.txt)
+and [hashed inventory](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/voidup/evidence/ci-42427327049/commit-inventory.json):six tracked
 modifications plus the new unit test and nine review artifacts,16 paths total.
 No unrelated or staged paths are included. This is a review inventory for an
 incomplete Server repair, not approval to describe it as CI-ready.

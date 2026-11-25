@@ -1,8 +1,8 @@
 # JSON API
 
 27 October 2026. The complete public surface is implemented and locally verified
-on Linux Debug, Release and strict sanitizer profiles. See [the handoff](HANDOFF.md),
-[implementation status](IMPLEMENTATION.md) and the
+on Linux Debug, Release and strict sanitizer profiles. See [the handoff](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/HANDOFF.md),
+[implementation status](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/IMPLEMENTATION.md) and the
 [approved contract](DESIGN.md) for acceptance obligations and exact budgets.
 
 Use `use json as json` to keep the module's public type `value` out of unqualified
@@ -41,7 +41,7 @@ braces. VOID interpolation rules are unchanged.
 Bind a propagated result to a local before passing it to an inferred generic call,
 as in `var data = json.parse_as<[i32]>(text)?` then `json.stringify(data)`.
 The existing frontend can infer the result wrapper for a nested `?` expression;
-the frozen unrelated generic reproduction is recorded in [HANDOFF.md](HANDOFF.md).
+the frozen unrelated generic reproduction is recorded in [HANDOFF.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/HANDOFF.md).
 `value` exposes a readonly `kind` property and these result-returning observations:
 
 | Member | Success payload |
@@ -167,4 +167,4 @@ not sorted cryptographic canonical JSON.
 The original JSON verification includes relocated Linux installed execution
 and independently linked AOT in both modes. G09 adds focused PikaOS and
 Windows 10 qualification for configuration. macOS and hosted G09
-qualification are open. [G09 implementation and native results](IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults)
+qualification are open. [G09 implementation and native results](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/json/IMPLEMENTATION.md#g09-configuration-and-typed-field-defaults)

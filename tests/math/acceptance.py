@@ -3,6 +3,11 @@
 Usage: python tests/math/acceptance.py debug|release|sanitizers [--failed-only|--numerical-followup|--tooling-followup]
 Re-run only recorded affected failures with --failed-only after investigation.
 """
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 import hashlib
 import json
@@ -22,7 +27,7 @@ tooling_followup='--tooling-followup' in sys.argv
 cache_followup='--cache-followup' in sys.argv
 assert sum((failed_only,numerical_followup,tooling_followup,cache_followup))<=1,'Choose one follow-up mode'
 build=(h.ROOT/'build'/('ci-official-san' if profile=='sanitizers' else 'ci-official-'+profile)).resolve()
-evidence=h.ROOT/'docs/math/evidence';evidence.mkdir(parents=True,exist_ok=True)
+evidence=(documentation_evidence('math'));evidence.mkdir(parents=True,exist_ok=True)
 selection='^(math_.*|lsp_math|core|numeric|frontend|modules|numeric_sprint2|binary_execution|binary_ownership|lsp_binary|debug_cache|debug_cache_processes|gc_schemas|gc_buffers|async_ir|documentation_execution|lsp_documentation|lsp_stage8|lsp_stage10_intelligence|lsp_stage10_display|text_encoding_crash_preservation)$'
 label=profile+('-cache-followup' if cache_followup else '-numerical-followup' if numerical_followup else '-tooling-followup' if tooling_followup else '-followup' if failed_only else '')
 if cache_followup:selection='^math_host$'

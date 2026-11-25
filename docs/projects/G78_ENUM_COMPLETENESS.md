@@ -90,7 +90,7 @@ expanding the milestone into another compiler architecture.
 ## Initial-candidate verification
 
 All compiler profiles use pinned LLVM/Clang/LLD 23.1.4 on Linux x86-64.
-[Machine-readable evidence](evidence/g78/qualification.json) records exact tests,
+[Machine-readable evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g78/qualification.json) records exact tests,
 source/binary hashes, timings and final outcomes. Full local logs remain in
 `/tmp/void-g78-484t4_vc`.
 
@@ -136,8 +136,8 @@ separate from the user's installed extension. No popup-paint latency is claimed.
 
 ## Preserved failures and corrections
 
-[Baseline evidence](evidence/g78/baseline.json) retains the five initial rejected
-feature probes and compiler identity. [Unsuccessful evidence](evidence/g78/unsuccessful-evidence.json)
+[Baseline evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g78/baseline.json) retains the five initial rejected
+feature probes and compiler identity. [Unsuccessful evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g78/unsuccessful-evidence.json)
 retains prototype failures; none have been replaced with successful summaries.
 
 - A payload-free generic pattern lost its contextual specialization. Pattern
@@ -217,7 +217,7 @@ The original review, inputs and failures remain under
 `/tmp/g78-independent-3p_fu0sn`; correction logs are under
 `/tmp/g78-corrections-apqyd6kg`. The original qualification above is retained as
 historical initial-candidate evidence. Current correction evidence is recorded in
-[evidence/g78/corrections.json](evidence/g78/corrections.json).
+[evidence/g78/corrections.json](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g78/corrections.json).
 
 ### Exact corrections
 

@@ -1,4 +1,9 @@
 """One focused consolidated local selection with exact commands, JUnit and source receipts."""
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[2] / "tools"))
+from engineering_storage import documentation_evidence
 from pathlib import Path
 import hashlib
 import json
@@ -16,7 +21,7 @@ infrastructure_repair='--infrastructure-repair' in sys.argv
 numeric_followup='--numeric-followup' in sys.argv
 label=profile+('-numeric-followup' if numeric_followup else '-infrastructure-repair' if infrastructure_repair else '-repair' if repair else '')
 build=(h.ROOT/'build'/('ci-official-'+profile)).resolve()
-evidence=h.ROOT/'docs/random/evidence'
+evidence=(documentation_evidence('random'))
 selection='^(random_.*|lsp_random|core|numeric|frontend|modules|collections_source|binary_execution|binary_ownership|lsp_binary|stage11_globals|stage11_globals_stack|stage11_globals_aot|lsp_stage11_globals|documentation_execution|lsp_documentation|debug_cache|debug_cache_processes|numeric_sprint2|text_collections_sprint3|text_encoding_crash_preservation|io_crash_preservation)$'
 if numeric_followup:selection='^(random_execution|random_stack)$'
 if repair:selection='^(random_host|lsp_random|random_execution|random_stack)$'

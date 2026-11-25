@@ -6,14 +6,14 @@
         "lib/cookie.h",
         "lib/getinfo.c"
       ],
-      "review_diff": "docs/net/http/evidence/curl-8.23.0-cookie-oom-candidate.patch",
+      "review_diff": "third_party/curl-patches/curl-8.23.0-cookie-oom-candidate.patch",
       "sha256": "6a558dc87faec9bbba68056ee79903dff0c05b5e61ba7b08a513b2e21b817920"
     },
     "http2_window": {
       "files": [
         "lib/http2.c"
       ],
-      "review_diff": "docs/net/http/evidence/curl-8.23.0-http2-window-candidate.patch",
+      "review_diff": "third_party/curl-patches/curl-8.23.0-http2-window-candidate.patch",
       "sha256": "f109b12c2c5b327fb9b2da2b9d302cb111d936097b98ace830ea886db7d4f1a2"
     }
   },

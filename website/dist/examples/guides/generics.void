@@ -1,7 +1,0 @@
-func larger<t>(first: t, second: t) -> t:
-    if first > second:
-        return first
-    return second
-
-func entry(score: i32) -> i32:
-    return larger(score, 10)

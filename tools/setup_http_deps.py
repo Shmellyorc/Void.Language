@@ -4,6 +4,11 @@
 Linux native recipe. Downloads, extraction, builds and prefixes are disposable.
 No ambient curl, IDN, TLS, h2, PSL, DNS or compression library is selected.
 """
+
+import sys as _evidence_sys
+from pathlib import Path as _EvidencePath
+_evidence_sys.path.insert(0, str(_EvidencePath(__file__).resolve().parents[1] / "tools"))
+from engineering_storage import documentation_evidence
 import argparse
 import datetime
 import hashlib
@@ -38,8 +43,8 @@ build_root = base / "build" / policy["bundle"] / args.profile
 cc = root / ".toolchains/llvm-23.1.4/bin/clang"
 cxx = root / ".toolchains/llvm-23.1.4/bin/clang++"
 stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
-receipt = root / "docs/net/http/evidence" / f"dependencies-{args.profile}-{stamp}"
-receipt.mkdir()
+receipt = (documentation_evidence('net/http')) / f"dependencies-{args.profile}-{stamp}"
+receipt.mkdir(parents=True, exist_ok=False)
 prefix.mkdir(parents=True, exist_ok=True)
 build_root.mkdir(parents=True, exist_ok=True)
 report = {"host": platform.platform(), "profile": args.profile,

@@ -12,7 +12,7 @@ See [G93](projects/G93_COMPILE_FUNCTIONS.md).
 [The shared calls/numeric contract](STAGE8_CALLS_NUMERIC.md) supersedes older
 ordinary named/default-call exclusions below. Existing constructor, readonly,
 receiver and specialization protections remain. See
-[actual local verification](stage8/SPRINT2_ACCEPTANCE.md) for acceptance status.
+[actual local verification](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/stage8/SPRINT2_ACCEPTANCE.md) for acceptance status.
 
 Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRATEGY.md#current-implementation-status). Dated phase-only exclusions below are historical where superseded; this guide retains its feature contract.
 

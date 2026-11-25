@@ -122,7 +122,7 @@ Final compiler/server SHA-256:
 | strict | `2da89ba0ca4f2df488e0b303c922879bd5589b6fe890740d17253a26926ba747` | `db53a5f717a441143c57e5c22f3efc75657d73356d8c63836dd5473080724204` |
 
 Evidence directory:
-`/home/shmellyorc/Documents/Void.Language-work/g85-xbyfkr9w`.
+`/home/shmellyorc/Documents/Void.Language-archives/relocated-documents-2026-11-25/Void.Language-work/g85-xbyfkr9w`.
 Review archive:
 `/home/shmellyorc/Documents/Void.Language-archives/g85-custom-iteration-2026-11-20-xbyfkr9w.zip`.
 The adjacent `.sha256` and `.verification.json` identify and verify that ZIP.

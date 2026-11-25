@@ -180,9 +180,9 @@ parameter hints and suggestion popups, type/generic completion, visibility filte
 and invalid-to-valid unsaved edits. This is provider/editor-host evidence, not a
 manual visual or paint-latency measurement. User profiles and installations are untouched.
 
-[Qualification JSON](evidence/g80/qualification.json) records per-run source/artifact
+[Qualification JSON](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g80/qualification.json) records per-run source/artifact
 hashes, raw outputs, commands, exact fixtures, evidence-reuse provenance and the
-complete manifest. [Original unsuccessful evidence](evidence/g80/unsuccessful-evidence.json)
+complete manifest. [Original unsuccessful evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g80/unsuccessful-evidence.json)
 retains unfavorable intermediate results. All 25 original G79 review/evidence files
 still match their checksums. `git diff --check` passes; the index is empty.
 
@@ -299,7 +299,7 @@ checks total); this includes all three previously failing forms, without
 reclassifying the original failures. Successful fixture output and expected
 negative diagnostics/exits remain asserted in JIT/AOT O0/O2 paths.
 
-The [current correction evidence](evidence/g80/corrections.json) records exact
+The [current correction evidence](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/g80/corrections.json) records exact
 commands, inputs, outputs, final source/test and compiler/server hashes, original
 review checksums and the complete inventory. All **17** original review records
 remain byte-for-byte unchanged. Initial G80 qualification and its unfavorable

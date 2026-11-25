@@ -297,7 +297,7 @@ failed. The four passing strict windows used the explicit graphics-only Mesa
 exclusion. ASan and UBSan remained fatal and all headless subprocesses kept
 leak detection enabled. The checked shim was instrumented. The upstream
 raylib binary was the uninstrumented release artifact.
-[S7 Mesa frame attribution](evidence/slice7-raylib/failures/linux-mesa-address-attribution.txt)
+[S7 Mesa frame attribution](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/projects/evidence/slice7-raylib/failures/linux-mesa-address-attribution.txt)
 
 ### Platform status
 

@@ -4,7 +4,7 @@ Current status/hosted evidence: [current implementation status](DEVELOPMENT_STRA
 
 Phase 20 preserves U1–U7 while adding static ancestry precedence, inherited using fields, original storage paths and virtual dispatch on component identity. Component promotion still considers directly declared members only. See [INHERITANCE.md](INHERITANCE.md) for the current boundary and WORK_LOG.md for actual verification.
 
-The owner approved U1–U7 in [COMPOSITION_PROPOSAL.md](COMPOSITION_PROPOSAL.md),
+The owner approved U1–U7 in [COMPOSITION_PROPOSAL.md](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/COMPOSITION_PROPOSAL.md),
 including named and unnamed embeddings. This guide describes the implementation;
 actual validation results and hosted limitations are recorded in WORK_LOG.md.
 LLVM is pinned to 23.1.4 under the [migration](llvm23/COMPATIBILITY.md). The single frontend, semantic model, shared IR,
@@ -165,6 +165,7 @@ results cannot establish Windows/macOS or unavailable VSCodium execution.
 blanket exclusions above for compile-time type `has`, typed if-expressions,
 multiline calls and string-only interpolation. Existing nominal storage,
 structural conformance, generic specialization, capabilities and checked failure
-rules remain authoritative. Both conditional branches type-check. Formatting and
-numeric/bool/custom string conversion remain deferred. Approval and implementation
-are separate from local acceptance, Wrench review and the final hosted lock.
+rules remain authoritative. Both conditional branches type-check. The later
+[display and formatting contract](stage10/DISPLAY_FORMATTING.md) implements the
+numeric, Boolean and custom display surface; the old string-only exclusion is
+superseded. Qualification remains specific to the recorded revision and platform.

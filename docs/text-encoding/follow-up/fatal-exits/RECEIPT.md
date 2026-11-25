@@ -5,7 +5,7 @@ Correction complete; stop for Golden Wrench review.
 
 ## Demonstrated defects and narrow repairs
 
-[Before-change proof](before.json) confirms the previous classifier missed ASan's
+[Before-change proof](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/fatal-exits/before.json) confirms the previous classifier missed ASan's
 reserved exit 87 and UBSan's reserved exit 86. It also shows signed Windows status
 -1073741819 raised `ValueError` during POSIX signal-name conversion, interrupting
 receipt creation. The proof used disposable simulated inputs, not a compiler crash.
@@ -59,11 +59,11 @@ Only registered preservation tests ran:
 
 | Profile | Result | CTest seconds | Verbose log | JUnit |
 | --- | --- | ---: | --- | --- |
-| Debug | 2/2 passed | 1.15 | [Log](debug.log) | [XML](debug-junit.xml) |
-| Release | 2/2 passed | 1.12 | [Log](release.log) | [XML](release-junit.xml) |
-| Strict sanitizers | 2/2 passed | 1.03 | [Log](sanitizers.log) | [XML](sanitizers-junit.xml) |
+| Debug | 2/2 passed | 1.15 | [Log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/fatal-exits/debug.log) | [XML](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/fatal-exits/debug-junit.xml) |
+| Release | 2/2 passed | 1.12 | [Log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/fatal-exits/release.log) | [XML](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/fatal-exits/release-junit.xml) |
+| Strict sanitizers | 2/2 passed | 1.03 | [Log](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/text-encoding/follow-up/fatal-exits/sanitizers.log) | [XML](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/fatal-exits/sanitizers-junit.xml) |
 
-[Exact commands, cwd, environment, final source hashes and log hashes](results.json)
+[Exact commands, cwd, environment, final source hashes and log hashes](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/fatal-exits/results.json)
 record each execution. The strict profile retained:
 
 ```text
@@ -78,7 +78,7 @@ No full IO workload, compiler matrix, rebuild or hosted CI ran.
 
 ## Integrity and handoff
 
-All 1,971 files in [the protected evidence manifest](protected-evidence-sha256.json)
+All 1,971 files in [the protected evidence manifest](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/text-encoding/follow-up/fatal-exits/protected-evidence-sha256.json)
 match their original hashes, including actual Debug crash evidence and historical
 filesystem/optimizer research. No new genuine incident occurred; the genuine root
 still contains only `incident-splghldg`. No synthetic snapshot directory remains.

@@ -1,7 +1,7 @@
 # Combined sprint implementation and Wrench handoff
 
 Scope and all public rules are in [CONTRACT.md](CONTRACT.md). The concise
-[receipt](evidence/RECEIPT.md) records the final local selection, exact outcomes,
+[receipt](https://github.com/Shmellyorc/Void.Language/blob/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/combined/evidence/RECEIPT.md) records the final local selection, exact outcomes,
 commands, hashes and benchmark samples. This is implementation evidence for
 independent Golden Wrench review, not a declaration of final platform acceptance.
 
@@ -83,8 +83,8 @@ added. Repeated requests and corrected overlays must recover in one server proce
 The regression includes file/local constants, inferred/typed/forward/imported globals,
 cycles, invalid annotations, defaults, fixed extents, the supplied complete guessing
 game, missing API diagnostics, and three cursor positions in the minimal fixture.
-[Original failure](evidence/voidls-crash-before.log),
-[actual debugger stack](evidence/voidls-crash-stack.log), and final per-profile
+[Original failure](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/combined/evidence/voidls-crash-before.log),
+[actual debugger stack](/home/shmellyorc/Documents/Void.Language-archives/repository-cleanup-2026-11-25/retained-repository/docs/combined/evidence/voidls-crash-stack.log), and final per-profile
 receipts distinguish reproduction from verification. The stack executable was
 reconstructed from the exact Debug compile/link commands in an isolated /tmp tree,
 reverting only the three repair sites after the original server was rebuilt; it did

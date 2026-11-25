@@ -30,7 +30,7 @@ the stop-token compile/link check. Compiler tests did not run on those platforms
   These match the unchanged installer pins. Inspected their CMake exports and
   native COFF/Mach-O library contents on Linux, without executing foreign code.
 
-The [evidence directory](evidence/cross-platform-repair/) retains initial error
+The [evidence directory](https://github.com/Shmellyorc/Void.Language/tree/df33af0a7e8ae75b97d2ab27395a683b69d3994f/docs/llvm23/evidence/cross-platform-repair) retains initial error
 excerpts, export excerpts with original line numbers, inspected file hashes,
 runtime inspection, local commands/results and negative discovery logs.
 
