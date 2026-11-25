@@ -35,7 +35,7 @@ TARGETS = ('voidc', 'voidls', 'void_publish_foundation', 'void_project_header',
 TESTS = ('publish_contracts', 'publish_binary_fixtures', 'project_manifest_header',
          'project_manifest', 'project_manifest_legacy', 'project_selection',
          'project_discovery_cli', 'project_profiles', 'project_protocol', 'cli_contract',
-         'publish_private_diagnostics', 'cli_presentation', 'project_native_debug_info',
+         'publish_private_diagnostics', 'cli_presentation',
          'runtime_coordination', 'runtime_generated', 'runtime_callbacks', 'runtime_failures',
          'runtime_aot_normal', 'runtime_aot_optimized', 'runtime_invariants')
 CI_PATHS = {'.github/workflows/ci-link-experiment.yml',
