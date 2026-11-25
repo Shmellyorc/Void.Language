@@ -106,7 +106,7 @@ int main(int argc,char** argv) {
     }
     if(!std::strcmp(argv[1],"stack-thread")) {std::thread thread([]{exhaust(0);});thread.join();return 0;}
     if(!std::strcmp(argv[1],"stack"))return exhaust(0);
-    if(!std::strcmp(argv[1],"ubsan")) {volatile int maximum=std::numeric_limits<int>::max();return maximum+argc;}
+    if(!std::strcmp(argv[1],"ubsan")) {volatile int maximum=(std::numeric_limits<int>::max)();return maximum+argc;}
     if(!std::strcmp(argv[1],"sanitizer")) {
         sanitizer_failure();return 0;
     }

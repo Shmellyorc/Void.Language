@@ -79,7 +79,8 @@ def run(argv,*,env=None,cwd=None,expected=0,timeout=900,data=None,directory_diag
 
 if a.reuse_work:a.reuse_work.mkdir(mode=0o700,parents=True,exist_ok=False)
 with (nullcontext(str(a.reuse_work.resolve())) if a.reuse_work else tempfile.TemporaryDirectory(prefix='voidup-first-run-')) as temporary:
-    work=Path(temporary);fixtures=work/'fixtures';fixtures.mkdir(mode=0o700)
+    # A Windows runner can supply its temporary folder through a short alias.
+    work=Path(temporary).resolve(strict=True);fixtures=work/'fixtures';fixtures.mkdir(mode=0o700)
     cases=a.installation_root.parent if a.installation_root else work
     # Existing private engineering keys stay in their original private location.
     # The fixture retains a link only; private bytes are never copied to evidence.

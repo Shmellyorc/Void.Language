@@ -242,13 +242,23 @@ int run_helper(int argc,char** argv)try {
     // Hard-linked generated executables are never accepted for transfer.
     auto alias=home/"alias";fs::create_hard_link(source,alias);
     rejects([&]{copy_checked(source,home/"hardlink-copy",true);});fs::remove(alias);
-    // Insecure roots fail closed instead of trusting a random leaf.
+    // Explicitly private roots still fail closed under an insecure DACL.
     auto insecure=home/"insecure";fs::create_directory(insecure);
     // Null DACL is intentionally confined to the disposable fixture directory.
     if(SetNamedSecurityInfoW(const_cast<wchar_t*>(insecure.c_str()),SE_FILE_OBJECT,
         DACL_SECURITY_INFORMATION|PROTECTED_DACL_SECURITY_INFORMATION,nullptr,nullptr,nullptr,nullptr)!=ERROR_SUCCESS)
         fail("Cannot make insecure test root");
-    rejects([&]{Directory d(insecure,true);});
+    {
+        auto pins=pin_directories(insecure);
+        PrivateAccess access;
+        rejects([&]{access.verify_root(pins.back().value);});
+        // Ordinary parents follow OS access. The exclusively owned stage
+        // still needs a private DACL and must leave the parent empty.
+        Directory stage(insecure,true);
+        access.verify(stage.pins.back().value);
+        access_check(stage.pins.back().value);
+    }
+    require(fs::is_empty(insecure),"private stage leaked into shared parent");
     // Optional second real volume supplied by Boss, never a fabricated same-volume pass.
     if(argc==2) {
         auto other=vd::utf8_path(argv[1]);auto pins=pin_directories(other);
