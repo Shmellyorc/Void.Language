@@ -4,8 +4,8 @@ Use Apple's install_name_tool and codesign to relocate the admitted Mach-O
 dependency closure. Ad-hoc signing permits local qualification only; Developer
 ID signing/notarization remains a separate, authorized distribution operation.
 """
-import os
 from pathlib import Path
+import posixpath
 import re
 import shutil
 import subprocess
@@ -84,7 +84,8 @@ def relocate(prefix, origins, allowed_roots, dependency_directory='sdk/lib/void-
             if target.name not in copied:
                 destination.mkdir(parents=True,exist_ok=True);shutil.copy2(library,target);copied[target.name]=library
             visit(target,library,executable)
-            changes+=['-change',reference,'@loader_path/'+os.path.relpath(target,image.parent)]
+            relative=posixpath.relpath(target.relative_to(prefix).as_posix(),image.parent.relative_to(prefix).as_posix())
+            changes+=['-change',reference,'@loader_path/'+relative]
         if details['identifier']:changes+=['-id','@rpath/'+image.name]
         for path in details['rpaths']:
             if not internal_rpath(path,image):changes+=['-delete_rpath',path]
