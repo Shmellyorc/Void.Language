@@ -121,7 +121,17 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
         _,v,p=timed(['check',app,*flags])
         assert v['configuration']=={'project_mode':False,'profile':None,'optimization':opt,'debug_info':'none'},v
     _,v,p=timed(['run','--project',project,'--cache'])
-    assert v['configuration']=={'project_mode':True,'profile':'debug','optimization':'none','debug_info':'unavailable'},v
+    cached_debug_info='none' if debug_info=='none' else 'unavailable'
+    assert v['configuration']=={'project_mode':True,'profile':'debug','optimization':'none','debug_info':cached_debug_info},v
+    # Exercise every requested mode even when the platform's starter uses none.
+    for requested,expected in [('none','none'),('full','unavailable'),('line','unavailable')]:
+        cached_project=root/f'cached-{requested}'
+        run(['new',cached_project,'--kind','application'])
+        (cached_project/'main.void').write_text('func main() -> i32:\n    return 0\n')
+        with (cached_project/'void.project.toml').open('a',encoding='utf-8') as manifest:
+            manifest.write(f'\n[build.debug]\ndebug_info = "{requested}"\n')
+        _,v,p=timed(['run','--project',cached_project,'--cache'])
+        assert v['configuration']=={'project_mode':True,'profile':'debug','optimization':'none','debug_info':expected},v
     distribution=root/'distribution'
     _,v,p=timed(['package','--project',project,'-o',distribution])
     assert v['build']['complete'] and v['build']['outcome']=='success'
