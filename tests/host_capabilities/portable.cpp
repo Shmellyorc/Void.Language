@@ -126,14 +126,12 @@ void owner_rights_ancestors(const fs::path& work,const fs::path& executable) {
    q=request(dir_admit);q.texts={text(parent)};r=directory_execute(q);
    check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired,"OWNER_RIGHTS is not a private leaf ACL");
   } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired && !fs::exists(leaf),"untrusted ancestor mutation rejected");
-  q=request(spawn);q.texts={text(executable),text(parent)};q.arrays={{"--exit"},{}};r=process_execute(q);
-  if(test.admitted) {
-   check(!r.kind && q.acquired,"OWNER_RIGHTS working directory admitted");auto process=q.acquired;
-   q=request(vd::host::wait);q.objects={process};r=process_execute(q);
-   check(!r.kind && r.number==23,"OWNER_RIGHTS child status");check(!process->close(),"OWNER_RIGHTS process cleanup");
-  } else check(r.kind==2 && r.code==ERROR_ACCESS_DENIED && !q.acquired,"untrusted working directory rejected");
-  // Apply the same hostile-parent condition to the executable, independently
-  // of cwd. The copy is a disposable fixture, never the runner's real root.
+  q=request(spawn);q.texts={text(executable),text(parent)};q.arrays={{"--verify-cwd",text(parent)},{}};r=process_execute(q);
+  check(!r.kind && q.acquired,"shared working directory admitted");auto cwd_child=q.acquired;
+  q=request(vd::host::wait);q.objects={cwd_child};r=process_execute(q);
+  check(!r.kind && r.number==23,"shared working directory child status");
+  check(!cwd_child->close(),"shared working directory process cleanup");
+  // Apply the shared parent ACL to the executable separately from cwd.
   auto image=parent/L"child.exe";fs::copy_file(executable,image);
   q=request(spawn);q.texts={text(image),text(work)};q.arrays={{"--exit"},{}};r=process_execute(q);
   if(test.admitted) {
@@ -172,6 +170,10 @@ int portable_main(int argc,char** argv) {
 #ifdef _WIN32
   if(argc==5 && std::string_view(argv[1])=="--stage-executable")return stage_executable(argv[2],argv[3],argv[4]);
   if(argc==2 && std::string_view(argv[1])=="--server-descriptor") {server_descriptor_regressions();return 0;}
+  if(argc==3 && std::string_view(argv[1])=="--verify-cwd") {
+   auto expected=fs::path(std::u8string_view(reinterpret_cast<const char8_t*>(argv[2])));
+   return fs::equivalent(fs::current_path(),expected)?23:97;
+  }
   if(argc==2 && std::string_view(argv[1])=="--verify-stdio") {
    for(DWORD selected:{STD_INPUT_HANDLE,STD_OUTPUT_HANDLE,STD_ERROR_HANDLE}) {
     auto handle=GetStdHandle(selected);

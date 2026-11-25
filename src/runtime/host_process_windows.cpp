@@ -146,8 +146,9 @@ Result windows_process_execute(Request& q,const CaptureLimits* capture) {
         for(const auto& entry:entries){environment.insert(environment.end(),entry.begin(),entry.end());environment.push_back(0);if(environment.size()>32765)return error(12);}
         if(environment.empty())environment.push_back(0);environment.push_back(0);
         stage=LaunchStage::image_ancestors;
-        auto image_ancestors=win::pin_directories(executable.substr(0,std::max<std::size_t>(7,executable.find_last_of(L'\\'))),false);
+        auto image_ancestors=win::pin_directories(executable.substr(0,std::max<std::size_t>(7,executable.find_last_of(L'\\'))));
         stage=LaunchStage::cwd_ancestors;
+        // A shared working directory still needs pinned, unaliased ancestry.
         auto cwd_ancestors=win::pin_directories(cwd,false);
         stage=LaunchStage::image_open;
         win::Handle image(CreateFileW(executable.c_str(),GENERIC_READ|FILE_EXECUTE,FILE_SHARE_READ,nullptr,OPEN_EXISTING,FILE_FLAG_OPEN_REPARSE_POINT,nullptr));
