@@ -5,6 +5,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 compiler = Path(sys.argv[1]).resolve()
 schema = json.loads((Path(__file__).resolve().parents[2] / 'docs/schemas/cli-timings-v1.schema.json').read_text())
@@ -99,6 +100,9 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
     assert subprocess.run([str(exe)]).returncode==7
     project=root/'packaged-project'
     run(['new','app',project])
+    starter=tomllib.loads((project/'void.project.toml').read_text(encoding='utf-8'))
+    # Starters without app_launch inherit the manifest's default of none.
+    debug_info=starter.get('build',{}).get('debug',{}).get('debug_info','none')
     # Schema-valid defaults must not pretend that a project profile resolved.
     malformed=root/'malformed-project';malformed.mkdir()
     (malformed/'void.project.toml').write_text('[=invalid manifest]\n')
@@ -108,7 +112,7 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
     r,v,p=timed(['run','--project',project,'--profile','release','--cache'],2)
     assert b'--cache requires the debug profile' in r.stderr
     assert v['configuration']=={'project_mode':True,'profile':None,'optimization':None,'debug_info':None},v
-    for profile,opt,debug in [('debug','none','full'),('release','O2','none')]:
+    for profile,opt,debug in [('debug','none',debug_info),('release','O2','none')]:
         _,v,p=timed(['check','--project',project,'--profile',profile])
         assert v['configuration']=={'project_mode':True,'profile':profile,'optimization':opt,'debug_info':debug},v
     _,v,p=timed(['check','--project',project,'--profile','release','--no-opt'])
