@@ -1,0 +1,31 @@
+{
+  "baseline": "df33af0a7e8ae75b97d2ab27395a683b69d3994f",
+  "stage_a_baseline": "458f7f1fb26e6c02edade48abf72ec333b059092",
+  "patch_sha256": "077977def3b5c9e6e19d64ff27653288e4777cb71755f5eff1a9ca7b33b8e891",
+  "stage_b_patch_sha256": "3f2d2ceb0ec1700046abb7f79d234ae33382b13ff46b1379458ba3306ba4bec9",
+  "source_sha256": {
+    "CMakeLists.txt": "777bb7c36af3cd975924aa2fb87944fe18eacbcdd30f9f8dd3622e9ca37b0b54",
+    "docs/PUBLISHER_STAGE_B.md": "8b605f98b8e98bc421eb16e31a629fd24d7c9fbf1e6ef6de86244793d1d2e843",
+    "include/void/backend.hpp": "8c7a061220d5ec450fc0dd37e1b8f550a6588abe9657b3f2d4f89a3e3d408701",
+    "include/void/binary_audit.hpp": "89d862dd5a02eb88aa6ae197231401a1ea5e0e8eb536ffe48139425070599a02",
+    "include/void/private_diagnostics.hpp": "45f7e6b94cbe485e6b7a2b4f9446555a9d11e498e01f1f70008b7dea0c134c50",
+    "include/void/project.hpp": "a87ba8d5accce0ed310d543210dd2da00e382ecac36df24d9baa677a28ab94f1",
+    "include/void/publish.hpp": "7f3509a6b4474daf0a68630c04e8bceb96b1ccf029f7f0fea1ee85bb6384a168",
+    "src/backend/llvm/backend.cpp": "507df5003b8eefa069c4970ac06bafbf380ebe2b8086b3f116af3a4235592fcb",
+    "src/binary_audit.cpp": "004f6478f64d7d25e36241b9ee49add4f324d715e880ac7f39c96b283185d0b0",
+    "src/cli_help.hpp": "514bbc72cb4b7d455721fb636f112962a639f8b695c6f856d17de405d7b7e76a",
+    "src/frontend/project.cpp": "fb00d01198a0af3997ede132a90b81f795927719a7af8f4706d190519a8d66f2",
+    "src/main.cpp": "6284028c33383a5acfa17134767f39402a5fb49095b9d3d34cbfc3ee6cadb596",
+    "src/private_diagnostics.cpp": "a8cd8b9238bfb80fc496cd49a245a0eb96a3a48a440b5897e9e50a1d3e9ba793",
+    "src/publish.cpp": "8d3cdb13496b3d52e4a9d43e3d6a74f66c53a4505adc9c19f352b1e83115d0fe",
+    "tests/cli/contract.py": "29e99428b11b513cdc199d3b866f1587092f862eac98790170399a2081c55902",
+    "tests/cli/presentation.py": "1504b2221a61c43999380c84d6b8844fd435cdd38c862135dac9517f008b3e32",
+    "tests/project/application_packages.py": "f8ac6b27a8625de545c34568f70c16ff9b1fa8847de7b6ef91a05d10d3956253",
+    "tests/project/discovery.py": "54c04cc8f5b76c4da4521e035cf7cd605fc0aacc1da896619f931ad3c4d19ebb",
+    "tests/project/manifest.cpp": "0d555fba1c55afc6bee0b89203c5bdc5334bbf2a4a856e9d1ce154ad39d74042",
+    "tests/project/private_binary.py": "7dd64d6d399dde46752bce931b696f2b9d9dd96aa8e36aadabecdb1afc36f76d",
+    "tests/project/private_diagnostics.cpp": "c584a12710fdbcbe9f7bf0a7897f6f8977e1251ed7b5e8a93622c63ae1da6d1c",
+    "tests/project/publish.cpp": "8ee85187d5e7c1a2d2f23d0deac1fd4ab964be2e187473fbd4cef71b5a45120e",
+    "tests/project/publish_fixtures.py": "e955574e93769e3cca6d6d0e8b7ec455cef883651cb0a6c2db6f9877322d3e7a"
+  }
+}

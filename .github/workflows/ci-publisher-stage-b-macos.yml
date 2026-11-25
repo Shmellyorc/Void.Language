@@ -1,0 +1,161 @@
+name: Publisher Stage B / native macOS ARM64
+on:
+  workflow_call:
+    inputs:
+      reviewed_sha:
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      reviewed_sha:
+        description: Exact reviewed qualification commit
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: publisher-stage-b-macos-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  qualify:
+    name: Stage B / macOS ARM64 / ${{ matrix.configuration }}
+    runs-on: macos-15
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        configuration: [Debug, Release]
+    defaults:
+      run:
+        shell: bash
+    env:
+      PUBLISH_CONFIGURATION: ${{ matrix.configuration }}
+      PUBLISH_REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      MACOSX_DEPLOYMENT_TARGET: '14.0'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Verify exact candidate, native runner and Apple SDK
+        run: python -B tools/ci/publisher_stage_b.py source
+      - name: Restore pinned complete LLVM SDK
+        id: llvm
+        uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Prepare and verify LLVM Clang LLD 23.1.4
+        timeout-minutes: 8
+        env:
+          LLVM_CACHE_HIT: ${{ steps.llvm.outputs.cache-hit }}
+        run: |
+          # Primary keys can prefix-match even without restore-keys.
+          if [[ "$LLVM_CACHE_HIT" != true ]]; then
+            rm -rf .toolchains/llvm-23.1.4
+          fi
+          python -B tools/ci/llvm_sdk.py 2>&1 | tee "$PUBLISH_WORK/llvm-bootstrap.log"
+      - name: Save verified complete LLVM SDK before compiler qualification
+        if: steps.llvm.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Identify existing verified HTTP cache keys
+        id: http
+        run: python -B tools/ci/publisher_stage_b.py http-identity
+      - name: Restore pinned HTTP sources
+        id: http_sources
+        uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/http/downloads
+          key: ${{ steps.http.outputs.sources-key }}
+      - name: Restore verified native HTTP profile
+        id: http_deps
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.deps-key }}
+      - name: Verify HTTP cache or build only missing pinned libraries
+        id: http_verify
+        env:
+          HTTP_DEPS_CACHE_HIT: ${{ steps.http_deps.outputs.cache-hit }}
+        run: python -B tools/ci/publisher_stage_b.py http
+      - name: Save verified HTTP sources
+        if: steps.http_sources.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .toolchains/http/downloads
+          key: ${{ steps.http.outputs.sources-key }}
+      - name: Save verified HTTP profile
+        if: steps.http_deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.deps-key }}
+      - name: Identify host provider cache bound to HTTP zlib and toolchain
+        id: host
+        run: python -B tools/ci/publisher_stage_b.py host-identity
+      - name: Restore pinned host sources
+        id: host_sources
+        uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/host/downloads
+          key: ${{ steps.host.outputs.sources-key }}
+      - name: Restore verified host provider profile
+        id: host_deps
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ steps.host.outputs.prefix }}
+          key: ${{ steps.host.outputs.deps-key }}
+      - name: Verify host cache or build only missing pinned providers
+        env:
+          HOST_DEPS_CACHE_HIT: ${{ steps.host_deps.outputs.cache-hit }}
+        run: python -B tools/ci/publisher_stage_b.py host
+      - name: Save verified host sources
+        if: steps.host_sources.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: .toolchains/host/downloads
+          key: ${{ steps.host.outputs.sources-key }}
+      - name: Save verified host profile
+        if: steps.host_deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ steps.host.outputs.prefix }}
+          key: ${{ steps.host.outputs.deps-key }}
+      - name: Probe Release ThinLTO and configure isolated native targets
+        run: python -B tools/ci/publisher_stage_b.py configure
+      - name: Build only the focused qualification targets
+        id: build
+        run: python -B tools/ci/publisher_stage_b.py build
+      - name: Run project_protocol independently with pipe diagnostics
+        run: python -B tools/ci/publisher_stage_b.py protocol
+      - name: Run exact focused CTests with strict registration and result checks
+        run: python -B tools/ci/publisher_stage_b.py tests
+      - name: Inspect native ARM64 Mach-O producers and ordinary VOID execution
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: python -B tools/ci/publisher_stage_b.py native
+      - name: Qualify private maps, dSYM UUIDs and exact reduced images
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: python -B tools/ci/publisher_stage_b.py private
+      - name: Verify all publish targets and profiles reject without output
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: python -B tools/ci/publisher_stage_b.py rejections
+      - name: Collect configuration, build, tests and failure evidence
+        if: ${{ always() }}
+        run: python -B tools/ci/publisher_stage_b.py collect
+      - name: Retain qualification evidence
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: publisher-stage-b-macos-arm64-${{ matrix.configuration }}-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/publisher-stage-b/evidence
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14

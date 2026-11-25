@@ -1,0 +1,1961 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -100,7 +100,7 @@
+ target_link_libraries(void_application_objects PRIVATE void_options)
+ add_library(void_core src/frontend/conditional.cpp src/frontend/project.cpp src/frontend/project_creation.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
+ target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
+-target_sources(void_core PRIVATE src/ir/c_primitive.cpp)
++target_sources(void_core PRIVATE src/ir/c_primitive.cpp src/private_diagnostics.cpp)
+ find_program(VOID_GIT_EXECUTABLE NAMES git DOC "Trusted Git executable for explicit D3 acquisition")
+ if(NOT VOID_GIT_EXECUTABLE)
+   set(VOID_GIT_EXECUTABLE "")
+@@ -320,6 +320,11 @@
+ configure_file(verified-packages/raylib-prepare.void "${verified_raylib_preparer}" COPYONLY)
+ file(SHA256 "${verified_raylib_preparer}" verified_raylib_preparer_sha256)
+ install(FILES "${verified_raylib_preparer}" DESTINATION share/void/verified-packages COMPONENT compiler)
++add_library(void_publish src/publish.cpp src/binary_audit.cpp)
++target_link_libraries(void_publish PUBLIC void_core)
++target_include_directories(void_publish SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
++target_compile_options(void_publish PRIVATE ${VOID_LLVM_DEFINITIONS})
++target_link_libraries(void_publish PRIVATE ${VOID_CORE_LLVM_LIBS})
+ add_library(voidc_objects OBJECT src/main.cpp src/native_approval.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
+ target_compile_definitions(voidc_objects PRIVATE VOID_RAYLIB_BUILD_ROOT="${verified_raylib_build_root}"
+   VOID_RAYLIB_SANITIZE=$<BOOL:${VOID_SANITIZERS}>
+@@ -331,9 +336,9 @@
+   VOID_RAYLIB_SUBDIR="${verified_raylib_subdirectory}" VOID_RAYLIB_VERSION="${verified_raylib_version}")
+ target_compile_definitions(voidc_objects PRIVATE VOID_COMPILER_VERSION="${PROJECT_VERSION}")
+ target_include_directories(voidc_objects SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
+-target_link_libraries(voidc_objects PRIVATE void_llvm)
+-set(cache_identity_inputs "$<TARGET_FILE:void_crash_diagnostics>;$<TARGET_OBJECTS:voidc_objects>;$<TARGET_FILE:void_llvm>;$<TARGET_FILE:void_core>;$<TARGET_FILE:void_runtime>;$<TARGET_FILE:void_native_fixture>")
+-set(cache_identity_deps void_crash_diagnostics void_llvm void_core void_runtime void_native_fixture "$<TARGET_OBJECTS:voidc_objects>")
++target_link_libraries(voidc_objects PRIVATE void_llvm void_publish)
++set(cache_identity_inputs "$<TARGET_FILE:void_crash_diagnostics>;$<TARGET_OBJECTS:voidc_objects>;$<TARGET_FILE:void_llvm>;$<TARGET_FILE:void_publish>;$<TARGET_FILE:void_core>;$<TARGET_FILE:void_runtime>;$<TARGET_FILE:void_native_fixture>")
++set(cache_identity_deps void_crash_diagnostics void_llvm void_publish void_core void_runtime void_native_fixture "$<TARGET_OBJECTS:voidc_objects>")
+ set(host_identity_inputs ${VOID_HOST_LINK_FILES}
+   "${PROJECT_SOURCE_DIR}/third_party/host-versions.json"
+   "${PROJECT_SOURCE_DIR}/third_party/host-patches/libsodium-1.0.22/PROVENANCE.json"
+@@ -380,7 +385,7 @@
+ target_link_libraries(void_cache_identity PRIVATE void_options)
+ add_dependencies(void_cache_identity voidc_objects)
+ add_executable(voidc $<TARGET_OBJECTS:voidc_objects>)
+-target_link_libraries(voidc PRIVATE void_llvm void_cache_identity void_crash_diagnostics)
++target_link_libraries(voidc PRIVATE void_llvm void_publish void_cache_identity void_crash_diagnostics)
+ if(WIN32)
+   target_link_libraries(voidc PRIVATE advapi32)
+ endif()
+@@ -441,6 +446,24 @@
+   target_link_libraries(void_project_manifest PRIVATE void_core)
+   add_test(NAME project_manifest COMMAND void_project_manifest)
+   set_tests_properties(project_manifest PROPERTIES TIMEOUT 60)
++  add_executable(void_private_diagnostics tests/project/private_diagnostics.cpp)
++  target_link_libraries(void_private_diagnostics PRIVATE void_llvm)
++  add_test(NAME publish_private_diagnostics COMMAND void_private_diagnostics)
++  set_tests_properties(publish_private_diagnostics PROPERTIES TIMEOUT 60)
++  if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
++    add_test(NAME publish_private_binary COMMAND "${Python3_EXECUTABLE}"
++      "${PROJECT_SOURCE_DIR}/tests/project/private_binary.py" "$<TARGET_FILE:void_private_diagnostics>"
++      "$<TARGET_FILE:void_publish_foundation>" "$<TARGET_FILE:voidc>" "${LLVM_TOOLS_BINARY_DIR}")
++    set_tests_properties(publish_private_binary PROPERTIES TIMEOUT 180)
++  endif()
++  add_executable(void_publish_foundation tests/project/publish.cpp)
++  target_link_libraries(void_publish_foundation PRIVATE void_publish)
++  add_test(NAME publish_contracts COMMAND void_publish_foundation)
++  set_tests_properties(publish_contracts PROPERTIES TIMEOUT 60)
++  add_test(NAME publish_binary_fixtures COMMAND "${Python3_EXECUTABLE}"
++    "${PROJECT_SOURCE_DIR}/tests/project/publish_fixtures.py" "$<TARGET_FILE:void_publish_foundation>"
++    "$<TARGET_FILE:voidc>" "${LLVM_TOOLS_BINARY_DIR}/llvm-readobj${CMAKE_EXECUTABLE_SUFFIX}")
++  set_tests_properties(publish_binary_fixtures PROPERTIES TIMEOUT 60)
+   add_test(NAME project_dependencies COMMAND "${Python3_EXECUTABLE}"
+     "${PROJECT_SOURCE_DIR}/tests/project/dependencies.py" "$<TARGET_FILE:voidc>" "${CMAKE_C_COMPILER}")
+   set_tests_properties(project_dependencies PROPERTIES TIMEOUT 300)
+diff --git a/docs/PUBLISHER_STAGE_B.md b/docs/PUBLISHER_STAGE_B.md
+new file mode 100644
+--- /dev/null
++++ b/docs/PUBLISHER_STAGE_B.md
+@@ -0,0 +1,146 @@
++# Publisher Stage B private diagnostics
++
++Stage B provides an internal publication object emitter, a private diagnostic map
++and final-image metadata qualification. `voidc publish` still rejects every
++target/profile before creating output. The development CLI and F5 do not call
++the publication emitter.
++
++## Diagnostic contract
++
++`emit_publication_object` uses the ordinary LLVM lowerer, optimizer, roots,
++cleanup and async adapters. It substitutes diagnostic constants at checked
++failure sites, source call frames and global-cell descriptions. It retains full
++DWARF in the intermediate object for private split-symbol extraction. That
++object and the unstripped linked image contain private data and are not shipping
++artifacts. No production artifact transaction or publication capability is added.
++
++`RuntimeFailure` is unchanged: a borrowed string pointer, a count and 32 borrowed
++frame pointers. The count still becomes 33 to mark truncation. Every replacement
++is a real NUL-terminated string, with no pointer tagging or Runtime ABI change:
++
++```text
++VOID-D1 <64 lowercase hex build ID> <decimal site ID> <decimal category>\n
++```
++
++The build ID is SHA-256 of two length-prefixed fields: the domain
++`void.private-diagnostics.v1` and a lowercase hex SHA-256 semantic-input digest.
++Field lengths are unsigned 64-bit big-endian, as in `project::Digest::field`.
++The future admitted publisher must supply the exact normalized input digest,
++including source content, target, toolchain, optimization, policy and dependency
++identities; physical producer paths must not enter those public inputs. This
++API does not admit a project or construct that input snapshot itself. Changing
++those inputs requires a new digest. Site IDs are one-based emission ordinals,
++stable only within that emission and build. They are not persistent source IDs.
++
++Categories are 1 Runtime, 2 arithmetic, 3 bounds, 4 null value, 5 source call and
++6 global access. Classification uses fixed compiler descriptions, with unknown
++errors falling back to Runtime. Detailed descriptions remain in the map.
++Existing Runtime/native helper messages retain their existing ABI and text;
++mapped source-call frames identify their language boundary. This is not a new
++Runtime-wide failure engine.
++
++## Private map version 1
++
++All integers below are unsigned 32-bit little-endian. A string is its byte
++length followed by exactly those bytes, without a terminator. Strings are
++opaque byte sequences; the frontend's path encoding is preserved.
++
++1. Magic bytes `VOID-PRIVATE-DIAGNOSTICS`, NUL, byte 1.
++2. Build ID string, final-image SHA-256 string, site count.
++3. For each implicit one-based site ID: category, line, column, function string,
++   physical source path string, source excerpt string and private description
++   string. Function strings include the original module identity.
++
++A draft cannot serialize until bound once to nonempty final-image bytes. Binding
++freezes site additions. Readers validate the version, lowercase digest shape,
++category, field/count/total bounds and exact end of input. Limits are 16 MiB per
++map, 65,536 sites and 1 MiB per field, with a conservative header reserve.
++Coordinates are original frontend coordinates, including zero for synthetic
++locations. Outlined code may produce multiple site IDs for one source location.
++
++Resolution takes the map bytes, actual final-image bytes and one exact public
++token including its newline. It checks SHA-256 of the image, build ID, site ID
++and category; missing maps, mismatched images/builds and malformed/unknown sites
++throw explicit errors. There is no nearest-build fallback. A byte change after
++binding, including later signing, requires a newly associated map. The map is
++plaintext and unauthenticated: SHA-256 association is not issuer authentication
++or tamper-proof provenance. Key management/encryption/signing remain later work.
++
++Only identity, site ordinal and category are public diagnostic fields. Maps,
++split symbols, source excerpts and unstripped intermediates belong in a
++separate owner-only archive, never in a distributable directory. Persistence
++and permissions remain the future publisher's transactional responsibility.
++The library itself performs no filesystem writes or uploads.
++
++## Linux final-image qualification
++
++The Linux controlled harness links using the existing same-build native input
++list and LLD, extracts `llvm-objcopy --only-keep-debug`, then writes a separate
++image with `--strip-all --remove-section=.comment`. These flags apply to the
++controlled ELF fixture only. Its dynamic symbols and unwind records are checked
++with `llvm-readobj`; an actual linked function address is resolved with
++`llvm-symbolizer` against the split file. No source-bearing debuglink is added.
++The private map binds to the stripped bytes, after reduction.
++
++Auditor policy revision 1 retains Stage A behavior. Revision 2 permits dynamic
++symbols, rejects static symbol metadata under `reject_symbols`, detects ELF
++compiler comments and private-map signatures, reports dynamic/static symbols
++and unwind-section presence, and classifies Mach-O external definitions/imports in validated LC_DYSYMTAB
++ranges separately from local, private-external and debug nlists. PE imports and
++exports are observed independently of their section names. Revision 1 still
++rejects any symbol-table entries. Revision 2 rejects compressed ELF sections rather than
++claiming their contents were scanned. Section presence does not prove unwind
++correctness; the independent oracle supplies fixture evidence. The report
++schema remains additive version 1. General closure/export qualification remains
++outside this revision.
++
++`publish_private_binary` tests O0/O2 sync and async failures, observable defer
++cleanup, the 32-frame limit, private map resolution, wrong/missing maps, stripped
++development leakage controls, split-symbol address resolution, compressed
++section rejection and accidental map inclusion. A separate retained-identity
++fixture deliberately produces a function-name finding: a defer capture's Runtime
++schema key needs that identity. It must not be renamed without ABI review.
++Development diagnostics and DWARF are independently tested. Whole-process error
++timings are informational and include startup, scheduling and I/O; they do not
++measure isolated error-path overhead.
++
++## Limits and native qualification requirements
++
++A clean canary scan is not proof of secrecy. It covers selected bytes and ASCII
++UTF-16LE forms, not arbitrary encodings or compressed/encrypted payloads.
++Compressed debug content is rejected, not decoded. Ordinary packed strings and
++native libraries need separate policies and inspection. Runtime type/catalog,
++capture, reflection, FFI/export identities, user literals and required legal
++notices remain public where required. Some contain source-level names. No
++closed-world identity rewriting, obfuscation, LTO, PGO or SLP change is introduced.
++Existing producer RUNPATHs and host ABI floors are reported, not fixed here.
++
++Windows x64 requires native controlled source/F5/failure/async/cleanup tests,
++actual PE import/export and unwind equivalence, and an established private
++archive route for VOID's current embedded DWARF. Do not assume a PDB exists.
++If PDB support is later introduced, match its GUID and age exactly. Qualify
++CodeView path removal and final bytes using pinned tools before enabling it.
++
++macOS ARM64 requires native tests, dsymutil before stripping, exact Mach-O/dSYM
++UUID matches, ASLR-relative address symbolication, retained exports/unwind/load
++commands and a final audit after any separately authorized signing. Neither
++foreign-format parsing nor this Linux harness qualifies a native publisher.
++
++Native crash collection is not added. Manual split-symbol address resolution is
++qualified on Linux; crash capture, relative-PC/load-image recording, archive
++retention transactions and automated offline crash reports remain explicit
++integration requirements. No hosted compiler matrix is dispatched by Stage B.
++
++## Upstream references
++
++The installed tools identify as LLVM 23.1.4. The patch-specific documentation URL
++was unavailable during this implementation; the official 23.1 release guide and
++installed tool behavior were checked instead. No claim is made that a rolling
++web page is the exact installed patch revision.
++
++- [LLVM 23.1 llvm-objcopy](https://releases.llvm.org/23.1.0/docs/CommandGuide/llvm-objcopy.html)
++- [LLVM symbolizer](https://llvm.org/docs/CommandGuide/llvm-symbolizer.html)
++- [Upstream split-debug reconstruction discussion 59370](https://github.com/llvm/llvm-project/issues/59370)
++- [Upstream split-debug implementation discussion D67090](https://reviews.llvm.org/D67090)
++- [Apple UUID and dSYM association](https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information)
++- [Microsoft exact symbol matching](https://learn.microsoft.com/en-us/windows/desktop/dxtecharts/debugging-with-symbols)
+diff --git a/include/void/backend.hpp b/include/void/backend.hpp
+--- a/include/void/backend.hpp
++++ b/include/void/backend.hpp
+@@ -2,6 +2,7 @@
+ #include "void/execution.hpp"
+ #include "void/cache.hpp"
+ #include "void/ir.hpp"
++#include "void/private_diagnostics.hpp"
+ #include <filesystem>
+ #include <memory>
+ #include <string>
+@@ -38,6 +39,12 @@
+ void emit_async_object(const ir::Module&, const std::filesystem::path&, bool optimize);
+ void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false,
+                  std::string_view build_inputs = {}, std::optional<project::DebugInfo> source_debug = {});
++// Stage B internal qualification path only. No CLI or publish capability. Uses
++// the normal lowerer/Runtime ABI and keeps DWARF for a private split-symbol file.
++// Caller must extract symbols, strip a separate final image, audit it, bind the
++// returned map to those final bytes and persist it outside the distributable.
++diagnostics::PrivateMap emit_publication_object(const ir::Module&, const std::filesystem::path&,
++                                                bool optimize, std::string_view semantic_inputs_sha256);
+ // Internal architectural harness supplies its own runtime entry guard/main.
+ void emit_runtime_object(const ir::Module&, const std::filesystem::path&, bool optimize, const std::string& generation_suffix = {});
+ }
+diff --git a/include/void/binary_audit.hpp b/include/void/binary_audit.hpp
+new file mode 100644
+--- /dev/null
++++ b/include/void/binary_audit.hpp
+@@ -0,0 +1,31 @@
++#pragma once
++#include <cstdint>
++#include <string>
++#include <string_view>
++#include <vector>
++
++namespace vd::audit {
++struct Finding { std::string code, detail; std::uint64_t offset = 0; };
++struct Policy {
++    unsigned revision = 1; // v2 permits required dynamic symbols, rejects static symbols
++    std::string target; // exactly linux-x64, windows-x64 or macos-arm64
++    bool reject_debug = true, reject_symbols = true, reject_loader_paths = true;
++    std::vector<std::string> forbidden_strings;
++};
++struct Report {
++    unsigned schema = 1;
++    bool inspected = false; // structural inspection, never closure/protection approval
++    std::string format, architecture, image_kind, sha256, interpreter;
++    std::vector<std::string> dependencies, versions, loader_paths;
++    bool symbols = false, debug = false;
++    bool static_symbols = false, dynamic_symbols = false, unwind = false;
++    std::vector<Finding> findings;
++};
++inline constexpr std::size_t byte_limit = 64 * 1024 * 1024;
++inline constexpr std::size_t record_limit = 4096;
++// Owned report from caller-owned bytes. No file opening, loading, execution,
++// subprocesses, environment access or mutation. ELF64LE, PE32+ and thin Mach-O64LE
++// declarations only. Archives/universal images and other variants fail closed.
++Report inspect(std::string_view bytes, const Policy&);
++std::string json(const Report&);
++}
+diff --git a/include/void/private_diagnostics.hpp b/include/void/private_diagnostics.hpp
+new file mode 100644
+--- /dev/null
++++ b/include/void/private_diagnostics.hpp
+@@ -0,0 +1,41 @@
++#pragma once
++#include <cstdint>
++#include <string>
++#include <string_view>
++#include <vector>
++
++namespace vd::diagnostics {
++inline constexpr std::size_t map_byte_limit = 16 * 1024 * 1024;
++inline constexpr std::size_t site_limit = 65536;
++// Public categories are deliberately independent of source text and ABI names.
++enum class Category : std::uint32_t { runtime = 1, arithmetic, bounds, null_value, call, global };
++struct Site {
++    Category category = Category::runtime;
++    std::string function, path, excerpt, description;
++    std::uint32_t line = 0, column = 0;
++};
++// A draft cannot be serialized/resolved until bound to the exact final image.
++// Contains private plaintext. Persistence/owner-only placement is the caller's
++// responsibility; never put this object or its serialization in an app bundle.
++class PrivateMap {
++    std::string build_, image_;
++    std::vector<Site> sites_;
++    std::size_t bytes_ = 0;
++public:
++    // Digest of normalized semantic inputs supplied by a future admitted plan,
++    // including target/toolchain/policy and source content, excluding host paths.
++    explicit PrivateMap(std::string_view semantic_inputs_sha256);
++    const auto& build_id() const { return build_; }
++    const auto& image_sha256() const { return image_; }
++    const auto& sites() const { return sites_; }
++    std::string add(Site);
++    void bind_image(std::string_view final_image_bytes);
++    std::string encode() const;
++    static PrivateMap decode(std::string_view);
++    // Exact public token, not arbitrary stderr. Throws for a missing map,
++    // malformed/unknown token, wrong build, wrong category or wrong image.
++    static Site resolve(std::string_view map, std::string_view final_image_bytes,
++                        std::string_view token);
++};
++Category category(std::string_view description);
++}
+diff --git a/include/void/project.hpp b/include/void/project.hpp
+--- a/include/void/project.hpp
++++ b/include/void/project.hpp
+@@ -70,6 +70,11 @@
+     SemanticVersion version;
+     unsigned abi = 0;
+ };
++// Schema 2 contract only. No optimization, protection or packaging capability
++// is enabled by these defaults; unknown publish fields are rejected.
++struct Publishing {
++    std::optional<std::string> target, default_profile;
++};
+ 
+ inline constexpr std::size_t native_catalog_byte_limit = 32 * 1024;
+ inline constexpr std::size_t native_catalog_file_limit = 24;
+@@ -109,6 +114,8 @@
+     Profile debug_ = {Optimization::none, DebugInfo::none};
+     Profile release_ = {Optimization::O2, DebugInfo::none};
+     std::map<std::string, Field> fields_;
++    unsigned schema_ = 1;
++    Publishing publishing_;
+     Manifest() = default;
+     friend class ManifestParser;
+ public:
+@@ -128,6 +135,8 @@
+     const Profile& debug() const { return debug_; }
+     const Profile& release() const { return release_; }
+     const auto& fields() const { return fields_; }
++    unsigned schema() const { return schema_; }
++    const Publishing& publishing() const { return publishing_; }
+ };
+ struct ParseResult {
+     std::shared_ptr<const Manifest> manifest;
+diff --git a/include/void/publish.hpp b/include/void/publish.hpp
+new file mode 100644
+--- /dev/null
++++ b/include/void/publish.hpp
+@@ -0,0 +1,47 @@
++#pragma once
++#include "void/project.hpp"
++#include <filesystem>
++#include <span>
++
++namespace vd::publish {
++inline constexpr std::string_view policy_revision = "stage-a-contract-1";
++struct Request {
++    std::filesystem::path project = ".";
++    std::optional<std::string> entry, target, profile;
++    std::optional<std::filesystem::path> output;
++};
++// Pure CLI parsing. No source operands, consent flags, subprocesses or writes.
++Request parse_arguments(std::span<const std::string_view>);
++
++// This stage records a contract, never an admitted graph or emission authority.
++// Later stages must capture/revalidate source, lock, toolchain, native and resource
++// snapshots before constructing an executable publication plan.
++class PublishPlan final {
++    std::string target_, profile_, manifest_sha256_;
++    std::filesystem::path output_;
++    std::string project_id_;
++    std::optional<std::string> entry_;
++    std::vector<std::string> required_capabilities_;
++    PublishPlan(const Request&, const project::Manifest&, std::string_view host);
++    friend PublishPlan plan_contract(const Request&, const project::Manifest&, std::string_view);
++public:
++    PublishPlan(const PublishPlan&) = default;
++    PublishPlan(PublishPlan&&) = default;
++    PublishPlan& operator=(const PublishPlan&) = delete;
++    PublishPlan& operator=(PublishPlan&&) = delete;
++    const auto& target() const { return target_; }
++    const auto& profile() const { return profile_; }
++    const auto& manifest_sha256() const { return manifest_sha256_; }
++    const auto& output() const { return output_; }
++    const auto& project_id() const { return project_id_; }
++    const auto& entry() const { return entry_; }
++    const auto& required_capabilities() const { return required_capabilities_; }
++    constexpr auto revision() const { return policy_revision; }
++    constexpr bool admitted() const { return false; }
++};
++PublishPlan plan_contract(const Request&, const project::Manifest&, std::string_view host);
++// Always throws in Stage A. Native execution approvals cannot authorize publish.
++void require_capabilities(const PublishPlan&);
++// Bounded read-only manifest preflight; always fails before any output creation.
++void preflight(const Request&, std::string_view host);
++}
+diff --git a/src/backend/llvm/backend.cpp b/src/backend/llvm/backend.cpp
+--- a/src/backend/llvm/backend.cpp
++++ b/src/backend/llvm/backend.cpp
+@@ -924,7 +924,7 @@
+                                   const std::string& suffix, const llvm::DataLayout& target_layout, const std::string& exported_entry,
+                                   std::vector<NominalDescriptor>* host_catalog=nullptr,std::vector<InterfaceWitness>* host_witnesses=nullptr,
+                                   llvm_backend::LoweringInventory* inventory=nullptr,
+-                                  bool fixed_call_research=false,std::optional<project::DebugInfo> source_debug={},bool optimized=false) {
++                                  bool fixed_call_research=false,std::optional<project::DebugInfo> source_debug={},bool optimized=false,diagnostics::PrivateMap* private_map=nullptr) {
+     // Pure default DAGs are outlined into ordinary private typed-IR functions.
+     // The normal shared lowerer supplies roots, failure cleanup and native ABI;
+     // defaults execute once per element without expanding IR by array extent.
+@@ -1871,7 +1871,10 @@
+                         b.CreateCondBr(b.CreateICmpULT(count, b.getInt32(32)), append, limit);
+                         b.SetInsertPoint(limit); b.CreateStore(b.getInt32(33), count_address); b.CreateBr(done);
+                         b.SetInsertPoint(append);
+-                        auto trace = "Called from " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n" +
++                        auto trace = private_map ? private_map->add({diagnostics::Category::call,
++                            f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name),
++                            loc.path,instruction.source_excerpt,"source call",loc.line,loc.column}) :
++                            "Called from " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n" +
+                             source_message(loc, instruction.source_excerpt, "source call");
+                         auto* frames = b.CreateStructGEP(failure_type, failure, 2);
+                         auto* address = b.CreateGEP(llvm::ArrayType::get(b.getPtrTy(), 32), frames, {b.getInt32(0), count});
+@@ -1884,8 +1887,11 @@
+                     auto* valid = llvm::BasicBlock::Create(context,"numeric_valid",fn);
+                     b.CreateCondBr(invalid_value,invalid,valid); b.SetInsertPoint(invalid);
+                     if (failure) {
+-                        auto message = source_message(loc,instruction.source_excerpt,"runtime error: " + description);
+-                        message += "In function " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n";
++                        auto message = private_map ? private_map->add({diagnostics::category(description),
++                            f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name),
++                            loc.path,instruction.source_excerpt,description,loc.line,loc.column}) :
++                            source_message(loc,instruction.source_excerpt,"runtime error: " + description) +
++                            "In function " + f.module_identity + "::" + (f.display_name.empty()?f.source_name:f.display_name) + "\n";
+                         b.CreateStore(b.CreateGlobalString(message),b.CreateStructGEP(failure_type,failure,0)); return_failure();
+                     } else { b.CreateCall(llvm::Intrinsic::getOrInsertDeclaration(module.get(),llvm::Intrinsic::trap)); b.CreateUnreachable(); }
+                     b.SetInsertPoint(valid);
+@@ -2175,7 +2181,9 @@
+                     auto found = std::find_if(input.globals.begin(), input.globals.end(), [&](const auto& g) { return g.identity == instruction.callee; });
+                     auto* storage = value_roots[n].at(values.size());
+                     b.CreateCall(module->getOrInsertFunction("vd_global_cell", b.getVoidTy(), b.getPtrTy(), size_type, b.getPtrTy(), b.getPtrTy()),
+-                        {storage, llvm::ConstantInt::get(size_type, found - input.globals.begin()), b.CreateGlobalString(found->identity + " declared at " + found->source.path + ":" + std::to_string(found->source.line)), failure});
++                        {storage, llvm::ConstantInt::get(size_type, found - input.globals.begin()), b.CreateGlobalString(private_map ? private_map->add({diagnostics::Category::global,
++                            found->identity,found->source.path,{},"global access",found->source.line,found->source.column}) :
++                            found->identity + " declared at " + found->source.path + ":" + std::to_string(found->source.line)), failure});
+                     selected_failure();
+                     v = b.CreateLoad(b.getPtrTy(), storage); break;
+                 }
+@@ -3801,7 +3809,7 @@
+ }
+ static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
+                       bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {},
+-                      std::optional<project::DebugInfo> source_debug = {}) {
++                      std::optional<project::DebugInfo> source_debug = {}, diagnostics::PrivateMap* private_map = nullptr) {
+     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
+     initialize();
+     llvm::LLVMContext context;
+@@ -3833,7 +3841,7 @@
+ #else
+                         ,nullptr
+ #endif
+-                        ,false,source_debug,optimize);
++                        ,false,source_debug,optimize,private_map);
+     module->setTargetTriple(machine->getTargetTriple());
+     module->setDataLayout(machine->createDataLayout());
+     llvm::GlobalVariable* application_record = nullptr;
+@@ -4033,6 +4041,12 @@
+                  std::optional<project::DebugInfo> source_debug) {
+     emit_impl(input,output,optimize,source_program,false,{},false,{},build_inputs,source_debug);
+ }
++diagnostics::PrivateMap emit_publication_object(const ir::Module& input, const std::filesystem::path& output,
++                                                bool optimize, std::string_view semantic_inputs_sha256) {
++    diagnostics::PrivateMap map(semantic_inputs_sha256);
++    emit_impl(input,output,optimize,true,false,{},false,{}, {},project::DebugInfo::full,&map);
++    return map;
++}
+ void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {
+     emit_impl(input,output,optimize,false,true,generation_suffix);
+ }
+diff --git a/src/binary_audit.cpp b/src/binary_audit.cpp
+new file mode 100644
+--- /dev/null
++++ b/src/binary_audit.cpp
+@@ -0,0 +1,378 @@
++#include "void/binary_audit.hpp"
++#include "frontend/project_digest.hpp"
++#include <llvm/Object/ObjectFile.h>
++#include <llvm/Object/ELFObjectFile.h>
++#include <llvm/Object/COFF.h>
++#include <llvm/Object/MachO.h>
++#include <llvm/Support/JSON.h>
++#include <llvm/Support/raw_ostream.h>
++#include <map>
++#include <stdexcept>
++
++namespace vd::audit {
++namespace {
++struct Invalid : std::runtime_error { using std::runtime_error::runtime_error; };
++struct Limited : Invalid { using Invalid::Invalid; };
++template<class T> T checked(llvm::Expected<T> value) {
++    if (!value) throw Invalid(llvm::toString(value.takeError()));
++    return std::move(*value);
++}
++void check(llvm::Error error) { if (error) throw Invalid(llvm::toString(std::move(error))); }
++void count(std::size_t& n) { if (++n > record_limit) throw Limited("Record budget exceeded."); }
++void bounded(std::string_view s, std::uint64_t offset, std::uint64_t size) {
++    if (offset > s.size() || size > s.size() - offset) throw Invalid("Truncated or out-of-bounds image record.");
++}
++std::uint64_t number(std::string_view s, std::uint64_t offset, unsigned width) {
++    bounded(s, offset, width); std::uint64_t value = 0;
++    for (unsigned i = 0; i < width; ++i) value |= std::uint64_t(static_cast<unsigned char>(s[offset+i])) << (i*8);
++    return value;
++}
++std::string cstring(std::string_view s, std::uint64_t offset) {
++    bounded(s, offset, 1); auto end = s.find('\0', offset);
++    if (end == s.npos) throw Invalid("Unterminated image string.");
++    if (end-offset > 4096) throw Limited("Image string budget exceeded.");
++    return std::string(s.substr(offset, end-offset));
++}
++// COFF dependency-name accessors use C strings. Validate their terminators in
++// file-backed RVA ranges before LLVM can inspect them; caller bytes need not
++// carry an accessible sentinel beyond the supplied string_view.
++void pe_bounds(std::string_view bytes) {
++    bounded(bytes,0,64);
++    const auto pe=number(bytes,60,4);bounded(bytes,pe,24);
++    if(bytes.substr(pe,4)!=std::string_view("PE\0\0",4)) throw Invalid("Invalid PE signature.");
++    const auto sections=number(bytes,pe+6,2), optional=pe+24, optional_size=number(bytes,pe+20,2);
++    bounded(bytes,optional,optional_size);
++    if(optional_size<112 || number(bytes,optional,2)!=0x20b) throw Invalid("Require a complete PE32+ optional header.");
++    const auto directories=number(bytes,optional+108,4);
++    if(directories>16 || directories>(optional_size-112)/8) throw Invalid("Invalid PE directory count.");
++    const auto table=optional+optional_size;
++    bounded(bytes,table,sections*40);
++    for(std::uint64_t i=0;i<sections;++i) {
++        const auto section=table+i*40;
++        bounded(bytes,number(bytes,section+20,4),number(bytes,section+16,4));
++    }
++    auto mapped=[&](std::uint64_t rva)->std::string_view {
++        const auto headers=number(bytes,optional+60,4);
++        std::optional<std::string_view> result;
++        if(rva<headers) {bounded(bytes,0,headers);result=bytes.substr(rva,headers-rva);}
++        for(std::uint64_t i=0;i<sections;++i) {
++            const auto section=table+i*40, address=number(bytes,section+12,4), size=number(bytes,section+16,4);
++            if(rva>=address && rva-address<size) {
++                if(result) throw Invalid("Ambiguous PE RVA mapping.");
++                const auto delta=rva-address;
++                result=bytes.substr(number(bytes,section+20,4)+delta,size-delta);
++            }
++        }
++        if(!result) throw Invalid("Unmapped PE dependency RVA.");
++        return *result;
++    };
++    std::size_t budget=0;
++    for(const auto index:{1u,13u}) {
++        if(index>=directories) continue;
++        const auto directory=optional+112+index*8, rva=number(bytes,directory,4), size=number(bytes,directory+4,4);
++        if(!rva && !size) continue;
++        if(!rva || !size) throw Invalid("Incomplete PE import directory.");
++        const auto stride=index==1?20u:32u;
++        auto data=mapped(rva);bounded(data,0,size);data=data.substr(0,size);
++        bool terminated=false;
++        for(std::uint64_t offset=0;offset<size;offset+=stride) {
++            count(budget);bounded(data,offset,stride);
++            const auto record=data.substr(offset,stride);
++            if(record.find_first_not_of('\0')==record.npos) {terminated=true;break;}
++            if(index==13 && number(record,0,4)!=1) throw Invalid("Unsupported PE delay import VA addressing.");
++            const auto name=number(record,index==1?12:4,4);
++            if(!name || cstring(mapped(name),0).empty()) throw Invalid("Empty PE dependency name.");
++        }
++        if(!terminated) throw Invalid("Unterminated PE import directory.");
++    }
++    const auto symbol_offset=number(bytes,pe+12,4), symbols=number(bytes,pe+16,4);
++    if(!symbol_offset && symbols) throw Invalid("Invalid PE symbol table.");
++    if(symbols>record_limit) throw Limited("PE symbol budget exceeded.");
++    if(symbol_offset) {
++        bounded(bytes,symbol_offset,symbols*18+4);
++        const auto strings=symbol_offset+symbols*18, size=number(bytes,strings,4);
++        if(size<4) throw Invalid("Invalid PE symbol string table.");
++        bounded(bytes,strings,size);
++        if(size>4 && bytes[strings+size-1]!='\0') throw Invalid("Unterminated PE symbol string table.");
++    }
++}
++// Mach-O symbol names also use a C-string accessor. Require every declared
++// symbol name to terminate within its declared string table before LLVM reads it.
++void macho_bounds(std::string_view bytes) {
++    bounded(bytes,0,32);
++    const auto commands=number(bytes,16,4), size=number(bytes,20,4);
++    bounded(bytes,32,size);auto data=bytes.substr(32,size);
++    std::uint64_t cursor=0;bool symbols_seen=false;
++    for(std::uint64_t i=0;i<commands;++i) {
++        bounded(data,cursor,8);
++        const auto tag=number(data,cursor,4), length=number(data,cursor+4,4);
++        if(length<8) throw Invalid("Invalid Mach-O command size.");
++        bounded(data,cursor,length);
++        if(tag==llvm::MachO::LC_SYMTAB) {
++            if(symbols_seen || length!=24) throw Invalid("Invalid Mach-O symbol command.");
++            symbols_seen=true;
++            const auto offset=number(data,cursor+8,4), count=number(data,cursor+12,4);
++            const auto strings=number(data,cursor+16,4), string_size=number(data,cursor+20,4);
++            if(count>record_limit) throw Limited("Mach-O symbol budget exceeded.");
++            bounded(bytes,offset,count*16);bounded(bytes,strings,string_size);
++            const auto names=bytes.substr(strings,string_size);
++            if(!names.empty() && names.back()!='\0') throw Invalid("Unterminated Mach-O symbol string table.");
++            for(std::uint64_t j=0;j<count;++j) (void)cstring(names,number(bytes,offset+j*16,4));
++        }
++        cursor+=length;
++    }
++    if(cursor!=size) throw Invalid("Inconsistent Mach-O command extent.");
++}
++// Program headers remain authoritative when section tables have been removed.
++void elf(std::string_view bytes, Report& report) {
++    bounded(bytes, 0, 64);
++    if (number(bytes,4,1)!=2 || number(bytes,5,1)!=1) throw Invalid("Unsupported ELF encoding; require ELF64 little endian.");
++    auto type=number(bytes,16,2);
++    if (type!=2 && type!=3) throw Invalid("ELF is not an executable or shared image.");
++    report.image_kind=type==2?"executable":"shared-or-pie";
++    if (number(bytes,52,2)!=64 || number(bytes,54,2)!=56) throw Invalid("Invalid ELF header sizes.");
++    const auto ph=number(bytes,32,8), n=number(bytes,56,2);
++    if (!n || n==65535) throw Invalid("Unsupported ELF program header count.");
++    if (n>record_limit) throw Limited("ELF program header budget exceeded.");
++    bounded(bytes,ph,n*56);
++    struct Load { std::uint64_t address, offset, size; };
++    std::vector<Load> loads;
++    std::optional<std::pair<std::uint64_t,std::uint64_t>> dynamic;
++    for (std::uint64_t i=0;i<n;++i) {
++        auto p=ph+i*56, tag=number(bytes,p,4), off=number(bytes,p+8,8), size=number(bytes,p+32,8);
++        bounded(bytes,off,size);
++        if (size>number(bytes,p+40,8)) throw Invalid("ELF file segment exceeds memory size.");
++        if (tag==1) loads.push_back({number(bytes,p+16,8),off,size});
++        if (tag==2) {
++            if (dynamic) throw Invalid("Duplicate ELF dynamic segment.");
++            dynamic={{off,size}};
++        }
++        if (tag==3) {
++            if (!report.interpreter.empty() || !size) throw Invalid("Invalid ELF interpreter segment.");
++            report.interpreter=cstring(bytes.substr(off,size),0);
++            if(report.interpreter.empty()) throw Invalid("Empty ELF interpreter.");
++        }
++    }
++    auto mapped=[&](std::uint64_t address)->std::string_view {
++        std::optional<Load> result;
++        for (const auto& load:loads) if (address>=load.address && address-load.address<load.size) {
++            if (result) throw Invalid("Ambiguous overlapping ELF virtual mapping.");
++            result=load;
++        }
++        if (!result) throw Invalid("Unmapped ELF dynamic address.");
++        auto delta=address-result->address;
++        return bytes.substr(result->offset+delta,result->size-delta);
++    };
++    if (!dynamic) return;
++    auto [offset,size]=*dynamic;
++    if (size%16) throw Invalid("Invalid ELF dynamic table.");
++    if (size/16>record_limit) throw Limited("ELF dynamic table budget exceeded.");
++    std::vector<std::pair<std::uint64_t,std::uint64_t>> entries;
++    std::map<std::uint64_t,std::uint64_t> tags;
++    bool terminated=false;
++    for (std::uint64_t i=0;i<size;i+=16) {
++        auto tag=number(bytes,offset+i,8), value=number(bytes,offset+i+8,8);
++        if (!tag) { terminated=true; break; }
++        entries.emplace_back(tag,value);
++        if (tag==5 || tag==10 || tag==0x6ffffffe || tag==0x6fffffff) {
++            if (!tags.emplace(tag,value).second) throw Invalid("Duplicate ELF dynamic singleton.");
++        }
++    }
++    if (!terminated) throw Invalid("Missing ELF dynamic terminator.");
++    bool needs_strings=false;
++    for (auto [tag,value]:entries) { (void)value; if(tag==1 || tag==15 || tag==29) needs_strings=true; }
++    if (tags.contains(0x6ffffffe) || tags.contains(0x6fffffff)) needs_strings=true;
++    if (!needs_strings) return;
++    if (!tags.contains(5) || !tags.contains(10)) throw Invalid("Missing ELF dynamic string table.");
++    auto strings=mapped(tags.at(5)); bounded(strings,0,tags.at(10)); strings=strings.substr(0,tags.at(10));
++    for (auto [tag,value]:entries) {
++        if (tag==1) report.dependencies.push_back(cstring(strings,value));
++        if (tag==15 || tag==29) report.loader_paths.push_back(cstring(strings,value));
++    }
++    if (tags.contains(0x6ffffffe)!=tags.contains(0x6fffffff)) throw Invalid("Incomplete ELF version requirements.");
++    if (!tags.contains(0x6ffffffe)) return;
++    auto versions=mapped(tags.at(0x6ffffffe)); auto total=tags.at(0x6fffffff);
++    if (!total) throw Invalid("Invalid ELF version count.");
++    if (total>record_limit) throw Limited("ELF version budget exceeded.");
++    std::uint64_t cursor=0; std::size_t budget=0;
++    for (std::uint64_t i=0;i<total;++i) {
++        bounded(versions,cursor,16);
++        if (number(versions,cursor,2)!=1) throw Invalid("Unsupported ELF version need revision.");
++        auto count_aux=number(versions,cursor+2,2), aux=number(versions,cursor+8,4), next=number(versions,cursor+12,4);
++        auto dependency=cstring(strings,number(versions,cursor+4,4));
++        if (count_aux && aux<16) throw Invalid("Invalid ELF version auxiliary offset.");
++        auto a=cursor+aux;
++        for (std::uint64_t j=0;j<count_aux;++j) {
++            count(budget); bounded(versions,a,16);
++            report.versions.push_back(dependency+":"+cstring(strings,number(versions,a+8,4)));
++            auto advance=number(versions,a+12,4);
++            if (j+1<count_aux) { if (advance<16 || advance>versions.size()-a) throw Invalid("Invalid ELF auxiliary chain."); a+=advance; }
++            else if (advance) throw Invalid("Excess ELF auxiliary chain.");
++        }
++        if (i+1<total) { if(next<16 || next>versions.size()-cursor) throw Invalid("Invalid ELF version chain."); cursor+=next; }
++        else if (next) throw Invalid("Excess ELF version chain.");
++    }
++}
++void macho(const llvm::object::MachOObjectFile& image, std::string_view bytes, Report& report) {
++    if (!image.is64Bit() || !image.isLittleEndian()) throw Invalid("Unsupported Mach-O encoding.");
++    auto type=image.getHeader64().filetype;
++    if (type!=llvm::MachO::MH_EXECUTE && type!=llvm::MachO::MH_DYLIB && type!=llvm::MachO::MH_BUNDLE)
++        throw Invalid("Mach-O is not an executable, dylib or bundle.");
++    report.image_kind=type==llvm::MachO::MH_EXECUTE?"executable":"shared";
++    std::size_t budget=0;
++    for (const auto& command:image.load_commands()) {
++        count(budget);
++        auto offset=static_cast<std::size_t>(command.Ptr-bytes.data());
++        auto size=command.C.cmdsize; bounded(bytes,offset,size);
++        if (size<8) throw Invalid("Invalid Mach-O load command size.");
++        auto cmd=command.C.cmd;
++        bool dylib=cmd==llvm::MachO::LC_LOAD_DYLIB || cmd==llvm::MachO::LC_LOAD_WEAK_DYLIB || cmd==llvm::MachO::LC_REEXPORT_DYLIB || cmd==llvm::MachO::LC_LOAD_UPWARD_DYLIB || cmd==llvm::MachO::LC_LAZY_LOAD_DYLIB;
++        if (dylib || cmd==llvm::MachO::LC_RPATH) {
++            if (size<(dylib?24u:12u)) throw Invalid("Truncated Mach-O path command.");
++            auto start=number(bytes,offset+8,4);
++            if(start<(dylib?24u:12u)) throw Invalid("Invalid Mach-O path offset.");
++            auto value=cstring(bytes.substr(offset,size),start);
++            (dylib?report.dependencies:report.loader_paths).push_back(std::move(value));
++        }
++    }
++}
++}
++Report inspect(std::string_view bytes, const Policy& policy) {
++    Report report;
++    auto finding=[&](std::string code,std::string detail,std::uint64_t offset=0) {
++        if(report.findings.size()<record_limit) report.findings.push_back({std::move(code),std::move(detail),offset});
++        else {
++            report.inspected=false;
++            report.findings.back()={"limit","Finding budget exceeded; inspection is incomplete.",0};
++        }
++    };
++    if ((policy.revision!=1 && policy.revision!=2) || (policy.target!="linux-x64" && policy.target!="windows-x64" && policy.target!="macos-arm64") || policy.forbidden_strings.size()>64) {
++        finding("unsupported-policy","Require policy revision 1 or 2 and an existing target spelling; at most 64 canaries."); return report;
++    }
++    std::size_t canary_bytes=0;
++    for(const auto& s:policy.forbidden_strings) {
++        if(s.empty() || s.size()>256 || canary_bytes+s.size()>4096) {finding("unsupported-policy","Canaries must be nonempty, at most 256 bytes each and 4096 bytes total.");return report;}
++        canary_bytes+=s.size();
++    }
++    if(bytes.size()>byte_limit) {finding("limit","Image byte budget exceeded.");return report;}
++    project::Digest digest;digest.bytes(bytes);report.sha256=digest.finish();
++    try {
++        const bool is_elf=bytes.starts_with("\x7f" "ELF"), is_pe=bytes.starts_with("MZ"), is_macho=bytes.starts_with("\xcf\xfa\xed\xfe");
++        if(!is_elf && !is_pe && !is_macho) {finding("unsupported-format","Require ELF64LE, PE32+ or thin Mach-O64LE.");return report;}
++        // Bound table counts before asking LLVM to allocate format structures.
++        if(is_elf) {
++            bounded(bytes,0,64);
++            if(number(bytes,4,1)!=2 || number(bytes,5,1)!=1) {finding("unsupported-format","Require ELF64 little endian.");return report;}
++            if(number(bytes,60,2)>record_limit || number(bytes,56,2)>record_limit) throw Limited("ELF table budget exceeded.");
++            if(number(bytes,60,2)==0 && number(bytes,40,8)!=0) throw Invalid("Extended ELF section counts are outside this inspection scope.");
++        }
++        if(is_pe) {
++            bounded(bytes,0,64); auto pe=number(bytes,60,4);bounded(bytes,pe,24);
++            if(number(bytes,pe+6,2)>record_limit) throw Limited("PE section budget exceeded.");
++            const auto optional=pe+24;bounded(bytes,optional,2);
++            if(number(bytes,optional,2)!=0x20b) {finding("unsupported-format","Require a PE32+ image.");return report;}
++            pe_bounds(bytes);
++        }
++        if(is_macho) {
++            bounded(bytes,0,32);if(number(bytes,16,4)>record_limit) throw Limited("Mach-O command budget exceeded.");
++            macho_bounds(bytes);
++        }
++        llvm::MemoryBufferRef buffer(llvm::StringRef(bytes.data(),bytes.size()),"<audit>");
++        auto object=checked(llvm::object::ObjectFile::createObjectFile(buffer));
++        report.architecture=llvm::Triple::getArchTypeName(object->getArch()).str();
++        if (auto* e=llvm::dyn_cast<llvm::object::ELFObjectFileBase>(object.get())) {
++            (void)e;report.format="ELF";elf(bytes,report);
++        } else if(auto* pe=llvm::dyn_cast<llvm::object::COFFObjectFile>(object.get())) {
++            report.format="PE";
++            if(!pe->getPE32PlusHeader()) {finding("unsupported-format","Require a PE32+ image.");return report;}
++            if(!(pe->getCharacteristics() & llvm::COFF::IMAGE_FILE_EXECUTABLE_IMAGE)) throw Invalid("PE image lacks executable-image characteristic.");
++            report.image_kind=pe->getCharacteristics() & llvm::COFF::IMAGE_FILE_DLL?"shared":"executable";
++            std::size_t budget=0;
++            for(const auto& dependency:pe->import_directories()) {count(budget);llvm::StringRef name;check(dependency.getName(name));if(name.size()>4096)throw Limited("PE import name budget exceeded.");report.dependencies.push_back(name.str());}
++            for(const auto& dependency:pe->delay_import_directories()) {count(budget);llvm::StringRef name;check(dependency.getName(name));if(name.size()>4096)throw Limited("PE delay import name budget exceeded.");report.dependencies.push_back(name.str());}
++            report.debug=!pe->debug_directories().empty();
++            report.dynamic_symbols=!pe->import_directories().empty() || !pe->export_directories().empty();
++        } else if(auto* m=llvm::dyn_cast<llvm::object::MachOObjectFile>(object.get())) {report.format="Mach-O";macho(*m,bytes,report);}
++        else {finding("unsupported-format","Object is outside supported image encodings.");return report;}
++        std::size_t sections=0;
++        for(const auto& section:object->sections()) {
++            count(sections);auto name=checked(section.getName());
++            if(section.isDebugSection() || name.starts_with(".debug") || name.starts_with(".zdebug") || name.starts_with("__debug") || name==".gnu_debuglink" || name==".gnu_debugdata") report.debug=true;
++            if(name==".symtab") report.static_symbols=true;
++            if(name==".dynsym" || name=="__export" || name==".edata") report.dynamic_symbols=true;
++            if(name==".eh_frame" || name=="__eh_frame" || name==".pdata") report.unwind=true;
++            if(name==".symtab" || name==".dynsym") report.symbols=true;
++            if(policy.revision==2 && llvm::isa<llvm::object::ELFObjectFileBase>(object.get()) &&
++               (llvm::object::ELFSectionRef(section).getFlags() & llvm::ELF::SHF_COMPRESSED))
++                finding("compressed-content","Compressed ELF section is outside the bounded canary decoder; reject for Stage B qualification.");
++            if(policy.revision==2 && name==".comment") finding("compiler-metadata","Development compiler identification section is present.");
++            if(!section.isBSS() && !section.isVirtual()) {auto contents=checked(section.getContents());(void)contents;}
++        }
++        // Mach-O shares one nlist table between local/debug symbols and dyld's
++        // external definitions/imports. The generic iterator includes both.
++        auto* mach=llvm::dyn_cast<llvm::object::MachOObjectFile>(object.get());
++        std::optional<llvm::MachO::dysymtab_command> dynamic;
++        if(mach) for(const auto& command:mach->load_commands()) if(command.C.cmd==llvm::MachO::LC_DYSYMTAB) {
++            if(dynamic) throw Invalid("Duplicate Mach-O dynamic symbol command.");
++            dynamic=mach->getDysymtabLoadCommand();
++            const auto total=mach->getSymtabLoadCommand().nsyms;
++            const auto& d=*dynamic;
++            if(d.ilocalsym>total || d.nlocalsym>total-d.ilocalsym ||
++               d.iextdefsym>total || d.nextdefsym>total-d.iextdefsym ||
++               d.iundefsym>total || d.nundefsym>total-d.iundefsym ||
++               std::uint64_t(d.ilocalsym)+d.nlocalsym>d.iextdefsym ||
++               std::uint64_t(d.iextdefsym)+d.nextdefsym>d.iundefsym)
++                throw Invalid("Invalid Mach-O dynamic symbol ranges.");
++        }
++        std::size_t symbols=0;
++        for(const auto& symbol:object->symbols()) {
++            count(symbols);(void)checked(symbol.getName());report.symbols=true;
++            bool retained=false;
++            if(mach && dynamic) {
++                const auto index=mach->getSymbolIndex(symbol.getRawDataRefImpl());
++                const auto type=mach->getSymbol64TableEntry(symbol.getRawDataRefImpl()).n_type;
++                const auto& d=*dynamic;
++                retained=(type & llvm::MachO::N_EXT) && !(type & (llvm::MachO::N_STAB | llvm::MachO::N_PEXT)) &&
++                    ((index>=d.iextdefsym && index-d.iextdefsym<d.nextdefsym) ||
++                     (index>=d.iundefsym && index-d.iundefsym<d.nundefsym));
++            }
++            if(retained) report.dynamic_symbols=true;
++            else report.static_symbols=true;
++        }
++        report.inspected=true;
++        const auto expected=policy.target=="macos-arm64"?"aarch64":"x86_64";
++        const auto expected_format=policy.target=="linux-x64"?"ELF":policy.target=="windows-x64"?"PE":"Mach-O";
++        if(report.architecture!=expected || report.format!=expected_format) finding("target-mismatch","Image format or architecture differs from policy target.");
++        if(policy.reject_debug && report.debug) finding("debug-metadata","Debug sections or external debug declarations are present; compressed contents are not decoded.");
++        if(policy.reject_symbols && (policy.revision==1 ? report.symbols : report.static_symbols)) finding("symbol-table","Symbol metadata is present outside the policy's retained dynamic symbols.");
++        if(policy.reject_loader_paths) for(const auto& path:report.loader_paths) { (void)path;finding("loader-path","Declared loader search path is forbidden by this policy."); }
++        if(policy.revision==2 && bytes.find("VOID-PRIVATE-DIAGNOSTICS")!=bytes.npos)
++            finding("private-diagnostic-map","Private diagnostic map signature is present in image bytes.");
++        // Scan full bounded bytes, including ordinary data. Offsets only: never
++        // echo potentially secret canaries or surrounding source text.
++        for(std::size_t i=0;i<policy.forbidden_strings.size();++i) {
++            const auto& s=policy.forbidden_strings[i];auto offset=bytes.find(s);
++            if(offset!=bytes.npos)finding("forbidden-string","Canary index "+std::to_string(i)+" (byte form)",offset);
++            std::string wide;for(unsigned char c:s){wide+=char(c);wide+='\0';}
++            offset=bytes.find(wide);
++            if(offset!=bytes.npos)finding("forbidden-string","Canary index "+std::to_string(i)+" (UTF-16LE ASCII form)",offset);
++        }
++    } catch(const Limited& error) {report.inspected=false;finding("limit",error.what());}
++      catch(const Invalid& error) {report.inspected=false;finding("malformed-image",error.what());}
++    return report;
++}
++std::string json(const Report& r) {
++    std::string result;llvm::raw_string_ostream stream(result);
++    llvm::json::OStream out(stream);
++    out.object([&] {
++        out.attribute("schema",r.schema);out.attribute("scope","image-declarations-only");out.attribute("inspected",r.inspected);
++        out.attribute("format",r.format);out.attribute("architecture",r.architecture);out.attribute("image_kind",r.image_kind);out.attribute("sha256",r.sha256);out.attribute("interpreter",r.interpreter);
++        out.attribute("symbols",r.symbols);out.attribute("debug",r.debug);
++        out.attribute("static_symbols",r.static_symbols);out.attribute("dynamic_symbols",r.dynamic_symbols);out.attribute("unwind",r.unwind);
++        auto strings=[&](const char* key,const auto& values){out.attributeArray(key,[&]{for(const auto& v:values)out.value(v);});};
++        strings("dependencies",r.dependencies);strings("versions",r.versions);strings("loader_paths",r.loader_paths);
++        out.attributeArray("findings",[&]{for(const auto& f:r.findings)out.object([&]{out.attribute("code",f.code);out.attribute("detail",f.detail);out.attribute("offset",f.offset);});});
++    });
++    return result;
++}
++}
+diff --git a/src/cli_help.hpp b/src/cli_help.hpp
+--- a/src/cli_help.hpp
++++ b/src/cli_help.hpp
+@@ -8,11 +8,12 @@
+ 
+ namespace vd::cli {
+ using HelpRow = std::pair<std::string_view, std::string_view>;
+-inline constexpr std::array<HelpRow, 15> commands{{
++inline constexpr std::array<HelpRow, 16> commands{{
+     {"crashes", "Diagnose an explicitly launched native program."},
+     {"check", "Check source and imports."},
+     {"run", "Compile and run through the JIT."},
+     {"build", "Build a native executable."},
++    {"publish", "Validate publication contracts (emission unavailable)."},
+     {"emit", "Write a native object."},
+     {"init", "Add a project manifest."},
+     {"new", "Create a project or manage templates."},
+@@ -40,6 +41,8 @@
+     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
+     if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
+     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
++    if(command.empty() || command=="publish")out<<"Usage: voidc publish [--project DIR] [--entry RELATIVE.void] [--target linux-x64|windows-x64|macos-arm64] [--profile release|performance|protected] [-o NEW-DIRECTORY]\n"
++      "Stage A: all publishing capabilities are unavailable; no output is created. No native consent, uploads or signing.\n";
+     if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
+       "       voidc package --verify DIR\n"
+       "       voidc package list | voidc package search NAME\n"
+@@ -73,7 +76,7 @@
+     std::cout << "VOID Language Compiler v" << VOID_COMPILER_VERSION << " (development)\nLLVM " << LLVM_VERSION_STRING << "\n\n";
+     if (command.empty()) {
+         std::cout << "Usage: voidc <command> [arguments] [options]\n\nCommands:\n";
+-        auto rows = std::array<HelpRow, 16>{};
++        auto rows = std::array<HelpRow, 17>{};
+         std::copy(commands.begin(), commands.end(), rows.begin());
+         rows.back() = {"help", "Show command help."};
+         help_rows(std::cout, rows);
+@@ -130,6 +133,7 @@
+             help_rows(std::cout, std::array<HelpRow,1>{{
+                 {"--debug-info none|line|full", "Override manifest debug information for this build/emit."}
+             }});
++            std::cout << '\n'; // The following option table has its own column width.
+             if (command=="build") help_rows(std::cout, std::array<HelpRow,3>{{
+                 {"-o PATH", "Executable output; defaults under build/."},
+                 {"--allow-native", "Authorize this manifest invocation only."},
+diff --git a/src/frontend/project.cpp b/src/frontend/project.cpp
+--- a/src/frontend/project.cpp
++++ b/src/frontend/project.cpp
+@@ -663,12 +663,30 @@
+             return finish();
+         }
+         const auto& root = result.table();
+-        fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements"});
+         const auto* schema = root.get("schema");
+-        if (!schema || !schema->is_integer() || schema->ref<std::int64_t>() != 1) {
+-            fail(Code::project_schema, schema ? span(schema->source()) : eof(), "Project schema must be integer 1.",
+-                "Add schema = 1, or use a matching compiler for another schema; schema is not the project's semantic version.");
++        if (!schema || !schema->is_integer() || (schema->ref<std::int64_t>() != 1 && schema->ref<std::int64_t>() != 2)) {
++            fail(Code::project_schema, schema ? span(schema->source()) : eof(), "Project schema must be integer 1 or 2.",
++                "Use a matching compiler for another schema; schema is not the project's semantic version.");
+             return finish();
++        }
++        manifest_->schema_ = static_cast<unsigned>(schema->ref<std::int64_t>());
++        if (manifest_->schema_ == 1)
++            fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements"});
++        else {
++            fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements", "publish"});
++            if (auto* publishing = table(root, "publish")) {
++                fields(*publishing, "publish", {"target", "default_profile"});
++                if (auto target = text(*publishing, "target", false)) {
++                    if (*target != "linux-x64" && *target != "windows-x64" && *target != "macos-arm64")
++                        fail(Code::project_reserved, span(publishing->get("target")->source()), "Unsupported publishing target.", "Stage A recognizes linux-x64, windows-x64 and macos-arm64 contracts; emission remains unavailable.");
++                    else manifest_->publishing_.target = *target;
++                }
++                if (auto profile = text(*publishing, "default_profile", false)) {
++                    if (*profile != "release" && *profile != "performance" && *profile != "protected")
++                        fail(Code::project_reserved, span(publishing->get("default_profile")->source()), "Unsupported publishing profile.", "Use release, performance or protected; Stage A enables no profile capability.");
++                    else manifest_->publishing_.default_profile = *profile;
++                }
++            }
+         }
+         auto* project = table(root, "project", true);
+         if (!project) return finish();
+diff --git a/src/main.cpp b/src/main.cpp
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -4,6 +4,8 @@
+ #include "void/frontend.hpp"
+ #include "void/path.hpp"
+ #include "void/native_build.hpp"
++#include "void/publish.hpp"
++#include <llvm/TargetParser/Triple.h>
+ #include "void/native_import.hpp"
+ #include "void/project_creation.hpp"
+ #include "void/project_resolution.hpp"
+@@ -635,7 +637,7 @@
+             return 0;
+         }
+         if(argc==2 && std::string_view(argv[1])=="--capabilities") {
+-            std::cout << "{\"schema\":1,\"cliPresentation\":1,\"statusPlain\":true,\"nativeApprovalStdio\":1,\"debugInfoOverride\":1,\"timingsSchema\":1}\n";
++            std::cout << "{\"schema\":1,\"cliPresentation\":1,\"statusPlain\":true,\"nativeApprovalStdio\":1,\"debugInfoOverride\":1,\"timingsSchema\":1,\"publishContract\":1,\"publishEmission\":false}\n";
+             return 0;
+         }
+         if(argc>=2 && std::string(argv[1])=="help") {
+@@ -665,6 +667,17 @@
+             throw UsageError("Unknown command: "+command);
+         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
+         if(command=="crashes")throw UsageError("Expected crashes run ABSOLUTE-EXECUTABLE [arguments...].");
++        if(command=="publish") {
++            std::vector<std::string_view> args;
++            for(int i=2;i<argc;++i)args.emplace_back(argv[i]);
++            auto request=vd::publish::parse_arguments(args);
++            const llvm::Triple host(LLVM_DEFAULT_TARGET_TRIPLE);
++            const auto target=host.isOSLinux() && host.getArch()==llvm::Triple::x86_64?"linux-x64":
++                host.isOSWindows() && host.getArch()==llvm::Triple::x86_64?"windows-x64":
++                host.isMacOSX() && host.getArch()==llvm::Triple::aarch64?"macos-arm64":"unqualified-host";
++            vd::publish::preflight(request,target);
++            return 1; // Stage A preflight always fails closed.
++        }
+         if(command=="add" || command=="remove" || command=="tidy")return maintain_project(command,argc,argv,executable);
+         if(command=="resolve")return resolve_project(argc,argv);
+         if(command=="deps") {
+diff --git a/src/private_diagnostics.cpp b/src/private_diagnostics.cpp
+new file mode 100644
+--- /dev/null
++++ b/src/private_diagnostics.cpp
+@@ -0,0 +1,94 @@
++#include "void/private_diagnostics.hpp"
++#include "frontend/project_digest.hpp"
++#include <algorithm>
++#include <charconv>
++#include <cctype>
++#include <stdexcept>
++
++namespace vd::diagnostics {
++namespace {
++using namespace std::string_view_literals;
++constexpr std::string_view magic = "VOID-PRIVATE-DIAGNOSTICS\0\1"sv;
++bool digest(std::string_view s) {
++    return s.size() == 64 && std::all_of(s.begin(), s.end(), [](char c) { return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'); });
++}
++std::string hash(std::string_view s) { project::Digest d; d.bytes(s); return d.finish(); }
++void number(std::string& out, std::uint32_t n) { for (unsigned i=0;i<4;++i) out += char(n >> (8*i)); }
++void field(std::string& out, std::string_view s) { number(out,static_cast<std::uint32_t>(s.size())); out += s; }
++struct Reader {
++    std::string_view bytes;
++    std::uint32_t number() {
++        if (bytes.size()<4) throw std::invalid_argument("Truncated private diagnostic map.");
++        std::uint32_t n=0; for(unsigned i=0;i<4;++i)n|=std::uint32_t(static_cast<unsigned char>(bytes[i]))<<(8*i);
++        bytes.remove_prefix(4); return n;
++    }
++    std::string field() {
++        auto n=number(); if(n>bytes.size() || n>1024*1024)throw std::invalid_argument("Invalid private diagnostic map field.");
++        std::string s(bytes.substr(0,n));bytes.remove_prefix(n);return s;
++    }
++};
++bool valid(Category c) { return c>=Category::runtime && c<=Category::global; }
++std::string token(std::string_view build, std::uint32_t id, Category c) {
++    return "VOID-D1 " + std::string(build) + " " + std::to_string(id) + " " + std::to_string(static_cast<unsigned>(c)) + "\n";
++}
++}
++PrivateMap::PrivateMap(std::string_view inputs) {
++    if(!digest(inputs))throw std::invalid_argument("Private diagnostic inputs require a lowercase SHA-256 digest.");
++    project::Digest d;d.field("void.private-diagnostics.v1");d.field(inputs);build_=d.finish();
++}
++std::string PrivateMap::add(Site s) {
++    if(!image_.empty())throw std::invalid_argument("Private diagnostic map is already image-bound.");
++    if(!valid(s.category) || sites_.size()>=site_limit)throw std::invalid_argument("Invalid private diagnostic site or site limit.");
++    std::size_t size=28;
++    for(const auto* value:{&s.function,&s.path,&s.excerpt,&s.description}) {
++        if(value->size()>1024*1024)throw std::invalid_argument("Private diagnostic field limit.");
++        size+=value->size();
++    }
++    if(size>map_byte_limit-256-bytes_)throw std::invalid_argument("Private diagnostic map byte limit.");
++    auto result=token(build_,static_cast<std::uint32_t>(sites_.size()+1),s.category);
++    bytes_+=size;sites_.push_back(std::move(s));return result;
++}
++void PrivateMap::bind_image(std::string_view bytes) {
++    if(bytes.empty() || !image_.empty())throw std::invalid_argument("Private diagnostic map requires one nonempty final image.");
++    image_=hash(bytes);
++}
++std::string PrivateMap::encode() const {
++    if(!digest(image_))throw std::invalid_argument("Private diagnostic map has no final image identity.");
++    std::string out(magic);field(out,build_);field(out,image_);number(out,static_cast<std::uint32_t>(sites_.size()));
++    for(const auto& s:sites_) {number(out,static_cast<unsigned>(s.category));number(out,s.line);number(out,s.column);field(out,s.function);field(out,s.path);field(out,s.excerpt);field(out,s.description);}
++    return out;
++}
++PrivateMap PrivateMap::decode(std::string_view bytes) {
++    if(bytes.empty())throw std::invalid_argument("Missing private diagnostic map.");
++    if(bytes.size()>map_byte_limit || !bytes.starts_with(magic))throw std::invalid_argument("Unsupported or oversized private diagnostic map.");
++    Reader r{bytes.substr(magic.size())};auto build=r.field(),image=r.field();
++    if(!digest(build) || !digest(image))throw std::invalid_argument("Invalid private diagnostic map identity.");
++    PrivateMap map(std::string(64,'0'));map.build_=std::move(build);
++    auto count=r.number();if(count>site_limit)throw std::invalid_argument("Private diagnostic site limit.");
++    for(std::uint32_t i=0;i<count;++i) {
++        Site s;s.category=static_cast<Category>(r.number());s.line=r.number();s.column=r.number();
++        s.function=r.field();s.path=r.field();s.excerpt=r.field();s.description=r.field();(void)map.add(std::move(s));
++    }
++    if(!r.bytes.empty())throw std::invalid_argument("Trailing private diagnostic map bytes.");
++    map.image_=std::move(image);return map;
++}
++Site PrivateMap::resolve(std::string_view bytes, std::string_view image, std::string_view public_token) {
++    auto map=decode(bytes);
++    if(map.image_!=hash(image))throw std::invalid_argument("Mismatched private diagnostic image.");
++    const auto prefix="VOID-D1 "+map.build_+" ";
++    if(!public_token.starts_with(prefix))throw std::invalid_argument("Mismatched diagnostic build or token version.");
++    auto rest=public_token.substr(prefix.size());std::uint32_t id=0;
++    auto result=std::from_chars(rest.data(),rest.data()+rest.size(),id);
++    if(result.ec!=std::errc{} || !id || id>map.sites_.size() || public_token!=token(map.build_,id,map.sites_[id-1].category))
++        throw std::invalid_argument("Unknown or malformed private diagnostic site.");
++    return map.sites_[id-1];
++}
++Category category(std::string_view value) {
++    std::string lowered(value);for(auto& c:lowered)c=static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
++    std::string_view description=lowered;
++    if(description.find("null")!=description.npos)return Category::null_value;
++    if(description.find("bounds")!=description.npos || description.find("index")!=description.npos)return Category::bounds;
++    if(description.find("overflow")!=description.npos || description.find("division")!=description.npos || description.find("shift")!=description.npos || description.find("numeric")!=description.npos)return Category::arithmetic;
++    return Category::runtime;
++}
++}
+diff --git a/src/publish.cpp b/src/publish.cpp
+new file mode 100644
+--- /dev/null
++++ b/src/publish.cpp
+@@ -0,0 +1,85 @@
++#include "void/publish.hpp"
++#include "void/path.hpp"
++#include "frontend/project_digest.hpp"
++#include "frontend/project_files.hpp"
++#include <set>
++#include <stdexcept>
++
++namespace vd::publish {
++namespace {
++bool target_name(std::string_view value) {
++    return value == "linux-x64" || value == "windows-x64" || value == "macos-arm64";
++}
++bool profile_name(std::string_view value) {
++    return value == "release" || value == "performance" || value == "protected";
++}
++}
++Request parse_arguments(std::span<const std::string_view> args) {
++    Request request;
++    std::set<std::string_view> seen;
++    for (std::size_t i = 0; i < args.size(); ++i) {
++        const auto key = args[i];
++        if (key != "--project" && key != "--entry" && key != "--target" && key != "--profile" && key != "-o")
++            throw std::invalid_argument("Unsupported publish argument: " + std::string(key) + ". Use --project DIR; publish accepts no source operand or native consent flag.");
++        if (!seen.insert(key).second) throw std::invalid_argument("Duplicate publish argument: " + std::string(key));
++        if (++i == args.size() || args[i].empty() || args[i].starts_with('-') || args[i].find('\0') != args[i].npos)
++            throw std::invalid_argument("Expected one value after " + std::string(key));
++        const auto value = args[i];
++        if (key == "--project") request.project = utf8_path(value);
++        else if (key == "--entry") {
++            auto p = utf8_path(value);
++            if (p.has_root_path() || value.find('\\') != value.npos || value.find(':') != value.npos || !value.ends_with(".void"))
++                throw std::invalid_argument("Publish --entry requires an exact project-relative .void path.");
++            for (const auto& part : p) if (part == "." || part == ".." || part.empty())
++                throw std::invalid_argument("Publish --entry cannot contain dot or parent components.");
++            if (path_utf8(p.lexically_normal()) != value) throw std::invalid_argument("Publish --entry must be normalized.");
++            request.entry = value;
++        } else if (key == "--target") {
++            if (!target_name(value)) throw std::invalid_argument("Unsupported publish target: " + std::string(value));
++            request.target = value;
++        } else if (key == "--profile") {
++            if (!profile_name(value)) throw std::invalid_argument("Unsupported publish profile: " + std::string(value));
++            request.profile = value;
++        } else request.output = utf8_path(value);
++    }
++    return request;
++}
++PublishPlan::PublishPlan(const Request& request, const project::Manifest& manifest, std::string_view host) {
++    if (manifest.kind() != project::Kind::application) throw std::invalid_argument("Publish requires an application project; libraries are ineligible.");
++    const auto& config = manifest.publishing();
++    target_ = request.target.value_or(config.target.value_or(std::string(host)));
++    profile_ = request.profile.value_or(config.default_profile.value_or("release"));
++    project_id_ = manifest.project().id;
++    entry_ = request.entry ? request.entry : manifest.entry();
++    if (!target_name(target_)) throw std::invalid_argument("Unsupported publish target: " + target_);
++    if (!profile_name(profile_)) throw std::invalid_argument("Unsupported publish profile: " + profile_);
++    output_ = request.output.value_or(request.project / "dist" / manifest.application()->id / target_ / profile_);
++    project::Digest digest; digest.bytes(manifest.source().text()); manifest_sha256_ = digest.finish();
++    required_capabilities_ = {"admitted-project-snapshot", "native-target:" + target_, "private-diagnostics", "final-bundle-audit", "fresh-directory-transaction"};
++    if (!manifest.dependencies().empty()) required_capabilities_.push_back("verified-dependency-lock");
++    if (!manifest.resources().empty()) required_capabilities_.push_back("resource-snapshot");
++    if (!manifest.native().empty() || manifest.native_requirement()) required_capabilities_.push_back("publish-native-authorization");
++    if (profile_ == "performance") required_capabilities_.push_back("qualified-performance-policy");
++    if (profile_ == "protected") required_capabilities_.push_back("qualified-protection-policy");
++}
++PublishPlan plan_contract(const Request& request, const project::Manifest& manifest, std::string_view host) {
++    return PublishPlan(request, manifest, host);
++}
++void require_capabilities(const PublishPlan& plan) {
++    throw std::runtime_error("Publish capability unavailable in Stage A for " + plan.target() + "/" + plan.profile() +
++        "; no target is qualified and no output was created. Native approvals, dependency admission and final-binary gates require separate review.");
++}
++void preflight(const Request& request, std::string_view host) {
++    // Reuse the compiler's bounded manifest reader and root alias admission.
++    const auto root = project::inspect_creation_root(request.project);
++    const auto path = root.path / "void.project.toml";
++    auto parsed = project::parse_manifest(SourceFile(path_utf8(path), project::read_project_input(path, project::manifest_byte_limit)));
++    if (!parsed.succeeded()) throw CompilationError(std::move(parsed.diagnostics));
++    auto plan = plan_contract(request, *parsed.manifest, host);
++    std::error_code ec;
++    auto status = std::filesystem::symlink_status(plan.output(), ec);
++    if (ec && ec != std::errc::no_such_file_or_directory) throw std::runtime_error("Cannot inspect publish output destination.");
++    if (std::filesystem::exists(status)) throw std::invalid_argument("Publish output must be a fresh directory; replacement is unavailable.");
++    require_capabilities(plan);
++}
++}
+diff --git a/tests/cli/contract.py b/tests/cli/contract.py
+--- a/tests/cli/contract.py
++++ b/tests/cli/contract.py
+@@ -9,6 +9,7 @@
+ import subprocess
+ import sys
+ import tempfile
++import time
+ 
+ compiler = Path(sys.argv[1]).resolve()
+ checks = 0
+@@ -52,8 +53,9 @@
+         assert result.stdout.decode('utf-8').splitlines()[:2] == ['VOID Language Compiler v0.1.0 (development)', 'LLVM 23.1.4']
+ 
+ # Top-level columns come from the command inventory, not literal padding.
+-rows = full_help.decode().split('Commands:\n', 1)[1].split('\nOptions:', 1)[0].strip('\n').splitlines()
+-assert len(rows) == 16
++help_lines = full_help.decode().splitlines()
++rows = [line for line in help_lines[help_lines.index('Commands:')+1:help_lines.index('Options:')] if line]
++assert len(rows) == 17  # Includes the fail-closed Stage A publish contract.
+ assert {re.match(r'  (\S+)( +)(.+)', line).start(3) for line in rows} == {15}
+ assert all('\t' not in line for line in rows)
+ for command, flags in {'run': ['--cache', '--no-cache'], 'build': ['-o PATH', '--no-opt'],
+@@ -167,5 +169,17 @@
+     before = output.read_bytes()
+     run(['build', source, '-o', output], 1, error='Reinstall the matching', tool=copied)
+     assert output.read_bytes() == before
++    if os.name == 'nt':
++        # Windows can briefly retain the just-exited image mapping. Remove only
++        # this owned copy with the same bounded sharing retry used by fixtures.
++        deadline = time.monotonic() + 2
++        while True:
++            try:
++                copied.unlink()
++                break
++            except PermissionError as error:
++                if error.winerror not in (5, 32) or time.monotonic() >= deadline:
++                    raise
++                time.sleep(0.05)
+ 
+ print(f'{checks} CLI process checks passed on {sys.platform}; native output and collision preservation passed')
+diff --git a/tests/cli/presentation.py b/tests/cli/presentation.py
+--- a/tests/cli/presentation.py
++++ b/tests/cli/presentation.py
+@@ -46,7 +46,7 @@
+     bad = sources/'bad.void'; bad.write_text('func main() -> i32:\n    return unknown\n')
+     reports = root/'reports'; reports.mkdir()
+     assert json.loads(run(['--capabilities']).stdout)['statusPlain'] is True
+-    default = run(['check',app]); assert default.stdout == b'Source checked successfully\n' and not default.stderr
++    default = run(['check',app]); assert default.stdout == ('Source checked successfully'+os.linesep).encode() and not default.stderr
+     for mode in ('auto','off'):
+         current=run(['check',app,'--status',mode]);assert current.stdout==default.stdout and current.stderr==default.stderr
+     plain=run(['check',app,'--status','plain'])
+@@ -108,8 +108,19 @@
+         assert v['configuration']=={'project_mode':False,'profile':None,'optimization':opt,'debug_info':'none'},v
+     _,v,p=timed(['run','--project',project,'--cache'])
+     assert v['configuration']=={'project_mode':True,'profile':'debug','optimization':'none','debug_info':'unavailable'},v
+-    _,v,p=timed(['package','--project',project,'-o',root/'distribution'])
+-    assert v['build']['complete'] and p['package_assembly']['count']==1 and p['publication']['count']>0
++    distribution=root/'distribution'
++    _,v,p=timed(['package','--project',project,'-o',distribution])
++    assert v['build']['complete'] and v['build']['outcome']=='success'
++    assert p['package_assembly']['count']==1 and p['package_assembly']['state']=='complete'
++    if os.name=='nt':
++        # Windows copies into the reserved package stage and publishes the outer
++        # directory inside package_assembly, bypassing native_build::publish.
++        assert p['publication']=={'id':'publication','parent_id':None,'kind':'unavailable',
++                                 'state':'not_reached','duration_us':None,'count':0,'reason':'not_applicable'},p
++    else:
++        assert p['publication']['count']>0 and p['publication']['state']=='complete'
++    run(['package','--verify',distribution])
++    assert subprocess.run([str(distribution/('app.exe' if os.name=='nt' else 'app'))]).returncode==0
+     run(['run',app,'--cache'],7)
+     r,v,p=timed(['run',app,'--cache'],7)
+     if os.name!='nt':
+diff --git a/tests/project/application_packages.py b/tests/project/application_packages.py
+--- a/tests/project/application_packages.py
++++ b/tests/project/application_packages.py
+@@ -305,8 +305,18 @@
+         run(compiler, 'package', '--verify', moved, status=1, message='without aliases')
+         hard_link.unlink()
+         run(compiler, 'package', '--verify', moved)
++        reserved_files = snapshot(base)
++        reserved_entries = {p.relative_to(base) for p in base.rglob('*')}
+         for leaf in ('NUL.txt', 'COM¹', 'stream:name', 'trailing.'):
+-            cli('package', '-o', base / leaf, status=1, message='portable directory')
++            # Approval-store containment canonicalizes the output before package
++            # leaf validation. The Windows CRT rejects NUL as a device there.
++            if leaf == 'NUL.txt':
++                text = cli('package', '-o', base / leaf, status=1)
++                assert 'weakly_canonical' in text and r'\\.\NUL' in text, text
++            else:
++                cli('package', '-o', base / leaf, status=1, message='portable directory')
++            assert snapshot(base) == reserved_files
++            assert {p.relative_to(base) for p in base.rglob('*')} == reserved_entries
+ 
+     unowned = base / 'unowned'
+     unowned.mkdir()
+diff --git a/tests/project/discovery.py b/tests/project/discovery.py
+--- a/tests/project/discovery.py
++++ b/tests/project/discovery.py
+@@ -81,7 +81,7 @@
+     for flags in [[],['--no-opt']]:run([compiler,'run',root,'--no-cache',*flags],23,b'IMPORTED\n')
+     run([compiler,'build','--project',root,'-o',exe]);run([exe],23,b'IMPORTED\n')
+     # Default output belongs to the manifest root, not the nested entry directory.
+-    run([compiler,'build',root]);default=root/'build'/('launcher.exe' if os.name=='nt' else 'launcher');assert default.is_file();run([default],23,b'IMPORTED\n')
++    run([compiler,'build',root]);default=root/'.void'/'build'/('launcher.exe' if os.name=='nt' else 'launcher');assert default.is_file();run([default],23,b'IMPORTED\n')
+     # Nested malformed manifests still exclude children and reject E crossings.
+     write('src/child/void.project.toml','[=roject]');write('src/child/child.void',main)
+     run([compiler,'check',root]);run([compiler,'run','--project',root,'--entry','src/child/child.void'],1,contains=b'VOID5009')
+diff --git a/tests/project/manifest.cpp b/tests/project/manifest.cpp
+--- a/tests/project/manifest.cpp
++++ b/tests/project/manifest.cpp
+@@ -155,7 +155,7 @@
+     check(settings->sources().roots.size() == 2 && settings->sources().exclude.empty(), "source settings");
+     check(settings->debug().optimization == Optimization::O2 && settings->release().debug_info == DebugInfo::full, "profile settings");
+     good(replace(application, "kind = \"application\"", "kind = \"application\"\nentry = \"game.void\""));
+-    for (auto s : {"schema = true", "schema = \"1\"", "schema = 1.0", "schema = 0", "schema = 2"}) bad(replace(application, "schema = 1", s), Code::project_schema);
++    for (auto s : {"schema = true", "schema = \"1\"", "schema = 1.0", "schema = 0", "schema = 3"}) bad(replace(application, "schema = 1", s), Code::project_schema);
+     bad(replace(application, "schema = 1\n", ""), Code::project_schema);
+     for (auto field : {"id", "name", "version", "kind"}) {
+         auto text = application; auto start = text.find(std::string(field) + " = "); auto end = text.find('\n', start); text.erase(start, end - start + 1);
+diff --git a/tests/project/private_binary.py b/tests/project/private_binary.py
+new file mode 100644
+--- /dev/null
++++ b/tests/project/private_binary.py
+@@ -0,0 +1,165 @@
++"""Linux Stage B qualification of exact linked, split-debug, stripped bytes.
++
++Uses only controlled temporary sources. Never publishes an application or
++touches the installed compiler, approvals or external projects.
++"""
++from pathlib import Path
++import hashlib
++import json
++import os
++import statistics
++import shutil
++import subprocess
++import sys
++import tempfile
++import time
++
++emitter, auditor, compiler, llvm = map(lambda p: Path(p).resolve(), sys.argv[1:])
++def run(args, expected=0):
++    result = subprocess.run(list(map(str, args)), capture_output=True, text=True, timeout=60)
++    assert result.returncode == expected, (args, result.returncode, result.stdout, result.stderr)
++    return result
++
++native = (compiler.parent / 'void-native.txt').read_text().splitlines()
++assert native[0] == 'VOID native 23.1.4 v2'
++assert '23.1.4' in run([llvm / 'llvm-objcopy', '--version']).stdout
++linker = ['--ld-path=' + native[2]]
++canaries = ['PRIVATE_PATH_B_7de94', 'private_function_b_9ac53', 'source_snippet_b_1dfee']
++sync = '''func private_function_b_9ac53(value: i32) -> i32:
++    if value > 0:
++        return private_function_b_9ac53(value - 1)
++    var source_snippet_b_1dfee = value - value
++    return value / source_snippet_b_1dfee
++
++func entry(value: i32) -> i32:
++    defer {
++        print("cleanup executed")
++    }
++    return private_function_b_9ac53(value)
++'''
++async_source = '''async func tick() -> i32:
++    return 1
++
++func private_function_b_9ac53(value: i32) -> i32:
++    if value > 0:
++        return private_function_b_9ac53(value - 1)
++    var source_snippet_b_1dfee = value - value
++    return value / source_snippet_b_1dfee
++
++async func worker(value: i32) -> i32:
++    var ignored = await tick()
++    return private_function_b_9ac53(value)
++
++async func entry(value: i32) -> i32:
++    defer {
++        print("cleanup executed")
++    }
++    return await worker(value)
++'''
++def audit(image, *extra):
++    result = json.loads(run([auditor, 'audit-stage-b', 'linux-x64', image, *canaries, *extra]).stdout)
++    assert result['inspected'], result
++    return result
++
++with tempfile.TemporaryDirectory(prefix='void-private-b-') as temp:
++    root = Path(temp)
++    private = root / 'private'
++    private.mkdir(mode=0o700)
++    source = root / canaries[0] / 'fixture.void'
++    source.parent.mkdir()
++    evidence = []
++    retained_source = sync.replace('    var source_snippet', '    defer {\n        print("retained cleanup")\n    }\n    var source_snippet', 1)
++    for kind, text in [('sync', sync), ('async', async_source), ('retained', retained_source)]:
++        source.write_text(text)
++        for mode in ['O0', 'O2']:
++            stem = kind + '-' + mode
++            obj, linked, final = [root / (stem + ext) for ext in ['.o', '.linked', '.final']]
++            mapfile, symbols = private / (stem + '.vdiag'), private / (stem + '.debug')
++            semantic_digest = hashlib.sha256((text + mode + kind).encode() + hashlib.sha256(compiler.read_bytes()).digest()).hexdigest()
++            process = subprocess.Popen(list(map(str, [emitter, 'emit', source, obj, mapfile, final, mode, kind, semantic_digest])),
++                                       stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
++            try:
++                assert process.stdout.readline() == 'READY\n', process.stderr.read()
++                # Existing same-build native inputs and linker policy are reused.
++                run([llvm / 'clang++', *linker, obj, '-o', linked, *native[3:]])
++                run([llvm / 'llvm-objcopy', '--only-keep-debug', linked, symbols])
++                run([llvm / 'llvm-objcopy', '--strip-all', '--remove-section=.comment', linked, final])
++                process.stdin.write('FINAL\n');process.stdin.flush()
++                stdout, stderr = process.communicate(timeout=60)
++                assert process.returncode == 0, (stdout, stderr)
++            finally:
++                if process.poll() is None:
++                    process.kill();process.communicate()
++            result = audit(final)
++            # Native dependencies may retain their existing producer RUNPATH.
++            # Stage B does not grant a portability/closure capability.
++            assert all(f['code'] in ({'loader-path', 'forbidden-string'} if kind == 'retained' else {'loader-path'}) for f in result['findings']), result
++            assert any(f['code'] == 'forbidden-string' for f in result['findings']) == (kind == 'retained'), result
++            assert not result['debug'] and not result['static_symbols'] and result['dynamic_symbols'] and result['unwind'], result
++            assert mapfile.read_bytes() not in final.read_bytes()
++            assert 'VOID-PRIVATE-DIAGNOSTICS'.encode() not in final.read_bytes()
++            before = run([llvm / 'llvm-readobj', '--dyn-symbols', '--unwind', linked]).stdout
++            after = run([llvm / 'llvm-readobj', '--dyn-symbols', '--unwind', final]).stdout
++            assert before.split('Format:', 1)[1] == after.split('Format:', 1)[1], 'Dynamic symbols or unwind records changed during reduction'
++            # Resolve an actual linked function address using the private split
++            # symbols. No source-bearing debuglink is added to the final image.
++            assert canaries[0].encode() in symbols.read_bytes()
++            function = ('/fixture.void::' + canaries[1]).encode().hex()
++            names = run([llvm / 'llvm-nm', '--defined-only', '--format=posix', linked]).stdout.splitlines()
++            selected = next(n.split() for n in names if n.startswith('__vd_' + function + '__void '))
++            symbolicated = run([llvm / 'llvm-symbolizer', '--obj=' + str(symbols), '0x' + selected[2]]).stdout
++            assert str(source) in symbolicated, symbolicated
++            compressed = root / 'compressed-debug'
++            run([llvm / 'llvm-objcopy', '--compress-debug-sections=zlib', linked, compressed])
++            assert any(f['code'] == 'compressed-content' for f in audit(compressed)['findings'])
++            error = run([final, '7'], expected=1)
++            assert error.stdout == ('retained cleanup\n' if kind == 'retained' else '') + 'cleanup executed\n' and 'VOID-D1 ' in error.stderr
++            assert all(c not in error.stderr for c in canaries)
++            deep = run([final, '40'], expected=1)
++            assert 'Source call trace limited to 32 callers' in deep.stderr
++            assert deep.stderr.count('VOID-D1 ') == 33, deep.stderr
++            tokens = root / 'error.txt';tokens.write_text(error.stderr)
++            resolved = run([emitter, 'resolve', mapfile, final, tokens]).stdout
++            assert all(c in resolved for c in canaries), resolved
++            assert 'Division by zero' in resolved and 'source call' in resolved, resolved
++            wrong = root / 'wrong-image';wrong.write_bytes(final.read_bytes() + b'changed')
++            assert 'Mismatched private diagnostic image' in run([emitter, 'resolve', mapfile, wrong, tokens], expected=1).stderr
++            missing = root / 'empty-map';missing.write_bytes(b'')
++            assert 'Missing private diagnostic map' in run([emitter, 'resolve', missing, final, tokens], expected=1).stderr
++            # Same source, normal development lowering: full diagnostics survive.
++            devobj, dev = root / 'development.o', root / 'development'
++            run([emitter, 'development', source, devobj, mode, kind])
++            run([llvm / 'clang++', *linker, devobj, '-o', dev, *native[3:]])
++            dev_error = run([dev, '7'], expected=1)
++            assert all(c in dev_error.stderr for c in canaries), dev_error.stderr
++            assert 'VOID-D1' not in dev_error.stderr
++            assert dev_error.stdout == error.stdout
++            # Stripping alone cannot remove development diagnostic canaries.
++            stripped_dev = root / 'development-stripped'
++            run([llvm / 'llvm-objcopy', '--strip-all', dev, stripped_dev])
++            assert any(f['code'] == 'forbidden-string' for f in audit(stripped_dev)['findings'])
++            samples = {}
++            for label, image in [('development', dev), ('private', final)]:
++                timings = []
++                for _ in range(5):
++                    start = time.perf_counter_ns();run([image, '7'], expected=1);timings.append(time.perf_counter_ns() - start)
++                samples[label] = statistics.median(timings)
++            record = dict(case=stem, sha256=hashlib.sha256(final.read_bytes()).hexdigest(),
++                          development_bytes=dev.stat().st_size, linked_private_bytes=linked.stat().st_size,
++                          final_bytes=final.stat().st_size, private_map_bytes=mapfile.stat().st_size, build_id=stdout.split()[1],
++                          split_debug_bytes=symbols.stat().st_size, process_error_median_ns=samples,
++                          report=result)
++            evidence.append(record)
++            destination = os.environ.get('VOID_STAGE_B_EVIDENCE')
++            if destination:
++                saved = Path(destination) / stem
++                saved.mkdir(parents=True, mode=0o700, exist_ok=True)
++                for artifact in [source, obj, linked, final, mapfile, symbols, tokens]:
++                    shutil.copy2(artifact, saved / artifact.name)
++                (saved / 'evidence.json').write_text(json.dumps(record, indent=2))
++    assert len({item['build_id'] for item in evidence}) == len(evidence), 'Build identities must distinguish semantic inputs'
++    # Audit catches an accidentally appended map, not only source canaries.
++    contaminated = root / 'contaminated';contaminated.write_bytes(final.read_bytes() + mapfile.read_bytes())
++    assert any(f['code'] == 'private-diagnostic-map' for f in audit(contaminated)['findings'])
++    print(json.dumps(evidence, indent=2))
++print('Stage B linked-byte canaries, private maps, ABI failure status and development diagnostics passed')
+diff --git a/tests/project/private_diagnostics.cpp b/tests/project/private_diagnostics.cpp
+new file mode 100644
+--- /dev/null
++++ b/tests/project/private_diagnostics.cpp
+@@ -0,0 +1,106 @@
++#include "void/backend.hpp"
++#include "void/frontend.hpp"
++#include "void/project.hpp"
++#include <fstream>
++#include <iostream>
++#include <iterator>
++#include <stdexcept>
++
++namespace {
++void require(bool ok, const char* what) { if(!ok)throw std::runtime_error(what); }
++template<class F> void rejects(F f) { try {f();} catch(const std::invalid_argument&) {return;} throw std::runtime_error("Expected diagnostic rejection"); }
++std::string read(const char* path) {
++    std::ifstream in(path,std::ios::binary);if(!in)throw std::runtime_error("Cannot read qualification input");
++    return {std::istreambuf_iterator<char>(in),{}};
++}
++}
++int main(int argc,char** argv) { try {
++    using namespace vd::diagnostics;
++    if(argc==9 && std::string_view(argv[1])=="emit") {
++        auto analysis=vd::analyze_project(argv[2]);
++        if(!analysis.succeeded())throw vd::CompilationError(analysis.diagnostics);
++        auto module=analysis.program->lower();
++        module.async_root=std::string_view(argv[7])=="async";
++        bool optimize=std::string_view(argv[6])=="O2";
++        auto map=vd::emit_publication_object(module,argv[3],optimize,argv[8]);
++        // Python owns final-link/split/strip/audit sequencing. Keep the draft
++        // in memory until final bytes exist; no draft map goes to disk.
++        std::cout<<"READY\n"<<std::flush;std::string ready;
++        if(!std::getline(std::cin,ready) || ready!="FINAL")throw std::runtime_error("No final image");
++        map.bind_image(read(argv[5]));auto bytes=map.encode();
++        std::ofstream out(argv[4],std::ios::binary);out.write(bytes.data(),bytes.size());out.close();
++        require(bool(out),"Private map write failed");
++        for(const auto& site:map.sites())require(!site.path.empty(),"Lost original source mapping");
++        std::cout<<"MAP "<<map.build_id()<<" "<<map.image_sha256()<<" "<<map.sites().size()<<'\n';return 0;
++    }
++    if(argc==5 && std::string_view(argv[1])=="resolve") {
++        auto map=read(argv[2]),image=read(argv[3]),tokens=read(argv[4]);std::size_t count=0;
++        while(!tokens.empty()) {
++            auto begin=tokens.find("VOID-D1 ");if(begin==tokens.npos)break;
++            tokens.erase(0,begin);auto end=tokens.find('\n');require(end!=tokens.npos,"Truncated public token");
++            auto site=PrivateMap::resolve(map,image,std::string_view(tokens).substr(0,end+1));
++            std::cout<<static_cast<unsigned>(site.category)<<" "<<site.path<<":"<<site.line<<":"<<site.column<<" "<<site.function<<" "<<site.description<<"\n"<<site.excerpt<<"\n";
++            tokens.erase(0,end+1);++count;
++        }
++        require(count>0,"No diagnostic tokens resolved");return 0;
++    }
++    if(argc==6 && std::string_view(argv[1])=="development") {
++        auto analysis=vd::analyze_project(argv[2]);if(!analysis.succeeded())throw vd::CompilationError(analysis.diagnostics);
++        auto module=analysis.program->lower();module.async_root=std::string_view(argv[5])=="async";
++        vd::emit_object(module,argv[3],std::string_view(argv[4])=="O2",true,{},vd::project::DebugInfo::full);return 0;
++    }
++    PrivateMap map(std::string(64,'a'));
++    Site original{Category::arithmetic,"/canary.void::secret","/private/canary.void","return value / zero","Division by zero",7,9};
++    auto failure=map.add(original),frame=map.add({Category::call,"caller","/private/canary.void","return secret()","source call",11,4});
++    require(failure!=frame,"Site identities collide");rejects([&]{map.encode();});
++    map.bind_image("exact final image");auto bytes=map.encode();auto round=PrivateMap::decode(bytes);
++    require(round.encode()==bytes,"Map round trip changed");
++    auto site=PrivateMap::resolve(bytes,"exact final image",failure);
++    require(site.path==original.path && site.excerpt==original.excerpt && site.function==original.function && site.line==7 && site.column==9,"Private mapping changed");
++    rejects([&]{map.add(original);});rejects([&]{map.bind_image("other");});
++    rejects([&]{PrivateMap::resolve({},"exact final image",failure);});
++    rejects([&]{PrivateMap::resolve(bytes,"wrong image",failure);});
++    PrivateMap other(std::string(64,'b'));auto wrong=other.add(original);other.bind_image("exact final image");
++    rejects([&]{PrivateMap::resolve(other.encode(),"exact final image",failure);});
++    rejects([&]{PrivateMap::resolve(bytes,"exact final image",wrong);});
++    require(category("Division by zero")==Category::arithmetic && category("Null supplied")==Category::null_value && category("index out of bounds")==Category::bounds,"Public category contract changed");
++    auto unknown=failure;unknown.replace(unknown.find(" 1 "),3," 999999 ");
++    rejects([&]{PrivateMap::resolve(bytes,"exact final image",unknown);});
++    auto wrong_category=failure;wrong_category[wrong_category.size()-2]='1';
++    rejects([&]{PrivateMap::resolve(bytes,"exact final image",wrong_category);});
++    for(auto token:{failure+"x",std::string("VOID-D2 ")+failure.substr(8),failure.substr(0,failure.size()-1)})rejects([&]{PrivateMap::resolve(bytes,"exact final image",token);});
++    // Exact tokens reject alternate spellings, overflow, separators and NULs.
++    const auto prefix=failure.substr(0,failure.find(" 1 ")+1);
++    for(const auto* tail:{"0 2\n","01 2\n","+1 2\n","-1 2\n","4294967296 2\n","1 02\n","1 +2\n","1 2\r\n","1 2\nextra","1 2 \n","1\t2\n","1  2\n","1 7\n"})
++        rejects([&]{PrivateMap::resolve(bytes,"exact final image",prefix+tail);});
++    rejects([&]{PrivateMap::resolve(bytes,"exact final image",failure+std::string(1,'\0'));});
++    auto upper=failure;upper[8]='A';rejects([&]{PrivateMap::resolve(bytes,"exact final image",upper);});
++    rejects([&]{PrivateMap empty(std::string(64,'a'));empty.bind_image({});});
++    // Serialized identity fields, counts and categories cannot bypass limits.
++    auto put=[](std::string& out,std::size_t offset,std::uint32_t value) {
++        for(unsigned i=0;i<4;++i)out[offset+i]=char(value>>(8*i));
++    };
++    for(auto value:{0u,65u,1024u*1024u+1u,0xffffffffu}) {
++        auto invalid=bytes;put(invalid,24,value);rejects([&]{PrivateMap::decode(invalid);});
++    }
++    for(auto value:{65537u,0xffffffffu}) {
++        auto invalid=bytes;put(invalid,160,value);rejects([&]{PrivateMap::decode(invalid);});
++    }
++    for(auto value:{0u,7u,0xffffffffu}) {
++        auto invalid=bytes;put(invalid,164,value);rejects([&]{PrivateMap::decode(invalid);});
++    }
++    PrivateMap total(std::string(64,'d'));
++    Site large{Category::runtime,std::string(1024*1024,'x')};
++    for(unsigned i=0;i<15;++i)(void)total.add(large);
++    rejects([&]{total.add(large);});
++    total.bind_image("bounded image");require(total.encode().size()<=map_byte_limit,"Encoded total exceeded limit");
++    for(std::size_t n=0;n<bytes.size();++n)rejects([&]{PrivateMap::decode(std::string_view(bytes).substr(0,n));});
++    rejects([&]{PrivateMap::decode(bytes+"x");});
++    auto corrupt=bytes;corrupt[0]='X';rejects([&]{PrivateMap::decode(corrupt);});
++    corrupt=bytes;corrupt[24]=char(0xff);rejects([&]{PrivateMap::decode(corrupt);});
++    rejects([&]{PrivateMap::decode(std::string(map_byte_limit+1,'x'));});
++    rejects([&]{PrivateMap bad("not-a-digest");});
++    PrivateMap bounded(std::string(64,'c'));for(std::size_t i=0;i<site_limit;++i)(void)bounded.add({});rejects([&]{bounded.add({});});
++    rejects([&]{PrivateMap m(std::string(64,'c'));m.add({Category::runtime,{}, {},std::string(1024*1024+1,'x')});});
++    std::cout<<"Private diagnostic map bounds, identities and round trips passed\n";return 0;
++} catch(const std::exception& e) {std::cerr<<e.what()<<'\n';return 1;} }
+diff --git a/tests/project/publish.cpp b/tests/project/publish.cpp
+new file mode 100644
+--- /dev/null
++++ b/tests/project/publish.cpp
+@@ -0,0 +1,80 @@
++#include "void/publish.hpp"
++#include "void/binary_audit.hpp"
++#include <algorithm>
++#include <fstream>
++#include <iostream>
++#include <type_traits>
++
++namespace {
++unsigned checks=0;
++void check(bool value,const char* what) {++checks;if(!value)throw std::runtime_error(what);}
++template<class F> void rejected(F action,const char* what) {
++    bool failed=false;try {action();}catch(const std::exception&) {failed=true;}check(failed,what);
++}
++const std::string app="schema=1\n[project]\nid='org.test.sources'\nname='Fixture'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.app'\n";
++auto parse(std::string bytes) {return vd::project::parse_manifest(vd::SourceFile("/fixture/void.project.toml",std::move(bytes)));}
++}
++int main(int argc,char** argv) {
++    try {
++        if(argc>=4 && (std::string_view(argv[1])=="audit" || std::string_view(argv[1])=="audit-stage-b")) {
++            std::ifstream input(argv[3],std::ios::binary|std::ios::ate);
++            if(!input || input.tellg()<0 || input.tellg()>std::streamoff(vd::audit::byte_limit))return 2;
++            std::string bytes(static_cast<std::size_t>(input.tellg()),'\0');input.seekg(0);input.read(bytes.data(),bytes.size());if(!input)return 2;
++            vd::audit::Policy policy;policy.target=argv[2];if(std::string_view(argv[1])=="audit-stage-b")policy.revision=2;for(int i=4;i<argc;++i)policy.forbidden_strings.emplace_back(argv[i]);
++            std::cout<<vd::audit::json(vd::audit::inspect(bytes,policy))<<'\n';return 0;
++        }
++        if(argc>=3 && std::string_view(argv[1])=="preflight") {
++            std::vector<std::string_view> args;for(int i=2;i<argc;++i)args.emplace_back(argv[i]);
++            vd::publish::preflight(vd::publish::parse_arguments(args),"linux-x64");return 99;
++        }
++        using namespace vd::publish;
++        static_assert(!std::is_copy_assignable_v<PublishPlan> && !std::is_move_assignable_v<PublishPlan>);
++        auto v1=parse(app);check(v1.succeeded() && v1.manifest->schema()==1,"schema 1 preserved");
++        auto v2text=app;v2text.replace(7,1,"2");
++        auto v2=parse(v2text+"[publish]\ntarget='windows-x64'\ndefault_profile='protected'\n");
++        check(v2.succeeded() && v2.manifest->schema()==2,"schema 2");
++        for(const auto& suffix: {"[publish]\nlto='thin'\n","[publish.profiles.release]\noptimization='O2'\n","[publish]\ntarget='linux-arm64'\n","[publish]\ndefault_profile='debug'\n","[publish]\ncrypto='secret'\n","[publish]\ntarget=4\n","[publish]\ntarget='linux-x64'\ntarget='windows-x64'\n","[publish.unknown]\n"})
++            check(!parse(v2text+suffix).succeeded(),"unknown schema 2 capability rejected");
++        check(!parse(app+"[publish]\ntarget='linux-x64'\n").succeeded(),"schema 1 rejects publish");
++        for(const auto& args:std::vector<std::vector<std::string_view>>{{"main.void"},{"."},{"--"},{"--target","linux-arm64"},{"--target","linux-x64","--target","linux-x64"},{"--profile","debug"},{"--profile","release","--profile","protected"},{"--allow-native"},{"--reuse-native-approval"},{"--project"},{"--entry","../main.void"},{"--entry","/main.void"},{"--entry","C:/main.void"},{"-o","x","-o","y"},{"--project","x","main.void"},{"--entry","a//b.void"}})
++            rejected([&]{(void)parse_arguments(args);},"CLI rejection");
++        auto defaults=plan_contract({},*v1.manifest,"linux-x64");
++        auto relative=parse_arguments(std::vector<std::string_view>{"--entry","src/main.void"});
++        check(relative.entry=="src/main.void","project-relative entry preserved on every host");
++        check(defaults.target()=="linux-x64" && defaults.profile()=="release" && !defaults.admitted(),"contract defaults unavailable");
++        check(defaults.manifest_sha256().size()==64 && defaults.project_id()=="org.test.sources","manifest identity");
++        check(defaults.output()=="./dist/org.test.app/linux-x64/release","default fresh output contract");
++        auto configured=plan_contract({},*v2.manifest,"linux-x64");check(configured.target()=="windows-x64" && configured.profile()=="protected","manifest defaults");
++        auto request=parse_arguments(std::vector<std::string_view>{"--target","macos-arm64","--profile","performance","--entry","src/main.void","-o","new output"});
++        auto overridden=plan_contract(request,*v2.manifest,"linux-x64");
++        check(overridden.target()=="macos-arm64" && overridden.profile()=="performance" && overridden.entry()=="src/main.void","CLI overrides");
++        for(auto target:{"linux-x64","windows-x64","macos-arm64"})for(auto profile:{"release","performance","protected"}) {
++            Request r;r.target=target;r.profile=profile;auto p=plan_contract(r,*v1.manifest,"linux-x64");
++            rejected([&]{require_capabilities(p);},"all target/profile capabilities unavailable");
++        }
++        const auto lib="schema=1\n[project]\nid='org.test.sources'\nname='Fixture'\nversion='1.0.0'\nkind='library'\n[package]\nid='org.test.lib'\nname='fixture'\n";
++        auto library=parse(lib);check(library.succeeded(),"valid library");rejected([&]{(void)plan_contract({},*library.manifest,"linux-x64");},"library ineligible");
++        auto native=parse(app+"[native-requirements.raylib]\nid='org.void.raylib'\nversion='=1.0.0'\nabi=3\n");
++        check(native.succeeded(),"valid native requirement");
++        auto nativeplan=plan_contract({},*native.manifest,"linux-x64");
++        check(std::find(nativeplan.required_capabilities().begin(),nativeplan.required_capabilities().end(),"publish-native-authorization")!=nativeplan.required_capabilities().end(),"separate native publish authority");
++        check(!parse(app+"[native-requirements.raylib]\nid='org.void.raylib'\nversion='latest'\nabi=99\n").succeeded(),"invalid native requirement");
++        vd::audit::Policy policy;policy.target="linux-x64";
++        for(const auto& bytes:{std::string("\x7f" "ELF"),std::string("MZ"),std::string("\xcf\xfa\xed\xfe"),std::string("archive")}) {
++            auto report=vd::audit::inspect(bytes,policy);check(!report.inspected && !report.findings.empty(),"malformed/unsupported image rejected");
++        }
++        policy.revision=3;check(vd::audit::inspect("",policy).findings.front().code=="unsupported-policy","policy fail closed");
++        policy.revision=1;policy.target="linux-arm64";
++        check(!vd::audit::inspect("",policy).inspected,"unknown policy target fails closed");
++        policy.target="linux-x64";
++        for(const auto& canaries:std::vector<std::vector<std::string>>{{""}, {std::string(257,'x')}, std::vector<std::string>(65,"x"), std::vector<std::string>(17,std::string(256,'x'))}) {
++            policy.forbidden_strings=canaries;
++            auto report=vd::audit::inspect("",policy);
++            check(!report.inspected && report.findings.front().code=="unsupported-policy","canary policy bounds");
++        }
++        policy.forbidden_strings.clear();
++        auto excessive=vd::audit::inspect(std::string(vd::audit::byte_limit+1,'x'),policy);
++        check(!excessive.inspected && excessive.findings.front().code=="limit" && excessive.sha256.empty(),"input byte limit precedes parser and hash allocation");
++        std::cout<<"PASS "<<checks<<" publish contract checks\n";return 0;
++    } catch(const std::exception& error) {std::cerr<<error.what()<<'\n';return 1;}
++}
+diff --git a/tests/project/publish_fixtures.py b/tests/project/publish_fixtures.py
+new file mode 100644
+--- /dev/null
++++ b/tests/project/publish_fixtures.py
+@@ -0,0 +1,283 @@
++"""Deterministic image data, CLI rejection and independent LLVM inspection.
++
++Never executes the ELF/PE/Mach-O images. Only the compiler and audit harness run.
++"""
++from pathlib import Path
++import hashlib
++import json
++import struct
++import subprocess
++import sys
++import tempfile
++
++auditor, compiler, readobj = map(lambda x: Path(x).resolve(), sys.argv[1:4])
++evidence = Path(sys.argv[4]) if len(sys.argv) > 4 else None
++rows = []
++checks = 0
++
++
++def check(value, message):
++    global checks
++    assert value, message
++    checks += 1
++
++
++def command(args, cwd=None):
++    p = subprocess.run(list(map(str, args)), cwd=cwd, capture_output=True, timeout=30)
++    rows.append(dict(argv=list(map(str, args)), status=p.returncode,
++                     stdout=p.stdout.decode(errors='replace'), stderr=p.stderr.decode(errors='replace')))
++    return p
++
++
++def put(b, offset, fmt, *values):
++    struct.pack_into('<' + fmt, b, offset, *values)
++
++
++def elf():
++    b = bytearray(0x1000)
++    b[:16] = b'\x7fELF\x02\x01\x01' + bytes(9)
++    put(b, 16, 'HHIQQQIHHHHHH', 2, 62, 1, 0, 64, 0x900, 0, 64, 56, 3, 64, 4, 1)
++    put(b, 64, 'IIQQQQQQ', 1, 5, 0, 0x400000, 0x400000, len(b), len(b), 0x1000)
++    interpreter = b'/lib64/ld-linux-x86-64.so.2\0'
++    b[0x200:0x200+len(interpreter)] = interpreter
++    put(b, 120, 'IIQQQQQQ', 3, 4, 0x200, 0x400200, 0, len(interpreter), len(interpreter), 1)
++    strings = b'\0libc.so.6\0/producer/absolute/lib\0GLIBC_2.42\0'
++    b[0x400:0x400+len(strings)] = strings
++    entries = [(5, 0x400400), (10, len(strings)), (1, strings.index(b'libc')),
++               (29, strings.index(b'/producer')), (0x6ffffffe, 0x400500), (0x6fffffff, 1), (0, 0)]
++    for i, pair in enumerate(entries):
++        put(b, 0x300+i*16, 'QQ', *pair)
++    put(b, 176, 'IIQQQQQQ', 2, 4, 0x300, 0x400300, 0, len(entries)*16, len(entries)*16, 8)
++    put(b, 0x500, 'HHIII', 1, 1, strings.index(b'libc'), 16, 0)
++    put(b, 0x510, 'IHHII', 0, 0, 2, strings.index(b'GLIBC'), 0)
++    names = b'\0.shstrtab\0.debug_info\0.symtab\0fixture\0'
++    b[0x600:0x600+len(names)] = names
++    for index, values in enumerate([
++        (names.index(b'.shstrtab'), 3, 0, 0, 0x600, len(names), 0, 0, 1, 0),
++        (names.index(b'.debug_info'), 1, 0, 0, 0x700, 1, 0, 0, 1, 0),
++        (names.index(b'.symtab'), 2, 0, 0, 0x800, 48, 1, 1, 8, 24),
++    ], 1):
++        put(b, 0x900+index*64, 'IIQQQQIIQQ', *values)
++    put(b, 0x818, 'IBBHQQ', names.index(b'fixture'), 0x12, 0, 2, 0x400700, 1)
++    b[0xb00:0xb00+len(b'/canary/source/main.void\0')] = b'/canary/source/main.void\0'
++    return bytes(b)
++
++
++def pe():
++    b = bytearray(0x600)
++    b[:2] = b'MZ'
++    put(b, 0x3c, 'I', 0x80)
++    b[0x80:0x84] = b'PE\0\0'
++    put(b, 0x84, 'HHIIIHH', 0x8664, 1, 0, 0, 0, 240, 0x22)
++    optional = 0x98
++    put(b, optional, 'H', 0x20b)
++    put(b, optional+24, 'Q', 0x140000000)
++    put(b, optional+32, 'II', 0x1000, 0x200)
++    put(b, optional+56, 'II', 0x2000, 0x200)
++    put(b, optional+68, 'H', 3)
++    put(b, optional+108, 'I', 16)
++    put(b, optional+120, 'II', 0x1000, 40)
++    put(b, optional+112+6*8, 'II', 0x10a0, 28)
++    b[0x188:0x190] = b'.rdata\0\0'
++    put(b, 0x190, 'IIIIIIHHI', 0x400, 0x1000, 0x400, 0x200, 0, 0, 0, 0, 0x40000040)
++    put(b, 0x200, 'IIIII', 0x1060, 0, 0, 0x1050, 0x1070)
++    b[0x250:0x25c] = b'fixture.dll\0'
++    put(b, 0x260, 'QQ', 0x1080, 0)
++    put(b, 0x270, 'QQ', 0x1080, 0)
++    b[0x280:0x28a] = b'\0\0fixture\0'
++    codeview = b'RSDS' + bytes(16) + struct.pack('<I', 1) + b'C:\\canary\\source\\main.void\0'
++    put(b, 0x2a0, 'IIHHIIII', 0, 0, 0, 0, 2, len(codeview), 0x10c0, 0x2c0)
++    b[0x2c0:0x2c0+len(codeview)] = codeview
++    return bytes(b)
++
++
++def macho():
++    def path_command(tag, value, minimum):
++        raw = value.encode() + b'\0'
++        size = (minimum+len(raw)+7)//8*8
++        result = bytearray(size)
++        put(result, 0, 'III', tag, size, minimum)
++        result[minimum:minimum+len(raw)] = raw
++        return result
++    commands = [path_command(0xc, '@rpath/libfixture.dylib', 24),
++                path_command(0x8000001c, '/producer/absolute/lib', 12)]
++    segment = bytearray(152)
++    put(segment, 0, 'II16sQQQQIIII', 0x19, 152, b'__DWARF', 0, 0x1000, 0x300, 0x100, 7, 1, 1, 0)
++    put(segment, 72, '16s16sQQIIIIIIII', b'__debug_info', b'__DWARF', 0, 1, 0x300, 0, 0, 0, 0, 0, 0, 0)
++    commands.append(segment)
++    b = bytearray(0x400)
++    put(b, 0, 'IIIIIIII', 0xfeedfacf, 0x100000c, 0, 2, len(commands), sum(map(len, commands)), 0, 0)
++    offset = 32
++    for c in commands:
++        b[offset:offset+len(c)] = c
++        offset += len(c)
++    canary = '/canary/source/main.void'.encode('utf-16le') + b'\0\0'
++    b[0x320:0x320+len(canary)] = canary
++    return bytes(b)
++
++
++try:
++    with tempfile.TemporaryDirectory(prefix='void publish fixtures ') as directory:
++        root = Path(directory)
++        def audit(data, target='linux-x64', name='image'):
++            path = root/name
++            path.write_bytes(data)
++            result = command([auditor, 'audit', target, path, '/canary/source/main.void', 'C:\\canary\\source\\main.void'])
++            check(result.returncode == 0, rows[-1])
++            return json.loads(result.stdout)
++
++        for name, data, target, dependency in [('ELF', elf(), 'linux-x64', 'libc.so.6'),
++                                              ('PE', pe(), 'windows-x64', 'fixture.dll'),
++                                              ('Mach-O', macho(), 'macos-arm64', '@rpath/libfixture.dylib')]:
++            report = audit(data, target, name)
++            check(report['inspected'] and report['format'] == name, report)
++            check(dependency in report['dependencies'], report)
++            check(report['debug'], report)
++            check(report['sha256'] == hashlib.sha256(data).hexdigest(), report)
++            codes = [f['code'] for f in report['findings']]
++            check('forbidden-string' in codes, report)
++            if name != 'PE':
++                check('loader-path' in codes and 'forbidden-string' in codes, report)
++            if name == 'ELF':
++                check(report['symbols'] and report['interpreter'].startswith('/lib64/'), report)
++                check('libc.so.6:GLIBC_2.42' in report['versions'], report)
++            oracle = command([readobj, '--file-headers', '--sections', root/name])
++            check(oracle.returncode == 0 and name.encode() in oracle.stdout, rows[-1])
++            wrong = audit(data, 'macos-arm64' if target != 'macos-arm64' else 'linux-x64')
++            check(any(f['code'] == 'target-mismatch' for f in wrong['findings']), wrong)
++            # Every header truncation is invalid; no inspected input is run.
++            for length in range(1, 64):
++                truncated = audit(data[:length], target)
++                check(not truncated['inspected'], (name, length, truncated))
++        damaged = bytearray(elf())
++        put(damaged, 64+32, 'Q', 2**64-1)
++        check(not audit(damaged)['inspected'], 'ELF overflow')
++        damaged = bytearray(elf())
++        put(damaged, 0x510+12, 'I', 16)
++        check(not audit(damaged)['inspected'], 'ELF malformed version chain')
++        for offset, fmt, value, label in [(0x200, 'B', 0, 'empty interpreter'),
++                                           (0x300+5*16+8, 'Q', 0, 'zero version count'),
++                                           (56, 'H', 0, 'missing program headers')]:
++            damaged = bytearray(elf())
++            put(damaged, offset, fmt, value)
++            report = audit(damaged)
++            check(not report['inspected'] and any(f['code'] == 'malformed-image' for f in report['findings']), label)
++        # Sectionless dynamic requirements still inspect through program headers.
++        stripped = bytearray(elf())
++        put(stripped, 40, 'Q', 0)
++        put(stripped, 60, 'HH', 0, 0)
++        report = audit(stripped)
++        check(report['inspected'] and report['versions'] == ['libc.so.6:GLIBC_2.42'], report)
++        damaged = bytearray(pe())
++        put(damaged, 0x200+12, 'I', 0xffffffff)
++        check(not audit(damaged, 'windows-x64')['inspected'], 'PE invalid import name')
++        damaged = bytearray(pe())
++        damaged[0x250:] = b'A'*(len(damaged)-0x250)
++        check(not audit(damaged, 'windows-x64')['inspected'], 'PE name must terminate inside the file-backed image')
++        damaged = bytearray(pe())
++        put(damaged, 0x80+16, 'I', 0xffffffff)
++        check(not audit(damaged, 'windows-x64')['inspected'], 'PE inconsistent symbol declaration')
++        crowded_symbols = bytearray(pe()) + bytearray(4097*18+4)
++        put(crowded_symbols, 0x80+12, 'II', 0x600, 4097)
++        put(crowded_symbols, 0x600+4097*18, 'I', 4)
++        report = audit(crowded_symbols, 'windows-x64')
++        check(not report['inspected'] and [f['code'] for f in report['findings']] == ['limit'],
++              'PE symbol policy budget is incomplete inspection, not a malformed-image claim')
++        for image, target, offset, fmt, value in [(elf(), 'linux-x64', 60, 'H', 4097),
++                                                  (macho(), 'macos-arm64', 16, 'I', 4097)]:
++            excessive = bytearray(image)
++            put(excessive, offset, fmt, value)
++            report = audit(excessive, target)
++            check(not report['inspected'] and [f['code'] for f in report['findings']] == ['limit'],
++                  'declared table budget must not claim malformed bytes')
++        damaged = bytearray(pe())
++        put(damaged, 0x80+12, 'I', 0x500)
++        put(damaged, 0x500, 'I', 4)
++        check(audit(damaged, 'windows-x64')['inspected'], 'PE string table can remain without COFF symbols')
++        damaged = bytearray(pe())
++        put(damaged, 0x98+120+4, 'I', 20)
++        check(not audit(damaged, 'windows-x64')['inspected'], 'PE directory needs a bounded terminator')
++        damaged = bytearray(pe())
++        put(damaged, 0x98+112+13*8, 'II', 0x1100, 64)
++        put(damaged, 0x300, 'IIIIIIII', 1, 0x1050, 0, 0, 0, 0, 0, 0)
++        report = audit(damaged, 'windows-x64')
++        check(report['inspected'] and report['dependencies'] == ['fixture.dll', 'fixture.dll'], 'bounded PE delay declarations')
++        put(damaged, 0x300, 'I', 0)
++        check(not audit(damaged, 'windows-x64')['inspected'], 'unsupported PE delay VA addressing fails closed')
++        damaged = bytearray(macho())
++        put(damaged, 36, 'I', 0xfffffff8)
++        check(not audit(damaged, 'macos-arm64')['inspected'], 'Mach-O invalid command')
++        damaged = bytearray(macho())
++        commands, extent = struct.unpack_from('<II', damaged, 16)
++        put(damaged, 32+extent, 'IIIIII', 2, 24, 0x380, 1, 0x390, 0x30)
++        put(damaged, 16, 'II', commands+1, extent+24)
++        put(damaged, 0x380, 'IBBHQ', 1, 0xe, 1, 0, 0)
++        damaged[0x390:0x3c0] = b'\0'+b'A'*47
++        check(not audit(damaged, 'macos-arm64')['inspected'], 'Mach-O symbol names cannot escape the declared string table')
++        damaged[0x3bf] = 0
++        check(audit(damaged, 'macos-arm64')['inspected'], 'valid bounded Mach-O symbol table')
++        # Exceed the finding budget using bounded repeated loader declarations.
++        crowded = bytearray(elf()) + bytearray(0x20000-0x1000)
++        put(crowded, 64+32, 'QQ', len(crowded), len(crowded))
++        entries = [(5, 0x400400), (10, len(b'\0libc.so.6\0/producer/absolute/lib\0GLIBC_2.42\0'))]
++        entries += [(29, len(b'\0libc.so.6\0'))]*4093 + [(0, 0)]
++        for index, pair in enumerate(entries):
++            put(crowded, 0x1000+index*16, 'QQ', *pair)
++        put(crowded, 176+8, 'Q', 0x1000)
++        put(crowded, 176+32, 'QQ', len(entries)*16, len(entries)*16)
++        report = audit(crowded, 'macos-arm64')
++        check(not report['inspected'] and len(report['findings']) == 4096 and report['findings'][-1]['code'] == 'limit', 'finding exhaustion is incomplete inspection')
++        # Fixed deterministic mutations must return a bounded report rather than
++        # crash, hang or turn malformed data into execution authority.
++        for label, original, target in [('elf', elf(), 'linux-x64'), ('pe', pe(), 'windows-x64'), ('macho', macho(), 'macos-arm64')]:
++            for i in range(32):
++                data = bytearray(original)
++                offset = (i*37+17) % len(data)
++                data[offset] ^= (1 << (i % 8))
++                report = audit(data, target)
++                check(report['scope'] == 'image-declarations-only' and len(report['findings']) <= 4096, (label, i, report))
++        project = root/'project'
++        project.mkdir()
++        manifest = "schema=1\n[project]\nid='org.test.sources'\nname='Fixture'\nversion='1.0.0'\nkind='application'\n[application]\nid='org.test.app'\n"
++        toml = project/'void.project.toml'
++        toml.write_text(manifest)
++        (project/'main.void').write_text('func main() -> i32:\n    return 0\n')
++        p = command([compiler, 'publish', '--project', project, '--entry', '/main.void'])
++        check(p.returncode != 0 and b'exact project-relative' in p.stderr,
++              'drive-rooted Windows entry must reject during argument parsing')
++        for args in [[], ['--project', project], ['--project', project, '--target', 'linux-x64'],
++                     ['--project', project, '--profile', 'performance'], ['--target', 'linux-arm64'],
++                     ['--profile', 'debug'], ['--project', project, '--project', project],
++                     ['--entry', '../main.void'], ['--allow-native'], ['main.void']]:
++            before = sorted(p.relative_to(project).as_posix() for p in project.rglob('*'))
++            out = root/'fresh output'
++            p = command([compiler, 'publish', *args, '-o', out], cwd=project)
++            check(p.returncode != 0 and not out.exists(), rows[-1])
++            if not args or args[:2] == ['--project', project] and len(args) in (2, 4) and '--project' not in args[2:]:
++                check(b'Publish capability unavailable' in p.stderr, rows[-1])
++            check(before == sorted(p.relative_to(project).as_posix() for p in project.rglob('*')), 'rejection changed project')
++        p = command([compiler, 'publish', '--project', project], cwd=project)
++        check(p.returncode != 0 and not (project/'dist').exists(), rows[-1])
++        existing = root/'existing'
++        existing.mkdir()
++        p = command([compiler, 'publish', '--project', project, '-o', existing])
++        check(p.returncode != 0 and b'fresh directory' in p.stderr and not list(existing.iterdir()), rows[-1])
++        toml.write_text(manifest.replace('schema=1', 'schema=2') + "[publish]\ntarget='windows-x64'\ndefault_profile='protected'\n")
++        p = command([compiler, 'publish', '--project', project, '-o', root/'schema2'])
++        check(p.returncode != 0 and b'windows-x64/protected' in p.stderr and not (root/'schema2').exists(), rows[-1])
++        library = manifest.replace("kind='application'", "kind='library'").replace("[application]\nid='org.test.app'", "[package]\nid='org.test.lib'\nname='fixture'")
++        toml.write_text(library)
++        p = command([compiler, 'publish', '--project', project, '-o', root/'library'])
++        check(p.returncode != 0 and b'libraries are ineligible' in p.stderr.lower() and not (root/'library').exists(), rows[-1])
++        for content in [None, 'schema=2\n[invalid', manifest.replace('schema=1', 'schema=3'),
++                        manifest.replace('schema=1', 'schema=2')+'[publish]\nlto="thin"\n']:
++            if content is None:
++                toml.unlink()
++            else:
++                toml.write_text(content)
++            p = command([compiler, 'publish', '--project', project, '-o', root/'rejected'])
++            check(p.returncode != 0 and not (root/'rejected').exists(), rows[-1])
++        print(f'PASS {checks} deterministic publisher and binary fixture checks')
++finally:
++    if evidence:
++        evidence.write_text(json.dumps(dict(checks=checks, rows=rows), indent=2))

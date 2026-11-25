@@ -1,0 +1,43 @@
+# Qualification-only injection, selected by CMAKE_PROJECT_VoidLanguage_INCLUDE.
+# Runtime, native fixtures, curl and verified providers stay ordinary machine code.
+function(publisher_stage_b_native_targets)
+  if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    message(FATAL_ERROR "Stage B qualification requires pinned Clang")
+  endif()
+  set(targets void_core void_llvm void_publish void_lsp void_crash_diagnostics
+    voidc_objects void_cache_identity voidc voidls void_publish_foundation
+    void_project_header void_project_manifest void_project_selection void_private_diagnostics
+    void_runtime_tests void_runtime_generated void_runtime_callbacks void_runtime_failures
+    void_runtime_aot_normal void_runtime_aot_optimized void_runtime_invariants)
+  set_property(GLOBAL PROPERTY JOB_POOLS publisher_link=1)
+  foreach(target IN LISTS targets)
+    if(NOT TARGET ${target})
+      message(FATAL_ERROR "Missing Stage B target: ${target}")
+    endif()
+    get_target_property(kind ${target} TYPE)
+    if(PUBLISH_STAGE_A_THINLTO)
+      target_compile_options(${target} PRIVATE -flto=thin)
+    endif()
+    if(kind STREQUAL "EXECUTABLE")
+      set_property(TARGET ${target} PROPERTY JOB_POOL_LINK publisher_link)
+      if(APPLE AND PUBLISH_STAGE_A_THINLTO)
+        # LLVM #237789: pinned Mach-O LLD can drop LTO exception FDEs.
+        # Keep ThinLTO; use the selected Xcode linker with pinned libLTO.
+        target_link_options(${target} PRIVATE -fuse-ld=ld "--ld-path=${PUBLISH_STAGE_A_APPLE_LD}"
+          "LINKER:-lto_library,${PUBLISH_STAGE_A_LIBLTO}")
+      else()
+        target_link_options(${target} PRIVATE -fuse-ld=lld "--ld-path=${PUBLISH_STAGE_A_LLD}")
+      endif()
+      if(PUBLISH_STAGE_A_THINLTO)
+        target_link_options(${target} PRIVATE -flto=thin)
+        if(APPLE)
+          target_link_options(${target} PRIVATE "LINKER:-mllvm,-threads=2" "LINKER:-cache_path_lto,${PUBLISH_STAGE_A_LTO_CACHE}")
+        else()
+          target_link_options(${target} PRIVATE "LINKER:--thinlto-jobs=2" "LINKER:--thinlto-cache-dir=${PUBLISH_STAGE_A_LTO_CACHE}")
+        endif()
+      endif()
+    endif()
+  endforeach()
+  file(WRITE "${CMAKE_BINARY_DIR}/publisher-native-targets.txt" "${targets}\nThinLTO=${PUBLISH_STAGE_A_THINLTO}\nLLD=${PUBLISH_STAGE_A_LLD}\nAppleLD=${PUBLISH_STAGE_A_APPLE_LD}\n")
+endfunction()
+cmake_language(DEFER CALL publisher_stage_b_native_targets)
