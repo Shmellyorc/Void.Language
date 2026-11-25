@@ -53,9 +53,19 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
     assert plain.stdout==default.stdout and b'Checking' in plain.stderr and b'Finished' in plain.stderr and b'\x1b' not in plain.stderr
     for flags in (['--status','bad'],['--status'],['--status','off','--status','auto'],['--timings','--timings'],
                   ['--timings-format','text'],['--timings','--timings-format','xml'],['--timings','--timings-format','json'],
-                  ['--timings-output',reports/'unused.json'],['--timings','--timings-format','json','--timings-output',app],
-                  ['--timings','--timings-format','json','--timings-output',reports/'missing'/'report.json']):
+                  ['--timings-output',reports/'unused.json'],['--timings','--timings-format','json','--timings-output',app]):
         run(['check',app,*flags],2)
+
+    # Invalid report parents must diagnose an invocation error before manifest
+    # discovery, without creating directories or changing an existing file.
+    parent_file=reports/'parent-file';parent_file.write_bytes(b'retained')
+    for parent in (reports/'missing', reports/'missing'/'nested', parent_file):
+        result=run(['check',app,'--timings','--timings-format','json',
+                    '--timings-output',parent/'report.json'],2)
+        assert not result.stdout and result.stderr.startswith(
+            b'Invalid invocation: Timing report parent must be an existing directory.'),result
+        assert not (reports/'missing').exists()
+        assert parent_file.read_bytes()==b'retained'
 
     serial=0
     def timed(args,status=0):

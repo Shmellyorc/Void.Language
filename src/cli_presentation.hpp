@@ -170,6 +170,9 @@ public:
             // Conservatively require reports outside all selected source trees
             // and manifest projects. Staging must not change a locked package.
             auto path=std::filesystem::absolute(*options.output).lexically_normal();
+            std::error_code error;
+            if (!std::filesystem::is_directory(path.parent_path(),error) || error)
+                throw std::invalid_argument("Timing report parent must be an existing directory.");
             auto source_root=std::filesystem::is_directory(source)?source:std::filesystem::absolute(source).parent_path();
             source_root=std::filesystem::weakly_canonical(std::filesystem::absolute(source_root));
             const auto location=std::filesystem::weakly_canonical(path);
