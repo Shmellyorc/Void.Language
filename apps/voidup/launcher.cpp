@@ -331,6 +331,22 @@ struct process_attributes {
 // redirected manager/compiler descendants in one group and relay cancellation.
 // Interactive terminals retain their foreground group and normal job control.
 #ifndef _WIN32
+template<std::size_t Size>
+[[noreturn]] void launcher_child_failure(const char (&message)[Size]) {
+    // Between fork and exec, emit the failing operation and errno without allocation.
+    auto code=static_cast<unsigned>(errno);
+    char digits[16];
+    char* end=digits+sizeof(digits);
+    char* first=end;
+    *--first='\n';
+    do {
+        *--first=static_cast<char>('0'+code%10);
+        code/=10;
+    } while(code);
+    (void)write(STDERR_FILENO,message,Size-1);
+    (void)write(STDERR_FILENO,first,static_cast<std::size_t>(end-first));
+    _exit(127);
+}
 volatile sig_atomic_t forwarded_group=0;
 void forward_cancellation(int signal) {
     const auto saved=errno;const auto group=forwarded_group;
@@ -354,7 +370,7 @@ struct cancellation_scope {
     }
     void child() {
         if(!active)return;
-        if(setpgid(0,0))_exit(127);
+        if(setpgid(0,0))launcher_child_failure("Cannot group native VOIDUP child, errno ");
         for(unsigned i=0;i<4;++i)sigaction(signals[i],&previous[i],nullptr);
         sigprocmask(SIG_SETMASK,&original,nullptr);
     }
@@ -395,7 +411,7 @@ int run(const fs::path& executable,const std::vector<std::string>& args) {
 #else
     std::vector<char*> argv{const_cast<char*>(executable.c_str())};for(const auto& a:args)argv.push_back(const_cast<char*>(a.c_str()));argv.push_back(nullptr);
     cancellation_scope cancellation(!isatty(STDIN_FILENO)&&!isatty(STDERR_FILENO));
-    auto pid=fork();require(pid>=0,"Cannot start native VOIDUP");if(!pid){cancellation.child();execv(executable.c_str(),argv.data());_exit(127);}
+    auto pid=fork();require(pid>=0,"Cannot start native VOIDUP");if(!pid){cancellation.child();execv(executable.c_str(),argv.data());launcher_child_failure("Cannot execute native VOIDUP, errno ");}
     cancellation.watch(pid);
     int status=0;while(waitpid(pid,&status,0)<0)require(errno==EINTR,"Cannot wait for native VOIDUP");
     return WIFEXITED(status)?WEXITSTATUS(status):128+WTERMSIG(status);
