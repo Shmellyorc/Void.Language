@@ -51,7 +51,10 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential ninja-build bubblewrap libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+          sudo apt-get install -y apparmor-profiles build-essential ninja-build bubblewrap libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+          # Ubuntu's Bubblewrap profile permits sandbox setup and confines its child.
+          sudo apparmor_parser -r /usr/share/apparmor/extra-profiles/bwrap-userns-restrict
+          bwrap --ro-bind / / -- /usr/bin/true
       - name: Windows native SDK environment
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
