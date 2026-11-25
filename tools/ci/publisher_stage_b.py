@@ -26,7 +26,7 @@ import http_bootstrap as http
 import verify_host_deps as host
 
 BASELINE = 'df33af0a7e8ae75b97d2ab27395a683b69d3994f'
-PATCH_SHA256 = '5657c8e77a0c417fcab0b7e97c45e3503f1740d0b5f16191f54e9f9a5781dca3'
+PATCH_SHA256 = '6d41f28306c0a245837711da2f649034de009ffe205ec0bb05aab1c9bcddfc38'
 POLICY = ROOT / 'tools/ci/publisher-stage-b'
 TARGETS = ('voidc', 'voidls', 'void_publish_foundation', 'void_project_header',
            'void_project_manifest', 'void_project_selection', 'void_private_diagnostics',

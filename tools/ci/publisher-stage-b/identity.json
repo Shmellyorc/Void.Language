@@ -1,8 +1,8 @@
 {
   "baseline": "df33af0a7e8ae75b97d2ab27395a683b69d3994f",
   "stage_a_baseline": "458f7f1fb26e6c02edade48abf72ec333b059092",
-  "patch_sha256": "5657c8e77a0c417fcab0b7e97c45e3503f1740d0b5f16191f54e9f9a5781dca3",
-  "stage_b_patch_sha256": "247aebfd0cec426b632efe2f014d4eb551e61f11ee14d04d163f7f3293fdee25",
+  "patch_sha256": "6d41f28306c0a245837711da2f649034de009ffe205ec0bb05aab1c9bcddfc38",
+  "stage_b_patch_sha256": "d8d8c146d84d349d8efbcb97f95f02fc0143624ef1114fb2658f761e7903eed5",
   "source_sha256": {
     "CMakeLists.txt": "777bb7c36af3cd975924aa2fb87944fe18eacbcdd30f9f8dd3622e9ca37b0b54",
     "docs/PUBLISHER_STAGE_B.md": "8b605f98b8e98bc421eb16e31a629fd24d7c9fbf1e6ef6de86244793d1d2e843",
@@ -20,7 +20,7 @@
     "src/private_diagnostics.cpp": "a8cd8b9238bfb80fc496cd49a245a0eb96a3a48a440b5897e9e50a1d3e9ba793",
     "src/publish.cpp": "8d3cdb13496b3d52e4a9d43e3d6a74f66c53a4505adc9c19f352b1e83115d0fe",
     "tests/cli/contract.py": "29e99428b11b513cdc199d3b866f1587092f862eac98790170399a2081c55902",
-    "tests/cli/presentation.py": "eaa4b2905c04cba2e8f2cf0079c83545b0d8c4406f523f7135c3e7ef510053f2",
+    "tests/cli/presentation.py": "7c78e7cf73c843621c20c0aa496f689989189275920f0ec4f2b812efeb755d5c",
     "tests/project/application_packages.py": "f8ac6b27a8625de545c34568f70c16ff9b1fa8847de7b6ef91a05d10d3956253",
     "tests/project/discovery.py": "54c04cc8f5b76c4da4521e035cf7cd605fc0aacc1da896619f931ad3c4d19ebb",
     "tests/project/manifest.cpp": "0d555fba1c55afc6bee0b89203c5bdc5334bbf2a4a856e9d1ce154ad39d74042",
@@ -28,5 +28,6 @@
     "tests/project/private_diagnostics.cpp": "c584a12710fdbcbe9f7bf0a7897f6f8977e1251ed7b5e8a93622c63ae1da6d1c",
     "tests/project/publish.cpp": "8ee85187d5e7c1a2d2f23d0deac1fd4ab964be2e187473fbd4cef71b5a45120e",
     "tests/project/publish_fixtures.py": "e955574e93769e3cca6d6d0e8b7ec455cef883651cb0a6c2db6f9877322d3e7a"
-  }
+  },
+  "product_commit": "ab1d32f72218d3d4191af2f8d548abaf4e94f492"
 }

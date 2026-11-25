@@ -89,12 +89,13 @@ for kind,text in [('sync',sync),('async',async_source),('retained',sync.replace(
    # Capture a real ASLR-loaded PC at the controlled private function, then
    # recover its file address from the loaded image base and match its UUID.
    script="import json; t=lldb.debugger.GetSelectedTarget(); f=t.GetProcess().GetSelectedThread().GetFrameAtIndex(0); m=f.GetModule(); h=m.GetObjectFileHeaderAddress(); print('ASLR_JSON '+json.dumps(dict(pc=f.GetPC(),file_pc=f.GetPCAddress().GetFileAddress(),load_base=h.GetLoadAddress(t),file_base=h.GetFileAddress(),uuid=m.GetUUIDString())))"
-   stopped=run(['xcrun','lldb','--batch','-o','breakpoint set -n '+name[0][1:],'-o','run 7','-o','script '+script,'--',final])
+   stopped=run(['xcrun','lldb','--batch','-o','settings set target.disable-aslr false','-o','breakpoint set -n '+name[0][1:],'-o','run 7','-o','script '+script,'--',final])
    loaded=json.loads(next(line.split('ASLR_JSON ',1)[1] for line in stopped.splitlines() if line.startswith('ASLR_JSON ')))
+   (case/'aslr.json').write_text(json.dumps(loaded,indent=2))
+   assert loaded['load_base']!=loaded['file_base'],'Nonzero native ASLR relocation was not demonstrated'
    assert loaded['pc']-loaded['load_base']+loaded['file_base']==loaded['file_pc']
    assert loaded['uuid'].lower()==re.search(r'UUID: (\S+)',uuids[1])[1].lower()
    restored=run([tools/'llvm-symbolizer','--obj='+str(symbol_obj),hex(loaded['file_pc'])]);assert canaries[0] in restored
-   (case/'aslr.json').write_text(json.dumps(loaded,indent=2))
 
   error=run([final,'7'],expected=1);deep=subprocess.run([str(final),'40'],capture_output=True,text=True,timeout=30);assert deep.returncode==1
   failure=subprocess.run([str(final),'7'],capture_output=True,text=True,timeout=30);assert failure.returncode==1
