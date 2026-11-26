@@ -21,9 +21,9 @@ struct Context {
     std::string base;
     unsigned mode;
     std::uint64_t count;
-    std::shared_ptr<ClientResource> client;
-    std::shared_ptr<TransferResource> transfer;
-    std::shared_ptr<filesystem::File> file;
+    std::shared_ptr<ClientResource> client = {};
+    std::shared_ptr<TransferResource> transfer = {};
+    std::shared_ptr<filesystem::File> file = {};
     std::size_t minimum = static_cast<std::size_t>(-1), maximum = 0, handles = 0;
     std::size_t tasks = 0, groups = 0, work = 0;
 };
