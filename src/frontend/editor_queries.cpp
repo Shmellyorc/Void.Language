@@ -1,4 +1,3 @@
-#include "editor_queries.hpp"
 #include "diagnostics.hpp"
 #include "model.hpp"
 #include "parser.hpp"
@@ -13,9 +12,9 @@ bool valid_editor_identifier(const std::string& name) {
     return !name.empty() && letter(name[0]) && !reserved.contains(name) &&
         std::all_of(name.begin(),name.end(),[](char c){return letter(c)||digit(c);});
 }
-namespace frontend {
 std::optional<EditorAssistance> editor_namespace_assistance(const ValidatedAnalysis& known,const SourceFile& source,
     const std::string& module,std::size_t cursor) {
+    using namespace frontend;
     const auto found=std::find_if(known.modules().begin(),known.modules().end(),[&](const auto& m){return m.identity==module;});
     if(found==known.modules().end() || found->qualifiers.empty() || cursor>source.text().size())return {};
     const auto& text=source.text();
@@ -167,7 +166,6 @@ std::optional<EditorAssistance> editor_namespace_assistance(const ValidatedAnaly
         out.candidates.push_back(std::move(candidate));
     }
     return out;
-}
 }
 
 std::optional<std::string> format_source(const SourceFile& source, bool insert_spaces) {

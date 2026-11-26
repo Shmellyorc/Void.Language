@@ -1,5 +1,4 @@
 #include "analysis.hpp"
-#include "editor_queries.hpp"
 #include "lowering.hpp"
 #include "stack_guard.hpp"
 #include "type_resolution.hpp"

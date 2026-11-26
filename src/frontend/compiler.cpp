@@ -1,6 +1,5 @@
 #include "semantic_passes.hpp"
 #include "analysis.hpp"
-#include "editor_queries.hpp"
 #include "source_graph.hpp"
 #include "semantics.hpp"
 #include "type_resolution.hpp"
