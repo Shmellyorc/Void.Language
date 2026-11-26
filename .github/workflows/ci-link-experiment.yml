@@ -406,6 +406,21 @@ jobs:
         run: |
           ulimit -s 1024
           ctest --test-dir build/${{ matrix.configuration }} -R '^frontend$' --output-on-failure
+      - name: Verify the native 1 MiB stack on Windows and macOS
+        if: ${{ !inputs.test_filter && runner.os != 'Linux' }}
+        env:
+          NATIVE_STACK_CONFIGURATION: ${{ matrix.configuration }}
+          NATIVE_STACK_BUILD: build/${{ matrix.configuration }}
+          NATIVE_STACK_EVIDENCE: ${{ env.EXPERIMENT_DIR }}/native-stack
+        shell: python {0}
+        run: |
+          import platform
+          import subprocess
+          import sys
+
+          binary_check = 'pe' if platform.system() == 'Windows' else 'macho'
+          for phase in (binary_check, 'frontend', 'depth'):
+              subprocess.run([sys.executable, 'tools/ci/stage10_native_stack.py', phase], check=True)
       - name: Extension Node.js toolchain
         if: ${{ !inputs.test_filter && matrix.configuration == 'Debug' }}
         uses: actions/setup-node@v5

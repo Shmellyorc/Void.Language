@@ -1,4 +1,4 @@
-"""Manual Stage 10 native stack evidence; no production or test policy changes."""
+"""Native stack qualification for targeted and cached compiler builds."""
 import hashlib
 import json
 import os
@@ -12,9 +12,9 @@ import time
 import traceback
 
 MIB = 1048576
-EVIDENCE = Path('build/native-stack-evidence')
+EVIDENCE = Path(os.environ.get('NATIVE_STACK_EVIDENCE', 'build/native-stack-evidence'))
 CONFIGURATION = os.environ.get('NATIVE_STACK_CONFIGURATION', '')
-BUILD = Path('build') / ('native-stack-' + CONFIGURATION)
+BUILD = Path(os.environ.get('NATIVE_STACK_BUILD', 'build/native-stack-' + CONFIGURATION))
 SYSTEM = platform.system()
 SUFFIX = '.exe' if SYSTEM == 'Windows' else ''
 
@@ -209,6 +209,10 @@ def main(phase):
         if SYSTEM != 'Windows':
             raise RuntimeError('PE readback requires the actual Windows build')
         verify_pe()
+    elif phase == 'macho':
+        if SYSTEM != 'Darwin':
+            raise RuntimeError('Mach-O readback requires the actual macOS build')
+        verify_macho()
     elif phase in ('frontend', 'depth', 'frontend-inherited', 'depth-inherited'):
         original_phase = phase.removesuffix('-inherited')
         label = 'frontend' if original_phase == 'frontend' else 'semantic-depth'
