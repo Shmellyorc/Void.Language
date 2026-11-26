@@ -29,6 +29,10 @@ if(VOID_LINKER)
     message(FATAL_ERROR "VOID_LINKER must be LLD 23.1.4")
   endif()
 endif()
+option(VOID_LINUX_THINLTO "Compile the Linux compiler libraries with pinned Clang ThinLTO" OFF)
+if(VOID_LINUX_THINLTO AND (NOT VOID_LINKER OR NOT CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL LLVM_PACKAGE_VERSION))
+  message(FATAL_ERROR "VOID_LINUX_THINLTO requires the matching Linux Clang and LLD SDK")
+endif()
 option(VOID_SANITIZERS "Instrument compiler/runtime with ASan and UBSan" OFF)
 include(cmake/Sanitizers.cmake)
 add_library(void_options INTERFACE)
@@ -164,6 +168,12 @@ add_library(void_llvm src/backend/llvm/backend.cpp src/backend/llvm/jit.cpp src/
   src/backend/llvm/native_abi.cpp src/backend/llvm/native_cache.cpp src/backend/llvm/optimization.cpp
   src/backend/llvm/root_storage.cpp src/backend/llvm/target.cpp
   src/backend/llvm/type_layout.cpp src/backend/llvm/async_frame.cpp)
+if(VOID_LINUX_THINLTO)
+  # The pinned LLD recognizes ThinLTO members in these archives. Keep provider,
+  # runtime and test sources on their existing native compilation recipes.
+  target_compile_options(void_core PRIVATE -flto=thin)
+  target_compile_options(void_llvm PRIVATE -flto=thin)
+endif()
 if(APPLE)
   if(NOT CMAKE_OSX_DEPLOYMENT_TARGET MATCHES "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$")
     message(FATAL_ERROR "Set CMAKE_OSX_DEPLOYMENT_TARGET explicitly for macOS code generation and native linking")

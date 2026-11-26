@@ -1,6 +1,6 @@
 # Run control and thinlto-cache on the SAME immutable commit via the dispatch ref.
 # Compare matching OS/configuration and identity.json toolchains; hosted runner noise remains.
-# Cache starts empty before configure; build is probe-primed, voidc relink is a warm pass.
+# Start with an empty cache and verify a warm voidc relink after acceptance.
 # Boss approved repeating the pinned Linux LLD selection for early CMake checks in cache mode.
 name: Compiler link experiment
 run-name: ${{ inputs.test_filter && format('Focused CTest / {0}', inputs.platform) || format('Compiler qualification / {0}', inputs.platform || 'all') }}
@@ -85,6 +85,7 @@ jobs:
           import os
           from pathlib import Path
           import platform
+          import shlex
           import shutil
           import subprocess
           import sys
@@ -93,6 +94,7 @@ jobs:
           phase = sys.argv[1]
           configuration = os.environ['EXPERIMENT_CONFIGURATION']
           mode = os.environ['EXPERIMENT_MODE']
+          linux_thinlto = mode == 'thinlto-cache' and platform.system() == 'Linux'
           build = Path('build') / configuration
           evidence = Path(os.environ['EXPERIMENT_DIR'])
           cache = Path(os.environ['THINLTO_CACHE_DIR'])
@@ -105,6 +107,25 @@ jobs:
               files = [p for p in cache.rglob('*') if p.is_file()]
               return {'directory': str(cache), 'files': len(files),
                       'bytes': sum(p.stat().st_size for p in files)}
+
+          def linux_cache_objects():
+              objects = {}
+              for path in cache.glob('llvmcache-*'):
+                  if path.is_file():
+                      stat = path.stat()
+                      if stat.st_size:
+                          objects[path.name] = (stat.st_size, stat.st_mtime_ns)
+              return objects
+
+          def verify_thinlto_objects():
+              commands = json.loads((build / 'compile_commands.json').read_text(encoding='utf-8'))
+              representatives = {'src/frontend/semantics.cpp', 'src/backend/llvm/backend.cpp'}
+              for entry in commands:
+                  for source in tuple(representatives):
+                      if Path(entry['file']).as_posix().endswith('/' + source):
+                          assert '-flto=thin' in shlex.split(entry['command']), f'{source} missing ThinLTO'
+                          representatives.remove(source)
+              assert not representatives, f'ThinLTO compilation inputs missing: {representatives}'
 
           def identity():
               commands = [['git', 'rev-parse', 'HEAD'], ['git', 'status', '--short'],
@@ -189,6 +210,7 @@ jobs:
                       # Compiler checks precede the project's LLD selection. Boss approved
                       # repeating that same pinned linker here so GNU ld never sees the cache flag.
                       flags = '--ld-path="' + os.environ['VOID_LINKER'] + '" ' + flags
+                      command.append('-DVOID_LINUX_THINLTO=ON')
                   command.append('-DCMAKE_EXE_LINKER_FLAGS:STRING=' + flags)
           elif phase in ('build', 'relink'):
               if phase == 'relink':
@@ -207,6 +229,7 @@ jobs:
               raise ValueError(phase)
 
           metrics = {'argv': command, 'cache_before': cache_size(), 'phase': phase}
+          cached_objects = linux_cache_objects() if linux_thinlto and phase == 'relink' else {}
           # POSIX child CPU totals include reaped descendants; peak RSS is a maximum, not a sum.
           try:
               import resource
@@ -246,9 +269,22 @@ jobs:
                           if event.get('cmd') == 'check_cxx_source_runs' and 'VOID_LLVM_ORC_RUNS' in event.get('args', []):
                               probe_start = event['time']
                   metrics['orc_probe_note'] = 'CMake trace call-to-return wall time; null means the probe did not return.'
+              if linux_thinlto:
+                  objects = linux_cache_objects()
+                  metrics['thinlto_objects'] = len(objects)
+                  if phase == 'relink':
+                      metrics['thinlto_reused_objects'] = sum(
+                          objects.get(name) == previous_entry for name, previous_entry in cached_objects.items())
               save(f'{phase}.json', metrics)
               if phase in ('build', 'relink'):
                   link_times(phase, previous)
+          if linux_thinlto and metrics['exit_code'] == 0:
+              if phase == 'configure':
+                  verify_thinlto_objects()
+              elif phase == 'build':
+                  assert objects, 'The Linux build produced no compiled ThinLTO cache objects'
+              else:
+                  assert cached_objects and objects == cached_objects, 'The warm voidc relink changed ThinLTO cache objects'
           sys.exit(metrics['exit_code'])
           ''').lstrip(), encoding='utf-8')
           with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as env:
