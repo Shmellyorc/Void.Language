@@ -445,9 +445,18 @@ class ServerManager {
         this.output.info(`Starting ${project.server} ${JSON.stringify(args)}`);
         const selector = {language: 'void', scheme: 'file', pattern: {baseUri: vscode.Uri.file(project.root).toString(),
             pattern: project.singleFile ? basename(project.entry!).replace(/[*?()[\]{}!+@,]/g, c => '[' + c + ']') : '**/*.void'}};
+        let spawned = false;
         const serverOptions: ServerOptions = async () => {
             const env = crashEnvironment();
             const child = spawn(project.server, args, {cwd: project.root, shell: false, env});
+            // A rejected spawn has no transport for the language client.
+            await new Promise<void>((resolve, reject) => {
+                const started = () => { child.off('error', failed); resolve(); };
+                const failed = (error: Error) => { child.off('spawn', started); reject(error); };
+                child.once('spawn', started);
+                child.once('error', failed);
+            });
+            spawned = true;
             child.once('exit', (code, signal) => {
                 if (this.client !== client || this.disposed) return;
                 this.output.info(`voidls process exit: code=${code}, signal=${signal ?? 'none'}.`);
@@ -459,7 +468,7 @@ class ServerManager {
         let initialized = false;
         let failureReported = false;
         const reportUnexpected = (): void => {
-            if (this.disposed || this.client !== client || failureReported) return;
+            if (!spawned || this.disposed || this.client !== client || failureReported) return;
             failureReported = true;
             this.diagnostics.flush();
             this.output.error(`CRASH voidls connection closed ${initialized ? 'while running' : 'during initialization'} for ${project.root} (${project.server}). Check the process exit and stderr in Output → VOID, then run VOID: Restart Language Server.`);
