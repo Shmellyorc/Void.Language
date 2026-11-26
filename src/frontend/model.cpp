@@ -1,5 +1,6 @@
 #include "model.hpp"
 #include "void/compiler_observation.hpp"
+#include "void/console_ops.hpp"
 #include "diagnostics.hpp"
 #include "void/path.hpp"
 #include <algorithm>
@@ -169,5 +170,19 @@ const Function* application_entry(const Unit& unit) {
     auto found=unit.declarations.find("main");if(found==unit.declarations.end())return nullptr;
     const auto* f=found->second;
     return !f->receiver && f->parameters.empty() && f->generics.empty() && !f->asynchronous && (f->result==Type::none || f->result==Type::i32) ? f : nullptr;
+}
+
+ir::Op operation(const std::string& op) {
+    static const std::map<std::string, ir::Op> ops = {{"+", ir::Op::add}, {"-", ir::Op::subtract}, {"*", ir::Op::multiply},
+        {"<<",ir::Op::shift_left},{">>",ir::Op::shift_right},{"&",ir::Op::bit_and},{"|",ir::Op::bit_or},{"^",ir::Op::bit_xor}, {"/", ir::Op::divide}, {"%", ir::Op::remainder}, {"<", ir::Op::less}, {"<=", ir::Op::less_equal},
+        {">", ir::Op::greater}, {">=", ir::Op::greater_equal}, {"==", ir::Op::equal}, {"!=", ir::Op::not_equal}};
+    return ops.at(op);
+}
+
+bool checked_initializer_default(Type t) {
+    // These required-value fields can have a checked pure declaration default.
+    // Prepare that value before init, just as for numeric enums and options.
+    return t.kind==Type::numeric_enum ||
+        (t.definition && (t.definition->callable || !t.definition->cases.empty())) || console::endpoint_type(t);
 }
 }

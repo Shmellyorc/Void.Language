@@ -352,4 +352,10 @@ struct Unit {
     Unit(SourceFile s, std::string id) : source(std::move(s)), identity(std::move(id)) {}
 };
 const Function* application_entry(const Unit&);
+
+// Flow sets describe possible exits from a statement, independently of LLVM.
+inline constexpr unsigned next_flow = 1, return_flow = 2, break_flow = 4, continue_flow = 8;
+inline bool always(const Expr* e) { return !e || (e->kind == Expr::Kind::literal && e->type == Type::boolean && e->value == 1); }
+ir::Op operation(const std::string&);
+bool checked_initializer_default(Type);
 }

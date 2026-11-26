@@ -1,3 +1,16 @@
+#include "constant_evaluation.hpp"
+#include "stack_guard.hpp"
+#include "void/compile_evaluation.hpp"
+#include "void/format.hpp"
+#include "void/math_ops.hpp"
+#include <algorithm>
+#include <bit>
+#include <limits>
+
+namespace vd::frontend {
+
+// Only typed, pure ASTs reach this evaluator. The shared software kernel
+// preserves declared precision and wrapping independently of host arithmetic.
 // G93 extends the existing typed constant-expression kernel. Calls carry the
 // declaration selected by ordinary binding; local frames contain owned values,
 // never Runtime objects, borrowed places, native addresses or executable code.
@@ -83,62 +96,31 @@ void validate_compile_function(const SourceFile& source,Function& f) {
         for(const auto& child:e.omitted)expressions.push_back(child.get());
     }
 }
-struct CompileEvaluation {
-    static constexpr std::uint64_t step_limit=1048576, graph_step_limit=8388608;
-    static constexpr std::size_t byte_limit=64*1024*1024, graph_byte_limit=256*1024*1024;
-    unsigned depth=0, calls=0, nesting=0;
-    // Calls retain their enclosing expression frame. Count statement sequences
-    // and loop handlers alongside it, so separate limits cannot multiply native
-    // stack use. Keep room to report the limit on the required 1 MiB stack.
-    struct Nesting {
-        CompileEvaluation& state;
-        Nesting(CompileEvaluation& state,const SourceFile& source,const Token& site):state(state) {
-            if(state.nesting>=256)error(source,site,Code::limit,"Compile-time combined expression/statement nesting limit of 256 exceeded.");
-            ++state.nesting;
-        }
-        ~Nesting(){--state.nesting;}
-    };
-    std::uint64_t steps=0, graph_steps=0;
-    std::size_t bytes=0, graph_bytes=0;
-    std::vector<std::optional<ir::ConstantValue>>* locals=nullptr;
-    std::function<void(Function&,const SourceFile&,const Token&,bool)> prepare;
-    std::function<void(Type)> numeric_definition;
-    void step(const SourceFile& source,const Token& site,std::uint64_t work=1) {
-        if(compile_evaluation_stop.stop_requested())error(source,site,Code::limit,"Compile-time evaluation cancelled.");
-        if(work>step_limit-steps || work>graph_step_limit-graph_steps)
-            error(source,site,Code::limit,"Compile-time evaluation work budget exceeded (1048576 steps per expression; 8388608 per analysis).");
-        steps+=work;graph_steps+=work;
+void CompileEvaluation::step(const SourceFile& source,const Token& site,std::uint64_t work) {
+    if(compile_evaluation_stop.stop_requested())error(source,site,Code::limit,"Compile-time evaluation cancelled.");
+    if(work>step_limit-steps || work>graph_step_limit-graph_steps)
+        error(source,site,Code::limit,"Compile-time evaluation work budget exceeded (1048576 steps per expression; 8388608 per analysis).");
+    steps+=work;graph_steps+=work;
+}
+
+void CompileEvaluation::charge(const SourceFile& source,const Token& site,const ir::ConstantValue& value) {
+    std::vector<const ir::ConstantValue*> pending{&value};
+    while(!pending.empty()) {
+        const auto& v=*pending.back();pending.pop_back();
+        const auto amount=sizeof(v)+v.text.size();
+        if(amount>byte_limit-bytes || amount>graph_byte_limit-graph_bytes)
+            error(source,site,Code::limit,"Compile-time temporary value budget exceeded (64 MiB per expression; 256 MiB per analysis).");
+        bytes+=amount;graph_bytes+=amount;
+        for(const auto& field:v.fields)pending.push_back(&field);
     }
-    void charge(const SourceFile& source,const Token& site,const ir::ConstantValue& value) {
-        std::vector<const ir::ConstantValue*> pending{&value};
-        while(!pending.empty()) {
-            const auto& v=*pending.back();pending.pop_back();
-            const auto amount=sizeof(v)+v.text.size();
-            if(amount>byte_limit-bytes || amount>graph_byte_limit-graph_bytes)
-                error(source,site,Code::limit,"Compile-time temporary value budget exceeded (64 MiB per expression; 256 MiB per analysis).");
-            bytes+=amount;graph_bytes+=amount;
-            for(const auto& field:v.fields)pending.push_back(&field);
-        }
-    }
-    ir::ConstantValue local(const SourceFile& source,const Expr& e) {
-        if(!locals || e.slot>=locals->size() || !locals->at(e.slot))
-            error(source,e.token,Code::constant_call,"Compile-time local value is not initialized.");
-        return *locals->at(e.slot);
-    }
-    struct Outcome {unsigned flow=next_flow;ir::ConstantValue value;};
-    Outcome sequence(const SourceFile&,const std::vector<Statement>&);
-    Outcome loop(const SourceFile&,const Statement&);
-    void assign(const SourceFile&,const Statement&);
-    ir::ConstantValue call(const SourceFile&,const Expr&);
-    struct Selection {
-        std::optional<unsigned> slot;
-        ir::ConstantValue captured;
-        struct Part {std::size_t index;bool array;};
-        std::vector<Part> path;
-    };
-    const ir::ConstantValue& read(const SourceFile&,const Token&,const Selection&);
-    Selection select(const SourceFile&,const Expr&);
-};
+}
+
+ir::ConstantValue CompileEvaluation::local(const SourceFile& source,const Expr& e) {
+    if(!locals || e.slot>=locals->size() || !locals->at(e.slot))
+        error(source,e.token,Code::constant_call,"Compile-time local value is not initialized.");
+    return *locals->at(e.slot);
+}
+
 void prepare_compile_call(CompileEvaluation* evaluation,Function& f,const SourceFile& source,const Token& site,bool body) {
     if(!evaluation || !evaluation->prepare)error(source,site,Code::constant_call,"Compile-time function is unavailable during this declaration dependency.");
     evaluation->prepare(f,source,site,body);
@@ -308,4 +290,150 @@ VOID_SEMANTIC_HANDLER CompileEvaluation::Outcome CompileEvaluation::sequence(con
         }
     }
     return {};
+}
+
+#include "collection_constants.inc"
+#include "enum_constants.inc"
+ir::ConstantValue constant_expression(const SourceFile& source, const Expr& e, CompileEvaluation* evaluation) {
+    // Presentation recovery keeps the nominal type of a partial enum member,
+    // but the hole has no value or operands. Propagate the existing poison
+    // boundary instead of evaluating it as an ordinary constant expression.
+    if(e.kind==Expr::Kind::editor_hole)throw Poison{};
+    if(e.kind==Expr::Kind::call && e.op=="$collection_equal") return frontend_case([&]() -> ir::ConstantValue {
+        const auto type=e.parts.at(0)->type;collection_constant_type(source,e.token,type);
+        return {collection_constant_equal(source,e.token,type,constant_value(source,*e.parts[0],evaluation),constant_value(source,*e.parts[1],evaluation),0),{}};
+    });
+    if(auto result=enum_constant(source,e,evaluation))return *result;
+    if(e.target=="$interpolation") return frontend_case([&]() -> ir::ConstantValue {
+        formatting::Builder builder;
+        for(const auto& part:e.parts){auto text=constant_value(source,*part,evaluation).text;if(text.size()>ir::string_constant_limit-builder.size())error(source,part->token,Code::limit,"Folded string exceeds the 16 MiB constant limit.");builder.append(text);}
+        return {0,{},std::move(builder).finish()};
+    });
+    if(e.target=="$hole") return frontend_case([&]() -> ir::ConstantValue {
+        auto value=constant_value(source,*e.parts[0],evaluation);const auto& spec=e.parts[1]->aggregate_value.text;
+        auto plan=formatting::parse_numeric(spec);
+        if(plan.alignment.width>ir::string_constant_limit || plan.minimum_integer>ir::string_constant_limit || plan.maximum_fraction>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");
+        auto type=e.parts[0]->type;
+        auto text=numeric::number(type)?formatting::number(numeric::display_number(value.bits,type),plan):formatting::text(type==Type::boolean?(value.bits?"true":"false"):std::string_view(value.text),spec);
+        if(text.size()>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");return {0,{},std::move(text)};
+    });
+    if(e.target.starts_with("$display.") && e.kind==Expr::Kind::call) return frontend_case([&]() -> ir::ConstantValue {
+        std::vector<ir::ConstantValue> values(e.parts.size());std::vector<Type> types(e.parts.size());
+        for(unsigned n=0;n<e.parts.size();++n){auto index=e.argument_indexes.at(n);values[index]=constant_value(source,*e.parts[n],evaluation);types[index]=e.parts[n]->type;}
+        const bool formatted=e.target=="$display.format";std::string text;bool valid=true;
+        try {
+            auto spec=formatted?std::string_view(values[1].text):std::string_view{};
+            // Preserve the existing compiler constant budget before allocating
+            // requested padding; Runtime formatting has no arbitrary width cap.
+            auto plan=formatting::parse_numeric(spec);
+            if(plan.alignment.width>ir::string_constant_limit || plan.minimum_integer>ir::string_constant_limit || plan.maximum_fraction>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");
+            text=numeric::number(types[0])?formatting::number(numeric::display_number(values[0].bits,types[0]),plan):formatting::text(types[0]==Type::boolean?(values[0].bits?"true":"false"):std::string_view(values[0].text),spec);
+        }catch(const formatting::Error& failure){if(!formatted)error(source,e.token,Code::invalid_value,failure.what());valid=false;text=failure.what();}
+        if(text.size()>ir::string_constant_limit)error(source,e.token,Code::limit,"Folded display exceeds the 16 MiB constant limit.");
+        if(!formatted)return {0,{},std::move(text)};
+        ir::ConstantValue result;result.fields.resize(3);result.fields[0].bits=valid?0:1;result.fields[valid?1:2].text=std::move(text);return result;
+    });
+    if(e.target.starts_with("$numeric::") && e.kind==Expr::Kind::call) return frontend_case([&]() -> ir::ConstantValue {
+        std::vector<std::uint64_t> values(e.parts.size());
+        for(unsigned n=0;n<e.parts.size();++n)values.at(e.argument_indexes.at(n))=constant_value(source,*e.parts[n],evaluation).bits;
+        try {return {e.token.text=="abs"?numeric::absolute(values.at(0),e.type):numeric::clamp(values.at(0),values.at(1),values.at(2),e.type),{}};}
+        catch(const std::invalid_argument& failure){error(source,e.token,Code::numeric_conversion,failure.what());}
+    });
+    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_try") return frontend_case([&]() -> ir::ConstantValue {
+        // Keep the owning input alive while copying into independent output
+        // storage. Assigning an input from its own child destroys that child.
+        const auto input=constant_value(source,*e.parts[0],evaluation);
+        const bool wrapped=ir::nullable_value(e.parts[0]->type);
+        const bool present=wrapped?input.fields.at(0).bits:input.bits || !input.text.empty();
+        ir::ConstantValue value;value.fields.resize(2);
+        if(present){value.fields[0].bits=1;value.fields[1]=wrapped?input.fields.at(1):input;}
+        return value;
+    });
+    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_lift") {ir::ConstantValue value;value.fields.resize(2);value.fields[0].bits=1;value.fields[1]=constant_value(source,*e.parts[0],evaluation);return value;}
+    if(e.kind==Expr::Kind::conversion && e.op=="$nullable_unwrap") {auto value=constant_value(source,*e.parts[0],evaluation);if(!value.fields.at(0).bits)error(source,e.token,Code::numeric_conversion,"Null value in checked conversion");return value.fields.at(1);}
+    if(e.kind==Expr::Kind::conversion && e.op=="identity" && e.type==e.parts[0]->type)return constant_value(source,*e.parts[0],evaluation);
+    if(e.kind==Expr::Kind::binary && e.op.starts_with("$nullable_null_")){bool equal=constant_value(source,*e.parts[0],evaluation).fields.at(0).bits==constant_value(source,*e.parts[1],evaluation).fields.at(0).bits;return {e.op=="$nullable_null_equal"?equal:!equal,{}};}
+    if(e.kind==Expr::Kind::choice)return constant_value(source,*e.parts[constant_value(source,*e.parts[0],evaluation).bits?1:2],evaluation);
+    if(e.kind==Expr::Kind::sum) return frontend_case([&]() -> ir::ConstantValue {
+        ir::ConstantValue result;result.fields.resize(e.type.definition->fields.size());result.fields[0].bits=e.slot;
+        const auto& variant=e.type.definition->cases.at(e.slot);
+        for(unsigned n=0;n<e.parts.size();++n)result.fields[variant.begin+n]=constant_value(source,*e.parts[n],evaluation);return result;
+    });
+    if(e.kind==Expr::Kind::function_reference)return {0,{},e.target};
+    if(e.kind==Expr::Kind::function_null)return {};
+    if(e.kind==Expr::Kind::dictionary_literal){ir::ConstantValue result;for(const auto& part:e.parts)result.fields.push_back(constant_value(source,*part,evaluation));return result;}
+    if (e.kind == Expr::Kind::literal) return (e.type.kind == Type::aggregate || ir::collection_type(e.type) || e.type==Type::string) ? e.aggregate_value : ir::ConstantValue{e.value,{}};
+    if(e.kind==Expr::Kind::array_default){ir::ConstantValue value;value.repeat=*e.type.definition->extent;if(*value.repeat)value.fields.push_back(constant_value(source,*e.parts.at(0),evaluation));return value;}
+    if(e.kind==Expr::Kind::array_literal || e.kind==Expr::Kind::return_pack) return frontend_case([&]() -> ir::ConstantValue {
+        ir::ConstantValue result;for(const auto& part:e.parts) result.fields.push_back(constant_value(source,*part,evaluation));return result;
+    });
+    if(e.kind==Expr::Kind::array_index) return frontend_case([&]() -> ir::ConstantValue {
+        auto array=constant_value(source,*e.parts[0],evaluation);auto index=constant_value(source,*e.parts[1],evaluation);
+        try {
+            const auto selected=ir::checked_array_index(index.bits,e.parts[1]->type,array.repeat.value_or(array.fields.size()));
+            return array.fields.at(array.repeat ? 0 : static_cast<std::size_t>(selected));
+        }
+        catch(const std::out_of_range&) {error(source,e.token,Code::invalid_value,"Constant array index out of bounds.");}
+    });
+    if (e.kind == Expr::Kind::construction) return frontend_case([&]() -> ir::ConstantValue {
+        auto result = e.aggregate_value;
+        for (unsigned n = 0; n < e.parts.size(); ++n) result.fields[e.field_indexes[n]] = constant_value(source,*e.parts[n],evaluation);
+        for (const auto& child : e.omitted) result.fields[child->slot] = constant_value(source,*child,evaluation);
+        return result;
+    });
+    if (e.kind == Expr::Kind::field) {auto value=constant_value(source,*e.parts[0],evaluation);if(e.target=="$array.count")return {value.repeat.value_or(value.fields.size()),{}};return value.fields.at(e.slot);}
+    if (e.kind==Expr::Kind::binary && e.parts[0]->type==Type::string) return frontend_case([&]() -> ir::ConstantValue {
+        auto a=constant_value(source,*e.parts[0],evaluation).text;
+        auto b=constant_value(source,*e.parts[1],evaluation).text;
+        if(e.op=="+") {
+            if(b.size()>ir::string_constant_limit-a.size()) error(source,e.token,Code::limit,"Folded string exceeds the 16 MiB constant limit.");
+            a+=b; return {0,{},std::move(a)};
+        }
+        return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
+    });
+    return frontend_case([&]() -> ir::ConstantValue {
+    if(e.kind!=Expr::Kind::conversion && e.kind!=Expr::Kind::unary && e.kind!=Expr::Kind::binary)
+        error(source,e.token,Code::constant_call,"Operation is not supported in compile-time evaluation.");
+    auto a = constant_value(source,*e.parts.at(0),evaluation).bits;
+    try {
+        if (e.kind == Expr::Kind::conversion) {
+            if(e.token.text=="as?") {
+                auto destination=ir::field_type(e.type,1);
+                auto backing=destination.kind==Type::numeric_enum?Type(*destination.definition->enum_backing):destination;
+                auto from=e.parts[0]->type.kind==Type::numeric_enum?Type(*e.parts[0]->type.definition->enum_backing):e.parts[0]->type;
+                auto value=numeric::try_integer_convert(a,from,backing);
+                ir::ConstantValue result;result.fields.resize(2);
+                if(destination.kind==Type::numeric_enum && evaluation){evaluation->numeric_definition(destination);evaluation->step(source,e.token,destination.definition->numeric_members.size());}
+                if(value && (destination.kind!=Type::numeric_enum || ir::numeric_enum_member(destination,*value))) {
+                    result.fields[0].bits=1;result.fields[1].bits=*value;
+                }
+                return result;
+            }
+            if (ir::reference_value(e.type)) { if (!a && !e.type.nullable) throw std::invalid_argument("Cannot unwrap null in a compile-time expression"); return {a,{}}; }
+            auto from=e.parts[0]->type.kind==Type::numeric_enum?Type(*e.parts[0]->type.definition->enum_backing):e.parts[0]->type;
+            auto to=e.type.kind==Type::numeric_enum?Type(*e.type.definition->enum_backing):e.type;
+            auto value=numeric::convert(a,from,to);
+            if(e.type.kind==Type::numeric_enum && evaluation){evaluation->numeric_definition(e.type);evaluation->step(source,e.token,e.type.definition->numeric_members.size());}
+            if(e.type.kind==Type::numeric_enum && !ir::numeric_enum_member(e.type,value))throw std::invalid_argument("Checked enum conversion requires a declared discriminant.");
+            return {value,{}};
+        }
+        if (e.kind == Expr::Kind::unary) {
+            auto primitive=e.type.kind==Type::numeric_enum?Type(*e.type.definition->enum_backing):e.type;
+            // APInt operands must already fit their declared width. In LLVM 23
+            // construction does not implicitly truncate an oversized uint64_t.
+            return {e.op=="~"?numeric::binary(ir::Op::bit_xor,a,~std::uint64_t{}>>(64-numeric::width(primitive)),primitive):e.op == "not" ? !a : e.op == "-" ? numeric::negate(a,primitive) : a,{}};
+        }
+        if (e.op == "and" && !a) return {};
+        if (e.op == "or" && a) return {1,{}};
+        auto b = constant_value(source,*e.parts[1],evaluation).bits;
+        if (e.op == "and" || e.op == "or") return {b,{}};
+        if (ir::reference_value(e.parts[0]->type)) return {static_cast<std::uint64_t>(e.op=="==" ? a==b : a!=b),{}};
+        auto primitive=e.parts[0]->type.kind==Type::numeric_enum?Type(*e.parts[0]->type.definition->enum_backing):e.parts[0]->type;
+        return {numeric::binary(operation(e.op),a,b,primitive),{}};
+    } catch (const CompilationError&) { throw; }
+      catch (const std::invalid_argument& failure) {
+        error(source,e.token,e.kind == Expr::Kind::conversion ? Code::numeric_conversion : Code::zero_divisor,failure.what());
+    }
+    });
+}
 }
