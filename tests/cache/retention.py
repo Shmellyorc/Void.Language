@@ -69,11 +69,17 @@ with tempfile.TemporaryDirectory(prefix="void-cache-retention-") as temporary:
         sys.exit(0)
     original = next(iter(entries().values()))
     initial_bytes, initial_mtime = read(original), original.stat().st_mtime_ns
+    warm = run()
+    assert "Debug cache: hit" in warm.stderr, (warm, original.name, sorted(p.name for p in directory.iterdir()))
     for value in range(1, 10):
         edit(value); run(value=value, hit="miss")
-    assert len(entries()) == 10
+    history = entries()
+    assert len(history) == 10 and original.name in history, (original.name, sorted(history))
     # A warm hit refreshes recency, while immutable bytes and mtime stay intact.
-    edit(0); run(hit="hit")
+    edit(0)
+    restored = run()
+    assert "Debug cache: hit" in restored.stderr, (
+        restored, original.name, sorted(p.name for p in directory.iterdir()))
     assert (read(original), original.stat().st_mtime_ns) == (initial_bytes, initial_mtime)
     for value in range(10, 14):
         edit(value); run(value=value, hit="miss")

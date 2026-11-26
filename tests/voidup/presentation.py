@@ -36,12 +36,12 @@ with tempfile.TemporaryDirectory(prefix='VOIDUP presentation 雪 ') as temporary
     assert b'--status' in run(['--help']).stdout
     if os.name != 'nt':
         import pty
+        import select
         import termios
         for extra, expected in (({}, True), ({'CI': '1'}, False), ({'TERM': 'dumb'}, False),
                                 ({'TERM': 'unknown'}, False), ({'TERM': None}, False),
                                 ({'TERMINFO': '/void-g75-missing-terminfo', 'TERMINFO_DIRS': '/void-g75-missing-terminfo'}, True)):
             master, slave = pty.openpty()
-            termios.tcsetwinsize(slave, (24, 80))
             environment = os.environ | {'TERM': 'xterm'}
             environment.pop('CI', None)
             for key, value in extra.items():
@@ -49,17 +49,17 @@ with tempfile.TemporaryDirectory(prefix='VOIDUP presentation 雪 ') as temporary
                     environment.pop(key, None)
                 else:
                     environment[key] = value
-            result = subprocess.run([application, '--root', str(root), 'doctor'], stdout=subprocess.PIPE,
-                                    stderr=slave, env=environment, timeout=60)
-            os.close(slave)
             data = b''
             try:
-                while chunk := os.read(master, 4096):
+                termios.tcsetwinsize(slave, (24, 80))
+                assert os.isatty(slave) and termios.tcgetwinsize(slave) == (24, 80)
+                result = subprocess.run([application, '--root', str(root), 'doctor'], stdout=subprocess.PIPE,
+                                        stderr=slave, env=environment, timeout=60)
+                while select.select([master], [], [], 0)[0] and (chunk := os.read(master, 4096)):
                     data += chunk
-            except OSError:
-                pass
             finally:
+                os.close(slave)
                 os.close(master)
-            assert result.returncode == 0 and (b'Finished' in data) == expected, (result, data)
+            assert result.returncode == 0 and (b'Finished' in data) == expected, (extra, result, data)
 
 print(f'VOIDUP presentation passed ({checks} captured processes plus native PTY controls)')

@@ -158,3 +158,6 @@ class Client:
                 stream.close()
         self.reader.join(timeout=5)
         self.logger.join(timeout=5)
+        if isinstance(value, EOFError):
+            value.add_note(f"Language server exit {self.process.returncode}; stderr:\n"
+                           + self.logs.decode("utf-8", errors="replace"))

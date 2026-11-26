@@ -96,11 +96,17 @@ with tempfile.TemporaryDirectory(prefix='VOID ordinary filesystem ') as temporar
         run('tidy', '--check', cwd=project)
         run('remove', 'helper', cwd=project)
         package = base / ('package-' + project.name)
-        run('package', '.', '-o', package, cwd=project)
-        if mode is not None:
-            for member in [package, *package.rglob('*')]:
-                member.chmod(0o775 if member.is_dir() or member.stat().st_mode & 0o111 else 0o664)
-        run('package', '--verify', package, cwd=project)
+        if sys.platform == 'darwin':
+            diagnostic = 'Application packaging requires Linux x86-64 GNU or Windows x64 MSVC.'
+            assert diagnostic in run('package', '.', '-o', package, cwd=project, status=1).stderr
+            assert diagnostic in run('package', '--verify', package, cwd=project, status=1).stderr
+            assert not package.exists()
+        else:
+            run('package', '.', '-o', package, cwd=project)
+            if mode is not None:
+                for member in [package, *package.rglob('*')]:
+                    member.chmod(0o775 if member.is_dir() or member.stat().st_mode & 0o111 else 0o664)
+            run('package', '--verify', package, cwd=project)
         source.write_text(SAVING)
         saves = project / '.void/saves'
         saves.mkdir()

@@ -109,18 +109,24 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
     _,v,p=timed(['run','--project',project,'--cache'])
     assert v['configuration']=={'project_mode':True,'profile':'debug','optimization':'none','debug_info':'unavailable'},v
     distribution=root/'distribution'
-    _,v,p=timed(['package','--project',project,'-o',distribution])
-    assert v['build']['complete'] and v['build']['outcome']=='success'
-    assert p['package_assembly']['count']==1 and p['package_assembly']['state']=='complete'
-    if os.name=='nt':
-        # Windows copies into the reserved package stage and publishes the outer
-        # directory inside package_assembly, bypassing native_build::publish.
-        assert p['publication']=={'id':'publication','parent_id':None,'kind':'unavailable',
-                                 'state':'not_reached','duration_us':None,'count':0,'reason':'not_applicable'},p
+    if sys.platform=='darwin':
+        r,v,p=timed(['package','--project',project,'-o',distribution],1)
+        assert b'Application packaging requires Linux x86-64 GNU or Windows x64 MSVC.' in r.stderr
+        assert not v['build']['complete'] and v['build']['outcome']=='failure' and not distribution.exists()
+        assert p['package_assembly']['count']==0 and p['publication']['count']==0,p
     else:
-        assert p['publication']['count']>0 and p['publication']['state']=='complete'
-    run(['package','--verify',distribution])
-    assert subprocess.run([str(distribution/('app.exe' if os.name=='nt' else 'app'))]).returncode==0
+        _,v,p=timed(['package','--project',project,'-o',distribution])
+        assert v['build']['complete'] and v['build']['outcome']=='success'
+        assert p['package_assembly']['count']==1 and p['package_assembly']['state']=='complete'
+        if os.name=='nt':
+            # Windows copies into the reserved package stage and publishes the outer
+            # directory inside package_assembly, bypassing native_build::publish.
+            assert p['publication']=={'id':'publication','parent_id':None,'kind':'unavailable',
+                                     'state':'not_reached','duration_us':None,'count':0,'reason':'not_applicable'},p
+        else:
+            assert p['publication']['count']>0 and p['publication']['state']=='complete'
+        run(['package','--verify',distribution])
+        assert subprocess.run([str(distribution/('app.exe' if os.name=='nt' else 'app'))]).returncode==0
     run(['run',app,'--cache'],7)
     r,v,p=timed(['run',app,'--cache'],7)
     if os.name!='nt':
@@ -202,6 +208,7 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
         result=subprocess.run([str(compiler),'check',str(app),'--status','plain'],stdout=subprocess.PIPE,stderr=write,timeout=30)
         os.close(write);assert result.returncode==0 and result.stdout==default.stdout
         import pty
+        import select
         for extra,expected in [({},True),({'CI':'1'},False),({'TERM':'dumb'},False),
                                ({'TERM':'unknown'},False),({'TERM':None},False),
                                ({'TERMINFO':'/void-g75-missing-terminfo','TERMINFO_DIRS':'/void-g75-missing-terminfo'},True)]:
@@ -210,11 +217,16 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
             for key,value in extra.items():
                 if value is None:environment.pop(key,None)
                 else:environment[key]=value
-            result=subprocess.run([str(compiler),'check',str(app)],stdout=subprocess.PIPE,stderr=slave,env=environment,timeout=30)
-            os.close(slave)
-            try:output=os.read(master,65536)
-            except OSError:output=b''
-            os.close(master)
+            output=b''
+            try:
+                assert os.isatty(slave)
+                result=subprocess.run([str(compiler),'check',str(app)],stdout=subprocess.PIPE,stderr=slave,env=environment,timeout=30)
+                # Drain the terminal while the slave is still open.
+                while select.select([master],[],[],0)[0] and (chunk:=os.read(master,4096)):
+                    output+=chunk
+            finally:
+                os.close(slave)
+                os.close(master)
             assert result.returncode==0 and (b'Finished' in output)==expected,(extra,output)
     assert not list(reports.glob('timing-*')), list(reports.iterdir())
 print(f'presentation: {checks} process checks, actual schema/phase/exit/publication contracts passed on {sys.platform}')

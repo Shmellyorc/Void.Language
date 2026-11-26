@@ -12,6 +12,7 @@ import tomllib
 compiler = Path(sys.argv[1]).resolve()
 interrupt = Path(sys.argv[2]).resolve() if len(sys.argv) > 2 else None
 checks = []
+packaging_unavailable = 'Application packaging requires Linux x86-64 GNU or Windows x64 MSVC.'
 
 
 def run(*args, status=0, contains=None, cwd=None):
@@ -54,6 +55,28 @@ def failure(root, *args, contains=None, status=1):
     assert not (root / '.void/package-edit').exists(), args
 
 
+def relocate_application(root, binary, output, relocated):
+    if sys.platform == 'darwin':
+        failure(root, 'package', '-o', output, contains=packaging_unavailable)
+        assert not output.exists()
+        return Path(shutil.move(binary, relocated))
+    cli(root, 'package', '-o', output)
+    run(compiler, 'package', '--verify', output)
+    shutil.move(output, relocated)
+    return None
+
+
+def execute_relocated_application(binary, package):
+    if binary is not None:
+        run(binary)
+        return
+    run(compiler, 'package', '--verify', package)
+    executables = list(package.glob('*.exe')) if os.name == 'nt' else [
+        p for p in package.iterdir() if p.is_file() and os.access(p, os.X_OK)]
+    assert len(executables) == 1, executables
+    run(executables[0])
+
+
 def new(root, library=False):
     root.parent.mkdir(parents=True, exist_ok=True)
     args = ['--nested', '--project-id', 'org.example.' + root.name + '.project']
@@ -84,17 +107,12 @@ def qualification(base):
     binary = base / ('transitive-native.exe' if os.name == 'nt' else 'transitive-native')
     cli(transitive, 'build', '-o', binary); run(binary)
     output, relocated = base / 'transitive-package', base / 'transitive-relocated'
-    cli(transitive, 'package', '-o', output)
-    run(compiler, 'package', '--verify', output)
-    shutil.move(output, relocated)
+    relocated_binary = relocate_application(transitive, binary, output, relocated)
     # Execution after moving both source projects proves the D5 source boundary.
     shutil.move(transitive, base / 'parked-transitive')
     shutil.move(consumer, base / 'parked-consumer')
     shutil.move(geometry, base / 'parked-geometry')
-    run(compiler, 'package', '--verify', relocated)
-    executables = list(relocated.glob('*.exe')) if os.name == 'nt' else [p for p in relocated.iterdir() if p.is_file() and os.access(p, os.X_OK)]
-    assert len(executables) == 1, executables
-    run(executables[0])
+    execute_relocated_application(relocated_binary, relocated)
     for root in (transitive, consumer, geometry):
         shutil.move(base / ('parked-' + root.name), root)
     # Equal IDs at independently copied editable origins must still conflict.
@@ -103,7 +121,7 @@ def qualification(base):
     failure(transitive, 'tidy', '--check', contains='Undeclared direct package')
     failure(transitive, 'check', contains='Undeclared direct package')
     write(transitive, 'src/app.void', 'use pkg/consumer as c\nfunc main() -> i32:\n    return c.answer() - 49\n')
-    checks.append('generated library add/tidy/check; transitive application JIT/O2/AOT/D5 after source moves; copied-origin VOID5007; no undeclared re-export')
+    checks.append('generated library add/tidy/check; transitive application JIT/O2 and relocated native execution after source moves; copied-origin VOID5007; no undeclared re-export')
 
     app = base / 'app'
     new(app)
@@ -171,19 +189,14 @@ def qualification(base):
     binary = app / ('build/native.exe' if os.name == 'nt' else 'build/native')
     cli(app, 'build', '-o', binary); run(binary)
     output = base / 'distribution'
-    cli(app, 'package', '-o', output)
-    run(compiler, 'package', '--verify', output)
     relocated = base / 'relocated'
-    shutil.move(output, relocated)
-    run(compiler, 'package', '--verify', relocated)
-    executables = list(relocated.glob('*.exe')) if os.name == 'nt' else [p for p in relocated.iterdir() if p.is_file() and os.access(p, os.X_OK)]
-    assert len(executables) == 1, executables
-    run(executables[0])
+    relocated_binary = relocate_application(app, binary, output, relocated)
+    execute_relocated_application(relocated_binary, relocated)
     before = state(app)
     cli(app, 'add', 'source', '--git', 'file:vendor/repo', '--rev', revision)
     cli(app, 'tidy'); cli(app, 'tidy')
     assert state(app) == before
-    checks.append('immutable D3 Git view; explain/locked; normal/O2 JIT; native AOT; D5 verification/relocation; idempotence')
+    checks.append('immutable D3 Git view; explain/locked; normal/O2 JIT; native AOT relocation and execution; idempotence')
     # Library consumers use the identical D3 pin and publication path. The app
     # already declares this same immutable origin; no physical local IDs merge.
     gitapp = base / 'gitapp'

@@ -170,8 +170,12 @@ struct ProjectCapture {
     static project_fs::path canonical_root(const project_fs::path& absolute) {
         SourceFile site(path_utf8(absolute),"");
         if(project_native_alias(absolute))project_failure(site,Code::project_boundary,"Selected project root is an alias.");
-        auto root=project_fs::canonical(absolute);
-        if(!project_fs::is_directory(root))project_failure(site,Code::project_boundary,"Selected project root is not a directory.");
+        std::error_code error;
+        auto root=project_fs::canonical(absolute,error);
+        if(error)project_failure(site,Code::project_boundary,"Cannot resolve selected project root: "+error.message(),
+            "Check the selected project root, permissions and exact path spelling.");
+        if(!project_fs::is_directory(root,error) || error)
+            project_failure(site,Code::project_boundary,"Selected project root is not a directory.");
         return root;
     }
     static project_fs::path admit_root(const project_fs::path& requested) {
