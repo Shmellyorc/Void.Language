@@ -1,11 +1,11 @@
 #pragma once
 
 #include "void/ir.hpp"
-#include <functional>
 
-namespace llvm { class DataLayout; class Type; }
+namespace llvm { class DataLayout; }
 
 namespace vd::llvm_backend {
+class TypeLayout;
 
 struct ElisionHelper { unsigned parameter; std::string module; std::set<unsigned> aliases; };
 struct ElisionFactory { std::string module; bool root_transfer; };
@@ -34,7 +34,7 @@ std::map<std::string, ElisionHelper> allocation_elision_helpers(
     const ir::Module&, const ir::InstructionTypes&, const std::map<std::string, ir::ReferenceEffects>&);
 BlockAllocationElision block_allocation_elision(const ir::Function&,
     const std::vector<std::vector<ir::Type>>&, const llvm::DataLayout&,
-    const std::function<llvm::Type*(ir::Type)>&, const std::map<std::string, ElisionHelper>&,
+    TypeLayout&, const std::map<std::string, ElisionHelper>&,
     const std::map<std::string, ElisionFactory>&);
 
 }

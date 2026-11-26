@@ -161,7 +161,8 @@ endif()
 option(VOID_LLVM_RESEARCH "Build optional LLVM machine-code certification experiments" OFF)
 add_library(void_llvm src/backend/llvm/backend.cpp src/backend/llvm/jit.cpp src/backend/llvm/aot.cpp
   src/backend/llvm/native_abi.cpp src/backend/llvm/native_cache.cpp src/backend/llvm/optimization.cpp
-  src/backend/llvm/root_storage.cpp src/backend/llvm/target.cpp)
+  src/backend/llvm/root_storage.cpp src/backend/llvm/target.cpp
+  src/backend/llvm/type_layout.cpp src/backend/llvm/async_frame.cpp)
 if(APPLE)
   if(NOT CMAKE_OSX_DEPLOYMENT_TARGET MATCHES "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$")
     message(FATAL_ERROR "Set CMAKE_OSX_DEPLOYMENT_TARGET explicitly for macOS code generation and native linking")

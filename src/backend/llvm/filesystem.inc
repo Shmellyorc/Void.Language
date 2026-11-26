@@ -25,10 +25,10 @@
                     }
                     std::vector<llvm::Constant*> fields;
                     for (unsigned field = 0; field < 10; ++field) {
-                        fields.push_back(llvm::ConstantInt::get(size_type, field_offset(reply, field)));
+                        fields.push_back(llvm::ConstantInt::get(size_type, type.field_offset(reply, field)));
                     }
                     std::vector<std::uint64_t> task_offsets;
-                    if (asynchronous) reference_offsets(ir::Type(instruction.type.definition), 0, task_offsets);
+                    if (asynchronous) type.reference_offsets(ir::Type(instruction.type.definition), 0, task_offsets);
                     auto* entry = element_record(ir::array_element(ir::field_type(reply, 9)));
                     auto* record = new llvm::GlobalVariable(*module, record_type, true,
                         llvm::GlobalValue::PrivateLinkage,
@@ -37,7 +37,7 @@
                             llvm::ConstantArray::get(offsets_type, fields), entry,
                             llvm::ConstantInt::get(size_type, asynchronous ? layout.getTypeAllocSize(payload) : 0),
                             offset_map(task_offsets), llvm::ConstantInt::get(size_type, task_offsets.size()),
-                            llvm::ConstantInt::get(size_type, asynchronous ? field_offset(instruction.type, 1) : 0),
+                            llvm::ConstantInt::get(size_type, asynchronous ? type.field_offset(instruction.type, 1) : 0),
                             b.CreateGlobalString(asynchronous ? instruction.type.definition->identity : "")
                         }), "filesystem.reply.layout");
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());

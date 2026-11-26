@@ -27,7 +27,7 @@
                     const unsigned fields=network?12:capture?11:7;
                     auto* offsets_type=llvm::ArrayType::get(size_type,fields);
                     std::vector<llvm::Constant*> offsets;
-                    for(unsigned k=0;k<fields;++k)offsets.push_back(llvm::ConstantInt::get(size_type,field_offset(reply,k)));
+                    for(unsigned k=0;k<fields;++k)offsets.push_back(llvm::ConstantInt::get(size_type,type.field_offset(reply,k)));
                     std::vector<llvm::Constant*> geometry{
                         llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(reply))),llvm::ConstantArray::get(offsets_type,offsets),element};
                     auto* record_type=llvm::StructType::get(size_type,offsets_type,b.getPtrTy());
@@ -38,11 +38,11 @@
                             throw std::logic_error("Extended host reply ABI mismatch");
                         auto task=asynchronous?ir::Type(instruction.type.definition):ir::Type(ir::Type::none);
                         std::vector<std::uint64_t> task_refs;
-                        if(asynchronous)reference_offsets(task,0,task_refs);
+                        if(asynchronous)type.reference_offsets(task,0,task_refs);
                         geometry.insert(geometry.end(),{
                             llvm::ConstantInt::get(size_type,asynchronous?layout.getTypeAllocSize(type(task)):0),
                             offset_map(task_refs),llvm::ConstantInt::get(size_type,task_refs.size()),
-                            llvm::ConstantInt::get(size_type,asynchronous?field_offset(instruction.type,1):0),
+                            llvm::ConstantInt::get(size_type,asynchronous?type.field_offset(instruction.type,1):0),
                             b.CreateGlobalString(asynchronous?instruction.type.definition->identity:"")});
                     } else if(layout.getTypeAllocSize(record_type)!=sizeof(host::ReplyLayout) ||
                         layout.getStructLayout(record_type)->getElementOffset(2)!=offsetof(host::ReplyLayout,element))

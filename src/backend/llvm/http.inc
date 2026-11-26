@@ -26,13 +26,13 @@
                         }
                     const bool have_task = task.kind == ir::Type::managed_ref;
                     std::vector<std::uint64_t> task_offsets;
-                    if (have_task) reference_offsets(ir::Type(task.definition), 0, task_offsets);
+                    if (have_task) type.reference_offsets(ir::Type(task.definition), 0, task_offsets);
                     auto* record = new llvm::GlobalVariable(*module, record_type, true, llvm::GlobalValue::PrivateLinkage,
                         llvm::ConstantStruct::get(record_type, {
                             llvm::ConstantArray::get(descriptors_type, descriptors),
                             llvm::ConstantInt::get(size_type, have_task ? layout.getTypeAllocSize(type(ir::Type(task.definition))) : 0),
                             offset_map(task_offsets), llvm::ConstantInt::get(size_type, task_offsets.size()),
-                            llvm::ConstantInt::get(size_type, have_task ? field_offset(task, 1) : 0),
+                            llvm::ConstantInt::get(size_type, have_task ? type.field_offset(task, 1) : 0),
                             b.CreateGlobalString(have_task ? task.definition->identity : "")}), "http.source.layout");
                     llvm::IRBuilder<> allocations(&*fn->getEntryBlock().begin());
                     auto* references_type = llvm::ArrayType::get(b.getPtrTy(), 8);

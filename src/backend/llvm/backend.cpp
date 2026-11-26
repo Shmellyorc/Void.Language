@@ -1,3 +1,5 @@
+#include "async_frame.hpp"
+#include "type_layout.hpp"
 #include "lowering.hpp"
 #include "native_abi.hpp"
 #include "root_storage.hpp"
@@ -136,33 +138,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
 #include "private_fixed_call_fixture.inc"
     }
 #endif
-    std::map<std::string,llvm::StructType*> aggregates;
-    auto* interface_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy());
-    auto* prepared_type=llvm::StructType::get(b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getInt64Ty());
-    std::function<llvm::Type*(ir::Type)> type = [&](ir::Type t) -> llvm::Type* {
-        if(ir::collection_type(t)) {
-            if(!input.coordinated) throw std::invalid_argument("Native fixed arrays require a coordinated Runtime");
-            return b.getPtrTy();
-        }
-        if(t.kind==ir::Type::interface_ref) return interface_type;
-        if(t.kind==ir::Type::prepared_receiver) return prepared_type;
-        if (t.kind == ir::Type::managed_ref || t.kind==ir::Type::string) return b.getPtrTy();
-        if (t.kind == ir::Type::aggregate) {
-            if (auto found = aggregates.find(t.definition->identity); found != aggregates.end()) return found->second;
-            auto* result = llvm::StructType::create(context,t.definition->identity); aggregates.emplace(t.definition->identity,result);
-            std::vector<llvm::Type*> fields;
-            auto base=t.definition->base.lock();
-            if(base) fields.push_back(type(ir::Type(base)));
-            for(unsigned n=base ? static_cast<unsigned>(base->fields.size()) : 0;n<t.definition->fields.size();++n) fields.push_back(type(t.definition->fields[n].type));
-            result->setBody(fields,false); return result;
-        }
-        if (t == ir::Type::boolean) return b.getInt1Ty();
-        if (t == ir::Type::none) return b.getVoidTy();
-        if (t == ir::Type::f32) return b.getFloatTy();
-        if (t == ir::Type::f64) return b.getDoubleTy();
-        if(t.kind==ir::Type::numeric_enum)t=*t.definition->enum_backing;
-        return b.getIntNTy(numeric::width(t));
-    };
+    TypeLayout type(*module, input.coordinated);
+    auto* interface_type = type.interface_type();
+    auto* prepared_type = type.prepared_receiver_type();
     auto checked_integer=[&](llvm::Value* value,ir::Type from,ir::Type to) {
         auto* wide_type=b.getIntNTy(128);
         auto extend=[&](std::uint64_t bits) {
@@ -186,35 +164,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         }
         return valid;
     };
-    auto field_offset=[&](ir::Type owner,unsigned field) {
-        std::uint64_t offset=0; auto* native=type(ir::Type(owner.definition));
-        for(auto index:ir::physical_field_path(owner,field)) {
-            auto* aggregate=llvm::cast<llvm::StructType>(native);
-            offset+=layout.getStructLayout(aggregate)->getElementOffset(index); native=aggregate->getElementType(index);
-        }
-        return offset;
-    };
     auto field_address=[&](ir::Type owner,llvm::Value* address,unsigned field) {
         std::vector<llvm::Value*> path{b.getInt32(0)};
         for(auto index:ir::physical_field_path(owner,field)) path.push_back(b.getInt32(index));
         return b.CreateGEP(type(ir::Type(owner.definition)),address,path);
-    };
-    std::function<void(ir::Type,std::uint64_t,std::vector<std::uint64_t>&)> reference_offsets;
-    reference_offsets = [&](ir::Type t,std::uint64_t base,std::vector<std::uint64_t>& result) {
-        // Scalar array payloads live in Runtime buffers; only their handles are
-        // embedded in native values. Trace handles even though numeric element
-        // shapes have no logical managed-reference leaves.
-        if(ir::collection_type(t) || (t.kind==ir::Type::managed_ref && t.definition && t.definition->task_result)) {result.push_back(base);return;}
-        if(t.kind==ir::Type::aggregate) {
-            for(unsigned n=0;n<t.definition->fields.size();++n) reference_offsets(ir::field_type(t,n),base+field_offset(t,n),result);
-            return;
-        }
-        for(const auto& path:ir::reference_paths(t,true)) {
-            auto current=t;auto offset=base;
-            for(auto field:path) {offset+=field_offset(current,field);current=ir::field_type(current,field);}
-            result.push_back(offset);
-            if(current.kind==ir::Type::prepared_receiver) result.push_back(offset+layout.getPointerSize());
-        }
     };
         auto* size_type = b.getIntNTy(layout.getPointerSizeInBits());
         auto offset_map = [&](const std::vector<std::uint64_t>& offsets) -> llvm::Constant* {
@@ -239,7 +192,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         if(auto found=element_records.find(root);found!=element_records.end())return found->second;
         std::vector<llvm::Constant*> fields;
         std::function<void(ir::Type,std::uint64_t,bool)> visit=[&](ir::Type t,std::uint64_t offset,bool inactive) {
-            if(t.kind==ir::Type::aggregate) {for(unsigned n=0;n<t.definition->fields.size();++n)visit(ir::field_type(t,n),offset+field_offset(t,n),inactive || (!t.definition->cases.empty() && n!=0));return;}
+            if(t.kind==ir::Type::aggregate) {for(unsigned n=0;n<t.definition->fields.size();++n)visit(ir::field_type(t,n),offset+type.field_offset(t,n),inactive || (!t.definition->cases.empty() && n!=0));return;}
             unsigned kind;std::string target;std::uint64_t extent=0;
             if(t.kind==ir::Type::numeric_enum)kind=scalar_encoding(*t.definition->enum_backing);
             else if(numeric::number(t) || t==ir::Type::boolean)kind=scalar_encoding(t);
@@ -261,7 +214,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     std::map<ir::Type,llvm::Constant*> dictionary_records;
     auto dictionary_record=[&](ir::Type t)->llvm::Constant* {
         if(auto found=dictionary_records.find(t);found!=dictionary_records.end())return found->second;auto entry=ir::array_element(t);
-        auto* record=new llvm::GlobalVariable(*module,dictionary_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(dictionary_record_type,{element_record(entry),element_record(ir::dictionary_key(t)),llvm::ConstantInt::get(size_type,field_offset(entry,1)),llvm::ConstantInt::get(size_type,field_offset(entry,2))}),"dictionary.layout");dictionary_records.emplace(t,record);return record;
+        auto* record=new llvm::GlobalVariable(*module,dictionary_record_type,true,llvm::GlobalValue::PrivateLinkage,llvm::ConstantStruct::get(dictionary_record_type,{element_record(entry),element_record(ir::dictionary_key(t)),llvm::ConstantInt::get(size_type,type.field_offset(entry,1)),llvm::ConstantInt::get(size_type,type.field_offset(entry,2))}),"dictionary.layout");dictionary_records.emplace(t,record);return record;
     };
     const auto elision_helpers=allocation_elision_helpers(input,checked_types,verified_effects);
     const auto heap_factories=allocation_heap_factories(input,checked_types,verified_effects);
@@ -316,22 +269,12 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         functions[f.name] = llvm::Function::Create(function_type, linkage, native_symbol(f, suffix)+(f.asynchronous?"$async":""), *module);
     }
     auto* async_generation=new llvm::GlobalVariable(*module,b.getInt8Ty(),true,llvm::GlobalValue::PrivateLinkage,b.getInt8(0),"async.generation");
-    struct AsyncPlan {llvm::StructType* frame;llvm::Function* resume;std::vector<unsigned> parameters,locals;std::vector<std::vector<unsigned>> values;std::vector<std::uint64_t> offsets;};
-    std::map<std::string,AsyncPlan> async_plans;
-    for(unsigned index=0;index<input.functions.size();++index){const auto& f=input.functions[index];if(!f.asynchronous)continue;
-        AsyncPlan plan;std::vector<llvm::Type*> fields{b.getPtrTy(),b.getInt32Ty()};std::vector<ir::Type> logical{f.task,ir::Type::i32};
-        auto add=[&](ir::Type t){auto i=static_cast<unsigned>(fields.size());fields.push_back(t==ir::Type::none?b.getInt8Ty():type(t));logical.push_back(t);return i;};
-        for(auto t:f.parameters)plan.parameters.push_back(add(t));for(auto t:f.locals)plan.locals.push_back(add(t));
-        for(const auto& block:checked_types[index]){std::vector<unsigned> values;for(auto t:block)values.push_back(add(t));plan.values.push_back(std::move(values));}
-        plan.frame=llvm::StructType::create(context,fields,"async.frame"+suffix);auto* native=layout.getStructLayout(plan.frame);
-        for(unsigned n=0;n<logical.size();++n)if(logical[n]!=ir::Type::none)reference_offsets(logical[n],native->getElementOffset(n),plan.offsets);
-        plan.resume=llvm::Function::Create(llvm::FunctionType::get(b.getVoidTy(),{b.getPtrTy(),b.getPtrTy()},false),llvm::GlobalValue::InternalLinkage,"async.resume"+suffix,*module);
-#ifdef VOID_ASYNC_START_SANITIZER_HASH
-        auto metadata=[&](llvm::Function* function,std::int32_t magic,std::int32_t hash){function->setMetadata("func_sanitize",llvm::MDNode::get(context,{llvm::ConstantAsMetadata::get(b.getInt32(magic)),llvm::ConstantAsMetadata::get(b.getInt32(hash))}));};
-        if(input.async_root && f.name==exported_entry)metadata(functions.at(f.name),VOID_ASYNC_START_SANITIZER_MAGIC,VOID_ASYNC_START_SANITIZER_HASH);
-        metadata(plan.resume,VOID_ASYNC_RESUME_SANITIZER_MAGIC,VOID_ASYNC_RESUME_SANITIZER_HASH);
-#endif
-        async_plans.emplace(f.name,std::move(plan));
+    std::map<std::string, AsyncPlan> async_plans;
+    for (unsigned index = 0; index < input.functions.size(); ++index) {
+        const auto& function = input.functions[index];
+        if (!function.asynchronous) continue;
+        auto* root_entry = input.async_root && function.name == exported_entry ? functions.at(function.name) : nullptr;
+        async_plans.emplace(function.name, plan_async_frame(*module, type, function, checked_types[index], suffix, root_entry));
     }
     std::map<std::string,std::uint64_t> function_ids;
     for(const auto& [name,function]:functions)function_ids.emplace(name,function_ids.size()+1);
@@ -379,13 +322,13 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     std::vector<llvm::Constant*> records,keys;
     for(const auto& [key,t]:nominal_types) {
         auto payload=t.kind==ir::Type::interface_ref ? t : ir::Type(t.definition);
-        std::vector<std::uint64_t> offsets;reference_offsets(payload,0,offsets);
+        std::vector<std::uint64_t> offsets;type.reference_offsets(payload,0,offsets);
         auto bytes=std::max<std::uint64_t>(1,layout.getTypeAllocSize(type(payload)));
         auto base=t.definition->base.lock();
         std::string shape=(t.kind==ir::Type::interface_ref ? "interface:" : "")+std::to_string(bytes)+":"+std::to_string(layout.getABITypeAlign(type(payload)).value());
         for(unsigned n=0;n<t.definition->fields.size();++n) {
             const auto& field=t.definition->fields[n];
-            for(const auto& part:{field.name,field.owner,ir::type_name(field.type),std::to_string(field_offset(t,n))}) shape+="|"+std::to_string(part.size())+":"+part;
+            for(const auto& part:{field.name,field.owner,ir::type_name(field.type),std::to_string(type.field_offset(t,n))}) shape+="|"+std::to_string(part.size())+":"+part;
         }
         const auto key_schema=element_key(t);const bool key_forbidden=ir::dictionary_equality_owner(t).has_value();
         if(host_catalog) { NominalDescriptor d{key,base ? base->identity : "",shape,{bytes,{}}};d.dictionary_key_schema=key_schema;d.dictionary_key_forbidden=key_forbidden;d.layout.references.assign(offsets.begin(),offsets.end());host_catalog->push_back(std::move(d)); }
@@ -530,7 +473,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             for (unsigned n = 0; n < t.definition->fields.size(); ++n) {
                 const auto& field = t.definition->fields[n]; auto* native_field = type(field.type);
                 members.push_back(debug->createMemberType(file,field.name,file,0,layout.getTypeSizeInBits(native_field),
-                    layout.getABITypeAlign(native_field).value()*8,field_offset(t,n)*8,llvm::DINode::FlagZero,debug_value_type(field.type)));
+                    layout.getABITypeAlign(native_field).value()*8,type.field_offset(t,n)*8,llvm::DINode::FlagZero,debug_value_type(field.type)));
             }
             auto* result = debug->createStructType(file,ir::type_name(t),file,0,offsets->getSizeInBits(),
                 layout.getABITypeAlign(native).value()*8,llvm::DINode::FlagZero,nullptr,debug->getOrCreateArray(members));
@@ -622,7 +565,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         if(!async)for(unsigned n=0;n<f.locals.size();++n) {
             if(f.receiver && n==0 && f.locals[n].kind==ir::Type::aggregate)continue;
             std::vector<std::uint64_t> offsets;
-            if(!elided_locals.contains(n))reference_offsets(f.locals[n],0,offsets);
+            if(!elided_locals.contains(n))type.reference_offsets(f.locals[n],0,offsets);
             if(!offsets.empty() && type(f.locals[n])->isPointerTy()) {
                 local_root_indexes[n]=local_root_types.size();local_root_types.push_back(type(f.locals[n]));
                 local_root_offsets.push_back(std::move(offsets));
@@ -637,7 +580,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         for(unsigned bn=0;bn<f.blocks.size();++bn)for(auto id:elided_values[bn]) {
             if(f.blocks[bn].instructions[id].op!=ir::Op::gc_construct)continue;
             const auto object=ir::Type(instruction_types[bn][id].definition);
-            std::vector<std::uint64_t> offsets;reference_offsets(object,0,offsets);
+            std::vector<std::uint64_t> offsets;type.reference_offsets(object,0,offsets);
             if(offsets.empty())continue;
             payload_root_indexes.emplace(std::pair{bn,id},local_root_types.size());
             local_root_types.push_back(type(object));local_root_offsets.push_back(std::move(offsets));
@@ -752,7 +695,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 if(!offsets.empty())entries.push_back({address,bytes,offset_map(offsets),offsets.size()});
             };
             auto add_root = [&](ir::Type t, llvm::Value* address) {
-                std::vector<std::uint64_t> offsets;reference_offsets(t,0,offsets);
+                std::vector<std::uint64_t> offsets;type.reference_offsets(t,0,offsets);
                 add_storage_root(layout.getTypeAllocSize(type(t)),address,offsets);
             };
             std::vector<std::uint64_t> local_offsets;
@@ -772,7 +715,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 if(async){add_root(f.parameters[i],frame_home(async->parameters[i]));continue;}
                 if (f.parameters[i].construction) { add_root(ir::Type(f.parameters[i].definition),fn->getArg(i)); continue; }
                 if (f.receiver && i == 0) continue;
-                std::vector<std::uint64_t> offsets; reference_offsets(f.parameters[i],0,offsets);
+                std::vector<std::uint64_t> offsets; type.reference_offsets(f.parameters[i],0,offsets);
                 if (offsets.empty()) continue;
                 auto* storage = home(b.CreateAlloca(type(f.parameters[i])),StorageRole::parameter,llvm_backend::HomeKind::argument);
                 b.CreateStore(fn->getArg(i),storage); add_root(f.parameters[i],storage);
@@ -795,7 +738,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 for(unsigned id=0;id<instruction_types[bn].size();++id) {
                     if(elided_values[bn].contains(id))continue;
                     auto t=instruction_types[bn][id];
-                    std::vector<std::uint64_t> offsets;reference_offsets(t,0,offsets);
+                    std::vector<std::uint64_t> offsets;type.reference_offsets(t,0,offsets);
                     if(!offsets.empty() && type(t)->isPointerTy()) {
                         if(block_roots==root_types.size()) {
                             root_types.push_back(type(t));root_offsets.push_back(std::move(offsets));
@@ -818,7 +761,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 unsigned root_index=0;
                 for (unsigned position=0;position<instruction_types[block].size();++position) {
                     auto t=instruction_types[block][position];
-                    std::vector<std::uint64_t> offsets; reference_offsets(t,0,offsets);
+                    std::vector<std::uint64_t> offsets; type.reference_offsets(t,0,offsets);
                     llvm::Value* storage = nullptr;
                     if (!offsets.empty() && !elided_values[block].contains(position)) {
                         if(async || !type(t)->isPointerTy()) {
@@ -1309,7 +1252,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                         b.CreateStore(value,field_address(object,payload,field));
                     }
                     if(elided_values[n].contains(values.size())) { v=payload; break; }
-                    std::vector<std::uint64_t> offsets; reference_offsets(object,0,offsets);
+                    std::vector<std::uint64_t> offsets; type.reference_offsets(object,0,offsets);
                     auto* storage=value_roots[n].at(values.size());
                     std::vector<llvm::Value*> arguments{storage,llvm::ConstantInt::get(size_type,bytes),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size()),payload};
                     if(nominal_types.contains(instruction.type.definition->identity)) arguments.push_back(b.CreateGlobalString(instruction.type.definition->identity));
@@ -1330,7 +1273,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 }
                 case Op::gc_allocate: {
                     auto object = ir::Type(instruction.type.definition);
-                    std::vector<std::uint64_t> offsets; reference_offsets(object,0,offsets);
+                    std::vector<std::uint64_t> offsets; type.reference_offsets(object,0,offsets);
                     auto* storage = value_roots[n].at(values.size());
                     b.CreateCall(module->getOrInsertFunction("vd_gc_allocate",b.getVoidTy(),b.getPtrTy(),size_type,b.getPtrTy(),size_type,b.getPtrTy()),
                         {storage,llvm::ConstantInt::get(size_type,layout.getTypeAllocSize(type(object))),offset_map(offsets),llvm::ConstantInt::get(size_type,offsets.size()),failure});
@@ -2011,7 +1954,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 case Op::async_sleep: {
                     auto task=ir::Type(instruction.type.definition);
                     if(layout.getTypeAllocSize(type(task))!=2*sizeof(std::int32_t) ||
-                       field_offset(task,1)!=sizeof(std::int32_t))
+                       type.field_offset(task,1)!=sizeof(std::int32_t))
                         throw std::logic_error("Async timer task ABI mismatch");
                     auto* output=value_roots[n].at(values.size());
                     b.CreateStore(llvm::ConstantPointerNull::get(b.getPtrTy()),output);

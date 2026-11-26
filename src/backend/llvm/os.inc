@@ -7,7 +7,7 @@
                         if (layout.getTypeAllocSize(record_type) != sizeof(os::ReplyLayout) ||
                             layout.getStructLayout(record_type)->getElementOffset(1) != offsetof(os::ReplyLayout, fields)) throw std::logic_error("OS layout ABI mismatch");
                         std::vector<llvm::Constant*> fields;
-                        for (unsigned k = 0; k < 6; ++k) fields.push_back(llvm::ConstantInt::get(size_type, field_offset(instruction.type, k)));
+                        for (unsigned k = 0; k < 6; ++k) fields.push_back(llvm::ConstantInt::get(size_type, type.field_offset(instruction.type, k)));
                         record = new llvm::GlobalVariable(*module, record_type, true, llvm::GlobalValue::PrivateLinkage,
                             llvm::ConstantStruct::get(record_type, {
                                 llvm::ConstantInt::get(size_type, layout.getTypeAllocSize(type(instruction.type))),

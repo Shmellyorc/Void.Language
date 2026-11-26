@@ -1,4 +1,5 @@
 #include "root_storage.hpp"
+#include "type_layout.hpp"
 #include "void/numeric.hpp"
 #include "void/reference_capabilities.hpp"
 #include <llvm/IR/DataLayout.h>
@@ -159,7 +160,7 @@ std::map<std::string,ElisionHelper> allocation_elision_helpers(const ir::Module&
 BlockAllocationElision block_allocation_elision(const ir::Function &f,
                                                 const std::vector<std::vector<ir::Type>> &instruction_types,
                                                 const llvm::DataLayout &layout,
-                                                const std::function<llvm::Type *(ir::Type)> &type,
+                                                TypeLayout& type,
                                                 const std::map<std::string,ElisionHelper>& helpers,
                                                 const std::map<std::string,ElisionFactory>& factories) {
     using O = ir::Op;

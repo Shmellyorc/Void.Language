@@ -6,7 +6,7 @@
                         throw std::logic_error("URL reply ABI mismatch");
                     std::vector<llvm::Constant*> offsets;
                     for (unsigned field = 0; field < 13; ++field)
-                        offsets.push_back(llvm::ConstantInt::get(size_type, field_offset(instruction.type, field)));
+                        offsets.push_back(llvm::ConstantInt::get(size_type, type.field_offset(instruction.type, field)));
                     auto* item = element_record(ir::array_element(ir::field_type(instruction.type, 12)));
                     auto* record = new llvm::GlobalVariable(*module, record_type, true, llvm::GlobalValue::PrivateLinkage,
                         llvm::ConstantStruct::get(record_type, {
