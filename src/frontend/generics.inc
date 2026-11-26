@@ -92,7 +92,7 @@ for(auto& [id,u]:units) {
         concrete.symbol=name;concrete.generic_origin=generic.symbol;concrete.concrete_name=name.substr(owner.identity.size()+2);concrete.display_name=generic.token.text;concrete.concrete_method_name=method_name;concrete.specialization_depth=depth;concrete.instantiation_context=context;
         owner.specialized_functions.emplace(name,&concrete);
         prepare_function(owner,concrete);
-        Semantics(owner,units,root,evaluate,diagnostics,defaults).parameter_defaults(concrete);
+        semantics.parameter_defaults(owner,concrete);
         root.member_catalog->functions.push_back(member_header(owner,concrete));
         return concrete;
     };
@@ -155,7 +155,7 @@ for(auto& [id,u]:units) {
                 else root.member_catalog->functions.push_back(std::move(header));
             }
             defaults(owner,concrete);
-            for(auto* f:methods) {Semantics semantics(owner,units,root,evaluate,diagnostics,defaults);semantics.parameter_defaults(*f);semantics.initializer_fields(*f);}
+            for(auto* f:methods) semantics.prepare_specialized_method(owner,*f);
         }
         return concrete;
     };

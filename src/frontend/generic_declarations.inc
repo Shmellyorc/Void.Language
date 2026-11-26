@@ -80,8 +80,7 @@ for(auto& [id,u]:units) {
             type(requirement.result,requirement.token,names);
             if(requirement.returns.empty())requirement_visibility(requirement.result,requirement.token);
             for(const auto& component:requirement.returns){type(component.type,component.site,names);requirement_visibility(component.type,component.site);}
-            Semantics semantics(*u,units,root,evaluate,diagnostics,defaults);
-            semantics.validate_header_names(requirement);semantics.validate_parameter_structure(requirement);
+            semantics.validate_header(*u,requirement);
         }
         std::function<std::string(Type)> operand_key=[&](Type raw) {
             Depth guard(diagnostics.semantic_depth(),u->source,s.token,128);
@@ -108,13 +107,13 @@ for(auto& [id,u]:units) {
             for(const auto& p:f.parameters){type(p.type,p.token,names);const auto identity=operand_key(p.type);key+=":"+std::to_string(identity.size())+":"+identity;}
             type(f.result,f.token,names);
             if(!operators.insert(key).second)error(u->source,f.token,Code::duplicate,"Duplicate generic operator operand tuple.");
-            Semantics semantics(*u,units,root,evaluate,diagnostics,defaults);semantics.validate_header_names(f);semantics.validate_parameter_structure(f);
+            semantics.validate_header(*u,f);
         }
 
     }catch(const CompilationError& failure){diagnostics.add(failure);}catch(const Poison&){}
     std::set<std::string> methods;
     for(auto& f:u->generic_functions)try {
-        auto names=parameters(f);Semantics semantics(*u,units,root,evaluate,diagnostics,defaults);
+        auto names=parameters(f);
         const auto* receiver=f.receiver?&*f.receiver:f.static_owner?&*f.static_owner:nullptr;
         if(receiver) {
             if(receiver->type.nullable)error(u->source,receiver->token,Code::receiver,"A receiver must be non-nullable.");
@@ -137,7 +136,7 @@ for(auto& [id,u]:units) {
                 if(!owner)error(u->source,receiver->token,Code::receiver,"Methods must be declared in their receiver's owning module.");
             }
             if(owner->definition->interface_type)error(u->source,receiver->token,Code::receiver,"Interfaces declare requirements, not receiver or static implementations.");
-            if(f.receiver && !f.generics.empty() && owner->generics.empty())semantics.validate_generic_receiver(Type(owner->definition,owner->definition->managed?Type::managed_ref:Type::aggregate),f.token);
+            if(f.receiver && !f.generics.empty() && owner->generics.empty())semantics.validate_generic_receiver(*u,Type(owner->definition,owner->definition->managed?Type::managed_ref:Type::aggregate),f.token);
             f.symbol=owner->definition->identity+(f.static_owner?"::static::":"::method::")+f.token.text;
             if(!methods.insert(owner->definition->identity+"::member::"+f.token.text).second || u->methods.contains(owner->definition->identity+"::method::"+f.token.text) || u->static_methods.contains(owner->definition->identity+"::static::"+f.token.text))error(u->source,f.token,Code::duplicate,"Static and instance methods cannot share a name.");
             if(!methods.insert(f.symbol).second || u->methods.contains(f.symbol))error(u->source,f.token,Code::duplicate,"Duplicate generic receiver method.");
@@ -151,6 +150,6 @@ for(auto& [id,u]:units) {
         }
         type(f.result,f.token,names);
         for(const auto& component:f.returns)type(component.type,component.site,names);
-        semantics.validate_header_names(f);semantics.validate_parameter_structure(f);
+        semantics.validate_header(*u,f);
     }catch(const CompilationError& failure){diagnostics.add(failure);}catch(const Poison&){}
 }
