@@ -1,3 +1,41 @@
+#include "validation.hpp"
+#include "void/ir.hpp"
+#include "void/path.hpp"
+#include <algorithm>
+#include <stdexcept>
+
+namespace vd::ir {
+bool operator_arity(std::string_view glyph,std::size_t arity) {
+    if(arity==1)return glyph=="+" || glyph=="-";
+    return arity==2 && (glyph=="+" || glyph=="-" || glyph=="*" || glyph=="/" || glyph=="%" || glyph=="==" || glyph=="<" || glyph==">" || glyph=="<=" || glyph==">=");
+}
+std::string operator_identity(Type owner,std::string_view glyph,const std::vector<Type>& operands) {
+    // No result, const spelling or visibility ranking. Length prefixes make
+    // nested generic/collection identities unambiguous and platform independent.
+    auto part=[](std::string_view value){return std::to_string(value.size())+":"+std::string(value);};
+    std::string result=Type::key(owner)+"::operator::"+part(glyph)+":"+std::to_string(operands.size());
+    for(auto t:operands)result+=":"+part(std::to_string(t.kind)+":"+Type::key(t)+(t.nullable?"?":""));
+    return result;
+}
+void validate_operator_declaration(const Function& f) {
+    auto fail=[](const char* message){throw std::invalid_argument(message);};
+    const auto owner=f.operator_owner;
+    if((owner.kind!=Type::aggregate && owner.kind!=Type::managed_ref) || !owner.definition || owner.nullable || owner.construction || owner.readonly || !owner.readonly_references.empty() || owner.definition->interface_type || owner.definition->native_resource || owner.definition->callable || owner.definition->result_type || owner.definition->task_result || owner.definition->element)fail("Operator requires an ordinary declaring nominal owner.");
+    if(!operator_arity(f.operator_glyph,f.parameters.size()))fail("Invalid operator glyph or arity.");
+    if(f.module_identity.empty() || owner.definition->module_identity!=f.module_identity || f.lexical_owner!=Type::key(owner) || !f.lexical_parent.empty())fail("Operator belongs to another nominal owner/module.");
+    if(f.receiver || f.receiver_mutates || f.initializer || f.accessor || f.closure || f.bound_receiver || f.asynchronous || f.worker || !f.virtual_slot.empty() || f.overriding || !f.method_name.empty() || f.task!=Type::none)fail("Prohibited operator declaration modifier or receiver.");
+    if(f.visibility!="public" && f.visibility!="internal" && f.visibility!="private")fail("Invalid operator visibility.");
+    bool owned=false;
+    for(auto t:f.parameters) {
+        if(t==Type::none || t.kind==Type::unresolved || t.kind==Type::prepared_receiver || t.construction || !t.readonly || readonly_paths(t)!=readonly_paths(readonly_view(t)))fail("Operator operands require complete storable const types.");
+        owned |= t.definition==owner.definition && t.kind==owner.kind && (!t.nullable || owner.kind==Type::managed_ref);
+    }
+    if(!owned)fail("At least one operator operand must be the exact declaring owner type.");
+    if(f.result==Type::none || f.result.kind==Type::unresolved || f.result.kind==Type::prepared_receiver || f.result.construction || f.result==Type::null_value)fail("Operator requires a complete storable result type.");
+    if((f.operator_glyph=="==" || f.operator_glyph=="<" || f.operator_glyph==">" || f.operator_glyph=="<=" || f.operator_glyph==">=") && f.result!=Type::boolean)fail("Equality and ordering operators must return exactly bool.");
+    if(f.name!=operator_identity(owner,f.operator_glyph,f.parameters))fail("Operator identity does not match its owner/glyph/exact operands.");
+}
+
 // Logical selection is shared with source diagnostics. Neither layout nor code
 // generation decides which accessible member a structural requirement means.
 bool method_accessible(const Module& m,const Function& f,std::string_view scope) {
@@ -180,7 +218,7 @@ std::string generic_instance_identity(const Module& m,const Module::GenericInsta
 }
 // Equality adapters are source-owned direct helpers, like display adapters.
 // Their parent is checked through an actual direct call, not a permission bit.
-static bool derived_equality_adapter(const Function& f) {
+bool derived_equality_adapter(const Function& f) {
     return !f.lexical_parent.empty() && !f.receiver && !f.static_member && !f.closure && !f.initializer && !f.asynchronous &&
            f.visibility=="private" && f.name.starts_with(f.lexical_parent+"::$equality$") && f.result==Type::boolean &&
            f.parameters.size()==2 && f.parameters[0]==f.parameters[1] &&
@@ -243,4 +281,23 @@ MemberSelection select_operator(const Module& m,std::string_view glyph,const std
     else if(result.candidates.size()==1){result.status=MemberSelection::found;result.method=result.candidates[0].second;}
     else if(!hidden.empty()){result.status=MemberSelection::inaccessible;result.candidates=std::move(hidden);}
     return result;
+}
+
+std::vector<VirtualTarget> virtual_targets(const Module& module,const Function& root) {
+    std::vector<VirtualTarget> result;
+    if(root.virtual_slot.empty()) throw std::invalid_argument("VOID IR: missing virtual family");
+    std::set<std::string> identities;
+    for(auto t:module.nominal_types) {
+        if(t.kind!=Type::managed_ref) continue;
+        if(!identities.insert(Type::key(t)).second) throw std::invalid_argument("VOID IR: duplicate nominal catalog identity");
+        if(!subtype(t,root.parameters.at(0))) continue;
+        const Function* selected=nullptr;
+        for(auto ancestor=t.definition;ancestor && !selected;ancestor=ancestor->base.lock())
+            for(const auto& candidate:module.functions) if(candidate.virtual_slot==root.virtual_slot && candidate.parameters.at(0).definition==ancestor) {selected=&candidate;break;}
+        if(!selected) throw std::invalid_argument("VOID IR: missing virtual dispatch implementation");
+        result.push_back({t,selected->name});
+    }
+    if(result.empty()) throw std::invalid_argument("VOID IR: virtual family absent from nominal catalog");
+    return result;
+}
 }

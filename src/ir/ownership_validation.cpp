@@ -1,3 +1,10 @@
+#include "validation.hpp"
+#include "void/c_primitive.hpp"
+#include "void/numeric.hpp"
+#include <algorithm>
+#include <stdexcept>
+
+namespace vd::ir {
 // Independent must-dataflow proof for private construction Places. No source
 // type checker or runtime pending-object state is hidden behind this validator.
 void validate_construction(const Function& f,const Module& module,const std::vector<std::vector<Type>>& types) {
@@ -204,4 +211,194 @@ void validate_construction(const Function& f,const Module& module,const std::vec
             } else {propagate(end.yes);propagate(end.no);}
         }
     }
+}
+
+// Bounded scalar proof inside the shared IR, independent of source annotations.
+// Instruction values are block-local. Only initialized local homes cross edges.
+void validate_fixed_ownership(const Function& f,const Module& m,const std::vector<std::vector<Type>>& types) {
+    auto fail=[&](const std::string& why) {throw std::invalid_argument("VOID IR: fixed ownership: "+why+" in "+f.name);};
+    auto carries=[](const Function& fn) {
+        if(array_type(fn.result)) return true;
+        return std::any_of(fn.parameters.begin(),fn.parameters.end(),[](auto t){return array_type(t);});
+    };
+    // A legacy value operation must not enter the private address-home ABI.
+    for(const auto& b:f.blocks) for(const auto& i:b.instructions) if(i.op==Op::call)
+        for(const auto& target:m.functions) if(target.name==i.callee && carries(target) && target.fixed_ownership!=f.fixed_ownership)
+            fail("mixed legacy/private call");
+    if(!f.fixed_ownership) return;
+    if(!m.coordinated || f.receiver || f.initializer || !f.virtual_slot.empty()) fail("unsupported runtime/receiver contract");
+    auto supported=[&](Type t) {
+        if(t.kind==Type::aggregate || (array_type(t) && !scalar_fixed_array(t)) || reference_value(t) || t.kind==Type::prepared_receiver || t.kind==Type::string)
+            fail("non-scalar carrier awaits a later proof");
+    };
+    for(auto t:f.parameters) supported(t);
+    for(auto t:f.locals) supported(t);
+    supported(f.result);
+    std::set<unsigned> all;
+    for(unsigned n=0;n<f.locals.size();++n) if(array_type(f.locals[n])) all.insert(n);
+    std::vector<std::vector<unsigned>> pred(f.blocks.size());
+    std::set<unsigned> reachable;
+    std::vector<unsigned> pending{0};
+    while(!pending.empty()) {
+        auto id=pending.back();pending.pop_back();if(!reachable.insert(id).second) continue;
+        auto edge=[&](unsigned to) {if(to==0) fail("entry reexecution could repeat argument transfer");pred[to].push_back(id);pending.push_back(to);};
+        auto end=f.blocks[id].end;
+        if(end.kind==Terminator::Kind::jump) edge(end.yes);
+        if(end.kind==Terminator::Kind::branch) {edge(end.yes);edge(end.no);}
+    }
+    std::vector<std::set<unsigned>> in(f.blocks.size(),all),out(f.blocks.size(),all);
+    bool changed;
+    do {
+        changed=false;
+        for(auto id:reachable) {
+            auto state=id==0 ? std::set<unsigned>{} : all;
+            for(auto p:pred[id]) std::erase_if(state,[&](auto s){return !out[p].contains(s);});
+            if(in[id]!=state) {in[id]=state;changed=true;}
+            for(auto& i:f.blocks[id].instructions) if(i.op==Op::store && all.contains(i.a)) state.insert(i.a);
+            if(out[id]!=state) {out[id]=state;changed=true;}
+        }
+    } while(changed);
+    std::set<unsigned> arguments;
+    for(unsigned block=0;block<f.blocks.size();++block) {
+        const auto& b=f.blocks[block];
+        auto initialized=in[block];
+        enum class Value { ordinary, borrowed, fresh, consumed, stale };
+        std::vector<Value> values;
+        std::set<unsigned> selections;
+        auto use=[&](unsigned id,bool consume=false) {
+            if(!array_type(types[block].at(id))) return;
+            if(values[id]==Value::consumed || values[id]==Value::stale) fail("use after transfer or invalidated borrow");
+            if(consume) {
+                if(values[id]!=Value::fresh) fail("shallow mutable alias requires explicit snapshot");
+                values[id]=Value::consumed;
+            }
+        };
+        auto invalidate=[&] {for(auto& value:values) if(value==Value::borrowed) value=Value::stale;};
+        for(unsigned n=0;n<b.instructions.size();++n) {
+            const auto& i=b.instructions[n];Value value=Value::ordinary;
+            supported(types[block][n]);
+            switch(i.op) {
+            case Op::argument:
+                if(array_type(types[block][n])) {
+                    if(block || !arguments.insert(i.a).second) fail("repeated argument transfer");
+                    value=Value::fresh;
+                }
+                break;
+            case Op::fixed_array: value=Value::fresh;break;
+            case Op::load:
+                if(all.contains(i.a)) {
+                    if(!initialized.contains(i.a)) fail("uninitialized fixed home");
+                    value=Value::borrowed;
+                }
+                break;
+            case Op::fixed_snapshot: use(i.a);value=Value::fresh;break;
+            case Op::array_get: use(i.a);break;
+            case Op::array_set: fail("functional array_set requires a separate copy plan");break;
+            case Op::store:
+                if(all.contains(i.a)) {use(i.b,true);initialized.insert(i.a);invalidate();}
+                break;
+            case Op::call: {
+                auto args=i.arguments;
+                const auto target=std::find_if(m.functions.begin(),m.functions.end(),[&](const auto& t){return t.name==i.callee;});
+                if(target!=m.functions.end() && args.empty() && target->parameters.size()==1) args.push_back(i.a);
+                for(auto arg:args) use(arg,true);
+                invalidate();
+                if(array_type(types[block][n])) value=Value::fresh;
+                break;
+            }
+            case Op::fixed_select:
+                if(!initialized.contains(i.receiver->slot)) fail("uninitialized selected home");
+                selections.insert(n);break;
+            case Op::fixed_commit:
+                if(!selections.erase(i.a)) fail("repeated selected-place commit");
+                invalidate();break;
+            default: break;
+            }
+            values.push_back(value);
+        }
+        if(!selections.empty()) fail("uncommitted selected place");
+        if(b.end.kind==Terminator::Kind::return_value) use(b.end.value,true);
+    }
+}
+
+bool checked_array_shape(Type type, const CPrimitiveAdmission* native) {
+    return contains_numeric_enum(type) || (native && native->inline_array(type));
+}
+bool checked_array_allocation(const Instruction& i, const CPrimitiveAdmission* native) {
+    return i.op == Op::array_allocate && i.type.kind == Type::fixed_array && checked_array_shape(i.type, native);
+}
+
+std::set<unsigned> checked_array_homes(const Function& f, const CPrimitiveAdmission* native) {
+    std::set<unsigned> homes;
+    for(const auto& block:f.blocks)for(unsigned n=0;n<block.instructions.size();++n) {
+        const auto& i=block.instructions[n];
+        if(i.op==Op::array_capture && i.a<n && i.immediate>=0 &&
+           static_cast<std::size_t>(i.immediate)<f.locals.size() && checked_array_allocation(block.instructions[i.a], native))
+            homes.insert(static_cast<unsigned>(i.immediate));
+    }
+    return homes;
+}
+
+namespace {
+bool checked_storage_slot(Type type, const CPrimitiveAdmission* native) {
+    if (contains_numeric_enum(type)) return true;
+    if (!native || native->revision() < 2) return false;
+    // Check scalar inputs too. A forged aggregate construction must not be
+    // able to wrap an uninitialized scalar in otherwise valid record storage.
+    return numeric::integer(type) || numeric::floating(type) || type == Type::boolean ||
+        type.kind == Type::aggregate || type.kind == Type::fixed_array ||
+        type.kind == Type::growable_array || native->resource_type(type);
+}
+}
+
+bool checked_storage_cleanup_return(const Function& f, unsigned id, const CPrimitiveAdmission* native) {
+    if(!f.cleanup_entry || id<*f.cleanup_entry)return false;
+    const auto& block=f.blocks[id];
+    return block.end.kind==Terminator::Kind::return_value && !block.instructions.empty() &&
+           block.end.value==block.instructions.size()-1 && block.instructions.back().op==Op::load &&
+           checked_storage_slot(f.locals.at(block.instructions.back().a), native);
+}
+
+void validate_numeric_enum_slots(const Function& f, const CPrimitiveAdmission* native) {
+    std::set<unsigned> tracked,entry;
+    for(unsigned n=0;n<f.locals.size();++n)
+        if(checked_storage_slot(f.locals[n], native)) tracked.insert(n);
+    if(tracked.empty())return;
+    if(f.receiver && tracked.contains(0))entry.insert(0);
+
+    // Intersect definitely initialized slots at explicit joins. A failure can
+    // also enter cleanup before any body write. Its terminal return load is
+    // emitted only on success and still needs a proof on the normal CFG.
+    auto verify=[&](unsigned start,bool unwinding) {
+        std::vector<std::optional<std::set<unsigned>>> inputs(f.blocks.size());
+        inputs[start]=entry;
+        std::vector<unsigned> work{start};
+        while(!work.empty()) {
+            const auto id=work.back();work.pop_back();
+            auto state=*inputs[id];
+            const auto& block=f.blocks[id];
+            auto require=[&](unsigned slot) {
+                if(tracked.contains(slot) && !state.contains(slot))
+                    throw std::invalid_argument(std::string("VOID IR: read of uninitialized ") +
+                        (contains_numeric_enum(f.locals[slot]) ? "numeric enum" : "C binding carrier") + " storage in " + f.name);
+            };
+            for(const auto& i:block.instructions) {
+                if(i.op==Op::load && !(unwinding && &i==&block.instructions.back() && checked_storage_cleanup_return(f,id,native)))require(i.a);
+                if(i.receiver)require(i.receiver->slot);
+                if(i.op==Op::store && tracked.contains(i.a))state.insert(i.a);
+                if(i.op==Op::array_capture && tracked.contains(i.immediate))state.insert(static_cast<unsigned>(i.immediate));
+            }
+            auto edge=[&](unsigned target) {
+                auto& known=inputs[target];
+                if(!known){known=state;work.push_back(target);return;}
+                const auto removed=std::erase_if(*known,[&](unsigned slot){return !state.contains(slot);});
+                if(removed)work.push_back(target);
+            };
+            if(block.end.kind==Terminator::Kind::jump || block.end.kind==Terminator::Kind::branch)edge(block.end.yes);
+            if(block.end.kind==Terminator::Kind::branch)edge(block.end.no);
+        }
+    };
+    verify(0,false);
+    if(f.cleanup_entry && *f.cleanup_entry)verify(*f.cleanup_entry,true);
+}
 }

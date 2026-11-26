@@ -1,3 +1,16 @@
+#include "validation.hpp"
+#include "void/c_primitive.hpp"
+#include "void/console_ops.hpp"
+#include "void/filesystem_ops.hpp"
+#include "void/http_ops.hpp"
+#include "void/reference_capabilities.hpp"
+#include <algorithm>
+#include <limits>
+#include <span>
+#include <stdexcept>
+
+namespace vd::ir {
+namespace {
 // Independent capability proof over nominally validated IR. Source summaries
 // are deliberately not inputs: malformed hand-built IR receives the same proof.
 std::set<unsigned> validate_reference_initialization(const Function& f) {
@@ -102,6 +115,8 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
     }
     return observed_defaults;
 }
+}
+
 void validate_reference_capabilities(const Module& module,InstructionTypes& types,std::map<std::string,ReferenceEffects>* verified) {
     std::vector<std::set<unsigned>> observed_defaults;
     for(const auto& f:module.functions) observed_defaults.push_back(validate_reference_initialization(f));
@@ -390,4 +405,5 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
     } while(changed);
     for(unsigned n=0;n<module.functions.size();++n) run(n,true,true);
     if(verified) for(const auto& [name,index]:indexes) verified->emplace(name,summaries[index]);
+}
 }
