@@ -61,6 +61,8 @@ Boss controls integration, hosted qualification and public release.
 | G27 | **IMPLEMENTED LOCALLY / QUALIFICATION RECORDED.** Generated `package.entry` and library-consumer `add` reuse the existing creation plan, Resolver and publication journal. [Report and platform limits](../projects/G27_LIBRARY_AUTHORING.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
 
+| Cross-Platform Publishing & Extensible Target Packs | **Future.** Begins after native publishing is complete and qualified. Scope includes official Windows, Linux and macOS packs for x64 and ARM64, pack generation and qualification in GitHub Actions, VOIDUP acquisition and management, cross-platform native compilation and linking, and automatic platform bundles including macOS `.app`. Keep compilation targets independent of packaging formats and support custom and community-maintained targets. Document signing and distribution and use legally redistributable target runtime and linking inputs. |
+
 
 
 ## Hosted acceptance
