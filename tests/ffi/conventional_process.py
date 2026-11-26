@@ -8,6 +8,9 @@ import subprocess
 import sys
 import tempfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
+from test_platform import relocate
+
 sys.stdout.reconfigure(encoding='utf-8')
 cmake, build, config, clang = sys.argv[1:5]
 sanitized = sys.argv[5] == 'ON'
@@ -198,7 +201,7 @@ def verify(root):
            1, 'does not provide ' + missing_export)
     write(descriptor, contract)
     project.rename(root / 'archived project inputs')
-    prefix.rename(root / 'archived compiler install')
+    relocate(prefix, root / 'archived compiler install')
     assert not project.exists() and not compiler.exists()
     environment['VOID_STDLIB_ROOT'] = str(root / 'absent stdlib')
     for mode, program in installed.items():
