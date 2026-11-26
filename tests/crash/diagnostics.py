@@ -248,15 +248,26 @@ def main(root):
 
         # Compiler attribution uses a real compiler worker with a controlled
         # fatal signal. It is not evidence of an underlying compiler defect.
-        large = root / 'large.void'
-        large.write_text(''.join(f'func f{i}() -> i32:\n    return {i}\n' for i in range(12000)))
+        # A fast check can finish before ps observes the worker. Wait for the
+        # frontend status line and leave the oversized diagnostic on the pipe
+        # so the worker cannot exit before receiving the signal.
+        failing = root / 'compiler-diagnostic.void'
+        failing.write_text('func main() -> i32:\n    return undefined_' + 'x' * (512 * 1024) + '\n')
         comp_dir = root / 'compiler reports'
-        comp = subprocess.Popen([COMPILER, 'check', str(large)], env=dict(env, VOID_CRASH_DIRECTORY=str(comp_dir)),
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=limits())
-        os.kill(worker(comp.pid), signal.SIGABRT)
-        out, err = comp.communicate(timeout=15)
-        record([COMPILER, 'check', '(controlled worker signal)'], subprocess.CompletedProcess([], comp.returncode, out, err))
-        assert comp.returncode == -signal.SIGABRT
+        command = [COMPILER, 'check', str(failing), '--status', 'plain']
+        with subprocess.Popen(command, env=dict(env, VOID_CRASH_DIRECTORY=str(comp_dir)),
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, preexec_fn=limits()) as comp:
+            try:
+                assert select.select([comp.stderr], [], [], 5)[0], 'compiler frontend readiness timeout'
+                checking = comp.stderr.readline()
+                assert checking.startswith(b'Checking ') and b'project sources' in checking, checking
+                os.kill(worker(comp.pid), signal.SIGABRT)
+                out, err = comp.communicate(timeout=15)
+            finally:
+                if comp.poll() is None:
+                    comp.terminate()
+            record(command, subprocess.CompletedProcess([], comp.returncode, out, checking + err))
+            assert comp.returncode == -signal.SIGABRT
         build = run([COMPILER, '--version'], disabled).stdout.decode().split('Build identity: ')[1].strip()
         data = read_latest(comp_dir)
         assert data['process'] == 'voidc' and data['boundary'] == 'voidc'
