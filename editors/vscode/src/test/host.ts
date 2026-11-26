@@ -54,6 +54,14 @@ export async function run(): Promise<void> {
         const files = (await fs.readdir(logs, {recursive:true})).filter(f => path.basename(f).endsWith(name + '.log'));
         return (await Promise.all(files.map(f => fs.readFile(path.join(logs, f), 'utf8')))).join('\n');
     };
+    const waitForRestriction = (message: string) => until(async () => {
+        try {
+            return (await readOutput('VOID')).includes(message);
+        } catch (error) {
+            if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false;
+            throw error;
+        }
+    }, Boolean, message + ' restriction report');
     const children: cp.ChildProcess[] = [];
     const original = cp.spawn;
     let disappearBeforeSpawn: string | undefined;
@@ -108,18 +116,18 @@ export async function run(): Promise<void> {
         const main = await vscode.workspace.openTextDocument(mainUri); await vscode.window.showTextDocument(main);
         api = await extension.activate(); assert(api); await api!.ready(); record('Activation ready: ' + JSON.stringify(api!.status()));
         record('Editor diagnostics: ' + JSON.stringify(vscode.languages.getDiagnostics(mainUri)));
-        if (process.env.VOID_TEST_VSIX && process.env.VOID_TEST_MODE !== 'trusted') await until(() => messages.length, n => n > 0, 'installed restriction report');
         if (process.env.VOID_TEST_MODE === 'multi-root') {
             assert.equal(vscode.workspace.workspaceFolders?.length, 2);
+            await waitForRestriction('one project');
             assert.equal(children.length, 0); assert.equal(api!.status().state, 'stopped');
-            assert(messages.some(m => m.includes('one project')));
             console.log('PASS real editor multi-root: explanatory error, no native child spawned'); return;
         }
         if (process.env.VOID_TEST_MODE === 'untrusted') {
             assert.equal(vscode.workspace.isTrusted, false);
             await vscode.commands.executeCommand('void.restartLanguageServer');
+            // Startup can report the restriction before the test hooks UI notifications.
+            await waitForRestriction('trusted workspace');
             assert.equal(children.length, 0); assert.equal(api!.status().state, 'stopped');
-            assert(messages.some(m => m.includes('trusted workspace')));
             console.log('PASS real editor restricted trust: no native child spawned'); return;
         }
         assert(vscode.workspace.isTrusted);
