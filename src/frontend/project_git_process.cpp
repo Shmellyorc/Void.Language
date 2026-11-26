@@ -161,8 +161,18 @@ public:
     }
 
     ~FetchProcess() {
-        TerminateJobObject(job.value, 1);
+        const auto terminated = TerminateJobObject(job.value, 1);
         WaitForSingleObject(child.value, INFINITE);
+        if (!terminated) return;
+        // Git's helpers can still hold the workspace files after the leader
+        // exits. Let the terminated job release those handles before cleanup.
+        const auto cleanup_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+        JOBOBJECT_BASIC_ACCOUNTING_INFORMATION usage{};
+        while (std::chrono::steady_clock::now() < cleanup_deadline &&
+               QueryInformationJobObject(job.value, JobObjectBasicAccountingInformation, &usage, sizeof(usage), nullptr) &&
+               usage.ActiveProcesses != 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        }
     }
 
     std::optional<int> poll() const {

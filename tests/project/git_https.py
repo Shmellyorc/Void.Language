@@ -605,7 +605,9 @@ with tempfile.TemporaryDirectory(prefix="VOID D3 HTTPS 雪 ") as temp, serve_crl
             project(probe, "app", program, pin("units", url, revision))
             before = len(server.requests)
             cli(probe, "deps", "fetch", env=hostile, status=1, message=diagnostic)
-            assert not (probe / store).exists() and not list(scratch.iterdir())
+            assert not (probe / store).exists(), (url, "rejected fetch created a dependency store")
+            leftovers = sorted(path.relative_to(scratch).as_posix() for path in scratch.rglob("*"))
+            assert not leftovers, (url, "rejected fetch left transport files", leftovers)
             if url.endswith("/redirect.git"):
                 assert [repo for repo, _, _, _ in server.requests[before:]] == ["redirect.git"]
                 assert not forbidden.requests
