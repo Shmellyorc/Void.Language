@@ -6948,8 +6948,6 @@ public:
 #include "collection_constants.inc"
 #include "enum_constants.inc"
 ir::ConstantValue constant_expression(const SourceFile& source, const Expr& e, CompileEvaluation* evaluation) {
-    if(evaluation && e.kind==Expr::Kind::name)return evaluation->local(source,e);
-    if(e.compile_target && (e.kind==Expr::Kind::call || e.kind==Expr::Kind::method_call))return evaluation?evaluation->call(source,e):throw std::logic_error("Missing constant evaluation context");
     // Presentation recovery keeps the nominal type of a partial enum member,
     // but the hole has no value or operands. Propagate the existing poison
     // boundary instead of evaluating it as an ordinary constant expression.

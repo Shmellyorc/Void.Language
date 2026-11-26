@@ -145,14 +145,24 @@ void prepare_compile_call(CompileEvaluation* evaluation,Function& f,const Source
 }
 ir::ConstantValue constant_expression(const SourceFile&,const Expr&,CompileEvaluation*);
 ir::ConstantValue constant_value(const SourceFile& source,const Expr& e,CompileEvaluation* evaluation) {
-    if(!evaluation)return constant_expression(source,e,nullptr);
+    const bool compile_call=e.compile_target && (e.kind==Expr::Kind::call || e.kind==Expr::Kind::method_call);
+    if(!evaluation) {
+        if(compile_call)throw std::logic_error("Missing constant evaluation context");
+        return constant_expression(source,e,nullptr);
+    }
     CompileEvaluation::Nesting nesting(*evaluation,source,e.token);
     if(!evaluation->depth){evaluation->steps=0;evaluation->bytes=0;}
     if(evaluation->depth>=128)error(source,e.token,Code::limit,"Compile-time evaluation nesting limit of 128 exceeded.");
     ++evaluation->depth;
     struct Leave {CompileEvaluation& state;~Leave(){--state.depth;}} leave{*evaluation};
     evaluation->step(source,e.token);
-    auto value=constant_expression(source,e,evaluation);evaluation->charge(source,e.token,value);return value;
+    // Keep recursive calls out of the general expression dispatcher's frame.
+    ir::ConstantValue value;
+    if(compile_call)value=evaluation->call(source,e);
+    else if(e.kind==Expr::Kind::name)value=evaluation->local(source,e);
+    else value=constant_expression(source,e,evaluation);
+    evaluation->charge(source,e.token,value);
+    return value;
 }
 VOID_SEMANTIC_HANDLER ir::ConstantValue CompileEvaluation::call(const SourceFile& source,const Expr& e) {
     auto& f=*e.compile_target;
