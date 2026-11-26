@@ -6,6 +6,30 @@ import {promises as fs} from 'node:fs';
 import {offer, pause, until, workbench} from './creationWorkbench';
 const review = 'Review VOID project creation';
 
+async function waitForFileWatcher(root: string): Promise<void> {
+    // String globs use the same workspace watcher as the creation workflow.
+    // Non-source probes cannot trigger a VOID project offer.
+    const watcher = vscode.workspace.createFileSystemWatcher('**/*.void-watch-ready', false, true, true);
+    const probes = new Set<string>();
+    let observed = false;
+    const subscription = watcher.onDidCreate(uri => {
+        if (probes.has(uri.fsPath)) observed = true;
+    });
+    try {
+        await until(async () => {
+            if (observed) return true;
+            const probe = vscode.Uri.file(path.join(root, `watcher-${probes.size}.void-watch-ready`));
+            probes.add(probe.fsPath);
+            await fs.writeFile(probe.fsPath, '', {flag: 'wx'});
+            return observed;
+        }, Boolean, 'workspace filesystem watcher startup');
+    } finally {
+        subscription.dispose();
+        watcher.dispose();
+        await Promise.all([...probes].map(probe => fs.rm(probe, {force: true})));
+    }
+}
+
 export async function run(): Promise<void> {
     const root = process.env.VOID_CREATION_ROOT!;
     const mode = process.env.VOID_CREATION_MODE!;
@@ -65,7 +89,9 @@ export async function run(): Promise<void> {
             assert.equal(await ui!.visible(offer, toast), 0);
             assert(!await exists(manifest));
         };
+        let watcherReady: Promise<void> | undefined;
         async function add(name: string, bytes = '') {
+            await (watcherReady ??= waitForFileWatcher(root));
             const file = uri(name);
             await vscode.workspace.fs.writeFile(file, Buffer.from(bytes));
             return file;
