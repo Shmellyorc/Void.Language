@@ -28,7 +28,7 @@ from verify_host_deps import verify_prefix
 HOST_RESERVE = 2 * 1024**3  # Conservative estimate, not a native-platform peak.
 APP_RESERVE = 512 * 1024**2
 COMMON_TESTS = {'host_capabilities_dependencies', 'host_capabilities_portable',
-                'host_capabilities_portable_source', 'voidup_smoke', 'voidup_ci_integration'}
+                'host_capabilities_portable_source', 'voidup_smoke', 'voidup_presentation', 'voidup_ci_integration'}
 LINUX_TESTS = {'host_capabilities', 'host_capabilities_stack', 'host_capabilities_frontend',
                'host_capabilities_lsp', 'host_capabilities_native', 'host_capabilities_install'}
 

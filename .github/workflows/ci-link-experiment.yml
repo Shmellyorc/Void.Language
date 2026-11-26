@@ -36,13 +36,29 @@ jobs:
       EXPERIMENT_MODE: ${{ inputs.mode }}
       EXPERIMENT_CONFIGURATION: ${{ matrix.configuration }}
       EXPERIMENT_DIR: ${{ github.workspace }}/build/link-experiment
+      PYTHONUTF8: '1'
       ASAN_OPTIONS: detect_leaks=1:halt_on_error=1:exitcode=87
       UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1:exitcode=86
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          # The pinned Linux LLDB links against Python 3.14.
+          python-version: ${{ runner.os == 'Linux' && '3.14' || '3.12' }}
+      - name: Use physical Windows temporary paths for fixtures
+        if: runner.os == 'Windows'
+        shell: python {0}
+        run: |
+          import os
+          import tempfile
+          from pathlib import Path
+
+          # The Actions work drive and the user's OS temp have different ACLs.
+          temp_root = Path(tempfile.gettempdir()).resolve(strict=True)
+          scratch = Path(tempfile.mkdtemp(prefix='void-foundation-', dir=temp_root))
+          with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as environment:
+              for name in ('TMPDIR', 'TMP', 'TEMP'):
+                  environment.write(f'{name}={scratch}\n')
       - name: Prepare isolated link experiment
         shell: python {0}
         run: |
@@ -232,7 +248,10 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+          sudo apt-get install -y apparmor-profiles build-essential ninja-build bubblewrap libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev
+          # Ubuntu's Bubblewrap profile permits sandbox setup and confines its child.
+          sudo apparmor_parser -r /usr/share/apparmor/extra-profiles/bwrap-userns-restrict
+          bwrap --ro-bind / / -- /usr/bin/true
       - name: Windows native SDK environment
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
