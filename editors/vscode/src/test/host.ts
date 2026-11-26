@@ -62,7 +62,7 @@ export async function run(): Promise<void> {
         if (String(args[0]) === disappearBeforeSpawn) { unlinkSync(disappearBeforeSpawn!); disappearBeforeSpawn = undefined; }
         const child = original(...args);
         if (String(args[0]) === process.env.VOIDLS_PATH || String(args[0]).includes('voidls')) {
-            children.push(child); record('Native server launched: ' + JSON.stringify(args));
+            children.push(child); record('Native server launched: ' + JSON.stringify(args.slice(0, 2)));
             child.once('exit', (code, signal) => record(`Native exit: code=${code}, signal=${signal}`));
             for (const [name, stream] of [['stdin', child.stdin], ['stdout', child.stdout]] as const)
                 stream?.on('error', error => record(`Native ${name} error: ${String(error)}`));
@@ -173,9 +173,12 @@ export async function run(): Promise<void> {
         assert.equal(mainEditor.options.insertSpaces, true, 'existing four-space file controls typing');
         const member = mainText.replace('    return', '    worker\n    return');
         await replace(main,member);
+        await vscode.window.showTextDocument(main);
+        await vscode.commands.executeCommand('workbench.action.focusActiveEditorGroup');
+        assert.equal(vscode.window.activeTextEditor?.document, main);
         mainEditor.selection = new vscode.Selection(3,10,3,10);
         await vscode.commands.executeCommand('type',{text:'.'});
-        assert.equal(main.lineAt(3).text, '    worker.');
+        await until(() => main.lineAt(3).text, text => text === '    worker.', 'the typed namespace dot');
         const tokens = () => vscode.commands.executeCommand<vscode.SemanticTokens>('vscode.provideDocumentSemanticTokens', mainUri);
         await until(tokens, result => !!result?.data.length, 'semantic tokens after typing a namespace dot');
         for (let repeat = 0; repeat < 3; repeat++) {
@@ -185,7 +188,7 @@ export async function run(): Promise<void> {
         }
         await until(() => readOutput('VOID'), log => /\[error\].*voidls analysis .*\[VOID1102\]/.test(log), 'diagnostics with trace off');
         await vscode.commands.executeCommand('type',{text:'cal'});
-        assert.equal(main.lineAt(3).text, '    worker.cal');
+        await until(() => main.lineAt(3).text, text => text === '    worker.cal', 'the typed member prefix');
         await until(tokens, result => !!result?.data.length, 'semantic tokens after typing a prefix');
         assert(!(await traceLog()).slice(offEnd).includes('textDocument/'), 'off still traced protocol messages');
         assert.equal(children.length,typingCount,'trace changes must not restart the native server');
@@ -357,7 +360,11 @@ export async function run(): Promise<void> {
         const formatEdit = new vscode.WorkspaceEdit(); formatEdit.set(workerUri, formatting); assert(await vscode.workspace.applyEdit(formatEdit));
         assert.equal(worker.getText(), originalText);
         assert.equal((await vscode.commands.executeCommand<vscode.TextEdit[]>('vscode.executeFormatDocumentProvider', workerUri, {tabSize: 4, insertSpaces: true}))?.length ?? 0, 0);
+        const beforeRefresh = children.length;
+        const refreshed = children[beforeRefresh - 1];
         await vscode.commands.executeCommand('void.refreshProject');
+        await until(() => gone(refreshed), Boolean, 'standalone refresh child cleanup');
+        assert.equal(children.length, beforeRefresh + 1); assert.equal(refreshed.exitCode, 0);
         assert.equal((await definitions())?.length, 1);
         await replace(worker, originalText.replace('x + 42', 'missing'));
         const diagnostic = await until(() => vscode.languages.getDiagnostics(workerUri), ds => ds.some(d => code(d) === 'VOID2002'), 'unsaved unknown identifier');
@@ -493,12 +500,15 @@ export async function run(): Promise<void> {
         await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(workerUri));
         assert.equal((await definitions())?.[0].uri.toString(), workerUri.toString());
         console.log('Diagnostics/navigation/unsaved repair/close-reopen passed');
-        const first = children[0]; await vscode.commands.executeCommand('void.restartLanguageServer');
-        await until(() => gone(first), Boolean, 'restart child cleanup');
-        assert.equal(children.length, 2); assert.equal(first.exitCode, 0);
+        const beforeRestart = children.length;
+        const prior = children[beforeRestart - 1];
+        await vscode.commands.executeCommand('void.restartLanguageServer');
+        await until(() => gone(prior), Boolean, 'restart child cleanup');
+        assert.equal(children.length, beforeRestart + 1); assert.equal(prior.exitCode, 0);
+        const restarted = children[beforeRestart];
         await config.update('project.entry', 'second.void', vscode.ConfigurationTarget.Workspace);
         await until(() => api!.status().entry, e => !!e?.endsWith('second.void'), 'configured entry change');
-        await until(() => gone(children[1]), Boolean, 'entry change cleanup');
+        await until(() => gone(restarted), Boolean, 'entry change cleanup');
         assert.equal(messages.length, 0, 'Normal initialization/restart/entry switch must not warn');
         const beforeMissing = children.length;
         await config.update('server.path', path.join(root, 'missing-voidls'), vscode.ConfigurationTarget.Workspace);
