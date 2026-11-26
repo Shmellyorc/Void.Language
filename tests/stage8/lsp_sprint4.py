@@ -22,6 +22,13 @@ with tempfile.TemporaryDirectory(prefix='VOID sprint4 editor ') as directory:
         assert result.get('result') is None or 'error' in result,result
         result,_=client.request('textDocument/rename',{'textDocument':{'uri':uri},'position':{'line':0,'character':5},'newName':'values'})
         assert result.get('result'),result
+        assert result['result']['documentChanges'] == [{
+            'textDocument': {'uri': uri, 'version': 1},
+            'edits': [
+                {'newText': 'values', 'range': {'start': {'line': 0, 'character': 4}, 'end': {'line': 0, 'character': 11}}},
+                {'newText': 'values', 'range': {'start': {'line': 2, 'character': 7}, 'end': {'line': 2, 'character': 14}}},
+            ],
+        }], result
         result,_=client.request('textDocument/hover',{'textDocument':{'uri':uri},'position':{'line':1,'character':5}})
         assert result.get('result') and 'string' in result['result']['contents']['value'],result
         assert not replace('func main() -> i32:\n    return 7\n',2)

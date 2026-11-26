@@ -63,7 +63,11 @@ public:
                 return *this;
             }
             iterator operator++(int){auto old=*this;++*this;return old;}
-            bool operator==(const iterator& other) const {return current_==other.current_;}
+            bool operator==(const iterator& other) const {
+                // The end of the second span can share an address with a
+                // record in the first span when allocations are adjacent.
+                return current_==other.current_ && next_==other.next_;
+            }
         };
         iterator begin() const {return iterator(*this,false);}
         iterator end() const {return iterator(*this,true);}
