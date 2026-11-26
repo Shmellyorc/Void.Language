@@ -74,13 +74,18 @@ export async function run(): Promise<void> {
         if (mode === 'old-tree') {
             const existing = uri('existing.void');
             const document = await vscode.workspace.openTextDocument(existing);
-            await vscode.window.showTextDocument(document);
             await api!.ready();
             await until(() => api!.status(), status => status.state === 'running' && entryIs(status.entry, existing),
                 'legacy standalone session');
+            // VS Code caches outline results by document version. Keep the editor
+            // hidden until the standalone server has analyzed the open document.
+            await until(async () => vscode.commands.executeCommand<vscode.Hover[]>('vscode.executeHoverProvider',
+                existing, new vscode.Position(0, 6)), hovers => !!hovers?.some(hover => hover.contents.some(content =>
+                (typeof content === 'string' ? content : content.value).includes('main'))), 'legacy standalone analysis');
             await until(async () => vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', existing),
                 symbols => !!symbols?.some(symbol => symbol.name === 'main'), 'legacy standalone symbols');
             pass('manifestless existing source keeps real standalone analysis available');
+            await vscode.window.showTextDocument(document);
             await noOffer();
             pass('activation and opening a pre-existing source do not offer');
             await add('later.void', main);
