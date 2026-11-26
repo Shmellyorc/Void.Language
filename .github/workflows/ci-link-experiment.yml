@@ -3,6 +3,7 @@
 # Cache starts empty before configure; build is probe-primed, voidc relink is a warm pass.
 # Boss approved repeating the pinned Linux LLD selection for early CMake checks in cache mode.
 name: Compiler link experiment
+run-name: ${{ inputs.test_filter && format('Focused CTest / {0}', inputs.platform) || format('Compiler qualification / {0}', inputs.platform || 'all') }}
 on:
   pull_request:
   workflow_dispatch:
@@ -15,22 +16,27 @@ on:
         options:
           - control
           - thinlto-cache
+      platform:
+        description: Platform scope for a focused manual run
+        type: choice
+        default: all
+        options: [all, linux, windows, macos]
+      test_filter:
+        description: CTest name pattern for an isolated repair (empty runs all qualification steps)
+        type: string
 permissions:
   contents: read
 jobs:
   build:
-    name: ${{ inputs.mode || 'thinlto-cache' }} / ${{ matrix.platform }} / ${{ matrix.configuration }}
+    name: ${{ inputs.mode || 'thinlto-cache' }} / ${{ matrix.os == 'ubuntu-24.04' && 'Ubuntu 24.04' || matrix.os == 'windows-2022' && 'Windows 2022' || 'macOS ARM64' }} / ${{ matrix.configuration }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Debug}
-          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Release}
-          - {os: ubuntu-24.04, platform: Ubuntu 24.04, configuration: Sanitizers}
-          - {os: windows-2022, platform: Windows 2022, configuration: Debug}
-          - {os: windows-2022, platform: Windows 2022, configuration: Release}
-          - {os: macos-latest, platform: macOS ARM64, configuration: Debug}
-          - {os: macos-latest, platform: macOS ARM64, configuration: Release}
+        os: ${{ fromJSON(inputs.platform == 'linux' && '["ubuntu-24.04"]' || inputs.platform == 'windows' && '["windows-2022"]' || inputs.platform == 'macos' && '["macos-latest"]' || '["ubuntu-24.04","windows-2022","macos-latest"]') }}
+        configuration: [Debug, Release, Sanitizers]
+        exclude:
+          - {os: windows-2022, configuration: Sanitizers}
+          - {os: macos-latest, configuration: Sanitizers}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 360
     env:
@@ -343,58 +349,73 @@ jobs:
       - name: Verify native host and VOIDUP smoke registration
         run: python tools/ci/voidup_bootstrap.py test-plan
       - name: Execute ${{ matrix.configuration }} tests
+        if: ${{ !inputs.test_filter }}
         run: ctest --test-dir build/${{ matrix.configuration }} --output-on-failure --output-junit ctest-results.xml
+      - name: Execute focused ${{ matrix.configuration }} tests
+        if: inputs.test_filter
+        env:
+          VOID_TEST_FILTER: ${{ inputs.test_filter }}
+        shell: python
+        run: |
+          import os
+          import subprocess
+          subprocess.run([
+              'ctest', '--test-dir', 'build/' + os.environ['EXPERIMENT_CONFIGURATION'],
+              '--output-on-failure', '--output-junit', 'ctest-results.xml',
+              '--no-tests=error', '-R', os.environ['VOID_TEST_FILTER'],
+          ], check=True)
       - name: Frontend Debug and Release small-stack regression
-        if: runner.os == 'Linux' && (matrix.configuration == 'Debug' || matrix.configuration == 'Release')
+        if: ${{ !inputs.test_filter && runner.os == 'Linux' && (matrix.configuration == 'Debug' || matrix.configuration == 'Release') }}
         shell: bash
         run: |
           ulimit -s 1024
           ctest --test-dir build/${{ matrix.configuration }} -R '^frontend$' --output-on-failure
       - name: Extension Node.js toolchain
-        if: matrix.configuration == 'Debug'
+        if: ${{ !inputs.test_filter && matrix.configuration == 'Debug' }}
         uses: actions/setup-node@v5
         with:
           node-version: '24.19.0'
           cache: npm
           cache-dependency-path: editors/vscode/package-lock.json
       - name: Linux editor display dependencies
-        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
+        if: ${{ !inputs.test_filter && runner.os == 'Linux' && matrix.configuration == 'Debug' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb libgtk-3-0 libnss3 libgbm1 libasound2t64
       - name: Install extension dependencies
-        if: matrix.configuration == 'Debug'
+        if: ${{ !inputs.test_filter && matrix.configuration == 'Debug' }}
         working-directory: editors/vscode
         run: npm ci
       - name: Type-check, build and test extension
-        if: matrix.configuration == 'Debug'
+        if: ${{ !inputs.test_filter && matrix.configuration == 'Debug' }}
         working-directory: editors/vscode
         env:
           VOIDLS_TEST_SERVER: ${{ github.workspace }}/build/Debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
         run: npm test
       - name: Real editor integration (Linux)
-        if: runner.os == 'Linux' && matrix.configuration == 'Debug'
+        if: ${{ !inputs.test_filter && runner.os == 'Linux' && matrix.configuration == 'Debug' }}
         working-directory: editors/vscode
         env:
           VOIDLS_PATH: ${{ github.workspace }}/build/Debug/voidls
         run: xvfb-run -a npm run test:host
       - name: Real editor integration (Windows and macOS)
-        if: runner.os != 'Linux' && matrix.configuration == 'Debug'
+        if: ${{ !inputs.test_filter && runner.os != 'Linux' && matrix.configuration == 'Debug' }}
         working-directory: editors/vscode
         env:
           VOIDLS_PATH: ${{ github.workspace }}/build/Debug/voidls${{ runner.os == 'Windows' && '.exe' || '' }}
         run: npm run test:host
       - name: Package local editor extension
-        if: matrix.configuration == 'Debug'
+        if: ${{ !inputs.test_filter && matrix.configuration == 'Debug' }}
         working-directory: editors/vscode
         run: npm run package
       - name: Preserve local editor package
-        if: always() && matrix.configuration == 'Debug'
+        if: ${{ always() && !inputs.test_filter && matrix.configuration == 'Debug' }}
         uses: actions/upload-artifact@v6
         with:
           name: void-editor-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}
           path: editors/vscode/dist/*.vsix
       - name: Measure warm voidc relink after acceptance
+        if: ${{ !inputs.test_filter }}
         run: python "${{ env.LINK_EXPERIMENT_HELPER }}" relink
       - name: Preserve link experiment diagnostics
         if: always()
