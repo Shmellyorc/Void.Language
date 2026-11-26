@@ -43,8 +43,15 @@ with tempfile.TemporaryDirectory(prefix="void-cache-retention-") as temporary:
 
     def read(path):
         # Inspection must not itself turn old entries into recent ones.
-        with os.fdopen(os.open(path, os.O_RDONLY | getattr(os, "O_NOATIME", 0)), "rb") as file:
-            return file.read()
+        no_atime = getattr(os, "O_NOATIME", 0)
+        with os.fdopen(os.open(path, os.O_RDONLY | no_atime), "rb") as file:
+            if no_atime:
+                return file.read()
+            original = os.fstat(file.fileno())
+            try:
+                return file.read()
+            finally:
+                os.utime(file.fileno(), ns=(original.st_atime_ns, original.st_mtime_ns))
 
     def entries():
         result = {}

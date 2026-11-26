@@ -98,7 +98,8 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
     r,v,p=timed(['run','--project',project,'--profile','release','--cache'],2)
     assert b'--cache requires the debug profile' in r.stderr
     assert v['configuration']=={'project_mode':True,'profile':None,'optimization':None,'debug_info':None},v
-    for profile,opt,debug in [('debug','none','full'),('release','O2','none')]:
+    default_debug_info='none' if sys.platform=='darwin' else 'full'
+    for profile,opt,debug in [('debug','none',default_debug_info),('release','O2','none')]:
         _,v,p=timed(['check','--project',project,'--profile',profile])
         assert v['configuration']=={'project_mode':True,'profile':profile,'optimization':opt,'debug_info':debug},v
     _,v,p=timed(['check','--project',project,'--profile','release','--no-opt'])
@@ -107,7 +108,8 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
         _,v,p=timed(['check',app,*flags])
         assert v['configuration']=={'project_mode':False,'profile':None,'optimization':opt,'debug_info':'none'},v
     _,v,p=timed(['run','--project',project,'--cache'])
-    assert v['configuration']=={'project_mode':True,'profile':'debug','optimization':'none','debug_info':'unavailable'},v
+    run_debug_info='none' if default_debug_info=='none' else 'unavailable'
+    assert v['configuration']=={'project_mode':True,'profile':'debug','optimization':'none','debug_info':run_debug_info},v
     distribution=root/'distribution'
     if sys.platform=='darwin':
         r,v,p=timed(['package','--project',project,'-o',distribution],1)

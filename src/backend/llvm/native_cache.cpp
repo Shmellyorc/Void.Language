@@ -158,6 +158,17 @@ int candidate(int directory,const char* name) {
 #endif
     return fd;
 }
+timespec access_time(const struct stat& info) {
+#ifdef __APPLE__
+    return info.st_atimespec;
+#else
+    return info.st_atim;
+#endif
+}
+void set_access_time(int fd,timespec access) {
+    const timespec times[2]{access,{0,UTIME_OMIT}};
+    ::futimens(fd,times);
+}
 std::optional<NativeArtifact> read_artifact(int fd,std::string_view key,std::string_view authentication) {
     if(fd<0 || !cache_object(fd,false))return {};
     struct stat info{};if(::fstat(fd,&info)!=0 || info.st_size<193 ||
@@ -171,14 +182,20 @@ std::optional<NativeArtifact> read_artifact(int fd,std::string_view key,std::str
     unsigned difference=0;
     for(std::size_t i=0;i<tag.size();++i)difference|=static_cast<unsigned char>(tag[i])^static_cast<unsigned char>(bytes[bytes.size()-64+i]);
     if(difference)return {};
+#ifndef O_NOATIME
+    // Validation may inspect the whole cache. Keep that read from changing
+    // authenticated entries' eviction order on hosts without O_NOATIME.
+    struct stat after{};
+    if(info.st_uid==::geteuid() && ::fstat(fd,&after)==0) {
+        const auto before=access_time(info), observed=access_time(after);
+        if(before.tv_sec!=observed.tv_sec || before.tv_nsec!=observed.tv_nsec)
+            set_access_time(fd,before);
+    }
+#endif
     return NativeArtifact{bytes[128]=='1',bytes.substr(129,bytes.size()-193)};
 }
 bool cache_key(std::string_view name) {
     return name.size()==64 && std::all_of(name.begin(),name.end(),[](char c){return (c>='0' && c<='9') || (c>='a' && c<='f');});
-}
-void recent(int fd) {
-    const timespec times[2]{{0,UTIME_NOW},{0,UTIME_OMIT}};
-    ::futimens(fd,times);
 }
 // Caller holds the directory's exclusive advisory lock. Readers copy bytes
 // under a shared lock, then own their object independently of the disk name.
@@ -206,11 +223,7 @@ void retain(int directory,std::string_view current,std::string_view authenticati
     std::erase_if(entries,[&](const Entry& entry){File file(candidate(directory,entry.name.c_str()));return !read_artifact(file.fd,entry.name,authentication);});
     std::sort(entries.begin(),entries.end(),[&](const Entry& a,const Entry& b) {
         if(a.name==current || b.name==current)return b.name==current && a.name!=current;
-#ifdef __APPLE__
-        auto x=a.info.st_atimespec,y=b.info.st_atimespec;
-#else
-        auto x=a.info.st_atim,y=b.info.st_atim;
-#endif
+        const auto x=access_time(a.info),y=access_time(b.info);
         if(x.tv_sec!=y.tv_sec)return x.tv_sec<y.tv_sec;
         if(x.tv_nsec!=y.tv_nsec)return x.tv_nsec<y.tv_nsec;
         return a.name<b.name;
@@ -270,7 +283,7 @@ void NativeCache::validated() const noexcept {
         Lock lock(directory_,LOCK_EX);if(lock.fd<0)return;
         File file(candidate(directory_,key_.c_str()));
         if(!read_artifact(file.fd,key_,authentication_))return;
-        recent(file.fd);
+        set_access_time(file.fd,{0,UTIME_NOW});
         retain(directory_,key_,authentication_);
     } catch(...) {}
 #endif
