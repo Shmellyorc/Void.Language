@@ -1,3 +1,9 @@
+#include "semantic_passes.hpp"
+#include "diagnostics.hpp"
+#include "stack_guard.hpp"
+#include <algorithm>
+
+namespace vd::frontend {
 // Construction capability/readiness analysis on the already nominally typed AST.
 // Contexts are finite parameter masks, never dynamic object identities.
 void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Diagnostics& diagnostics) {
@@ -194,4 +200,5 @@ void analyze_construction(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         }
         f.capability_contract+=';'+f.construction_contract;
     }
+}
 }

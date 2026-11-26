@@ -103,7 +103,8 @@ target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_
 target_sources(void_core PRIVATE src/frontend/lexer.cpp src/frontend/parser.cpp
   src/frontend/diagnostics.cpp src/frontend/model.cpp src/frontend/constant_evaluation.cpp
   src/frontend/lowering.cpp src/frontend/semantics.cpp src/frontend/type_resolution.cpp
-  src/frontend/source_graph.cpp src/frontend/analysis.cpp src/frontend/editor_queries.cpp)
+  src/frontend/source_graph.cpp src/frontend/analysis.cpp src/frontend/editor_queries.cpp
+  src/frontend/effect_analysis.cpp src/frontend/construction_analysis.cpp src/frontend/inheritance.cpp)
 target_sources(void_core PRIVATE src/ir/c_primitive.cpp src/ir/types.cpp src/ir/interfaces.cpp
   src/ir/reference_validation.cpp src/ir/ownership_validation.cpp)
 find_program(VOID_GIT_EXECUTABLE NAMES git DOC "Trusted Git executable for explicit D3 acquisition")

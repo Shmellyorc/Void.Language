@@ -1,6 +1,16 @@
+#include "semantic_passes.hpp"
+#include "diagnostics.hpp"
+#include "stack_guard.hpp"
+#include "void/filesystem_ops.hpp"
+#include "void/http_ops.hpp"
+#include "void/temporal_ops.hpp"
+#include <algorithm>
+#include <limits>
+
+namespace vd::frontend {
 // Capability/effect analysis consumes the nominally checked AST. Logical leaf
 // operations are shared with the independent IR verifier; no runtime permission tags exist.
-VOID_SEMANTIC_HANDLER bool scalar_numeric_call(const Expr& expression) {
+static VOID_SEMANTIC_HANDLER bool scalar_numeric_call(const Expr& expression) {
     if (!numeric::number(expression.type)) return false;
     // Exactly the two existing compiler-owned scalar kernels. Source/native
     // function spellings cannot acquire this private target identity.
@@ -657,4 +667,5 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
         if(unsafe)try{error(function_units.at(name)->source,spawn->token,Code::unsupported_type,"Worker reachable calls must be synchronous and have known private effects; task operations and indirect/native calls are unsupported.");}catch(const CompilationError& error){diagnostics.add(error);}
     }
 
+}
 }

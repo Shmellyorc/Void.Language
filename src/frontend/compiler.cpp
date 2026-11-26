@@ -1,3 +1,4 @@
+#include "semantic_passes.hpp"
 #include "analysis.hpp"
 #include "editor_queries.hpp"
 #include "source_graph.hpp"
@@ -65,9 +66,6 @@
 namespace vd {
 namespace frontend {
 
-#include "capabilities.inc"
-#include "construction.inc"
-#include "inheritance.inc"
 ir::Function member_header(const Unit& u,const Function& f) {
     ir::Function header;header.name=f.symbol;header.module_identity=u.identity;header.method_name=f.receiver?(f.concrete_method_name.empty()?f.token.text:f.concrete_method_name):std::string{};
     header.static_member=bool(f.static_owner) || (f.global_initializer && !f.lexical_owner.empty());

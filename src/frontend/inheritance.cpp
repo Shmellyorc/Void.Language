@@ -1,3 +1,9 @@
+#include "semantic_passes.hpp"
+#include "diagnostics.hpp"
+#include "stack_guard.hpp"
+#include <algorithm>
+
+namespace vd::frontend {
 // Declaration-only hierarchy checks precede body/effect analysis. The existing
 // owner maps remain authoritative; inherited bodies are never duplicated.
 void validate_inheritance(std::map<std::string,std::unique_ptr<Unit>>& units,Unit& root,Diagnostics& diagnostics) {
@@ -75,4 +81,5 @@ void validate_inheritance(std::map<std::string,std::unique_ptr<Unit>>& units,Uni
         try { error(u->source,f.token,Code::receiver,"virtual and override require a managed receiver method."); }
         catch (const CompilationError& failure) { diagnostics.add(failure); }
     }
+}
 }
