@@ -2282,6 +2282,12 @@ if(BUILD_TESTING)
   set_tests_properties(analysis PROPERTIES TIMEOUT 180)
   add_test(NAME numeric COMMAND void_tests numeric "${PROJECT_SOURCE_DIR}")
   set_tests_properties(numeric PROPERTIES TIMEOUT 120)
+  set(loop_main_symbol main)
+  set(loop_renamed_main void_numeric_loops_source_main)
+  if(APPLE)
+    set(loop_main_symbol "_${loop_main_symbol}")
+    set(loop_renamed_main "_${loop_renamed_main}")
+  endif()
   foreach(mode normal optimized)
     set(loop_raw "${CMAKE_CURRENT_BINARY_DIR}/numeric-loops-${mode}-raw${CMAKE_CXX_OUTPUT_EXTENSION}")
     set(loop_object "${CMAKE_CURRENT_BINARY_DIR}/numeric-loops-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
@@ -2291,7 +2297,7 @@ if(BUILD_TESTING)
     endif()
     add_custom_command(OUTPUT "${loop_object}"
       COMMAND voidc emit "${PROJECT_SOURCE_DIR}/tests/numeric/automatic_simd/kernels.void" -o "${loop_raw}" ${loop_options}
-      COMMAND "${LLVM_TOOLS_BINARY_DIR}/llvm-objcopy${CMAKE_EXECUTABLE_SUFFIX}" --redefine-sym main=void_numeric_loops_source_main "${loop_raw}" "${loop_object}"
+      COMMAND "${LLVM_TOOLS_BINARY_DIR}/llvm-objcopy${CMAKE_EXECUTABLE_SUFFIX}" "--redefine-sym=${loop_main_symbol}=${loop_renamed_main}" "${loop_raw}" "${loop_object}"
       DEPENDS voidc "${PROJECT_SOURCE_DIR}/tests/numeric/automatic_simd/kernels.void" VERBATIM)
     set_source_files_properties("${loop_object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
     add_executable(void_numeric_loops_aot_${mode} tests/numeric/loops_aot.cpp "${loop_object}")
