@@ -40,6 +40,7 @@ async function verifyPersistence(executable: string, server: string, root: strin
     let failure: string | undefined;
     try {
         for (const phase of ['offer', 'reopen']) {
+            if (phase === 'reopen') await fs.unlink(path.join(workspace, 'offer.void'));
             const port = await freePort();
             // The VS Code extension test launch uses ephemeral storage. The two
             // windows below use one real user-data directory and graceful exit.
@@ -56,7 +57,10 @@ async function verifyPersistence(executable: string, server: string, root: strin
             try {
                 ui = await workbench(String(port));
                 await until(() => ui!.visible('VOID: stopped', '.statusbar'), Boolean, 'startup of normal VS Code');
-                if (phase === 'reopen') await fs.unlink(path.join(workspace, 'offer.void'));
+                // A visible status bar can precede native file-watcher startup.
+                const marker = 'watcher-ready-' + phase + '.txt';
+                await fs.writeFile(path.join(workspace, marker), '');
+                await until(() => ui!.visible(marker, '.explorer-folders-view'), Boolean, 'the Explorer file watcher');
                 await fs.writeFile(path.join(workspace, phase + '.void'), 'func main():\n    return\n');
                 if (phase === 'offer') {
                     await until(() => ui!.visible(offer, '.notification-toast'), Boolean, 'offer in a normal editor window');

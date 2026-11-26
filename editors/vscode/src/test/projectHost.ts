@@ -39,12 +39,13 @@ public func play():
  await applyFormatting(false,'unreferenced compiler-validated tabs');assert(document.getText().includes('\tname: string'));
  await applyFormatting(true,'unreferenced compiler-validated spaces');assert.equal(document.getText(),body);
  await replace(document,body.replace('name = "player")','na'));
+ await until(()=>vscode.languages.getDiagnostics(app),d=>d.some(e=>e.severity===vscode.DiagnosticSeverity.Error),
+  'unreferenced dirty-source diagnostics');
  const argument=point.translate(0,7);
  await until(()=>vscode.commands.executeCommand<vscode.SignatureHelp>('vscode.executeSignatureHelpProvider',app,argument),
   h=>h?.signatures[0]?.label==='game(name: string)' && h.activeParameter===0,'unreferenced incomplete constructor signature');
  await until(()=>vscode.commands.executeCommand<vscode.CompletionList>('vscode.executeCompletionItemProvider',app,argument),
   l=>!!l?.items.some(i=>(typeof i.label==='string'?i.label:i.label.label)==='name ='),'unreferenced named argument completion');
- await until(()=>vscode.languages.getDiagnostics(app),d=>d.some(e=>e.severity===vscode.DiagnosticSeverity.Error),'unreferenced dirty-source diagnostics');
  assert(document.isDirty);assert.equal(await fs.readFile(app.fsPath,'utf8'),body);
  await until(definition,locations=>!locations?.length,'failed unreferenced analysis drops previous definitions');
  await replace(document,body);

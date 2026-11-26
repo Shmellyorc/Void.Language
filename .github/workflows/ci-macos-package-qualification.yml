@@ -235,6 +235,7 @@ jobs:
           mkdir -p "$PACKAGE_WORK/editor-evidence"
           export VOID_CREATION_EVIDENCE_DIR="$PACKAGE_WORK/editor-evidence"
           export VOID_S3_HOST_EVIDENCE="$VOID_CREATION_EVIDENCE_DIR/project-host.json"
+          export VOID_S3_PROFILE_EVIDENCE="$VOID_CREATION_EVIDENCE_DIR/failed-project-host"
           export VOID_NUMERIC_HOST_EVIDENCE="$VOID_CREATION_EVIDENCE_DIR/numeric-host.json"
           npm ci --cache "$PACKAGE_WORK/npm-cache" 2>&1 | tee "$PACKAGE_WORK/logs/editor-dependencies.log"
           npm run build 2>&1 | tee "$PACKAGE_WORK/logs/editor-build.log"
