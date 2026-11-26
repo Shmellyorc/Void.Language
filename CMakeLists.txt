@@ -174,6 +174,13 @@ if(VOID_LINUX_THINLTO)
   target_compile_options(void_core PRIVATE -flto=thin)
   target_compile_options(void_llvm PRIVATE -flto=thin)
 endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+  # Share stable headers across independently compiled Debug units.
+  target_precompile_headers(void_core PRIVATE "$<$<CONFIG:Debug>:${PROJECT_SOURCE_DIR}/include/void/ir.hpp>")
+  target_precompile_headers(void_llvm PRIVATE
+    "$<$<CONFIG:Debug>:<llvm/IR/Module.h$<ANGLE-R>>"
+    "$<$<CONFIG:Debug>:<llvm/IR/IRBuilder.h$<ANGLE-R>>")
+endif()
 if(APPLE)
   if(NOT CMAKE_OSX_DEPLOYMENT_TARGET MATCHES "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$")
     message(FATAL_ERROR "Set CMAKE_OSX_DEPLOYMENT_TARGET explicitly for macOS code generation and native linking")
