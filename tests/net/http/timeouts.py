@@ -59,30 +59,35 @@ class Handler(fixture.Handler):
             valid=fixture.valid_digest(self.headers.get('Authorization',''),'user','password',self.command,
                                        self.path,'fixture','fixture-nonce')
             if not valid:
-                body=self.read_body();digest_events.append({'event':'challenge','bytes':len(body),'time':time.monotonic()})
+                body=self.read_body();digest_events.append({'event':'challenge','bytes':len(body),'time':time.perf_counter()})
                 self.reply(b'',401,[('WWW-Authenticate','Digest realm="fixture", nonce="fixture-nonce", algorithm=MD5, qop="auth"')]);return
             remaining=int(self.headers['Content-Length'])
             block=self.rfile.read(min(1024,remaining));remaining-=len(block);digest_seen.set()
-            held_at=time.monotonic()
+            # Python 3.12's Windows monotonic clock can quantize a short hold.
+            held_at=time.perf_counter()
             digest_events.append({'event':'authenticated-prefix','remaining':remaining,'time':held_at})
             if os.name=='nt':
                 # Schannel can block its caller finishing an encrypted record.
                 # The peer must not depend on that same driver to release TCP
                 # backpressure. Still hold the real 8 MiB upload longer than
                 # its unchanged 20 ms header budget, and verify the whole body.
-                time.sleep(.060);digest_release.set()
+                release_at=held_at+.060
+                while (hold_left:=release_at-time.perf_counter())>0:
+                    time.sleep(hold_left)
+                digest_release.set()
             assert digest_release.wait(3)
-            digest_events.append({'event':'released','time':time.monotonic(),'hold_ms':(time.monotonic()-held_at)*1000})
+            released_at=time.perf_counter()
+            digest_events.append({'event':'released','time':released_at,'hold_ms':(released_at-held_at)*1000})
             assert block==b'd'*len(block)
             while remaining:
                 block=self.rfile.read(min(65536,remaining))
                 if not block:
-                    digest_events.append({'event':'short-body','remaining':remaining,'time':time.monotonic()});return
+                    digest_events.append({'event':'short-body','remaining':remaining,'time':time.perf_counter()});return
                 remaining-=len(block)
                 assert block==b'd'*len(block)
                 if remaining<65536 or remaining%1048576<65536:
-                    digest_events.append({'event':'body-progress','remaining':remaining,'time':time.monotonic()})
-            digest_events.append({'event':'body-complete','time':time.monotonic()})
+                    digest_events.append({'event':'body-progress','remaining':remaining,'time':time.perf_counter()})
+            digest_events.append({'event':'body-complete','time':time.perf_counter()})
             self.reply(b'ok');return
         super().route()
     do_GET = route
