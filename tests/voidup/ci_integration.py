@@ -7,6 +7,7 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools/ci'))
 import voidup_bootstrap as host
 import llvm_sdk
+from qualification_matrix import assert_cached_qualification_matrix
 
 class Toolchain(unittest.TestCase):
  def setUp(self):
@@ -74,7 +75,7 @@ class Integration(unittest.TestCase):
     self.assertTrue(actual['zlib'].endswith(('zs.lib' if profile=='Release' else 'zsd.lib') if system=='Windows' else 'libz.a'))
  def test_selected_workflow_order_and_no_credentials(self):
   text=(ROOT/'.github/workflows/ci-link-experiment.yml').read_text()
-  self.assertEqual(text.count('- {os:'),7)
+  assert_cached_qualification_matrix(self,text)
   self.assertLess(text.index('http_bootstrap.py bootstrap'),text.index('voidup_bootstrap.py bootstrap'))
   self.assertLess(text.index('voidup_bootstrap.py bootstrap'),text.index('- name: Configure ${{ matrix.configuration }}'))
   self.assertLess(text.index('voidup_bootstrap.py test-plan'),text.index('- name: Execute ${{ matrix.configuration }} tests'))

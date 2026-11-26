@@ -1,16 +1,15 @@
 """No deletion: disk budgeting, allowlist safety, workflow ordering controls."""
-import importlib.util
-import json
 import os
 from pathlib import Path
-import re
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[3]
-spec = importlib.util.spec_from_file_location('linux_disk', ROOT / 'tools/ci/linux_disk.py')
-disk = importlib.util.module_from_spec(spec); spec.loader.exec_module(disk)
+sys.path.insert(0, str(ROOT / 'tools/ci'))
+import linux_disk as disk
+from qualification_matrix import assert_cached_qualification_matrix
 
 
 class DiskTests(unittest.TestCase):
@@ -61,24 +60,7 @@ class DiskTests(unittest.TestCase):
         # YAML parse is separately checked; these assertions preserve the exact
         # invocation placement without adding a YAML dependency to CTest.
         text = (ROOT / '.github/workflows/ci-link-experiment.yml').read_text()
-        matrix_os = re.search(r'^        os: \$\{\{ fromJSON\((.+)\) \}\}$', text, re.MULTILINE)
-        self.assertIsNotNone(matrix_os)
-        linux, windows, macos, default = matrix_os[1].split(' || ')
-        for scope, expression, runner in (
-            ('linux', linux, 'ubuntu-24.04'), ('windows', windows, 'windows-2022'),
-            ('macos', macos, 'macos-latest'),
-        ):
-            self.assertEqual(expression, f"inputs.platform == '{scope}' && '{json.dumps([runner])}'")
-        configurations = re.search(r'^        configuration: \[([^\]]+)\]$', text, re.MULTILINE)
-        self.assertIsNotNone(configurations)
-        excluded = set(re.findall(r'^          - \{os: ([\w.-]+), configuration: (\w+)\}$', text, re.MULTILINE))
-        full_matrix = [(runner, profile) for runner in json.loads(default[1:-1])
-                       for profile in configurations[1].split(', ') if (runner, profile) not in excluded]
-        self.assertCountEqual(full_matrix, [
-            ('ubuntu-24.04', 'Debug'), ('ubuntu-24.04', 'Release'), ('ubuntu-24.04', 'Sanitizers'),
-            ('windows-2022', 'Debug'), ('windows-2022', 'Release'),
-            ('macos-latest', 'Debug'), ('macos-latest', 'Release'),
-        ])
+        assert_cached_qualification_matrix(self, text)
         for command in ('after-sdk', 'before-build'):
             self.assertIn("if: runner.os == 'Linux'\n        run: python tools/ci/linux_disk.py " + command, text)
         self.assertIn("if: runner.os == 'Linux'\n        run: |\n          python tests/net/http/ci_disk_test.py\n          python tools/ci/linux_disk.py prepare", text)
