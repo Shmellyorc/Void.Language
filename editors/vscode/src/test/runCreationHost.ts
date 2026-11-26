@@ -57,11 +57,20 @@ async function verifyPersistence(executable: string, server: string, root: strin
             try {
                 ui = await workbench(String(port));
                 await until(() => ui!.visible('VOID: stopped', '.statusbar'), Boolean, 'startup of normal VS Code');
-                // A visible status bar can precede native file-watcher startup.
-                const marker = 'watcher-ready-' + phase + '.txt';
-                await fs.writeFile(path.join(workspace, marker), '');
-                await until(() => ui!.visible(marker, '.explorer-folders-view'), Boolean, 'the Explorer file watcher');
-                await fs.writeFile(path.join(workspace, phase + '.void'), 'func main():\n    return\n');
+                // Create the file through the real editor so each launch
+                // delivers a file-create event even if its OS watcher is late.
+                ui.key('F1', 'F1', 112);
+                await until(() => ui!.evaluate<boolean>('!!document.activeElement?.closest(".quick-input-widget")'),
+                    Boolean, 'the command palette');
+                await ui.type('File: New File...');
+                await ui.click('File: New File...', '.quick-input-widget');
+                await until(() => ui!.evaluate<boolean>('!!document.activeElement?.closest(".explorer-item-edited")'),
+                    Boolean, 'the Explorer filename input');
+                await ui.type(phase + '.void');
+                ui.key('Enter', 'Enter', 13);
+                const created = path.join(workspace, phase + '.void');
+                await until(() => fs.stat(created).then(stat => stat.isFile(), () => false), Boolean,
+                    'creation of the source in the normal editor');
                 if (phase === 'offer') {
                     await until(() => ui!.visible(offer, '.notification-toast'), Boolean, 'offer in a normal editor window');
                     events.push('normal editor closes while the prompt remains offered');
