@@ -115,7 +115,9 @@ with tempfile.TemporaryDirectory(prefix='VOID G75 雪 ') as folder:
         r,v,p=timed(['package','--project',project,'-o',distribution],1)
         assert b'Application packaging requires Linux x86-64 GNU or Windows x64 MSVC.' in r.stderr
         assert not v['build']['complete'] and v['build']['outcome']=='failure' and not distribution.exists()
-        assert p['package_assembly']['count']==0 and p['publication']['count']==0,p
+        assert p['package_assembly']['count']==1 and p['package_assembly']['state']=='partial',p
+        for phase in ('native_link_driver','publication'):
+            assert p[phase]['count']==0 and p[phase]['state']=='not_reached',p
     else:
         _,v,p=timed(['package','--project',project,'-o',distribution])
         assert v['build']['complete'] and v['build']['outcome']=='success'

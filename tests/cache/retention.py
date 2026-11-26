@@ -9,28 +9,27 @@ import tempfile
 
 compiler = Path(sys.argv[1]).resolve()
 
-def limits():
-    import resource
-    resource.setrlimit(resource.RLIMIT_STACK, (1048576, 1048576))
-
 with tempfile.TemporaryDirectory(prefix="void-cache-retention-") as temporary:
     root = Path(temporary)
     source = root / "main.void"
     directory = root / ".void/cache/v1"
+    launcher = root / "limited-exec"
+    if os.name != "nt":
+        assert len(sys.argv) == 3, "supply the configured C compiler for the resource-limit launcher"
+        built = subprocess.run([sys.argv[2], str(Path(__file__).with_name("retention_launcher.c")),
+                                "-o", launcher], capture_output=True, timeout=60)
+        assert built.returncode == 0, built.stderr
 
     def run(path=source, value=0, hit=None, fail_write=False, fault=None):
-        def restricted():
-            limits()
-            if fail_write:
-                import resource
-                resource.setrlimit(resource.RLIMIT_FSIZE, (1, 1))
         environment = dict(os.environ)
         if fault:
             environment.update(LD_PRELOAD=str(shim), VOID_CACHE_FAULT=fault,
                                VOID_CACHE_FAULT_DIRECTORY=str(directory))
-        result = subprocess.run([str(compiler), "run", str(path), "--cache"], env=environment,
-                                capture_output=True, text=True, timeout=60,
-                                preexec_fn=restricted if os.name != "nt" else None)
+        argv = [compiler, "run", path, "--cache"]
+        if os.name != "nt":
+            # Apply exact limits after a fresh launch, including in pool workers.
+            argv = [launcher, "1" if fail_write else "0", *argv]
+        result = subprocess.run(argv, env=environment, capture_output=True, text=True, timeout=60)
         assert result.returncode == 0 and result.stdout == f"{value}\n", result
         if hit is not None:
             assert f"Debug cache: {hit}" in result.stderr, result
@@ -106,7 +105,6 @@ with tempfile.TemporaryDirectory(prefix="void-cache-retention-") as temporary:
     finally:
         directory.chmod(0o700)
     if sys.platform.startswith("linux"):
-        assert len(sys.argv) == 3, "supply configured C compiler for real syscall fault tests"
         shim = root / "cache-fault.so"
         compiled = subprocess.run([sys.argv[2], "-shared", "-fPIC", str(Path(__file__).with_name("fault.c")),
                                    "-ldl", "-o", str(shim)], capture_output=True, timeout=60)
