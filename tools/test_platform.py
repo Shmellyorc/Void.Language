@@ -115,7 +115,7 @@ def _windows_deny_fixture_reads(root, sid):
                     error.filename = str(path)
                     raise error
                 if retries:
-                    print(f'Windows fixture reservation recovered after {retries} sharing retries for {path}', flush=True)
+                    print(f'Windows fixture reservation recovered after {retries} sharing retries for {str(path)!a}', flush=True)
             try:
                 subprocess.run(['icacls.exe', root, '/deny', f'*{sid}:(RX)'],
                                check=True, capture_output=True, timeout=30)
