@@ -234,7 +234,7 @@ void namespace_reuse(const fs::path& root) {
         const auto reuse=vd::editor_namespace_assistance(*program,{"/main.void",source},"/main.void",cursor);
         check(reuse && std::any_of(reuse->candidates.begin(),reuse->candidates.end(),[](const auto& c){return c.name=="read";}),"body/EOF edit unnecessarily discarded verified namespace analysis");
     }
-    for(const std::string source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
+    for(const std::string& source:std::vector<std::string>{header+"    var lib = 1\n    lib.",
             header+"    var text = \"lib.\"",header+"    # lib.",
             "use \"./leaf.void\" as lib\nfunc changed():\n    lib.",
             "use \"./other.void\" as lib\nfunc main():\n    lib.",header+"    var value: lib."}) {

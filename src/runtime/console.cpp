@@ -644,7 +644,7 @@ struct Operation::InputReader {
     std::size_t block=0,pos,consumed=0;
     bool pending,committed=false;
     std::optional<std::size_t> control;
-    struct Item {int byte=-1;bool eof=false,unavailable=false;Error error{};bool event=false;std::optional<PhysicalKey> key;};
+    struct Item {int byte=-1;bool eof=false,unavailable=false;Error error{};bool event=false;std::optional<PhysicalKey> key{};};
     struct Mark {std::size_t block,pos,consumed;bool pending;};
     InputReader(Operation& operation,const Request& req)
         :op(operation),queue(operation.session_->streams->state_->input),request(req),pos(queue.head),pending(queue.crlf){}

@@ -181,7 +181,7 @@ struct Function {
     bool asynchronous = false;
     bool worker = false; // Private enqueue wrapper; synchronous reachable source body on a pool thread.
     Type task = Type::none; // Exact checked task shape for an async declaration.
-    std::optional<unsigned> cleanup_entry;
+    std::optional<unsigned> cleanup_entry{};
     bool initializer = false;
     unsigned accessor = 0; // 1 getter, 2 setter; ordinary native method ABI.
     bool receiver = false, receiver_mutates = false; // First parameter aliases local slot zero.

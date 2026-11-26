@@ -667,11 +667,13 @@ bool CPrimitiveAdmission::matches(const Shape& shape, Type type) const {
         return type.kind == Type::growable_array && type.definition && type.definition->element &&
             !type.definition->extent && ir::array_element(type) == Type::u8 &&
             (shape.direction == 1 || ir::readonly_paths(type).empty());
-    if (shape.extent)
+    if (shape.extent) {
         if (type.kind == Type::fixed_array && type.definition && type.definition->element && type.definition->extent == shape.extent) {
             auto element = shape; element.extent = 0;
             return matches(element, ir::array_element(type));
-        } else return false;
+        }
+        return false;
+    }
     if (!shape.record) return type == shape.scalar;
     const auto& expected = record(shape.record);
     if (type.kind != Type::aggregate || !type.definition) return false;

@@ -28,7 +28,7 @@ void* fifo_create(int index,vd::RuntimeFailure* failure){
     if(failure->message)return nullptr;*static_cast<FifoFrame*>(frame)={task,0,index};vd_async_start(task,failure);return task;
 }
 bool foreign_rejected=false;
-void* fifo_start(std::int32_t,vd::RuntimeFailure* failure){void* task=nullptr;void* frame=nullptr;const std::size_t zero=0;vd::Runtime::Slot slots[]={{&task,sizeof(task),&zero,1},{&frame,sizeof(frame),&zero,1}};vd::Runtime::Frame roots(vd::Runtime::current(),slots,2);char foreign;vd::RuntimeFailure wrong;vd_async_new(&task,&frame,8,nullptr,0,8,nullptr,0,"parallel-fifo-task",&foreign,fifo_resume,&wrong,1);foreign_rejected=wrong.message && !task && !frame;return fifo_create(-1,failure);}
+void* fifo_start(std::int32_t,vd::RuntimeFailure* failure){void* task=nullptr;void* frame=nullptr;const std::size_t zero=0;vd::Runtime::Slot slots[]={{&task,sizeof(task),&zero,1},{&frame,sizeof(frame),&zero,1}};vd::Runtime::Frame roots(vd::Runtime::current(),slots,2);char foreign{};vd::RuntimeFailure wrong;vd_async_new(&task,&frame,8,nullptr,0,8,nullptr,0,"parallel-fifo-task",&foreign,fifo_resume,&wrong,1);foreign_rejected=wrong.message && !task && !frame;return fifo_create(-1,failure);}
 void fifo_resume(void* raw,vd::RuntimeFailure* failure){auto& frame=*static_cast<FifoFrame*>(raw);
     if(frame.index>=0){fifo.push_back(frame.index);vd_async_complete(frame.task);return;}
     if(!frame.step){frame.step=1;for(int n=0;n<24 && !failure->message;++n)fifo_create(n,failure);}

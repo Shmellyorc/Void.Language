@@ -1174,8 +1174,11 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 case Op::gc_release:
                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
-                        operand(i.a).construction || (primitive && primitive->resource_type(operand(i.a))))
-                        fail("invalid deterministic release");result=Type::boolean;break;
+                        operand(i.a).construction || (primitive && primitive->resource_type(operand(i.a)))) {
+                        fail("invalid deterministic release");
+                    }
+                    result=Type::boolean;
+                    break;
                 case Op::c_primitive_call: {
                     if (!primitive || f.module_identity != primitive->module() ||
                         i.immediate < 0 || static_cast<std::size_t>(i.immediate) >= primitive->bindings().size())
