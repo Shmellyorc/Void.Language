@@ -147,10 +147,19 @@ export async function run():Promise<void>{
   }
   api=await extension.activate();await api!.ready();
   await until(()=>vscode.languages.getDiagnostics(toml),ds=>ds.some(d=>code(d)==='VOID5010'),'no-main project session opens with manifest diagnostics');assert.equal(api!.status().state,'running');assert.equal(api!.status().entry,undefined);
-  const game=vscode.Uri.file(path.join(root,'src/game.void'));const main='use "./helper.void" as h\nfunc main() -> i32:\n    return h.value()\n';await vscode.workspace.fs.writeFile(game,Buffer.from(main));let source=await vscode.workspace.openTextDocument(game);await vscode.window.showTextDocument(source);
+  const game=vscode.Uri.file(path.join(root,'src/game.void'));const main='use "./helper.void" as h\nfunc main() -> i32:\n    return h.value()\n';await vscode.workspace.fs.writeFile(game,Buffer.from(main));let source=await vscode.workspace.openTextDocument(game);
   await until(()=>api!.status().entry,p=>entryIs(p,game),'file creation selects any-name main');await until(()=>vscode.languages.getDiagnostics(toml),ds=>!ds.some(d=>code(d)==='VOID5010'),'missing-main diagnostic clears');
   const helper=vscode.Uri.file(path.join(root,'src/helper.void'));const point=new vscode.Position(2,14);await until(()=>vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',game,point),locations=>!!locations?.some(l=>l.uri.fsPath===helper.fsPath),'real editor project navigation');
-  await until(()=>vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider',game),symbols=>!!symbols?.some(symbol=>symbol.name==='main'),'real editor project symbols');
+  const hasMain=(symbols:vscode.DocumentSymbol[]|undefined)=>!!symbols?.some(symbol=>symbol.name==='main');
+  await until(async()=>{
+   const symbols=await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider',game);
+   // A delayed file-created event can invalidate the analysis after navigation.
+   // VS Code can cache an empty outline until the document version advances.
+   if(!hasMain(symbols))await replace(source,source.getText()===main?main+'\n':main);
+   return symbols;
+  },hasMain,'real editor project symbols');
+  if(source.getText()!==main)await replace(source,main);
+  await vscode.window.showTextDocument(source);
   const app=await unreferenced(root,source,main);
   await replace(document,'schema=1\n# é😀\n[=roject]\n');const errors=await until(()=>vscode.languages.getDiagnostics(toml),ds=>ds.some(d=>code(d)==='VOID5001'),'dirty TOML diagnostic publication');const error=errors.find(d=>code(d)==='VOID5001')!;assert.deepEqual(error.range,new vscode.Range(2,1,2,1));
   await until(()=>vscode.commands.executeCommand<vscode.Location[]>('vscode.executeDefinitionProvider',game,point),locations=>!locations?.length,'failed manifest hides historical semantic results');
