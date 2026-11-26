@@ -1,4 +1,6 @@
 """No-opt AOT must finish a local initializer before stopping on the next line."""
+import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -7,6 +9,7 @@ from tempfile import TemporaryDirectory
 
 
 compiler, dwarf, lldb = (str(Path(p).resolve()) for p in sys.argv[1:4])
+sanitized = sys.argv[4:] == ['1']
 SOURCE = '''struct board:
     scroll: f32
 func (g board) draw_background():
@@ -34,7 +37,13 @@ def values(output):
 
 
 def debug(root, executable, mode):
-    commands = ['settings set target.disable-aslr false', 'breakpoint set -f app.void -l 7', 'run']
+    commands = ['settings set target.disable-aslr false']
+    if sanitized:
+        # The untraced run checks for leaks; the LLDB child cannot use ptrace for that check.
+        asan_options = os.environ.get('ASAN_OPTIONS', '')
+        target_options = ':'.join(filter(None, (asan_options, 'detect_leaks=0')))
+        commands.append('settings set target.env-vars ' + json.dumps(f'ASAN_OPTIONS={target_options}'))
+    commands += ['breakpoint set -f app.void -l 7', 'run']
     if mode == 'full':
         commands += ['frame variable row col px', 'expression -- px']
     commands += ['next', 'frame info']
@@ -79,6 +88,7 @@ with TemporaryDirectory(prefix='VOID debug initializer ') as directory:
     # Line-only source debugging must honor the same no-opt codegen contract.
     executable = root / 'line-only'
     run(compiler, 'build', '--project', root, '--profile', 'debug', '--debug-info', 'line', '-o', executable)
+    values(run(executable))
     debug(root, executable, 'line')
     assert source.read_text() == SOURCE
     print('PASS: full/line no-opt source breakpoint 7 -> 8, initialized locals and native Watch evaluation')
