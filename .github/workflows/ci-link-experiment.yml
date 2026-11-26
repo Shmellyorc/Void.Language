@@ -46,16 +46,18 @@ jobs:
         with:
           # The pinned Linux LLDB links against Python 3.14.
           python-version: ${{ runner.os == 'Linux' && '3.14' || '3.12' }}
-      - name: Use physical Windows temporary paths for fixtures
-        if: runner.os == 'Windows'
+      - name: Use physical temporary paths for fixtures
+        if: runner.os == 'Windows' || runner.os == 'macOS'
         shell: python {0}
         run: |
           import os
+          import sys
           import tempfile
           from pathlib import Path
 
-          # The Actions work drive and the user's OS temp have different ACLs.
-          temp_root = Path(tempfile.gettempdir()).resolve(strict=True)
+          # Use the user's OS temp on Windows and leave room for VS Code's
+          # IPC socket in the shorter physical /tmp directory on macOS.
+          temp_root = Path('/tmp' if sys.platform == 'darwin' else tempfile.gettempdir()).resolve(strict=True)
           scratch = Path(tempfile.mkdtemp(prefix='void-foundation-', dir=temp_root))
           with open(os.environ['GITHUB_ENV'], 'a', encoding='utf-8') as environment:
               for name in ('TMPDIR', 'TMP', 'TEMP'):

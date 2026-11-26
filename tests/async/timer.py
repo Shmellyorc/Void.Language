@@ -25,6 +25,8 @@ def link(object_file, application, work):
         sdk_linker = Path(clang).with_name("lld-link.exe").resolve(strict=True)
         assert run([sdk_linker, "--version"], work)[0].startswith("LLD 23.1.4")
         flags.extend(["-B" + str(sdk_linker.parent), "-fuse-ld=lld"])
+    elif sys.platform == "darwin":
+        assert not linker, "macOS native builds use Clang's SDK linker"
     else:
         assert linker and "LLD 23.1.4" in run([linker, "--version"], work)[0]
         flags.append("--ld-path=" + linker)
