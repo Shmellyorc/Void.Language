@@ -4,6 +4,7 @@
 # Boss approved repeating the pinned Linux LLD selection for early CMake checks in cache mode.
 name: Compiler link experiment
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       mode:
@@ -18,7 +19,7 @@ permissions:
   contents: read
 jobs:
   build:
-    name: ${{ inputs.mode }} / ${{ matrix.platform }} / ${{ matrix.configuration }}
+    name: ${{ inputs.mode || 'thinlto-cache' }} / ${{ matrix.platform }} / ${{ matrix.configuration }}
     strategy:
       fail-fast: false
       matrix:
@@ -33,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 360
     env:
-      EXPERIMENT_MODE: ${{ inputs.mode }}
+      EXPERIMENT_MODE: ${{ inputs.mode || 'thinlto-cache' }}
       EXPERIMENT_CONFIGURATION: ${{ matrix.configuration }}
       EXPERIMENT_DIR: ${{ github.workspace }}/build/link-experiment
       PYTHONUTF8: '1'
@@ -397,7 +398,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: link-experiment-${{ inputs.mode }}-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}-${{ github.sha }}-${{ github.run_attempt }}
+          name: link-experiment-${{ env.EXPERIMENT_MODE }}-${{ runner.os }}-${{ runner.arch }}-${{ matrix.configuration }}-${{ github.sha }}-${{ github.run_attempt }}
           include-hidden-files: true
           path: |
             build/link-experiment/

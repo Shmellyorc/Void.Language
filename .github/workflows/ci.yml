@@ -1,7 +1,6 @@
 name: Compiler foundation
 on:
-  push:
-  pull_request:
+  # Manual uncached control. Routine qualification uses ci-link-experiment.yml.
   workflow_dispatch:
 permissions:
   contents: read
