@@ -257,7 +257,7 @@ VOID_SEMANTIC_HANDLER Type json_call(Expr& e) {
     }
     SourceFile generated(source.path(),code);auto syntax=lex(generated,diagnostics);
     for(auto& token:syntax){token.offset=e.token.offset;token.source_width=0;}
-    Unit parsed(unit.source,unit.identity);Parser(unit.source,diagnostics,std::move(syntax),std::move(bindings)).parse(parsed);
+    Unit parsed(unit.source,unit.identity);parse_specialization(parsed,diagnostics,std::move(syntax),std::move(bindings));
     if(parsed.parse_failed || parsed.functions.size()!=1)throw Poison{};
     unit.function_types.splice(unit.function_types.end(),parsed.function_types);unit.results.splice(unit.results.end(),parsed.results);unit.arrays.splice(unit.arrays.end(),parsed.arrays);unit.applications.splice(unit.applications.end(),parsed.applications);
     unit.functions.splice(unit.functions.end(),parsed.functions);auto& adapter=unit.functions.back();

@@ -24,7 +24,7 @@ auto check_constraints=[&](Unit& caller,Unit& owner,const std::vector<GenericPar
         for(unsigned n=0;n<parameters.size();++n)if(parameters[n].constraint) {
             // Reparse the existing constraint type syntax with this job's concrete
             // bindings, including nested applications/collections and nullability.
-            auto raw=Parser(owner->source,diagnostics,parameters[n].constraint_syntax,bindings).parse_type(*owner);
+            auto raw=parse_constraint(*owner,diagnostics,parameters[n].constraint_syntax,bindings);
             auto constraint=resolve_type(raw,*owner,root,units,parameters[n].token);
             try {ir::satisfy_constraint(*root.member_catalog,arguments[n],constraint,owner->identity);}
             catch(const std::invalid_argument& reason) {error(caller->source,site,Code::type_mismatch,"Generic constraint for '"+parameters[n].token.text+"' is not satisfied: "+reason.what(),{},{{span(owner->source,parameters[n].token),"Constraint declared here."}});}
@@ -81,7 +81,7 @@ for(auto& [id,u]:units) {
             for(unsigned n=0;n<s.type_arguments.size();++n)bindings.emplace(s.generic_origin->generics[n].token.text,s.type_arguments[n]);
         check_constraints(caller,owner,generic.generics,arguments,site,bindings);
         for(unsigned n=0;n<arguments.size();++n)bindings.emplace(generic.generics[n].token.text,arguments[n]);
-        Unit parsed(owner.source,owner.identity);Parser(owner.source,diagnostics,generic.syntax,std::move(bindings)).parse(parsed);
+        Unit parsed(owner.source,owner.identity);parse_specialization(parsed,diagnostics,generic.syntax,std::move(bindings));
         if(parsed.parse_failed || parsed.functions.size()!=1)throw Poison{};
         transfer_syntax(owner,parsed);owner.functions.splice(owner.functions.end(),parsed.functions);
         auto& concrete=owner.functions.back();concrete.accessor=generic.accessor;
@@ -107,7 +107,7 @@ for(auto& [id,u]:units) {
         Diagnostics::Context diagnostic_context(diagnostics,context,depth);
         check_constraints(caller,owner,generic.generics,arguments,site,{},generic.definition->interface_type);
         std::map<std::string,Type> bindings;for(unsigned n=0;n<arguments.size();++n)bindings.emplace(generic.generics[n].token.text,arguments[n]);
-        Unit parsed(owner.source,owner.identity);Parser(owner.source,diagnostics,generic.syntax,bindings).parse(parsed);
+        Unit parsed(owner.source,owner.identity);parse_specialization(parsed,diagnostics,generic.syntax,bindings);
         if(parsed.parse_failed || parsed.structures.size()!=1)throw Poison{};
         transfer_syntax(owner,parsed);owner.structures.splice(owner.structures.end(),parsed.structures);
         auto& concrete=owner.structures.back();concrete.generic_origin=&generic;concrete.type_arguments=arguments;concrete.specialization_depth=depth;
@@ -128,7 +128,7 @@ for(auto& [id,u]:units) {
             const auto& receiver=method.receiver?*method.receiver:*method.static_owner;
             const auto application=std::find_if(owner.applications.begin(),owner.applications.end(),[&](const auto& a){return a.definition==receiver.type.definition;});
             if(application==owner.applications.end() || application->name!=generic.token.text)continue;
-            Unit body(owner.source,owner.identity);Parser(owner.source,diagnostics,method.syntax,bindings).parse(body);
+            Unit body(owner.source,owner.identity);parse_specialization(body,diagnostics,method.syntax,bindings);
             if(body.parse_failed || body.functions.size()!=1)throw Poison{};
             transfer_syntax(owner,body);owner.functions.splice(owner.functions.end(),body.functions);auto& f=owner.functions.back();f.accessor=method.accessor;
             f.generic_origin=generic.definition->identity+(method.static_owner?"::static::":"::method::")+method.token.text;f.display_name=generic.token.text+"::method::"+method.token.text;f.instantiation_context=context;f.specialization_depth=depth;
