@@ -135,7 +135,7 @@ calls; the loop grants no receiver or callback authority.
 Typed errors can be yielded as `option<result<T,E>>`; the body chooses whether to
 handle or propagate them. There is no implicit conversion of cancellation or
 runtime failure into `Err`. Async factories, async `index`/destruction, erased
-iterator state, async interface requirements, `yield`, streams/backpressure,
+iterator state, async interface requirements, streams/backpressure,
 prefetch and arbitrary async callback values remain deferred. In particular,
 async acquisition would need an explicit ownership contract for an acquired
 resource whose task result is abandoned before the loop activates its scope.

@@ -189,6 +189,14 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 }
             return {};
         };
+        // Generator-specific temporaries are needed only after the receiver
+        // has been evaluated. Keep them out of every recursive call frame.
+        auto generator_advance=[&](const ReferenceFacts& receiver,const Token& token) {
+            if(auto fact=receiver.find({});fact!=receiver.end()) {
+                effect(f.reference_effects.mutations,fact->second);
+                if(report && fact->second.readonly)issue(token,"Cannot advance or close a readonly generator.");
+            }
+        };
         std::function<ReferenceFacts(Expr&)> expression;
         std::function<void(Pattern&,const ReferenceFacts&)> pattern;
         pattern=[&](Pattern& p,const ReferenceFacts& facts) {
@@ -307,12 +315,7 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
                 if(e.target=="$weak.create" || e.target=="$weak.lock")
                     ir::join_facts(view,arguments[0]);
-                if(e.target.starts_with("$generator.")) {
-                    if(auto receiver=arguments[0].find({});receiver!=arguments[0].end()) {
-                        effect(f.reference_effects.mutations,receiver->second);
-                        if(report && receiver->second.readonly)issue(e.token,"Cannot advance or close a readonly generator.");
-                    }
-                }
+                if(e.target.starts_with("$generator."))generator_advance(arguments[0],e.token);
                 if (e.target == "$convert.unwrap") {
                     view = ir::field_facts(e.parts[0]->type, arguments[0], 1);
                 }
@@ -548,9 +551,11 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                     }
                 } else if(s.kind==K::yielded) {
                     if(!ir::generator_type(f.result))continue;
-                    auto item=ir::field_type(*f.result.definition->generator_result,1);
-                    compatible(rhs,item,s.token);
-                    retain(rhs,item,s.token);
+                    frontend_case([&] {
+                        auto item=ir::field_type(*f.result.definition->generator_result,1);
+                        compatible(rhs,item,s.token);
+                        retain(rhs,item,s.token);
+                    });
                 } else if (s.kind==K::returned) {
                     changed|=ir::join_facts(f.reference_effects.returned,rhs);
                 }

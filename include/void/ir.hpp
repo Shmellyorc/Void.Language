@@ -79,8 +79,8 @@ struct ValueType {
     std::string native_provider = {}; // Compiled catalog identity, independent of source module spelling.
     bool native_resource = false; // Binding-private managed identity; no source payload/constructor.
     bool async_generator=false;
-    std::optional<FieldType> generator_result; // The option<T> returned by advancement.
-    std::optional<FieldType> weak_target; // Opaque managed cell, independent of target reachability.
+    std::optional<FieldType> generator_result = {}; // The option<T> returned by advancement.
+    std::optional<FieldType> weak_target = {}; // Opaque managed cell, independent of target reachability.
     std::optional<FieldType> task_result = {}; // Private inferred task handle; no public constructor.
     std::vector<FieldType> call_parameters = {};
     std::optional<FieldType> call_result = {};
