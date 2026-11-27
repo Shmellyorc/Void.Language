@@ -40,16 +40,16 @@ VOID_SEMANTIC_HANDLER void custom_iteration(Statement& s) {
         auto e=std::make_unique<Expr>(Expr::Kind::method_call,site);
         e->op="$iteration";e->implicit=true;e->parts.push_back(std::move(receiver));return e;
     };
-    const bool generator=ir::generator_type(s.expression->type);
-    const bool async_generator=ir::async_generator_type(s.expression->type);
+    auto factory=ir::generator_type(s.expression->type)?std::move(s.expression):call(s.asynchronous_iteration?(s.reverse?"reverse_async_iterator":"async_iterator"):
+        (s.reverse?"reverse_iterator":"iterator"),std::move(s.expression));
+    const auto state=expression(*factory);
+    if(state==error_type)throw Poison{};
+    const bool generator=ir::generator_type(state);
+    const bool async_generator=ir::async_generator_type(state);
     if(generator && (s.asynchronous_iteration!=async_generator || s.reverse || !s.index_binder.text.empty()))
         error(source,s.token,Code::unsupported_iteration,
               async_generator?"An asynchronous generator requires forward for await with one item binder.":
                               "A synchronous generator requires forward for with one item binder.");
-    auto factory=generator?std::move(s.expression):call(s.asynchronous_iteration?(s.reverse?"reverse_async_iterator":"async_iterator"):
-        (s.reverse?"reverse_iterator":"iterator"),std::move(s.expression));
-    const auto state=expression(*factory);
-    if(state==error_type)throw Poison{};
     Token hidden{TokenKind::name,"$iterator$"+std::to_string(s.token.offset),s.token.offset};
     hidden.source_width=0;
     auto state_read=[&] {

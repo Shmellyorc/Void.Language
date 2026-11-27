@@ -2996,6 +2996,19 @@ class Semantics {
         }
         return s.flow = flow;
     }
+    // Cleanup registration owns the closure draft. Release those temporaries
+    // before descending into nested with scopes on the supported 1 MiB stack.
+    VOID_SEMANTIC_HANDLER void prepare_scope_cleanup(Statement& s,Type type) {
+        auto cell=unit.make_capture_record(current->symbol+"::$cell$"+std::to_string(s.slot),type,true);auto initial=type;initial.nullable=true;std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=initial;current->captured_locals.emplace(s.slot,cell);
+        Function lambda;lambda.anonymous=true;lambda.token=s.token;lambda.token.text="$with$"+std::to_string(current->lambdas.size());lambda.visibility="private";
+        Statement invoke(Statement::Kind::expression,s.token);invoke.expression=std::make_unique<Expr>(Expr::Kind::method_call,Token{TokenKind::name,ir::generator_type(type)?"close":"deinit",s.token.offset});invoke.expression->parts.push_back(std::make_unique<Expr>(Expr::Kind::name,s.binder));lambda.body.push_back(std::move(invoke));
+        s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);
+        for(const auto& selected:unit.functions)if(selected.symbol==s.selection->target && selected.body.size()==1 && selected.body[0].expression){
+            const auto& dispose=*selected.body[0].expression;
+            if(dispose.kind==Expr::Kind::method_call && dispose.token.text=="deinit" && dispose.type==Type::none && dispose.virtual_slot.empty() && !dispose.interface_call && dispose.native_symbol.empty() && dispose.parts.size()==1 && dispose.parts[0]->type==current->locals[s.slot])s.cleanup_target=dispose.target;
+        }
+        current->cleanup_type=unit.make_cleanup();
+    }
     VOID_SEMANTIC_HANDLER unsigned scoped_statement(Statement& s) {
         unsigned flow = next_flow;
 
@@ -3017,15 +3030,10 @@ class Semantics {
         if(ir::async_generator_type(type))
             error(source,s.token,Code::unsupported_type,"An asynchronous generator is consumed in for await.");
         scopes.emplace_back();s.slot=declare(s.binder,type,false);
-        auto cell=unit.make_capture_record(current->symbol+"::$cell$"+std::to_string(s.slot),type,true);auto initial=type;initial.nullable=true;std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=initial;current->captured_locals.emplace(s.slot,cell);
-        Function lambda;lambda.anonymous=true;lambda.token=s.token;lambda.token.text="$with$"+std::to_string(current->lambdas.size());lambda.visibility="private";
-        Statement invoke(Statement::Kind::expression,s.token);invoke.expression=std::make_unique<Expr>(Expr::Kind::method_call,Token{TokenKind::name,ir::generator_type(type)?"close":"deinit",s.token.offset});invoke.expression->parts.push_back(std::make_unique<Expr>(Expr::Kind::name,s.binder));lambda.body.push_back(std::move(invoke));
-        s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);
-        for(const auto& selected:unit.functions)if(selected.symbol==s.selection->target && selected.body.size()==1 && selected.body[0].expression){
-            const auto& dispose=*selected.body[0].expression;
-            if(dispose.kind==Expr::Kind::method_call && dispose.token.text=="deinit" && dispose.type==Type::none && dispose.virtual_slot.empty() && !dispose.interface_call && dispose.native_symbol.empty() && dispose.parts.size()==1 && dispose.parts[0]->type==current->locals[s.slot])s.cleanup_target=dispose.target;
-        }
-        current->cleanup_type=unit.make_cleanup();flow=sequence(s.body,false);scopes.pop_back();return s.flow = flow;
+        prepare_scope_cleanup(s,type);
+        flow=sequence(s.body,false);
+        scopes.pop_back();
+        return s.flow=flow;
     }
 
     VOID_SEMANTIC_HANDLER unsigned conditional_statement(Statement& s) {

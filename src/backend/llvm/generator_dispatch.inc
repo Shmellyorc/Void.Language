@@ -2,10 +2,13 @@
 // a generation number and a checked route to their own resume body.
 std::map<std::string,GeneratorPlan> generator_plans;
 std::map<std::string,llvm::Function*> generator_dispatchers;
-auto* generator_epoch=new llvm::GlobalVariable(*module,b.getInt64Ty(),false,
-    llvm::GlobalValue::PrivateLinkage,b.getInt64(0),"generator.epoch");
-generator_epoch->setAlignment(llvm::Align(alignof(std::uint64_t)));
+llvm::GlobalVariable* generator_epoch=nullptr;
 auto generator_generation=[&]() {
+    if(!generator_epoch) {
+        generator_epoch=new llvm::GlobalVariable(*module,b.getInt64Ty(),false,
+            llvm::GlobalValue::PrivateLinkage,b.getInt64(0),"generator.epoch");
+        generator_epoch->setAlignment(llvm::Align(alignof(std::uint64_t)));
+    }
     return b.CreateCall(module->getOrInsertFunction("vd_generator_generation",b.getInt64Ty(),b.getPtrTy()),{generator_epoch});
 };
 auto generator_thread=[&]() {

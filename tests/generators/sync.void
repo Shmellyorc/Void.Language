@@ -37,6 +37,12 @@ generator func resources(owner: ledger) -> item:
         yield target
         yield target
 
+value struct scoped_sequence:
+    owner: ledger
+
+func (self scoped_sequence) iterator() -> generator<item>:
+    return resources(self.owner)
+
 func leave_early(owner: ledger) -> i32:
     for target in resources(owner):
         return target.number
@@ -61,7 +67,7 @@ func main():
     var early = ledger()
     print(leave_early(early), early.order)
     var broken = ledger()
-    for target in resources(broken):
+    for target in scoped_sequence(owner = broken):
         break
     print(broken.order)
     var normal = ledger()

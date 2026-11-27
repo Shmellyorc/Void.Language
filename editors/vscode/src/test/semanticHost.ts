@@ -143,15 +143,17 @@ export async function run(): Promise<void> {
         const managedHover = async (fragment: string, offset: number) => {
             const result = await vscode.commands.executeCommand<vscode.Hover[]>(
                 'vscode.executeHoverProvider', app, position(fragment, offset));
-            return result.flatMap(item => item.contents.map(part => typeof part === 'string' ? part : part.value)).join(' ');
+            return result.flatMap(item => item.contents.map(part => typeof part === 'string' ? part : part.value)).join(' ').replaceAll('&nbsp;', ' ');
         };
         const managedCompletion = async (fragment: string, offset: number) => {
             const result = await vscode.commands.executeCommand<vscode.CompletionList>(
                 'vscode.executeCompletionItemProvider', app, position(fragment, offset));
             return result.items.map(item => typeof item.label === 'string' ? item.label : item.label.label);
         };
-        assert((await managedHover('reference.lock()', 'reference.lo'.length)).includes('strong reference'));
-        assert((await managedHover('sequence.close()', 'sequence.cl'.length)).includes('reached cleanup'));
+        const lockHover = await managedHover('reference.lock()', 'reference.lo'.length);
+        assert(lockHover.includes('strong reference'), lockHover);
+        const closeHover = await managedHover('sequence.close()', 'sequence.cl'.length);
+        assert(closeHover.includes('reached cleanup'), closeHover);
         assert((await managedCompletion('reference.lock()', 'reference.'.length)).includes('lock'));
         assert((await managedCompletion('sequence.close()', 'sequence.'.length)).includes('next'));
 

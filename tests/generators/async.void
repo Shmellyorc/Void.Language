@@ -28,10 +28,16 @@ async generator func sequence(owner: ledger) -> i32:
     var idle = await tick()
     yield 20
 
+value struct scoped_sequence:
+    owner: ledger
+
+func (self scoped_sequence) async_iterator() -> async_generator<i32>:
+    return sequence(self.owner)
+
 async func run_case(mode: i32) -> i32:
     var owner = ledger()
     var sum = 0
-    for await item in sequence(owner):
+    for await item in scoped_sequence(owner = owner):
         if owner.started != 1 or owner.drained != 0:
             return -9
         owner.consumed += 1
