@@ -166,13 +166,15 @@ lookup precedence and ambiguity diagnostics. Imports do not execute entry script
 as a substitute for the selected application.
 
 Manifest projects use `void.project.toml`. Applications discover one valid
-synchronous main, regardless of filename, or diagnose ambiguity. Libraries check
+synchronous or async main, regardless of filename, or diagnose ambiguity. Libraries check
 their source union without inventing an executable main; `package.entry` selects
 their import surface. Manifestless directory selection uses `main.void`; explicit
 source-file selection remains supported. Script-style entry and explicit main
 cannot compete in the same selected program. `main() -> i32` returns on every
-reachable path; no-result completion exits zero. Ordinary CLI run/build does not
-implicitly host an async root. `--app` is removed and rejected.
+reachable path. No-result completion exits zero. Ordinary CLI run/build selects
+the structured scheduler for `async func main()` and `async func main() -> i32`.
+See [async application entry](ASYNC.md#async-application-entry). `--app` is removed
+and rejected.
 
 Source package maintenance, lock identity, generated library entries and explicit
 native requirements follow [local libraries](LOCAL_LIBRARIES.md),
@@ -245,12 +247,23 @@ their runtime behavior. Local `const` still means readonly runtime initializatio
 it does not request evaluation during compilation.
 
 The supported body subset includes owned local values, local assignment, returns
-and multiple returns, Boolean branches, conditional/range/fixed-array loops,
-recursion, supported expressions and nested marked calls. Receiver mutation,
-mutable reference storage, managed identities, custom initializers/operators,
-closures, patterns, resource/defer scopes, async work, native calls, globals and
-observable I/O are excluded. Compiler-owned collection templates do not allocate
-Runtime objects during evaluation. No reference can escape a compiler temporary.
+and multiple returns, Boolean branches, conditional/range/array loops, recursion
+and nested marked calls. Pure reads include UTF-8 scalar indexing, text scalar
+and byte counts, collection counts, checked and recoverable array and dictionary
+lookups, and dictionary membership. Dictionary templates retain the last value
+for duplicate keys.
+
+Apply `is` and `match` to eligible constant values. The same syntax works in a
+required constant expression or in a `compile func` body. Match arms retain
+their ordering, bindings and exhaustiveness diagnostics. Scalar values and
+ranges, record fields, enum, nullable and result tags, list patterns with rest,
+and dictionary entry patterns are supported.
+
+Receiver mutation, growable collection mutation, managed identities, custom
+initializers and runtime-only operators, closures, resource scopes, deferred
+effects, async work, native calls, globals and observable I/O remain outside the
+constant evaluator. Compiler-owned templates carry values without Runtime
+allocation.
 
 Evaluation has finite call, nesting, step, temporary-value and graph budgets.
 Exhaustion produces a source diagnostic; editor cancellation stops constant work.
@@ -643,6 +656,10 @@ Completion, hover, signature help, definition/reference navigation, semantic
 highlighting, diagnostics and recovery are compiler-owned. Readable generic,
 enum and inferred task labels preserve actual symbol identity. Editor versions
 and extension presentation are qualified separately from protocol behavior.
+Use `# section Name` and `# endsection` to organize a file. The language server
+provides section folding and document navigation. Sections leave language scope
+and visibility unchanged. See [VOID sections](LANGUAGE_SERVER.md#void-sections).
+
 See [language server](LANGUAGE_SERVER.md), [editor integration](EDITOR_INTEGRATION.md),
 [diagnostics](DIAGNOSTICS.md) and [public library modules](README.md#standard-library-modules).
 
@@ -655,7 +672,6 @@ The complete original rationale remains in [the historical Bible](LANGUAGE_BIBLE
 | Direction | Current boundary |
 | --- | --- |
 | Optional `if condition: return` | Deferred; use an indented body. |
-| VOID Sections (`# section Name`, `# endsection`) | Approved organizational-comment direction; specialized tooling remains deferred. Comments do not create scope. |
 | Stateless/method-only reuse and transitive promotion | Future design; `using` currently embeds storage and promotes one hop. |
 | Standalone value-interface boxing, broad interface conversions | No general erasure/downcast protocol beyond current managed views and concrete constraints. |
 | Weak references and broader collector tuning | Design direction; do not infer public weak-reference syntax or certified memory/latency bounds. |

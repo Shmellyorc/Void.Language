@@ -102,10 +102,10 @@ target_compile_definitions(void_zone_objects PRIVATE
 target_link_libraries(void_zone_objects PRIVATE void_options)
 add_library(void_application_objects OBJECT src/application_metadata.cpp src/project_identity.cpp src/dynamic_closure.cpp)
 target_link_libraries(void_application_objects PRIVATE void_options)
-add_library(void_core src/frontend/conditional.cpp src/frontend/project.cpp src/frontend/project_creation.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
+add_library(void_core src/frontend/conditional.cpp src/frontend/project.cpp src/frontend/project_creation.cpp src/frontend/source.cpp src/frontend/compiler.cpp src/frontend/tooling.cpp src/frontend/rename.cpp src/numeric.cpp src/ir/module.cpp src/ir/native_storage.cpp src/ir/native_binding.cpp)
 target_sources(void_core PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
 target_sources(void_core PRIVATE src/frontend/lexer.cpp src/frontend/parser.cpp
-  src/frontend/diagnostics.cpp src/frontend/model.cpp src/frontend/constant_evaluation.cpp
+  src/frontend/diagnostics.cpp src/frontend/model.cpp src/frontend/constant_evaluation.cpp src/frontend/constant_patterns.cpp
   src/frontend/lowering.cpp src/frontend/semantics.cpp src/frontend/type_resolution.cpp
   src/frontend/source_graph.cpp src/frontend/analysis.cpp src/frontend/editor_queries.cpp
   src/frontend/effect_analysis.cpp src/frontend/construction_analysis.cpp src/frontend/inheritance.cpp)
@@ -664,6 +664,12 @@ if(BUILD_TESTING)
   add_test(NAME compile_functions_cancellation COMMAND void_compile_cancellation)
   set_tests_properties(compile_functions_source PROPERTIES TIMEOUT 300)
   set_tests_properties(compile_functions_lsp compile_functions_cancellation PROPERTIES TIMEOUT 120)
+  add_test(NAME lsp_sections_and_rename COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/lsp/sections_and_rename.py" "$<TARGET_FILE:voidls>")
+  add_test(NAME async_application_source COMMAND "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/async/application.py" "$<TARGET_FILE:voidc>")
+  set_tests_properties(lsp_sections_and_rename PROPERTIES TIMEOUT 90)
+  set_tests_properties(async_application_source PROPERTIES TIMEOUT 180)
   add_test(NAME lsp_intellisense COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/lsp/intellisense.py" "$<TARGET_FILE:voidls>" "$<TARGET_FILE:voidc>")
   set_tests_properties(lsp_intellisense PROPERTIES TIMEOUT 180)

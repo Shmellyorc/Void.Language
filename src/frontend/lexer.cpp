@@ -49,7 +49,8 @@ Indentation indentation_at(std::string_view text, std::size_t start) {
 namespace {
 #include "strings.inc"
 #include "conditional.inc"
-std::vector<Token> lex_range(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin, std::size_t end, unsigned interpolation_depth, bool expand_interpolation=true, EditorRecovery* recovery=nullptr, const BuildConditions* configuration=nullptr, std::vector<ConditionalRegion>* regions=nullptr) {
+std::vector<Token> lex_range(const SourceFile& source, Diagnostics& diagnostics, std::size_t begin, std::size_t end, unsigned interpolation_depth, bool expand_interpolation=true, EditorRecovery* recovery=nullptr, const BuildConditions* configuration=nullptr, std::vector<ConditionalRegion>* regions=nullptr,
+                             std::vector<std::pair<std::size_t, std::size_t>>* standalone_comments=nullptr) {
     const auto& text = source.text();
     ConditionalSelection selection(source,diagnostics,configuration?*configuration:native_build_conditions(),regions);
     std::vector<Token> tokens;
@@ -90,6 +91,11 @@ std::vector<Token> lex_range(const SourceFile& source, Diagnostics& diagnostics,
                 continue;
             }
             const bool blank = p == text.size() || text[p] == '#' || text[p] == '\r' || text[p] == '\n';
+            if (standalone_comments && p < end &&
+                (text.compare(p, 10, "# section ") == 0 || text.compare(p, 12, "# endsection") == 0)) {
+                const auto newline = text.find_first_of("\r\n", p);
+                standalone_comments->emplace_back(p, std::min(newline, end));
+            }
             if (!blank && !braces && !literal_blocks.empty()) {
                 const auto block = literal_blocks.back();
                 const bool alternative = block.conditional && prefix.width == block.indent && text.compare(p, 4, "else") == 0;
@@ -250,4 +256,57 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, bool 
     return lex_range(source, diagnostics, 0, std::string::npos, 0, expand_interpolation, recovery,
                      configuration, regions);
 }
+}
+
+namespace vd {
+std::vector<SourceSection> source_sections(const SourceFile& source,const BuildConditions* conditions,
+                                           std::vector<std::pair<unsigned,unsigned>>* blocks) {
+    frontend::Diagnostics diagnostics;
+    std::vector<std::pair<std::size_t, std::size_t>> comments;
+    // Reuse lexical comment boundaries, including multiline strings and BOM.
+    const auto tokens=frontend::lex_range(source, diagnostics, 0, std::string::npos, 0, false, nullptr,
+                                          conditions, nullptr, &comments);
+
+    std::vector<SourceSection> pending, sections;
+    const std::string_view text = source.text();
+    for (const auto& [begin, end] : comments) {
+        auto marker = text.substr(begin, end - begin);
+        marker.remove_suffix(marker.size() - marker.find_last_not_of(" \t") - 1);
+        if (marker == "# endsection") {
+            if (pending.empty()) continue;
+            auto section = pending.back();
+            pending.pop_back();
+            section.end = begin + marker.size();
+            sections.push_back(section);
+        } else if (marker.starts_with("# section ")) {
+            const auto name = marker.find_first_not_of(" \t", 10);
+            if (name != std::string_view::npos)
+                pending.push_back({begin, begin + name, begin + marker.size(), 0});
+        }
+    }
+    std::sort(sections.begin(), sections.end(), [](const auto& left, const auto& right) {
+        return left.begin < right.begin;
+    });
+    // Clients switch from indentation fallback to language-server folding
+    // when explicit ranges arrive. Keep the lexer-indented bodies in that view.
+    if(blocks && !sections.empty()) {
+        using K=frontend::TokenKind;
+        std::vector<unsigned> starts;
+        std::size_t last=0;
+        for(const auto& token:tokens) {
+            if(token.kind==K::indent)starts.push_back(source.location(last).line-1);
+            else if(token.kind==K::dedent && !starts.empty()) {
+                const auto start=starts.back(),end=source.location(last).line-1;
+                starts.pop_back();
+                if(start<end)blocks->emplace_back(start,end);
+            } else if(token.kind!=K::newline && token.kind!=K::end) {
+                const auto width=token.source_width.value_or(token.text.size());
+                last=token.kind==K::invalid || !width?token.offset:
+                    std::min(source.text().size(),token.offset+width-1);
+            }
+        }
+    }
+    return sections;
+}
+
 }

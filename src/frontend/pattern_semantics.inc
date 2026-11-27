@@ -63,10 +63,12 @@
     }
     void check_pattern(Pattern& p,Type type) {
         Depth guard(diagnostics.semantic_depth(),source,p.token,128);p.type=type;
+        if(!current && type!=error_type && !compile_value_type(type))
+            error(source,p.token,Code::constant_call,"Constant pattern requires a pure value without Runtime identity.");
         using K=Pattern::Kind;
         switch(p.kind) {
         case K::wildcard: return;
-        case K::capture:p.slot=declare(p.token,type);return;
+        case K::capture:p.constant_binding=!current;p.slot=declare(p.token,type);return;
         case K::value:{
             auto& value=*p.values.front();
             if(value.kind==Expr::Kind::field && (p.editor_incomplete_arm || editor_cursor(value) || (type.definition && (!type.definition->cases.empty() || type.kind==Type::numeric_enum)))) {
@@ -203,13 +205,14 @@
     Type check_match(Expr& e,std::optional<Type> expected) {
         auto type=expression(*e.parts[0]);std::optional<Type> result=expected;
         for(unsigned n=0;n<e.patterns.size();++n) {
-            scopes.emplace_back();check_pattern(e.patterns[n],type);
+            scopes.emplace_back();
+            struct Leave {decltype(scopes)& stack;~Leave(){stack.pop_back();}} leave{scopes};
+            check_pattern(e.patterns[n],type);
             auto& arm=*e.parts[n+1];
             if(arm.kind!=Expr::Kind::editor_hole) {
                 auto value=expression(arm,result);
                 if(result)expect(value,*result,arm.token);else result=value;
             }
-            scopes.pop_back();
         }
         if(!result || *result==Type::none)error(source,e.token,Code::invalid_value,"A match expression requires value-producing arms.");
         warn_match(e.token,type,[&](auto visit){for(const auto& p:e.patterns)visit(p);});return e.type=*result;

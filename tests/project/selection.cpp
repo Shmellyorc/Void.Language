@@ -41,7 +41,9 @@ void selection_and_snapshots(){
  auto explicit_p=f.good("src/features/launcher.void");check(explicit_p->discovery_sources().empty() && explicit_p->selection_key()!=old,"explicit mode distinct without D");
  f.bad(Code::import_read,"src/missing.void");f.bad(Code::project_path,"../outside.void");f.bad(Code::project_path,"/src/features/launcher.void");
  fs::remove(f.root/"src/second.void");f.write("src/features/launcher.void","func main(value: i32) -> i32:\n    return value\n");f.bad(Code::project_entry);
- for(const auto& text:{std::string("async func main():\n    pass\n"),std::string("func main<t>():\n    pass\n"),std::string("func main() -> bool:\n    return false\n"),std::string("func main(value: i32 = 0):\n    pass\n")}){f.write("src/features/launcher.void",text);f.bad(Code::project_entry);}
+ f.write("src/features/launcher.void","async func main():\n    pass\n");
+ check(f.good()->program()->async_application(),"async project main");
+ for(const auto& text:{std::string("func main<t>():\n    pass\n"),std::string("func main() -> bool:\n    return false\n"),std::string("func main(value: i32 = 0):\n    pass\n")}){f.write("src/features/launcher.void",text);f.bad(Code::project_entry);}
  f.write("src/features/launcher.void",main_source);f.write("src/unrelated.void","func broken(:\n");f.bad(Code::identifier);f.good("src/features/launcher.void");
  f.write("void.project.toml","[=roject]");f.bad(Code::project_syntax);
 }

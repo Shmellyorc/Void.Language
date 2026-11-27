@@ -3,6 +3,7 @@
 #include "void/compile_evaluation.hpp"
 #include "void/format.hpp"
 #include "void/math_ops.hpp"
+#include "void/utf8.hpp"
 #include <algorithm>
 #include <bit>
 #include <limits>
@@ -30,10 +31,15 @@ bool compile_value_type(Type root) {
     return true;
 }
 void collection_constant_type(const SourceFile&,const Token&,Type);
+bool constant_core_operation(std::string_view target) {
+    return target == "$text.index" || target == "$text.length" || target == "$text.byte_length" ||
+        target == "$dict.count" || target == "$dict.contains" || target == "$safe.dict.get" ||
+        target == "$safe.array.get" || target == "$array.count";
+}
 bool compile_intrinsic(const Expr& e) {
     if(!e.display_adapter.empty())return false;
     return e.target.starts_with("$numeric::") || e.target=="$interpolation" || e.target=="$hole" ||
-        e.target=="$display.string" || e.target=="$display.format" || e.op=="$enum_equal" ||
+        constant_core_operation(e.target) || e.target=="$display.string" || e.target=="$display.format" || e.op=="$enum_equal" ||
         e.op.starts_with("$enum.") || e.op=="$collection_equal";
 }
 void validate_compile_function(const SourceFile& source,Function& f) {
@@ -46,11 +52,13 @@ void validate_compile_function(const SourceFile& source,Function& f) {
     for(const auto& t:f.locals)if(!compile_value_type(t))reject(f.token,"local/parameter type requires Runtime identity or unsupported storage.");
     std::vector<const Statement*> statements;for(const auto& s:f.body)statements.push_back(&s);
     std::vector<const Expr*> expressions;
+    std::vector<const Pattern*> patterns;
     while(!statements.empty()) {
         const auto& s=*statements.back();statements.pop_back();
         using K=Statement::Kind;
-        if(s.kind==K::scoped || s.kind==K::deferred || s.kind==K::match || s.asynchronous_iteration || s.pattern)
-            reject(s.token,"resource scopes, deferred effects, patterns and async iteration are not supported constant operations.");
+        if(s.kind==K::scoped || s.kind==K::deferred || s.asynchronous_iteration)
+            reject(s.token,"resource scopes, deferred effects and async iteration are not supported constant operations.");
+        if(s.pattern)patterns.push_back(&*s.pattern);
         if(s.kind==K::assignment) {
             if(s.selection || s.event || !s.compound_target.empty() || s.compound_conversion)
                 reject(s.token,"only direct local value assignments are supported; external state and property effects are forbidden.");
@@ -62,23 +70,29 @@ void validate_compile_function(const SourceFile& source,Function& f) {
             }
             if(s.index && selected.kind!=Type::fixed_array)reject(s.token,"only owned fixed-array elements may be mutated.");
         }
-        if(s.kind==K::loop && !s.binder.text.empty() && !s.range_end && s.expression->type.kind!=Type::fixed_array)
-            reject(s.token,"constant iteration supports ranges, conditions and owned fixed arrays.");
+        if(s.kind==K::loop && !s.binder.text.empty() && !s.range_end && !ir::array_type(s.expression->type))
+            reject(s.token,"constant iteration supports ranges, conditions and arrays.");
         for(const auto* e:{s.expression.get(),s.selection.get(),s.index.get(),s.range_end.get()})if(e)expressions.push_back(e);
         for(const auto& child:s.body)statements.push_back(&child);
         for(const auto& child:s.otherwise)statements.push_back(&child);
     }
-    while(!expressions.empty()) {
+    while(!expressions.empty() || !patterns.empty()) {
+        if(!patterns.empty()) {
+            const auto& pattern = *patterns.back(); patterns.pop_back();
+            if(!compile_value_type(pattern.type) || ir::reference_value(pattern.narrowed))
+                reject(pattern.token,"pattern requires Runtime identity or unsupported storage.");
+            for(const auto& value : pattern.values)expressions.push_back(value.get());
+            for(const auto& child : pattern.children)patterns.push_back(&child);
+            continue;
+        }
         const auto& e=*expressions.back();expressions.pop_back();using K=Expr::Kind;
         if(!compile_value_type(e.type))reject(e.token,"expression requires Runtime identity or unsupported storage.");
         switch(e.kind) {
         case K::name:case K::literal:case K::unary:case K::binary:case K::conversion:case K::choice:
-        case K::sum:case K::array_literal:case K::dictionary_literal:case K::array_default:case K::return_pack:break;
-        case K::array_index:
-            if(!ir::array_type(e.parts.at(0)->type))reject(e.token,"dictionary lookup requires runtime evaluation.");
-            break;
+        case K::sum:case K::array_literal:case K::dictionary_literal:case K::array_default:case K::return_pack:
+        case K::array_index:case K::test:case K::match:break;
         case K::field:
-            if(e.property || (e.target.starts_with("$") && e.target!="$array.count"))reject(e.token,"this property requires runtime evaluation.");
+            if(e.property || (e.target.starts_with("$") && !constant_core_operation(e.target)))reject(e.token,"this property requires runtime evaluation.");
             break;
         case K::construction:
             if(e.type.kind!=Type::aggregate || !e.initializer.empty())reject(e.token,"managed allocation and custom initialization are forbidden.");
@@ -94,6 +108,7 @@ void validate_compile_function(const SourceFile& source,Function& f) {
         }
         for(const auto& child:e.parts)expressions.push_back(child.get());
         for(const auto& child:e.omitted)expressions.push_back(child.get());
+        for(const auto& pattern:e.patterns)patterns.push_back(&pattern);
     }
 }
 void CompileEvaluation::step(const SourceFile& source,const Token& site,std::uint64_t work) {
@@ -103,14 +118,16 @@ void CompileEvaluation::step(const SourceFile& source,const Token& site,std::uin
     steps+=work;graph_steps+=work;
 }
 
+void CompileEvaluation::charge_bytes(const SourceFile& source, const Token& site, std::size_t amount) {
+    if(amount>byte_limit-bytes || amount>graph_byte_limit-graph_bytes)
+        error(source,site,Code::limit,"Compile-time temporary value budget exceeded (64 MiB per expression; 256 MiB per analysis).");
+    bytes+=amount;graph_bytes+=amount;
+}
 void CompileEvaluation::charge(const SourceFile& source,const Token& site,const ir::ConstantValue& value) {
     std::vector<const ir::ConstantValue*> pending{&value};
     while(!pending.empty()) {
         const auto& v=*pending.back();pending.pop_back();
-        const auto amount=sizeof(v)+v.text.size();
-        if(amount>byte_limit-bytes || amount>graph_byte_limit-graph_bytes)
-            error(source,site,Code::limit,"Compile-time temporary value budget exceeded (64 MiB per expression; 256 MiB per analysis).");
-        bytes+=amount;graph_bytes+=amount;
+        charge_bytes(source,site,sizeof(v)+v.text.size());
         for(const auto& field:v.fields)pending.push_back(&field);
     }
 }
@@ -259,7 +276,10 @@ VOID_SEMANTIC_HANDLER CompileEvaluation::Outcome CompileEvaluation::loop(const S
             cursor=numeric::binary(up?ir::Op::add:ir::Op::subtract,cursor,1,type);
         }
     } else {
-        const auto selected=select(source,*s.expression);
+        Selection selected;
+        if(s.expression->type.kind==Type::growable_array)
+            selected.captured=constant_value(source,*s.expression,this);
+        else selected=select(source,*s.expression);
         const auto& initial=read(source,s.token,selected);auto count=initial.repeat.value_or(initial.fields.size());
         for(std::uint64_t n=0;n<count;++n) {
             step(source,s.token);const auto index=s.reverse?count-1-n:n;
@@ -283,6 +303,7 @@ VOID_SEMANTIC_HANDLER CompileEvaluation::Outcome CompileEvaluation::sequence(con
         case K::returned:return {return_flow,s.expression?constant_value(source,*s.expression,this):ir::ConstantValue{}};
         case K::conditional:{auto result=sequence(source,constant_value(source,*s.expression,this).bits?s.body:s.otherwise);if(result.flow!=next_flow)return result;break;}
         case K::loop:{auto result=loop(source,s);if(result.flow!=next_flow)return result;break;}
+        case K::match:{auto result=match_statement(source,s);if(result.flow!=next_flow)return result;break;}
         case K::broken:return {break_flow,{}};case K::continued:return {continue_flow,{}};
         case K::no_op:break;
         case K::destructure:{auto value=constant_value(source,*s.expression,this);for(unsigned n=0;n<s.bindings.size();++n)locals->at(s.bindings[n].slot)=value.fields.at(n);break;}
@@ -294,14 +315,78 @@ VOID_SEMANTIC_HANDLER CompileEvaluation::Outcome CompileEvaluation::sequence(con
 
 #include "collection_constants.inc"
 #include "enum_constants.inc"
+namespace {
+std::size_t constant_array_count(const ir::ConstantValue& value) {
+    return value.repeat.value_or(value.fields.size());
+}
+
+const ir::ConstantValue* constant_array_find(const Expr& index_expr,const ir::ConstantValue& index,
+                                             const ir::ConstantValue& array) {
+    try {
+        const auto offset=ir::checked_array_index(index.bits,index_expr.type,constant_array_count(array));
+        return &array.fields.at(array.repeat?0:static_cast<std::size_t>(offset));
+    } catch(const std::out_of_range&) {
+        return nullptr;
+    }
+}
+
+ir::ConstantValue inspect_constant(const SourceFile& source,const Expr& e,CompileEvaluation* evaluation) {
+    const auto owner=constant_value(source,*e.parts.at(0),evaluation);
+    const auto type=e.parts[0]->type;
+    if(e.target=="$array.count")return {constant_array_count(owner),{}};
+    if(e.target=="$dict.count")return {constant_dictionary_entries(source,e.token,type,owner,evaluation).size(),{}};
+    if(e.target=="$text.byte_length")return {owner.text.size(),{}};
+    if(type==Type::string) {
+        if(evaluation)evaluation->step(source,e.token,(owner.text.size()+63)/64);
+        const auto count=utf8_scalar_count(owner.text);
+        if(e.target=="$text.length")return {count,{}};
+        const auto& operand=*e.parts.at(1);
+        const auto index=constant_value(source,operand,evaluation);
+        try {
+            const auto selected=ir::checked_array_index(index.bits,operand.type,count);
+            std::size_t offset=0;
+            for(std::uint64_t n=0;n<selected;++n)offset+=utf8_scalar_bytes(owner.text,offset);
+            return {0,{},owner.text.substr(offset,utf8_scalar_bytes(owner.text,offset))};
+        } catch(const std::out_of_range&) {
+            error(source,e.token,Code::invalid_value,"String index outside extent.");
+        }
+    }
+    const auto& operand=*e.parts.at(1);
+    const auto index=constant_value(source,operand,evaluation);
+    const bool dictionary=type.kind==Type::dictionary;
+    const auto* selected=dictionary?constant_dictionary_find(source,e.token,type,owner,index,evaluation):
+        constant_array_find(operand,index,owner);
+    if(e.target=="$dict.contains")return {selected!=nullptr,{}};
+    if(e.target=="$safe.dict.get" || e.target=="$safe.array.get") {
+        ir::ConstantValue result;
+        result.fields.resize(3);
+        result.fields[0].bits=selected?0:1;
+        if(selected)result.fields[1]=*selected;
+        else result.fields[2].text=dictionary?"key not found":"index out of range";
+        return result;
+    }
+    if(selected)return *selected;
+    error(source,e.token,Code::invalid_value,dictionary?"Dictionary key not found.":"Constant array index out of bounds.");
+}
+}
 ir::ConstantValue constant_expression(const SourceFile& source, const Expr& e, CompileEvaluation* evaluation) {
     // Presentation recovery keeps the nominal type of a partial enum member,
     // but the hole has no value or operands. Propagate the existing poison
     // boundary instead of evaluating it as an ordinary constant expression.
     if(e.kind==Expr::Kind::editor_hole)throw Poison{};
+    if(e.kind==Expr::Kind::test || e.kind==Expr::Kind::match) {
+        if(!evaluation)error(source,e.token,Code::constant_call,"Pattern requires a compile-time evaluation context.");
+        return evaluation->match_expression(source,e);
+    }
+    if(e.kind==Expr::Kind::array_index || constant_core_operation(e.target))
+        return frontend_case([&]{return inspect_constant(source,e,evaluation);});
+    if(e.kind==Expr::Kind::test || e.kind==Expr::Kind::match)
+        return evaluation->match_expression(source,e);
     if(e.kind==Expr::Kind::call && e.op=="$collection_equal") return frontend_case([&]() -> ir::ConstantValue {
         const auto type=e.parts.at(0)->type;collection_constant_type(source,e.token,type);
-        return {collection_constant_equal(source,e.token,type,constant_value(source,*e.parts[0],evaluation),constant_value(source,*e.parts[1],evaluation),0),{}};
+        const auto left = constant_value(source,*e.parts[0],evaluation);
+        const auto right = constant_value(source,*e.parts[1],evaluation);
+        return {collection_constant_equal(source,e.token,type,left,right,0,evaluation),{}};
     });
     if(auto result=enum_constant(source,e,evaluation))return *result;
     if(e.target=="$interpolation") return frontend_case([&]() -> ir::ConstantValue {
@@ -367,21 +452,13 @@ ir::ConstantValue constant_expression(const SourceFile& source, const Expr& e, C
     if(e.kind==Expr::Kind::array_literal || e.kind==Expr::Kind::return_pack) return frontend_case([&]() -> ir::ConstantValue {
         ir::ConstantValue result;for(const auto& part:e.parts) result.fields.push_back(constant_value(source,*part,evaluation));return result;
     });
-    if(e.kind==Expr::Kind::array_index) return frontend_case([&]() -> ir::ConstantValue {
-        auto array=constant_value(source,*e.parts[0],evaluation);auto index=constant_value(source,*e.parts[1],evaluation);
-        try {
-            const auto selected=ir::checked_array_index(index.bits,e.parts[1]->type,array.repeat.value_or(array.fields.size()));
-            return array.fields.at(array.repeat ? 0 : static_cast<std::size_t>(selected));
-        }
-        catch(const std::out_of_range&) {error(source,e.token,Code::invalid_value,"Constant array index out of bounds.");}
-    });
     if (e.kind == Expr::Kind::construction) return frontend_case([&]() -> ir::ConstantValue {
         auto result = e.aggregate_value;
         for (unsigned n = 0; n < e.parts.size(); ++n) result.fields[e.field_indexes[n]] = constant_value(source,*e.parts[n],evaluation);
         for (const auto& child : e.omitted) result.fields[child->slot] = constant_value(source,*child,evaluation);
         return result;
     });
-    if (e.kind == Expr::Kind::field) {auto value=constant_value(source,*e.parts[0],evaluation);if(e.target=="$array.count")return {value.repeat.value_or(value.fields.size()),{}};return value.fields.at(e.slot);}
+    if (e.kind == Expr::Kind::field) {auto value=constant_value(source,*e.parts[0],evaluation);return value.fields.at(e.slot);}
     if (e.kind==Expr::Kind::binary && e.parts[0]->type==Type::string) return frontend_case([&]() -> ir::ConstantValue {
         auto a=constant_value(source,*e.parts[0],evaluation).text;
         auto b=constant_value(source,*e.parts[1],evaluation).text;

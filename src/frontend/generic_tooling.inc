@@ -117,6 +117,17 @@ for(const auto& f:unit->generic_functions) {
         AnalyzedParameter parameter{p.token.text,editor_pattern_type(p.type),location(p.token)};
         if(p.default_expression){auto range=location(p.token);range.begin=p.default_begin;range.end=p.default_end;parameter.default_source=range;}
         record.written_parameters.push_back(std::move(parameter));
+        AnalyzedDeclaration binding{AnalyzedDeclaration::Kind::parameter,f.symbol+"::parameter::"+p.token.text,id,
+            "local",location(p.token),{},editor_pattern_type(p.type),{},{},f.symbol};
+        binding.rename_safe=valid_editor_identifier(p.token.text);
+        declaration(std::move(binding),false);
+    }
+    if(f.receiver) {
+        const auto& receiver=*f.receiver;
+        AnalyzedDeclaration binding{AnalyzedDeclaration::Kind::parameter,f.symbol+"::parameter::"+receiver.token.text,id,
+            "local",location(receiver.token),{},editor_pattern_type(receiver.type),{},{},f.symbol};
+        binding.rename_safe=valid_editor_identifier(receiver.token.text);
+        declaration(std::move(binding),false);
     }
     if(f.source_end>f.token.offset){auto r=location(f.token);r.begin=unit->source.line_starts().at(unit->source.location(f.token.offset).line-1);r.end=f.source_end;record.extent=r;}
     if(f.static_owner){record.static_member=true;record.editor_symbol_kind=6;record.signature=editor_signature(f);}
@@ -124,6 +135,9 @@ for(const auto& f:unit->generic_functions) {
     record.generic_template=true;
     if(f.receiver)record.receiver=editor_pattern_type(f.receiver->type);
     if(!f.returns.empty())record.signature=editor_signature(f);
+    record.rename_safe=!f.initializer && f.native_symbol.empty() && !f.c_primitive &&
+        f.token.text!="entry" && f.token.text!="main" && f.token.text!="deinit" && f.token.text!="call" &&
+        (f.accessor || valid_editor_identifier(f.token.text));
     declaration(std::move(record),false);parameter_records(f.generics,f.symbol);
     return_components(f);
     std::map<std::string,std::string> names;

@@ -1498,11 +1498,39 @@ ir::Module lower_graph(const std::map<std::string, std::unique_ptr<Unit>>& units
         module.application=true;module.entry_symbol=entry+"::$app_adapter";
         ir::Function adapter;adapter.name=module.entry_symbol;adapter.source_name="$app_adapter";adapter.module_identity=entry;adapter.source=selected.source.location(application ? application->token.offset : 0);
         adapter.parameters={Type::i32};adapter.result=Type::i32;adapter.locals={Type::i32};
-        ir::Instruction call{ir::Op::call};call.callee=application ? application->symbol : "";call.type=application ? application->result : Type(Type::none);
-        ir::Block body; if (application) body.instructions.push_back(call);
-        if(!application || application->result==Type::none){body.instructions.push_back({ir::Op::constant,0});body.end={ir::Terminator::Kind::return_value,application ? 1u : 0u};}
-        else body.end={ir::Terminator::Kind::return_value,0};
-        adapter.blocks.push_back(std::move(body));module.functions.push_back(std::move(adapter));
+        adapter.asynchronous = application && application->asynchronous;
+        ir::Block body;
+        if (application) {
+            ir::Instruction call{adapter.asynchronous ? ir::Op::async_call : ir::Op::call};
+            call.callee = application->symbol;
+            call.type = adapter.asynchronous ? application->task : application->result;
+            call.source = adapter.source;
+            body.instructions.push_back(std::move(call));
+            if (adapter.asynchronous) {
+                ir::Instruction await{ir::Op::await, 0};
+                await.source = adapter.source;
+                body.instructions.push_back(std::move(await));
+            }
+        }
+        if (!application || application->result == Type::none)
+            body.instructions.push_back({ir::Op::constant, 0});
+        const auto result = static_cast<unsigned>(body.instructions.size() - 1);
+        if (adapter.asynchronous) {
+            // The host invokes the existing i32(i32) scheduler root. It awaits
+            // the source main in the same structured task tree.
+            module.async_root = true;
+            adapter.task = selected.async_application_task;
+            body.instructions.push_back({ir::Op::store, 0, result});
+            body.end = {ir::Terminator::Kind::jump, 0, 1};
+            adapter.cleanup_entry = 1;
+            adapter.blocks.push_back(std::move(body));
+            adapter.blocks.push_back({{{ir::Op::async_drain}, {ir::Op::load, 0}},
+                                      {ir::Terminator::Kind::return_value, 1}});
+        } else {
+            body.end = {ir::Terminator::Kind::return_value, result};
+            adapter.blocks.push_back(std::move(body));
+        }
+        module.functions.push_back(std::move(adapter));
     }
     module.interface_bindings=units.at(entry)->member_catalog->interface_bindings;
     module.strings=std::move(strings.values);

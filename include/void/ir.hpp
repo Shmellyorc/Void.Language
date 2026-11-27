@@ -219,7 +219,7 @@ struct Module {
     std::shared_ptr<const ValidatedAnalysis> analysis = {};
     std::string constant_contract = {}; // Exact canonical const declarations.
     bool application = false; // Explicit CLI application status policy; adapter retains i32(i32).
-    bool async_root = false; // Explicit scheduler adapter, never implicit CLI behavior.
+    bool async_root = false; // Entry uses the structured scheduler root adapter.
     std::string native_library = {};
     bool coordinated = false; // Requires a runtime owner; inferred for managed source.
     std::vector<Type> nominal_types = {}; // Complete validated generation universe.

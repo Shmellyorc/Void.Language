@@ -21,6 +21,7 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
     const auto& selected=library_scope?*library_scope:*units.at(entry);
     result->executable_=!library_scope && !editor_only;
     const auto* app=application_entry(selected);
+    result->async_application_ = app && app->asynchronous;
     result->application_=app!=nullptr || (!selected.globals.empty() && !selected.declarations.contains("entry") && !selected.declarations.contains("main"));
     result->entry_symbol_=result->executable_?entry+(result->application_?"::$app_adapter":"::entry"):std::string{};
     // Builtin declaration snapshots provide stable canonical hover/reference
@@ -42,6 +43,7 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
     }
     for(const auto& [id,u]:units)for(const auto& [symbol,record]:u->builtins)if(std::none_of(result->editor_declarations_.begin(),result->editor_declarations_.end(),[&](const auto& d){return d.identity==symbol;}))result->editor_declarations_.push_back(record);
     result->contract_="18:numeric-prelude-v1:20:text-collections-v1:unicode-case-16-v1:display-v1:console-v2:terminal-v2:application-args-v2:host-primitives-v1:"+result->entry_symbol_;
+    if(result->async_application_)result->contract_+="|async-application-v1";
     if(!context_key.empty())result->contract_+="|project-context-v1:"+context_key;
     for (const auto& [id,u] : units) if (u->c_primitives) {
         result->c_primitives_ = u->c_primitives;
@@ -55,9 +57,16 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
     auto& context=library_scope?*library_scope:*graph->at(entry);
     auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };
     std::map<std::string,std::string> source_identities;
+    std::set<std::string> instantiated;
     for(const auto& [id,u]:*graph) {
-        for(const auto& f:u->functions)if(!f.generic_origin.empty())source_identities.emplace(f.symbol,f.generic_origin);
-        for(const auto& s:u->structures)if(s.generic_origin)source_identities.emplace(s.definition->identity,s.generic_origin->definition->identity);
+        for(const auto& f:u->functions)if(!f.generic_origin.empty()) {
+            source_identities.emplace(f.symbol,f.generic_origin);
+            instantiated.insert(f.generic_origin);
+        }
+        for(const auto& s:u->structures)if(s.generic_origin) {
+            source_identities.emplace(s.definition->identity,s.generic_origin->definition->identity);
+            instantiated.insert(s.generic_origin->definition->identity);
+        }
     }
     auto source_identity=[&](const std::string& key) {
         auto prefix=key;
@@ -98,7 +107,22 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
     std::set<std::string> visible_declarations;
     std::set<std::tuple<std::string,std::string,std::string,std::size_t,std::size_t,bool>> visible_references;
     std::set<std::string> exact_references;
+    auto rename_relationship=[&](const std::string& left,const std::string& right) {
+        auto a=source_identity(left),b=source_identity(right);
+        if(a==b)return;
+        if(b<a)std::swap(a,b);
+        result->rename_relationships_.emplace(std::move(a),std::move(b));
+    };
     auto declaration = [&](AnalyzedDeclaration d,bool native_contract=true,bool visible=true) {
+        using K=AnalyzedDeclaration::Kind;
+        switch(d.kind) {
+        case K::value_structure: case K::managed_structure: case K::interface_type:
+        case K::managed_field: case K::value_field: case K::type_parameter: case K::interface_requirement:
+            d.rename_safe=true;
+            break;
+        default:
+            d.rename_safe|=d.editor_symbol_kind==22;
+        }
         if(d.source.source)d.documentation=source_documentation(*d.source.source,d.source.begin);
         for(auto& p:d.documentation.parameters)p.source.module_identity=d.module;
         if(d.documentation.returns)d.documentation.returns->source.module_identity=d.module;
@@ -195,6 +219,14 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
         for (const auto& i : imports) field(result->contract_,i);
         result->modules_.push_back(std::move(module));
         auto location = [&](const Token& t) { auto l = span(unit->source,t); l.module_identity=id; return l; };
+        auto unresolved_template=[&](const std::string& identity,const std::vector<Token>& syntax) {
+            if(instantiated.contains(identity))return;
+            for(const auto& token:syntax)
+                if(token.kind==TokenKind::name && valid_editor_identifier(token.text))
+                    result->unresolved_template_names_[token.text].push_back(location(token));
+        };
+        for(const auto& f:unit->generic_functions)unresolved_template(f.symbol,f.syntax);
+        for(const auto& s:unit->generic_structures)unresolved_template(s.definition->identity,s.syntax);
         auto return_components = [&](const Function& f) {
             if(!f.generic_origin.empty())return;
             for(const auto& component:f.returns)if(component.name) {
@@ -211,8 +243,11 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
             reference(id+"::$module",import.target+"::$module",use,*unit,false,false);
         }
         std::set<std::string> aliases;
-        for(const auto& import:unit->imports)if(import.explicit_alias && aliases.insert(import.alias.text).second)
-            result->editor_declarations_.push_back({AnalyzedDeclaration::Kind::import_alias,id+"::import::"+import.alias.text,id,"private",location(import.alias),{},Type::none,{},{},id});
+        for(const auto& import:unit->imports)if(import.explicit_alias && aliases.insert(import.alias.text).second) {
+            AnalyzedDeclaration record{AnalyzedDeclaration::Kind::import_alias,id+"::import::"+import.alias.text,id,"private",location(import.alias),{},Type::none,{},{},id};
+            record.rename_safe=true;
+            result->editor_declarations_.push_back(std::move(record));
+        }
         auto namespace_reference=[&](const std::string& owner,const Token& token,bool implicit=false,bool semantic_only=false) {
             auto binding=unit->qualifiers.find(token.text);
             if(binding==unit->qualifiers.end() || binding->second.size()!=1)return;
@@ -235,6 +270,13 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
             std::vector<const Pattern*> patterns{&pattern};
             while(!patterns.empty()) {
                 auto* p=patterns.back();patterns.pop_back();
+                if(p->constant_binding && !implicit) {
+                    const auto identity=constant_pattern_identity(id,p->token);
+                    AnalyzedDeclaration record{AnalyzedDeclaration::Kind::local_variable,identity,id,"local",
+                        location(p->token),{},p->type,{},{},owner};
+                    record.rename_safe=true;
+                    declaration(std::move(record),false);
+                }
                 enum_type_reference(owner,p->enum_type_use.get(),implicit);
                 if(p->kind==Pattern::Kind::constructor && !p->variant_token.text.empty())frontend_case([&] {
                     std::string target;
@@ -245,6 +287,16 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
                     }
                     if(!target.empty()){Expr use(Expr::Kind::name,p->variant_token);reference(owner,target,use,*unit,implicit,false);}
                 });
+                if(p->kind==Pattern::Kind::constructor && p->narrowed!=Type::none && p->narrowed.definition) {
+                    if(p->token.offset!=p->variant_token.offset)namespace_reference(owner,p->token,implicit);
+                    Expr use(Expr::Kind::name,p->variant_token);
+                    reference(owner,p->narrowed.definition->identity,use,*unit,implicit,false);
+                    for(unsigned n=0;n<p->indexes.size();++n) {
+                        const auto& member=p->narrowed.definition->fields.at(p->indexes[n]);
+                        Expr field(Expr::Kind::name,p->fields.at(n));
+                        reference(owner,member.owner+"::field::"+member.name,field,*unit,implicit,false);
+                    }
+                }
                 for(const auto& value:p->values)visit_expression(*value,owner,locals,implicit);
                 for(const auto& child:p->children)patterns.push_back(&child);
             }
@@ -260,7 +312,9 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
             }
             if(!e.qualifier.empty())namespace_reference(owner,e.qualifier_token,implicit_site,e.kind==Expr::Kind::editor_hole);
             if(!e.source_target.empty()) {
-                reference(owner,e.source_target,e,*unit,implicit_site,!e.source_target.starts_with("$result::"));
+                reference(owner,e.source_target,e,*unit,implicit_site,
+                          !e.source_target.starts_with("$result::") &&
+                          !(e.kind==Expr::Kind::name && e.source_target.starts_with(id+"::$constant_pattern::")));
                 if(!e.target.empty() && !collection_kernel)reference(owner,e.target,e,*unit,true);
                 if(!implicit_site && e.source_target.starts_with("$display.") && display_hooks.contains(e.target)) {
                     std::set<std::string> names{e.token.text};
@@ -285,15 +339,19 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
                      locals.contains(e.slot)) reference(owner,locals.at(e.slot),e,*unit,implicit_site,locals.at(e.slot).find("::const::")!=std::string::npos && locals.at(e.slot).substr(0,locals.at(e.slot).find("::const::"))==owner.substr(0,owner.find("::const::")));
             if(!e.virtual_slot.empty() && !e.super_call) for(const auto& [id,target_unit]:*graph) for(const auto& target:target_unit->functions)
                 if(target.virtual_slot==e.virtual_slot) reference(owner,target.symbol,e,*unit,true);
-            if (!e.initializer.empty()) reference(owner,e.initializer,e,*unit,implicit);
+            if (!e.initializer.empty())
+                reference(owner,e.initializer,e,*unit,implicit,true,/*navigation_only=*/true);
             if(!e.setter.empty())reference(owner,e.setter,e,*unit,true);
             if(!e.display_adapter.empty())reference(owner,e.display_adapter,e,*unit,true);
-            if(!e.argument_indexes.empty() && !e.target.starts_with("$") &&
+            const auto& callee=e.initializer.empty()?e.target:e.initializer;
+            if(!e.argument_indexes.empty() && !callee.starts_with("$") &&
                std::any_of(e.names.begin(),e.names.end(),[](const auto& name){return !name.text.empty();}))
-              for(const auto& [target_id,target_unit]:*graph)for(const auto& target:target_unit->functions)if(target.symbol==e.target && target.generic_origin.empty()) {
+              for(const auto& [target_id,target_unit]:*graph)for(const auto& target:target_unit->functions)if(target.symbol==callee) {
                 for(unsigned n=0;n<e.names.size();++n)if(!e.names[n].text.empty()) {
                     const auto& parameter=target.parameters.at(e.argument_indexes.at(n));
-                    Expr use(Expr::Kind::name,e.names[n]);reference(owner,target.symbol+"::local::"+std::to_string(parameter.slot),use,*unit,false,false);
+                    auto identity=target.generic_origin.empty()?target.symbol+"::local::"+std::to_string(parameter.slot):
+                        target.generic_origin+"::parameter::"+parameter.token.text;
+                    Expr use(Expr::Kind::name,e.names[n]);reference(owner,identity,use,*unit,implicit_site,false);
                 }
             }
 
@@ -396,7 +454,10 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
                 method_record.readonly=f.accessor==1 && std::none_of(unit->functions.begin(),unit->functions.end(),[&](const auto& other){return other.accessor==2 && other.token.offset==f.token.offset;});
             }
             method_record.declaration_only=!f.native_symbol.empty() || f.c_primitive;
-            method_record.rename_safe=f.operator_glyph.empty() && !f.receiver && !f.anonymous && f.generic_origin.empty() && f.generics.empty() && f.token.text!="entry" && f.token.text!="$application" && !f.global_initializer;
+            method_record.rename_safe=f.operator_glyph.empty() && !f.anonymous && !f.initializer &&
+                !method_record.declaration_only && !f.global_initializer && f.token.text!="entry" &&
+                f.token.text!="main" && f.token.text!="deinit" && f.token.text!="call" &&
+                (f.accessor || valid_editor_identifier(f.token.text));
             method_record.signature=editor_signature(f);
             method_record.initialization_contract=f.initialization_contract;
             method_record.virtual_slot=f.virtual_slot;
@@ -474,20 +535,27 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
                     }
                 }
             }
-            if(f.overriding) {Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);}
+            if(f.overriding) {
+                Expr use(Expr::Kind::name,f.token);reference(f.symbol,f.virtual_slot,use,*unit,true);
+                rename_relationship(f.symbol,f.virtual_slot);
+            }
             for (const auto& p : f.parameters) if (p.default_expression) expression(*p.default_expression,f.symbol,{});
             std::map<unsigned,std::string> locals;
             for(const auto& binding:f.editor_bindings) {
                 if(presentation && f.locals.at(binding.slot)==error_type)continue;
-                if(!f.generic_origin.empty() || f.display_adapter || f.json_adapter || f.enum_adapter || binding.token.text.starts_with("$iterator$") || (f.global_initializer && !valid_editor_identifier(binding.token.text)))continue;
+                if(f.display_adapter || f.json_adapter || f.enum_adapter || binding.token.text.starts_with("$iterator$") || (f.global_initializer && !valid_editor_identifier(binding.token.text)))continue;
                 const bool parameter=(f.receiver && f.receiver->slot==binding.slot) ||
                     std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;});
+                if(!f.generic_origin.empty()) {
+                    if(parameter)locals.emplace(binding.slot,f.generic_origin+"::parameter::"+binding.token.text);
+                    continue;
+                }
                 if(binding.readonly && !parameter) continue;
                 auto key=source_identity(f.symbol)+"::local::"+std::to_string(binding.slot);
                 auto kind=parameter ? AnalyzedDeclaration::Kind::parameter : AnalyzedDeclaration::Kind::local_variable;
                 AnalyzedDeclaration record{kind,key,id,"local",location(binding.token),{},f.locals.at(binding.slot),{},{},source_identity(f.symbol)};
                 record.readonly=binding.readonly;
-                record.rename_safe=!f.receiver && !f.anonymous && f.lambdas.empty() && f.captures.empty() && valid_editor_identifier(binding.token.text);
+                record.rename_safe=valid_editor_identifier(binding.token.text);
                 result->editor_declarations_.push_back(std::move(record));
                 locals.emplace(binding.slot,key);
             }
@@ -509,7 +577,7 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
                     if (s.readonly) {
                         owner += "::const::" + s.name + "::" + std::to_string(names[s.name]++);
                         AnalyzedDeclaration record{AnalyzedDeclaration::Kind::local_constant,owner,id,"local",location(s.token),{},f.locals.at(s.slot),s.constant_syntax,{},f.symbol};
-                        record.rename_safe=!f.receiver && !f.anonymous && f.generic_origin.empty() && f.lambdas.empty() && f.captures.empty();
+                        record.rename_safe=f.generic_origin.empty() && valid_editor_identifier(s.token.text);
                         declaration(std::move(record));
                     }
                     if(s.kind==Statement::Kind::assignment && locals.contains(s.slot) && !s.selection) {
@@ -545,6 +613,7 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
             const auto& owner=*graph->at(binding.interface.definition->module_identity);
             Expr use(Expr::Kind::name,Token{TokenKind::name,binding.interface.definition->name,binding.interface.definition->source_offset});
             reference(requirement,route.second,use,owner,true);
+            rename_relationship(requirement,route.second);
         }
     }
     // One generic source expression may be instantiated with several exact

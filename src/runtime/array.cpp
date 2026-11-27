@@ -333,7 +333,7 @@ std::uint64_t Runtime::string_count(void* source,bool bytes) const {
     // Intrinsic strings are immutable and validated by string_parts_into /
     // construct_into before publication. Each non-continuation byte starts
     // exactly one scalar; counting needs no second UTF-8 decoder traversal.
-    std::uint64_t count=0;for(unsigned char byte:text)count+=(byte&0xc0)!=0x80;return count;
+    return utf8_scalar_count(text);
 }
 void Runtime::string_index_into(void** out,void* source,ScalarEncoding encoding,std::uint64_t bits) {
     auto text=string_bytes(source);

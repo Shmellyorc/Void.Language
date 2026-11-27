@@ -612,9 +612,9 @@ ProjectAnalysisResult analyze_manifest_project_impl(const std::filesystem::path&
             capture.diagnostics.finish_parse();
             if(!library) {
                 std::vector<std::pair<Unit*,const Function*>> candidates;
-                for(const auto& [id,unit]:capture.graph.parsed)for(const auto* functions:{&unit->functions,&unit->generic_functions})for(const auto& f:*functions)if(f.token.text=="main" && !f.receiver && !f.anonymous) {
-                    if(f.asynchronous || !f.generics.empty() || !f.parameters.empty() || (f.result!=Type::none && f.result!=Type::i32)) {
-                        try {error(unit->source,f.token,Code::project_entry,"Automatic project main must be synchronous, nongeneric, parameterless and return no result or exact i32.","Correct this declaration or use an explicit project entry.");}catch(const CompilationError& failure){capture.diagnostics.add(failure);}
+                for(const auto& [id,unit]:capture.graph.parsed)for(const auto* functions:{&unit->functions,&unit->generic_functions})for(const auto& f:*functions)if(f.token.text=="main" && !f.receiver && !f.static_owner && !f.anonymous) {
+                    if(!application_main(f)) {
+                        try {error(unit->source,f.token,Code::project_entry,"Automatic project main must be nongeneric, parameterless and return no result or exact i32.","Correct this declaration or use an explicit project entry.");}catch(const CompilationError& failure){capture.diagnostics.add(failure);}
                     } else candidates.emplace_back(unit.get(),&f);
                 }
                 capture.diagnostics.finish_parse();

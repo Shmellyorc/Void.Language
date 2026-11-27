@@ -25,11 +25,15 @@ struct CompileEvaluation {
     std::function<void(Function&,const SourceFile&,const Token&,bool)> prepare;
     std::function<void(Type)> numeric_definition;
     void step(const SourceFile& source,const Token& site,std::uint64_t work=1);
+    void charge_bytes(const SourceFile&, const Token&, std::size_t);
     void charge(const SourceFile& source,const Token& site,const ir::ConstantValue& value);
+    bool matches(const SourceFile&, const Pattern&, const ir::ConstantValue&);
+    ir::ConstantValue match_expression(const SourceFile&, const Expr&);
     ir::ConstantValue local(const SourceFile& source,const Expr& e);
     struct Outcome {unsigned flow=next_flow;ir::ConstantValue value;};
     Outcome sequence(const SourceFile&,const std::vector<Statement>&);
     Outcome loop(const SourceFile&,const Statement&);
+    Outcome match_statement(const SourceFile&, const Statement&);
     void assign(const SourceFile&,const Statement&);
     ir::ConstantValue call(const SourceFile&,const Expr&);
     struct Selection {
@@ -42,6 +46,11 @@ struct CompileEvaluation {
     Selection select(const SourceFile&,const Expr&);
 };
 
+bool compile_value_type(Type);
+bool constant_core_operation(std::string_view target);
+bool constant_pattern_equal(const SourceFile&, const Token&, Type, const ir::ConstantValue&, const ir::ConstantValue&, CompileEvaluation&);
+const ir::ConstantValue* constant_dictionary_find(const SourceFile&, const Token&, Type, const ir::ConstantValue&,
+                                                 const ir::ConstantValue&, CompileEvaluation*);
 ir::ConstantValue constant_value(const SourceFile&, const Expr&, CompileEvaluation* = nullptr);
 void validate_compile_function(const SourceFile&, Function&);
 void prepare_compile_call(CompileEvaluation*,Function&,const SourceFile&,const Token&,bool);

@@ -1,0 +1,63 @@
+enum parcel<t>:
+    empty
+    present(value: t)
+
+value struct pair:
+    left: i32
+    right: i32
+
+compile func collect(words: {string: i32}, values: [i32]) -> i32:
+    if values is [1, var picked, .. var tail] and tail.count == 1:
+        match words:
+            {"😀": var number}:
+                return picked + number + (words.count as i32)
+            _:
+                pass
+    return 0
+
+compile func unpack<t>(value: parcel<t>, fallback: t) -> t:
+    return match value:
+        parcel.present(var picked): picked
+        parcel.empty: fallback
+
+compile func rank(value: pair) -> i32:
+    return match value:
+        pair(left = 9..<4, right = var score): score * 2
+        _: 0
+
+compile func lookup(key: i32) -> i32:
+    const table: {result<i32, string>: i32} = {Ok(1): 7, Err("x"): 3, Ok(1): 9}
+    return match table.get(Ok(key)):
+        Ok(var found): found
+        Err("key not found"): table[Err("x")]
+        Err(_): -1
+
+compile func total(input: [i32]) -> i32:
+    var values = input
+    var answer = 0
+    for item in reverse values:
+        answer += item
+        values = [10, 10]
+    return match ([answer]).get(-1):
+        Ok(var found): found
+        Err(_): 0
+
+const folded_collection = collect({"😀": 3, "😀": 7}, [1, 4, 5])
+const folded_generic = unpack(parcel<i32>.present(17), 0)
+const folded_range = rank(pair(left = 5, right = 10))
+const folded_text = "ab😀é"[-2]
+const folded_length = "ab😀é".length
+const folded_bytes = "ab😀é".byte_length + 1
+const folded_contains = {true: 7}.contains(true)
+const folded_miss = not {true: 7}.contains(false)
+const folded_lookup = lookup(2)
+const folded_total = total([2, 3])
+
+const direct = match parcel<i32>.present(21):
+    parcel.present(var direct_payload): direct_payload * 2
+    parcel.empty: 0
+const direct_test = "hello" is string("hello")
+
+func main():
+    print(folded_collection, collect({"😀": 3, "😀": 7}, [1, 4, 5]), folded_generic, unpack(parcel<i32>.present(17), 0), folded_range, rank(pair(left = 5, right = 10)), folded_text, folded_length, folded_bytes, folded_contains, folded_miss, folded_lookup, lookup(2), folded_total, total([2, 3]))
+    print(direct, direct_test)

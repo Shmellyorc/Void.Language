@@ -56,6 +56,7 @@ struct Pattern {
     std::unique_ptr<TypeUse> enum_type_use;
     std::vector<Pattern> children;std::vector<std::unique_ptr<Expr>> values;std::vector<Token> fields;
     std::vector<unsigned> indexes;
+    bool constant_binding=false;
     std::vector<Type> type_arguments;
     Type type=Type::none,narrowed=Type::none;unsigned slot=0,tag=0;bool rest=false,exclusive=false,nullable=false,annotated_type=false,editor_incomplete_arm=false,derived_case=false,invocation=false;
 };
@@ -71,6 +72,7 @@ struct Expr {
     std::unique_ptr<TypeUse> enum_type_use;
     std::string op, qualifier, target, source_target;
     std::vector<Pattern> patterns;
+    unsigned constant_pattern_frame=0;
     std::vector<Type> type_arguments;
     std::uint64_t value = 0;
     ir::ConstantValue aggregate_value;
@@ -344,6 +346,7 @@ struct Unit {
     std::function<Function&(Unit&,Unit&,Function&,const std::vector<Type>&,const Token&,unsigned,Type)> specialize_function;
     std::function<Structure&(Unit&,Unit&,Structure&,const std::vector<Type>&,const Token&)> specialize_structure;
     bool application_body = false;
+    Type async_application_task = Type::none;
     bool failed_import = false;
     bool parse_failed = false;
     std::function<void(Structure&)> resolve_numeric;
@@ -351,6 +354,10 @@ struct Unit {
     std::shared_ptr<ir::Module> member_catalog;
     Unit(SourceFile s, std::string id) : source(std::move(s)), identity(std::move(id)) {}
 };
+inline std::string constant_pattern_identity(const std::string& module,const Token& token) {
+    return module+"::$constant_pattern::"+std::to_string(token.offset);
+}
+bool application_main(const Function&);
 const Function* application_entry(const Unit&);
 
 // Flow sets describe possible exits from a statement, independently of LLVM.

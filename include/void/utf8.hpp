@@ -22,6 +22,12 @@ inline unsigned utf8_scalar_bytes(std::string_view text, std::size_t i) {
         (count == 3 && scalar < 0x800) || (count == 4 && scalar < 0x10000)) return 0;
     return count;
 }
+// Callers supply validated UTF-8. Each non-continuation byte begins a scalar.
+inline std::size_t utf8_scalar_count(std::string_view text) {
+    std::size_t count = 0;
+    for (unsigned char byte : text) count += (byte & 0xc0) != 0x80;
+    return count;
+}
 inline bool valid_utf8(std::string_view text) {
     for (std::size_t i=0;i<text.size();) {
         auto count=utf8_scalar_bytes(text,i); if (!count) return false; i+=count;

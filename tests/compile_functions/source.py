@@ -33,7 +33,7 @@ negative = {
     'list_write': ('compile func f(items: [i32]):\n    items[0] = 3\n', 'fixed-array'),
     'list_push': ('compile func f(items: [i32]):\n    items.push(3)\n', 'runtime-only'),
     'nominal_interpolation': ('value struct box:\n    item: i32\nfunc (b box) string() -> string:\n    return "shown"\ncompile func render() -> string:\n    return "value {box(item = 1)}"\nconst folded = render()\n', 'runtime-only'),
-    'dictionary_lookup': ('compile func lookup(mapping: {i32: i32}) -> i32:\n    return mapping[0]\nconst answer = lookup({1: 7, 0: 9})\n', 'dictionary lookup'),
+    'dictionary_lookup': ('compile func lookup(mapping: {i32: i32}) -> i32:\n    return mapping[0]\nconst answer = lookup({1: 7})\n', 'dictionary key not found'),
     'enum_custom_equality': ('value struct item:\n    number: i32\n    operator ==(const left: item, const right: item) -> bool:\n        return left.number == right.number\nenum reading:\n    present(value: item)\ncompile func compare(left: reading, right: reading) -> bool:\n    return left == right\n', 'custom equality'),
     'collection_custom_equality': ('value struct item:\n    number: i32\n    operator ==(const left: item, const right: item) -> bool:\n        return left.number == right.number\ncompile func compare(left: [item], right: [item]) -> bool:\n    return left == right\n', 'custom equality'),
     'deferred': ('compile func f():\n    defer print("bad")\n', 'deferred'),
@@ -90,6 +90,27 @@ with tempfile.TemporaryDirectory(prefix='g93-source-', dir=output_directory()) a
         assert '^' in row['stderr'] and ': error:' in row['stderr'], row
         if name == 'zero':
             assert ':2:14:' in row['stderr'] and 'While evaluating compile func' in row['stderr'], row
+    kernels = Path(__file__).with_name('patterns_and_reads.void').read_text()
+    source.write_text(kernels)
+    for flags in (['--no-opt'], []):
+        expected_kernels = '12 12 17 17 20 20 😀 4 9 true true 3 3 5 5\n42 true\n'
+        run([compiler, 'run', source, '--no-cache', *flags], output=expected_kernels)
+        exe = root / ('folding-' + str(len(flags)) + ('.exe' if os.name == 'nt' else ''))
+        run([compiler, 'build', source, '-o', exe, *flags])
+        run([exe], output=expected_kernels)
+    source.write_text((Path(__file__).parents[1] / 'dictionaries/tagged_keys.void').read_text())
+    for flags in (['--no-opt'], []):
+        expected_tags = '7 13 11\nfalse 3\n'
+        run([compiler, 'run', source, '--no-cache', *flags], output=expected_tags)
+        exe = root / ('tagged-' + str(len(flags)) + ('.exe' if os.name == 'nt' else ''))
+        run([compiler, 'build', source, '-o', exe, *flags])
+        run([exe], output=expected_tags)
+    source.write_text('func main():\n    var invalid: {option<f64>: i32}\n')
+    run([compiler, 'check', source], 1, contains='Unsupported dictionary key type')
+    source.write_text('const invalid = "é"[-2]\n')
+    run([compiler, 'check', source], 1, contains='String index outside extent')
+    source.write_text('compile func incomplete(input: i32) -> i32:\n    return match input:\n        1: 2\nconst out = incomplete(0)\n')
+    run([compiler, 'check', source], 1, contains='No match expression arm selected')
     # Fixed-array iteration captures computed values once, freezes selected
     # indexes, and refreshes live fixed storage without retaining stale children.
     source.write_text(Path(__file__).with_name('corrections.void').read_text())

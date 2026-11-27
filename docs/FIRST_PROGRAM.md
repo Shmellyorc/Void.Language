@@ -53,7 +53,7 @@ flowchart LR
     B --> E[hello executable]
 ```
 
-The manifest selects a unique supported synchronous `main` in any filename
+The manifest selects a unique supported synchronous or async `main` in any filename
 under its source roots. For a standalone source, pass its file path directly.
 A manifestless directory still selects exact-case `main.void`. `check` analyzes
 source without running startup code.

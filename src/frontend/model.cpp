@@ -163,13 +163,17 @@ std::string import_alias(const Import& import) {
     return path_utf8(utf8_path(import.target.empty() ? import.path.text : import.target).stem());
 }
 
+bool application_main(const Function& f) {
+    return f.token.text == "main" && !f.receiver && !f.static_owner &&
+        f.parameters.empty() && f.generics.empty() && (f.result == Type::none || f.result == Type::i32);
+}
+
 // Entry selection is shared by validated metadata and typed IR lowering.
 const Function* application_entry(const Unit& unit) {
     if(unit.application_body)return unit.declarations.at("$application");
     if(unit.declarations.contains("entry"))return nullptr;
     auto found=unit.declarations.find("main");if(found==unit.declarations.end())return nullptr;
-    const auto* f=found->second;
-    return !f->receiver && f->parameters.empty() && f->generics.empty() && !f->asynchronous && (f->result==Type::none || f->result==Type::i32) ? f : nullptr;
+    return application_main(*found->second) ? found->second : nullptr;
 }
 
 ir::Op operation(const std::string& op) {

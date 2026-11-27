@@ -38,7 +38,7 @@ class Semantics {
     Statement* editor_statement = nullptr;
     const Function* default_context = nullptr;
     bool inferring_default=false;
-    unsigned loops = 0;
+    unsigned loops = 0, constant_pattern_depth = 0, constant_pattern_slots = 0;
     bool suppress_zero = false,pattern_bindings=false,allow_event=false;
     bool visible_name(const std::string& name) const {
         if (unit.structure_names.contains(name) || unit.global_names.contains(name) ||
@@ -364,11 +364,11 @@ class Semantics {
     VOID_SEMANTIC_HANDLER std::optional<Type> text_anchor() {return Type::string;}
     VOID_SEMANTIC_HANDLER std::optional<Type> text_result_anchor() {return unit.make_result(Type::string,Type::string);}
     VOID_SEMANTIC_HANDLER Type text_index_expression(Expr& e) {
-        if(!current)error(source,e.token,Code::constant_call,"String indexing requires runtime evaluation.");
+
         if(!numeric::integer(expression(*e.parts[1])))error(source,e.parts[1]->token,Code::type_mismatch,"String index requires an integer, excluding bool and floats.");e.target="$text.index";return e.type=Type::string;
     }
     VOID_SEMANTIC_HANDLER Type core_call(Expr& e,const Type& receiver,bool type_level=false) {
-        if(!current)error(source,e.token,Code::constant_call,"Text and collection APIs require runtime evaluation.");
+
         if(!e.type_arguments.empty())error(source,e.token,Code::argument_count,"Core members do not take explicit generic arguments.");
         const auto* api=core_member(receiver,e.token.text,type_level);
         if(!api || api->property)error(source,e.token,Code::unknown_method,"Unknown callable member '"+e.token.text+"' in "+ir::type_name(receiver)+".");
@@ -377,6 +377,8 @@ class Semantics {
         if(type_level)e.parts.erase(e.parts.begin());
         if(api->positional && std::any_of(e.names.begin(),e.names.end(),[](const auto& n){return !n.text.empty();}))
             error(source,e.token,Code::argument_count,"Incorrect positional arguments for collection operation.");
+        if(!current && !constant_core_operation(target.symbol.substr(0,target.symbol.find("::"))))
+            error(source,e.token,Code::constant_call,"This text or collection operation requires runtime evaluation.");
         if(!target.parameters.empty() && target.parameters.front().token.text=="index" && e.parts.size()>first && !editor_cursor(*e.parts[first])) {
             auto index=expression(*e.parts[first]);
             if(!numeric::integer(index))error(source,e.parts[first]->token,Code::type_mismatch,"Collection index requires an integer, excluding bool and floats.");
@@ -864,8 +866,11 @@ class Semantics {
     }
     unsigned declare(const Token& token, Type type, bool readonly = false) {
         check_local_name(token,true);
-        auto slot = static_cast<unsigned>(current->locals.size()); current->locals.push_back(type);
-        current->editor_bindings.push_back({token,slot,readonly});
+        const auto slot = current ? static_cast<unsigned>(current->locals.size()) : constant_pattern_slots++;
+        if(current) {
+            current->locals.push_back(type);
+            current->editor_bindings.push_back({token,slot,readonly});
+        }
         scopes.back().emplace(token.text, Variable{type, slot, readonly, token,current}); return slot;
     }
     // Qualified lookup needs a temporary AST node only on this cold path.
@@ -1441,12 +1446,35 @@ class Semantics {
         expect(expression(*e.parts[0],ir::array_element(e.type)),ir::array_element(e.type),e.token);
         return e.type;
     }
+    struct ConstantPatternFrame {
+        unsigned& depth;
+        unsigned& slots;
+        Expr& expression;
+        bool active;
+        ConstantPatternFrame(Semantics& context, Expr& e)
+            : depth(context.constant_pattern_depth), slots(context.constant_pattern_slots),
+              expression(e), active(!context.current) {
+            if(active)++depth;
+        }
+        ~ConstantPatternFrame() {
+            if(active && --depth==0) {
+                expression.constant_pattern_frame=slots;
+                slots=0;
+            }
+        }
+    };
     VOID_SEMANTIC_HANDLER Type test_expression(Expr& e){
-        if(!current)error(source,e.token,Code::constant_call,"Patterns require a function body; compile-time pattern evaluation is not implemented.");
-        auto subject=expression(*e.parts[0]);if(!pattern_bindings)scopes.emplace_back();check_pattern(e.patterns[0],subject);if(!pattern_bindings)scopes.pop_back();return e.type=Type::boolean;
+        ConstantPatternFrame frame(*this,e);
+        auto subject=expression(*e.parts[0]);
+        const auto scope_depth=scopes.size();
+        if(!pattern_bindings)scopes.emplace_back();
+        struct Leave {decltype(scopes)& stack;std::size_t depth;~Leave(){stack.resize(depth);}} leave{scopes,scope_depth};
+        check_pattern(e.patterns[0],subject);
+        return e.type=Type::boolean;
     }
     VOID_SEMANTIC_HANDLER Type match_expression(Expr& e,const std::optional<Type>& expected){
-        if(!current)error(source,e.token,Code::constant_call,"Patterns require a function body; compile-time pattern evaluation is not implemented.");return check_match(e,expected);
+        ConstantPatternFrame frame(*this,e);
+        return check_match(e,expected);
     }
     VOID_SEMANTIC_HANDLER Type propagate_expression(Expr& e){
         auto type=expression(*e.parts[0]);
@@ -1775,7 +1803,7 @@ class Semantics {
         auto array=expression(*e.parts[0]);
         if(array==error_type) return error_type;
         if(array.kind==Type::string)return text_index_expression(e);
-        if(array.kind==Type::dictionary){if(!current)error(source,e.token,Code::constant_call,"Dictionary lookup requires runtime evaluation.");expect(expression(*e.parts[1],ir::readonly_view(ir::dictionary_key(array))),ir::readonly_view(ir::dictionary_key(array)),e.parts[1]->token);return e.type=ir::dictionary_value(array);}
+        if(array.kind==Type::dictionary){expect(expression(*e.parts[1],ir::readonly_view(ir::dictionary_key(array))),ir::readonly_view(ir::dictionary_key(array)),e.parts[1]->token);return e.type=ir::dictionary_value(array);}
         if(!ir::array_type(array)) error(source,e.token,Code::unsupported_type,"Indexing requires an array or dictionary.");
         auto index=expression(*e.parts[1]);
         if(index==error_type) return error_type;
@@ -1864,6 +1892,7 @@ class Semantics {
         if (!v && unit.failed_import) throw Poison{};
         if (!v) error(source, e.token, Code::unknown_identifier, "Unknown identifier '" + e.token.text + "'.", "Declare it with var before use.");
         if(v->task_group)error(source,e.token,Code::unsupported_type,"Task group aliases are lexical scopes, not first-class values; jobs.spawn is deferred.");
+        if(!v->owner)e.source_target=constant_pattern_identity(unit.identity,v->declaration);
         e.slot = v->slot; return e.type = v->type;
     }
     VOID_SEMANTIC_HANDLER Type field_expression(Expr& e, const std::optional<Type>& expected) {
@@ -1896,7 +1925,6 @@ class Semantics {
         if(t.definition && t.definition->task_result)error(source,e.token,Code::unsupported_type,"Inferred task handles support await; task internals are not source fields.");
         if(base.event)error(source,e.token,Code::invalid_value,"Event subscription storage is private.");
         if(const auto* api=core_member(t,e.token.text);api && api->property) {
-            if(!current && (t.kind==Type::string || t.kind==Type::dictionary))error(source,e.token,Code::constant_call,"Collection inspection requires runtime evaluation.");
             auto target=core_signature(*api,t,e.token);core_record(*api,target,t);
             e.source_target=target.symbol;e.target=target.symbol.substr(0,target.symbol.find("::"));return e.type=target.result;
         }

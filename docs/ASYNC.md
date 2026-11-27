@@ -154,8 +154,8 @@ one application. The native owner is created on the owning executor and remains
 local across suspension; it is never transferred as a task/worker argument or
 result. Normal/O2 JIT uses the explicit `compile_async` adapter; independent AOT
 uses `emit_async_object`. Cancellation and parent-plus-cleanup failure programs
-verify draining before deterministic native cleanup. No implicit async CLI entry
-or new native/worker contract is added.
+verify draining before deterministic native cleanup. These Delivery 5 fixtures
+exercise the explicit embedding path.
 
 Permanent host regressions hold a running worker and another published/queued job
 under suspended async parents while GC and compatible reload occur. The old root
@@ -174,19 +174,35 @@ Resource task transfer, native worker effects, incompatible layout/capture chang
 and unauthorized tooling imports remain checked rejections. See WORK_LOG.md for
 actual final acceptance and retained-memory observations.
 
+## Async application entry
+
+Declare a parameterless async `main` returning exact `i32` or no result.
+Manifest discovery and explicit source selection use the same entry rules as
+synchronous applications. The following runs through both `voidc run` and a
+native executable from `voidc build`.
+
+```void
+async func work() -> i32:
+    return 7
+
+async func main() -> i32:
+    return await work()
+```
+
+The process exits with the returned status or zero for normal no-result
+completion. The existing structured scheduler runs the application. On exit,
+it drains owned child tasks and executes reached cleanup. Failed or cancelled
+awaits use the same checked failure and cleanup paths as other async bodies.
+
 ## Explicit root adapter
 
-The synchronous CLI entry ABI is unchanged. A development host explicitly uses
-`Jit::compile_async(analysis, optimize)` for an `async entry(i32) -> i32` and invokes
-the returned ordinary `NativeCode`. `emit_async_object(module, path, optimize)`
-provides the corresponding native AOT adapter; the normal CLI does not select it
-implicitly. Calling an async function requires an active adapter.
+Embedding hosts can use `Jit::compile_async(analysis, optimize)` for a legacy
+`async entry(i32) -> i32`, or `emit_async_object(module, path, optimize)` for its
+AOT equivalent. Ordinary `Jit::compile` and native application emission select
+the root adapter for async `main`. The synchronous entry ABI remains available.
+The [activation example](../examples/async/activation.void) is exercised through
+the explicit adapter by the [maintained host](../tests/async/tests.cpp).
 
-An `_async` stdlib function therefore does not make `voidc run` or `voidc build`
-an implicit async host. Use synchronous APIs from an ordinary CLI main, or the
-existing explicit adapter for async networking, timers, file work and
-[process capture](process/API.md). The [activation example](../examples/async/activation.void)
-is exercised through that adapter by the [maintained host](../tests/async/tests.cpp).
 For synchronous owner-thread pub/sub, use [channel](channel/API.md); its `emit`
 does not enqueue task communication.
 

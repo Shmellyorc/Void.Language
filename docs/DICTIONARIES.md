@@ -46,15 +46,19 @@ func entry(value: i32) -> i32:
   duplicate keys replace the value without moving the first insertion position.
   Literal storage remains private until construction succeeds.
 - Keys support all eight exact-width integer types, bool, immutable strings, managed
-  structs including nullable references, numeric/flags enums, and value structs or
-  ordinary tagged enums whose fields/payloads recursively
-  support these rules. Managed keys compare/hash by identity. Strings compare exact
+  structs including nullable references, numeric/flags enums, and value structs,
+  tagged enums, nullable value wrappers, `option<T>` and `result<T, E>` whose
+  fields or payloads recursively support these rules. Managed keys compare/hash by identity. Strings compare exact
   UTF-8 bytes, including NUL, with no normalization. Value keys compare/hash fields,
   ignoring native padding. Copying a value key preserves its stored value when the
   original variable changes; referenced object identities remain shared.
 - Float, interface, array/list/dictionary keys and value structs containing those
-  fields reject. Canonical option/result keys remain unsupported. G78 adds eligible
-  enum keys using the same schemas and ownership; see [enums](ENUMS.md). Stage 10
+  fields are ineligible. Floating-point equality already equates signed zeros and
+  is nonreflexive for NaN. A floating-point key family would need an explicit
+  equivalence and hashing policy. Tagged keys distinguish the tag and the active
+  data, with canonical storage for inactive fields. For example,
+  `var counts: {result<i32, string>: i32} = {Ok(3): 7, Err("missing"): 2}`
+  stores two distinct entries using the existing key schemas. Stage 10
   excludes direct owners defining custom `operator ==` (any visibility/signature),
   including concrete generics and managed/nullable keys, and eligible value keys
   recursively containing such owners through any stored field. Managed payloads

@@ -79,6 +79,10 @@ public:
     std::vector<AnalyzedDeclaration> definitions_at(const std::string& module, std::size_t byte_offset) const;
     std::optional<AnalyzedDeclaration> definition_at(const std::string& module, std::size_t byte_offset) const;
     std::vector<AnalyzedReference> references_to(const std::string& identity) const;
+    std::vector<AnalyzedDeclaration> rename_family(const std::string& identity) const;
+    bool unresolved_rename_use(const std::string& spelling) const;
+    void validate_rename(const ToolingIndex& edited,
+                         const std::function<std::size_t(const std::string&,std::size_t)>& translate) const;
     std::vector<AnalyzedDeclaration> declarations_in(const std::string& module) const;
     std::vector<SemanticToken> semantic_tokens(const std::string& module) const;
 };

@@ -292,6 +292,19 @@ export async function run(): Promise<void> {
         assert(hover?.some(h => h.contents.some(c => typeof c === 'object' && 'value' in c && c.value.includes('calculate'))));
         const symbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', mainUri);
         assert(symbols?.some(s => s.name === 'entry' && s.range.end.line >= 3));
+        const sectioned = '# section Public API 😀\n' + mainText
+            .replace('    return', '    # section Result\n    return') + '    # endsection\n# endsection\n';
+        await replace(main, sectioned);
+        const folds = () => vscode.commands.executeCommand<vscode.FoldingRange[]>('vscode.executeFoldingRangeProvider', mainUri);
+        await until(folds, values => values?.some(value => value.start === 0 && value.end === 7)
+            && values.some(value => value.start === 4 && value.end === 6), 'nested VOID section folds');
+        const outline = () => vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', mainUri);
+        await until(outline, values => values?.some(value => value.name === 'Public API 😀')
+            && values.some(value => value.name === 'Result'), 'section navigation');
+        await replace(main, sectioned.replace('# section Result', '# sect'));
+        await until(outline, values => values?.some(value => value.name === 'Public API 😀')
+            && !values.some(value => value.name === 'Result'), 'incomplete section marker');
+        await replace(main, mainText);
         const workspaceSymbols = await vscode.commands.executeCommand<vscode.SymbolInformation[]>('vscode.executeWorkspaceSymbolProvider', 'calc');
         assert(workspaceSymbols?.some(s => s.name === 'calculate'));
         await replace(main, mainText.replace('worker.calculate(x)', 'worker.'));
@@ -360,6 +373,14 @@ export async function run(): Promise<void> {
         const rename = await vscode.commands.executeCommand<vscode.WorkspaceEdit>('vscode.executeDocumentRenameProvider', workerUri, new vscode.Position(0, 7), 'compute');
         assert(rename && await vscode.workspace.applyEdit(rename));
         assert(main.getText().includes('worker.compute(x)') && worker.getText().includes('func compute'));
+        await replace(worker, 'public value struct data:\n    public quantity: i32\n');
+        await replace(main, 'use "/worker space.void" as worker\nfunc entry(x: i32) -> i32:\n    var item = worker.data(quantity = x)\n    print("😀", item.quantity)\n    return item.quantity\n');
+        await until(() => vscode.languages.getDiagnostics(mainUri), ds => ds.length === 0, 'field rename analysis');
+        const fieldRename = await vscode.commands.executeCommand<vscode.WorkspaceEdit>('vscode.executeDocumentRenameProvider',
+            mainUri, new vscode.Position(3, 23), 'amount');
+        assert(fieldRename && await vscode.workspace.applyEdit(fieldRename));
+        assert(worker.getText().includes('public amount: i32'));
+        assert(main.getText().includes('worker.data(amount = x)') && main.getText().includes('print("😀", item.amount)'));
         await replace(worker, originalText); await replace(main, mainText);
         assert.equal((await definitions())?.length, 1);
         await replace(worker, originalText.replace('    return x + 42', '  return x + 42'));

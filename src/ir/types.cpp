@@ -40,7 +40,10 @@ bool dictionary_key_supported(Type root) {
     std::set<const ValueType*> active;std::map<const ValueType*,bool> memo;std::size_t work=0;
     std::function<bool(Type)> visit=[&](Type t){
         if(numeric::integer(t) || t.kind==Type::numeric_enum || t==Type::boolean || t==Type::string || t.kind==Type::managed_ref)return true;
-        if(t.kind!=Type::aggregate || !t.definition || t.definition->callable || t.definition->result_type || t.definition->option_type || active.size()>=128 || ++work>65536)return false;
+        // Tagged sums, including option and result, have canonical zeroed
+        // inactive fields. The existing data-only key schema covers their tag
+        // and all recursively eligible payload fields.
+        if(t.kind!=Type::aggregate || !t.definition || t.definition->callable || active.size()>=128 || ++work>65536)return false;
         if(auto found=memo.find(t.definition.get());found!=memo.end())return found->second;
         if(!active.insert(t.definition.get()).second)return false;
         for(const auto& field:t.definition->fields)if(!visit(field.type))return false;active.erase(t.definition.get());memo.emplace(t.definition.get(),true);return true;

@@ -435,7 +435,7 @@ std::shared_ptr<const NativeCode> Jit::compile_analysis(const ValidatedAnalysis&
     } catch(...) {impl_->canonical=false;impl_->capture=false;impl_->captured.clear();throw;}
 }
 std::shared_ptr<const NativeCode> Jit::compile(const ValidatedAnalysis& analysis, bool optimize, Compatibility contract) {
-    return compile_analysis(analysis,optimize,std::move(contract),{});
+    return compile_analysis(analysis,optimize,std::move(contract),{},analysis.async_application());
 }
 std::shared_ptr<const NativeCode> Jit::compile_async(const ValidatedAnalysis& analysis,bool optimize,Compatibility contract){return compile_analysis(analysis,optimize,std::move(contract),{},true);}
 std::shared_ptr<const NativeCode> Jit::replacement(const NativeCode& current,const ValidatedAnalysis& analysis,bool optimize,Compatibility contract) {

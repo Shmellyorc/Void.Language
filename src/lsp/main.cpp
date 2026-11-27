@@ -271,6 +271,7 @@ struct QueryProfile {
 };
 class Server {
     enum class State { initial, waiting, ready, shutdown } state=State::initial;
+    std::size_t folding_range_limit = 5000;
     struct Document { std::int64_t version; std::string uri; std::optional<vd::SourceFile> source; };
     fs::path root, selected_root, entry_path, requested_root;
     vd::ToolingSession session;
@@ -783,6 +784,55 @@ class Server {
         std::string encoded;llvm::raw_string_ostream stream(encoded);stream<<assistance_result(method,module,&source,result);
         probes[method=="textDocument/signatureHelp"?1:0]=ProbeCache{snapshot,module,offset,result,std::move(basis),std::move(encoded)};
     }
+    std::optional<vd::BuildConditions> section_conditions(const std::string& module) const {
+        auto current=session.current_analysis();
+        if(!current)return {};
+        if(auto* program=analysis_for(*current,module))
+            for(const auto& item:program->modules())if(item.identity==module)return item.conditions;
+        if(auto project=current->project();project && project->manifest) {
+            auto conditions=vd::native_build_conditions();
+            conditions.features=project->manifest->conditions();
+            return conditions;
+        }
+        return {};
+    }
+
+    const vd::SourceFile* section_source(const std::string& module) const {
+        if (auto document = open.find(module); document != open.end())
+            return document->second.source ? &*document->second.source : nullptr;
+        auto current = session.current_analysis();
+        const auto* program = current ? analysis_for(*current, module) : nullptr;
+        return program && !current->editor_documents().contains(module) ? source_in(*program, module) : nullptr;
+    }
+
+    j::Array section_folds(const j::Object& params) const {
+        j::Array folds;
+        const auto module = identity(string(object(params.get("textDocument")), "uri"));
+        const auto* source = section_source(module);
+        if (!source || module.ends_with("/void.project.toml")) return folds;
+        const auto conditions=section_conditions(module);
+        std::vector<std::pair<unsigned,unsigned>> blocks, regions;
+        for(const auto& section:vd::source_sections(*source,conditions?&*conditions:nullptr,&blocks)) {
+            const auto start=source->location(section.begin).line-1;
+            const auto end=source->location(section.end).line-1;
+            if(start>=end)continue;
+            regions.emplace_back(start,end);
+            if(regions.size()==folding_range_limit)break;
+        }
+        for(const auto& [start,end]:regions)
+            folds.push_back(j::Object{{"startLine",start},{"endLine",end},{"kind","region"}});
+        for(const auto& [start,end]:blocks) {
+            if(folds.size()==folding_range_limit)break;
+            const auto conflicts=std::any_of(regions.begin(),regions.end(),[&](const auto& region) {
+                const auto [open,close]=region;
+                return start==open || (start<open && open<=end && end<close) ||
+                    (open<start && start<=close && close<end);
+            });
+            if(!conflicts)folds.push_back(j::Object{{"startLine",start},{"endLine",end}});
+        }
+        return folds;
+    }
+
     j::Value editor_query(const std::string& method,const j::Object& params) {
         auto current=session.current_analysis();
         auto index=current?current->index().get():nullptr;
@@ -795,6 +845,22 @@ class Server {
                 selected=identity(string(object(params.get("textDocument")),"uri"));
                 if(current && current->editor_documents().contains(selected) && !open.contains(selected))return result;
                 index=current?current->index_for(selected):nullptr;
+                if (const auto* source = section_source(selected); source && !selected.ends_with("/void.project.toml")) {
+                    auto snapshot = std::make_shared<const vd::SourceFile>(*source);
+                    const auto conditions=section_conditions(selected);
+                    for (const auto& section : vd::source_sections(*source,conditions?&*conditions:nullptr)) {
+                        auto title = source->text().substr(section.name_begin, section.name_end - section.name_begin);
+                        auto name = vd::SourceSpan{snapshot, selected, section.name_begin, section.name_end};
+                        if (hierarchical_symbols) {
+                            auto extent = vd::SourceSpan{snapshot, selected, section.begin, section.end};
+                            result.push_back(j::Object{{"name", std::move(title)}, {"kind", 3},
+                                {"range", range(extent)}, {"selectionRange", range(name)}});
+                        } else {
+                            result.push_back(j::Object{{"name", std::move(title)}, {"kind", 3}, {"location", location(name)}});
+                        }
+                        if (result.size() == 256) return result;
+                    }
+                }
             }
             if(!index)return result;
             for(const auto& d:index->declarations()) {
@@ -923,7 +989,11 @@ class Server {
             }
             return assistance_result(method,module,source,assistance);
         }
-        if(!index || (document && method!="textDocument/hover"))return nullptr;
+        if(!index || (document && method!="textDocument/hover")) {
+            if(method=="textDocument/prepareRename" || method=="textDocument/rename")
+                throw std::invalid_argument("Rename needs a fully resolved declaration in the selected project");
+            return nullptr;
+        }
         auto definitions=index->definitions_at(module,*offset);
         if(definitions.empty())for(const auto& d:index->declarations_in(module))if(d.source.begin<=*offset && *offset<d.source.end){definitions.push_back(d);break;}
         if(definitions.empty())return nullptr;
@@ -935,49 +1005,80 @@ class Server {
             for(const auto& d:definitions){if(!text.empty())text+="\n\n";auto docs=d.documentation.text(d.type!=vd::ir::Type::none && (d.kind==vd::AnalyzedDeclaration::Kind::function || d.kind==vd::AnalyzedDeclaration::Kind::receiver_method || d.kind==vd::AnalyzedDeclaration::Kind::interface_requirement || d.kind==vd::AnalyzedDeclaration::Kind::operator_function));text+=describe(d)+(docs.empty()?"":"\n\n"+docs);}
             return j::Object{{"contents",j::Object{{"kind","plaintext"},{"value",std::move(text)}}},{"range",range(selected_span)}};
         }
-        if(definitions.size()!=1)throw std::invalid_argument("Rename cannot choose between concrete specialization targets");
-        if(read_only_source(module) || read_only_source(definition->module))throw std::invalid_argument("Installed standard and locked package sources are read-only");
-        if(!rename_edits || !definition->rename_safe)throw std::invalid_argument("Rename requires version-safe documentChanges and a supported ordinary function, global, constant or uncaptured local binding");
-        if(!disk_current(*current->semantic_analysis()))throw std::invalid_argument("Disk sources changed; refresh before rename");
-        if(method=="textDocument/prepareRename")return j::Object{{"range",range(selected_span)},{"placeholder",name_of(*definition)}};
-        auto replacement=string(params,"newName");if(!vd::valid_editor_identifier(replacement) || replacement=="entry" || replacement=="init" || replacement=="deinit" || replacement=="call")throw std::invalid_argument("Expected a non-reserved VOID identifier");
+        // Constructor navigation prefers init; the authored token spells its type.
+        for(auto& candidate:definitions)if(candidate.kind==vd::AnalyzedDeclaration::Kind::initializer &&
+            (candidate.module!=module || candidate.source.begin>*offset || *offset>=candidate.source.end))
+            if(auto owner=index->declaration(candidate.owner))candidate=std::move(*owner);
+        definition=&definitions.front();
+        auto family=index->rename_family(definition->identity);
+        auto in_family=[&](const auto& candidate) {
+            return std::any_of(family.begin(),family.end(),[&](const auto& member){return member.identity==candidate.identity;});
+        };
+        if(!std::all_of(definitions.begin(),definitions.end(),in_family))
+            throw std::invalid_argument("Rename cannot choose between distinct resolved targets");
+        if(!rename_edits)throw std::invalid_argument("Rename requires transactional, versioned documentChanges");
+        if(read_only_source(module))throw std::invalid_argument("Installed standard and locked package sources are read-only");
+        const auto spelling=name_of(*definition);
+        if(!vd::valid_editor_identifier(spelling))throw std::invalid_argument("Select an authored VOID identifier to rename");
+        if(!current->semantic_analysis() || !disk_current(*current->semantic_analysis()))
+            throw std::invalid_argument("Rename needs a valid project with current disk sources");
+        if(index->unresolved_rename_use(spelling))
+            throw std::invalid_argument("An uninstantiated generic body may use this name; analyze a concrete use first");
         std::map<std::string,std::vector<vd::SourceSpan>> edits;
-        edits[definition->module].push_back(definition->source);
-        for(const auto& r:index->references_to(definition->identity))edits[r.source.module_identity].push_back(r.source);
-        for(auto& [id,spans]:edits){
-            if(read_only_source(id))throw std::invalid_argument("Rename would edit a read-only source");std::sort(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.begin<b.begin;});
-            spans.erase(std::unique(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.begin==b.begin && a.end==b.end;}),spans.end());
-            std::size_t end=0;for(const auto& span:spans){if(span.begin<end || span.source->text().substr(span.begin,span.end-span.begin)!=name_of(*definition))throw std::invalid_argument("Uncertain or overlapping rename binding");end=span.end;}
+        for(const auto& member:family) {
+            if(member.builtin || !member.rename_safe || name_of(member)!=spelling)
+                throw std::invalid_argument("This declaration or a related member has no supported authored rename");
+            edits[member.module].push_back(member.source);
+            for(const auto& ref:index->references_to(member.identity)) {
+                if(ref.navigation_only)
+                    throw std::invalid_argument("This member is used through an implicit language operation");
+                edits[ref.source.module_identity].push_back(ref.source);
+                if(ref.source.module_identity==module && ref.source.begin<=*offset && *offset<ref.source.end)
+                    selected_span=ref.source;
+            }
         }
+        for(auto& [id,spans]:edits) {
+            if(read_only_source(id))throw std::invalid_argument("Rename would edit a read-only source");
+            std::sort(spans.begin(),spans.end(),[](const auto& a,const auto& b){return std::tie(a.begin,a.end)<std::tie(b.begin,b.end);});
+            spans.erase(std::unique(spans.begin(),spans.end(),[](const auto& a,const auto& b){return a.begin==b.begin && a.end==b.end;}),spans.end());
+            std::size_t end=0;
+            for(const auto& span:spans) {
+                if(span.begin<end || span.source->text().substr(span.begin,span.end-span.begin)!=spelling)
+                    throw std::invalid_argument("Rename found an uncertain or overlapping binding");
+                end=span.end;
+            }
+        }
+        if(method=="textDocument/prepareRename")return j::Object{{"range",range(selected_span)},{"placeholder",spelling}};
+        auto replacement=string(params,"newName");
+        if(!vd::valid_editor_identifier(replacement) || replacement=="entry" || replacement=="main" ||
+           replacement=="init" || replacement=="deinit" || replacement=="call")
+            throw std::invalid_argument("Expected a non-reserved VOID identifier");
+        if(index->unresolved_rename_use(replacement))
+            throw std::invalid_argument("The new name may capture a reference in an uninstantiated generic body");
+        // All edits replace the same identifier. The number of earlier
+        // edits determines each translated position in logarithmic time.
+        const auto increment=static_cast<std::ptrdiff_t>(replacement.size())-static_cast<std::ptrdiff_t>(spelling.size());
         auto translate=[&](const std::string& module,std::size_t offset) {
-            std::ptrdiff_t delta=0;
-            if(auto found=edits.find(module);found!=edits.end())for(const auto& span:found->second)if(span.end<=offset)delta+=static_cast<std::ptrdiff_t>(replacement.size())-static_cast<std::ptrdiff_t>(span.end-span.begin);
-            return static_cast<std::size_t>(static_cast<std::ptrdiff_t>(offset)+delta);
+            auto found=edits.find(module);
+            if(found==edits.end())return offset;
+            const auto& spans=found->second;
+            const auto first_after=std::upper_bound(spans.begin(),spans.end(),offset,
+                [](auto position,const auto& span){return position<span.end;});
+            return static_cast<std::size_t>(static_cast<std::ptrdiff_t>(offset)+(first_after-spans.begin())*increment);
         };
         auto overlays=session.select().overrides();for(const auto& m:current->semantic_analysis()->modules()) {
             if(read_only_source(m.identity))continue;
             auto text=m.source.text();if(auto found=edits.find(m.identity);found!=edits.end())for(auto it=found->second.rbegin();it!=found->second.rend();++it)text.replace(it->begin,it->end-it->begin,replacement);
             overlays.insert_or_assign(m.identity,vd::SourceFile(m.source.path(),std::move(text)));
         }
-        auto checked=check_overlays(overlays);if(!checked.program)throw std::invalid_argument("Rename fails compiler validation");
-        vd::ToolingIndex fresh(checked.program);
-        // Compare every declaration and written binding at its transformed source
-        // position: valid compilation alone cannot detect legal rebinding.
-        std::map<std::string,std::string> identities;
-        for(const auto& d:index->declarations()) {
-            if(d.builtin) {
-                auto next=fresh.declaration(d.identity);
-                if(!next || !next->builtin || next->type!=d.type || next->parameters!=d.parameters)throw std::invalid_argument("Rename changes a compiler-owned numeric declaration");
-                identities.emplace(d.identity,d.identity);continue;
-            }
-            for(const auto& next:fresh.declarations())if(!next.builtin && d.module==next.module && translate(d.module,d.source.begin)==next.source.begin && d.kind==next.kind)identities.emplace(d.identity,next.identity);
+        auto checked=check_overlays(overlays);
+        if(!checked.succeeded()) {
+            const auto failure=std::find_if(checked.diagnostics.begin(),checked.diagnostics.end(),
+                [](const auto& diagnostic){return diagnostic.severity==vd::Severity::error;});
+            throw std::invalid_argument(failure==checked.diagnostics.end()?"Rename fails compiler validation":
+                "Rename fails compiler validation. "+failure->description);
         }
-        if(identities.size()!=index->declarations().size() || fresh.declarations().size()!=index->declarations().size())throw std::invalid_argument("Rename changes declaration structure");
-        using Binding=std::tuple<std::string,std::size_t,std::string>;
-        std::set<Binding> expected,actual;
-        for(const auto& r:index->references())if(!r.implicit){if(!identities.contains(r.to))throw std::invalid_argument("Uncertain reference target");expected.emplace(r.source.module_identity,translate(r.source.module_identity,r.source.begin),identities.at(r.to));}
-        for(const auto& r:fresh.references())if(!r.implicit)actual.emplace(r.source.module_identity,r.source.begin,r.to);
-        if(expected!=actual)throw std::invalid_argument("Rename would rebind a written reference");
+        index->validate_rename(vd::ToolingIndex(checked.program),translate);
         std::error_code root_error;
         auto current_root=fs::canonical(selected_root,root_error);
         if(root_error || current_root!=root)throw std::invalid_argument("Rename project root changed; restart the server");
@@ -1164,6 +1265,7 @@ public:
                 if(cancellations.erase(key)){fail(-32800,"Request cancelled");return {};}
                 if(!interactive || (name!="textDocument/semanticTokens/full" && name!="textDocument/completion" &&
                    name!="textDocument/documentSymbol" && name!="textDocument/signatureHelp" &&
+                   name!="textDocument/foldingRange" &&
                    name!="textDocument/codeAction"))flush();
             }
             if(name=="initialize") {
@@ -1172,6 +1274,10 @@ public:
                 const auto& caps=object(params.get("capabilities"));
                 if(auto pid=params.get("processId");pid && !pid->getAsNull())process_id=integer(pid,1);
                 if(auto td=caps.getObject("textDocument")) {
+                    if (auto folding = td->getObject("foldingRange")) {
+                        const auto limit = folding->getInteger("rangeLimit").value_or(5000);
+                        if (limit > 0 && limit < 5000) folding_range_limit = static_cast<std::size_t>(limit);
+                    }
                     if(auto help=td->getObject("signatureHelp"))if(auto info=help->getObject("signatureInformation")) {
                         if(auto parameter=info->getObject("parameterInformation"))signature_offsets=parameter->getBoolean("labelOffsetSupport").value_or(false);
                         if(auto formats=info->getArray("documentationFormat"))
@@ -1202,7 +1308,7 @@ public:
                 state=State::waiting;
                 j::Object capabilities{{"positionEncoding","utf-16"},{"textDocumentSync",j::Object{{"openClose",true},{"change",incremental_sync?2:1},{"save",j::Object{{"includeText",false}}}}},
                         {"definitionProvider",true},{"referencesProvider",true},{"hoverProvider",true},{"completionProvider",j::Object{{"triggerCharacters",j::Array{"."," ","\"","/",":"}}}},
-                        {"signatureHelpProvider",j::Object{{"triggerCharacters",j::Array{"(",","}}}},{"documentSymbolProvider",true},{"workspaceSymbolProvider",true},
+                        {"signatureHelpProvider",j::Object{{"triggerCharacters",j::Array{"(",","}}}},{"documentSymbolProvider",true},{"workspaceSymbolProvider",true},{"foldingRangeProvider",true},
                         {"documentFormattingProvider",true},{"renameProvider",rename_edits ? j::Value(j::Object{{"prepareProvider",true}}):j::Value(false)},
                         {"workspace",manifest_mode?j::Value(j::Object{{"fileOperations",j::Object{{"didCreate",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didRename",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}},{"didDelete",j::Object{{"filters",j::Array{j::Object{{"scheme","file"},{"pattern",j::Object{{"glob","**/*"}}}}}}}}}}}):j::Value(j::Object{})},{"experimental",j::Object{{"voidToolingProtocol",1},{"voidProjectProtocol",1},{"refreshProject",true}}}};
                 if(guarded_fixes)capabilities["codeActionProvider"]=j::Object{{"codeActionKinds",j::Array{"quickfix"}}};
@@ -1254,6 +1360,14 @@ public:
                 if(!id){fail(-32600,"Quick fixes require a request");return {};}
                 editor_result([&](const auto& params){return quick_fix(params,name=="void/resolveQuickFix");},
                     name=="void/resolveQuickFix"?j::Value(nullptr):j::Value(j::Array{}));return {};
+            }
+            if (name == "textDocument/foldingRange") {
+                if (!id) { fail(-32600, "Folding ranges require a request"); return {}; }
+                editor_result([&](const auto& params) -> j::Value {
+                    auto folds = section_folds(params);
+                    return folds.empty() ? j::Value(nullptr) : j::Value(std::move(folds));
+                }, nullptr);
+                return {};
             }
             if(name=="textDocument/definition" || name=="textDocument/references") {
                 if(!id) { fail(-32600,"Navigation requires a request"); return {}; }

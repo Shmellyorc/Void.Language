@@ -415,3 +415,38 @@ workspace discovery, file watching, background analysis, persistent caches,
 incremental parsing and automatic native publication/restart remain deferred.
 No VOID syntax or numeric semantics change. See WORK_LOG.md for measured local
 verification and the pending hosted Linux/Windows/macOS run.
+
+
+## VOID sections
+
+Use `# section Name` and `# endsection` on standalone comment lines. Sections
+can appear at file level or at an existing indentation level inside a declaration
+or function. A name is the nonempty text after `# section `, with surrounding
+spaces and tabs removed. Place openings and closings at the same indentation for
+readability. The server pairs a closing marker with the nearest open marker even
+if the indentation differs.
+
+Matched sections appear in document navigation and fold through the closing
+marker. Nested sections fold independently and each name appears in document
+navigation. An incomplete, malformed or unmatched marker remains an ordinary
+comment. Marker-like text in strings, trailing comments and inactive build
+branches does not create a section. Sections leave scopes, declaration
+visibility, formatting and execution unchanged.
+
+
+## Rename across the selected project
+
+Rename uses resolved compiler declarations and references. The server can follow
+lexical bindings, closure captures, fields, properties, explicit import aliases,
+nominal types, enum cases, functions, methods and resolved generic declarations.
+A property name covers its accessors. A participating virtual override or
+resolved structural interface implementation is renamed as part of its member
+family. Compiler conventions such as entry and lifecycle names retain their
+spelling.
+
+The server checks the proposed source graph and compares both binding locations
+and member relationships before returning one transactional workspace edit.
+Open-document edits carry versions, and the compiler rechecks captured disk
+inputs. Read-only installed or locked-package sources, unresolved generic uses,
+conflicts and sources outside the selected analysis can prevent a safe edit.
+Repair compile errors before renaming.

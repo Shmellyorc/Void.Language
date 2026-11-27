@@ -1,0 +1,17 @@
+struct identity:
+    n: i32
+value struct tagged_key:
+    optional: option<i32?>
+    status: result<identity, string>
+
+func main():
+    var owner = identity(n = 2)
+    var other = identity(n = 2)
+    var key = tagged_key(optional = Some(null), status = Ok(owner))
+    var table: {tagged_key: i32} = {key: 7, tagged_key(optional = None, status = Err("é")): 11}
+    var reading: i32? = 0
+    key.optional = Some(reading)
+    table[key] = 13
+    owner.n = 99
+    print(table[tagged_key(optional = Some(null), status = Ok(owner))], table[key], table[tagged_key(optional = None, status = Err("é"))])
+    print(table.contains(tagged_key(optional = Some(null), status = Ok(other))), table.count)

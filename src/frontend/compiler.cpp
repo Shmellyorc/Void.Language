@@ -95,7 +95,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     for(auto& [id,u]:units)if(u->application_body) {
         try {
             if(id!=entry)error(u->source,{TokenKind::name,"",0},Code::entry,"Imported modules cannot contain executable top-level statements.");
-            for(const auto& f:u->functions)if(f.token.text=="main" && !f.receiver && !f.static_owner && f.parameters.empty() && f.generics.empty() && !f.asynchronous && (f.result==Type::none || f.result==Type::i32))error(u->source,f.token,Code::entry,"Executable top-level statements compete with main().");
+            for(const auto& f:u->functions)if(application_main(f))error(u->source,f.token,Code::entry,"Executable top-level statements compete with main().");
         } catch(const CompilationError& failure){diagnostics.add(failure);}
     }
     auto arena = std::make_shared<ir::TypeArena>();
@@ -751,6 +751,8 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         }
     }
     headers_ready=true;
+    if (auto* app = application_entry(root); app && app->asynchronous)
+        root.async_application_task = root.make_task(Type::i32);
     root.prepare_relationships=[](Type,Type,const SourceFile&,const Token&){};
     validate_inheritance(units,root,diagnostics);
     root.member_catalog=std::make_shared<ir::Module>(member_catalog(units,entry));

@@ -10,6 +10,13 @@
 #include <map>
 #include <set>
 namespace vd {
+
+struct SourceSection {
+    std::size_t begin, name_begin, name_end, end;
+};
+std::vector<SourceSection> source_sections(const SourceFile&, const BuildConditions* = nullptr,
+                                           std::vector<std::pair<unsigned,unsigned>>* blocks = nullptr);
+
 std::string inspect_native_provider(const SourceFile&, const BuildConditions&);
 // Parse relevant project sources and resolve local imports with the compiler's
 // source graph. This metadata result cannot authorize native code or lowering.
@@ -105,7 +112,7 @@ struct DebugBinding {
 class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis> {
     friend struct AnalysisAccess;
     std::string entry_, entry_symbol_, contract_, constants_;
-    bool application_=false, executable_=true;
+    bool application_=false, async_application_=false, executable_=true;
     std::shared_ptr<const CPrimitiveAdmission> c_primitives_;
     std::shared_ptr<const project::LockedDependencies> locked_dependencies_;
     ApplicationMetadata::Owner application_metadata_;
@@ -115,6 +122,8 @@ class ValidatedAnalysis : public std::enable_shared_from_this<ValidatedAnalysis>
     std::vector<AnalyzedReference> references_;
     std::vector<AnalyzedDeclaration> editor_declarations_;
     std::vector<AnalyzedReference> editor_references_;
+    std::set<std::pair<std::string,std::string>> rename_relationships_;
+    std::map<std::string,std::vector<SourceSpan>> unresolved_template_names_;
     std::map<std::string,std::vector<DebugBinding>> debug_bindings_;
     std::map<std::string,std::vector<DebugScope>> debug_scopes_;
     std::function<ir::Module()> lower_;
@@ -126,6 +135,7 @@ public:
     const std::string& entry_identity() const { return entry_; }
     const std::string& entry_symbol() const { return entry_symbol_; }
     bool application() const { return application_; }
+    bool async_application() const { return async_application_; }
     const ApplicationMetadata::Owner& application_metadata() const { return application_metadata_; }
     const auto& c_primitive_admission() const { return c_primitives_; }
     const auto& locked_dependencies() const { return locked_dependencies_; }
@@ -135,6 +145,8 @@ public:
     const auto& references() const { return references_; }
     const auto& editor_declarations() const { return editor_declarations_; }
     const auto& editor_references() const { return editor_references_; }
+    const auto& rename_relationships() const { return rename_relationships_; }
+    const auto& unresolved_template_names() const { return unresolved_template_names_; }
     const auto& debug_bindings() const { return debug_bindings_; }
     const auto& debug_scopes() const { return debug_scopes_; }
     const std::string& compatibility_contract() const { return contract_; }
