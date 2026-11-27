@@ -3,12 +3,12 @@
 namespace runtime_test {
 inline vd::ir::Module proof(bool changed_layout = false) {
     using namespace vd::ir;
-    auto leaf = std::make_shared<ValueType>(ValueType{.identity = "runtime.Leaf", .name = "Leaf", .fields = {{"payload",Type::i32}}, .enum_backing = {}});
+    auto leaf = std::make_shared<ValueType>(ValueType{.identity = "runtime.Leaf", .name = "Leaf", .fields = {{"payload",Type::i32}}, .enum_backing = {}, .numeric_members = {}});
     if (changed_layout) leaf->fields.push_back({"extra",Type::i64});
     Type reference(leaf,Type::managed_ref);
-    auto inner = std::make_shared<ValueType>(ValueType{.identity = "runtime.Inner", .name = "Inner", .fields = {{"reference",reference},{"flag",Type::boolean}}, .enum_backing = {}});
+    auto inner = std::make_shared<ValueType>(ValueType{.identity = "runtime.Inner", .name = "Inner", .fields = {{"reference",reference},{"flag",Type::boolean}}, .enum_backing = {}, .numeric_members = {}});
     Type nested(inner);
-    auto outer = std::make_shared<ValueType>(ValueType{.identity = "runtime.Outer", .name = "Outer", .fields = {{"tag",Type::i32},{"nested",nested}}, .enum_backing = {}});
+    auto outer = std::make_shared<ValueType>(ValueType{.identity = "runtime.Outer", .name = "Outer", .fields = {{"tag",Type::i32},{"nested",nested}}, .enum_backing = {}, .numeric_members = {}});
     Type value(outer), object(outer,Type::managed_ref);
     Module m; m.identity = "runtime_proof"; m.coordinated = true;
     Function make; make.name = "make"; make.result = reference;
@@ -38,7 +38,7 @@ inline vd::ir::Module proof(bool changed_layout = false) {
     mutate.blocks = {{{{Op::argument}, {Op::argument,1}, {Op::gc_allocate,0,0,0,{}, {},reference}, {Op::gc_write,2,1},
         {Op::constant,0,0,1,{}, {},Type::boolean}, {Op::aggregate,0,0,0,{}, {},nested,{2,4}},
         {Op::insert,0,5,1}, {Op::store,0,6}, {Op::gc_collect}}, {Terminator::Kind::return_void}}};
-    auto container_definition = std::make_shared<ValueType>(ValueType{.identity = "runtime.Container", .name = "Container", .fields = {{"value",value},{"padding",Type::i32}}, .enum_backing = {}});
+    auto container_definition = std::make_shared<ValueType>(ValueType{.identity = "runtime.Container", .name = "Container", .fields = {{"value",value},{"padding",Type::i32}}, .enum_backing = {}, .numeric_members = {}});
     Type container(container_definition);
     Function receiver; receiver.name = "entry_receiver"; receiver.locals = {container,value};
     receiver.blocks = {{{{Op::argument}, {Op::call,0,0,0,"make",{},reference,{0}}, {Op::constant,0,0,1}, {Op::add,0,2},
