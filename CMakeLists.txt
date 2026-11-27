@@ -29,7 +29,7 @@ if(VOID_LINKER)
     message(FATAL_ERROR "VOID_LINKER must be LLD 23.1.4")
   endif()
 endif()
-option(VOID_LINUX_THINLTO "Compile the Linux compiler libraries with pinned Clang ThinLTO" OFF)
+option(VOID_LINUX_THINLTO "Compile selected Linux compiler components with pinned Clang ThinLTO" OFF)
 if(VOID_LINUX_THINLTO AND (NOT VOID_LINKER OR NOT CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL LLVM_PACKAGE_VERSION))
   message(FATAL_ERROR "VOID_LINUX_THINLTO requires the matching Linux Clang and LLD SDK")
 endif()
@@ -169,10 +169,13 @@ add_library(void_llvm src/backend/llvm/backend.cpp src/backend/llvm/jit.cpp src/
   src/backend/llvm/root_storage.cpp src/backend/llvm/target.cpp
   src/backend/llvm/type_layout.cpp src/backend/llvm/async_frame.cpp)
 if(VOID_LINUX_THINLTO)
-  # The pinned LLD recognizes ThinLTO members in these archives. Keep provider,
-  # runtime and test sources on their existing native compilation recipes.
-  target_compile_options(void_core PRIVATE -flto=thin)
-  target_compile_options(void_llvm PRIVATE -flto=thin)
+  # Pinned LLD optimizes these related units and caches their native objects.
+  # Keep the large semantic and lowering units native to avoid reoptimizing
+  # them for each distinct test executable.
+  set_property(SOURCE
+    src/frontend/lexer.cpp src/frontend/parser.cpp src/ir/types.cpp
+    src/backend/llvm/type_layout.cpp src/backend/llvm/async_frame.cpp
+    APPEND PROPERTY COMPILE_OPTIONS -flto=thin)
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   # Share stable headers across independently compiled Debug units.

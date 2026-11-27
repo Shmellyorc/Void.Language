@@ -119,7 +119,8 @@ jobs:
 
           def verify_thinlto_objects():
               commands = json.loads((build / 'compile_commands.json').read_text(encoding='utf-8'))
-              representatives = {'src/frontend/semantics.cpp', 'src/backend/llvm/backend.cpp'}
+              representatives = {'src/frontend/lexer.cpp', 'src/frontend/parser.cpp', 'src/ir/types.cpp',
+                                 'src/backend/llvm/type_layout.cpp', 'src/backend/llvm/async_frame.cpp'}
               for entry in commands:
                   for source in tuple(representatives):
                       if Path(entry['file']).as_posix().endswith('/' + source):
