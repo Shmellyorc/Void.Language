@@ -1,26 +1,23 @@
 # VOID developer experience milestone register
 
-Current authorized work is **G27: complete library authoring integration**, at
-baseline `5aa51bdd1edbf1146fb64379497b2a1fb0b78561`. G23–G26 are integrated
-in that baseline. G27 records known generated library entries and admits library
-consumers to existing add/tidy publication. See [G27 implementation and qualification](../projects/G27_LIBRARY_AUTHORING.md).
-Boss controls integration, publication and hosted CI; no new integration commit
-or hosted campaign is part of G27.
+Boss authorized **Milestone 1 — Language & Tooling Completeness** on the
+qualified compiler modernization baseline `c068434e44775bd4a91457a1357efc48f6de8e70`.
+All seven compiler profiles and ten focused hosted workflows passed on that
+revision. Milestone 1 includes implementation and hosted qualification. The
+later milestones are recorded here for future assignments.
 
-The preceding assignment was the Boss-authorized G23 editor packaging and G24 raylib
-verified source package integration. G22 is accepted at
-`ff3bbcd5a20fa2e81506d23e276a8a7837e9404f`. G23 is implemented; G24 has usable
-interfaces for all 600 declarations, with typed adaptations and native limits
-explicit. The G24 physical-source conversion is integrated at
-`b61a32193fad616ae3863b01809533ab4a721cde`; canonical
-development stays in `verified-packages/raylib/`, with a standalone Git subtree
-publication proposal awaiting Boss authorization. Boss acceptance remains pending.
-Public post-push qualification at `6a7cb50b2d35023324053694275596c9a4a7b328` failed
-on unchanged D3 whole-repository acquisition limits; see the
-[public-origin report](../projects/G24_PUBLIC_GITHUB_QUALIFICATION.md) and
-[physical-source report](../projects/G24_PHYSICAL_SOURCE_IMPLEMENTATION.md).
-Batch entries below identify the integration commits and qualification scopes.
-Boss controls integration, hosted qualification and public release.
+## Approved milestone sequence
+
+| Milestone | Approved scope |
+| --- | --- |
+| 1 · Language & Tooling Completeness | Expanded compile-time evaluation, compile-time pattern matching, complete symbol renaming, section folding and navigation, async application entry, expanded dictionary key support. |
+| 2 · Managed Memory & Iteration | Weak references and generators. Detailed ownership, lifetime and suspension contracts remain subject to design. |
+| 3 · Native Publishing | Resume and complete the preserved Publisher Stage A and B implementation and existing publishing requirements. |
+| 4 · Cross-Platform Publishing & Extensible Target Packs | After native publishing is complete and qualified, deliver official Windows, Linux and macOS packs for x64 and ARM64, pack generation and qualification in GitHub Actions, VOIDUP acquisition and management, cross-compilation and native linking, and automatic platform bundles including macOS `.app`. Keep targets independent of packaging formats, support custom and community-maintained targets, use redistributable runtime and linking inputs, and document signing and distribution. |
+| 5 · Advanced Compiler & Developer Tooling | Incremental VOID compilation and automatic application reload. |
+| Subsequent milestones | Standard-library maturity and real-world application development. |
+
+The records below retain the original integration and qualification scopes.
 [Feature roadmap](FEATURE_COMPLETENESS_AND_DEVELOPER_EXPERIENCE.md)
 
 ## Integrated milestones
@@ -60,7 +57,6 @@ Boss controls integration, hosted qualification and public release.
 | G26 | **INTEGRATED at `5aa51bdd1edbf1146fb64379497b2a1fb0b78561` / FIVE NATIVE PROFILES QUALIFIED.** Explicit `voidc add`, `voidc tidy` and read-only `tidy --check`; editable path sources and verified Git views under `libs/`, existing package identities and D3 locks, recoverable serialized publication, separate D4 approval. See the [G26 report](../projects/G26_PACKAGE_MAINTENANCE.md). No registry, downloader, Runtime, compiler ABI or D3 limit change. |
 | G27 | **IMPLEMENTED LOCALLY / QUALIFICATION RECORDED.** Generated `package.entry` and library-consumer `add` reuse the existing creation plan, Resolver and publication journal. [Report and platform limits](../projects/G27_LIBRARY_AUTHORING.md) |
 | G00 · Production distribution | Conditional on release authorization. Public bootstrap, distribution and platform obligations remain tracked in the release record. [Preview blockers](../release/PREVIEW_BLOCKERS.md) |
-| Cross-Platform Publishing & Extensible Target Packs | **Future.** Begins after native publishing is complete and qualified. Scope includes official Windows, Linux and macOS packs for x64 and ARM64, pack generation and qualification in GitHub Actions, VOIDUP acquisition and management, cross-platform native compilation and linking, and automatic platform bundles including macOS `.app`. Keep compilation targets independent of packaging formats and support custom and community-maintained targets. Document signing and distribution and use legally redistributable target runtime and linking inputs. |
 
 
 
