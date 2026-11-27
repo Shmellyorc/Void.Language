@@ -218,7 +218,7 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
             case O::gc_write: use(i.a,id,Use::field); use(i.b,id,Use::escape); break;
             case O::convert:
                 use(i.a,id,nullable_alias(instruction_types[bn][i.a],instruction_types[bn][id])?Use::alias:Use::escape);break;
-            case O::negate: case O::logical_not: case O::bitcast:
+            case O::negate: case O::logical_not: case O::bitcast: case O::weak_create: case O::weak_lock:
                 use(i.a,id,Use::escape); break;
             case O::constant: case O::argument: case O::stage_begin:
             case O::gc_construct: case O::gc_allocate: case O::global_cell:

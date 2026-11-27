@@ -231,6 +231,9 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         join_facts(value,reference_facts(i.type));
                         break;
                     case Op::type_cast: case Op::interface_pack: case Op::interface_prepare: case Op::convert: case Op::upcast: case Op::stage_prefix: value=values[i.a];join_facts(value,reference_facts(i.type));break;
+                    case Op::weak_create: case Op::weak_lock:
+                        join_facts(value,values[i.a]);
+                        break;
                     case Op::gc_construct:
                         for(unsigned field=0;field<i.arguments.size();++field)retain(values[i.arguments[field]],field_type(i.type,field));
                         break;

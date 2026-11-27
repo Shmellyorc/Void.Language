@@ -254,6 +254,18 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
+            if(d->weak_target) {
+                const auto target=Type(*d->weak_target);
+                if(t.kind!=Type::managed_ref || t.construction || !d->managed || !d->fields.empty() ||
+                   !d->base.expired() || !d->cases.empty() || d->result_type || d->option_type ||
+                   d->nullable_value || d->interface_type || d->callable || d->native_resource ||
+                   d->task_result || d->custom_equality || d->call_result || !d->call_parameters.empty() ||
+                   !d->native_provider.empty() || !d->module_identity.empty() || !weak_target_type(target) ||
+                   !readonly_paths(target).empty() || d->visibility!=target.definition->visibility ||
+                   d->identity!=weak_identity(target) || d->name!=d->identity)
+                    fail("invalid weak reference type");
+                if(!checked.contains(d))pending.push_back(target);
+            } else if(d->identity.starts_with("$weak:"))fail("forged weak reference type");
             const bool returns=d->identity.starts_with("$returns:");
             if(returns) {
                 if(!multiple_return_type(t) || t.nullable || d->name!="$returns" ||
@@ -271,7 +283,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                         fail("invalid multiple-return component");
                 }
             }
-            if(auto base=d->base.lock();base && base->native_resource)fail("native resource cannot be extended");
+            if(auto base=d->base.lock();base && (base->native_resource || base->weak_target))
+                fail("opaque managed type cannot be extended");
             if(console::endpoint_type(t) && (t.kind!=Type::aggregate || d->module_identity!=console::source_module || d->identity!=d->module_identity+"::"+d->name || d->managed || !d->base.expired() || !d->cases.empty() || d->interface_type || d->callable || d->native_resource || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].name!="_id" || !d->fields[0].readonly || d->fields[0].visibility!="internal"))fail("invalid console endpoint identity");
             if(console::session_type(t) && (!d->native_resource || d->native_provider!="void.console.v1" || t.kind!=Type::managed_ref || !d->managed || d->module_identity!=console::source_module || !d->base.expired() || d->callable || !d->cases.empty() || d->interface_type || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].readonly || d->fields[0].visibility!="internal" || d->fields[0].name!="_token"))fail("invalid terminal session identity");
             if(d->native_resource && !console::session_type(t) && !(primitive && primitive->resource_type(t)) && ((m.native_library!="void.fixture.v1" && m.native_library!="void.sink.v1") || t.kind!=Type::managed_ref || d->native_provider!=m.native_library || !d->managed || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::u64 || d->callable || !d->base.expired() || !d->cases.empty() || d->interface_type))fail("invalid native resource identity");
@@ -324,7 +337,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
             const bool callable_environment=d->identity=="$void::$environment";
             if(callable_environment && (!d->managed || !d->fields.empty() || !d->base.expired() || !d->module_identity.empty() || d->name!="$environment" || d->visibility!="private"))fail("invalid shared callable environment base");
-            if(!m.interface_requirements.empty() && !returns && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->nullable_value && !d->callable && !d->task_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
+            if(!m.interface_requirements.empty() && !returns && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->nullable_value && !d->callable && !d->task_result && !d->weak_target && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
@@ -675,6 +688,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (!i.type.construction || !i.type.definition->managed || slot(i.a)!=i.type) fail("invalid construction storage");
                     result=i.type; break;
                 case Op::gc_construct:
+                    if(i.type.definition && i.type.definition->weak_target)fail("weak construction requires weak_create");
                     if(i.type.definition && i.type.definition->task_result)fail("task construction requires async call");
                     valid_type(i.type);
                     if (!m.coordinated || i.type.kind!=Type::managed_ref || i.type.nullable || i.type.construction || i.arguments.size()!=i.type.definition->fields.size()) fail("invalid complete managed construction");
@@ -724,7 +738,8 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 case Op::gc_release:
                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
-                        operand(i.a).construction || (primitive && primitive->resource_type(operand(i.a)))) {
+                        operand(i.a).construction || operand(i.a).definition->weak_target ||
+                        (primitive && primitive->resource_type(operand(i.a)))) {
                         fail("invalid deterministic release");
                     }
                     result=Type::boolean;
@@ -755,6 +770,27 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if(package_source(f.module_identity) || !m.coordinated || m.native_library!=native_provider(i.callee) || i.receiver || !native_signature(i.callee,parameters,i.type))fail("invalid native ABI/call/publication");
                     if(native_binding(i.callee).name=="register" && b.instructions[i.arguments[1]].op!=Op::function_reference)fail("native callback lacks generation-local provenance");
                     result=i.type;break;
+                }
+                case Op::weak_create: case Op::weak_lock: {
+                    valid_type(i.type);
+                    auto from=operand(i.a);
+                    if(!m.coordinated || f.worker || i.b || i.immediate || i.receiver || !i.arguments.empty() ||
+                       !i.callee.empty() || i.initialization || i.array_repeat || !i.operator_glyph.empty() ||
+                       i.os_location_adapter || from.construction || from.nullable)
+                        fail("invalid weak operation");
+                    auto cell=i.op==Op::weak_create?i.type:from;
+                    if(cell.kind!=Type::managed_ref || cell.nullable || !cell.definition->weak_target ||
+                       !catalog_definitions.contains(cell.definition.get()))
+                        fail("weak operation requires an admitted cell type");
+                    auto target=Type(*cell.definition->weak_target);
+                    if(i.op==Op::weak_create) {
+                        if(!weak_target_type(from) || from!=target)fail("wrong weak target type");
+                    } else {
+                        target.nullable=true;
+                        if(i.type!=target)fail("wrong weak promotion result type");
+                    }
+                    result=i.type;
+                    break;
                 }
                 case Op::gc_alive:
                     if (!m.coordinated || (operand(i.a).kind != Type::managed_ref || operand(i.a).construction)) fail("invalid managed inspection");
@@ -1415,6 +1451,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             for(const auto& block:f->blocks)for(const auto& i:block.instructions){
                 switch(i.op){
                 case Op::async_drain:if(f!=&worker)fail("worker task operation");break;
+                case Op::weak_create: case Op::weak_lock:fail("worker cannot use weak references");break;
                 case Op::random_seed:fail("worker cannot acquire OS entropy");break;
                 case Op::global_cell:fail("worker cannot access runtime globals");break;
                 case Op::host_native:fail("worker cannot perform owned host operations");break;

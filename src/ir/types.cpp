@@ -191,6 +191,7 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
             current->arena = owner;
             owner->definitions.push_back(current);
             if (auto base=current->base.lock()) pending.push_back(std::move(base));
+            if(current->weak_target)if(auto child=current->weak_target->target.lock())pending.push_back(std::move(child));
             if(current->task_result)if(auto child=current->task_result->target.lock())pending.push_back(std::move(child));
             if(current->call_result)if(auto child=current->call_result->target.lock())pending.push_back(std::move(child));
             for(const auto& parameter:current->call_parameters)if(auto child=parameter.target.lock())pending.push_back(std::move(child));
@@ -206,6 +207,12 @@ Type Type::nominal(std::shared_ptr<const ValueType> d) {
     return Type(std::move(d),kind);
 }
 std::string option_identity(Type payload) {return "$option:"+array_identity(payload,{});}
+bool weak_target_type(Type type) {
+    return type.kind==Type::managed_ref && !type.nullable && !type.construction && type.definition &&
+        type.definition->managed && !type.definition->module_identity.empty() &&
+        !type.definition->weak_target && !type.definition->task_result && !type.definition->native_resource;
+}
+std::string weak_identity(Type target) {return "$weak:"+Type::key(target);}
 bool numeric_enum_member(Type t,std::uint64_t bits) {
     if(t.kind==Type::numeric_enum && t.definition && t.definition->enum_flags) {const auto width=numeric::width(*t.definition->enum_backing);return width==64 || !(bits>>width);}
     return t.kind==Type::numeric_enum && t.definition &&
@@ -407,6 +414,8 @@ std::string type_name(Type t) {
     if (t.readonly && t.kind!=Type::managed_ref) { t.readonly=false; return "readonly " + type_name(t); }
     if(t.kind==Type::dictionary)return "{"+type_name(dictionary_key(t))+": "+type_name(dictionary_value(t))+"}";
     if(array_type(t)) return "["+type_name(array_element(t))+(t.definition->extent ? ", "+std::to_string(*t.definition->extent) : "")+"]";
+    if (t.kind==Type::managed_ref && t.definition && t.definition->weak_target)
+        return std::string(t.readonly?"readonly ":"")+"weak<"+type_name(*t.definition->weak_target)+">"+(t.nullable?"?":"");
     if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");
     switch (t.kind) { case Type::string: return "string"; case Type::numeric_enum: case Type::aggregate: if (t.definition) return t.definition->identity.c_str(); break; case Type::unresolved: if (t.definition) return t.definition->name.c_str(); break; case Type::i8: return "i8"; case Type::i16: return "i16"; case Type::i64: return "i64"; case Type::u8: return "u8"; case Type::u16: return "u16"; case Type::u32: return "u32"; case Type::u64: return "u64"; case Type::f32: return "f32"; case Type::f64: return "f64"; case Type::i32: return "i32"; case Type::boolean: return "bool"; case Type::none: return "no result"; default: break; }
     throw std::invalid_argument("VOID IR: unknown type");

@@ -1,0 +1,55 @@
+struct address:
+    number: i32
+    neighbor: weak<address>?
+
+struct mailbox:
+    links: [weak<address>]
+
+func address_number<t>(reference: weak<t>) -> t?:
+    return reference.lock()
+
+func expired_cycle() -> mailbox:
+    var home = address(number = 42)
+    var office = address(number = 24)
+    var home_link = weak(home)
+    var office_link = weak(office)
+    home.neighbor = office_link
+    office.neighbor = home_link
+    return mailbox(links = [home_link, office_link, weak(home)])
+
+func entry(mode: i32) -> i32:
+    if mode == 0:
+        var home = address(number = 42)
+        var reference: weak<address> = weak(target = home)
+        if address_number(reference) is Ok(var target):
+            return target.number
+        return 0
+    if mode == 2:
+        return release_case(mode)
+    var expired = expired_cycle()
+    # The host applies a collection on each managed allocation.
+    var live = address(number = 1)
+    var barrier = weak(live)
+    for reference in expired.links:
+        if reference.lock() != null:
+            return 0
+    if barrier.lock() is Ok(var promoted):
+        return promoted.number
+    return 0
+
+struct resource:
+    ledger: address
+
+func (self resource) deinit():
+    self.ledger.number += 1
+
+func release_case(mode: i32) -> i32:
+    var ledger = address(number = 3)
+    var owner = resource(ledger = ledger)
+    var handle = weak(owner)
+    with owner:
+        if handle.lock() == null:
+            return 0
+    if handle.lock() != null:
+        return 0
+    return ledger.number + mode

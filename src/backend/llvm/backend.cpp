@@ -1214,6 +1214,19 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     break;
                 }
                 case Op::gc_release:v=b.CreateCall(module->getOrInsertFunction("vd_gc_release",b.getInt1Ty(),b.getPtrTy()),{values[instruction.a]});break;
+                case Op::weak_create: case Op::weak_lock: {
+                    auto* storage=value_roots[n].at(values.size());
+                    if(instruction.op==Op::weak_create) {
+                        auto callee=module->getOrInsertFunction("vd_weak_create",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy());
+                        b.CreateCall(callee,{storage,values[instruction.a],b.CreateGlobalString(ir::Type::key(instruction.type)),failure});
+                    } else {
+                        auto callee=module->getOrInsertFunction("vd_weak_lock",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy());
+                        b.CreateCall(callee,{storage,values[instruction.a],failure});
+                    }
+                    selected_failure();
+                    v=b.CreateLoad(b.getPtrTy(),storage);
+                    break;
+                }
                 case Op::gc_alive:
                     v = b.CreateCall(module->getOrInsertFunction("vd_gc_alive",b.getInt1Ty(),b.getPtrTy()),{values[instruction.a]}); break;
                 case Op::stage_check:

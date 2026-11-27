@@ -81,6 +81,23 @@ shielded cleanup. Transfer restrictions forbid arbitrary mutable shared graphs.
 Delivery 3 passed 120/120 local suites in Debug, Release and strict sanitizers;
 hosted verification remains owner-controlled.
 
+## Weak references
+
+The collector traces the weak cell as an ordinary managed reference. The cell
+has two untraced words for its target and the next cell with a potentially live
+target. While the Runtime holds the existing collector lock, a pass after
+successful marking clears cells whose targets are unmarked or released and
+unlinks cells that are dead or expired. The sweep can then retire and recycle
+object addresses. Unreachable cells are reclaimed by the same sweep.
+
+Creation temporarily roots the target across allocation. Promotion checks the
+cell and target while the caller is Managed, then writes the strong reference
+directly into a registered root before the next safepoint. Explicit release
+immediately prevents new promotions. Already-promoted references follow the
+existing resource contract. Runtime shutdown retains its existing resource and
+participant ordering. The heap discards any remaining weak cells as managed
+storage.
+
 ## Historical Phase 15–23 foundation context
 
 This implemented the owner-approved G1–G6 in `GC_RUNTIME_PROPOSAL.md`. It is an

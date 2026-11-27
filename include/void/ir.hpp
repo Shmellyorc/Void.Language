@@ -78,6 +78,7 @@ struct ValueType {
     bool callable = false;
     std::string native_provider = {}; // Compiled catalog identity, independent of source module spelling.
     bool native_resource = false; // Binding-private managed identity; no source payload/constructor.
+    std::optional<FieldType> weak_target; // Opaque managed cell, independent of target reachability.
     std::optional<FieldType> task_result = {}; // Private inferred task handle; no public constructor.
     std::vector<FieldType> call_parameters = {};
     std::optional<FieldType> call_result = {};
@@ -116,6 +117,8 @@ std::string capability_key(Type type);
 std::string reference_path_name(Type type,const ReferencePath& path);
 std::string type_name(Type type);
 std::string option_identity(Type payload);
+bool weak_target_type(Type);
+std::string weak_identity(Type target);
 bool nullable_value(Type);
 bool nullable_type(Type);
 Type nullable_payload(Type);
@@ -149,7 +152,7 @@ enum class Op { math, random_xor, random_seed, global_cell, bitcast, native_call
     stage_begin, gc_construct, gc_allocate, gc_read, gc_write, gc_collect, gc_poll, gc_alive,
     upcast, virtual_call, base_init, stage_prefix, interface_pack, interface_prepare, interface_call, string_literal, string_concat, string_equal, string_count, string_index, string_encode, string_decode, text_case, scalar_display, scalar_format, format_unwrap, format_layout, scalar_parse, result_unwrap, memory_write, temporal_result, temporal_native, string_join, collection_enter, collection_leave, collection_append, collection_finish, os_query, host_native, url_native, http_native, http_async, http_control, console_endpoint, console_native, console_print, filesystem_native, filesystem_async, filesystem_control,
     fixed_array, array_get, array_set, fixed_snapshot, fixed_select, fixed_commit, array_count, list_push, list_remove, list_index, list_version, list_commit, list_check, array_capture, array_allocate, array_initialize, list_insert, list_clear, array_slice, dict_new, dict_get, dict_set, dict_contains, dict_remove, dict_clear, dict_count, dict_version, dict_check, dict_entry, text_translate, string_join_encode, local_cleanup, filesystem_write, try_convert, array_finish, c_primitive_call, async_sleep, bit_and, bit_or, bit_xor, bit_not, shift_left, shift_right,
-    stage_check, stage_abort, initializer_return };
+    stage_check, stage_abort, initializer_return, weak_create, weak_lock };
 // A validated local aggregate storage path; never a source-visible reference.
 struct Place { std::uint32_t slot = 0; std::vector<unsigned> fields; };
 struct Instruction {

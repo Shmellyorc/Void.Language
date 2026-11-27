@@ -156,6 +156,7 @@ class Lowering {
             i.receiver->slot=cells.at(i.receiver->slot);i.receiver->fields.insert(i.receiver->fields.begin(),0);
         }
         const bool coordinated_operation =
+            i.op == ir::Op::weak_create || i.op == ir::Op::weak_lock ||
             i.op == ir::Op::collection_enter ||
             i.op == ir::Op::collection_leave ||
             i.op == ir::Op::collection_append ||
@@ -670,6 +671,11 @@ class Lowering {
             // Finish builtin dispatch before recursively lowering an ordinary
             // receiver, so unrelated builtin temporaries do not stack per call.
             auto builtin=frontend_case([&]() -> std::optional<unsigned> {
+            if(e.target=="$weak.create" || e.target=="$weak.lock") {
+                ir::Instruction operation{e.target=="$weak.create"?ir::Op::weak_create:ir::Op::weak_lock,expression(*e.parts[0])};
+                operation.type=expression_type(e);
+                return emit(operation,e.token);
+            }
             if(e.target=="$console.print")return frontend_case([&]() -> unsigned {
                 std::vector<unsigned> captured(e.parts.size());
                 for(unsigned n=0;n<e.parts.size();++n){

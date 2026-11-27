@@ -304,7 +304,8 @@ void Runtime::allocation_committed(std::size_t bytes) noexcept {
 void Runtime::construct_into(void** slot, const TypeLayout& layout, const void* payload) {
     require_output(slot);
     {std::lock_guard lock(mutex_);heap_.validate_output_address(slot);}
-    if (!payload) throw std::invalid_argument("missing prepared object");
+    if (!payload || layout.kind==TypeLayout::Kind::weak_cell)
+        throw std::invalid_argument("invalid prepared object");
     if (layout.kind==TypeLayout::Kind::string) {
         if (layout.size<=sizeof(std::uint64_t) || !layout.references.empty() || layout.descriptor)
             throw std::invalid_argument("invalid intrinsic string layout");
@@ -334,6 +335,59 @@ void Runtime::store(void* object, std::size_t offset, void* value) {
     require_managed();
     std::lock_guard lock(mutex_);
     heap_.store(object, offset, value);
+}
+void Runtime::weak_create(void** slot, void* target, std::string_view cell_type) {
+    require_output(slot);
+    PrivateRoot strong(*this);
+    {
+        std::lock_guard lock(mutex_);
+        const auto owner=heap_.objects_.find(target);
+        if(owner==heap_.objects_.end() || owner->second.kind!=TypeLayout::Kind::ordinary || !owner->second.metadata)
+            throw std::invalid_argument("weak target must be a managed object");
+        constexpr std::string_view prefix="$weak:";
+        if(!cell_type.starts_with(prefix) || !types_)throw std::invalid_argument("invalid weak reference type");
+        auto key=cell_type.substr(prefix.size());
+        auto* descriptor=static_cast<const NominalDescriptor*>(owner->second.metadata.get());
+        while(descriptor->identity!=key && !descriptor->base.empty())
+            descriptor=types_->types.at(descriptor->base).get();
+        if(descriptor->identity!=key)throw std::invalid_argument("weak reference target type mismatch");
+        strong.value_=target;
+    }
+    allocation_checkpoint(sizeof(Heap::WeakCell));
+    poll();
+    std::lock_guard lock(mutex_);
+    const auto descriptor=types_->types.find(cell_type);
+    if(descriptor==types_->types.end() || descriptor->second->layout.size!=sizeof(Heap::WeakCell) ||
+       !descriptor->second->layout.references.empty())
+        throw std::invalid_argument("invalid weak reference type");
+    heap_.validate_output_address(slot);
+    TypeLayout layout{sizeof(Heap::WeakCell),{},descriptor->second,TypeLayout::Kind::weak_cell};
+    auto* cell=static_cast<Heap::WeakCell*>(heap_.allocate_validated(layout,LegacyReferenceMap::validate(layout.size,{}),&reuse_));
+    if(heap_.objects_.find(strong.value_)->second.released) {
+        std::construct_at(cell,Heap::WeakCell{nullptr,nullptr});
+    } else {
+        std::construct_at(cell,Heap::WeakCell{strong.value_,reuse_.weak_cells_});
+        reuse_.weak_cells_=cell;
+    }
+    *slot=cell;
+    allocation_committed(layout.size);
+}
+void Runtime::weak_lock(void** slot, void* reference) {
+    require_output(slot);
+    std::lock_guard lock(mutex_);
+    heap_.validate_output_address(slot);
+    const auto owner=heap_.objects_.find(reference);
+    if(owner==heap_.objects_.end() || owner->second.kind!=TypeLayout::Kind::weak_cell)
+        throw std::invalid_argument("invalid weak reference");
+    auto* target=static_cast<Heap::WeakCell*>(reference)->target;
+    if(target) {
+        const auto found=heap_.objects_.find(target);
+        if(found==heap_.objects_.end())std::terminate();
+        if(found->second.released)target=nullptr;
+    }
+    // The elected collector cannot trace in this interval. Publish the strong
+    // reference in a registered root before the caller can reach a safepoint.
+    *slot=target;
 }
 bool Runtime::begin_release(void* object) {
     require_managed();std::lock_guard lock(mutex_);auto found=heap_.objects_.find(object);

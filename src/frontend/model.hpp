@@ -331,7 +331,7 @@ struct Unit {
     std::vector<Type> synthetic_types;
     std::map<std::string,AnalyzedDeclaration> builtins;
     std::function<Type(Type,Type)> make_result;
-    std::function<Type(Type)> make_option;
+    std::function<Type(Type)> make_option, make_weak;
     std::function<Type(Type)> make_nullable;
     std::map<std::string,Type> nullable_types; // Resolved annotations remain available to immutable tooling.
     std::function<Type(Type,const Token&)> resolve_callable;

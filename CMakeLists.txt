@@ -1206,6 +1206,9 @@ if(BUILD_TESTING)
   target_link_libraries(void_runtime_tests PRIVATE void_runtime)
   add_test(NAME runtime_coordination COMMAND void_runtime_tests)
   set_tests_properties(runtime_coordination PROPERTIES TIMEOUT 90)
+  add_executable(void_weak_references_runtime tests/weak_references/runtime.cpp)
+  target_link_libraries(void_weak_references_runtime PRIVATE void_runtime)
+  add_test(NAME weak_references_runtime COMMAND void_weak_references_runtime)
   add_executable(void_runtime_generated tests/runtime/generated.cpp)
   # Instrument only this executable's poll entry. Compile the SAME ABI source
   # with its poll symbol renamed; the test forwards to it after its rendezvous
@@ -1507,6 +1510,22 @@ if(BUILD_TESTING)
       "$<TARGET_FILE:void_conditional_async_${mode}>" "${PROJECT_SOURCE_DIR}/tests/conditional/async.void"
       "${conditional_async_object}" "${mode}" --emit-async)
     set_tests_properties(conditional_async_aot_${mode} PROPERTIES TIMEOUT 180)
+  endforeach()
+  void_add_output_test(lsp_weak_references "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/weak_references/lsp.py" "$<TARGET_FILE:voidls>")
+  set(weak_source "${PROJECT_SOURCE_DIR}/tests/weak_references/main.void")
+  add_executable(void_weak_references_source tests/weak_references/source.cpp)
+  target_link_libraries(void_weak_references_source PRIVATE void_llvm)
+  add_test(NAME weak_references_jit COMMAND void_weak_references_source "${weak_source}")
+  foreach(mode normal optimized)
+    set(object "${CMAKE_CURRENT_BINARY_DIR}/weak-references-${mode}${CMAKE_CXX_OUTPUT_EXTENSION}")
+    add_custom_command(OUTPUT "${object}"
+      COMMAND void_weak_references_source "${weak_source}" "${object}" "${mode}"
+      DEPENDS void_weak_references_source "${weak_source}" VERBATIM)
+    set_source_files_properties("${object}" PROPERTIES GENERATED TRUE EXTERNAL_OBJECT TRUE)
+    add_executable(void_weak_references_aot_${mode} tests/weak_references/aot.cpp "${object}")
+    target_link_libraries(void_weak_references_aot_${mode} PRIVATE void_runtime)
+    add_test(NAME weak_references_aot_${mode} COMMAND void_weak_references_aot_${mode})
   endforeach()
   add_executable(void_custom_iteration_tests tests/custom_iteration/tests.cpp
     tests/managed/probe.cpp $<TARGET_OBJECTS:void_managed_test_abi>)

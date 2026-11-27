@@ -304,6 +304,8 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             else if (e.kind==K::call || e.kind==K::method_call) frontend_case([&] {
                 std::vector<ReferenceFacts> arguments;
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
+                if(e.target=="$weak.create" || e.target=="$weak.lock")
+                    ir::join_facts(view,arguments[0]);
                 if (e.target == "$convert.unwrap") {
                     view = ir::field_facts(e.parts[0]->type, arguments[0], 1);
                 }

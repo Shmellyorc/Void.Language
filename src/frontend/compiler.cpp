@@ -467,6 +467,25 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         return ir::with_field_type(type,1,authority);
     };
     for(auto& [id,u]:units)u->make_option=make_option;
+    std::map<std::string,Type> canonical_weak_types;
+    auto make_weak=[&](Type target) {
+        auto key=ir::weak_identity(target);
+        auto found=canonical_weak_types.find(key);
+        if(found==canonical_weak_types.end()) {
+            auto cell=std::make_shared<ir::ValueType>();
+            cell->identity=cell->name=key;
+            cell->managed=true;
+            cell->visibility=target.definition->visibility;
+            cell->weak_target=ir::with_readonly_paths(target,{});
+            cell->self=cell;
+            cell->arena=arena;
+            arena->definitions.push_back(cell);
+            found=canonical_weak_types.emplace(key,Type::nominal(cell)).first;
+            root.synthetic_types.push_back(found->second);
+        }
+        return target.readonly?ir::readonly_view(found->second):found->second;
+    };
+    for(auto& [id,u]:units)u->make_weak=make_weak;
     std::map<std::string,Type> canonical_nullables;
     auto make_nullable=[&](Type payload) {
         if(ir::nullable_type(payload))return payload;
@@ -932,7 +951,7 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     check_string_pool(units);
     for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
     root.prepare_relationships=[](Type,Type,const SourceFile&,const Token&){};
-    for(auto& [id,u]:units) {u->resolve_numeric={};u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->make_nullable={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
+    for(auto& [id,u]:units) {u->resolve_numeric={};u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->make_weak={};u->make_nullable={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 
 }

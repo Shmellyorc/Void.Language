@@ -97,6 +97,8 @@ std::int32_t vd_runtime_entry_context_v1(vd::NativeCode::CheckedEntry,std::int32
 std::int64_t vd_gc_dynamic_type(void*,const char* const*,std::size_t) noexcept;
 std::int32_t vd_runtime_entry(vd::NativeCode::CheckedEntry, std::int32_t, vd::RuntimeFailure*) noexcept;
 std::int32_t vd_runtime_entry_typed(vd::NativeCode::CheckedEntry,std::int32_t,vd::RuntimeFailure*,const vd::RuntimeTypeRecord*,std::size_t) noexcept;
+void vd_weak_create(void**, void*, const char*, vd::RuntimeFailure*) noexcept;
+void vd_weak_lock(void**, void*, vd::RuntimeFailure*) noexcept;
 void vd_gc_allocate(void**, std::size_t, const std::size_t*, std::size_t, vd::RuntimeFailure*) noexcept;
 bool vd_gc_alive(void*) noexcept;
 void vd_gc_native_enter(void*) noexcept;

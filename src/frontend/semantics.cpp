@@ -353,6 +353,7 @@ class Semantics {
     }
 #include "enum_api.inc"
 #include "core_members.inc"
+#include "weak_references.inc"
     // Signature construction owns a Function-sized temporary. Keep it out of
     // recursive method/field hint frames at the unchanged 1 MiB stack limit.
     VOID_SEMANTIC_HANDLER std::optional<Type> core_member_anchor(const Type& receiver,const Token& token,bool type_level=false,bool property=false) {
@@ -391,7 +392,7 @@ class Semantics {
     }
 #include "static_members.inc"
     VOID_SEMANTIC_HANDLER Type method_expression(Expr& e) {
-        if(!e.argument_indexes.empty())return e.type;
+        if(!e.argument_indexes.empty() || e.target=="$weak.lock")return e.type;
         if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
         if(text_type_base(*e.parts[0]))return text_type_call(e);
         if(primitive_base_selected(*e.parts[0]))return type_numeric_call(e);
@@ -423,6 +424,7 @@ class Semantics {
     // the supported 1 MiB native stack in Debug as well as optimized builds.
     #include "random.inc"
     VOID_SEMANTIC_HANDLER Type resolved_method_expression(Expr& e,Type receiver) {
+        if(receiver.definition && receiver.definition->weak_target && e.token.text=="lock")return weak_promotion(e,receiver);
         if(auto result=enum_value_api(e,receiver,true))return *result;
         if(numeric::number(receiver))return numeric_call(e,receiver,false);
         if(core_member(receiver,e.token.text))return core_call(e,receiver);
@@ -1342,6 +1344,12 @@ class Semantics {
                 for(const auto& [name,owners]:unit.qualifiers) candidates.emplace(name,EditorCandidate{name,"import",9});
                 for(const auto& name:{"true","false","null","not","match","if","func"}) candidates.emplace(name,EditorCandidate{name,"keyword",14});
                 for(const auto& name:{"string","format","print"})if(!candidates.contains(name))candidates.emplace(name,EditorCandidate{name,name==std::string("print")?"print(*values, sep = space, end = newline, file = console.stdout, flush = false)":name==std::string("string")?"string(value) -> string":"format(value, spec: string) -> result<string, string>",3,{},"Invariant type-aware display and formatting."});
+                if(!candidates.contains("weak")) {
+                    Expr probe(Expr::Kind::name,e.token);
+                    probe.token.text="weak";
+                    if(prelude_available(probe))candidates.emplace("weak",EditorCandidate{
+                        "weak","weak(target: T) -> weak<T>",3,{},weak_creation_doc});
+                }
                 if(current && current->asynchronous)for(const auto& name:{"await","spawn"})candidates.emplace(name,EditorCandidate{name,"keyword",14});
             }
         }
@@ -1386,6 +1394,8 @@ class Semantics {
             // before unwinding them; retain by its owning checked statement.
             if(effects)throw EditorReceiverFound{editor_statement,std::move(e.parts.front()),e.token,type.readonly,addressable};
         }
+        if(type.definition && type.definition->weak_target && !invalid_function && !unit.failed_import)
+            weak_member_candidates(e,type);
         if(enum_value_type(type)) {
             std::vector<std::string> names{"name","is_defined"};if(type.kind==Type::numeric_enum)names.push_back("value");
             if(type.kind==Type::numeric_enum && type.definition->enum_flags)for(auto name:{"has","has_any","with","without","toggled"})names.push_back(name);
@@ -2033,13 +2043,16 @@ class Semantics {
         }catch(const formatting::Error& failure){auto site=spec.token;site.offset+=failure.offset;site.source_width=1;error(source,site,Code::invalid_value,failure.what());}
         e.type_arguments.push_back(unit.make_result(Type::string,Type::string));e.target="$hole";return e.type=Type::string;
     }
-    bool display_prelude(const Expr& e) {
-        if(!e.qualifier.empty() || (e.token.text!="string" && e.token.text!="format" && e.token.text!="print") || lookup(e.token.text) || unit.declarations.contains(e.token.text) || unit.constant_names.contains(e.token.text) || unit.invalid_declarations.contains(e.token.text))return false;
+    bool prelude_available(const Expr& e) {
+        if(!e.qualifier.empty() || lookup(e.token.text) || unit.declarations.contains(e.token.text) || unit.constant_names.contains(e.token.text) || unit.invalid_declarations.contains(e.token.text))return false;
         for(const auto& import:unit.imports)if(!import.explicit_alias && !import.target.empty()) {
             const auto& owner=*units.at(import.target);
             if(owner.declarations.contains(e.token.text) || owner.constant_names.contains(e.token.text) || owner.structure_names.contains(e.token.text) || owner.invalid_declarations.contains(e.token.text))return false;
         }
         return !unit.structure_names.contains(e.token.text);
+    }
+    bool display_prelude(const Expr& e) {
+        return (e.token.text=="string" || e.token.text=="format" || e.token.text=="print") && prelude_available(e);
     }
     VOID_SEMANTIC_HANDLER Type display_call(Expr& e) {
         if(e.target=="$display.string" || e.target=="$display.format")return e.type;
@@ -2152,6 +2165,9 @@ class Semantics {
     // Builtin dispatch returns before ordinary argument recursion, keeping
     // unrelated adapter temporaries out of every nested user-call frame.
     VOID_SEMANTIC_HANDLER std::optional<Type> builtin_call_expression(Expr& e) {
+        if(e.target=="$weak.create")return e.type;
+        if(e.token.text=="weak" && prelude_available(e) && !(current && current->substitutions.contains("weak")))
+            return weak_creation(e);
         if (e.target == "$collections.version" || e.target == "$collections.check") return e.type;
         if (unit.identity == "/@stdlib/collections.void" && e.qualifier.empty() &&
             (e.token.text == "_collections_version" || e.token.text == "_collections_check")) {
@@ -2355,7 +2371,7 @@ class Semantics {
             if(current->substitution_sources.contains(e.token.text))e.source_target=current->substitution_sources.at(e.token.text);
             const auto type=current->substitutions.at(e.token.text);
             if(type.definition && type.definition->task_result)error(source,e.token,Code::not_callable,"Inferred task handles have no source constructor; call an async function.");
-            if(!type.definition || ir::nullable_type(type) || (type.kind!=Type::aggregate && type.kind!=Type::managed_ref) || type.definition->enum_backing || !type.definition->cases.empty() || type.definition->callable)error(source,e.token,Code::not_callable,"The specialized type has no source constructor.");
+            if(!type.definition || ir::nullable_type(type) || (type.kind!=Type::aggregate && type.kind!=Type::managed_ref) || type.definition->enum_backing || !type.definition->cases.empty() || type.definition->callable || type.definition->weak_target)error(source,e.token,Code::not_callable,"The specialized type has no source constructor.");
             auto [owner,structure]=owned_structure(type);construction(e,*owner,*structure,true,unit);return e.type;
         }
         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);

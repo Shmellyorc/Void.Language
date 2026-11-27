@@ -11,7 +11,7 @@ later milestones are recorded here for future assignments.
 | Milestone | Approved scope |
 | --- | --- |
 | 1 · Language & Tooling Completeness | Expanded compile-time evaluation, compile-time pattern matching, complete symbol renaming, section folding and navigation, async application entry, expanded dictionary key support. |
-| 2 · Managed Memory & Iteration | Weak references and generators. Detailed ownership, lifetime and suspension contracts remain subject to design. |
+| 2 · Managed Memory & Iteration | Weak reference candidate implemented against Milestone 1 baseline `139bcc59e2c84e02bb0dd0cacc8202f713b45846`. Generator implementation and final qualification are open. [Weak references](../LANGUAGE_BIBLE.md#weak-references) |
 | 3 · Native Publishing | Resume and complete the preserved Publisher Stage A and B implementation and existing publishing requirements. |
 | 4 · Cross-Platform Publishing & Extensible Target Packs | After native publishing is complete and qualified, deliver official Windows, Linux and macOS packs for x64 and ARM64, pack generation and qualification in GitHub Actions, VOIDUP acquisition and management, cross-compilation and native linking, and automatic platform bundles including macOS `.app`. Keep targets independent of packaging formats, support custom and community-maintained targets, use redistributable runtime and linking inputs, and document signing and distribution. |
 | 5 · Advanced Compiler & Developer Tooling | Incremental VOID compilation and automatic application reload. |

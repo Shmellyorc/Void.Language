@@ -322,6 +322,17 @@ void vd_cleanup_failure(vd::RuntimeFailure* primary,const vd::RuntimeFailure* cl
     append("Additional failure during defer:\n");append(cleanup->message);
     for(unsigned n=0;n<cleanup->count && n<32;++n)append(cleanup->frames[n]);
 }
+void vd_weak_create(void** slot, void* target, const char* type, vd::RuntimeFailure* failure) noexcept {
+    try { vd::Runtime::current().weak_create(slot,target,type); }
+    catch(const std::bad_alloc&) { failure->message="Weak reference allocation failed"; }
+    catch(const std::invalid_argument&) { failure->message="Invalid weak reference target or type"; }
+    catch(...) { std::terminate(); }
+}
+void vd_weak_lock(void** slot, void* reference, vd::RuntimeFailure* failure) noexcept {
+    try { vd::Runtime::current().weak_lock(slot,reference); }
+    catch(const std::invalid_argument&) { failure->message="Invalid weak reference"; }
+    catch(...) { std::terminate(); }
+}
 bool vd_gc_release(void* object) noexcept {try{return vd::Runtime::current().begin_release(object);}catch(...){std::terminate();}}
 void vd_gc_poll() noexcept {
     try { vd::Runtime::current().poll(); } catch (...) { std::terminate(); }

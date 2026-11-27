@@ -417,6 +417,39 @@ equality; custom enum operators take precedence. Unsupported payload equality
 diagnoses. Eligible enum dictionary keys use the existing data-only key rules.
 See [enums and flags](ENUMS.md).
 
+## Weak references
+
+Use `weak(target)` to create a `weak<t>` for a non-null concrete managed
+object. Call `lock()` to obtain a strong `t?`. A successful promotion keeps
+the target alive for the ordinary lifetime of the strong value. After collection
+or deterministic release, promotion returns `null`. Weak references have no
+implicit member access to their targets.
+
+```void
+struct contact:
+    number: i32
+
+func get_number(reference: weak<contact>) -> i32?:
+    if reference.lock() is Ok(var target):
+        return target.number
+    return null
+
+func entry(input: i32) -> i32:
+    var target = contact(number = input)
+    var reference: weak<contact> = weak(target)
+    if get_number(reference) is Ok(var number):
+        return number
+    return 0
+```
+
+Fields and collections can store weak references, and generic parameters can
+infer their exact target type from `weak<t>`. A readonly target produces a
+readonly weak reference and promotion preserves that authority. Nullable targets
+must be checked and extracted before creating a weak reference. Weak references
+require Runtime storage and are outside constant evaluation and worker transfer.
+Values, interfaces, task handles and opaque native resource handles are ineligible
+targets. See [Runtime weak references](GC_RUNTIME.md#weak-references).
+
 ## Nullable values and results
 
 `T?` contains a supported `T` or `null`. Scalars, strings, structs, enums, arrays,

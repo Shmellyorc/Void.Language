@@ -66,12 +66,18 @@ Heap::MemorySnapshot Heap::memory_snapshot(const ReuseCache* cache) const {
 }
 Heap::~Heap() { for (auto& [p, o] : objects_) { (void)o; destroy(p,o); } }
 void* Heap::allocate(const TypeLayout& layout) {
+    if(layout.kind==TypeLayout::Kind::weak_cell)throw std::invalid_argument("weak cells require a coordinated Runtime");
     return allocate_validated(layout,LegacyReferenceMap::validate(layout.size,layout.references));
 }
 void* Heap::allocate_validated(const TypeLayout& layout,LegacyReferenceMap shape,ReuseCache* cache) {
     auto* small_=cache?cache->data_.get():nullptr;
     if (!layout.size || layout.size!=shape.bytes()) throw std::invalid_argument("empty or mismatched object layout");
-    if (layout.kind!=TypeLayout::Kind::ordinary && layout.kind!=TypeLayout::Kind::string) throw std::invalid_argument("unknown object layout kind");
+    if (layout.kind==TypeLayout::Kind::weak_cell) {
+        if (layout.size!=sizeof(WeakCell) || !layout.references.empty() || !layout.descriptor)
+            throw std::invalid_argument("invalid weak cell layout");
+    } else if (layout.kind!=TypeLayout::Kind::ordinary && layout.kind!=TypeLayout::Kind::string) {
+        throw std::invalid_argument("unknown object layout kind");
+    }
     if (layout.kind == TypeLayout::Kind::string &&
         (layout.size <= sizeof(std::uint64_t) || !layout.references.empty() || layout.descriptor))
         throw std::invalid_argument("invalid intrinsic string layout");
@@ -143,7 +149,8 @@ void Heap::validate_reference(const ReferenceEvent& event,void* object,const voi
         if(witness || found->second.kind!=TypeLayout::Kind::string)throw std::invalid_argument("buffer string kind mismatch");
         (void)string_bytes(object);return;
     }
-    if(found->second.kind!=TypeLayout::Kind::ordinary || !found->second.metadata)throw std::invalid_argument("buffer nominal kind mismatch");
+    if((found->second.kind!=TypeLayout::Kind::ordinary && found->second.kind!=TypeLayout::Kind::weak_cell) ||
+       !found->second.metadata)throw std::invalid_argument("buffer nominal kind mismatch");
     const auto* actual=static_cast<const NominalDescriptor*>(found->second.metadata.get());
     auto current=catalog.types.find(actual->identity);
     if(current==catalog.types.end() || current->second.get()!=actual)throw std::invalid_argument("foreign buffer nominal descriptor");
@@ -241,7 +248,8 @@ std::string_view Heap::string_bytes(void* p) const {
 }
 std::string_view Heap::nominal_identity(void* p) const {
     auto found=objects_.find(p);
-    if(found==objects_.end() || found->second.kind!=TypeLayout::Kind::ordinary || !found->second.metadata) return {};
+    if(found==objects_.end() || (found->second.kind!=TypeLayout::Kind::ordinary &&
+       found->second.kind!=TypeLayout::Kind::weak_cell) || !found->second.metadata) return {};
     return static_cast<const NominalDescriptor*>(found->second.metadata.get())->identity;
 }
 void Heap::add_root(void** slot) {
@@ -294,6 +302,23 @@ void Heap::store(void* object, std::size_t offset, void* value) {
         throw std::invalid_argument("invalid managed reference store");
     std::memcpy(static_cast<char*>(object) + offset, &value, sizeof(value));
 }
+void Heap::clear_weak_cells(WeakCell*& cells) noexcept {
+    // All marks are intact and every address still belongs to its original
+    // allocation. Unlink dead cells and expire surviving cells before reuse.
+    for(auto** link=&cells; *link;) {
+        auto* cell=*link;
+        const auto owner=objects_.find(cell);
+        const auto target=objects_.find(cell->target);
+        if(owner==objects_.end() || target==objects_.end())std::terminate();
+        if(owner->second.marked && target->second.marked && !target->second.released) {
+            link=&cell->next;
+            continue;
+        }
+        *link=cell->next;
+        cell->target=nullptr;
+        cell->next=nullptr;
+    }
+}
 void Heap::collect() { collect({}); }
 void Heap::collect(std::span<void* const> additional_roots) { collect(additional_roots,nullptr); }
 std::size_t Heap::collect(std::span<void* const> additional_roots,ReuseCache* cache) {
@@ -345,6 +370,7 @@ std::size_t Heap::collect(std::span<void* const> additional_roots,ReuseCache* ca
         for (auto& [p, o] : objects_) { (void)p; o.marked = false; }
         throw;
     }
+    if(cache && cache->weak_cells_)clear_weak_cells(cache->weak_cells_);
     // Account surviving payload during the existing sweep, with no second walk.
     std::size_t live_bytes=0;
     for (auto it = objects_.begin(); it != objects_.end();) {

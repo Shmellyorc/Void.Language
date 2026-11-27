@@ -22,6 +22,10 @@ llvm::Type* TypeLayout::operator()(ir::Type t) {
     if(t.kind==ir::Type::prepared_receiver) return prepared_;
     if (t.kind == ir::Type::managed_ref || t.kind==ir::Type::string) return llvm::PointerType::get(context_, 0);
     if (t.kind == ir::Type::aggregate) {
+        if(t.definition->weak_target) {
+            auto* pointer=llvm::PointerType::get(context_,0);
+            return llvm::StructType::get(context_,{pointer,pointer});
+        }
         if (auto found = aggregates_.find(t.definition->identity); found != aggregates_.end()) return found->second;
         auto* result = llvm::StructType::create(context_,t.definition->identity); aggregates_.emplace(t.definition->identity,result);
         std::vector<llvm::Type*> fields;

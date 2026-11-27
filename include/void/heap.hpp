@@ -18,7 +18,7 @@ struct TypeLayout {
     std::size_t size;
     std::vector<std::size_t> references;
     std::shared_ptr<const NominalDescriptor> descriptor = {};
-    enum class Kind { ordinary, string, buffer } kind = Kind::ordinary;
+    enum class Kind { ordinary, string, buffer, weak_cell } kind = Kind::ordinary;
 };
 // Runtime-owned data only: no code pointers, LLVM types, or generation leases.
 struct NominalDescriptor {
@@ -110,12 +110,15 @@ private:
     };
     std::unordered_map<void*, Object> objects_;
     std::vector<void**> roots_;
+    struct WeakCell { void* target; WeakCell* next; };
     // Dead nodes stay outside the live registry. Runtime places this opaque
     // Heap resource at its tail, preserving all existing hot member offsets.
     class ReuseCache {
         friend class Heap;
+        friend class Runtime;
         struct Data;
         std::unique_ptr<Data> data_;
+        WeakCell* weak_cells_=nullptr;
     public:
         ReuseCache() noexcept;
         ~ReuseCache();
@@ -128,6 +131,7 @@ private:
     // Conservative inclusive address bounds, widened on adoption. Stale bounds
     // after collection only cause extra scanning; no per-object index is needed.
     std::uintptr_t buffer_low_=0,buffer_high_=0;
+    void clear_weak_cells(WeakCell*&) noexcept;
     void destroy(void*,const Object&) noexcept;
 };
 class Root {
