@@ -27,7 +27,7 @@ impose limits on an operation even when its declaration exists.
 | Public VOIDUP distribution | Native manager implemented; no verified public bootstrap or production catalog. Linux private installation evidence only; Windows/macOS installation remains unqualified. |
 | Further IntelliSense completion improvements | Planned; current assistance and recovery have documented limits. |
 | Compact `if condition: return` | Deferred; write an indented body. |
-| Async application main | Available through ordinary JIT and AOT entry with the structured scheduler. See [async application entry](../ASYNC.md#async-application-entry). |
+| Async application main | Available through ordinary JIT and AOT entry with the structured scheduler. See [async application entry](https://github.com/Shmellyorc/Void.Language/blob/main/docs/ASYNC.md#async-application-entry). |
 | Detached source tasks | Outside the structured task contract. |
 | Async callable values, interface dispatch and destructors | Unavailable under the current async contract. |
 | General public package registry | Not implied by the explicit source-package workflow. |
