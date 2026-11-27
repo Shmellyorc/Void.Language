@@ -1,0 +1,16 @@
+struct ledger:
+    seen: i32
+
+func finish(owner: ledger):
+    print("generator", owner.seen)
+
+generator func values(owner: ledger) -> i32:
+    defer finish(owner)
+    yield 7
+    var empty: [i32] = []
+    yield empty[0]
+
+func main():
+    var owner = ledger()
+    for item in values(owner):
+        owner.seen += item

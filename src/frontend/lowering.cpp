@@ -124,8 +124,8 @@ class Lowering {
         if(output.initializer && ir::fallible_initializer_result(output.result) && value) {
             ir::Instruction checked{ir::Op::initializer_return,*value};value=emit(checked,token);
         }
-        if(output.asynchronous && early)emit({ir::Op::async_cancel_children},token);
-        if(output.asynchronous)for(auto scope=with_scopes.rbegin();scope!=with_scopes.rend();++scope){if(scope->group)join_group(scope->slot,true,token);else if(scope->owned_group)join_group(*scope->owned_group,true,token);}
+        if(output.asynchronous && early && !output.generator)emit({ir::Op::async_cancel_children},token);
+        if(output.asynchronous)for(auto scope=with_scopes.rbegin();scope!=with_scopes.rend();++scope){if(scope->group)join_group(scope->slot,!output.generator,token);else if(scope->owned_group)join_group(*scope->owned_group,!output.generator,token);}
         if(!cleanup_head && !output.asynchronous){terminate(value?ir::Terminator{ir::Terminator::Kind::return_value,*value}:ir::Terminator{ir::Terminator::Kind::return_void});return;}
         if(value)emit({ir::Op::store,*return_slot,*value},token);
         cleanup_jumps.push_back(*current);terminate({ir::Terminator::Kind::jump});
@@ -157,6 +157,8 @@ class Lowering {
         }
         const bool coordinated_operation =
             i.op == ir::Op::weak_create || i.op == ir::Op::weak_lock ||
+            i.op == ir::Op::generator_next || i.op == ir::Op::generator_close ||
+            i.op == ir::Op::async_generator_next || i.op == ir::Op::async_generator_bind ||
             i.op == ir::Op::collection_enter ||
             i.op == ir::Op::collection_leave ||
             i.op == ir::Op::collection_append ||
@@ -671,6 +673,15 @@ class Lowering {
             // Finish builtin dispatch before recursively lowering an ordinary
             // receiver, so unrelated builtin temporaries do not stack per call.
             auto builtin=frontend_case([&]() -> std::optional<unsigned> {
+            if(e.target.starts_with("$generator.")) {
+                using Op=ir::Op;
+                auto op=e.target=="$generator.async.bind"?Op::async_generator_bind:
+                        e.target=="$generator.async.next"?Op::async_generator_next:
+                        e.target=="$generator.next"?Op::generator_next:Op::generator_close;
+                ir::Instruction operation{op,expression(*e.parts[0])};
+                operation.type=expression_type(e);
+                return emit(operation,e.token);
+            }
             if(e.target=="$weak.create" || e.target=="$weak.lock") {
                 ir::Instruction operation{e.target=="$weak.create"?ir::Op::weak_create:ir::Op::weak_lock,expression(*e.parts[0])};
                 operation.type=expression_type(e);
@@ -1112,6 +1123,13 @@ class Lowering {
         }
         case K::loop: case K::scoped: case K::conditional: return;
         case K::deferred:register_cleanup(expression(*s.expression),true,s.token);break;
+        case K::yielded: {
+            auto value=expression(*s.expression);
+            auto resume=block();
+            terminate({ir::Terminator::Kind::yield,value,resume});
+            current=resume;
+            break;
+        }
         case K::no_op: break;
         case K::variable: {
             ir::Instruction zero{ir::Op::constant}; zero.type = output.locals[s.slot];
@@ -1310,12 +1328,13 @@ public:
         output = {}; output.name = f.symbol; output.source_name = f.concrete_name.empty() ? f.token.text : f.concrete_name; output.display_name=f.display_name; output.source = source.location(f.token.offset);
         if(f.static_owner)output.source_name=f.symbol.substr(f.static_owner->type.definition->module_identity.size()+2);
         output.static_member=bool(f.static_owner) || (f.global_initializer && !f.lexical_owner.empty());
-        output.asynchronous=f.asynchronous;output.task=f.task;output.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;output.lexical_parent=f.lexical_parent;output.operator_owner=f.operator_owner;output.operator_glyph=f.operator_glyph;
+        output.asynchronous=f.asynchronous;output.generator=f.generator;output.task=f.task;output.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;output.lexical_parent=f.lexical_parent;output.operator_owner=f.operator_owner;output.operator_glyph=f.operator_glyph;
         output.bound_receiver=f.bound_receiver;output.closure=f.anonymous;cells.clear();cleanup_head.reset();return_slot.reset();cleanup_jumps.clear();with_scopes.clear();loop_with_depth.clear();
         output.parameters.clear(); output.result = f.result; output.locals = f.locals; current = block();
         const bool rooted_cleanup=select_local_cleanups(f);
         if(f.cleanup_type!=Type::none){cleanup_head=output.locals.size();auto head=f.cleanup_type;head.nullable=true;output.locals.push_back(head);}
-        if((cleanup_head || f.asynchronous) && f.result!=Type::none){return_slot=output.locals.size();output.locals.push_back(f.result);}
+        if(f.generator)module.coordinated=true;
+        if(!f.generator && (cleanup_head || f.asynchronous) && f.result!=Type::none){return_slot=output.locals.size();output.locals.push_back(f.result);}
         for(const auto& [slot,type]:f.captured_locals){if(rooted_cleanup && local_cleanup_targets.contains(slot))continue;cells.emplace(slot,static_cast<unsigned>(output.locals.size()));output.locals.push_back(type);}
         for(const auto& [slot,field]:f.capture_inputs){
             auto environment=emit({ir::Op::argument,0},f.token);ir::Instruction read{ir::Op::gc_read,environment};read.immediate=field;

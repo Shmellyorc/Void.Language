@@ -22,7 +22,7 @@ for(auto& [id,u]:units) {
         auto application=std::find_if(u->applications.begin(),u->applications.end(),[&](const auto& a){return a.definition==raw.definition;});
         if(application!=u->applications.end()) {
             auto [owner,declaration]=structure_lookup(*u,root,units,application->name,application->token);(void)owner;
-            if(!declaration && (application->name=="option" || application->name=="weak")) {
+            if(!declaration && (application->name=="option" || application->name=="weak" || application->name=="generator" || application->name=="async_generator")) {
                 if(application->arguments.size()!=1)
                     error(u->source,application->token,Code::argument_count,application->name+"<T> requires exactly one type argument.");
                 type(application->arguments.front(),application->token,names);

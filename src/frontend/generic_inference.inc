@@ -56,6 +56,11 @@ std::vector<Type> infer_arguments(Unit& owner,const std::vector<GenericParameter
             auto application=std::find_if(owner.applications.begin(),owner.applications.end(),[&](const auto& a){return a.definition==pattern.definition;});
             if(application==owner.applications.end())return;
             auto [declaration_owner,generic]=structure_lookup(owner,root,units,application->name,application->token);(void)declaration_owner;
+            if(!generic && application->arguments.size()==1 && ir::generator_type(actual) &&
+               application->name==(ir::async_generator_type(actual)?"async_generator":"generator")) {
+                match(application->arguments.front(),ir::field_type(*actual.definition->generator_result,1));
+                return;
+            }
             if(!generic && application->name=="weak" && application->arguments.size()==1 &&
                actual.definition && actual.definition->weak_target) {
                 match(application->arguments.front(),*actual.definition->weak_target);

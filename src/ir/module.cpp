@@ -65,6 +65,9 @@ std::string construction_name(const std::string& symbol,const std::vector<unsign
 
 void validate(const Module& m, InstructionTypes* results,std::map<std::string,ReferenceEffects>* verified_effects) {
     for(const auto& symbol:m.imports)if(symbol.starts_with("vd_native_fixture_call"))throw std::invalid_argument("VOID IR: native bridge requires its verified typed descriptor");
+    for (const auto& symbol:m.imports)
+        if(symbol.starts_with("vd_weak_") || symbol.starts_with("vd_generator_") || symbol.starts_with("vd_async_generator_"))
+            throw std::invalid_argument("VOID IR: managed lifecycle bridge requires a typed operation");
     for (const auto& symbol : m.imports) if (symbol.starts_with("vd_global")) throw std::invalid_argument("VOID IR: global bridge requires validated typed global operations");
     if(std::find(m.imports.begin(),m.imports.end(),"vd_value_array_complete")!=m.imports.end())
         throw std::invalid_argument("VOID IR: array completion requires validated typed array operations");
@@ -254,6 +257,20 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
             if (!t.definition || t.definition->identity.empty() || t.definition->identity.find('\0')!=std::string::npos || t.definition->name.empty()) fail("missing value type identity");
             auto* d=t.definition.get();
+            if(d->generator_result) {
+                auto result=Type(*d->generator_result);
+                if(!generator_type(t) || t.construction || !d->managed || d->weak_target ||
+                   !d->fields.empty() || !d->base.expired() || !d->cases.empty() || d->result_type ||
+                   d->option_type || d->nullable_value || d->interface_type || d->callable ||
+                   d->native_resource || d->task_result || d->custom_equality || d->call_result ||
+                   !d->call_parameters.empty() || !d->native_provider.empty() || !d->module_identity.empty() ||
+                   result.kind!=Type::aggregate || !result.definition->option_type || result.definition->fields.size()!=2 ||
+                   d->identity!=generator_identity(field_type(result,1),d->async_generator) ||
+                   (d->async_generator && !async_boundary_safe(result)) || d->name!=d->identity)
+                    fail("invalid generator handle type");
+                if(!checked.contains(d))pending.push_back(result);
+            } else if(d->async_generator || d->identity.starts_with("$generator:") ||
+                      d->identity.starts_with("$async_generator:"))fail("forged generator handle type");
             if(d->weak_target) {
                 const auto target=Type(*d->weak_target);
                 if(t.kind!=Type::managed_ref || t.construction || !d->managed || !d->fields.empty() ||
@@ -283,7 +300,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                         fail("invalid multiple-return component");
                 }
             }
-            if(auto base=d->base.lock();base && (base->native_resource || base->weak_target))
+            if(auto base=d->base.lock();base && (base->native_resource || base->weak_target || base->generator_result))
                 fail("opaque managed type cannot be extended");
             if(console::endpoint_type(t) && (t.kind!=Type::aggregate || d->module_identity!=console::source_module || d->identity!=d->module_identity+"::"+d->name || d->managed || !d->base.expired() || !d->cases.empty() || d->interface_type || d->callable || d->native_resource || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].name!="_id" || !d->fields[0].readonly || d->fields[0].visibility!="internal"))fail("invalid console endpoint identity");
             if(console::session_type(t) && (!d->native_resource || d->native_provider!="void.console.v1" || t.kind!=Type::managed_ref || !d->managed || d->module_identity!=console::source_module || !d->base.expired() || d->callable || !d->cases.empty() || d->interface_type || d->fields.size()!=1 || Type(d->fields[0].type)!=Type::i64 || d->fields[0].readonly || d->fields[0].visibility!="internal" || d->fields[0].name!="_token"))fail("invalid terminal session identity");
@@ -337,7 +354,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             if(!m.interface_requirements.empty() && d->visibility!="public" && d->visibility!="internal" && d->visibility!="private") fail("invalid concrete nominal visibility");
             const bool callable_environment=d->identity=="$void::$environment";
             if(callable_environment && (!d->managed || !d->fields.empty() || !d->base.expired() || !d->module_identity.empty() || d->name!="$environment" || d->visibility!="private"))fail("invalid shared callable environment base");
-            if(!m.interface_requirements.empty() && !returns && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->nullable_value && !d->callable && !d->task_result && !d->weak_target && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
+            if(!m.interface_requirements.empty() && !returns && !callable_environment && !dictionary_entries.contains(d) && !d->result_type && !d->option_type && !d->nullable_value && !d->callable && !d->task_result && !d->weak_target && !d->generator_result && (d->identity!=d->module_identity+"::"+d->name || !m.source_imports.contains(d->module_identity))) fail("invalid concrete nominal ownership for interface binding");
             if (t.construction && !d->managed) fail("construction view requires a managed nominal");
             if (t.kind==Type::aggregate && d->managed) fail("managed nominal cannot be an inline value");
             auto [found,added]=definitions.emplace(d->identity,d);
@@ -430,7 +447,10 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
              f.blocks.front().instructions.back().op != Op::c_primitive_call || f.name == m.entry_symbol))
             fail("invalid admitted C primitive wrapper");
         if(!m.interface_requirements.empty() && !m.source_imports.contains(f.module_identity)) fail("function has no source access scope");
-        if(f.asynchronous){
+        if(f.asynchronous && f.generator) {
+            if(f.task!=f.result || !async_generator_type(f.task))fail("invalid async generator activation");
+            for(auto t:f.parameters)if(!async_boundary_safe(t))fail("unsafe async generator parameter");
+        } else if(f.asynchronous){
             if(!m.coordinated || f.task.kind!=Type::managed_ref || f.task.nullable || f.task.construction || !f.task.definition || !f.task.definition->task_result || f.initializer || f.accessor || (f.receiver && f.method_name=="deinit") || !f.virtual_slot.empty() || f.closure || (f.receiver && (f.parameters.empty() || f.parameters[0].kind!=Type::managed_ref)))fail("invalid async declaration or task result");
             if(!async_boundary_safe(f.result))fail("callable escape through async result");for(auto t:f.parameters)if(!async_boundary_safe(t))fail("callable or borrowed place crosses async argument boundary");
             valid_type(f.task);
@@ -466,6 +486,12 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         if (f.result.construction) fail("construction view returned from function");
         if (f.initializer && f.parameters[0].kind==Type::managed_ref && (!f.parameters[0].construction || context_parameters!=std::vector<unsigned>{0})) fail("managed init requires a private construction receiver");
         valid_type(f.result);
+        if(f.generator && (!m.coordinated || !generator_type(f.result) || f.result.nullable ||
+           f.result.construction || f.asynchronous!=async_generator_type(f.result) || f.worker || f.receiver || f.closure ||
+           f.initializer || f.accessor || f.static_member || f.name==m.entry_symbol ||
+           !catalog_definitions.contains(f.result.definition.get()) ||
+           std::any_of(f.parameters.begin(),f.parameters.end(),[](Type type){return type.construction;})))
+            fail("invalid generator declaration");
         for (auto t : f.parameters) if (t == Type::none) fail("no-result parameter"); else valid_type(t);
         for (auto t : f.locals) if (t == Type::none) fail("no-result slot"); else valid_type(t);
     }
@@ -601,6 +627,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         }
         std::vector<std::vector<Type>> body_types;
         const auto enum_array_homes=checked_array_homes(f, primitive);
+        std::set<unsigned> generator_suspensions;
         for (const auto& b : f.blocks) {
             std::vector<Type> types;
             std::vector<bool> pure_templates;
@@ -688,6 +715,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if (!i.type.construction || !i.type.definition->managed || slot(i.a)!=i.type) fail("invalid construction storage");
                     result=i.type; break;
                 case Op::gc_construct:
+                    if(generator_type(i.type))fail("generator construction requires its start function");
                     if(i.type.definition && i.type.definition->weak_target)fail("weak construction requires weak_create");
                     if(i.type.definition && i.type.definition->task_result)fail("task construction requires async call");
                     valid_type(i.type);
@@ -738,7 +766,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                 }
                 case Op::gc_release:
                     if(!f.receiver || f.method_name!="deinit" || operand(i.a).kind!=Type::managed_ref || operand(i.a).nullable ||
-                        operand(i.a).construction || operand(i.a).definition->weak_target ||
+                        operand(i.a).construction || generator_type(operand(i.a)) || operand(i.a).definition->weak_target ||
                         (primitive && primitive->resource_type(operand(i.a)))) {
                         fail("invalid deterministic release");
                     }
@@ -770,6 +798,24 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     if(package_source(f.module_identity) || !m.coordinated || m.native_library!=native_provider(i.callee) || i.receiver || !native_signature(i.callee,parameters,i.type))fail("invalid native ABI/call/publication");
                     if(native_binding(i.callee).name=="register" && b.instructions[i.arguments[1]].op!=Op::function_reference)fail("native callback lacks generation-local provenance");
                     result=i.type;break;
+                }
+                case Op::generator_next: case Op::generator_close:
+                case Op::async_generator_bind: case Op::async_generator_next: {
+                    auto state=operand(i.a);
+                    const bool asynchronous=i.op==Op::async_generator_bind || i.op==Op::async_generator_next;
+                    if(!m.coordinated || !generator_type(state) || async_generator_type(state)!=asynchronous ||
+                       !catalog_definitions.contains(state.definition.get()) ||
+                       (asynchronous && (!f.asynchronous || f.worker ||
+                        (f.cleanup_entry && static_cast<std::size_t>(&b-f.blocks.data())>=*f.cleanup_entry))) ||
+                       state.nullable || state.construction ||
+                       state.readonly || i.b || i.immediate || i.receiver || !i.arguments.empty() ||
+                       !i.callee.empty() || i.initialization || i.array_repeat || !i.operator_glyph.empty() ||
+                       i.os_location_adapter)fail("invalid generator operation");
+                    result=i.op==Op::generator_next || i.op==Op::async_generator_next?
+                        Type(*state.definition->generator_result):Type(Type::none);
+                    if(i.type!=result || capability_key(i.type)!=capability_key(result))
+                        fail("invalid generator advancement result");
+                    break;
                 }
                 case Op::weak_create: case Op::weak_lock: {
                     valid_type(i.type);
@@ -983,6 +1029,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     result=Type(*task.definition->task_result)==Type::none?Type::none:field_type(task,1);break;
                 }
                 case Op::argument:
+                    if(f.generator && &b!=&f.blocks.front())fail("generator argument access after entry");
                     if (i.a >= f.parameters.size()) fail("invalid argument index");
                     result = f.parameters[i.a]; break;
                 case Op::collection_enter: case Op::collection_leave: case Op::collection_append: case Op::collection_finish: {
@@ -1306,7 +1353,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
                     auto target = names.find(i.callee);
                     if (target == names.end()) fail("unknown callee " + i.callee);
                     const auto& signature = target->second;
-                    if((i.op==Op::async_call)!=(declaration!=functions.end() && declaration->second->asynchronous))fail("async call effect mismatch");
+                    if((i.op==Op::async_call)!=(declaration!=functions.end() && declaration->second->asynchronous && !declaration->second->generator))fail("async call effect mismatch");
                     if (i.initialization != signature.initializer) fail("initializer invocation kind mismatch");
                     if (i.initialization && (!i.receiver || !i.receiver->fields.empty() || (f.receiver && i.receiver->slot==0))) fail("initializer requires fresh construction storage");
                     if (i.receiver.has_value() != signature.receiver) fail("call receiver mismatch");
@@ -1351,14 +1398,23 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
             }
             body_types.push_back(types);
             qualified_types.back().push_back(types);
-            auto destination = [&](unsigned id) { if (id >= f.blocks.size()) fail("invalid branch destination"); };
+            auto destination = [&](unsigned id) {
+                if(id>=f.blocks.size() || (f.generator && !id))fail("invalid branch destination");
+            };
             validating=nullptr;
             switch (b.end.kind) {
             case Terminator::Kind::return_value:
-                if (f.result == Type::none) fail("value returned from no-result function");
+                if (f.result == Type::none || f.generator) fail("invalid value-returning terminator");
                 expect(b.end.value, f.result); break;
             case Terminator::Kind::return_void:
-                if (f.result != Type::none) fail("missing return value"); break;
+                if (f.result != Type::none && !f.generator) fail("missing return value"); break;
+            case Terminator::Kind::yield:
+                if(!f.generator || !b.end.yes || b.end.no || !generator_suspensions.insert(b.end.yes).second ||
+                   (f.cleanup_entry && (static_cast<unsigned>(&b-f.blocks.data())>=*f.cleanup_entry || b.end.yes>=*f.cleanup_entry)))
+                    fail("invalid generator suspension");
+                destination(b.end.yes);
+                expect(b.end.value,field_type(*f.result.definition->generator_result,1));
+                break;
             case Terminator::Kind::branch:
                 expect(b.end.value, Type::boolean); destination(b.end.yes); destination(b.end.no); break;
             case Terminator::Kind::jump: destination(b.end.yes); break;
@@ -1371,6 +1427,7 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         }
 #include "local_cleanup.inc"
         validate_construction(f,m,body_types);
+        if(f.generator)validate_generator_suspensions(f);
         validate_numeric_enum_slots(f, primitive && primitive->revision() >= 2 ? primitive : nullptr);
         validate_fixed_ownership(f,m,body_types);
     }
@@ -1447,11 +1504,13 @@ void validate(const Module& m, InstructionTypes* results,std::map<std::string,Re
         }
         std::set<std::string> visited;std::vector<const Function*> graph{&worker};
         while(!graph.empty()){auto* f=graph.back();graph.pop_back();if(!visited.insert(f->name).second)continue;
-            if(f!=&worker && f->asynchronous)fail("worker cannot create/await tasks");
+            if(f->generator || (f!=&worker && f->asynchronous))fail("worker cannot create or advance suspendable activations");
             for(const auto& block:f->blocks)for(const auto& i:block.instructions){
                 switch(i.op){
                 case Op::async_drain:if(f!=&worker)fail("worker task operation");break;
                 case Op::weak_create: case Op::weak_lock:fail("worker cannot use weak references");break;
+                case Op::generator_next: case Op::generator_close:
+                case Op::async_generator_bind: case Op::async_generator_next:fail("worker cannot use generators");break;
                 case Op::random_seed:fail("worker cannot acquire OS entropy");break;
                 case Op::global_cell:fail("worker cannot access runtime globals");break;
                 case Op::host_native:fail("worker cannot perform owned host operations");break;

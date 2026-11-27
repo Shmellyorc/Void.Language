@@ -194,6 +194,38 @@ completion. The existing structured scheduler runs the application. On exit,
 it drains owned child tasks and executes reached cleanup. Failed or cancelled
 awaits use the same checked failure and cleanup paths as other async bodies.
 
+## Async generators
+
+An async generator can suspend at either `await` or `yield`. The call
+creates an inert `async_generator<t>`; the first advancement starts its
+body under the consuming `for await` scope.
+
+```void
+async func ready() -> i32:
+    return 7
+
+async generator func readings() -> i32:
+    var pending = ready()
+    yield 3
+    yield await pending
+
+async func main():
+    for await value in readings():
+        print(value)
+```
+
+The consuming scope owns one started generator. The generator keeps its
+child tasks across yields. Exhaustion drains its children before executing
+reached cleanup. Early exit, cancellation and failure cancel outstanding
+children and drain them before cleanup. Managed frame roots and the
+generation lease remain available until dependent activity has quiesced.
+Cleanup runs once. The first consuming scope claims the instance; concurrent,
+reentrant and subsequent consumption from another scope fail.
+
+Async generators use the existing executor and structured task scopes.
+Ordinary custom async iterators continue to use the existing task-draining
+`next()` contract. See [Generator iteration](CUSTOM_ITERATION.md#generator-iteration).
+
 ## Explicit root adapter
 
 Embedding hosts can use `Jit::compile_async(analysis, optimize)` for a legacy

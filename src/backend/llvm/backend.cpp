@@ -1,4 +1,5 @@
 #include "async_frame.hpp"
+#include "generator_frame.hpp"
 #include "type_layout.hpp"
 #include "lowering.hpp"
 #include "native_abi.hpp"
@@ -278,6 +279,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     }
     std::map<std::string,std::uint64_t> function_ids;
     for(const auto& [name,function]:functions)function_ids.emplace(name,function_ids.size()+1);
+#include "generator_dispatch.inc"
     std::map<std::string,llvm::Function*> callable_dispatchers;
     std::map<std::string,ir::Type> callable_types;
     std::vector<ir::Type> pending_callables;
@@ -493,8 +495,16 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         const auto& elided_values=elision.values;
         const auto& elided_locals=elision.locals;
         const auto* async=f.asynchronous?&async_plans.at(f.name):nullptr;
-        auto* fn = async?async->resume:functions.at(f.name);
-        llvm::BasicBlock* setup=async?llvm::BasicBlock::Create(context,"async.enter",fn):nullptr;
+        const auto* generator=f.generator && !f.asynchronous?&generator_plans.at(f.name):nullptr;
+        const auto async_generator_retirements=f.generator && f.asynchronous?generator_yield_retirements(type,f):
+            std::vector<std::vector<unsigned>>{};
+        auto* fn = async?async->resume:generator?generator->resume:functions.at(f.name);
+        llvm::BasicBlock* setup=async || generator?llvm::BasicBlock::Create(context,async?"async.enter":"generator.enter",fn):nullptr;
+        llvm::Value* generator_frame=nullptr;
+        auto generator_field=[&](unsigned field) {
+            return b.CreateStructGEP(type(ir::Type(f.result.definition)),fn->getArg(0),field);
+        };
+        auto generator_home=[&](unsigned field) {return b.CreateStructGEP(generator->frame,generator_frame,field);};
         auto frame_home=[&](unsigned field){return b.CreateStructGEP(async->frame,fn->getArg(0),field);};
         llvm::DIFile* source_file=nullptr;
         llvm::DISubprogram* subprogram=nullptr;
@@ -535,7 +545,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         for (std::size_t i = 0; i < f.blocks.size(); ++i)
             blocks.push_back(llvm::BasicBlock::Create(context, "block" + std::to_string(i), fn));
         auto* failure_type = llvm::StructType::get(b.getPtrTy(), b.getInt32Ty(), llvm::ArrayType::get(b.getPtrTy(), 32));
-        llvm::Value* failure = async?fn->getArg(1):f.module_identity.empty() && !input.coordinated ? nullptr : fn->getArg(static_cast<unsigned>(f.parameters.size()));
+        llvm::Value* failure = async?fn->getArg(1):generator?fn->getArg(2):f.module_identity.empty() && !input.coordinated ? nullptr : fn->getArg(static_cast<unsigned>(f.parameters.size()));
         llvm::Value* root_frame = nullptr;
         const bool deinit_body=f.receiver && (f.method_name=="deinit" || f.method_name.starts_with("deinit::$body$"));
         const bool collection_body=std::any_of(f.blocks.begin(),f.blocks.end(),[](const auto& block){return std::any_of(block.instructions.begin(),block.instructions.end(),[](const auto& i){return i.op==ir::Op::collection_finish || i.op==ir::Op::collection_append || i.op==ir::Op::collection_enter || i.op==ir::Op::collection_leave;});});
@@ -546,23 +556,38 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             if(deinit_body)b.CreateCall(module->getOrInsertFunction("vd_async_cleanup_leave",b.getVoidTy()));
             if (root_frame) b.CreateCall(module->getOrInsertFunction("vd_gc_frame_leave", b.getVoidTy(), b.getPtrTy()), {root_frame});
         };
+        auto finish_generator=[&] {
+            b.CreateStore(llvm::ConstantPointerNull::get(b.getPtrTy()),generator_field(GeneratorField::frame_pointer));
+            leave_frame();
+            b.CreateRet(llvm::Constant::getNullValue(type(*f.result.definition->generator_result)));
+        };
+        auto finish_async_generator=[&] {
+            auto* handle=b.CreateLoad(b.getPtrTy(),frame_home(0));
+            auto* payload=type(ir::Type(f.result.definition));
+            b.CreateStore(llvm::ConstantPointerNull::get(b.getPtrTy()),b.CreateStructGEP(payload,handle,GeneratorField::frame_pointer));
+            auto option=ir::Type(*f.result.definition->generator_result);
+            b.CreateStore(llvm::Constant::getNullValue(type(option)),b.CreateStructGEP(payload,handle,GeneratorField::item));
+        };
         unsigned active_block=0;
         auto return_failure = [&] {
             if(f.cleanup_entry && active_block<*f.cleanup_entry){b.CreateBr(blocks[*f.cleanup_entry]);return;}
+            if(generator) {finish_generator();return;}
+            if(f.generator && async)finish_async_generator();
             leave_frame();
             if (async || f.result == ir::Type::none) b.CreateRetVoid();
             else b.CreateRet(llvm::Constant::getNullValue(type(f.result)));
         };
         std::vector<llvm::Value*> slots;
-        b.SetInsertPoint(async?setup:blocks.front());
+        b.SetInsertPoint(setup?setup:blocks.front());
         b.SetCurrentDebugLocation(llvm::DebugLoc());
+        if(generator)generator_frame=b.CreateLoad(b.getPtrTy(),generator_field(GeneratorField::frame_pointer));
         // Pointer-shaped locals share one lifetime. Keep compound values in
         // their own precise descriptors, preserving nested-layout root proofs,
         // and scalar locals separate for ordinary promotion.
         std::vector<unsigned> local_root_indexes(f.locals.size(),~0u);
         std::vector<llvm::Type*> local_root_types;
         std::vector<std::vector<std::uint64_t>> local_root_offsets;
-        if(!async)for(unsigned n=0;n<f.locals.size();++n) {
+        if(!async && !generator)for(unsigned n=0;n<f.locals.size();++n) {
             if(f.receiver && n==0 && f.locals[n].kind==ir::Type::aggregate)continue;
             std::vector<std::uint64_t> offsets;
             if(!elided_locals.contains(n))type.reference_offsets(f.locals[n],0,offsets);
@@ -595,8 +620,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             auto t = f.locals[n];
             if (f.receiver && n == 0 && t.kind==ir::Type::aggregate) { slots.push_back(fn->getArg(0)); continue; }
             const bool packed=local_root_indexes[n]!=~0u;
-            llvm::Value* slot = async?frame_home(async->locals[n]):packed?b.CreateStructGEP(local_roots_type,local_roots,local_root_indexes[n]):home(b.CreateAlloca(type(t)),StorageRole::local,llvm_backend::HomeKind::value); slots.push_back(slot);
-            if(!async && (!packed || (f.receiver && n==0)))b.CreateStore(f.receiver && n==0 && t.kind==ir::Type::managed_ref ? static_cast<llvm::Value*>(fn->getArg(0)) : llvm::Constant::getNullValue(type(t)), slot);
+            llvm::Value* slot = async?frame_home(async->locals[n]):generator?generator_home(generator->locals[n]):packed?b.CreateStructGEP(local_roots_type,local_roots,local_root_indexes[n]):home(b.CreateAlloca(type(t)),StorageRole::local,llvm_backend::HomeKind::value); slots.push_back(slot);
+            if(!async && !generator && (!packed || (f.receiver && n==0)))b.CreateStore(f.receiver && n==0 && t.kind==ir::Type::managed_ref ? static_cast<llvm::Value*>(fn->getArg(0)) : llvm::Constant::getNullValue(type(t)), slot);
         }
         std::map<unsigned,llvm::Value*> stage_storage;
         for (const auto& block:f.blocks) for (const auto& instruction:block.instructions) if (instruction.op==ir::Op::stage_begin) {
@@ -711,7 +736,13 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             for(auto [t,storage]:element_staging) add_root(t,storage);
             for(auto [t,storage]:array_sources) add_root(t,storage);
             for (auto [slot,storage]:stage_storage) add_root(ir::Type(f.locals[slot].definition),storage);
+            if(generator) {
+                auto* handle=home(b.CreateAlloca(b.getPtrTy()),StorageRole::parameter,llvm_backend::HomeKind::root);
+                b.CreateStore(fn->getArg(0),handle);
+                add_root(f.result,handle);
+            }
             for (unsigned i = 0; i < f.parameters.size(); ++i) {
+                if(generator)continue;
                 if(async){add_root(f.parameters[i],frame_home(async->parameters[i]));continue;}
                 if (f.parameters[i].construction) { add_root(ir::Type(f.parameters[i].definition),fn->getArg(i)); continue; }
                 if (f.receiver && i == 0) continue;
@@ -904,6 +935,26 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             auto* ready = llvm::BasicBlock::Create(context, "globals.entry_ready", fn);
             b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(), failure)), invalid, ready);
             b.SetInsertPoint(invalid); return_failure(); blocks[0] = ready; b.SetInsertPoint(ready);
+        }
+        if(generator) {
+            auto* state=generator_field(GeneratorField::state);
+            auto* saved=b.CreateLoad(b.getInt32Ty(),state);
+            b.CreateStore(b.getInt32(GeneratorPlan::running),state);
+            auto* resume=llvm::BasicBlock::Create(context,"generator.resume_state",fn);
+            auto* exhausted=llvm::BasicBlock::Create(context,"generator.exhausted",fn);
+            b.CreateCondBr(fn->getArg(1),f.cleanup_entry?blocks[*f.cleanup_entry]:exhausted,resume);
+            b.SetInsertPoint(exhausted);
+            finish_generator();
+            b.SetInsertPoint(resume);
+            auto* invalid=llvm::BasicBlock::Create(context,"generator.invalid_state",fn);
+            auto* states=b.CreateSwitch(saved,invalid);
+            states->addCase(b.getInt32(0),blocks.front());
+            for(const auto& block:f.blocks)
+                if(block.end.kind==ir::Terminator::Kind::yield)
+                    states->addCase(b.getInt32(block.end.yes),blocks[block.end.yes]);
+            b.SetInsertPoint(invalid);
+            b.CreateStore(b.CreateGlobalString("Invalid generator suspension state"),failure);
+            return_failure();
         }
         llvm::SwitchInst* resume_states=nullptr;unsigned resume_serial=0;
         if(async){auto* invalid=llvm::BasicBlock::Create(context,"async.invalid_state",fn);resume_states=b.CreateSwitch(b.CreateLoad(b.getInt32Ty(),frame_home(1)),invalid);resume_states->addCase(b.getInt32(0),blocks.front());b.SetInsertPoint(invalid);b.CreateStore(b.CreateGlobalString("Invalid async resume state"),failure);return_failure();}
@@ -1214,6 +1265,16 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     break;
                 }
                 case Op::gc_release:v=b.CreateCall(module->getOrInsertFunction("vd_gc_release",b.getInt1Ty(),b.getPtrTy()),{values[instruction.a]});break;
+                case Op::async_generator_bind:
+                    v=b.CreateCall(async_generator_dispatchers.at(ir::Type::key(operand_type(instruction.a))),
+                        {values[instruction.a],failure});
+                    selected_failure();
+                    break;
+                case Op::generator_next: case Op::generator_close:
+                    v=b.CreateCall(generator_dispatchers.at(ir::Type::key(operand_type(instruction.a))),
+                        {values[instruction.a],b.getInt1(instruction.op==Op::generator_close),failure});
+                    selected_failure();
+                    break;
                 case Op::weak_create: case Op::weak_lock: {
                     auto* storage=value_roots[n].at(values.size());
                     if(instruction.op==Op::weak_create) {
@@ -1783,22 +1844,29 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                     auto* suspend=llvm::BasicBlock::Create(context,"async.join_suspend",fn);auto* done=llvm::BasicBlock::Create(context,"async.join_complete",fn);b.CreateCondBr(ready,done,suspend);b.SetInsertPoint(suspend);b.CreateStore(b.getInt32(resume_serial),frame_home(1));leave_frame();b.CreateRetVoid();b.SetInsertPoint(done);
                     if(instruction.op!=Op::async_drain){auto* bad=llvm::BasicBlock::Create(context,"async.join_failure",fn);auto* good=llvm::BasicBlock::Create(context,"async.join_valid",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,good);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(good);}v=llvm::UndefValue::get(b.getInt8Ty());break;
                 }
-                case Op::await: {
+                case Op::await: case Op::async_generator_next: {
+                    const bool generator_step=instruction.op==Op::async_generator_next;
                     auto* check=llvm::BasicBlock::Create(context,"async.await",fn);b.CreateBr(check);resume_states->addCase(b.getInt32(++resume_serial),check);b.SetInsertPoint(check);
                     for(unsigned k=0;k<values.size();++k)if(value_types[k]!=ir::Type::none)values[k]=b.CreateLoad(type(value_types[k]),frame_home(async->values[n][k]));
                     auto* task=values[instruction.a];auto task_type=operand_type(instruction.a);
-                    auto* ready=b.CreateCall(module->getOrInsertFunction("vd_async_ready",b.getInt1Ty(),b.getPtrTy(),b.getPtrTy()),{task,failure});
+                    auto* ready=b.CreateCall(module->getOrInsertFunction(generator_step?"vd_async_generator_ready":"vd_async_ready",
+                        b.getInt1Ty(),b.getPtrTy(),b.getPtrTy()),{task,failure});
                     auto propagate=[&]{auto* bad=llvm::BasicBlock::Create(context,"async.await_failure",fn);auto* okay=llvm::BasicBlock::Create(context,"async.await_valid",fn);b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),bad,okay);b.SetInsertPoint(bad);trace_failure();b.SetInsertPoint(okay);};propagate();
                     auto* suspend=llvm::BasicBlock::Create(context,"async.suspend",fn);auto* completed=llvm::BasicBlock::Create(context,"async.completed",fn);b.CreateCondBr(ready,completed,suspend);b.SetInsertPoint(suspend);
                     b.CreateStore(b.getInt32(resume_serial),frame_home(1));b.CreateCall(module->getOrInsertFunction("vd_async_suspend",b.getVoidTy(),b.getPtrTy(),b.getPtrTy(),b.getPtrTy()),{fn->getArg(0),task,failure});propagate();leave_frame();b.CreateRetVoid();b.SetInsertPoint(completed);
-                    auto result=instruction_types[n].at(values.size());auto* address=field_address(task_type,task,1);
+                    auto result=instruction_types[n].at(values.size());
+                    auto* address=generator_step?
+                        b.CreateStructGEP(type(ir::Type(task_type.definition)),task,GeneratorField::item):
+                        field_address(task_type,task,1);
                     if(result==ir::Type::none)v=llvm::UndefValue::get(b.getInt8Ty());
                     else if(contains_arrays(result)){auto* source=value_roots[n].at(values.size());b.CreateStore(b.CreateLoad(type(result),address),source);auto* destination=copy_staging.at(result);copy_value(result,destination,source,propagate);v=b.CreateLoad(type(result),destination);}
                     else v=b.CreateLoad(type(result),address);
+                    if(generator_step)b.CreateStore(llvm::Constant::getNullValue(type(result)),address);
                     break;
                 }
                 case Op::argument:
                     if(async)v=b.CreateLoad(type(f.parameters[instruction.a]),frame_home(async->parameters[instruction.a]));
+                    else if(generator)v=b.CreateLoad(type(f.parameters[instruction.a]),generator_home(generator->parameters[instruction.a]));
                     else if (f.receiver && f.parameters[0].kind==ir::Type::aggregate && instruction.a == 0) v = b.CreateLoad(type(f.parameters[0]),fn->getArg(0));
                     else v = fn->getArg(instruction.a);
                     break;
@@ -2372,6 +2440,13 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
             const auto& end = f.blocks[n].end;
             if(!defer_return_load && f.cleanup_entry && n>=*f.cleanup_entry &&
                (end.kind==ir::Terminator::Kind::return_value || end.kind==ir::Terminator::Kind::return_void))check_cleanup_return();
+            auto retire_generator_values=[&] {
+                // Instruction values are block-local. A suspended await still
+                // needs its block's homes, but no successor can read them.
+                for(unsigned id=0;id<value_types.size();++id)if(value_roots[n][id])
+                    b.CreateStore(llvm::Constant::getNullValue(type(value_types[id])),value_roots[n][id]);
+            };
+            if(f.generator && async && end.kind!=ir::Terminator::Kind::yield)retire_generator_values();
             switch (end.kind) {
             case ir::Terminator::Kind::return_value: {
                 auto* value=values[end.value];
@@ -2388,7 +2463,52 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                 if(async){auto* task=b.CreateLoad(b.getPtrTy(),frame_home(0));b.CreateStore(value,field_address(f.task,task,1));b.CreateCall(module->getOrInsertFunction("vd_async_complete",b.getVoidTy(),b.getPtrTy()),{task});leave_frame();b.CreateRetVoid();}
                 else {leave_frame();b.CreateRet(value);}break;
             }
-            case ir::Terminator::Kind::return_void: if(async)b.CreateCall(module->getOrInsertFunction("vd_async_complete",b.getVoidTy(),b.getPtrTy()),{b.CreateLoad(b.getPtrTy(),frame_home(0))});leave_frame(); b.CreateRetVoid(); break;
+            case ir::Terminator::Kind::yield: {
+                auto result=ir::Type(*f.result.definition->generator_result);
+                auto item=ir::field_type(result,1);
+                auto* value=values[end.value];
+                if(contains_arrays(item)) {
+                    auto* staging=copy_staging.at(item);
+                    copy_value(item,staging,value_roots[n].at(end.value),[&] {
+                        auto* failed=llvm::BasicBlock::Create(context,"generator.yield_copy_failure",fn);
+                        auto* good=llvm::BasicBlock::Create(context,"generator.yield_copy_success",fn);
+                        b.CreateCondBr(b.CreateIsNotNull(b.CreateLoad(b.getPtrTy(),failure)),failed,good);
+                        b.SetInsertPoint(failed);return_failure();b.SetInsertPoint(good);
+                    });
+                    value=b.CreateLoad(type(item),staging);
+                }
+                if(async)retire_generator_values();
+                const auto& retirement=async?async_generator_retirements[n]:generator->retire_at_yield[n];
+                for(auto slot:retirement)
+                    b.CreateStore(llvm::Constant::getNullValue(type(f.locals[slot])),slots[slot]);
+                for(unsigned parameter=0;parameter<f.parameters.size();++parameter) {
+                    auto* destination=async?frame_home(async->parameters[parameter]):generator_home(generator->parameters[parameter]);
+                    b.CreateStore(llvm::Constant::getNullValue(type(f.parameters[parameter])),destination);
+                }
+                llvm::Value* yielded=llvm::Constant::getNullValue(type(result));
+                yielded=b.CreateInsertValue(yielded,b.getInt32(1),0);
+                yielded=b.CreateInsertValue(yielded,value,1);
+                if(async) {
+                    auto* handle=b.CreateLoad(b.getPtrTy(),frame_home(0));
+                    auto* payload=type(ir::Type(f.result.definition));
+                    b.CreateStore(yielded,b.CreateStructGEP(payload,handle,GeneratorField::item));
+                    auto* continuation=b.getInt32(++resume_serial);
+                    resume_states->addCase(continuation,blocks[end.yes]);
+                    b.CreateStore(continuation,frame_home(1));
+                    b.CreateCall(module->getOrInsertFunction("vd_async_generator_yield",b.getVoidTy(),b.getPtrTy()),{handle});
+                    leave_frame();
+                    b.CreateRetVoid();
+                } else {
+                    b.CreateStore(b.getInt32(end.yes),generator_field(GeneratorField::state));
+                    leave_frame();
+                    b.CreateRet(yielded);
+                }
+                break;
+            }
+            case ir::Terminator::Kind::return_void:
+                if(generator){finish_generator();break;}
+                if(f.generator && async)finish_async_generator();
+                if(async)b.CreateCall(module->getOrInsertFunction("vd_async_complete",b.getVoidTy(),b.getPtrTy()),{b.CreateLoad(b.getPtrTy(),frame_home(0))});leave_frame(); b.CreateRetVoid(); break;
             case ir::Terminator::Kind::jump: b.CreateBr(blocks[end.yes]); break;
             case ir::Terminator::Kind::branch: b.CreateCondBr(values[end.value], blocks[end.yes], blocks[end.no]); break;
             case ir::Terminator::Kind::unreachable: b.CreateUnreachable(); break;
@@ -2396,6 +2516,7 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         }
     }
 #include "async_start.inc"
+#include "generator_start.inc"
     if (!input.globals.empty()) {
         // The host adapter owns startup. Calls between source functions use the
         // ordinary bodies, and every cell access still checks readiness/owner.

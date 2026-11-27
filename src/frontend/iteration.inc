@@ -7,6 +7,7 @@ VOID_SEMANTIC_HANDLER Type iteration_expression(Expr& e) {
     const bool async_next=e.op=="$async_iteration_next";
     auto type=method_expression(e);
     if(type==error_type)throw Poison{};
+    if(e.target=="$generator.next")return type;
     const Function* selected=nullptr;
     for(const auto& [id,owner]:units)for(const auto& f:owner->functions)
         if(f.symbol==e.target)selected=&f;
@@ -39,7 +40,13 @@ VOID_SEMANTIC_HANDLER void custom_iteration(Statement& s) {
         auto e=std::make_unique<Expr>(Expr::Kind::method_call,site);
         e->op="$iteration";e->implicit=true;e->parts.push_back(std::move(receiver));return e;
     };
-    auto factory=call(s.asynchronous_iteration?(s.reverse?"reverse_async_iterator":"async_iterator"):
+    const bool generator=ir::generator_type(s.expression->type);
+    const bool async_generator=ir::async_generator_type(s.expression->type);
+    if(generator && (s.asynchronous_iteration!=async_generator || s.reverse || !s.index_binder.text.empty()))
+        error(source,s.token,Code::unsupported_iteration,
+              async_generator?"An asynchronous generator requires forward for await with one item binder.":
+                              "A synchronous generator requires forward for with one item binder.");
+    auto factory=generator?std::move(s.expression):call(s.asynchronous_iteration?(s.reverse?"reverse_async_iterator":"async_iterator"):
         (s.reverse?"reverse_iterator":"iterator"),std::move(s.expression));
     const auto state=expression(*factory);
     if(state==error_type)throw Poison{};
@@ -52,7 +59,8 @@ VOID_SEMANTIC_HANDLER void custom_iteration(Statement& s) {
     loop.expression=std::make_unique<Expr>(Expr::Kind::test,s.token);
     loop.expression->implicit=true;
     auto next=call("next",state_read());
-    if(s.asynchronous_iteration) {
+    if(async_generator)next->op="$generator.async.next";
+    else if(s.asynchronous_iteration) {
         next->op="$async_iteration_next";
         Token token{TokenKind::name,"await",s.token.offset};token.source_width=s.token.text.size();
         auto awaited=std::make_unique<Expr>(Expr::Kind::awaited,token);awaited->implicit=true;
@@ -69,11 +77,29 @@ VOID_SEMANTIC_HANDLER void custom_iteration(Statement& s) {
     }
     for(auto& child:s.body)loop.body.push_back(std::move(child));
 
+    if(async_generator) {
+        Statement scope(Statement::Kind::scoped,s.token);
+        scope.generator_iteration=true;
+        scope.binder={TokenKind::name,"$generator_group$"+std::to_string(s.token.offset),s.token.offset};
+        scope.source_end=s.source_end;
+        Statement binding(Statement::Kind::variable,hidden);
+        binding.name=hidden.text;
+        binding.expression=std::move(factory);
+        scope.body.push_back(std::move(binding));
+        Statement bind(Statement::Kind::expression,s.token);
+        bind.expression=call("next",state_read());
+        bind.expression->op="$generator.async.bind";
+        scope.body.push_back(std::move(bind));
+        scope.body.push_back(std::move(loop));
+        s=std::move(scope);
+        return;
+    }
+
     // A declared destructor is a capability, including inaccessible/ambiguous
     // declarations: ordinary with checking must diagnose them rather than omit
     // cleanup. Value structs have no deinit under the existing lifetime model.
-    bool resource=false;
-    if(state.kind==Type::managed_ref) {
+    bool resource=generator;
+    if(!generator && state.kind==Type::managed_ref) {
         const auto selected=ir::select_member(*root.member_catalog,state,"deinit",unit.identity,nullptr,lexical_owner());
         resource=selected.status!=ir::MemberSelection::missing;
     }

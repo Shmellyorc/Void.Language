@@ -164,6 +164,12 @@ for(auto& [id,u]:units) {
         if(found==owner->applications.end())return raw;
         if(found->resolved!=Type::none)return found->resolved;
         auto [declaration_owner,generic]=structure_lookup(*owner,root,units,found->name,found->token);
+        if(!generic && (found->name=="generator" || found->name=="async_generator")) {
+            if(found->arguments.size()!=1)
+                error(owner->source,found->token,Code::argument_count,"generator<T> requires exactly one item type.");
+            auto item=resolve_type(found->arguments.front(),*owner,root,units,site);
+            return found->resolved=owner->make_generator(item,found->name=="async_generator");
+        }
         if(!generic && found->name=="weak") {
             if(found->arguments.size()!=1)
                 error(owner->source,found->token,Code::argument_count,"weak<T> requires exactly one target type.");

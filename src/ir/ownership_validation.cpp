@@ -190,11 +190,14 @@ void validate_construction(const Function& f,const Module& module,const std::vec
             } else if (f.initializer && f.parameters[0].construction) require_all(0);
             for (auto root:owned) if (state.regions.at(root).phase & (preparing|initialized|awaiting|rejected)) fail("uncommitted construction on successful exit");
         }
+        if(end.kind==Terminator::Kind::yield)
+            for(auto root:owned)if(state.regions.at(root).phase & (preparing|initialized|awaiting|rejected))
+                fail("unfinished construction at generator yield");
         auto propagate=[&](unsigned target) {
             auto merged=inputs[target] ? join(*inputs[target],state) : state;
             if (!inputs[target] || merged!=*inputs[target]) { inputs[target]=std::move(merged); pending.push_back(target); }
         };
-        if (end.kind==Terminator::Kind::jump) propagate(end.yes);
+        if (end.kind==Terminator::Kind::jump || end.kind==Terminator::Kind::yield) propagate(end.yes);
         if (end.kind==Terminator::Kind::branch) {
             if(checks.at(end.value)) {
                 auto [root,base]=*checks.at(end.value);auto before=state;
@@ -243,7 +246,7 @@ void validate_fixed_ownership(const Function& f,const Module& m,const std::vecto
         auto id=pending.back();pending.pop_back();if(!reachable.insert(id).second) continue;
         auto edge=[&](unsigned to) {if(to==0) fail("entry reexecution could repeat argument transfer");pred[to].push_back(id);pending.push_back(to);};
         auto end=f.blocks[id].end;
-        if(end.kind==Terminator::Kind::jump) edge(end.yes);
+        if(end.kind==Terminator::Kind::jump || end.kind==Terminator::Kind::yield) edge(end.yes);
         if(end.kind==Terminator::Kind::branch) {edge(end.yes);edge(end.no);}
     }
     std::vector<std::set<unsigned>> in(f.blocks.size(),all),out(f.blocks.size(),all);
@@ -317,7 +320,40 @@ void validate_fixed_ownership(const Function& f,const Module& m,const std::vecto
             values.push_back(value);
         }
         if(!selections.empty()) fail("uncommitted selected place");
-        if(b.end.kind==Terminator::Kind::return_value) use(b.end.value,true);
+        if(b.end.kind==Terminator::Kind::return_value || b.end.kind==Terminator::Kind::yield)
+            use(b.end.value,true);
+    }
+}
+
+void validate_generator_suspensions(const Function& function) {
+    using End=Terminator::Kind;
+    for(unsigned slot=0;slot<function.locals.size();++slot) {
+        auto type=function.locals[slot];
+        if(!type.construction && type.kind!=Type::prepared_receiver)continue;
+        std::vector<bool> visited(function.blocks.size());
+        std::vector<unsigned> pending;
+        for(const auto& block:function.blocks)if(block.end.kind==End::yield)pending.push_back(block.end.yes);
+        if(function.cleanup_entry)pending.push_back(*function.cleanup_entry);
+        while(!pending.empty()) {
+            auto index=pending.back();
+            pending.pop_back();
+            if(visited[index])continue;
+            visited[index]=true;
+            const auto& block=function.blocks[index];
+            bool initialized=false;
+            for(const auto& op:block.instructions) {
+                if((op.op==Op::load && op.a==slot) || (op.receiver && op.receiver->slot==slot))
+                    throw std::invalid_argument("VOID IR: borrowed generator storage survives suspension");
+                if((op.op==Op::store || op.op==Op::stage_begin) && op.a==slot) {
+                    initialized=true;
+                    break;
+                }
+            }
+            if(initialized)continue;
+            const auto& end=block.end;
+            if(end.kind==End::jump || end.kind==End::yield || end.kind==End::branch)pending.push_back(end.yes);
+            if(end.kind==End::branch)pending.push_back(end.no);
+        }
     }
 }
 
@@ -394,7 +430,8 @@ void validate_numeric_enum_slots(const Function& f, const CPrimitiveAdmission* n
                 const auto removed=std::erase_if(*known,[&](unsigned slot){return !state.contains(slot);});
                 if(removed)work.push_back(target);
             };
-            if(block.end.kind==Terminator::Kind::jump || block.end.kind==Terminator::Kind::branch)edge(block.end.yes);
+            if(block.end.kind==Terminator::Kind::jump || block.end.kind==Terminator::Kind::branch ||
+               block.end.kind==Terminator::Kind::yield)edge(block.end.yes);
             if(block.end.kind==Terminator::Kind::branch)edge(block.end.no);
         }
     };

@@ -305,6 +305,7 @@ VOID_SEMANTIC_HANDLER CompileEvaluation::Outcome CompileEvaluation::sequence(con
         case K::loop:{auto result=loop(source,s);if(result.flow!=next_flow)return result;break;}
         case K::match:{auto result=match_statement(source,s);if(result.flow!=next_flow)return result;break;}
         case K::broken:return {break_flow,{}};case K::continued:return {continue_flow,{}};
+        case K::yielded:throw std::logic_error("yield reached constant execution");
         case K::no_op:break;
         case K::destructure:{auto value=constant_value(source,*s.expression,this);for(unsigned n=0;n<s.bindings.size();++n)locals->at(s.bindings[n].slot)=value.fields.at(n);break;}
         default:error(source,s.token,Code::constant_call,"Unsupported compile-time statement.");

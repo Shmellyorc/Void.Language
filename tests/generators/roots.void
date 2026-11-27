@@ -1,0 +1,52 @@
+struct item:
+    number: i32
+
+struct ledger:
+    closed: i32
+
+func finish(owner: ledger):
+    owner.closed += 1
+
+generator func suspends(owner: ledger) -> weak<item>:
+    var retired = item(number = 17)
+    var keep = item(number = 42)
+    defer finish(owner)
+    yield weak(retired)
+    yield weak(keep)
+    owner.closed += keep.number
+
+func force_collection(number: i32) -> i32:
+    var value = item(number = number)
+    var reference = weak(value)
+    if reference.lock() is Ok(var target):
+        return target.number
+    return 0
+
+func alive(reference: weak<item>) -> bool:
+    return reference.lock() != null
+
+func entry(mode: i32) -> i32:
+    var owner = ledger()
+    var saved: weak<item>?
+    with suspends(owner) as generator:
+        if generator.next() is Some(var retired):
+            var forced = force_collection(1)
+            if forced != 1 or alive(retired):
+                return -1
+        else:
+            return -2
+        if generator.next() is Some(var keep):
+            var forced = force_collection(2)
+            if forced != 2 or not alive(keep):
+                return -3
+            saved = keep
+        else:
+            return -4
+        if mode == 1:
+            if generator.next() is Some(var unexpected):
+                return -5
+    if saved is Ok(var reference):
+        var forced = force_collection(3)
+        if forced != 3 or alive(reference):
+            return -6
+    return owner.closed

@@ -558,6 +558,35 @@ member lookup. Managed iterator `deinit` cleanup is scoped; no hidden buffering
 is used. Async iteration is a separate protocol described below. See
 [custom iteration](CUSTOM_ITERATION.md).
 
+### Generator functions
+
+Declare `generator func` with the item type after `->`. The call creates a
+`generator<t>` and the body starts when iteration requests its first item.
+Each `yield` produces one value and suspends the body at that point.
+
+```void
+generator func countdown(start: i32) -> i32:
+    var value = start
+    for value > 0:
+        yield value
+        value -= 1
+
+func main():
+    for value in countdown(3):
+        print(value)
+```
+
+Generators are single-pass. A bare `return` or the end of the body exhausts
+the generator. `for` closes a generator on exit. Manual iteration uses
+`next() -> option<t>` and `close()`. Use `with` to guarantee closure on
+all exits when advancing manually. Closing runs reached cleanup once and
+releases the suspended frame. A never-started generator has reached no cleanup.
+
+Use `async generator func` for a body that can both await and yield. Its
+`async_generator<t>` is consumed by one owning `for await` scope. See
+[Generator iteration](CUSTOM_ITERATION.md#generator-iteration) and
+[Async generators](ASYNC.md#async-generators).
+
 ## Resources and memory
 
 Managed allocations use the coordinated precise GC. Reachable managed children,

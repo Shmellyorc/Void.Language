@@ -68,7 +68,7 @@ namespace frontend {
 ir::Function member_header(const Unit& u,const Function& f) {
     ir::Function header;header.name=f.symbol;header.module_identity=u.identity;header.method_name=f.receiver?(f.concrete_method_name.empty()?f.token.text:f.concrete_method_name):std::string{};
     header.static_member=bool(f.static_owner) || (f.global_initializer && !f.lexical_owner.empty());
-    header.asynchronous=f.asynchronous;header.task=f.task;header.bound_receiver=f.bound_receiver;header.closure=f.anonymous;header.accessor=f.accessor;header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
+    header.asynchronous=f.asynchronous;header.generator=f.generator;header.task=f.task;header.bound_receiver=f.bound_receiver;header.closure=f.anonymous;header.accessor=f.accessor;header.receiver=static_cast<bool>(f.receiver);header.initializer=f.initializer;header.visibility=f.visibility;header.result=f.result;header.virtual_slot=f.virtual_slot;header.receiver_mutates=f.receiver_mutates;
     header.lexical_owner=f.receiver?Type::key(f.receiver->type):f.lexical_owner;header.lexical_parent=f.lexical_parent;header.operator_owner=f.operator_owner;header.operator_glyph=f.operator_glyph;
     header.parameters.clear();if(f.receiver)header.parameters.push_back(f.receiver->type);
     for(const auto& p:f.parameters)header.parameters.push_back(p.type);
@@ -486,6 +486,24 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
         return target.readonly?ir::readonly_view(found->second):found->second;
     };
     for(auto& [id,u]:units)u->make_weak=make_weak;
+    std::map<std::string,Type> canonical_generators;
+    auto make_generator=[&](Type item,bool asynchronous) {
+        const auto key=ir::generator_identity(item,asynchronous);
+        auto found=canonical_generators.find(key);
+        if(found!=canonical_generators.end())return found->second;
+        auto state=std::make_shared<ir::ValueType>();
+        state->identity=state->name=key;
+        state->managed=true;
+        state->async_generator=asynchronous;
+        state->generator_result=make_option(item);
+        state->self=state;
+        state->arena=arena;
+        arena->definitions.push_back(state);
+        auto type=Type::nominal(state);
+        root.synthetic_types.push_back(type);
+        return canonical_generators.emplace(key,type).first->second;
+    };
+    for(auto& [id,u]:units)u->make_generator=make_generator;
     std::map<std::string,Type> canonical_nullables;
     auto make_nullable=[&](Type payload) {
         if(ir::nullable_type(payload))return payload;
@@ -622,6 +640,14 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
             if(std::none_of(f.returns.begin(),f.returns.end(),[](const auto& component){return component.type==error_type;}))
                 f.result=make_return_type(f.returns);
             else f.result=error_type;
+        }
+        if(f.generator && !f.parse_failed) {
+            if(f.receiver || f.static_owner || f.virtual_method || f.overriding || f.compile_time ||
+               f.result==Type::none || f.result==error_type || !f.returns.empty())
+                error(owner.source,f.token,Code::unsupported_type,"A generator requires a free function with an explicit item type.");
+            if(f.asynchronous && !ir::async_boundary_safe(f.result))
+                error(owner.source,f.token,Code::unsupported_type,"Asynchronous generator items must satisfy async transfer rules.");
+            f.result=make_generator(f.result,f.asynchronous);
         }
         for (auto& parameter : f.parameters) {
             if(parameter.type==Type::none && parameter.default_expression) {
@@ -949,9 +975,9 @@ void validate_graph(std::map<std::string, std::unique_ptr<Unit>>& units, const s
     analyze_construction(units,diagnostics);
     diagnostics.finish();
     check_string_pool(units);
-    for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=u->make_task(f.result);if(!ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
+    for(auto& [id,u]:units)for(auto& f:u->functions)if(f.asynchronous){f.task=f.generator?f.result:u->make_task(f.result);if(!f.generator && !ir::async_boundary_safe(f.result))error(u->source,f.token,Code::unsupported_type,"Callable-containing results cannot escape an async task in Delivery 1.");for(const auto& parameter:f.parameters)if(!ir::async_boundary_safe(parameter.type))error(u->source,parameter.token,Code::unsupported_type,"Callable-containing or borrowed arguments cannot cross an async task boundary in Delivery 1.");if(f.receiver && !ir::async_boundary_safe(f.receiver->type))error(u->source,f.token,Code::unsupported_type,"Callable-containing managed receivers cannot cross an async task boundary in Delivery 1.");if(f.initializer || f.accessor || (f.receiver && f.token.text=="deinit") || f.virtual_method || f.overriding || f.interface_requirement || (f.receiver && f.receiver->type.kind!=Type::managed_ref))error(u->source,f.token,Code::unsupported_type,"Async lifecycle methods, accessors, value receivers and virtual/interface methods require a reviewed contract.");}
     root.prepare_relationships=[](Type,Type,const SourceFile&,const Token&){};
-    for(auto& [id,u]:units) {u->resolve_numeric={};u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->make_weak={};u->make_nullable={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
+    for(auto& [id,u]:units) {u->resolve_numeric={};u->resolve_global={};u->make_task={};u->make_cleanup={};u->make_capture_record={};u->make_callable={};u->resolve_callable={};u->resolve_result={};u->make_result={};u->make_option={};u->make_weak={};u->make_generator={};u->make_nullable={};u->resolve_array={};u->resolve_application={};u->specialize_function={};u->specialize_structure={};} // No closures into this validation frame escape.
 }
 
 }

@@ -502,6 +502,14 @@ class Parser {
     }
     Statement statement() {
         nodes = 0;
+        if(at("yield") && ((parsing_function && parsing_function->generator && peek(1).text!="=") ||
+           peek(1).kind==TokenKind::number || peek(1).kind==TokenKind::string ||
+           (peek(1).kind==TokenKind::name && peek(1).text!="as"))) {
+            Statement yield(Statement::Kind::yielded,take());
+            yield.expression=expression();
+            newline();
+            return yield;
+        }
         if(at("defer"))return deferred_statement();
         if(at("for"))return loop_statement();
         return ordinary_statement();
@@ -855,6 +863,8 @@ public:
                 }
                 need("<dedent>");if(!getter)error(source,property,Code::syntax,"A property requires a getter.");continue;
             }
+            f.generator=at("generator") && (peek(1).text=="func" || peek(1).text=="async");
+            if(f.generator)take();
             if(!at("func") && !at("async") && !at("virtual") && !at("override")) {
                 unit.application_body=true;
                 FunctionScope scope(parsing_function,application);
@@ -863,6 +873,7 @@ public:
                 continue;
             }
             f.asynchronous=accept("async");
+            if(f.asynchronous && at("generator") && peek(1).text=="func"){take();f.generator=true;}
             f.virtual_method=accept("virtual");
             f.overriding=!f.virtual_method && accept("override");
             need("func");

@@ -140,6 +140,38 @@ prefetch and arbitrary async callback values remain deferred. In particular,
 async acquisition would need an explicit ownership contract for an acquired
 resource whose task result is abandoned before the loop activates its scope.
 
+## Generator iteration
+
+A synchronous `generator<T>` participates in forward `for item in source`.
+The loop advances to the next `yield` or to completion. It closes the
+generator on exhaustion, `break`, return or failure. The same instance is
+single-pass, including when accessed through an alias. Explicit `close()`
+is idempotent, and later `next()` calls return `None`.
+
+Use `with` when driving a generator manually.
+
+```void
+generator func duplicate<t>(value: t) -> t:
+    yield value
+    yield value
+
+func main():
+    with duplicate(42) as values:
+        if values.next() is Some(var first):
+            print(first)
+```
+
+A generator declared with `async generator func` has type
+`async_generator<T>`. It uses forward `for await item in source`; the
+loop owns sequential advancement and closure. See
+[Async generators](ASYNC.md#async-generators).
+
+Both forms use one item binder. Reverse iteration, indexed binders, worker
+transfer and compile-time execution are outside the generator contract.
+Runtime faults follow the existing checked error path. A generator can yield
+`result<T, E>` values for typed error handling by its consumer. Use a bare
+`return` for early exhaustion.
+
 ## Mutation and readonly authority
 
 Custom implementations define and enforce their own structural mutation,

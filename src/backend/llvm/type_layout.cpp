@@ -1,4 +1,5 @@
 #include "type_layout.hpp"
+#include "generator_frame.hpp"
 #include "void/numeric.hpp"
 #include <llvm/IR/DerivedTypes.h>
 #include <llvm/IR/Module.h>
@@ -22,6 +23,14 @@ llvm::Type* TypeLayout::operator()(ir::Type t) {
     if(t.kind==ir::Type::prepared_receiver) return prepared_;
     if (t.kind == ir::Type::managed_ref || t.kind==ir::Type::string) return llvm::PointerType::get(context_, 0);
     if (t.kind == ir::Type::aggregate) {
+        if(t.definition->generator_result) {
+            auto* pointer=llvm::PointerType::get(context_,0);
+            auto* word=llvm::Type::getInt64Ty(context_);
+            auto* i32=llvm::Type::getInt32Ty(context_);
+            std::vector<llvm::Type*> fields{i32,pointer,word,word,word,i32};
+            if(t.definition->async_generator)fields.push_back((*this)(*t.definition->generator_result));
+            return llvm::StructType::get(context_,fields);
+        }
         if(t.definition->weak_target) {
             auto* pointer=llvm::PointerType::get(context_,0);
             return llvm::StructType::get(context_,{pointer,pointer});
@@ -57,6 +66,13 @@ void TypeLayout::reference_offsets(ir::Type t, std::uint64_t base, std::vector<s
     // shapes have no logical managed-reference leaves.
     if(ir::collection_type(t) || (t.kind==ir::Type::managed_ref && t.definition && t.definition->task_result)) {result.push_back(base);return;}
     if(t.kind==ir::Type::aggregate) {
+        if(t.definition->generator_result) {
+            const auto* geometry=layout_.getStructLayout(llvm::cast<llvm::StructType>((*this)(t)));
+            result.push_back(base+geometry->getElementOffset(GeneratorPlan::frame_pointer));
+            if(t.definition->async_generator)
+                reference_offsets(*t.definition->generator_result,base+geometry->getElementOffset(GeneratorPlan::item),result);
+            return;
+        }
         for(unsigned n=0;n<t.definition->fields.size();++n) reference_offsets(ir::field_type(t,n),base+field_offset(t,n),result);
         return;
     }

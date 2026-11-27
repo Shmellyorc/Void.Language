@@ -1,0 +1,59 @@
+struct ledger:
+    consumed: i32
+    started: i32
+    drained: i32
+    closed: i32
+
+func child_drained(owner: ledger):
+    owner.drained += 1
+
+func generator_closed(owner: ledger):
+    if owner.drained == 1:
+        owner.closed += 1
+
+async func tick() -> i32:
+    return 0
+
+async func child(owner: ledger) -> i32:
+    owner.started += 1
+    defer child_drained(owner)
+    for owner.consumed < 2:
+        var idle = await tick()
+    return 0
+
+async generator func sequence(owner: ledger) -> i32:
+    defer generator_closed(owner)
+    var owned = child(owner)
+    yield 10
+    var idle = await tick()
+    yield 20
+
+async func run_case(mode: i32) -> i32:
+    var owner = ledger()
+    var sum = 0
+    for await item in sequence(owner):
+        if owner.started != 1 or owner.drained != 0:
+            return -9
+        owner.consumed += 1
+        sum += item
+        if mode == 1:
+            break
+    return owner.started * 1000 + owner.drained * 100 + owner.closed * 10 + sum
+
+async func main() -> i32:
+    print(await run_case(0))
+    print(await run_case(1))
+    var owner = ledger()
+    var first = await leave_early(owner)
+    print(first, owner.started, owner.drained, owner.closed)
+    return 0
+
+async generator func nested(owner: ledger) -> i32:
+    for await item in sequence(owner):
+        yield item + 1
+
+async func leave_early(owner: ledger) -> i32:
+    for await item in nested(owner):
+        owner.consumed += 1
+        return item
+    return 0

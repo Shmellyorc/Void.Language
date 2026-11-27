@@ -102,7 +102,7 @@ std::string format_specification_syntax(const Expr&);
 
 struct Statement {
     std::size_t source_end=0;
-    enum class Kind { scoped, deferred, match, variable, assignment, expression, returned, conditional, loop, broken, continued, no_op, destructure } kind;
+    enum class Kind { scoped, deferred, match, variable, assignment, expression, returned, yielded, conditional, loop, broken, continued, no_op, destructure } kind;
     Token token;
     std::optional<Pattern> pattern;
     std::string name, op, constant_syntax, compound_target;
@@ -116,7 +116,7 @@ struct Statement {
     unsigned compound_slot=0;
     Token binder{TokenKind::name,"",0}, index_binder{TokenKind::name,"",0};
     unsigned index_slot=0;
-    bool reverse=false, exclusive=false, exhaustive=false, asynchronous_iteration=false;
+    bool reverse=false, exclusive=false, exhaustive=false, asynchronous_iteration=false, generator_iteration=false;
     std::vector<Token> fields;
     std::vector<bool> implicit_fields;
     std::vector<unsigned> field_indexes;
@@ -152,6 +152,7 @@ struct Function {
     Unit* compile_owner=nullptr;
     bool global_initializer=false;
     std::optional<Parameter> static_owner; // Type context only; never an ABI receiver.
+    bool generator=false;
     bool anonymous=false, deferred=false, bound_receiver=false, asynchronous=false, display_adapter=false, display_has_string=false, display_has_format=false;
     Type task=Type::none;
     unsigned binding_ordinal=0;
@@ -332,6 +333,7 @@ struct Unit {
     std::map<std::string,AnalyzedDeclaration> builtins;
     std::function<Type(Type,Type)> make_result;
     std::function<Type(Type)> make_option, make_weak;
+    std::function<Type(Type,bool)> make_generator;
     std::function<Type(Type)> make_nullable;
     std::map<std::string,Type> nullable_types; // Resolved annotations remain available to immutable tooling.
     std::function<Type(Type,const Token&)> resolve_callable;

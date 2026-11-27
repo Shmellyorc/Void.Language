@@ -1,0 +1,38 @@
+struct ledger:
+    seen: i32
+
+func finish_child(owner: ledger):
+    print("child", owner.seen)
+
+func finish_generator(owner: ledger):
+    print("generator", owner.seen)
+
+async func tick() -> i32:
+    return 0
+
+async func child(owner: ledger) -> i32:
+    defer finish_child(owner)
+    for:
+        var idle = await tick()
+    return 0
+
+async generator func values(owner: ledger) -> i32:
+    defer finish_generator(owner)
+    var launched = child(owner)
+    yield 7
+    var idle = await tick()
+    yield 11
+
+async func consumer(owner: ledger):
+    for await item in values(owner):
+        owner.seen += item
+        for:
+            var idle = await tick()
+
+async func main():
+    var owner = ledger()
+    var work = consumer(owner)
+    for owner.seen == 0:
+        var idle = await tick()
+    work.cancel()
+    await work

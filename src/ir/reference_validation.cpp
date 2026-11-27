@@ -41,7 +41,7 @@ std::set<unsigned> validate_reference_initialization(const Function& f) {
         const auto& end=f.blocks[block].end;
         auto edge=[&](unsigned target){predecessors[target].push_back(block);pending.emplace_back(target,false);};
         if(end.kind==Terminator::Kind::branch){edge(end.yes);edge(end.no);}
-        else if(end.kind==Terminator::Kind::jump)edge(end.yes);
+        else if(end.kind==Terminator::Kind::jump || end.kind==Terminator::Kind::yield)edge(end.yes);
     }
     // Source pattern branches need not follow block-number order. Reverse
     // postorder propagates straight-line facts in one pass, without changing
@@ -231,6 +231,13 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                         join_facts(value,reference_facts(i.type));
                         break;
                     case Op::type_cast: case Op::interface_pack: case Op::interface_prepare: case Op::convert: case Op::upcast: case Op::stage_prefix: value=values[i.a];join_facts(value,reference_facts(i.type));break;
+                    case Op::generator_next: case Op::generator_close:
+                    case Op::async_generator_bind: case Op::async_generator_next:
+                        if(auto receiver=values[i.a].find({});receiver!=values[i.a].end()) {
+                            if(receiver->second.readonly)fail("mutating operation on a readonly generator");
+                            effect(summary.mutations,receiver->second);
+                        }
+                        break;
                     case Op::weak_create: case Op::weak_lock:
                         join_facts(value,values[i.a]);
                         break;
@@ -368,6 +375,7 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                             check(prefixed,f.locals[i.receiver->slot]);
                             local_changed|=join_facts(locals[i.receiver->slot],prefixed);
                         }
+                        if(target.generator)for(unsigned n=0;n<arguments.size();++n)retain(arguments[n],target.parameters[n]);
                         if(i.op==Op::async_call){for(unsigned n=0;n<arguments.size();++n)retain(arguments[n],target.parameters[n]);value=replaced_facts(reference_facts(type),1,instantiate_result(effects.returned,arguments));}else value=instantiate_result(effects.returned,arguments); break;
                     }
                     default: break;
@@ -375,6 +383,11 @@ void validate_reference_capabilities(const Module& module,InstructionTypes& type
                     for(const auto& path:reference_paths(type)) value.try_emplace(path);
                     if(report) types[function][block][n]=fact_type(type,value);
                     values.push_back(std::move(value));
+                }
+                if(b.end.kind==Terminator::Kind::yield) {
+                    auto type=field_type(*f.result.definition->generator_result,1);
+                    check(values[b.end.value],type,true);
+                    retain(values[b.end.value],type);
                 }
                 if(b.end.kind==Terminator::Kind::return_value) {
                     check(values[b.end.value],f.result);

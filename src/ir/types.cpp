@@ -191,6 +191,7 @@ Type::Type(std::shared_ptr<const ValueType> d, Kind k) : kind(k) {
             current->arena = owner;
             owner->definitions.push_back(current);
             if (auto base=current->base.lock()) pending.push_back(std::move(base));
+            if(current->generator_result)if(auto child=current->generator_result->target.lock())pending.push_back(std::move(child));
             if(current->weak_target)if(auto child=current->weak_target->target.lock())pending.push_back(std::move(child));
             if(current->task_result)if(auto child=current->task_result->target.lock())pending.push_back(std::move(child));
             if(current->call_result)if(auto child=current->call_result->target.lock())pending.push_back(std::move(child));
@@ -213,6 +214,15 @@ bool weak_target_type(Type type) {
         !type.definition->weak_target && !type.definition->task_result && !type.definition->native_resource;
 }
 std::string weak_identity(Type target) {return "$weak:"+Type::key(target);}
+std::string generator_identity(Type item,bool asynchronous) {
+    return std::string(asynchronous?"$async_generator:":"$generator:")+array_identity(item,{})+":"+capability_key(item);
+}
+bool async_generator_type(Type type) {
+    return generator_type(type) && type.definition->async_generator;
+}
+bool generator_type(Type type) {
+    return type.kind==Type::managed_ref && type.definition && type.definition->generator_result.has_value();
+}
 bool numeric_enum_member(Type t,std::uint64_t bits) {
     if(t.kind==Type::numeric_enum && t.definition && t.definition->enum_flags) {const auto width=numeric::width(*t.definition->enum_backing);return width==64 || !(bits>>width);}
     return t.kind==Type::numeric_enum && t.definition &&
@@ -414,6 +424,9 @@ std::string type_name(Type t) {
     if (t.readonly && t.kind!=Type::managed_ref) { t.readonly=false; return "readonly " + type_name(t); }
     if(t.kind==Type::dictionary)return "{"+type_name(dictionary_key(t))+": "+type_name(dictionary_value(t))+"}";
     if(array_type(t)) return "["+type_name(array_element(t))+(t.definition->extent ? ", "+std::to_string(*t.definition->extent) : "")+"]";
+    if (generator_type(t))
+        return std::string(t.readonly?"readonly ":"")+(async_generator_type(t)?"async_generator<":"generator<")+
+            type_name(field_type(*t.definition->generator_result,1))+">"+(t.nullable?"?":"");
     if (t.kind==Type::managed_ref && t.definition && t.definition->weak_target)
         return std::string(t.readonly?"readonly ":"")+"weak<"+type_name(*t.definition->weak_target)+">"+(t.nullable?"?":"");
     if (t.kind == Type::managed_ref && t.definition) return std::string(t.readonly ? "readonly " : "") + t.definition->identity + (t.nullable ? "?" : "");

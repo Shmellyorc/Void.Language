@@ -98,6 +98,22 @@ existing resource contract. Runtime shutdown retains its existing resource and
 participant ordering. The heap discards any remaining weak cells as managed
 storage.
 
+## Generator frames
+
+A generator's managed handle roots its suspension frame. The compiler derives
+the precise frame layout from typed locals, parameters and values. Each
+synchronous yield returns the item to the caller and records the next block.
+Async generators suspend on the owning executor and root a single published
+item until the consumer accepts it. Dead local roots clear at yields.
+Completion and explicit closure retire the frame link.
+
+Generator handles carry data-only resume routes, an owner-thread identity and
+a generation number. The active native generation supplies the checked
+dispatch targets. For async consumption, the existing task record retains the
+frame through structured draining and completion. GC can reclaim unreachable
+managed frame storage. Reached user cleanup runs through the normal checked
+closure or task drain, and never as a GC callback.
+
 ## Historical Phase 15–23 foundation context
 
 This implemented the owner-approved G1–G6 in `GC_RUNTIME_PROPOSAL.md`. It is an

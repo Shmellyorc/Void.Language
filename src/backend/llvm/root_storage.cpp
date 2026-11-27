@@ -38,7 +38,7 @@ std::map<std::string,ElisionFactory> allocation_heap_factories(const ir::Module&
     std::map<std::string,ElisionFactory> result;
     for(unsigned fn=0;fn<input.functions.size();++fn) {
         const auto& f=input.functions[fn];
-        if(f.visibility!="private" || f.module_identity.empty() || f.asynchronous || f.worker || f.receiver ||
+        if(f.visibility!="private" || f.module_identity.empty() || f.asynchronous || f.generator || f.worker || f.receiver ||
            f.initializer || f.closure || f.cleanup_entry || f.blocks.size()!=1 ||
            f.blocks[0].instructions.size()>64 || f.result.kind!=ir::Type::managed_ref || f.result.construction)
             continue;
@@ -165,7 +165,7 @@ BlockAllocationElision block_allocation_elision(const ir::Function &f,
                                                 const std::map<std::string,ElisionFactory>& factories) {
     using O = ir::Op;
     BlockAllocationElision result{std::vector<std::set<unsigned>>(f.blocks.size()), {}, {}, {}, {}, false};
-    if (f.asynchronous || f.receiver || f.initializer || f.cleanup_entry)
+    if (f.asynchronous || f.generator || f.receiver || f.initializer || f.cleanup_entry)
         return result;
     struct Use { unsigned block, index; enum Kind { field, store, call, alias, escape } kind; };
     using Position = std::pair<unsigned,unsigned>;

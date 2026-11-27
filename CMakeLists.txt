@@ -124,7 +124,7 @@ target_link_libraries(void_core PUBLIC void_options Threads::Threads)
 add_library(void_native_fixture STATIC src/native/fixture.c src/native/sink.c)
 target_link_libraries(void_native_fixture PRIVATE void_options)
 add_library(void_runtime STATIC src/runtime/application.cpp src/runtime/os.cpp src/runtime/os_abi.cpp src/runtime/random.cpp src/runtime/filesystem_abi.cpp src/runtime/filesystem.cpp src/runtime/native_resource.cpp src/runtime/native_binding.cpp src/runtime/temporal_abi.cpp src/runtime/conversion.cpp src/runtime/text_case.cpp src/runtime/buffer.cpp src/runtime/list.cpp src/runtime/array.cpp src/runtime/dictionary.cpp src/runtime/fixed_abi.cpp src/runtime/gc_schema.cpp src/runtime/heap.cpp src/runtime/coordination.cpp src/runtime/console.cpp src/runtime/console_abi.cpp src/runtime/callback.cpp src/runtime/abi.cpp src/runtime/reload.cpp src/runtime/native.cpp src/runtime/async.cpp)
-target_sources(void_runtime PRIVATE src/runtime/c_span.cpp src/runtime/c_resource.cpp src/runtime/c_dynamic.cpp)
+target_sources(void_runtime PRIVATE src/runtime/c_span.cpp src/runtime/c_resource.cpp src/runtime/c_dynamic.cpp src/runtime/generator.cpp)
 target_sources(void_runtime PRIVATE $<TARGET_OBJECTS:void_format_objects> $<TARGET_OBJECTS:void_zone_objects> $<TARGET_OBJECTS:void_application_objects>)
 target_link_libraries(void_runtime PUBLIC void_options Threads::Threads void_native_fixture ${CMAKE_DL_LIBS})
 include(cmake/CurlProvider.cmake)
@@ -167,14 +167,14 @@ option(VOID_LLVM_RESEARCH "Build optional LLVM machine-code certification experi
 add_library(void_llvm src/backend/llvm/backend.cpp src/backend/llvm/jit.cpp src/backend/llvm/aot.cpp
   src/backend/llvm/native_abi.cpp src/backend/llvm/native_cache.cpp src/backend/llvm/optimization.cpp
   src/backend/llvm/root_storage.cpp src/backend/llvm/target.cpp
-  src/backend/llvm/type_layout.cpp src/backend/llvm/async_frame.cpp)
+  src/backend/llvm/type_layout.cpp src/backend/llvm/async_frame.cpp src/backend/llvm/generator_frame.cpp)
 if(VOID_LINUX_THINLTO)
   # Pinned LLD optimizes these related units and caches their native objects.
   # Keep the large semantic and lowering units native to avoid reoptimizing
   # them for each distinct test executable.
   set_property(SOURCE
     src/frontend/lexer.cpp src/frontend/parser.cpp src/ir/types.cpp
-    src/backend/llvm/type_layout.cpp src/backend/llvm/async_frame.cpp
+    src/backend/llvm/type_layout.cpp src/backend/llvm/async_frame.cpp src/backend/llvm/generator_frame.cpp
     APPEND PROPERTY COMPILE_OPTIONS -flto=thin)
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -1513,6 +1513,14 @@ if(BUILD_TESTING)
   endforeach()
   void_add_output_test(lsp_weak_references "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/weak_references/lsp.py" "$<TARGET_FILE:voidls>")
+  void_add_output_test(generators_source "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/generators/source.py" "$<TARGET_FILE:voidc>")
+  void_add_output_test(lsp_generators "${Python3_EXECUTABLE}"
+    "${PROJECT_SOURCE_DIR}/tests/generators/lsp.py" "$<TARGET_FILE:voidls>")
+  add_executable(void_generator_roots tests/generators/roots.cpp)
+  target_link_libraries(void_generator_roots PRIVATE void_llvm)
+  add_test(NAME generator_roots COMMAND void_generator_roots
+    "${PROJECT_SOURCE_DIR}/tests/generators/roots.void" "${PROJECT_SOURCE_DIR}/tests/generators/async.void")
   set(weak_source "${PROJECT_SOURCE_DIR}/tests/weak_references/main.void")
   add_executable(void_weak_references_source tests/weak_references/source.cpp)
   target_link_libraries(void_weak_references_source PRIVATE void_llvm)

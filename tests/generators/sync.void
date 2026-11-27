@@ -1,0 +1,83 @@
+struct ledger:
+    order: i32
+
+struct item:
+    number: i32
+
+func finish(owner: ledger):
+    owner.order = owner.order * 10 + 3
+
+struct resource:
+    owner: ledger
+
+func (self resource) deinit():
+    self.owner.order = self.owner.order * 10 + 2
+
+generator func sequence(count: i32) -> i32:
+    var n = 0
+    for n < count:
+        if n < 2:
+            yield n
+        else:
+            yield n + 1
+        n += 1
+
+generator func empty() -> i32:
+    return
+
+generator func pair<t>(value: t) -> t:
+    yield value
+    yield value
+
+generator func resources(owner: ledger) -> item:
+    owner.order = owner.order * 10 + 1
+    defer finish(owner)
+    with resource(owner = owner):
+        var target = item(number = 7)
+        yield target
+        yield target
+
+func leave_early(owner: ledger) -> i32:
+    for target in resources(owner):
+        return target.number
+    return -1
+
+func main():
+    var untouched = ledger()
+    var pending = resources(untouched)
+    pending.close()
+    pending.close()
+    print(untouched.order, pending.next() is None)
+
+    var owner = ledger()
+    var iterator = resources(owner)
+    print(owner.order)
+    with iterator as active:
+        if active.next() is Some(var first):
+            print(first.number)
+        active.close()
+    print(owner.order, iterator.next() is None)
+
+    var early = ledger()
+    print(leave_early(early), early.order)
+    var broken = ledger()
+    for target in resources(broken):
+        break
+    print(broken.order)
+    var normal = ledger()
+    var total = 0
+    for target in resources(normal):
+        total += target.number
+    print(total, normal.order)
+
+    var nested = 0
+    for a in sequence(10):
+        for b in pair(a):
+            nested += b
+    for unreachable in empty():
+        nested += unreachable + 1000
+    print(nested)
+    var count = 0
+    for value in sequence(250000):
+        count += 1
+    print(count)

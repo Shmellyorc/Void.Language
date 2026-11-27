@@ -22,7 +22,16 @@ value struct point:
 func (p point) move(delta: i32) -> i32:
     var offset = delta
     return p.x + offset
+struct sample:
+    count: i32
+generator func numbers() -> i32:
+    yield 7
 func main() -> i32:
+    var target = sample()
+    var reference = weak(target)
+    reference.lock()
+    var sequence = numbers()
+    sequence.close()
     var p: point = point(x = 2)
     var total, text = lib.split(p.x)
     var valid, note = lib.status()
@@ -131,6 +140,30 @@ export async function run(): Promise<void> {
             app, position(', text,', ', te'.length));
         assert(local.items.some(item => (typeof item.label === 'string' ? item.label : item.label.label) === 'text' &&
             item.detail === 'string'));
+        const managedHover = async (fragment: string, offset: number) => {
+            const result = await vscode.commands.executeCommand<vscode.Hover[]>(
+                'vscode.executeHoverProvider', app, position(fragment, offset));
+            return result.flatMap(item => item.contents.map(part => typeof part === 'string' ? part : part.value)).join(' ');
+        };
+        const managedCompletion = async (fragment: string, offset: number) => {
+            const result = await vscode.commands.executeCommand<vscode.CompletionList>(
+                'vscode.executeCompletionItemProvider', app, position(fragment, offset));
+            return result.items.map(item => typeof item.label === 'string' ? item.label : item.label.label);
+        };
+        assert((await managedHover('reference.lock()', 'reference.lo'.length)).includes('strong reference'));
+        assert((await managedHover('sequence.close()', 'sequence.cl'.length)).includes('reached cleanup'));
+        assert((await managedCompletion('reference.lock()', 'reference.'.length)).includes('lock'));
+        assert((await managedCompletion('sequence.close()', 'sequence.'.length)).includes('next'));
+
+        const invalidManaged = source.replace('weak(target)', 'weak(7)').replace('yield 7', 'yield true');
+        await replace(document, invalidManaged);
+        await until(() => vscode.languages.getDiagnostics(app), diagnostics =>
+            diagnostics.some(d => d.message.includes('non-null concrete managed object')) &&
+            diagnostics.some(d => d.message.toLowerCase().includes('expected i32')), 'managed reference and yield diagnostics');
+        await replace(document, source);
+        await until(() => vscode.languages.getDiagnostics(app),
+            diagnostics => diagnostics.every(d => d.severity !== vscode.DiagnosticSeverity.Error), 'managed and yield diagnostic recovery');
+
         const dirtyHelper = helper.replace('label: string', 'dirty_label: string');
         await replace(dependency, dirtyHelper);
         await until(() => signature('lib.split('), s => s?.signatures[0]?.label.includes('dirty_label: string') ?? false,

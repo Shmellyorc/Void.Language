@@ -354,6 +354,7 @@ class Semantics {
 #include "enum_api.inc"
 #include "core_members.inc"
 #include "weak_references.inc"
+#include "generators.inc"
     // Signature construction owns a Function-sized temporary. Keep it out of
     // recursive method/field hint frames at the unchanged 1 MiB stack limit.
     VOID_SEMANTIC_HANDLER std::optional<Type> core_member_anchor(const Type& receiver,const Token& token,bool type_level=false,bool property=false) {
@@ -392,7 +393,7 @@ class Semantics {
     }
 #include "static_members.inc"
     VOID_SEMANTIC_HANDLER Type method_expression(Expr& e) {
-        if(!e.argument_indexes.empty() || e.target=="$weak.lock")return e.type;
+        if(!e.argument_indexes.empty() || e.target=="$weak.lock" || e.target.starts_with("$generator."))return e.type;
         if(e.source_target.starts_with("$text.") || e.source_target.starts_with("$safe."))return e.type;
         if(text_type_base(*e.parts[0]))return text_type_call(e);
         if(primitive_base_selected(*e.parts[0]))return type_numeric_call(e);
@@ -424,6 +425,14 @@ class Semantics {
     // the supported 1 MiB native stack in Debug as well as optimized builds.
     #include "random.inc"
     VOID_SEMANTIC_HANDLER Type resolved_method_expression(Expr& e,Type receiver) {
+        if(ir::async_generator_type(receiver) && (e.op=="$generator.async.bind" || e.op=="$generator.async.next")) {
+            if(receiver.nullable || receiver.readonly)
+                error(source,e.token,Code::type_mismatch,"for await requires a mutable, non-null asynchronous generator.");
+            e.target=e.op;
+            return e.type=e.op=="$generator.async.next"?Type(*receiver.definition->generator_result):Type(Type::none);
+        }
+        if(ir::generator_type(receiver) && (e.token.text=="next" || e.token.text=="close"))
+            return generator_method(e,receiver);
         if(receiver.definition && receiver.definition->weak_target && e.token.text=="lock")return weak_promotion(e,receiver);
         if(auto result=enum_value_api(e,receiver,true))return *result;
         if(numeric::number(receiver))return numeric_call(e,receiver,false);
@@ -610,7 +619,7 @@ class Semantics {
         e.compile_target=target.compile_owner?const_cast<Function*>(&target):nullptr;
         if(target.compile_time)prepare_compile_call(root.compile_evaluation,*e.compile_target,source,e.token,false);
         if(!current && !constructor && target.compile_owner && !target.compile_time)error(source,e.token,Code::constant_call,"A compile-time constant cannot call a function unless it is explicitly marked compile func.",{},target.compile_owner?std::vector<RelatedLocation>{{span(target.compile_owner->source,target.token),"Runtime function declared here."}}:std::vector<RelatedLocation>{});
-        e.asynchronous_call=target.asynchronous;e.native_symbol=target.native_symbol;
+        e.asynchronous_call=target.asynchronous && !target.generator;e.native_symbol=target.native_symbol;
         if(diagnostics.editor && !constructor) {editor_call(e,target,first);if(first==1 && target.token.text=="format" && e.parts.size()==2)editor_format(*e.parts[1],e.parts[0]->type);}
         if(e.interface_call) {
             std::vector<const Expr*> pending;for(std::size_t n=first;n<e.parts.size();++n)pending.push_back(e.parts[n].get());
@@ -646,7 +655,7 @@ class Semantics {
             e.parts.push_back(std::move(value)); mapping.push_back(n);
         }
         if(constructor)e.field_indexes=std::move(mapping);else e.argument_indexes=std::move(mapping);
-        return invalid ? error_type : target.asynchronous ? unit.make_task(target.result) : target.result;
+        return invalid ? error_type : e.asynchronous_call ? unit.make_task(target.result) : target.result;
     }
     std::pair<Unit*,Structure*> owned_structure(Type type) {
         for (const auto& [id,owner] : units) for (auto& structure : owner->structures)
@@ -931,7 +940,7 @@ class Semantics {
 
     template<class Target> VOID_SEMANTIC_HANDLER std::optional<Type> call_result_anchor(const Target& target) {
         if(ir::multiple_return_type(target.result))return {};
-        if(target.asynchronous)return unit.make_task(target.result);
+        if(target.asynchronous && !target.generator)return unit.make_task(target.result);
         return target.result;
     }
     // These projections are type-only. Keep their Type temporaries out of
@@ -1350,6 +1359,8 @@ class Semantics {
                     if(prelude_available(probe))candidates.emplace("weak",EditorCandidate{
                         "weak","weak(target: T) -> weak<T>",3,{},weak_creation_doc});
                 }
+                if(current && current->generator)candidates.emplace("yield",EditorCandidate{
+                    "yield","Produce a value and suspend this generator.",14});
                 if(current && current->asynchronous)for(const auto& name:{"await","spawn"})candidates.emplace(name,EditorCandidate{name,"keyword",14});
             }
         }
@@ -1394,6 +1405,8 @@ class Semantics {
             // before unwinding them; retain by its owning checked statement.
             if(effects)throw EditorReceiverFound{editor_statement,std::move(e.parts.front()),e.token,type.readonly,addressable};
         }
+        if(ir::generator_type(type) && !invalid_function && !unit.failed_import)
+            generator_member_candidates(e,type);
         if(type.definition && type.definition->weak_target && !invalid_function && !unit.failed_import)
             weak_member_candidates(e,type);
         if(enum_value_type(type)) {
@@ -2166,7 +2179,7 @@ class Semantics {
     // unrelated adapter temporaries out of every nested user-call frame.
     VOID_SEMANTIC_HANDLER std::optional<Type> builtin_call_expression(Expr& e) {
         if(e.target=="$weak.create")return e.type;
-        if(e.token.text=="weak" && prelude_available(e) && !(current && current->substitutions.contains("weak")))
+        if(e.token.text=="weak" && prelude_available(e) && !(current && current->substitutions.contains("weak")) && !global(e).second)
             return weak_creation(e);
         if (e.target == "$collections.version" || e.target == "$collections.check") return e.type;
         if (unit.identity == "/@stdlib/collections.void" && e.qualifier.empty() &&
@@ -2371,7 +2384,7 @@ class Semantics {
             if(current->substitution_sources.contains(e.token.text))e.source_target=current->substitution_sources.at(e.token.text);
             const auto type=current->substitutions.at(e.token.text);
             if(type.definition && type.definition->task_result)error(source,e.token,Code::not_callable,"Inferred task handles have no source constructor; call an async function.");
-            if(!type.definition || ir::nullable_type(type) || (type.kind!=Type::aggregate && type.kind!=Type::managed_ref) || type.definition->enum_backing || !type.definition->cases.empty() || type.definition->callable || type.definition->weak_target)error(source,e.token,Code::not_callable,"The specialized type has no source constructor.");
+            if(!type.definition || ir::nullable_type(type) || (type.kind!=Type::aggregate && type.kind!=Type::managed_ref) || type.definition->enum_backing || !type.definition->cases.empty() || type.definition->callable || type.definition->weak_target || ir::generator_type(type))error(source,e.token,Code::not_callable,"The specialized type has no source constructor.");
             auto [owner,structure]=owned_structure(type);construction(e,*owner,*structure,true,unit);return e.type;
         }
         auto [owner, structure] = structure_lookup(unit,root,units,e.qualifier.empty() ? e.token.text : e.qualifier + "." + e.token.text,e.qualifier.empty() ? e.token : e.qualifier_token);
@@ -2754,6 +2767,10 @@ class Semantics {
     }
     VOID_SEMANTIC_HANDLER void return_statement(Statement& s) {
         if(current->deferred)error(source,s.token,Code::invalid_value,"Deferred code cannot return directly.");
+        if(current->generator) {
+            if(s.expression)error(source,s.token,Code::type_mismatch,"Use yield to produce a value. A generator return takes no value.");
+            return;
+        }
         const bool packed=s.expression && s.expression->kind==Expr::Kind::return_pack;
         if(packed || !current->returns.empty()) {
             const auto count=current->returns.empty()?std::size_t(current->result!=Type::none):current->returns.size();
@@ -2955,6 +2972,15 @@ class Semantics {
             }
             break;
         }
+        case K::yielded:
+            if(!current || !current->generator)
+                error(source,s.token,Code::unsupported_type,"yield requires a generator function body.");
+            {
+                if(!ir::generator_type(current->result))throw Poison{};
+                auto item=ir::field_type(*current->result.definition->generator_result,1);
+                expect(expression(*s.expression,item),item,s.expression->token);
+            }
+            break;
         case K::returned:
             return_statement(s);
             flow = return_flow; break;
@@ -2973,6 +2999,14 @@ class Semantics {
     VOID_SEMANTIC_HANDLER unsigned scoped_statement(Statement& s) {
         unsigned flow = next_flow;
 
+        if(s.generator_iteration) {
+            s.task_group=true;
+            scopes.emplace_back();
+            s.slot=declare(s.binder,Type::u64,true);
+            flow=sequence(s.body,false);
+            scopes.pop_back();
+            return s.flow=flow;
+        }
         auto& call=*s.expression;
         if(call.kind==Expr::Kind::method_call && call.token.text=="group" && call.parts.size()==1 && call.parts[0]->kind==Expr::Kind::name && call.parts[0]->token.text=="tasks" && !lookup("tasks") && !visible_name("tasks")){
             if(!current || !current->asynchronous || current->deferred || !call.type_arguments.empty())error(source,s.token,Code::unsupported_type,"tasks.group() requires an async scope.");
@@ -2980,10 +3014,12 @@ class Semantics {
             flow=sequence(s.body,false);scopes.pop_back();return s.flow=flow;
         }
         auto type=expression(*s.expression);if(type.kind!=Type::managed_ref || type.nullable)error(source,s.token,Code::type_mismatch,"with requires a non-nullable managed resource with deinit.");
+        if(ir::async_generator_type(type))
+            error(source,s.token,Code::unsupported_type,"An asynchronous generator is consumed in for await.");
         scopes.emplace_back();s.slot=declare(s.binder,type,false);
         auto cell=unit.make_capture_record(current->symbol+"::$cell$"+std::to_string(s.slot),type,true);auto initial=type;initial.nullable=true;std::const_pointer_cast<ir::ValueType>(cell.definition)->fields[0].type=initial;current->captured_locals.emplace(s.slot,cell);
         Function lambda;lambda.anonymous=true;lambda.token=s.token;lambda.token.text="$with$"+std::to_string(current->lambdas.size());lambda.visibility="private";
-        Statement invoke(Statement::Kind::expression,s.token);invoke.expression=std::make_unique<Expr>(Expr::Kind::method_call,Token{TokenKind::name,"deinit",s.token.offset});invoke.expression->parts.push_back(std::make_unique<Expr>(Expr::Kind::name,s.binder));lambda.body.push_back(std::move(invoke));
+        Statement invoke(Statement::Kind::expression,s.token);invoke.expression=std::make_unique<Expr>(Expr::Kind::method_call,Token{TokenKind::name,ir::generator_type(type)?"close":"deinit",s.token.offset});invoke.expression->parts.push_back(std::make_unique<Expr>(Expr::Kind::name,s.binder));lambda.body.push_back(std::move(invoke));
         s.selection=std::make_unique<Expr>(Expr::Kind::lambda,s.token);s.selection->slot=current->lambdas.size();current->lambdas.push_back(std::move(lambda));expression(*s.selection);
         for(const auto& selected:unit.functions)if(selected.symbol==s.selection->target && selected.body.size()==1 && selected.body[0].expression){
             const auto& dispose=*selected.body[0].expression;
@@ -3282,7 +3318,7 @@ public:
             unsigned flow;
             try {flow=sequence(f.body,false);}
             catch(EditorReceiverFound& found) {retain_editor_receiver(f,found);return;}
-            if (f.result != Type::none && (flow & next_flow) && diagnostics.size() == before && !f.parse_failed && !invalid_function)
+            if (!f.generator && f.result != Type::none && (flow & next_flow) && diagnostics.size() == before && !f.parse_failed && !invalid_function)
                 try { error(source, f.token, Code::missing_return, "Missing return path in '" + f.token.text + "'.", "Return " + editor_return_type(f) + " on every path that reaches the end."); }
                 catch (const CompilationError& failure) { diagnostics.add(failure); }
             if(f.compile_time) {

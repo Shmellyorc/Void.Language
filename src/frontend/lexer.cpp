@@ -76,9 +76,11 @@ std::vector<Token> lex_range(const SourceFile& source, Diagnostics& diagnostics,
                 const auto word=std::string_view(text).substr(p,last-p);
                 auto next=last;while(next<end && (text[next]==' ' || text[next]=='\t'))++next;
                 const bool value_declaration=word=="value" && text.compare(next,6,"struct")==0;
+                const bool generator_declaration=word=="generator" &&
+                    (text.compare(next,4,"func")==0 || text.compare(next,5,"async")==0);
                 if(word=="func" || word=="property" || word=="interface" || word=="struct" || value_declaration ||
                    word=="use" || word=="public" || word=="private" || word=="internal" || word=="async" ||
-                   word=="virtual" || word=="override" || word=="compile") {
+                   word=="virtual" || word=="override" || word=="compile" || generator_declaration) {
                     // An unclosed declaration must not swallow later declarations.
                     parentheses=header_delimiter->parentheses;braces=header_delimiter->braces;header_delimiter.reset();
                     if(!tokens.empty() && tokens.back().kind!=TokenKind::newline)emit(TokenKind::newline,"<newline>",start);

@@ -1,6 +1,6 @@
 // Async starts only initialize and enqueue. Resume bodies use the ordinary
 // validated lowering above; task/frame roots use the same Runtime Frame ABI.
-for(const auto& f:input.functions)if(f.asynchronous){
+for(const auto& f:input.functions)if(f.asynchronous && !f.generator){
     const auto& plan=async_plans.at(f.name);auto* start=functions.at(f.name);
     b.SetCurrentDebugLocation(llvm::DebugLoc());b.SetInsertPoint(llvm::BasicBlock::Create(context,"async.create",start));
     auto* failure=start->getArg(static_cast<unsigned>(f.parameters.size()));

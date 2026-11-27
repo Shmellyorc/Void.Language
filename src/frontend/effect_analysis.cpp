@@ -94,12 +94,13 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
             }
         };
         auto call=[&](Function& target,const std::vector<ReferenceFacts>& arguments,const Token& token,bool dynamic=false) {
-            graph[f.symbol].calls.insert(target.symbol);if(dynamic || target.asynchronous)graph[f.symbol].unsafe=true;
+            graph[f.symbol].calls.insert(target.symbol);if(dynamic || target.asynchronous || target.generator)graph[f.symbol].unsafe=true;
             const auto& target_effects=dynamic ? target.virtual_effects : target.reference_effects;
             unsigned first=target.receiver ? 1u : 0u;
             auto formal=[&](unsigned n) { return n<first ? target.receiver->type : target.parameters.at(n-first).type; };
             auto declaration=[&](unsigned n) { return span(function_units.at(target.symbol)->source,n<first ? target.receiver->token : target.parameters.at(n-first).token); };
             for (unsigned n=first;n<arguments.size();++n) {
+                if(target.generator)retain(arguments[n],formal(n),token);
                 std::vector<RelatedLocation> related;
                 if(report && !ir::capability_assignable(ir::fact_type(formal(n),arguments[n]),formal(n)))
                     related.push_back({declaration(n),"Parameter declared here; const accepts readonly reference leaves."});
@@ -306,6 +307,12 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                 for (auto& part:e.parts) arguments.push_back(expression(*part));
                 if(e.target=="$weak.create" || e.target=="$weak.lock")
                     ir::join_facts(view,arguments[0]);
+                if(e.target.starts_with("$generator.")) {
+                    if(auto receiver=arguments[0].find({});receiver!=arguments[0].end()) {
+                        effect(f.reference_effects.mutations,receiver->second);
+                        if(report && receiver->second.readonly)issue(e.token,"Cannot advance or close a readonly generator.");
+                    }
+                }
                 if (e.target == "$convert.unwrap") {
                     view = ir::field_facts(e.parts[0]->type, arguments[0], 1);
                 }
@@ -539,6 +546,11 @@ void analyze_capabilities(std::map<std::string,std::unique_ptr<Unit>>& units, Di
                         for (const auto& [leaf,fact]:updated) { auto path=s.field_indexes; path.insert(path.end(),leaf.begin(),leaf.end()); prefixed.emplace(std::move(path),fact); }
                         local_changed|=ir::join_facts(locals[s.slot],prefixed);
                     }
+                } else if(s.kind==K::yielded) {
+                    if(!ir::generator_type(f.result))continue;
+                    auto item=ir::field_type(*f.result.definition->generator_result,1);
+                    compatible(rhs,item,s.token);
+                    retain(rhs,item,s.token);
                 } else if (s.kind==K::returned) {
                     changed|=ir::join_facts(f.reference_effects.returned,rhs);
                 }

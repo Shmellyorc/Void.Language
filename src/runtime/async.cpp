@@ -95,7 +95,7 @@ namespace {
 struct Task;
 struct Group {Task* owner=nullptr;Group* outer=nullptr;std::uint64_t id=0;bool closed=false;std::size_t pending=0,failures=0;};
 struct Task {
-    enum State { prepared,ready,running,waiting,joining,working,finishing,finished } state=prepared;
+    enum State { prepared,ready,running,waiting,joining,working,finishing,finished,yielded } state=prepared;
     enum Outcome { success,cancelled,failed } outcome=success;
     // Only scheduler-owned roots live here. A completed result is thereafter
     // owned by ordinary precise source roots; retained handles still keep the
@@ -153,7 +153,7 @@ struct Task {
     std::unique_ptr<Work> work;
     std::atomic<bool> cancel_requested{false};
     bool observed=false,cancel_observed=false,draining=false,child_interrupt=false;
-    bool activation_lifetime=false;
+    bool activation_lifetime=false, generator=false, yield_available=false;
     unsigned cleanup_depth=0;
     Diagnostic interrupted;
     Diagnostic failure;
@@ -608,6 +608,59 @@ void vd_async_new(void** task,void** frame,std::size_t frame_size,const std::siz
     }catch(const std::bad_alloc&){exception(failure,"Async activation allocation failed");}
      catch(const std::exception&){exception(failure,"Async activation requires a valid owning root adapter");}
 }
+void vd_async_generator_bind(void* address,void* frame,const void* generation,vd_async_resume_entry resume,vd::RuntimeFailure* failure) noexcept {
+    try {
+        auto& s=scope();
+        auto* owner=s.current;
+        if(!owner || owner->draining || owner->cleanup_depth || owner->active_group==&owner->children ||
+           s.generation!=generation || !address || !frame || !resume)
+            throw std::logic_error("invalid async generator owner");
+        auto item=std::make_unique<Task>(s.runtime);
+        item->resume=resume;
+        item->group=owner->active_group;
+        item->generator=item->activation_lifetime=true;
+        item->address=address;
+        item->task.reset(address);
+        item->frame.reset(frame);
+        item->state=Task::yielded; // A prepared generator has no published item.
+        auto* task=item.get();
+        s.register_task(std::move(item));
+        s.activate(*task);
+    } catch(const std::bad_alloc&) {
+        exception(failure,"Async generator activation allocation failed");
+    } catch(...) {
+        exception(failure,"Async generator requires an owning for await scope");
+    }
+}
+bool vd_async_generator_ready(void* address,vd::RuntimeFailure* failure) noexcept {
+    try {
+        auto& s=scope();
+        auto& producer=s.find(address);
+        if(!s.current || !producer.generator || producer.group!=s.current->active_group ||
+           producer.group->owner!=s.current)
+            throw std::logic_error("invalid generator consumer");
+        if(producer.state==Task::finished)return vd_async_ready(address,failure);
+        vd_async_checkpoint(failure);
+        if(failure->message)return true;
+        if(producer.state!=Task::yielded)return false;
+        if(std::exchange(producer.yield_available,false))return true;
+        s.enqueue(producer);
+        return false;
+    } catch(...) {
+        exception(failure,"Async generator advancement is outside its owning for await scope");
+        return true;
+    }
+}
+void vd_async_generator_yield(void* address) noexcept {
+    try {
+        auto& s=scope();
+        auto* producer=s.current;
+        if(!producer || !producer->generator || producer->state!=Task::running ||
+           producer->address!=address || producer->draining || producer->yield_available)std::terminate();
+        producer->yield_available=true;
+        producer->state=Task::yielded;
+    } catch(...) {std::terminate();}
+}
 void vd_async_start(void* address,vd::RuntimeFailure* failure) noexcept {
     try{auto& s=scope();auto& task=s.find(address);if(task.state!=Task::prepared)throw std::logic_error("duplicate async start");if(task.work)s.publish(task);else s.enqueue(task);}
     catch(...){exception(failure,"Async activation publication failed");}
@@ -749,7 +802,13 @@ std::int32_t vd_async_root(vd_async_start_entry start,std::int32_t input,std::si
             bool retired=false;
             for(auto* task=s.live_head;task;){
                 auto* following=task->next_live;
-                if(task->state==Task::waiting && (task->dependency->state==Task::finished || task->cancel_requested || s.child_failure(*task)))s.enqueue(*task);
+                if(task->state==Task::waiting && (task->dependency->state==Task::finished ||
+                    (task->dependency->state==Task::yielded && task->dependency->yield_available) ||
+                    task->cancel_requested || s.child_failure(*task)))s.enqueue(*task);
+                else if(task->state==Task::yielded && (task->cancel_requested || s.child_failure(*task))) {
+                    task->yield_available=false;
+                    s.enqueue(*task);
+                }
                 else if(task->state==Task::joining && !s.pending(*task,task->joining_group))s.enqueue(*task);
                 else if (task->state == Task::finishing && !s.pending(*task)) {
                     s.finish_native_children(*task);
