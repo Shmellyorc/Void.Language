@@ -144,9 +144,9 @@ public:
                 "LC_ALL=C"
 #endif
             };
-        } catch (...) { std::error_code ignored; fs::remove_all(work, ignored); throw; }
+        } catch (...) { remove_git_workspace(work); throw; }
     }
-    ~GitObjects() { std::error_code ignored; fs::remove_all(work, ignored); }
+    ~GitObjects() { remove_git_workspace(work); }
     GitObjects(const GitObjects&) = delete;
 
     void transport(const std::string& origin, const std::vector<std::string>& command, bool capture_output=false) const {

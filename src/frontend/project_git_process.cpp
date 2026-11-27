@@ -250,6 +250,22 @@ public:
 #endif
 }
 
+void remove_git_workspace(const fs::path& work) {
+    std::error_code error;
+    fs::remove_all(work, error);
+#ifdef _WIN32
+    // A transient Windows file lock can outlast the Git job's process wait.
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+    while (error.category() == std::system_category() &&
+           (error.value() == ERROR_SHARING_VIOLATION || error.value() == ERROR_LOCK_VIOLATION ||
+            error.value() == ERROR_ACCESS_DENIED) &&
+           std::chrono::steady_clock::now() < deadline) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        fs::remove_all(work, error);
+    }
+#endif
+}
+
 int run_git_fetch(const fs::path& work, const std::vector<std::string>& args,
                   const std::vector<std::string>& environment,
                   std::chrono::steady_clock::time_point deadline, bool capture_output) {

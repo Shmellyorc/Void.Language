@@ -11,4 +11,6 @@ namespace vd::project {
 int run_git_fetch(const std::filesystem::path& work, const std::vector<std::string>& args,
                   const std::vector<std::string>& environment,
                   std::chrono::steady_clock::time_point deadline, bool capture_output = false);
+
+void remove_git_workspace(const std::filesystem::path& work);
 }
