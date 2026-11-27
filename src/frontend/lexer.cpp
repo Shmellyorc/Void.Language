@@ -261,6 +261,8 @@ std::vector<Token> lex(const SourceFile& source, Diagnostics& diagnostics, bool 
 namespace vd {
 std::vector<SourceSection> source_sections(const SourceFile& source,const BuildConditions* conditions,
                                            std::vector<std::pair<unsigned,unsigned>>* blocks) {
+    const std::string_view text=source.text();
+    if(text.find("# section ")==std::string_view::npos || text.find("# endsection")==std::string_view::npos)return {};
     frontend::Diagnostics diagnostics;
     std::vector<std::pair<std::size_t, std::size_t>> comments;
     // Reuse lexical comment boundaries, including multiline strings and BOM.
@@ -268,7 +270,6 @@ std::vector<SourceSection> source_sections(const SourceFile& source,const BuildC
                                           conditions, nullptr, &comments);
 
     std::vector<SourceSection> pending, sections;
-    const std::string_view text = source.text();
     for (const auto& [begin, end] : comments) {
         auto marker = text.substr(begin, end - begin);
         marker.remove_suffix(marker.size() - marker.find_last_not_of(" \t") - 1);

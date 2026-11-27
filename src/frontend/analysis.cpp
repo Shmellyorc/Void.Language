@@ -57,8 +57,9 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
     auto& context=library_scope?*library_scope:*graph->at(entry);
     auto field = [](std::string& out, const std::string& value) { out += std::to_string(value.size()) + ":" + value; };
     std::map<std::string,std::string> source_identities;
-    std::set<std::string> instantiated;
+    std::set<std::string> instantiated, authored_generic_functions;
     for(const auto& [id,u]:*graph) {
+        for(const auto& f:u->generic_functions)authored_generic_functions.insert(f.symbol);
         for(const auto& f:u->functions)if(!f.generic_origin.empty()) {
             source_identities.emplace(f.symbol,f.generic_origin);
             instantiated.insert(f.generic_origin);
@@ -346,7 +347,8 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
             const auto& callee=e.initializer.empty()?e.target:e.initializer;
             if(!e.argument_indexes.empty() && !callee.starts_with("$") &&
                std::any_of(e.names.begin(),e.names.end(),[](const auto& name){return !name.text.empty();}))
-              for(const auto& [target_id,target_unit]:*graph)for(const auto& target:target_unit->functions)if(target.symbol==callee) {
+              for(const auto& [target_id,target_unit]:*graph)for(const auto& target:target_unit->functions)if(target.symbol==callee &&
+                  (target.generic_origin.empty() || authored_generic_functions.contains(target.generic_origin))) {
                 for(unsigned n=0;n<e.names.size();++n)if(!e.names[n].text.empty()) {
                     const auto& parameter=target.parameters.at(e.argument_indexes.at(n));
                     auto identity=target.generic_origin.empty()?target.symbol+"::local::"+std::to_string(parameter.slot):
@@ -547,7 +549,8 @@ std::shared_ptr<const ValidatedAnalysis> AnalysisAccess::build(std::map<std::str
                 const bool parameter=(f.receiver && f.receiver->slot==binding.slot) ||
                     std::any_of(f.parameters.begin(),f.parameters.end(),[&](const auto& p){return p.slot==binding.slot;});
                 if(!f.generic_origin.empty()) {
-                    if(parameter)locals.emplace(binding.slot,f.generic_origin+"::parameter::"+binding.token.text);
+                    if(parameter && authored_generic_functions.contains(f.generic_origin))
+                        locals.emplace(binding.slot,f.generic_origin+"::parameter::"+binding.token.text);
                     continue;
                 }
                 if(binding.readonly && !parameter) continue;

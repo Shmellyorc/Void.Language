@@ -1005,6 +1005,9 @@ class Server {
             for(const auto& d:definitions){if(!text.empty())text+="\n\n";auto docs=d.documentation.text(d.type!=vd::ir::Type::none && (d.kind==vd::AnalyzedDeclaration::Kind::function || d.kind==vd::AnalyzedDeclaration::Kind::receiver_method || d.kind==vd::AnalyzedDeclaration::Kind::interface_requirement || d.kind==vd::AnalyzedDeclaration::Kind::operator_function));text+=describe(d)+(docs.empty()?"":"\n\n"+docs);}
             return j::Object{{"contents",j::Object{{"kind","plaintext"},{"value",std::move(text)}}},{"range",range(selected_span)}};
         }
+        if(read_only_source(module) ||
+            std::any_of(definitions.begin(),definitions.end(),[](const auto& item){return read_only_source(item.module);}))
+            throw std::invalid_argument("Installed standard and locked package sources are read-only");
         // Constructor navigation prefers init; the authored token spells its type.
         for(auto& candidate:definitions)if(candidate.kind==vd::AnalyzedDeclaration::Kind::initializer &&
             (candidate.module!=module || candidate.source.begin>*offset || *offset>=candidate.source.end))
@@ -1017,7 +1020,6 @@ class Server {
         if(!std::all_of(definitions.begin(),definitions.end(),in_family))
             throw std::invalid_argument("Rename cannot choose between distinct resolved targets");
         if(!rename_edits)throw std::invalid_argument("Rename requires transactional, versioned documentChanges");
-        if(read_only_source(module))throw std::invalid_argument("Installed standard and locked package sources are read-only");
         const auto spelling=name_of(*definition);
         if(!vd::valid_editor_identifier(spelling))throw std::invalid_argument("Select an authored VOID identifier to rename");
         if(!current->semantic_analysis() || !disk_current(*current->semantic_analysis()))

@@ -98,7 +98,7 @@ library consumers to that existing maintenance path. See the
 [project ownership contract](PROJECT_ARCHITECTURE_ROADMAP.md#phase-1-ownership-and-data-flow).
 No second parser, editor resolver, package mechanism or LLVM path is introduced.
 
-Manifest applications select one valid synchronous main regardless of filename,
+Manifest applications select one valid synchronous or async main regardless of filename,
 or report ambiguity. Manifestless directory selection retains exact `main.void`;
 explicit-file compatibility remains available. Ordinary run/build async roots
 still require an explicit host adapter; [async contracts](ASYNC.md) remain intact.
