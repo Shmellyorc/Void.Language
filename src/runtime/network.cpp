@@ -154,10 +154,11 @@ void dns_complete(void* owner,int status,int,ares_addrinfo* addresses) {
     lookup.status=status;
     if(status==ARES_SUCCESS && addresses) {
         for(auto* node=addresses->nodes;node;node=node->ai_next) {
-            if(node->ai_addrlen>sizeof(sockaddr_storage))continue;
+            const auto length=static_cast<std::size_t>(node->ai_addrlen);
+            if(length>sizeof(sockaddr_storage))continue;
             Endpoint candidate;
-            candidate.size=static_cast<AddressSize>(node->ai_addrlen);
-            std::memcpy(&candidate.storage,node->ai_addr,node->ai_addrlen);
+            candidate.size=static_cast<AddressSize>(length);
+            std::memcpy(&candidate.storage,node->ai_addr,length);
             if(!valid_endpoint(candidate))continue;
             const auto seen=std::span(lookup.results).first(lookup.count);
             if(std::ranges::any_of(seen,[&](const Endpoint& value){return same_address(value,candidate);}))continue;

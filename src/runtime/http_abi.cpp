@@ -115,7 +115,7 @@ public:
         out.user_agent = text(value, 20);
         if (out.proxy.mode == ProxyOptions::environment) {
             // An owned snapshot at acquisition; never defer getenv to transport.
-            auto environment = [&](const char* lower, const char* upper) {
+            auto environment = [&](const char* lower, [[maybe_unused]] const char* upper) {
 #ifdef _WIN32
                 // Windows aliases HTTP_PROXY and http_proxy. Ignore both to
                 // preserve CGI safety; ALL_PROXY and explicit routing remain.

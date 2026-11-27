@@ -212,7 +212,10 @@ void live(const char* path,std::string method,bool timeout,bool character){
 bool in_poll(long tid){std::ifstream in("/proc/self/task/"+std::to_string(tid)+"/syscall");long call=-1;in>>call;return in && call==SYS_poll;}
 #endif
 void blocked(const char* path){
-    vd::Runtime runtime;auto c=runtime.console_context();frame(*c,c->read_line());std::atomic<long> tid=0;TextResult result;
+    vd::Runtime runtime;auto c=runtime.console_context();frame(*c,c->read_line());TextResult result;
+#ifdef __linux__
+    std::atomic<long> tid=0;
+#endif
     auto call=std::async(std::launch::async,[&]{vd::Runtime::Attachment a(runtime);vd::Runtime::Managed m(runtime);void* root=nullptr;std::size_t off=0;vd::Runtime::Slot slot{&root,sizeof(root),&off,1};vd::Runtime::Frame f(runtime,&slot,1);runtime.allocate_into(&root,{8,{}});{vd::Runtime::Native safe(runtime);
 #ifdef __linux__
         tid=syscall(SYS_gettid);
@@ -230,7 +233,7 @@ void blocked(const char* path){
 }
 #endif
 }
-int main(int argc,char** argv){try{
+int main([[maybe_unused]] int argc,[[maybe_unused]] char** argv){try{
 #ifndef _WIN32
     if(argc>=3){std::string mode=argv[1];if(mode=="--lines" || mode=="--recover")native_lines(argv[2],argc>3?std::stoll(argv[3]):-1,mode=="--recover");else if(mode=="--blocked")blocked(argv[2]);else live(argv[2],argc>3?argv[3]:"line",mode=="--timeout-line" || mode=="--timeout-char",mode=="--timeout-char");return 0;}
 #endif

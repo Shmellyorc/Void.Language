@@ -20,7 +20,9 @@
 #ifndef _WIN32
 #include <sys/stat.h>
 #else
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #endif
 namespace fs=std::filesystem;

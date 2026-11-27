@@ -28,8 +28,10 @@ thread_local bool poison=false;
 thread_local std::latch* allocation_entered=nullptr;
 thread_local std::latch* allocation_resume=nullptr;
 thread_local vd::Runtime* allocating_runtime=nullptr;
+#ifdef VD_BUFFER_WRAP_MEMSET
 thread_local std::latch* zeroing_entered=nullptr;
 thread_local std::latch* zeroing_resume=nullptr;
+#endif
 std::atomic<bool> allocation_was_native{false};
 // Linux test-only Heap collection-entry witness, after Runtime's rendezvous and
 // root enumeration under its mutex. Both candidate values are already rooted.
@@ -284,7 +286,11 @@ void failures() {
 void native_and_chunk_collections() {
     Runtime r;auto s=admit(r,spec("byte",{SchemaScalar{ScalarEncoding::u8}}));
     auto layout=r.buffer_layout(s,64*1024*1024);
-    std::latch entered(1),resume(1),prepared(1),finish(1),half_zeroed(1),zero_resume(1);std::atomic<void*> result{nullptr};
+    std::latch entered(1),resume(1),prepared(1),finish(1);
+#ifdef VD_BUFFER_WRAP_MEMSET
+    std::latch half_zeroed(1),zero_resume(1);
+#endif
+    std::atomic<void*> result{nullptr};
     auto worker=std::async(std::launch::async,[&] {
         Runtime::Attachment a(r);Runtime::Managed m(r);Output out(r);
         capture_size=layout->bytes();poison=true;allocation_entered=&entered;allocation_resume=&resume;allocating_runtime=&r;
@@ -292,7 +298,10 @@ void native_and_chunk_collections() {
         zeroing_entered=&half_zeroed;zeroing_resume=&zero_resume;
 #endif
         {Runtime::BufferBuilder b(r,layout,layout->capacity(),quota);
-            capture_size=0;allocation_entered=nullptr;allocation_resume=nullptr;allocating_runtime=nullptr;zeroing_entered=nullptr;zeroing_resume=nullptr;
+            capture_size=0;allocation_entered=nullptr;allocation_resume=nullptr;allocating_runtime=nullptr;
+#ifdef VD_BUFFER_WRAP_MEMSET
+            zeroing_entered=nullptr;zeroing_resume=nullptr;
+#endif
             prepared.count_down();{Runtime::Native native(r);finish.wait();}
             b.zero_elements(layout->capacity());b.finish_into(&out.value);result=out.value;
             check(r.buffer_byte(out.value,layout,layout->capacity()-1,0)==std::byte{0},"concurrent zeroing incomplete");}

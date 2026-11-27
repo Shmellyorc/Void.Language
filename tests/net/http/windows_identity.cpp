@@ -209,7 +209,7 @@ int main(int argc, char** argv) {
                 ++count; matching &= certificate.value && found->cbCertEncoded == encoded.size() && !std::memcmp(found->pbCertEncoded, encoded.data(), encoded.size());
                 DWORD size = 0;
                 if (!CertGetCertificateContextProperty(found, CERT_KEY_PROV_INFO_PROP_ID, nullptr, &size))
-                    matching &= public_only && GetLastError() == CRYPT_E_NOT_FOUND;
+                    matching &= public_only && GetLastError() == static_cast<DWORD>(CRYPT_E_NOT_FOUND);
                 else if (public_only || size > 65536) matching = false;
                 else {
                     Bytes bytes(size);

@@ -209,7 +209,7 @@ void probe(const char* path,bool payload){
 }
 #endif
 }
-int main(int argc,char** argv){try{
+int main([[maybe_unused]] int argc,[[maybe_unused]] char** argv){try{
 #ifndef _WIN32
     if((argc==3 || argc==4) && std::string(argv[1])=="--probe"){probe(argv[2],argc==4);return 0;}
 #endif

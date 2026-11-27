@@ -10,7 +10,9 @@
 #include <stdexcept>
 
 #ifdef _WIN32
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <windows.h>
 #elif defined(__linux__)
 #include <dlfcn.h>

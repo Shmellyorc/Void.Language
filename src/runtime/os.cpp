@@ -33,7 +33,7 @@ Result native_error(std::int64_t code, std::string domain, ErrorKind kind) {
 }
 namespace {
 Result fail(ErrorKind kind) { Result r; r.kind = kind; return r; }
-#ifndef _WIN32
+#ifdef __linux__
 Result posix_error(int code) {
     if (code == ENOMEM) throw std::bad_alloc();
     return native_error(code, "errno", code == EACCES || code == EPERM ? ErrorKind::permission_denied :
@@ -41,11 +41,13 @@ Result posix_error(int code) {
                         code == ENOSYS || code == ENOTSUP ? ErrorKind::unsupported : ErrorKind::system_failure);
 }
 #endif
+#if defined(__linux__) || defined(_WIN32)
 // All growing native buffers have a finite attempt bound and checked heap extents.
 std::size_t grow(std::size_t size) {
     if (size > std::numeric_limits<std::size_t>::max() / 2) throw std::length_error("OS buffer extent");
     return size * 2;
 }
+#endif
 #ifdef _WIN32
 Result win_error(DWORD code) {
     if (code == ERROR_NOT_ENOUGH_MEMORY || code == ERROR_OUTOFMEMORY) throw std::bad_alloc();

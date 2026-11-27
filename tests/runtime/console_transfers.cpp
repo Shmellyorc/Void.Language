@@ -191,7 +191,10 @@ void copy(const char* path,std::int64_t expected){
 bool in_poll(pid_t tid){std::ifstream in("/proc/self/task/"+std::to_string(tid)+"/syscall");long call=-1;in>>call;return in && call==SYS_poll;}
 #endif
 void cancel_native(const char* path,bool writing,bool missing_input=false){
-    auto before=flags();vd::Runtime runtime;auto c=runtime.console_context();std::atomic<bool> started=false;Transfer result;std::atomic<long> tid=0;
+    auto before=flags();vd::Runtime runtime;auto c=runtime.console_context();std::atomic<bool> started=false;Transfer result;
+#ifdef __linux__
+    std::atomic<long> tid=0;
+#endif
     int initial_write_poll=-1;short initial_write_revents=0;
     if(writing){
         pollfd descriptor{STDOUT_FILENO,POLLOUT,0};
@@ -286,7 +289,10 @@ void broken(const char* path,std::string mode){
 }
 void interrupted_native(const char* path){
     struct sigaction old{},action{};sigemptyset(&action.sa_mask);action.sa_handler=handler;sigaction(SIGUSR1,&action,&old);
-    vd::Runtime runtime;auto c=runtime.console_context();std::atomic<long> tid=0;std::promise<pthread_t> identity;auto id=identity.get_future();
+    vd::Runtime runtime;auto c=runtime.console_context();std::promise<pthread_t> identity;auto id=identity.get_future();
+#ifdef __linux__
+    std::atomic<long> tid=0;
+#endif
     auto reader=std::async(std::launch::async,[&]{identity.set_value(pthread_self());
 #ifdef __linux__
         tid=syscall(SYS_gettid);
