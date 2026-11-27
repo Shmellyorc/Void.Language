@@ -10,6 +10,9 @@ import subprocess
 import sys
 import tempfile
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'tools'))
+from test_platform import relocate
+
 sys.stdout.reconfigure(encoding='utf-8')
 compiler, clang = map(Path, sys.argv[1:3])
 windows = os.name == 'nt'
@@ -240,7 +243,7 @@ def qualify(root):
         packages.append(package / output.name)
     project.rename(root / 'retained original project')
     if prefix.exists():
-        prefix.rename(root / 'retained compiler install')
+        relocate(prefix, root / 'retained compiler install')
     if managed:
         catalog.rename(root / 'retained original catalog')
     runtime_path = str(Path(os.environ['SystemRoot']) / 'System32') if windows else '/usr/bin:/bin'
