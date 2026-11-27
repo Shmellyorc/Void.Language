@@ -172,7 +172,10 @@ std::optional<std::string> format_source(const SourceFile& source, bool insert_s
     using namespace frontend;
     // Parse with the ordinary compiler before proposing edits. This is local
     // syntax validation, never import discovery or a second semantic resolver.
-    Diagnostics diagnostics;Unit parsed(source,source.path());parse_unit(parsed,diagnostics);
+    Diagnostics diagnostics;
+    Unit parsed(source,source.path());
+    std::vector<Token> parsed_tokens;
+    parse_unit(parsed,diagnostics,{},native_build_conditions(),&parsed_tokens);
     if(diagnostics.failed() || !parsed.conditional_regions.empty())return {};
     auto tokens=lex(source,diagnostics,false);
     if(diagnostics.failed())return {};
@@ -221,7 +224,7 @@ std::optional<std::string> format_source(const SourceFile& source, bool insert_s
     // line can change indentation-sensitive bodies inside an unchanged string.
     // Prove the parser sees the identical expanded stream as well.
     auto expanded=lex(SourceFile(source.path(),result),check);
-    if(check.failed() || !same_tokens(tokens,expanded))return {};
+    if(check.failed() || !same_tokens(parsed_tokens,expanded))return {};
     return result;
 }
 }
