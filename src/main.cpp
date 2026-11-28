@@ -1,4 +1,5 @@
 #include "void/backend.hpp"
+#include "void/private_diagnostics.hpp"
 #include "void/crash_diagnostics.hpp"
 #include "void/c_primitive.hpp"
 #include "void/frontend.hpp"

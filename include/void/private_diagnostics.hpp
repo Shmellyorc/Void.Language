@@ -1,5 +1,8 @@
 #pragma once
+#include <cstddef>
 #include <cstdint>
+#include <filesystem>
+#include <map>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -38,4 +41,14 @@ public:
                         std::string_view token);
 };
 Category category(std::string_view description);
+}
+
+namespace vd {
+namespace ir { struct Module; }
+// Production emission uses the shared AOT lowerer and returns a draft for
+// association with the audited, stripped executable.
+using PublicationResources = std::map<std::string, std::string>;
+diagnostics::PrivateMap emit_publication_object(const ir::Module&, const std::filesystem::path&,
+    bool optimize, std::string_view semantic_inputs_sha256, bool size = false,
+    bool debug = true, const PublicationResources* resources = nullptr, bool thin_lto = false);
 }

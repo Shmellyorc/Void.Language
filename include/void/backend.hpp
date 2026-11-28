@@ -2,7 +2,6 @@
 #include "void/execution.hpp"
 #include "void/cache.hpp"
 #include "void/ir.hpp"
-#include "void/private_diagnostics.hpp"
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -39,12 +38,6 @@ private:
 void emit_async_object(const ir::Module&, const std::filesystem::path&, bool optimize);
 void emit_object(const ir::Module&, const std::filesystem::path&, bool optimize, bool source_program = false,
                  std::string_view build_inputs = {}, std::optional<project::DebugInfo> source_debug = {});
-// Production emission uses the shared AOT lowerer and returns a draft for
-// association with the audited, stripped executable.
-using PublicationResources = std::map<std::string, std::string>;
-diagnostics::PrivateMap emit_publication_object(const ir::Module&, const std::filesystem::path&,
-    bool optimize, std::string_view semantic_inputs_sha256, bool size = false,
-    bool debug = true, const PublicationResources* resources = nullptr, bool thin_lto = false);
 // Internal architectural harness supplies its own runtime entry guard/main.
 void emit_runtime_object(const ir::Module&, const std::filesystem::path&, bool optimize, const std::string& generation_suffix = {});
 }

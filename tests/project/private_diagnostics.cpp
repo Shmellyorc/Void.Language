@@ -1,4 +1,5 @@
 #include "void/backend.hpp"
+#include "void/private_diagnostics.hpp"
 #include "void/frontend.hpp"
 #include "void/project.hpp"
 #include <fstream>

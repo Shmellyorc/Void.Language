@@ -1,6 +1,7 @@
 #pragma once
 
-#include "void/backend.hpp"
+#include "void/ir.hpp"
+#include "void/private_diagnostics.hpp"
 
 namespace llvm { class DataLayout; class LLVMContext; class Module; class TargetMachine; }
 
@@ -8,7 +9,6 @@ namespace vd {
 struct InterfaceWitness;
 struct NominalDescriptor;
 namespace project { enum class DebugInfo; }
-namespace diagnostics { class PrivateMap; }
 
 namespace llvm_backend {
 class LoweringInventory;

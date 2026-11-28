@@ -6,6 +6,7 @@
 #include "frontend/project_digest.hpp"
 #include "void/native_import.hpp"
 #include "void/backend.hpp"
+#include "void/private_diagnostics.hpp"
 #include "void/cache.hpp"
 #include "void/c_primitive.hpp"
 #include "void/path.hpp"
