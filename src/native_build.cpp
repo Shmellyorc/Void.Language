@@ -438,6 +438,7 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
         if (production.plan.symbols() == "private") arguments.push_back("/debug:dwarf");
         for (auto name : publish::windows_archives) input(name);
         for (auto name : publish::windows_libraries) input(name);
+        if (arm) input(publish::windows_arm64_synchronization);
     } else {
         const auto loader = publish::linux_loader(*pack.target);
         const auto interpreter = std::string(arm ? "/lib/" : "/lib64/") + loader;

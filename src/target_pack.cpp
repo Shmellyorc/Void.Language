@@ -42,6 +42,7 @@ std::set<std::string> link_names(const Target& target) {
     if (target.system == System::windows_msvc) {
         std::set<std::string> result(windows_archives.begin(), windows_archives.end());
         result.insert(windows_libraries.begin(), windows_libraries.end());
+        if (target.architecture == Architecture::arm64) result.emplace(windows_arm64_synchronization);
         return result;
     }
     if (target.system != System::linux_gnu)
@@ -69,7 +70,8 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
         reject("invalid archive structure");
     }
     const bool windows = target.system == System::windows_msvc;
-    const bool msvc_sdk = windows && std::ranges::find(windows_libraries, name) != windows_libraries.end();
+    const bool msvc_sdk = windows && (name == windows_arm64_synchronization ||
+        std::ranges::find(windows_libraries, name) != windows_libraries.end());
     const auto expected = llvm_architecture(target);
     const auto machine = expected == llvm::Triple::aarch64 ? llvm::COFF::IMAGE_FILE_MACHINE_ARM64 :
         llvm::COFF::IMAGE_FILE_MACHINE_AMD64;

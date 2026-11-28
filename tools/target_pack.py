@@ -168,7 +168,8 @@ def windows_inputs():
         raise ValueError("Use a matching native Visual Studio developer environment")
     locations = [developer / arch, kit / "ucrt" / arch, kit / "um" / arch]
     found = {}
-    for name in WINDOWS_SYSTEM:
+    required = (*WINDOWS_SYSTEM, "synchronization.lib") if arch == "arm64" else WINDOWS_SYSTEM
+    for name in required:
         path = next((location / name for location in locations if (location / name).is_file()), None)
         if path is None:
             raise ValueError(f"Windows development input missing: {name}")
