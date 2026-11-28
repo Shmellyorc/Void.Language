@@ -57,7 +57,8 @@ def produce(compiler, pack, output):
     lines = manifest.read_text().splitlines()
     pack_id = lines[1].split()[1]
     target = lines[3].split()[1]
-    expected_arch = {"linux-x64": "x86_64", "linux-arm64": "aarch64"}[target]
+    expected_arch = "aarch64" if target.endswith("-arm64") else "x86_64"
+    windows = target.startswith("windows-")
     output.mkdir()
     with tempfile.TemporaryDirectory(prefix="void target packs ") as temp:
         workspace = Path(temp).resolve()
@@ -100,8 +101,8 @@ def produce(compiler, pack, output):
         private = Path(next(row.split(": ", 1)[1] for row in result.stdout.splitlines()
                             if row.startswith("Private diagnostics: ")))
         shutil.copyfile(private / "diagnostics.vdiag", output / "failure.vdiag")
-        assert (private / "app.debug").is_file()
-        runtime = workspace / "store" / pack_id / "link/libvoid_runtime.a"
+        assert (private / ("app.unstripped.exe" if windows else "app.debug")).is_file()
+        runtime = workspace / "store" / pack_id / ("link/void_runtime.lib" if windows else "link/libvoid_runtime.a")
         with runtime.open("ab") as stream:
             stream.write(b"bad")
         run(compiler, "target", "verify", pack_id, env=env, failure="checksum mismatch")
@@ -116,10 +117,11 @@ def consume(output, compiler):
         root = Path(temp).resolve()
         relocated = root / "relocated"
         shutil.copytree(output, relocated)
+        exe = "app.exe" if os.name == "nt" else "app"
         for application, expected in [("async", "21"), ("sync", "18")]:
-            image = relocated / application / "app"
+            image = relocated / application / exe
             assert run(image, cwd=root).stdout.strip() == expected
-        image = relocated / "failure/app"
+        image = relocated / "failure" / exe
         result = subprocess.run([image], cwd=root, capture_output=True, text=True, timeout=90)
         assert result.returncode == 1 and "VOID-" in result.stderr, result
         if compiler:

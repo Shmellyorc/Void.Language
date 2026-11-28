@@ -32,8 +32,13 @@ std::string digest(std::string_view bytes) {
     return hash.finish();
 }
 std::set<std::string> link_names(const Target& target) {
+    if (target.system == System::windows_msvc) {
+        std::set<std::string> result(windows_archives.begin(), windows_archives.end());
+        result.insert(windows_libraries.begin(), windows_libraries.end());
+        return result;
+    }
     if (target.system != System::linux_gnu)
-        throw std::runtime_error("This compiler has no pack linker for " + std::string(target.id) + ".");
+        throw std::runtime_error("A macOS pack requires independently redistributable libSystem and framework linking inputs. Use the matching native macOS toolchain for publishing.");
     std::set<std::string> result{linux_loader(target)};
     for (auto name : linux_start) result.emplace(name);
     for (auto name : linux_archives) result.emplace(name);
@@ -43,7 +48,7 @@ std::set<std::string> link_names(const Target& target) {
 }
 void check_link_file(std::string_view name, std::string_view bytes, const Target& target) {
     const auto kind = llvm::identify_magic(bytes);
-    if (name.ends_with(".a")) {
+    if (name.ends_with(".a") || name.ends_with(".lib")) {
         // A thin archive can reference arbitrary physical files at link time.
         if (kind != llvm::file_magic::archive || !bytes.starts_with("!<arch>\n"))
             throw std::runtime_error("Expected a self-contained archive in target pack: " + std::string(name));
@@ -104,8 +109,12 @@ static Pack read_pack(const fs::path& requested, const project::ProjectDirectory
     if (!hex(revision, 40)) throw std::runtime_error("Target pack requires a source revision.");
     auto minimum = field("minimum ");
     auto expected = link_names(*target);
-    if (!minimum.starts_with("glibc-") || !numeric_version(std::string_view(minimum).substr(6)))
+    if (target->system == System::linux_gnu &&
+        (!minimum.starts_with("glibc-") || !numeric_version(std::string_view(minimum).substr(6))))
         throw std::runtime_error("Linux target pack requires a glibc deployment floor.");
+    if (target->system == System::windows_msvc &&
+        minimum != (target->architecture == Architecture::arm64 ? "windows-11" : "windows-10"))
+        throw std::runtime_error("Windows target pack requires a Windows 10 x64 or Windows 11 ARM64 deployment floor.");
     Pack pack{target, std::move(id), std::move(revision), std::move(version), std::move(minimum), digest(manifest), {}};
     std::set<std::string> names;
     std::size_t budget = pack_limit;

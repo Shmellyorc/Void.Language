@@ -10,12 +10,20 @@ permissions:
   contents: read
 jobs:
   build:
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+      artifact-metadata: write
     strategy:
       fail-fast: false
       matrix:
         include:
-          - {runner: ubuntu-24.04, job: runtime}
+          - {runner: ubuntu-24.04, job: runtime, target: linux-x64}
+          - {runner: ubuntu-24.04-arm, job: runtime, target: linux-arm64}
           - {runner: macos-26, job: publisher}
+          - {runner: windows-2022, job: local-msvc, target: windows-x64, arch: x64}
+          - {runner: windows-11-arm, job: local-msvc, target: windows-arm64, arch: arm64}
     runs-on: ${{ matrix.runner }}
     env:
       PYTHONUTF8: '1'
@@ -24,7 +32,8 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
-          python-version: ${{ runner.os == 'Linux' && '3.14' || '3.12' }}
+          python-version: ${{ (runner.os == 'Linux' || (runner.os == 'Windows' && runner.arch == 'ARM64')) && '3.14' || '3.12' }}
+          architecture: ${{ runner.arch == 'ARM64' && 'arm64' || 'x64' }}
       - name: Select isolated build and linker cache locations
         shell: bash
         run: |
@@ -36,6 +45,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev libc6-dev gcc-13 g++-13 libidn2-0 libunistring5
           python tools/ci/linux_disk.py prepare
+      - name: Select the native Visual Studio SDK
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
       - uses: actions/cache@v5
         with:
           path: .toolchains/llvm-23.1.4
@@ -68,6 +82,7 @@ jobs:
       - name: Build pinned Runtime host providers
         run: python tools/ci/voidup_bootstrap.py bootstrap
       - name: Configure the selective ThinLTO build
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           cache="$THINLTO_CACHE_DIR"
@@ -84,19 +99,44 @@ jobs:
           cmake --build "$RUNNER_TEMP/build" --target voidc voidup --parallel 3
           test -n "$(find "$cache" -type f -size +0c | head -1)"
           find "$cache" -type f | wc -l
+      - name: Configure and build Windows with the existing fast native configuration
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cmake -S . -B "$env:RUNNER_TEMP/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF `
+            "-DLLVM_DIR=$env:LLVM_DIR" "-DVOID_CLANG=$env:VOID_CLANG"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmake --build "$env:RUNNER_TEMP/build" --target voidc voidup --parallel 3
+      - name: Qualify the local MSVC pack on the destination runner
+        if: matrix.job == 'local-msvc'
+        env:
+          VOID_PACK_ID: custom-ci-${{ matrix.target }}
+        shell: pwsh
+        run: |
+          python tools/target_pack.py "$env:RUNNER_TEMP/build" "$env:RUNNER_TEMP/pack" --id "$env:VOID_PACK_ID" --local-msvc-inputs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tests/project/target_packs.py produce "$env:RUNNER_TEMP/build/voidc.exe" "$env:RUNNER_TEMP/pack" "$env:RUNNER_TEMP/distributions"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tests/project/target_packs.py consume "$env:RUNNER_TEMP/distributions" --compiler "$env:RUNNER_TEMP/build/voidc.exe"
       - name: Verify native macOS publishing and application bundle
         if: matrix.job == 'publisher'
         run: python tests/project/native_publication.py "$RUNNER_TEMP/build/voidc" "$(dirname "$VOID_CLANG")"
       - name: Generate Runtime candidate and authenticated Ubuntu input references
         if: matrix.job == 'runtime'
+        env:
+          VOID_TARGET: ${{ matrix.target }}
         run: |
-          python tools/target_pack.py "$RUNNER_TEMP/build" "$RUNNER_TEMP/candidate" --id custom-ci-linux --cc gcc-13 --ubuntu-inputs
-          tar -C "$RUNNER_TEMP/candidate" -czf "$RUNNER_TEMP/runtime-linux-x64.tar.gz" .
+          python tools/target_pack.py "$RUNNER_TEMP/build" "$RUNNER_TEMP/candidate" --id "custom-ci-$VOID_TARGET" --cc gcc-13 --ubuntu-inputs
+          tar --sort=name --mtime=@0 --owner=0 --group=0 --numeric-owner -C "$RUNNER_TEMP/candidate" -cf - . | gzip -n > "$RUNNER_TEMP/runtime-$VOID_TARGET.tar.gz"
+      - uses: actions/attest@v4
+        if: matrix.job == 'runtime'
+        with:
+          subject-path: ${{ runner.temp }}/runtime-${{ matrix.target }}.tar.gz
       - uses: actions/upload-artifact@v6
         if: matrix.job == 'runtime'
         with:
-          name: linux-x64-runtime-${{ github.sha }}
-          path: ${{ runner.temp }}/runtime-linux-x64.tar.gz
+          name: ${{ matrix.target }}-runtime-${{ github.sha }}
+          path: ${{ runner.temp }}/runtime-${{ matrix.target }}.tar.gz
           if-no-files-found: error
       - name: Preserve qualified compiler inputs for the cross-host job
         if: matrix.job == 'publisher'
@@ -113,11 +153,16 @@ jobs:
       - uses: actions/upload-artifact@v6
         if: failure()
         with:
-          name: target-pack-build-evidence-${{ runner.os }}
+          name: target-pack-build-evidence-${{ runner.os }}-${{ runner.arch }}
           path: ${{ runner.temp }}/evidence/
           if-no-files-found: ignore
   publish:
     needs: build
+    if: ${{ !cancelled() }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [linux-x64, linux-arm64]
     runs-on: macos-26
     steps:
       - uses: actions/checkout@v5
@@ -131,18 +176,23 @@ jobs:
       - run: python tools/ci/llvm_sdk.py
       - uses: actions/download-artifact@v7
         with:
-          name: linux-x64-runtime-${{ github.sha }}
+          name: ${{ matrix.target }}-runtime-${{ github.sha }}
           path: ${{ runner.temp }}
       - uses: actions/download-artifact@v7
         with:
           name: macos-arm64-publisher-${{ github.sha }}
           path: ${{ runner.temp }}
-      - name: Publish Linux x64 on macOS ARM64
+      - name: Verify Runtime provenance and publish on macOS ARM64
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VOID_TARGET: ${{ matrix.target }}
         run: |
           mkdir "$RUNNER_TEMP/candidate" "$RUNNER_TEMP/compiler"
-          tar -C "$RUNNER_TEMP/candidate" -xzf "$RUNNER_TEMP/runtime-linux-x64.tar.gz"
+          gh attestation verify "$RUNNER_TEMP/runtime-$VOID_TARGET.tar.gz" --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci-target-packs.yml" --source-digest "$GITHUB_SHA"
+          tar -C "$RUNNER_TEMP/candidate" -xzf "$RUNNER_TEMP/runtime-$VOID_TARGET.tar.gz"
           tar -C "$RUNNER_TEMP/compiler" -xzf "$RUNNER_TEMP/compiler.tar.gz"
-          grep -Fx 'source ${{ github.sha }}' "$RUNNER_TEMP/candidate/runtime/target-pack.txt"
+          grep -Fx "source $GITHUB_SHA" "$RUNNER_TEMP/candidate/runtime/target-pack.txt"
           python tools/target_pack.py compose "$RUNNER_TEMP/candidate" "$RUNNER_TEMP/pack"
           printf 'VOID native 23.1.4 v2\n%s\n' "$VOID_CLANG" > "$RUNNER_TEMP/compiler/void-native.txt"
           export VOID_STDLIB_ROOT="$GITHUB_WORKSPACE/stdlib"
@@ -150,19 +200,26 @@ jobs:
           tar -C "$RUNNER_TEMP/distributions" -czf "$RUNNER_TEMP/distributions.tar.gz" .
       - uses: actions/upload-artifact@v6
         with:
-          name: linux-x64-from-macos-arm64-${{ github.sha }}
+          name: ${{ matrix.target }}-from-macos-arm64-${{ github.sha }}
           path: ${{ runner.temp }}/distributions.tar.gz
           if-no-files-found: error
   run:
     needs: publish
-    runs-on: ubuntu-24.04
+    if: ${{ !cancelled() }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, target: linux-x64}
+          - {runner: ubuntu-24.04-arm, target: linux-arm64}
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v7
         with:
-          name: linux-x64-from-macos-arm64-${{ github.sha }}
+          name: ${{ matrix.target }}-from-macos-arm64-${{ github.sha }}
           path: ${{ runner.temp }}
-      - name: Execute relocated Linux x64 distributions
+      - name: Execute relocated distributions on the destination architecture
         run: |
           mkdir "$RUNNER_TEMP/distributions"
           tar -C "$RUNNER_TEMP/distributions" -xzf "$RUNNER_TEMP/distributions.tar.gz"

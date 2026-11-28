@@ -31,7 +31,8 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--profile", choices=["Release", "Debug", "strict"], default="Release")
 parser.add_argument("--jobs", type=int, default=4)
 args = parser.parse_args()
-if platform.system() != "Linux" or platform.machine() not in ("x86_64", "amd64"):
+architecture = {"aarch64": "arm64", "amd64": "x86_64"}.get(platform.machine(), platform.machine())
+if platform.system() != "Linux" or architecture not in ("x86_64", "arm64"):
     raise SystemExit("This native recipe is Linux-only; no system-library fallback is permitted")
 root = Path(__file__).resolve().parents[1]
 pins_path = root / "third_party/http-versions.json"
@@ -47,7 +48,7 @@ receipt = (documentation_evidence('net/http')) / f"dependencies-{args.profile}-{
 receipt.mkdir(parents=True, exist_ok=False)
 prefix.mkdir(parents=True, exist_ok=True)
 build_root.mkdir(parents=True, exist_ok=True)
-report = {"host": platform.platform(), "profile": args.profile,
+report = {"host": platform.platform(), "platform": "Linux", "architecture": architecture, "profile": args.profile,
           "pins_sha256": hashlib.sha256(pins_path.read_bytes()).hexdigest(), "commands": []}
 env = os.environ.copy()
 env.update(CC=str(cc), CXX=str(cxx), PKG_CONFIG="/bin/false")

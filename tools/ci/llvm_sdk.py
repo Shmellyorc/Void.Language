@@ -22,8 +22,12 @@ RELEASE = f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{VERS
 ARCHIVES = {
     ("Windows", "x86_64"): (f"clang+llvm-{VERSION}-x86_64-pc-windows-msvc.tar.xz",
                             "854bffcfc84528e0ee92490ff5c178920abd358a79c3e98f053e41e3e8e4c6d2"),
+    ("Windows", "aarch64"): (f"clang+llvm-{VERSION}-aarch64-pc-windows-msvc.tar.xz",
+                             "f0d2e32424850ffb9b6aef190587a8298353d858a8a7260f490c173fe98d6811"),
     ("Linux", "x86_64"): (f"LLVM-{VERSION}-Linux-X64.tar.xz",
                           "25d814fda50d5fb0084b42be09605d8b1595d49d5e2e03a3345d7e112ff6f9f3"),
+    ("Linux", "aarch64"): (f"LLVM-{VERSION}-Linux-ARM64.tar.xz",
+                           "9b27cf263d711aa6ebfd4045ab241d947bd09b3cd19ffa5728f48a80c9eb3a91"),
     ("Darwin", "aarch64"): (f"LLVM-{VERSION}-macOS-ARM64.tar.xz",
                             "5d3179db39adeca5b17a34d82708fe976bc60e055b05fe557878fb3fb64d39ef"),
 }

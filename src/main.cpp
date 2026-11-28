@@ -690,9 +690,16 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
                 return 0;
             }
             const llvm::Triple host(LLVM_DEFAULT_TARGET_TRIPLE);
-            const auto target=host.isOSLinux() && host.getArch()==llvm::Triple::x86_64?"linux-x64":
-                host.isOSWindows() && host.getArch()==llvm::Triple::x86_64?"windows-x64":
-                host.isMacOSX() && host.getArch()==llvm::Triple::aarch64?"macos-arm64":"unqualified-host";
+            const auto arch = host.getArch();
+            const auto system = host.isOSLinux() ? std::optional{vd::publish::System::linux_gnu} :
+                host.isOSWindows() ? std::optional{vd::publish::System::windows_msvc} :
+                host.isMacOSX() ? std::optional{vd::publish::System::macos} : std::nullopt;
+            std::string_view target = "unqualified-host";
+            if (system && (arch == llvm::Triple::x86_64 || arch == llvm::Triple::aarch64)) {
+                for (const auto& candidate : vd::publish::targets)
+                    if (candidate.system == system && ((arch == llvm::Triple::aarch64) ==
+                        (candidate.architecture == vd::publish::Architecture::arm64))) target = candidate.id;
+            }
             if (args.size() == 2 && args[0] == "--verify") {
                 vd::verify_native_publication(vd::utf8_path(args[1]));
                 std::cout << "Native publication verified.\n";
@@ -705,7 +712,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             }
             auto request=vd::publish::parse_arguments(args);
             vd::project::require_outside_user_package_store(request.project);
-            const auto plan = vd::publish::preflight(request,target);
+            const auto plan = vd::publish::preflight(request, target);
             const auto pack = plan.target() == target ? std::optional<vd::publish::Pack>{} :
                 std::optional{vd::publish::load_pack(plan.target())};
             auto result = vd::analyze_manifest_project_with_native_approval(request.project, plan.entry(),

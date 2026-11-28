@@ -19,7 +19,7 @@ def verify_static_crt(directives):
 def main():
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--profile',choices=['Release','Debug','strict'],required=True);p.add_argument('--jobs',type=int,default=4);p.add_argument('--prefix',type=pathlib.Path);p.add_argument('--build-dir',type=pathlib.Path);a=p.parse_args()
  system=platform.system();arch={'amd64':'x86_64','aarch64':'arm64'}.get(platform.machine().lower(),platform.machine().lower())
- if (system,arch) not in [('Windows','x86_64'),('Darwin','arm64')]:raise SystemExit('Native Windows x64 or macOS ARM64 required; no ABI substitution')
+ if (system,arch) not in [('Windows','x86_64'),('Windows','arm64'),('Darwin','arm64')]:raise SystemExit('Native Windows x64/ARM64 or macOS ARM64 required')
  base=ROOT/'.toolchains/host';bundle=('windows-' if system=='Windows' else 'macos-')+arch
  prefix=(a.prefix or base/'prefix'/bundle/a.profile).resolve();build=(a.build_dir or base/'build'/bundle/a.profile).resolve()
  if prefix.exists() or build.exists():raise SystemExit('Clean provider build required; retain the old prefix/build and select fresh paths')
@@ -45,7 +45,7 @@ def main():
    source.parent.mkdir(parents=True,exist_ok=True)
    with tarfile.open(archive) as tar:tar.extractall(source.parent,filter='data')
   source_tree(archive,source);sources[name]=source
- http_bundle='windows-schannel-x86_64' if system=='Windows' else 'macos-aws-lc-5.12.0-arm64'
+ http_bundle='windows-schannel-'+arch if system=='Windows' else 'macos-aws-lc-5.12.0-arm64'
  http=ROOT/'.toolchains/http/prefix'/http_bundle/a.profile
  run([os.sys.executable,ROOT/'tools/verify_http_dependencies.py',http,a.profile,system,arch],'http-closure')
  suffix='.exe' if system=='Windows' else '';cc=ROOT/'.toolchains/llvm-23.1.4/bin'/('clang-cl.exe' if system=='Windows' else 'clang')
@@ -54,7 +54,9 @@ def main():
  common=['-G','Ninja','-DBUILD_SHARED_LIBS=OFF','-DCMAKE_INSTALL_LIBDIR=lib','-DCMAKE_INSTALL_PREFIX='+str(prefix),'-DCMAKE_C_COMPILER='+str(cc),'-DCMAKE_BUILD_TYPE='+('Release' if a.profile=='Release' else 'Debug')]
  sodium_source=build/'sodium-source';report['source_provenance']=prepare_sodium(sources['libsodium'],base/'downloads'/pins['libsodium']['url'].rsplit('/',1)[-1],sodium_source)
  if system=='Windows':
-  if os.environ.get('VSCMD_ARG_TGT_ARCH','').lower() not in ['x64','amd64']:raise SystemExit('Use a native x64 Visual Studio developer environment')
+  vs_arch='arm64' if arch=='arm64' else 'x64'
+  allowed=['arm64'] if arch=='arm64' else ['x64','amd64']
+  if os.environ.get('VSCMD_ARG_TGT_ARCH','').lower() not in allowed:raise SystemExit('Use a matching native Visual Studio developer environment')
   msbuild=shutil.which('msbuild');
   if not msbuild:raise SystemExit('MSBuild and the Windows SDK are required')
   selected=windows_clangcl(cc.parent.parent);report['clangcl_selection']=selected
@@ -62,7 +64,7 @@ def main():
   # disposable copy so the archive-verified source remains unchanged.
   sodium=build/'sodium-source'
   output=build/'sodium-output';intermediate=build/'sodium-objects';output.mkdir(exist_ok=True)
-  properties=['/p:Configuration='+('ReleaseLIB' if a.profile=='Release' else 'DebugLIB'),'/p:Platform=x64','/p:PlatformToolset=ClangCL',
+  properties=['/p:Configuration='+('ReleaseLIB' if a.profile=='Release' else 'DebugLIB'),'/p:Platform='+('ARM64' if arch=='arm64' else 'x64'),'/p:PlatformToolset=ClangCL',
    '/p:LLVMInstallDir='+selected['sdk']+os.sep,'/p:LLVMToolsVersion='+selected['LLVMToolsVersion'],
    '/p:CLToolPath='+str(cc.parent)+os.sep,'/p:CLToolExe=clang-cl.exe',
    '/p:LinkToolPath='+str(cc.parent)+os.sep,'/p:LinkToolExe=lld-link.exe',
@@ -82,7 +84,7 @@ def main():
   # MSBuild resolves the WindowsTargetPlatformVersion "10.0" alias here.
   sdk=pathlib.Path(actual.get('WindowsSdkDir',''));sdk_version=actual.get('TargetPlatformVersion','')
   vc=pathlib.Path(actual.get('VCToolsInstallDir',''))
-  if not sdk.is_absolute() or not vc.is_absolute() or not sdk_version or not (sdk/'Include'/sdk_version/'um/Windows.h').is_file() or not (sdk/'Lib'/sdk_version/'um/x64/kernel32.lib').is_file() or not (vc/'include/vcruntime.h').is_file() or not (vc/'lib/x64/libcmt.lib').is_file():
+  if not sdk.is_absolute() or not vc.is_absolute() or not sdk_version or not (sdk/'Include'/sdk_version/'um/Windows.h').is_file() or not (sdk/'Lib'/sdk_version/'um'/vs_arch/'kernel32.lib').is_file() or not (vc/'include/vcruntime.h').is_file() or not (vc/'lib'/vs_arch/'libcmt.lib').is_file():
    raise SystemExit('Evaluated native Windows SDK/VC headers and libraries are incomplete: '+repr(actual))
   report['msbuild_properties']=actual
   run([msbuild,project,*properties,'-preprocess:'+str(evidence/'sodium-evaluated.xml')],'sodium-preprocess')

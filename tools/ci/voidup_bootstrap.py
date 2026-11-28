@@ -36,7 +36,7 @@ LINUX_TESTS = {'host_capabilities', 'host_capabilities_stack', 'host_capabilitie
 def layout(configuration):
     plan = http.make_plan(configuration)  # Share the existing SDK/HTTP profile and native identity.
     system = plan['identity']['host']['system']
-    bundle = {'Linux': '', 'Windows': 'windows-x86_64/', 'Darwin': 'macos-arm64/'}[system]
+    bundle = {'Linux': '', 'Windows': 'windows-' + plan['identity']['host']['architecture'] + '/', 'Darwin': 'macos-arm64/'}[system]
     plan['host_prefix'] = f'.toolchains/host/prefix/{bundle}{plan["profile"]}'
     zlib = ('zs.lib' if plan['profile'] == 'Release' else 'zsd.lib') if system == 'Windows' else 'libz.a'
     plan['zlib'] = str(ROOT / plan['prefix'] / 'lib' / zlib)

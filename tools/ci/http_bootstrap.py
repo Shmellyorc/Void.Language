@@ -48,7 +48,7 @@ def key(value):
 def host_identity():
     system = platform.system()
     arch = {'amd64': 'x86_64', 'aarch64': 'arm64'}.get(platform.machine().lower(), platform.machine().lower())
-    if (system, arch) not in {('Linux', 'x86_64'), ('Windows', 'x86_64'), ('Darwin', 'arm64')}:
+    if (system, arch) not in {('Linux', 'x86_64'), ('Linux', 'arm64'), ('Windows', 'x86_64'), ('Windows', 'arm64'), ('Darwin', 'arm64')}:
         raise RuntimeError(f'HTTP seven-job CI native host mismatch: {system}/{arch}')
     host = {'system': system, 'architecture': arch, 'image_os': os.environ.get('ImageOS', ''),
             'cmake': subprocess.check_output(['cmake', '--version'], text=True).splitlines()[0],
@@ -56,8 +56,9 @@ def host_identity():
     if system == 'Windows':
         for name in ('VCToolsVersion', 'WindowsSDKVersion', 'VSCMD_ARG_TGT_ARCH'):
             host[name] = os.environ[name]
-        if host['VSCMD_ARG_TGT_ARCH'].lower() not in ('x64', 'amd64'):
-            raise RuntimeError('HTTP CI requires the native x64 MSVC developer environment')
+        allowed = ('arm64',) if arch == 'arm64' else ('x64', 'amd64')
+        if host['VSCMD_ARG_TGT_ARCH'].lower() not in allowed:
+            raise RuntimeError('HTTP CI requires the matching native MSVC developer environment')
     elif system == 'Darwin':
         sdk = os.environ.get('SDKROOT') or subprocess.check_output(['xcrun', '--show-sdk-path'], text=True).strip()
         if not Path(sdk).is_absolute() or not Path(sdk).is_dir():
@@ -77,7 +78,7 @@ def make_plan(configuration):
     if profile == 'strict' and host['system'] != 'Linux':
         raise RuntimeError('The seven-job matrix has one strict Linux job')
     policy = json.loads((ROOT / 'third_party/http-versions.json').read_text())
-    bundle = {'Linux': policy['bundle'], 'Windows': 'windows-schannel-x86_64',
+    bundle = {'Linux': policy['bundle'], 'Windows': 'windows-schannel-' + host['architecture'],
               'Darwin': 'macos-aws-lc-5.12.0-arm64'}[host['system']]
     identity = {'schema': 1, 'llvm': '23.1.4', 'host': host, 'profile': profile,
                 'files': {name: digest(ROOT / name) for name in RECIPES}}
@@ -133,7 +134,7 @@ def verify_prefix(plan, evidence, cached=False):
     if report.get('platform', 'Linux') != host['system']:
         raise RuntimeError('HTTP manifest platform mismatch')
     # Linux's original accepted manifest predates explicit architecture metadata.
-    if report.get('architecture', host['architecture']) != host['architecture']:
+    if report.get('architecture', 'x86_64') != host['architecture']:
         raise RuntimeError('HTTP manifest architecture mismatch')
     if host['system'] == 'Darwin' and (
         str(Path(report['sdk']).resolve()) != host['sdk'] or

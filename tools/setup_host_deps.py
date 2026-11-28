@@ -13,7 +13,8 @@ def main():
  if platform.system() in ('Windows','Darwin'):
   raise SystemExit(subprocess.call([sys.executable,str(ROOT/'tools/setup_host_deps_native.py'),*sys.argv[1:]]))
  p=argparse.ArgumentParser(description=__doc__);p.add_argument('--profile',choices=['Debug','Release','strict'],required=True);p.add_argument('--jobs',default='3');p.add_argument('--prefix',type=pathlib.Path);p.add_argument('--build-dir',type=pathlib.Path);a=p.parse_args()
- if platform.system()!='Linux' or platform.machine().lower() not in ['x86_64','amd64']:raise SystemExit('Native Linux x64 required')
+ arch={'amd64':'x86_64','aarch64':'arm64'}.get(platform.machine().lower(),platform.machine().lower())
+ if platform.system()!='Linux' or arch not in ('x86_64','arm64'):raise SystemExit('Native Linux x64 or ARM64 required')
  base=ROOT/'.toolchains/host';prefix=(a.prefix or base/'prefix'/a.profile).resolve();build=(a.build_dir or base/'build'/a.profile).resolve()
  if prefix.exists() or build.exists():raise SystemExit('Clean provider build required; retain the old prefix/build and select fresh paths')
  evidence=(documentation_evidence('voidup'))/('dependencies-linux-'+a.profile+'-'+str(time.time_ns()));evidence.mkdir(parents=True);build.mkdir(parents=True)
@@ -22,7 +23,7 @@ def main():
  if a.profile=='strict':flags+=' -fsanitize=address,undefined -fno-omit-frame-pointer';link+=' -fsanitize=address,undefined'
  env=dict(os.environ,CC=str(cc),AR=str(bin/'llvm-ar'),RANLIB=str(bin/'llvm-ranlib'),LD=str(bin/'ld.lld'),CFLAGS=flags,LDFLAGS=link)
  if a.profile=='strict':env.update(ASAN_OPTIONS='detect_leaks=1:halt_on_error=1:exitcode=87',UBSAN_OPTIONS='halt_on_error=1:print_stacktrace=1:exitcode=86',ASAN_SYMBOLIZER_PATH=str(bin/'llvm-symbolizer'))
- report={'schema':SCHEMA,'platform':'Linux','architecture':'x86_64','profile':a.profile,'pins':pins,'toolchain':tools,'compiler':str(cc),'compiler_sha256':sha(cc),'recipe_sha256':recipe_hashes(),'flags':flags,'link_flags':link,'commands':[],'build_evidence':str(evidence)}
+ report={'schema':SCHEMA,'platform':'Linux','architecture':arch,'profile':a.profile,'pins':pins,'toolchain':tools,'compiler':str(cc),'compiler_sha256':sha(cc),'recipe_sha256':recipe_hashes(),'flags':flags,'link_flags':link,'commands':[],'build_evidence':str(evidence)}
  def run(args,label,cwd=build):
   args=list(map(str,args));start=time.monotonic()
   with (evidence/(label+'.log')).open('wb') as log:r=subprocess.run(args,cwd=cwd,env=env,stdout=log,stderr=subprocess.STDOUT)

@@ -41,7 +41,9 @@
     (defined(_WIN32) && defined(_MSC_VER) && defined(_M_X64))
 #define VOID_APPLICATION_PACKAGING
 #endif
-#if defined(VOID_APPLICATION_PACKAGING) || (defined(__APPLE__) && defined(__aarch64__))
+#if defined(VOID_APPLICATION_PACKAGING) || (defined(__APPLE__) && defined(__aarch64__)) || \
+    (defined(__linux__) && defined(__GLIBC__) && defined(__aarch64__)) || \
+    (defined(_WIN32) && defined(_MSC_VER) && defined(_M_ARM64))
 #define VOID_NATIVE_PUBLISHING
 #endif
 namespace vd {
@@ -347,7 +349,8 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
 #endif
     const auto& work = stage.directory;
     const auto object = work / "program.o";
-    const auto executable = work / "program";
+    const bool windows = pack.target->system == publish::System::windows_msvc;
+    const auto executable = work / (windows ? "program.exe" : "program");
     const auto directory = pack_tools_directory(argv0);
     const auto tool = [&](std::string_view name) {
         auto path = directory / utf8_path(name);
@@ -359,7 +362,7 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
             throw std::runtime_error("Missing LLVM target-pack linker tool: " + path_utf8(path));
         return path;
     };
-    const auto linker = tool("ld.lld");
+    const auto linker = tool(windows ? "lld-link" : "ld.lld");
     version(linker, "LLD 23.1.4", work / "version.txt");
     for (const auto& [name, bytes] : pack.files) {
         if (!name.starts_with("link/")) continue;
@@ -368,20 +371,32 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
         file.close();
         if (!file) throw std::runtime_error("Cannot stage pack link input: " + name);
     }
-    const auto loader = publish::linux_loader(*pack.target);
-    const auto interpreter = std::string(pack.target->architecture == publish::Architecture::arm64 ? "/lib/" : "/lib64/") + loader;
-    std::vector<std::string> arguments{path_utf8(linker), "-pie", "--as-needed", "--gc-sections", "--no-undefined",
-        "--eh-frame-hdr", "--build-id=sha1", "-z", "relro", "-z", "now", "-z", "noexecstack",
-        "--dynamic-linker", interpreter, "-o", path_utf8(executable)};
+    const bool arm = pack.target->architecture == publish::Architecture::arm64;
+    std::vector<std::string> arguments{path_utf8(linker)};
     const auto input = [&](const char* name) { arguments.push_back(path_utf8(work / name)); };
-    for (auto name : publish::linux_start) input(name);
-    arguments.push_back(path_utf8(object));
-    arguments.push_back("--start-group");
-    for (auto name : publish::linux_archives) input(name);
-    for (auto name : publish::linux_libraries) input(name);
-    input(loader);
-    arguments.push_back("--end-group");
-    for (auto name : publish::linux_end) input(name);
+    if (windows) {
+        arguments.insert(arguments.end(), {arm ? "/machine:arm64" : "/machine:x64", "/subsystem:console",
+            "/entry:wmainCRTStartup", "/nodefaultlib", "/opt:ref", "/opt:noicf", "/incremental:no",
+            "/brepro", "/nxcompat", "/dynamicbase", "/highentropyva", "/manifest:embed",
+            "/out:" + path_utf8(executable), path_utf8(object)});
+        if (production.plan.symbols() == "private") arguments.push_back("/debug:dwarf");
+        for (auto name : publish::windows_archives) input(name);
+        for (auto name : publish::windows_libraries) input(name);
+    } else {
+        const auto loader = publish::linux_loader(*pack.target);
+        const auto interpreter = std::string(arm ? "/lib/" : "/lib64/") + loader;
+        arguments.insert(arguments.end(), {"-pie", "--as-needed", "--gc-sections", "--no-undefined",
+            "--eh-frame-hdr", "--build-id=sha1", "-z", "relro", "-z", "now", "-z", "noexecstack",
+            "--dynamic-linker", interpreter, "-o", path_utf8(executable)});
+        for (auto name : publish::linux_start) input(name);
+        arguments.push_back(path_utf8(object));
+        arguments.push_back("--start-group");
+        for (auto name : publish::linux_archives) input(name);
+        for (auto name : publish::linux_libraries) input(name);
+        input(loader);
+        arguments.push_back("--end-group");
+        for (auto name : publish::linux_end) input(name);
+    }
 
     const auto& plan = production.plan;
     const bool keep_symbols = plan.symbols() == "private";
@@ -395,19 +410,34 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
             throw std::runtime_error("Target pack link failed for " + pack.id + ". Review the linker diagnostics above.");
         }
     }
-    const auto objcopy = path_utf8(tool("llvm-objcopy"));
-    if (keep_symbols) {
-        const auto debug = work / "program.debug";
-        if (execute({objcopy, "--only-keep-debug", path_utf8(executable), path_utf8(debug)}))
-            throw std::runtime_error("Cannot extract target-pack private debug symbols.");
-        production.symbols = project::read_project_input(debug, audit::byte_limit);
+    if (windows) {
+        auto image = project::read_project_input(executable, audit::byte_limit);
+        if (keep_symbols) production.symbols = image;
+        if (execute({path_utf8(tool("llvm-strip")), "--strip-all", path_utf8(executable)}))
+            throw std::runtime_error("Cannot strip target-pack PE image.");
+        image = project::read_project_input(executable, audit::byte_limit);
+        audit::remove_pe_debug_records(image);
+        std::ofstream public_image(executable, std::ios::binary | std::ios::trunc);
+        public_image.write(image.data(), static_cast<std::streamsize>(image.size()));
+        public_image.close();
+        if (!public_image) throw std::runtime_error("Cannot finish the target-pack PE image.");
+    } else {
+        const auto objcopy = path_utf8(tool("llvm-objcopy"));
+        if (keep_symbols) {
+            const auto debug = work / "program.debug";
+            if (execute({objcopy, "--only-keep-debug", path_utf8(executable), path_utf8(debug)}))
+                throw std::runtime_error("Cannot extract target-pack private debug symbols.");
+            production.symbols = project::read_project_input(debug, audit::byte_limit);
+        }
+        if (execute({objcopy, "--strip-all", "--remove-section=.comment", path_utf8(executable)}))
+            throw std::runtime_error("Cannot strip target-pack executable.");
     }
-    if (execute({objcopy, "--strip-all", "--remove-section=.comment", path_utf8(executable)}))
-        throw std::runtime_error("Cannot strip target-pack executable.");
 #ifdef _WIN32
     const auto pins = native_windows::pin_directories(output.parent_path(), reader.reservation);
     native_windows::copy_checked(executable, output);
 #else
+    if (windows) fs::permissions(executable, fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec,
+        fs::perm_options::add);
     if (!llvm::sys::fs::can_execute(path_utf8(executable)))
         throw std::runtime_error("Target linker did not set executable file permissions.");
     publish_link_output(executable, output);
