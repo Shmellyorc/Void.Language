@@ -282,6 +282,7 @@ jobs:
     steps: *run-steps
   run-from-windows:
     needs: publish-from-windows
+    if: ${{ !cancelled() && needs.publish-from-windows.result == 'success' }}
     strategy: *linux-destinations
     runs-on: ${{ matrix.runner }}
     env:
