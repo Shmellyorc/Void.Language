@@ -81,7 +81,10 @@ print(checks,'native PTY key/mode checks passed')
 # terminal adapter, sleeps as a race oracle, or hidden terminal input channel.
 m,s=pty.openpty();mode=termios.tcgetattr(s);mode[0]&=~(termios.ICRNL|termios.INLCR|termios.IGNCR);termios.tcsetattr(s,termios.TCSANOW,mode);original=termios.tcgetattr(s)
 try:
- p=subprocess.Popen([binary,'shared'],stdin=s,stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=dict(os.environ,TERM='xterm-256color'))
+ # Read READY directly from the pipe. Buffered read-ahead can consume writer
+ # rows that communicate() then bypasses when it reads the pipe descriptor.
+ p=subprocess.Popen([binary,'shared'],stdin=s,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+                    bufsize=0,env=dict(os.environ,TERM='xterm-256color'))
  first=p.stdout.readline();assert first==b'READY\n',first
  active=termios.tcgetattr(s);assert not active[3]&(termios.ECHO|termios.ICANON|termios.ISIG),active
  os.write(m,'é\r\nZ\n'.encode())
