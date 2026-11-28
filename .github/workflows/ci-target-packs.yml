@@ -692,7 +692,7 @@ jobs:
           PYTHON
           for image in app libVoidRuntime.dylib; do
             lipo -create "arm64/$image" "x86_64/$image" -output "$bundle/Contents/MacOS/$image"
-            lipo -verify_arch arm64 x86_64 "$bundle/Contents/MacOS/$image"
+            lipo "$bundle/Contents/MacOS/$image" -verify_arch arm64 x86_64
           done
           chmod 755 "$bundle/Contents/MacOS/app"
           codesign --force --sign - "$bundle/Contents/MacOS/libVoidRuntime.dylib"
@@ -728,6 +728,6 @@ jobs:
           bundle="$RUNNER_TEMP/VoidRuntimeProbe.app"
           codesign --verify --strict --deep "$bundle"
           for image in app libVoidRuntime.dylib; do
-            lipo -verify_arch arm64 x86_64 "$bundle/Contents/MacOS/$image"
+            lipo "$bundle/Contents/MacOS/$image" -verify_arch arm64 x86_64
           done
           test "$(cd / && "$bundle/Contents/MacOS/app")" = 43
