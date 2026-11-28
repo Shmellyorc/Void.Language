@@ -363,7 +363,15 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
             throw std::runtime_error("Missing LLVM target-pack linker tool: " + path_utf8(path));
         return path;
     };
-    const auto linker = tool(windows ? "lld-link" : "ld.lld");
+    // Each installed SDK keeps one LLD binary under its native driver name.
+    // The explicit flavor selects the destination without another LLD copy.
+#if defined(_WIN32)
+    const auto linker = tool("lld-link");
+#elif defined(__APPLE__)
+    const auto linker = tool("ld64.lld");
+#else
+    const auto linker = tool("ld.lld");
+#endif
     version(linker, "LLD 23.1.4", work / "version.txt");
     for (const auto& [name, bytes] : pack.files) {
         if (!name.starts_with("link/")) continue;
@@ -373,7 +381,7 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
         if (!file) throw std::runtime_error("Cannot stage pack link input: " + name);
     }
     const bool arm = pack.target->architecture == publish::Architecture::arm64;
-    std::vector<std::string> arguments{path_utf8(linker)};
+    std::vector<std::string> arguments{path_utf8(linker), "-flavor", windows ? "link" : "gnu"};
     const auto input = [&](const char* name) { arguments.push_back(path_utf8(work / name)); };
     if (windows) {
         arguments.insert(arguments.end(), {arm ? "/machine:arm64" : "/machine:x64", "/subsystem:console",
@@ -414,7 +422,7 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
     if (windows) {
         auto image = project::read_project_input(executable, audit::byte_limit);
         if (keep_symbols) production.symbols = image;
-        if (execute({path_utf8(tool("llvm-strip")), "--strip-all", path_utf8(executable)}))
+        if (execute({path_utf8(tool("llvm-objcopy")), "--strip-all", path_utf8(executable)}))
             throw std::runtime_error("Cannot strip target-pack PE image.");
         image = project::read_project_input(executable, audit::byte_limit);
         audit::remove_pe_debug_records(image);
@@ -608,7 +616,7 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
         // LLVM supports stripping embedded DWARF from PE. Retain the complete
         // linked image privately so a debugger can use its original RVAs.
         if (keep_symbols) production->symbols = project::read_project_input(executable, audit::byte_limit);
-        run({tool("llvm-strip.exe"), "--strip-all", path_utf8(executable)});
+        run({tool("llvm-objcopy.exe"), "--strip-all", path_utf8(executable)});
         auto public_image = project::read_project_input(executable, audit::byte_limit);
         audit::remove_pe_debug_records(public_image);
         std::ofstream stripped(executable, std::ios::binary | std::ios::trunc);

@@ -1,8 +1,8 @@
 # Publishing target packs
 
 A pack supplies destination Runtime and link inputs for the existing VOID LLVM
-backend. The host LLVM 23.1.4 SDK supplies the executable linker and stripping
-tools. The compiler snapshots the verified inputs, emits a destination object,
+backend. The host LLVM 23.1.4 SDK supplies one host LLD binary and the stripping tools. VOID selects its
+linker flavor from the destination. The compiler snapshots the verified inputs, emits a destination object,
 links without running the application, audits the resulting binary and
 publishes through the existing exclusive directory transaction. Use the
 ordinary native path to publish for the compiler's own platform without a pack.

@@ -66,6 +66,10 @@ def produce(build, release_id, output, sdk, host=HOST, configuration=None):
     identity = re.search(r'Build identity: ([0-9a-f]{64})', version).group(1)
     (prefix / 'sdk/bin').mkdir(parents=True)
     tools=[('clang.exe','clang.exe'),('lld-link.exe','lld-link.exe')] if suffix else [('clang','clang'),('ld64.lld','ld64.lld')] if sys.platform=='darwin' else [('clang-23','clang'),('lld','ld.lld')]
+    objcopy = 'llvm-objcopy' + suffix
+    tools.append((objcopy, objcopy))
+    if sys.platform == 'darwin':
+        tools.append(('dsymutil', 'dsymutil'))
     for original, name in tools:
         shutil.copy2(sdk / 'bin' / original, prefix / 'sdk/bin' / name)
     shutil.copytree(sdk / 'lib/clang/23', prefix / 'sdk/lib/clang/23', symlinks=False)
