@@ -20,12 +20,16 @@ jobs:
     env:
       PYTHONUTF8: '1'
       EXPERIMENT_CONFIGURATION: Release
-      EXPERIMENT_DIR: ${{ runner.temp }}/evidence
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
           python-version: '3.14'
+      - name: Select isolated build and linker cache locations
+        shell: bash
+        run: |
+          echo "EXPERIMENT_DIR=$RUNNER_TEMP/evidence" >> "$GITHUB_ENV"
+          echo "THINLTO_CACHE_DIR=$RUNNER_TEMP/void-thinlto" >> "$GITHUB_ENV"
       - name: Install Linux development tools and Ubuntu link inputs
         if: runner.os == 'Linux'
         run: |
@@ -66,7 +70,7 @@ jobs:
       - name: Configure the selective ThinLTO build
         shell: bash
         run: |
-          cache="$RUNNER_TEMP/void-thinlto"
+          cache="$THINLTO_CACHE_DIR"
           mkdir "$cache"
           options=()
           if [ "$RUNNER_OS" = Linux ]; then
