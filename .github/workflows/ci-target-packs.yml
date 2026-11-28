@@ -3,6 +3,12 @@ on:
   push:
     branches: [codex/milestone-4-cross-platform-publishing]
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Target-pack qualification scope
+        type: choice
+        default: foundation
+        options: [foundation, platform-probes, all]
 concurrency:
   group: target-packs-${{ github.ref }}
   cancel-in-progress: false
@@ -10,6 +16,7 @@ permissions:
   contents: read
 jobs:
   build-linux:
+    if: inputs.scope != 'platform-probes'
     permissions:
       contents: read
       id-token: write
@@ -159,6 +166,7 @@ jobs:
           path: ${{ runner.temp }}/evidence/
           if-no-files-found: ignore
   build-macos:
+    if: inputs.scope != 'platform-probes'
     strategy:
       matrix:
         include:
@@ -167,6 +175,7 @@ jobs:
     env: *build-env
     steps: *build-steps
   build-windows:
+    if: inputs.scope != 'platform-probes'
     strategy:
       fail-fast: false
       matrix:
@@ -288,3 +297,122 @@ jobs:
     env:
       PRODUCER: Windows-X64
     steps: *run-steps
+  probe-windows-link:
+    if: inputs.scope == 'platform-probes' || inputs.scope == 'all'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Verify pinned LLVM-MinGW UCRT inputs and cross-link offline
+        shell: bash
+        run: |
+          set -euo pipefail
+          release=20261117
+          archive="llvm-mingw-$release-ucrt-ubuntu-22.04-x86_64.tar.xz"
+          curl --fail --location --output "$RUNNER_TEMP/$archive" "https://github.com/mstorsjo/llvm-mingw/releases/download/$release/$archive"
+          echo "e7a15a49a2ea95e9f3d8a9d0cfabe5052a4b10fb4777cc54de5a8c27b64bb701  $RUNNER_TEMP/$archive" | sha256sum -c
+          sdk="$RUNNER_TEMP/mingw"
+          mkdir "$sdk" "$RUNNER_TEMP/windows-probes"
+          tar -xf "$RUNNER_TEMP/$archive" -C "$sdk" --strip-components=1
+          for arch in x86_64 aarch64; do
+            image="$RUNNER_TEMP/windows-probes/$arch.exe"
+            sudo unshare --net -- runuser -u "$USER" -- "$sdk/bin/$arch-w64-mingw32-clang++" \
+              -std=c++20 -O2 -static tools/ci/probe_windows_ucrt.cpp -o "$image"
+            "$sdk/bin/llvm-readobj" --file-headers --coff-imports "$image" | tee "$RUNNER_TEMP/windows-probes/$arch.txt"
+            if [ "$arch" = x86_64 ]; then machine=AMD64; else machine=ARM64; fi
+            grep -q "Machine: IMAGE_FILE_MACHINE_$machine " "$RUNNER_TEMP/windows-probes/$arch.txt"
+            grep -Ei 'Name: (ucrtbase|api-ms-win-crt-[^ ]+)\.dll' "$RUNNER_TEMP/windows-probes/$arch.txt"
+            if grep -Ei 'Name: (msvcp|vcruntime|libc\+\+|libwinpthread)' "$RUNNER_TEMP/windows-probes/$arch.txt"; then exit 1; fi
+          done
+      - uses: actions/upload-artifact@v6
+        with:
+          name: windows-ucrt-link-probe-${{ github.sha }}
+          path: ${{ runner.temp }}/windows-probes/
+          if-no-files-found: error
+  probe-windows-run:
+    needs: probe-windows-link
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: windows-2022, cpu: x86_64}
+          - {runner: windows-11-arm, cpu: aarch64}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: windows-ucrt-link-probe-${{ github.sha }}
+          path: ${{ runner.temp }}/windows-probes
+      - name: Execute on the destination architecture
+        shell: pwsh
+        run: |
+          $cpu = '${{ matrix.cpu }}'
+          $native = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+          if (($cpu -eq 'aarch64' -and $native -ne 'Arm64') -or ($cpu -eq 'x86_64' -and $native -ne 'X64')) { throw "Wrong native architecture: $native" }
+          $output = & "$env:RUNNER_TEMP/windows-probes/$cpu.exe"
+          if ($LASTEXITCODE -ne 0 -or $output -ne 'VOID UCRT ABI probe') { throw "Windows ABI probe failed: $output" }
+          Write-Output "$native executed $output"
+  probe-macos-link:
+    if: inputs.scope == 'platform-probes' || inputs.scope == 'all'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/cache@v5
+        with:
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Verify pinned compiler SDK
+        run: python tools/ci/llvm_sdk.py
+      - name: Link the independent adapter interface offline
+        shell: bash
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/macos-probes"
+          sudo unshare --net -- runuser -u "$USER" -- tools/ci/probe_macos_offline.sh "$work" "$VOID_CLANG" "$(dirname "$VOID_CLANG")/ld64.lld"
+          for arch in arm64 x86_64; do
+            llvm-objdump --macho --private-headers --dylibs-used "$work/$arch/app" | tee "$work/$arch/link-audit.txt"
+            grep -F '@rpath/libVoidProbe.dylib' "$work/$arch/link-audit.txt"
+            grep -F '/usr/lib/libSystem.B.dylib' "$work/$arch/link-audit.txt"
+          done
+          tar -C "$work" -czf "$RUNNER_TEMP/macos-probes.tar.gz" arm64 x86_64
+      - uses: actions/upload-artifact@v6
+        with:
+          name: macos-adapter-link-probe-${{ github.sha }}
+          path: ${{ runner.temp }}/macos-probes.tar.gz
+          if-no-files-found: error
+  probe-macos-run:
+    needs: probe-macos-link
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: macos-26, cpu: arm64}
+          - {runner: macos-15-intel, cpu: x86_64}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v7
+        with:
+          name: macos-adapter-link-probe-${{ github.sha }}
+          path: ${{ runner.temp }}
+      - name: Build the native adapter and run the cross-linked slice
+        shell: bash
+        run: |
+          set -euo pipefail
+          arch='${{ matrix.cpu }}'
+          test "$(uname -m)" = "$arch"
+          xcrun clang++ --version
+          mkdir "$RUNNER_TEMP/macos-probes"
+          tar -C "$RUNNER_TEMP/macos-probes" -xzf "$RUNNER_TEMP/macos-probes.tar.gz"
+          slice="$RUNNER_TEMP/macos-probes/$arch"
+          xcrun clang++ -std=c++20 -arch "$arch" -mmacosx-version-min=14.0 -fvisibility=hidden \
+            -dynamiclib -Wl,-install_name,@rpath/libVoidProbe.dylib tools/ci/probe_macos_adapter.cpp -o "$slice/libVoidProbe.dylib"
+          codesign --force --sign - "$slice/libVoidProbe.dylib"
+          codesign --verify --strict "$slice/app"
+          codesign --verify --strict "$slice/libVoidProbe.dylib"
+          test "$(lipo -archs "$slice/app")" = "$arch"
+          test "$(lipo -archs "$slice/libVoidProbe.dylib")" = "$arch"
+          "$slice/app"
+          echo "$arch executed the Linux-linked adapter probe"
