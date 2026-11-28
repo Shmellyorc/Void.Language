@@ -81,7 +81,7 @@ inline void help(const std::string& command = {}, std::string_view nested = {}) 
     std::cout << "VOID Language Compiler v" << VOID_COMPILER_VERSION << " (development)\nLLVM " << LLVM_VERSION_STRING << "\n\n";
     if (command.empty()) {
         std::cout << "Usage: voidc <command> [arguments] [options]\n\nCommands:\n";
-        auto rows = std::array<HelpRow, 17>{};
+        auto rows = std::array<HelpRow, commands.size() + 1>{};
         std::copy(commands.begin(), commands.end(), rows.begin());
         rows.back() = {"help", "Show command help."};
         help_rows(std::cout, rows);
