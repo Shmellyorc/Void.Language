@@ -1,3 +1,4 @@
+#include "void/publish_target.hpp"
 #include "void/project.hpp"
 #include "void/conditional.hpp"
 #include "void/frontend.hpp"
@@ -677,8 +678,8 @@ public:
             if (auto* publishing = table(root, "publish")) {
                 fields(*publishing, "publish", {"target", "default_profile", "output", "optimization", "resources", "symbols", "lto"});
                 if (auto target = text(*publishing, "target", false)) {
-                    if (*target != "linux-x64" && *target != "windows-x64" && *target != "macos-arm64")
-                        fail(Code::project_reserved, span(publishing->get("target")->source()), "Unsupported publishing target.", "Use linux-x64, windows-x64 or macos-arm64.");
+                    if (!publish::target_name(*target))
+                        fail(Code::project_reserved, span(publishing->get("target")->source()), "Unsupported publishing target.", "Use an OS/architecture target or a registered custom-* pack.");
                     else manifest_->publishing_.target = *target;
                 }
                 if (auto profile = text(*publishing, "default_profile", false)) {

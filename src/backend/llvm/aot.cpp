@@ -28,7 +28,7 @@ using llvm_backend::native_symbol;
 
 static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
                       bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {},
-                      std::optional<project::DebugInfo> source_debug = {}, diagnostics::PrivateMap* private_map = nullptr, bool size = false, const PublicationResources* resources = nullptr, bool thin_lto = false) {
+                      std::optional<project::DebugInfo> source_debug = {}, diagnostics::PrivateMap* private_map = nullptr, bool size = false, const PublicationResources* resources = nullptr, bool thin_lto = false, std::string_view target_triple = {}) {
     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
     detail::initialize_native_target();
     llvm::LLVMContext context;
@@ -37,7 +37,11 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         entry_valid = f.parameters == std::vector<ir::Type>{ir::Type::i32} && f.result == ir::Type::i32;
     for(const auto& f:input.functions)if(f.name==input.entry_symbol && f.asynchronous!=input.async_root)throw std::invalid_argument("Async AOT entry requires the explicit scheduler root adapter");
     if (!entry_valid) throw std::invalid_argument("AOT CLI adapter requires entry: i32(i32)");
-    auto machine = detail::native_aot_machine(private_map != nullptr);
+    auto machine = target_triple.empty() ? detail::native_aot_machine(private_map != nullptr) :
+        detail::aot_machine(llvm::Triple(llvm::StringRef(target_triple)), private_map != nullptr);
+    const auto layout = machine->createDataLayout();
+    if (!target_triple.empty() && (!layout.isLittleEndian() || layout.getPointerSizeInBits() != 64))
+        throw std::invalid_argument("Publishing requires a little-endian 64-bit Runtime ABI");
     // No-opt AOT must also disable machine scheduling/optimization. Otherwise
     // a later source line can execute before an earlier local's store, even
     // when IR optimization is off and the emitted debug locations are exact.
@@ -54,7 +58,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     (void)proof_report;
 #endif
     observation::Scope ir_timing(observation::Phase::llvm_ir);
-    auto module = lower(input, context, source_program ? "__void" : generation_suffix, machine->createDataLayout(),input.entry_symbol,
+    auto module = lower(input, context, source_program ? "__void" : generation_suffix, layout,input.entry_symbol,
                         nullptr,nullptr
 #ifdef VOID_LLVM_RESEARCH
                         ,storage_proof ? &inventory : nullptr
@@ -186,18 +190,16 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         b.SetInsertPoint(failed);
         // Use the platform CRT's stderr, preserving the existing captured source
         // messages and bounded trace without requiring Runtime for scalar objects.
-#ifdef _WIN32
-        auto* stream=b.CreateCall(module->getOrInsertFunction("__acrt_iob_func",b.getPtrTy(),b.getInt32Ty()),{b.getInt32(2)});
-#else
-#ifdef __APPLE__
-        const char* stream_name="__stderrp";
-#else
-        const char* stream_name="stderr";
-#endif
-        auto* stream_global=module->getNamedGlobal(stream_name);
-        if(!stream_global)stream_global=new llvm::GlobalVariable(*module,b.getPtrTy(),false,llvm::GlobalValue::ExternalLinkage,nullptr,stream_name);
-        auto* stream=b.CreateLoad(b.getPtrTy(),stream_global);
-#endif
+        llvm::Value* stream;
+        if (machine->getTargetTriple().isOSWindows()) {
+            stream = b.CreateCall(module->getOrInsertFunction("__acrt_iob_func", b.getPtrTy(), b.getInt32Ty()), {b.getInt32(2)});
+        } else {
+            const char* stream_name = machine->getTargetTriple().isMacOSX() ? "__stderrp" : "stderr";
+            auto* global = module->getNamedGlobal(stream_name);
+            if (!global) global = new llvm::GlobalVariable(*module, b.getPtrTy(), false,
+                llvm::GlobalValue::ExternalLinkage, nullptr, stream_name);
+            stream = b.CreateLoad(b.getPtrTy(), global);
+        }
         auto print_error=module->getOrInsertFunction("fprintf",llvm::FunctionType::get(b.getInt32Ty(),{b.getPtrTy(),b.getPtrTy()},true));
         auto* format=b.CreateGlobalString("%s");
         b.CreateCall(print_error, {stream,format,message});
@@ -276,9 +278,9 @@ void emit_object(const ir::Module& input, const std::filesystem::path& output, b
 }
 diagnostics::PrivateMap emit_publication_object(const ir::Module& input, const std::filesystem::path& output,
                                                 bool optimize, std::string_view semantic_inputs_sha256, bool size, bool debug,
-                                                const PublicationResources* resources, bool thin_lto) {
+                                                const PublicationResources* resources, bool thin_lto, std::string_view target_triple) {
     diagnostics::PrivateMap map(semantic_inputs_sha256);
-    emit_impl(input,output,optimize,true,false,{},false,{}, {},debug ? project::DebugInfo::full : project::DebugInfo::none,&map,size,resources,thin_lto);
+    emit_impl(input,output,optimize,true,false,{},false,{}, {},debug ? project::DebugInfo::full : project::DebugInfo::none,&map,size,resources,thin_lto,target_triple);
     return map;
 }
 void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {

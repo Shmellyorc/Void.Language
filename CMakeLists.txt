@@ -238,7 +238,7 @@ if(VOID_SANITIZERS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT MSVC)
       "VOID_${entry_kind}_SANITIZER_MAGIC=${CMAKE_MATCH_1}" "VOID_${entry_kind}_SANITIZER_HASH=${CMAKE_MATCH_2}")
   endforeach()
 endif()
-set(VOID_LLVM_COMPONENTS Core Support native OrcJIT Passes Target MC Object CodeGen BitWriter)
+set(VOID_LLVM_COMPONENTS Core Support native X86 AArch64 OrcJIT Passes Target MC Object CodeGen BitWriter)
 if(VOID_LLVM_RESEARCH)
   list(APPEND VOID_LLVM_COMPONENTS MCDisassembler)
 endif()
@@ -355,7 +355,7 @@ target_link_libraries(void_publish PUBLIC void_core)
 target_include_directories(void_publish SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS})
 target_compile_options(void_publish PRIVATE ${VOID_LLVM_DEFINITIONS})
 target_link_libraries(void_publish PRIVATE ${VOID_CORE_LLVM_LIBS})
-add_library(voidc_objects OBJECT src/main.cpp src/native_approval.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
+add_library(voidc_objects OBJECT src/main.cpp src/target_pack.cpp src/native_approval.cpp src/native_build.cpp src/native_import.cpp examples/proof.cpp)
 target_compile_definitions(voidc_objects PRIVATE VOID_RAYLIB_BUILD_ROOT="${verified_raylib_build_root}"
   VOID_RAYLIB_SANITIZE=$<BOOL:${VOID_SANITIZERS}>
   VOID_RAYLIB_ORIGIN="${verified_raylib_origin}" VOID_RAYLIB_BASE_REVISION="${verified_raylib_base_revision}"

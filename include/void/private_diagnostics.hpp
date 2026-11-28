@@ -50,5 +50,5 @@ namespace ir { struct Module; }
 using PublicationResources = std::map<std::string, std::string>;
 diagnostics::PrivateMap emit_publication_object(const ir::Module&, const std::filesystem::path&,
     bool optimize, std::string_view semantic_inputs_sha256, bool size = false,
-    bool debug = true, const PublicationResources* resources = nullptr, bool thin_lto = false);
+    bool debug = true, const PublicationResources* resources = nullptr, bool thin_lto = false, std::string_view target_triple = {});
 }

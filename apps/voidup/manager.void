@@ -239,6 +239,7 @@ func up_environment(context: up_context, release_id: string) -> [string]:
     for name in ["HOME", "USERPROFILE", "SYSTEMROOT", "WINDIR", "PROGRAMDATA", "TMPDIR", "TMP", "TEMP", "LANG", "LC_ALL", "TERM", "CI", "XDG_DATA_HOME", "XDG_CONFIG_HOME", "XDG_CACHE_HOME", "XDG_STATE_HOME", "XDG_RUNTIME_DIR", "DISPLAY", "WAYLAND_DISPLAY", "XAUTHORITY", "DBUS_SESSION_BUS_ADDRESS"]:
         if os.env(name) is Ok(var item):
             environment.push(name + "=" + item)
+    environment.push("VOID_TARGET_PACK_ROOT=" + context.options.root_path + "/target-packs")
     # Compiler/loader overrides and caller PATH never select executables or SDKs.
     if os.platform() == "windows":
         environment.push("PATH=" + context.options.root_path + "/toolchains/" + release_id + "/sdk/bin")
@@ -279,7 +280,7 @@ func up_run(context: up_context, writer: io.directory_lock) -> result<i32, suppo
 
 func up_dispatch(context: up_context, writer: io.directory_lock) -> result<i32, support.up_error>:
     var command_name = context.options.command
-    if command_name == "run":
+    if command_name == "run" or command_name == "target":
         return up_run(context, writer)
     if command_name == "setup" or command_name == "update":
         context.options.release_id = ""

@@ -1,0 +1,162 @@
+name: Publish with target packs
+on:
+  push:
+    branches: [codex/milestone-4-cross-platform-publishing]
+  workflow_dispatch:
+concurrency:
+  group: target-packs-${{ github.ref }}
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, job: runtime}
+          - {runner: macos-15, job: publisher}
+    runs-on: ${{ matrix.runner }}
+    env:
+      PYTHONUTF8: '1'
+      EXPERIMENT_CONFIGURATION: Release
+      EXPERIMENT_DIR: ${{ runner.temp }}/evidence
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - name: Install Linux development tools and Ubuntu link inputs
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential ninja-build libffi-dev libedit-dev libxml2-dev libzstd-dev zlib1g-dev libtinfo-dev libc6-dev gcc-13 g++-13 libidn2-0 libunistring5
+          python tools/ci/linux_disk.py prepare
+      - uses: actions/cache@v5
+        with:
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
+      - name: Verify pinned compiler SDK
+        run: python tools/ci/llvm_sdk.py
+      - name: Identify pinned dependency closure
+        id: http
+        run: python tools/ci/http_bootstrap.py identity
+      - uses: actions/cache@v5
+        with:
+          path: .toolchains/http/downloads
+          key: ${{ steps.http.outputs.sources-key }}
+      - uses: actions/cache@v5
+        id: http-deps
+        with:
+          path: ${{ steps.http.outputs.prefix }}
+          key: ${{ steps.http.outputs.deps-key }}
+      - uses: actions/cache@v5
+        with:
+          path: |
+            .toolchains/http/test-python
+            .toolchains/http/test-certificates
+            .toolchains/http/test-certificates-tools
+          key: ${{ steps.http.outputs.fixtures-key }}
+      - name: Verify or build pinned HTTP closure
+        env:
+          HTTP_DEPS_CACHE_HIT: ${{ steps.http-deps.outputs.cache-hit }}
+        run: python tools/ci/http_bootstrap.py bootstrap
+      - name: Build pinned Runtime host providers
+        run: python tools/ci/voidup_bootstrap.py bootstrap
+      - name: Configure the selective ThinLTO build
+        shell: bash
+        run: |
+          cache="$RUNNER_TEMP/void-thinlto"
+          mkdir "$cache"
+          options=()
+          if [ "$RUNNER_OS" = Linux ]; then
+            options+=(-DVOID_LINUX_THINLTO=ON "-DCMAKE_EXE_LINKER_FLAGS=--ld-path=\"$VOID_LINKER\" -Wl,--thinlto-cache-dir=\"$cache\"")
+          else
+            options+=(-DCMAKE_OSX_ARCHITECTURES=arm64 "-DCMAKE_OSX_SYSROOT=$SDKROOT"
+              "-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET" "-DCMAKE_EXE_LINKER_FLAGS=-Wl,-cache_path_lto,\"$cache\"")
+          fi
+          cmake -S . -B "$RUNNER_TEMP/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
+            "-DLLVM_DIR=$LLVM_DIR" "-DVOID_CLANG=$VOID_CLANG" "-DVOID_LINKER=$VOID_LINKER" "${options[@]}"
+          cmake --build "$RUNNER_TEMP/build" --target voidc voidup --parallel 3
+          test -n "$(find "$cache" -type f -size +0c -print -quit)"
+          find "$cache" -type f | wc -l
+      - name: Generate Runtime candidate and authenticated Ubuntu input references
+        if: matrix.job == 'runtime'
+        run: |
+          python tools/target_pack.py "$RUNNER_TEMP/build" "$RUNNER_TEMP/candidate" --id custom-ci-linux --cc gcc-13 --ubuntu-inputs
+          tar -C "$RUNNER_TEMP/candidate" -czf "$RUNNER_TEMP/runtime-linux-x64.tar.gz" .
+      - uses: actions/upload-artifact@v6
+        if: matrix.job == 'runtime'
+        with:
+          name: linux-x64-runtime-${{ github.sha }}
+          path: ${{ runner.temp }}/runtime-linux-x64.tar.gz
+          if-no-files-found: error
+      - name: Preserve qualified compiler inputs for the cross-host job
+        if: matrix.job == 'publisher'
+        run: |
+          mkdir "$RUNNER_TEMP/compiler"
+          cp "$RUNNER_TEMP/build/voidc" "$RUNNER_TEMP/compiler/"
+          tar -C "$RUNNER_TEMP/compiler" -czf "$RUNNER_TEMP/compiler.tar.gz" .
+      - uses: actions/upload-artifact@v6
+        if: matrix.job == 'publisher'
+        with:
+          name: macos-arm64-publisher-${{ github.sha }}
+          path: ${{ runner.temp }}/compiler.tar.gz
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: target-pack-build-evidence-${{ runner.os }}
+          path: ${{ runner.temp }}/evidence/
+          if-no-files-found: ignore
+  publish:
+    needs: build
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+      - uses: actions/cache/restore@v5
+        with:
+          path: .toolchains/llvm-23.1.4
+          key: llvm-sdk-23.1.4-${{ runner.os }}-${{ runner.arch }}-v1
+      - run: python tools/ci/llvm_sdk.py
+      - uses: actions/download-artifact@v7
+        with:
+          name: linux-x64-runtime-${{ github.sha }}
+          path: ${{ runner.temp }}
+      - uses: actions/download-artifact@v7
+        with:
+          name: macos-arm64-publisher-${{ github.sha }}
+          path: ${{ runner.temp }}
+      - name: Publish Linux x64 on macOS ARM64
+        run: |
+          mkdir "$RUNNER_TEMP/candidate" "$RUNNER_TEMP/compiler"
+          tar -C "$RUNNER_TEMP/candidate" -xzf "$RUNNER_TEMP/runtime-linux-x64.tar.gz"
+          tar -C "$RUNNER_TEMP/compiler" -xzf "$RUNNER_TEMP/compiler.tar.gz"
+          grep -Fx 'source ${{ github.sha }}' "$RUNNER_TEMP/candidate/runtime/target-pack.txt"
+          python tools/target_pack.py compose "$RUNNER_TEMP/candidate" "$RUNNER_TEMP/pack"
+          printf 'VOID native 23.1.4 v2\n%s\n' "$VOID_CLANG" > "$RUNNER_TEMP/compiler/void-native.txt"
+          export VOID_STDLIB_ROOT="$GITHUB_WORKSPACE/stdlib"
+          python tests/project/target_packs.py produce "$RUNNER_TEMP/compiler/voidc" "$RUNNER_TEMP/pack" "$RUNNER_TEMP/distributions"
+          tar -C "$RUNNER_TEMP/distributions" -czf "$RUNNER_TEMP/distributions.tar.gz" .
+      - uses: actions/upload-artifact@v6
+        with:
+          name: linux-x64-from-macos-arm64-${{ github.sha }}
+          path: ${{ runner.temp }}/distributions.tar.gz
+          if-no-files-found: error
+  run:
+    needs: publish
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v7
+        with:
+          name: linux-x64-from-macos-arm64-${{ github.sha }}
+          path: ${{ runner.temp }}
+      - name: Execute relocated Linux x64 distributions
+        run: |
+          mkdir "$RUNNER_TEMP/distributions"
+          tar -C "$RUNNER_TEMP/distributions" -xzf "$RUNNER_TEMP/distributions.tar.gz"
+          python3 tests/project/target_packs.py consume "$RUNNER_TEMP/distributions"

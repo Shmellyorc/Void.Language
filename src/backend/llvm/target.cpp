@@ -16,11 +16,28 @@ void initialize_native_target() {
     std::call_once(once, [] {
         if (llvm::InitializeNativeTarget() || llvm::InitializeNativeTargetAsmPrinter())
             throw std::runtime_error("native LLVM target unavailable");
+        const auto host = llvm::Triple(llvm::sys::getDefaultTargetTriple()).getArch();
+        if (host != llvm::Triple::x86_64) {
+            LLVMInitializeX86TargetInfo();
+            LLVMInitializeX86Target();
+            LLVMInitializeX86TargetMC();
+            LLVMInitializeX86AsmPrinter();
+        }
+        if (host != llvm::Triple::aarch64) {
+            LLVMInitializeAArch64TargetInfo();
+            LLVMInitializeAArch64Target();
+            LLVMInitializeAArch64TargetMC();
+            LLVMInitializeAArch64AsmPrinter();
+        }
     });
 }
 
 std::unique_ptr<llvm::TargetMachine> native_aot_machine(bool split_sections) {
-    const auto triple = detail::native_deployment_triple(llvm::Triple(llvm::sys::getDefaultTargetTriple()));
+    return aot_machine(native_deployment_triple(llvm::Triple(llvm::sys::getDefaultTargetTriple())), split_sections);
+}
+
+std::unique_ptr<llvm::TargetMachine> aot_machine(const llvm::Triple& triple, bool split_sections) {
+    initialize_native_target();
     std::string error;
     auto* target = llvm::TargetRegistry::lookupTarget(triple, error);
     if (!target) throw std::runtime_error(error);
@@ -29,7 +46,7 @@ std::unique_ptr<llvm::TargetMachine> native_aot_machine(bool split_sections) {
     options.DataSections = split_sections;
     std::unique_ptr<llvm::TargetMachine> machine(target->createTargetMachine(triple, "generic", "",
         options, llvm::Reloc::PIC_));
-    if (!machine) throw std::runtime_error("cannot create native target machine");
+    if (!machine) throw std::runtime_error("cannot create LLVM target machine: " + triple.str());
     return machine;
 }
 void write_object(llvm::Module& module, llvm::TargetMachine& machine, const std::filesystem::path& output) {

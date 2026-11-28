@@ -100,6 +100,12 @@ func up_parse(const operands: [string]) -> result<up_options, support.up_error>:
             position += 1
         if position != operands.count:
             return Err(support.up_fail("unexpected command operands", "arguments", 2))
+    else if options.command == "target":
+        options.release_id = "default"
+        options.tool = "voidc"
+        options.forwarded = ["target"]
+        for index in position..<operands.count:
+            options.forwarded.push(operands[index])
     else if options.command == "run":
         if position + 2 >= operands.count:
             return Err(support.up_fail("run requires release/default, tool, and --", "arguments", 2))
@@ -121,4 +127,4 @@ func up_parse(const operands: [string]) -> result<up_options, support.up_error>:
     return Ok(options)
 
 func up_help() -> string:
-    return "VOIDUP 0.2 — " + distribution.up_trust_label + "\n\nRun the downloaded installer to install and activate the latest compatible stable VOID.\nOpen a new terminal, then use voidc and voidls. No Python, CMake or manual LLVM setup.\n\nCommands:\n  setup (default when no command is given)\n  update\n  install [RELEASE|latest] [--activate]\n  list [--available]\n  default RELEASE | rollback\n  which <voidc|voidls>\n  env [--format json|sh|powershell|vscode]\n  verify RELEASE | doctor\n  run <RELEASE|default> <voidc|voidls> -- <literal arguments...>\n  --help | --version\n\nAdvanced global options (before command):\n  --root ABSOLUTE-PATH  Dedicated private user root\n  --catalog HTTPS-URL   Authenticated private/test catalog override\n  --ca-file PEM         Replacement TLS roots; never release signing keys\n  --timeout-ms N        100..120000, default 30000\n  --status MODE         auto|plain|off\n\nThe bootstrap integrates a stable user-local tool directory. Existing versions and rollback are retained.\nNo automatic manager self-update or pruning is performed.\n"
+    return "VOIDUP 0.2 — " + distribution.up_trust_label + "\n\nRun the downloaded installer to install and activate the latest compatible stable VOID.\nOpen a new terminal, then use voidc and voidls. No Python, CMake or manual LLVM setup.\n\nCommands:\n  setup (default when no command is given)\n  update\n  install [RELEASE|latest] [--activate]\n  list [--available]\n  default RELEASE | rollback\n  which <voidc|voidls>\n  env [--format json|sh|powershell|vscode]\n  verify RELEASE | doctor\n  target list [--available] | add DIRECTORY | inspect ID | verify ID | remove ID\n  run <RELEASE|default> <voidc|voidls> -- <literal arguments...>\n  --help | --version\n\nAdvanced global options (before command):\n  --root ABSOLUTE-PATH  Dedicated private user root\n  --catalog HTTPS-URL   Authenticated private/test catalog override\n  --ca-file PEM         Replacement TLS roots; never release signing keys\n  --timeout-ms N        100..120000, default 30000\n  --status MODE         auto|plain|off\n\nThe bootstrap integrates a stable user-local tool directory. Existing versions and rollback are retained.\nNo automatic manager self-update or pruning is performed.\n"

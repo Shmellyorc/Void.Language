@@ -8,12 +8,13 @@
 
 namespace vd::cli {
 using HelpRow = std::pair<std::string_view, std::string_view>;
-inline constexpr std::array<HelpRow, 16> commands{{
+inline constexpr std::array<HelpRow, 17> commands{{
     {"crashes", "Diagnose an explicitly launched native program."},
     {"check", "Check source and imports."},
     {"run", "Compile and run through the JIT."},
     {"build", "Build a native executable."},
     {"publish", "Publish a native application distribution."},
+    {"target", "Manage publishing target packs."},
     {"emit", "Write a native object."},
     {"init", "Add a project manifest."},
     {"new", "Create a project or manage templates."},
@@ -41,10 +42,11 @@ inline void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="check")out<<"Usage: voidc check <file-or-directory> [--no-opt]\n";
     if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
-    if(command.empty() || command=="publish")out<<"Usage: voidc publish [--project DIR] [--entry RELATIVE.void] [--target linux-x64|windows-x64|macos-arm64] [--profile release|performance|protected] [-o NEW-DIRECTORY]\n"
+    if(command.empty() || command=="publish")out<<"Usage: voidc publish [--project DIR] [--entry RELATIVE.void] [--target TARGET] [--profile release|performance|protected] [-o NEW-DIRECTORY]\n"
       "       [--optimization none|size|speed] [--resources embed|files] [--symbols private|none] [--native-catalog SHA256] [--lto none|thin] [--portable]\n"
       "       voidc publish --verify DIR\n"
       "       voidc publish --resolve-diagnostic MAP IMAGE TOKEN\n";
+    if(command.empty() || command=="target")out<<"Usage: voidc target list [--available] | add DIRECTORY | inspect ID | verify ID | remove ID\n";
     if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
       "       voidc package --verify DIR\n"
       "       voidc package list | voidc package search NAME\n"
@@ -222,7 +224,8 @@ Example: voidc check --project .
             }});
         }
         if (command=="publish") std::cout << R"help(
-Publish to a fresh native-host distribution. The default profile is release.
+Publish to a fresh distribution. The default profile is release.
+Foreign targets require a compatible installed target pack.
 Managed native code needs the exact catalog SHA-256 and redistribution rights.
 Example: voidc publish --project . --resources embed -o dist/my-app
 )help";

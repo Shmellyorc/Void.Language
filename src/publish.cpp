@@ -1,4 +1,5 @@
 #include "void/publish.hpp"
+#include "void/publish_target.hpp"
 #include "void/path.hpp"
 #include "frontend/project_digest.hpp"
 #include "frontend/project_files.hpp"
@@ -8,9 +9,6 @@
 
 namespace vd::publish {
 namespace {
-bool target_name(std::string_view value) {
-    return value == "linux-x64" || value == "windows-x64" || value == "macos-arm64";
-}
 bool profile_name(std::string_view value) {
     return value == "release" || value == "performance" || value == "protected";
 }
@@ -104,13 +102,10 @@ PublishPlan preflight(const Request& request, std::string_view host) {
     Request physical = request;
     physical.project = root.path;
     auto plan = plan_contract(physical, *parsed.manifest, host);
-    if (plan.target() != host)
-        throw std::invalid_argument("Publishing target " + plan.target() + "/" + plan.profile() +
-            " requires its matching native host. Current host: " + std::string(host) + ".");
     if (plan.profile() == "protected")
         throw std::invalid_argument("The protected publishing profile has no approved obfuscation policy. Use release or performance.");
-    if (plan.thin_lto() && (plan.target() != "linux-x64" || plan.optimization() == "none"))
-        throw std::invalid_argument("Publishing ThinLTO requires Linux x64 and optimization size or speed.");
+    if (plan.thin_lto() && (plan.target() != "linux-x64" || host != plan.target() || plan.optimization() == "none"))
+        throw std::invalid_argument("Publishing ThinLTO requires native Linux x64 and optimization size or speed.");
     if (!parsed.manifest->native().empty())
         throw std::invalid_argument("Publish requires verified managed native catalogs with redistribution notices.");
     if (request.native_catalog && !parsed.manifest->native_requirement())

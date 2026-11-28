@@ -1,3 +1,4 @@
+#include "void/publish_target.hpp"
 #include "void/binary_audit.hpp"
 #include "frontend/project_digest.hpp"
 #include <llvm/Object/ObjectFile.h>
@@ -281,7 +282,8 @@ Report inspect(std::string_view bytes, const Policy& policy) {
             report.findings.back()={"limit","Finding budget exceeded; inspection is incomplete.",0};
         }
     };
-    if ((policy.revision!=1 && policy.revision!=2) || (policy.target!="linux-x64" && policy.target!="windows-x64" && policy.target!="macos-arm64") || policy.forbidden_strings.size()>64) {
+    const auto* target=publish::find_target(policy.target);
+    if ((policy.revision!=1 && policy.revision!=2) || !target || policy.forbidden_strings.size()>64) {
         finding("unsupported-policy","Require policy revision 1 or 2 and an existing target spelling; at most 64 canaries."); return report;
     }
     std::size_t canary_bytes=0;
@@ -399,8 +401,8 @@ Report inspect(std::string_view bytes, const Policy& policy) {
         }
         std::sort(report.exports.begin(), report.exports.end());
         report.inspected=true;
-        const auto expected=policy.target=="macos-arm64"?"aarch64":"x86_64";
-        const auto expected_format=policy.target=="linux-x64"?"ELF":policy.target=="windows-x64"?"PE":"Mach-O";
+        const auto expected=target->architecture==publish::Architecture::arm64?"aarch64":"x86_64";
+        const auto expected_format=target->system==publish::System::linux_gnu?"ELF":target->system==publish::System::windows_msvc?"PE":"Mach-O";
         if(report.architecture!=expected || report.format!=expected_format) finding("target-mismatch","Image format or architecture differs from policy target.");
         if(policy.reject_debug && report.debug) finding("debug-metadata","Debug sections or external debug declarations are present; compressed contents are not decoded.");
         if(policy.reject_symbols && (policy.revision==1 ? report.symbols : report.static_symbols)) finding("symbol-table","Symbol metadata is present outside the policy's retained dynamic symbols.");

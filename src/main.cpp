@@ -6,6 +6,7 @@
 #include "void/path.hpp"
 #include "void/native_build.hpp"
 #include "void/publish.hpp"
+#include "target_pack.hpp"
 #include "void/binary_audit.hpp"
 #include "frontend/project_digest.hpp"
 #include <llvm/TargetParser/Triple.h>
@@ -670,6 +671,11 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             throw UsageError("Unknown command: "+command);
         if(argc==3 && (std::string(argv[2])=="--help" || std::string(argv[2])=="-h")) {help(command);return 0;}
         if(command=="crashes")throw UsageError("Expected crashes run ABSOLUTE-EXECUTABLE [arguments...].");
+        if (command == "target") {
+            std::vector<std::string_view> args;
+            for (int i = 2; i < argc; ++i) args.emplace_back(argv[i]);
+            return vd::publish::pack_command(args);
+        }
         if(command=="publish") {
             std::vector<std::string_view> args;
             for(int i=2;i<argc;++i)args.emplace_back(argv[i]);
@@ -695,8 +701,12 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             auto request=vd::publish::parse_arguments(args);
             vd::project::require_outside_user_package_store(request.project);
             const auto plan = vd::publish::preflight(request,target);
+            const auto pack = plan.target() == target ? std::optional<vd::publish::Pack>{} :
+                std::optional{vd::publish::load_pack(plan.target())};
             auto result = vd::analyze_manifest_project_with_native_approval(request.project, plan.entry(),
                 [&](const vd::ManagedNativeApprovalSubject& subject) -> std::filesystem::path {
+                    if (pack)
+                        throw vd::NativeApprovalRequired("Managed native dependencies require a destination-approved catalog variant. Target packs currently publish applications without managed native dependencies.");
                     const auto& identity = subject.dependencies.native_catalog_identity();
                     if (request.native_catalog != identity)
                         throw vd::NativeApprovalRequired("Review redistribution rights and native catalog contents. "
@@ -712,7 +722,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             vd::require_source_entry(program);
             for (const auto& warning : program.warnings()) std::cerr << vd::render_diagnostic(warning) << '\n';
             vd::crash::context(vd::crash::Operation::aot_build);
-            const auto archive = vd::publish_native_application(*result.project, plan, argv[0]);
+            const auto archive = vd::publish_native_application(*result.project, plan, argv[0], pack ? &*pack : nullptr);
             std::cout << "Private diagnostics: " << vd::path_utf8(archive) << '\n';
             return 0;
         }

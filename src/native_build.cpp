@@ -2,6 +2,7 @@
 #include "void/compiler_observation.hpp"
 #include "void/native_build.hpp"
 #include "void/publish.hpp"
+#include "target_pack.hpp"
 #include "void/binary_audit.hpp"
 #include "frontend/project_digest.hpp"
 #include "void/native_import.hpp"
@@ -203,15 +204,35 @@ void verify_resources(const fs::path& config, Resources& resources) {
         if(path.is_absolute() && (extension==".a" || extension==".lib" || extension==".so" || extension==".dylib"))require(path);
     }
 }
+fs::path native_config_path(const char* argv0) {
+    const auto executable = utf8_path(llvm::sys::fs::getMainExecutable(argv0, reinterpret_cast<void*>(&native_config_path)));
+    return executable.parent_path() / "void-native.txt";
+}
+bool native_config_header(std::string_view header) {
+    return header == "VOID native 23.1.4 v1" || header == "VOID native 23.1.4 v2";
+}
+fs::path config_path_value(const fs::path& config, std::string_view value) {
+    const auto path = utf8_path(value);
+    return path.is_absolute() ? path : (config.parent_path() / path).lexically_normal();
+}
+#ifdef VOID_NATIVE_PUBLISHING
+fs::path pack_tools_directory(const char* argv0) {
+    const auto path = native_config_path(argv0);
+    std::ifstream config(path);
+    std::string header, driver;
+    if (!std::getline(config, header) || !std::getline(config, driver) || !native_config_header(header) || driver.empty())
+        throw std::runtime_error("Cannot identify the host LLVM SDK from " + path_utf8(path));
+    return config_path_value(path, driver).parent_path();
+}
+#endif
 Resources resources(const char* argv0) {
     observation::Scope timing(observation::Phase::toolchain_validation);
-    auto executable=utf8_path(llvm::sys::fs::getMainExecutable(argv0,reinterpret_cast<void*>(&resources)));
-    const auto config=executable.parent_path()/"void-native.txt";
+    const auto config=native_config_path(argv0);
     std::ifstream file(config);std::vector<std::string> lines;std::string line;
     while(std::getline(file,line)){if(!line.empty() && line.back()=='\r')line.pop_back();lines.push_back(line);}
-    if(!file.eof() || lines.size()<5 || (lines[0]!="VOID native 23.1.4 v1" && lines[0]!="VOID native 23.1.4 v2"))
+    if(!file.eof() || lines.size()<5 || !native_config_header(lines[0]))
         throw std::runtime_error("Native toolchain resources missing or invalid: "+path_utf8(config));
-    auto path=[&](const std::string& text){auto p=utf8_path(text);return p.is_absolute()?p:(config.parent_path()/p).lexically_normal();};
+    auto path=[&](const std::string& text){return config_path_value(config, text);};
     Resources result{path(lines[1]),lines[2].empty()?fs::path{}:path(lines[2]),path(lines[3]),path(lines[4]),{},{}};
     for(const auto& p:{result.driver,result.runtime,result.fixture}) {
         if(!fs::is_regular_file(p))throw std::runtime_error("Native toolchain resource missing: "+path_utf8(p));
@@ -278,6 +299,120 @@ struct ProductionLink {
     std::optional<diagnostics::PrivateMap> map;
     std::string symbols;
 };
+std::string publishing_inputs(const ProductionLink& production, const ValidatedAnalysis& analysis,
+                              std::string_view link_digest, const std::map<std::string, std::string>& payload) {
+    project::Digest inputs;
+    inputs.field(publish::policy_revision);
+    inputs.field(compiler_build_identity());
+    inputs.field(production.plan.target());
+    inputs.field(production.plan.profile());
+    inputs.field(production.plan.optimization());
+    inputs.field(production.plan.resources());
+    inputs.field(production.plan.symbols());
+    inputs.field(production.plan.thin_lto() ? "thin" : "none");
+    inputs.field(link_digest);
+    const auto& locked = analysis.locked_dependencies();
+    inputs.field(locked ? locked->identity() : "");
+    inputs.field(analysis.entry_identity());
+    inputs.field(analysis.application_metadata()->bytes());
+    for (const auto& module : analysis.modules()) {
+        inputs.field(module.identity);
+        inputs.field(module.source.text());
+    }
+    for (const auto& [name, bytes] : production.assets) {
+        inputs.field(name);
+        inputs.field(bytes);
+    }
+    for (const auto& [name, bytes] : payload) {
+        inputs.field(name);
+        inputs.field(bytes);
+    }
+    return inputs.finish();
+}
+
+#ifdef VOID_NATIVE_PUBLISHING
+void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& requested, const char* argv0,
+                      const project::ProjectDirectoryReader& reader, ProductionLink& production,
+                      const publish::Pack& pack) {
+    if (analysis.c_primitive_admission())
+        throw std::runtime_error("Target pack publishing requires a destination-compatible native provider.");
+    const auto output = output_path(analysis, requested);
+#ifdef _WIN32
+    native_windows::Directory stage(native_windows::temporary_root(), true);
+#else
+    (void)reader;
+    Staging stage(output);
+#endif
+    const auto& work = stage.directory;
+    const auto object = work / "program.o";
+    const auto executable = work / "program";
+    const auto directory = pack_tools_directory(argv0);
+    const auto tool = [&](std::string_view name) {
+        auto path = directory / utf8_path(name);
+#ifdef _WIN32
+        path += ".exe";
+#endif
+        exact_path(path);
+        if (!llvm::sys::fs::can_execute(path_utf8(path)))
+            throw std::runtime_error("Missing LLVM target-pack linker tool: " + path_utf8(path));
+        return path;
+    };
+    const auto linker = tool("ld.lld");
+    version(linker, "LLD 23.1.4", work / "version.txt");
+    for (const auto& [name, bytes] : pack.files) {
+        if (!name.starts_with("link/")) continue;
+        std::ofstream file(work / utf8_path(std::string_view(name).substr(5)), std::ios::binary);
+        file.write(bytes.data(), static_cast<std::streamsize>(bytes.size()));
+        file.close();
+        if (!file) throw std::runtime_error("Cannot stage pack link input: " + name);
+    }
+    const auto loader = publish::linux_loader(*pack.target);
+    const auto interpreter = std::string(pack.target->architecture == publish::Architecture::arm64 ? "/lib/" : "/lib64/") + loader;
+    std::vector<std::string> arguments{path_utf8(linker), "-pie", "--as-needed", "--gc-sections", "--no-undefined",
+        "--eh-frame-hdr", "--build-id=sha1", "-z", "relro", "-z", "now", "-z", "noexecstack",
+        "--dynamic-linker", interpreter, "-o", path_utf8(executable)};
+    const auto input = [&](const char* name) { arguments.push_back(path_utf8(work / name)); };
+    for (auto name : publish::linux_start) input(name);
+    arguments.push_back(path_utf8(object));
+    arguments.push_back("--start-group");
+    for (auto name : publish::linux_archives) input(name);
+    for (auto name : publish::linux_libraries) input(name);
+    input(loader);
+    arguments.push_back("--end-group");
+    for (auto name : publish::linux_end) input(name);
+
+    const auto& plan = production.plan;
+    const bool keep_symbols = plan.symbols() == "private";
+    production.map = emit_publication_object(analysis.lower(ir::Emission::entry), object, plan.optimization() != "none",
+        publishing_inputs(production, analysis, pack.digest, {}), plan.optimization() == "size", keep_symbols,
+        plan.resources() == "embed" ? &production.assets : nullptr, false, pack.target->triple);
+    {
+        observation::Scope timing(observation::Phase::native_link_driver);
+        if (execute(arguments) != 0) {
+            timing.fail();
+            throw std::runtime_error("Target pack link failed for " + pack.id + ". Review the linker diagnostics above.");
+        }
+    }
+    const auto objcopy = path_utf8(tool("llvm-objcopy"));
+    if (keep_symbols) {
+        const auto debug = work / "program.debug";
+        if (execute({objcopy, "--only-keep-debug", path_utf8(executable), path_utf8(debug)}))
+            throw std::runtime_error("Cannot extract target-pack private debug symbols.");
+        production.symbols = project::read_project_input(debug, audit::byte_limit);
+    }
+    if (execute({objcopy, "--strip-all", "--remove-section=.comment", path_utf8(executable)}))
+        throw std::runtime_error("Cannot strip target-pack executable.");
+#ifdef _WIN32
+    const auto pins = native_windows::pin_directories(output.parent_path(), reader.reservation);
+    native_windows::copy_checked(executable, output);
+#else
+    if (!llvm::sys::fs::can_execute(path_utf8(executable)))
+        throw std::runtime_error("Target linker did not set executable file permissions.");
+    publish_link_output(executable, output);
+#endif
+}
+#endif
+
 }
 static std::string link_executable(const ValidatedAnalysis& analysis, const fs::path& requested, bool optimize,
                                    const char* argv0, std::string_view profile, bool package,
@@ -384,31 +519,6 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
     args.push_back("-ldl"); // Optional system terminfo binding in the Runtime archive.
 #endif
     if (production) {
-        project::Digest inputs;
-        inputs.field(publish::policy_revision);
-        inputs.field(compiler_build_identity());
-        inputs.field(production->plan.target());
-        inputs.field(production->plan.profile());
-        inputs.field(production->plan.optimization());
-        inputs.field(production->plan.resources());
-        inputs.field(production->plan.symbols());
-        inputs.field(production->plan.thin_lto() ? "thin" : "none");
-        inputs.field(config.verified_digests);
-        inputs.field(locked ? locked->identity() : "");
-        inputs.field(analysis.entry_identity());
-        inputs.field(analysis.application_metadata()->bytes());
-        for (const auto& module : analysis.modules()) {
-            inputs.field(module.identity);
-            inputs.field(module.source.text());
-        }
-        for (const auto& [name, bytes] : production->assets) {
-            inputs.field(name);
-            inputs.field(bytes);
-        }
-        for (const auto& [name, bytes] : payload) {
-            inputs.field(name);
-            inputs.field(bytes);
-        }
 #if defined(_WIN32)
         args.insert(args.end(), {"-Xlinker", "/opt:ref", "-Xlinker", "/opt:noicf",
             "-Xlinker", "/incremental:no", "-Xlinker", "/brepro"});
@@ -423,7 +533,7 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
         }
 #endif
         production->map = emit_publication_object(analysis.lower(ir::Emission::entry), object, optimize,
-            inputs.finish(), production->plan.optimization() == "size", production->plan.symbols() == "private",
+            publishing_inputs(*production, analysis, config.verified_digests, payload), production->plan.optimization() == "size", production->plan.symbols() == "private",
             production->plan.resources() == "embed" ? &production->assets : nullptr, production->plan.thin_lto());
     } else {
         emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance,source_debug);
@@ -639,6 +749,11 @@ void copy_notices(const fs::path& stage, const char* argv0, const project::Proje
     if (!notices.contains("void-mit-license.txt")) throw std::runtime_error("Missing VOID application package license.");
 }
 
+bool production_image(const audit::Report& report) {
+    return report.inspected && (report.image_kind == "executable" ||
+        (report.format == "ELF" && report.image_kind == "shared-or-pie" && !report.interpreter.empty()));
+}
+
 void check_package_image(std::string_view bytes) {
 #ifdef _WIN32
     native_windows::check_executable({llvm::StringRef(bytes),executable_name},true);
@@ -661,7 +776,9 @@ void check_package_image(std::string_view bytes) {
 #endif
 }
 
-std::string package_inventory(const fs::path& root, bool prepare, const project::ProjectDirectoryReader& reader, bool production = false) {
+std::string package_inventory(const fs::path& root, bool prepare, const project::ProjectDirectoryReader& reader, std::string_view production_target = {}) {
+    const bool production = !production_target.empty();
+    const auto executable = production_target.starts_with("windows-") ? "app.exe" : production ? "app" : executable_name;
     std::map<std::string, std::string> rows;
     std::size_t remaining = package_byte_limit;
     auto file = [&](const fs::directory_entry& entry, const std::string& name) {
@@ -670,17 +787,17 @@ std::string package_inventory(const fs::path& root, bool prepare, const project:
         const auto bytes = reader.read(entry.path(), remaining);
         remaining -= bytes.size();
 #ifndef _WIN32
-        if (name == executable_name && !llvm::sys::fs::can_execute(path_utf8(entry.path())))
+        if (name == executable && !llvm::sys::fs::can_execute(path_utf8(entry.path())))
             throw std::runtime_error("Application package executable is not executable: " + path_utf8(entry.path()));
 #endif
-        if (name == executable_name) check_package_image(bytes);
+        if (name == executable && !production) check_package_image(bytes);
         rows.emplace(name, package_digest(bytes) + '\t' + std::to_string(bytes.size()) + '\t' + name + '\n');
     };
     bool has_inventory = false;
     for (const auto& entry : fs::directory_iterator(root)) {
         const auto name = path_utf8(entry.path().filename());
         if (name == inventory_name && !prepare) { has_inventory = true; continue; }
-        if (name == executable_name || name == metadata_name || (production && name == "binary-audit.json")) file(entry, name);
+        if (name == executable || name == metadata_name || (production && name == "binary-audit.json")) file(entry, name);
         else if ((name == "assets" || name == "native" || name == "licenses") && fs::is_directory(entry.symlink_status())) {
 #ifdef _WIN32
             reader.inspect(entry.path());
@@ -706,7 +823,7 @@ std::string package_inventory(const fs::path& root, bool prepare, const project:
         } else throw std::runtime_error("Unexpected application package entry: " + name);
     }
     if (!prepare && !has_inventory) throw std::runtime_error("Missing exact application package inventory filename.");
-    if (!rows.contains(executable_name) || !rows.contains(metadata_name) || !rows.contains("licenses/VOID-MIT-LICENSE.txt"))
+    if (!rows.contains(executable) || !rows.contains(metadata_name) || !rows.contains("licenses/VOID-MIT-LICENSE.txt"))
         throw std::runtime_error("Application package is missing its executable, metadata or license.");
     std::string result;
     for (const auto& [name, row] : rows) result += row;
@@ -806,8 +923,10 @@ void build_application_package(const ProjectAnalysis& project_analysis, const fs
 #endif
 }
 
-fs::path publish_native_application(const ProjectAnalysis& project_analysis, const publish::PublishPlan& plan, const char* argv0) {
+fs::path publish_native_application(const ProjectAnalysis& project_analysis, const publish::PublishPlan& plan, const char* argv0, const publish::Pack* pack) {
 #ifdef VOID_NATIVE_PUBLISHING
+    const auto target = pack ? pack->target->id : std::string_view(plan.target());
+    const auto executable = target.starts_with("windows-") ? "app.exe" : "app";
     const auto& analysis = *project_analysis.program();
     const auto& root = project_analysis.root();
     const auto& requested = plan.output();
@@ -846,7 +965,10 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
     fs::path archive;
     project::publish_application_directory(parent, leaf, [&](const fs::path& stage, const project::ProjectDirectoryReader& reader) {
         ProductionLink production{plan, assets, {}, {}};
-        copy_notices(stage, argv0, reader);
+        if (pack) {
+            for (const auto& [name, bytes] : pack->files)
+                if (name.starts_with("licenses/")) write_package_file(stage / utf8_path(name), bytes, reader);
+        } else copy_notices(stage, argv0, reader);
         const auto license = root / "LICENSE";
         if (fs::exists(fs::symlink_status(license)))
             write_package_file(stage / "licenses/APPLICATION-LICENSE.txt", project::read_project_input(license, 1024 * 1024), reader);
@@ -855,9 +977,10 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
                 write_package_file(stage / utf8_path(name), bytes, reader);
 
         const auto debug = plan.symbols() == "private" ? project::DebugInfo::full : project::DebugInfo::none;
-        link_executable(analysis, stage / executable_name, plan.optimization() != "none", argv0, plan.profile(), true, reader, debug, &production);
-        const auto image = reader.read(stage / executable_name, audit::byte_limit);
-        audit::Policy policy{2, plan.target(), true, true, true, {}};
+        if (pack) link_target_pack(analysis, stage / executable, argv0, reader, production, *pack);
+        else link_executable(analysis, stage / executable, plan.optimization() != "none", argv0, plan.profile(), true, reader, debug, &production);
+        const auto image = reader.read(stage / executable, audit::byte_limit);
+        audit::Policy policy{2, std::string(target), true, true, true, {}};
         auto forbid = [&](const fs::path& path) {
             auto text = path_utf8(path);
             if (text.size() > 3 && text.size() <= 256 &&
@@ -868,17 +991,15 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
         forbid(parent.path);
         forbid(standard_library_root());
         const auto report = audit::inspect(image, policy);
-        if (!report.inspected || !report.findings.empty()) {
+        if (!production_image(report) || !report.findings.empty()) {
             std::string details;
             for (const auto& finding : report.findings) details += "\n" + finding.code + ": " + finding.detail;
             throw std::runtime_error("Final executable failed binary auditing." + details);
         }
         for (const auto& name : report.dependencies) {
-#if defined(__APPLE__)
-            const bool system = name.starts_with("/usr/lib/") || name.starts_with("/System/Library/Frameworks/");
-#else
-            const bool system = !name.empty() && name.find_first_of("/\\:") == name.npos;
-#endif
+            const bool system = target.starts_with("macos-") ?
+                name.starts_with("/usr/lib/") || name.starts_with("/System/Library/Frameworks/") :
+                !name.empty() && name.find_first_of("/\\:") == name.npos;
             if (!system) throw std::runtime_error("Non-relocatable executable dependency: " + name);
         }
         production.map->bind_image(image);
@@ -887,23 +1008,18 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
             throw std::runtime_error("Binary audit report exceeds the publication size limit.");
         write_package_file(stage / "binary-audit.json", report_text, reader);
         write_package_file(stage / metadata_name, analysis.application_metadata()->bytes(), reader);
-        const auto files = package_inventory(stage, true, reader, true);
-        const auto inventory = std::string("VOID native publication 1\ntarget ") + plan.target() +
+        const auto files = package_inventory(stage, true, reader, target);
+        const auto inventory = std::string("VOID native publication 1\ntarget ") + std::string(target) +
             "\nprofile " + plan.profile() + "\nbuild " + production.map->build_id() + "\n" + files;
         write_package_file(stage / inventory_name, inventory, reader);
-        if (files != package_inventory(stage, false, reader, true))
+        if (files != package_inventory(stage, false, reader, target))
             throw std::runtime_error("Publication file inventory changed before delivery.");
 
         const auto private_root = root / ".void" / "publish-diagnostics";
         const auto archive_name = production.map->image_sha256();
         const auto map = production.map->encode();
-#if defined(__APPLE__)
-        constexpr auto symbol_file = "app.dwarf";
-#elif defined(_WIN32)
-        constexpr auto symbol_file = "app.unstripped.exe";
-#else
-        constexpr auto symbol_file = "app.debug";
-#endif
+        const auto symbol_file = target.starts_with("macos-") ? "app.dwarf" : target.starts_with("windows-") ?
+            "app.unstripped.exe" : "app.debug";
         std::map<std::string, std::string_view> private_files{{"diagnostics.vdiag", map}};
         if (!production.symbols.empty()) private_files.emplace(symbol_file, production.symbols);
         project::with_user_package_store(private_root, true, [&](const project::CreationRoot& destination) {
@@ -919,12 +1035,12 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
     std::cout << "Published application: " << path_utf8(actual_output) << '\n';
     return archive;
 #else
-    (void)project_analysis; (void)plan; (void)argv0;
+    (void)project_analysis; (void)plan; (void)argv0; (void)pack;
     throw std::runtime_error("Publishing requires Linux x64 GNU, Windows x64 MSVC or macOS ARM64.");
 #endif
 }
 
-void verify_native_publication(const fs::path& directory, std::string_view host) {
+void verify_native_publication(const fs::path& directory, std::string_view) {
 #ifdef VOID_NATIVE_PUBLISHING
 #ifdef _WIN32
     require_package_path_spelling(directory);
@@ -935,21 +1051,22 @@ void verify_native_publication(const fs::path& directory, std::string_view host)
     std::string magic, target, profile, build;
     if (!std::getline(rows, magic) || !std::getline(rows, target) || !std::getline(rows, profile) ||
         !std::getline(rows, build) || magic != "VOID native publication 1" ||
-        target != "target " + std::string(host) ||
+        !target.starts_with("target ") || !publish::find_target(std::string_view(target).substr(7)) ||
         (profile != "profile release" && profile != "profile performance") ||
         !build.starts_with("build ") || !hex_digest(std::string_view(build).substr(6)))
-        throw std::runtime_error("Invalid native publication inventory for the current host.");
+        throw std::runtime_error("Invalid native publication inventory.");
     const std::string recorded{std::istreambuf_iterator<char>(rows), {}};
-    if (recorded != package_inventory(root, false, {}, true))
+    const auto platform = std::string_view(target).substr(7);
+    if (recorded != package_inventory(root, false, {}, platform))
         throw std::runtime_error("Native publication inventory mismatch. A file is missing, changed or unexpected.");
-    const auto image = project::read_project_input(root / executable_name, audit::byte_limit);
-    const auto report = audit::inspect(image, {2, std::string(host), true, true, true, {}});
-    if (!report.inspected || !report.findings.empty() ||
+    const auto image = project::read_project_input(root / (platform.starts_with("windows-") ? "app.exe" : "app"), audit::byte_limit);
+    const auto report = audit::inspect(image, {2, std::string(platform), true, true, true, {}});
+    if (!production_image(report) || !report.findings.empty() ||
         project::read_project_input(root / "binary-audit.json", audit_report_byte_limit) != audit::json(report) + '\n')
         throw std::runtime_error("Native publication binary audit mismatch.");
     (void)ApplicationMetadata::decode(project::read_project_input(root / metadata_name, ApplicationMetadata::byte_limit));
 #else
-    (void)directory; (void)host;
+    (void)directory;
     throw std::runtime_error("Native publication verification is unavailable on this host.");
 #endif
 }
