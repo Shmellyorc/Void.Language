@@ -9,7 +9,10 @@
 #include <llvm/Object/COFFImportFile.h>
 #include <llvm/Config/llvm-config.h>
 #include <llvm/Object/ELFObjectFile.h>
+#include <llvm/Support/Path.h>
 #include <llvm/Support/Process.h>
+#include <llvm/Support/Endian.h>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -54,55 +57,80 @@ llvm::Triple::ArchType llvm_architecture(const Target& target) {
 }
 void check_archive(std::string_view name, std::string_view bytes, const Target& target) {
     auto archive = llvm::object::Archive::create({bytes, name});
-    const auto reject = [&] {
-        throw std::runtime_error("Target pack contains a malformed or incompatible archive: " + std::string(name));
+    std::string member_name;
+    const auto reject = [&](std::string_view reason) {
+        auto message = "Target pack contains a malformed or incompatible archive: " + std::string(name);
+        if (!member_name.empty()) message += " (" + member_name + ")";
+        throw std::runtime_error(message + ": " + std::string(reason));
     };
     if (!archive) {
         llvm::consumeError(archive.takeError());
-        reject();
+        reject("invalid archive structure");
     }
     const bool windows = target.system == System::windows_msvc;
+    const bool msvc_sdk = windows && std::ranges::find(windows_libraries, name) != windows_libraries.end();
     const auto expected = llvm_architecture(target);
+    const auto machine = expected == llvm::Triple::aarch64 ? llvm::COFF::IMAGE_FILE_MACHINE_ARM64 :
+        llvm::COFF::IMAGE_FILE_MACHINE_AMD64;
     auto iteration_error = llvm::Error::success();
-    std::size_t count = 0;
+    std::size_t count = 0, compatible = 0;
     for (const auto& member : (*archive)->children(iteration_error)) {
         auto buffer = member.getMemoryBufferRef();
         if (!buffer) {
             llvm::consumeError(buffer.takeError());
-            reject();
+            reject("invalid member extent");
         }
-        if (++count > 100000) reject();
+        member_name = std::string(llvm::sys::path::filename(buffer->getBufferIdentifier()));
+        if (++count > 100000) reject("member count exceeds limit");
         const auto kind = llvm::identify_magic(buffer->getBuffer());
+        if (msvc_sdk && (kind == llvm::file_magic::windows_resource || kind == llvm::file_magic::unknown)) {
+            // These vendor records carry no readable machine identity. Keep
+            // checking all native members and let LLD reject any unsupported
+            // record that the application actually selects from the archive.
+            continue;
+        }
+        if (msvc_sdk && kind == llvm::file_magic::coff_cl_gl_object) {
+            // MSVC libraries can carry lazy LTCG members alongside ordinary
+            // COFF. Validate the anonymous header's machine. LLD decides
+            // whether the application actually requires such a member.
+            const auto contents = buffer->getBuffer();
+            if (contents.size() < 8 || llvm::support::endian::read16le(contents.data() + 6) != machine)
+                reject("MSVC LTCG member has the wrong machine");
+            continue;
+        }
         if (kind == llvm::file_magic::bitcode) {
             auto triple = llvm::getBitcodeTargetTriple(*buffer);
             if (!triple) {
                 llvm::consumeError(triple.takeError());
-                reject();
+                reject("invalid LLVM bitcode");
             }
             const llvm::Triple value{llvm::StringRef(*triple)};
             if (value.getArch() != expected || (windows ? !value.isWindowsMSVCEnvironment() : !value.isOSLinux()))
-                reject();
+                reject("LLVM triple differs from the target");
         } else if (windows && kind == llvm::file_magic::coff_import_library) {
-            if (buffer->getBufferSize() < sizeof(llvm::object::coff_import_header)) reject();
+            if (buffer->getBufferSize() < sizeof(llvm::object::coff_import_header))
+                reject("truncated import header");
             const llvm::object::COFFImportFile object(*buffer);
-            if (object.getMachine() != (expected == llvm::Triple::aarch64 ? llvm::COFF::IMAGE_FILE_MACHINE_ARM64 : llvm::COFF::IMAGE_FILE_MACHINE_AMD64))
-                reject();
+            if (object.getMachine() != machine) reject("import header has the wrong machine");
         } else {
             if (kind != (windows ? llvm::file_magic::coff_object : llvm::file_magic::elf_relocatable))
-                reject();
+                reject("unexpected member format " + std::to_string(static_cast<int>(kind)));
             auto object = llvm::object::ObjectFile::createObjectFile(*buffer);
             if (!object) {
                 llvm::consumeError(object.takeError());
-                reject();
+                reject("invalid relocatable object");
             }
-            if ((*object)->getArch() != expected || !(*object)->isRelocatableObject()) reject();
+            if ((*object)->getArch() != expected || !(*object)->isRelocatableObject())
+                reject("relocatable object has the wrong architecture");
         }
+        ++compatible;
     }
     if (iteration_error) {
         llvm::consumeError(std::move(iteration_error));
-        reject();
+        reject("invalid member table");
     }
-    if (!count) reject();
+    if (!compatible) reject("no compatible linkable object");
+
 }
 void check_link_file(std::string_view name, std::string_view bytes, const Target& target) {
     const auto kind = llvm::identify_magic(bytes);
