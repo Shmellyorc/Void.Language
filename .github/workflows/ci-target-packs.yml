@@ -8,11 +8,15 @@ on:
         description: Target-pack qualification scope
         type: choice
         default: foundation
-        options: [foundation, acquisition, platform-probes, windows-runtime, macos-runtime, all]
+        options: [foundation, acquisition, platform-probes, windows-runtime, macos-runtime, macos-universal, all]
       reviewed_sha:
         description: Exact source revision for full platform Runtime probes
         type: string
         default: 8da376501a5a5ee3be7bf606b44e41088e429511
+      native_run_id:
+        description: Successful independent native macOS Runtime run for the universal probe
+        type: string
+        default: ''
 concurrency:
   group: target-packs-${{ github.ref }}-${{ inputs.scope || 'foundation' }}
   cancel-in-progress: false
@@ -20,7 +24,7 @@ permissions:
   contents: read
 jobs:
   build-linux:
-    if: inputs.scope != 'windows-runtime' && inputs.scope != 'macos-runtime' && inputs.scope != 'platform-probes'
+    if: inputs.scope != 'macos-universal' && inputs.scope != 'windows-runtime' && inputs.scope != 'macos-runtime' && inputs.scope != 'platform-probes'
     permissions:
       contents: read
       id-token: write
@@ -246,7 +250,7 @@ jobs:
           path: ${{ runner.temp }}/evidence/
           if-no-files-found: ignore
   build-macos:
-    if: inputs.scope != 'windows-runtime' && inputs.scope != 'macos-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
+    if: inputs.scope != 'macos-universal' && inputs.scope != 'windows-runtime' && inputs.scope != 'macos-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
     strategy:
       matrix:
         include:
@@ -255,7 +259,7 @@ jobs:
     env: *build-env
     steps: *build-steps
   build-windows:
-    if: inputs.scope != 'windows-runtime' && inputs.scope != 'macos-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
+    if: inputs.scope != 'macos-universal' && inputs.scope != 'windows-runtime' && inputs.scope != 'macos-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
     strategy:
       fail-fast: false
       matrix:
@@ -617,3 +621,113 @@ jobs:
           name: macos-full-native-logs-${{ matrix.cpu }}-${{ inputs.reviewed_sha }}
           path: ${{ runner.temp }}/macos-full-native/**/*.log
           if-no-files-found: ignore
+  compose-universal-runtime:
+    if: inputs.scope == 'macos-universal'
+    runs-on: macos-26
+    permissions:
+      actions: read
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NATIVE_RUN_ID: ${{ inputs.native_run_id }}
+      REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+    steps:
+      - name: Require successful independent native checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$NATIVE_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$REVIEWED_SHA" =~ ^[0-9a-f]{40}$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$NATIVE_RUN_ID" | jq -e             '.path == ".github/workflows/ci-target-packs.yml" and .conclusion == "success"'
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$NATIVE_RUN_ID/jobs" | jq -e             '[.jobs[] | select(.name | startswith("run-full-macos-runtime (")) | select(.conclusion == "success")] as $jobs
+            | ($jobs | length) == 2 and ($jobs | any(.name | contains("macos-26-intel, x86_64")))
+              and ($jobs | any(.name | contains("macos-26, arm64")))'
+      - uses: actions/download-artifact@v7
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.native_run_id }}
+          name: macos-full-runtime-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/linux-original
+      - uses: actions/download-artifact@v7
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.native_run_id }}
+          name: macos-full-native-arm64-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/arm64
+      - uses: actions/download-artifact@v7
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.native_run_id }}
+          name: macos-full-native-x86_64-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/x86_64
+      - name: Assemble and sign the universal probe application
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          mkdir linux-expanded
+          tar -C linux-expanded -xzf linux-original/macos-full-runtime.tar.gz
+          test "$(cat linux-expanded/source-sha.txt)" = "$REVIEWED_SHA"
+          for arch in arm64 x86_64; do
+            cmp "$arch/app" "linux-expanded/$arch/app"
+            for image in app libVoidRuntime.dylib; do
+              test "$(lipo -archs "$arch/$image")" = "$arch"
+              codesign --verify --strict "$arch/$image"
+            done
+          done
+          bundle=VoidRuntimeProbe.app
+          mkdir -p "$bundle/Contents/MacOS"
+          python3 - "$bundle/Contents/Info.plist" <<'PYTHON'
+          import plistlib
+          import sys
+          with open(sys.argv[1], 'wb') as plist:
+              plistlib.dump({
+                  'CFBundleExecutable': 'app',
+                  'CFBundleIdentifier': 'org.void.runtime-probe',
+                  'CFBundleName': 'VOID Runtime Probe',
+                  'CFBundlePackageType': 'APPL',
+                  'CFBundleVersion': '1.0.0',
+                  'LSMinimumSystemVersion': '14.0',
+              }, plist)
+          PYTHON
+          for image in app libVoidRuntime.dylib; do
+            lipo -create "arm64/$image" "x86_64/$image" -output "$bundle/Contents/MacOS/$image"
+            lipo -verify_arch arm64 x86_64 "$bundle/Contents/MacOS/$image"
+          done
+          chmod 755 "$bundle/Contents/MacOS/app"
+          codesign --force --sign - "$bundle/Contents/MacOS/libVoidRuntime.dylib"
+          codesign --force --sign - "$bundle"
+          codesign --verify --strict --deep "$bundle"
+          tar -czf universal-runtime-probe.tar.gz "$bundle"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: macos-universal-runtime-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/universal-runtime-probe.tar.gz
+          if-no-files-found: error
+  run-universal-runtime:
+    needs: compose-universal-runtime
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: macos-26, cpu: arm64}
+          - {runner: macos-26-intel, cpu: x86_64}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: macos-universal-runtime-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}
+      - name: Run the signed universal application on its native slice
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          test "$(uname -m)" = '${{ matrix.cpu }}'
+          tar -xzf universal-runtime-probe.tar.gz
+          bundle="$RUNNER_TEMP/VoidRuntimeProbe.app"
+          codesign --verify --strict --deep "$bundle"
+          for image in app libVoidRuntime.dylib; do
+            lipo -verify_arch arm64 x86_64 "$bundle/Contents/MacOS/$image"
+          done
+          test "$(cd / && "$bundle/Contents/MacOS/app")" = 43
