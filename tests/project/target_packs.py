@@ -82,7 +82,8 @@ def produce(compiler, pack, output):
         altered = workspace / "altered"
         altered.mkdir()
         # Compatibility is checked before any pack payload is read.
-        (altered / manifest.name).write_text(manifest.read_text().replace("runtime void-aot-64-v1", "runtime future"))
+        (altered / manifest.name).write_bytes(
+            manifest.read_bytes().replace(b"runtime void-aot-64-v1", b"runtime future"))
         run(compiler, "target", "add", altered, env=env, failure="Incompatible target pack")
         result = run(compiler, "target", "add", pack, env=env)
         assert pack_id in result.stdout and f"sha256={hashlib.sha256(manifest.read_bytes()).hexdigest()}" in result.stdout
