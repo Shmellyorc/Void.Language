@@ -24,27 +24,31 @@ Request parse_arguments(std::span<const std::string_view> args) {
         }
         if (key != "--project" && key != "--entry" && key != "--target" && key != "--profile" &&
             key != "--optimization" && key != "--resources" && key != "--symbols" &&
-            key != "--native-catalog" && key != "--lto" && key != "-o")
+            key != "--native-catalog" && key != "--lto" && key != "--format" && key != "--icon" && key != "-o")
             throw std::invalid_argument("Unsupported publish argument: " + std::string(key) + ". Use --project DIR; publish accepts no source operand or native consent flag.");
         if (!seen.insert(key).second) throw std::invalid_argument("Duplicate publish argument: " + std::string(key));
         if (++i == args.size() || args[i].empty() || args[i].starts_with('-') || args[i].find('\0') != args[i].npos)
             throw std::invalid_argument("Expected one value after " + std::string(key));
         const auto value = args[i];
         if (key == "--project") request.project = utf8_path(value);
-        else if (key == "--entry") {
+        else if (key == "--entry" || key == "--icon") {
             auto p = utf8_path(value);
-            if (p.has_root_path() || value.find('\\') != value.npos || value.find(':') != value.npos || !value.ends_with(".void"))
-                throw std::invalid_argument("Publish --entry requires an exact project-relative .void path.");
+            if (p.has_root_path() || value.find('\\') != value.npos || value.find(':') != value.npos || !value.ends_with(key == "--entry" ? ".void" : ".icns"))
+                throw std::invalid_argument(std::string(key) + " requires an exact project-relative path with the matching extension.");
             for (const auto& part : p) if (part == "." || part == ".." || part.empty())
-                throw std::invalid_argument("Publish --entry cannot contain dot or parent components.");
-            if (path_utf8(p.lexically_normal()) != value) throw std::invalid_argument("Publish --entry must be normalized.");
-            request.entry = value;
+                throw std::invalid_argument("Publish paths cannot contain dot or parent components.");
+            if (path_utf8(p.lexically_normal()) != value) throw std::invalid_argument("Publish paths must be normalized.");
+            if (key == "--entry") request.entry = value;
+            else request.icon = value;
         } else if (key == "--target") {
             if (!target_name(value)) throw std::invalid_argument("Unsupported publish target: " + std::string(value));
             request.target = value;
         } else if (key == "--profile") {
             if (!profile_name(value)) throw std::invalid_argument("Unsupported publish profile: " + std::string(value));
             request.profile = value;
+        } else if (key == "--format") {
+            if (value != "directory" && value != "app") throw std::invalid_argument("Expected --format directory|app.");
+            request.format = value;
         } else if (key == "--optimization") {
             if (value != "none" && value != "size" && value != "speed")
                 throw std::invalid_argument("Expected --optimization none|size|speed.");
@@ -83,6 +87,8 @@ PublishPlan::PublishPlan(const Request& request, const project::Manifest& manife
     resources_ = request.resources.value_or(config.resources.value_or("files"));
     symbols_ = request.symbols.value_or(config.symbols.value_or("private"));
     lto_ = request.lto.value_or(config.lto.value_or("none"));
+    app_bundle_ = request.format.value_or(config.format.value_or("directory")) == "app";
+    icon_ = request.icon ? request.icon : config.icon;
     project::Digest digest; digest.bytes(manifest.source().text()); manifest_sha256_ = digest.finish();
     required_capabilities_ = {"admitted-project-snapshot", "native-target:" + target_, "private-diagnostics", "final-bundle-audit", "fresh-directory-transaction"};
     if (!manifest.dependencies().empty()) required_capabilities_.push_back("verified-dependency-lock");
@@ -102,6 +108,10 @@ PublishPlan preflight(const Request& request, std::string_view host) {
     Request physical = request;
     physical.project = root.path;
     auto plan = plan_contract(physical, *parsed.manifest, host);
+    if (plan.icon() && !plan.app_bundle())
+        throw std::invalid_argument("An application icon requires --format app.");
+    if (plan.app_bundle() && !plan.target().starts_with("macos-"))
+        throw std::invalid_argument("Application bundles require a macOS compilation target.");
     if (plan.profile() == "protected")
         throw std::invalid_argument("The protected publishing profile has no approved obfuscation policy. Use release or performance.");
     if (plan.thin_lto() && (plan.target() != "linux-x64" || host != plan.target() || plan.optimization() == "none"))

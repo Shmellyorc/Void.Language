@@ -13,6 +13,7 @@ void build_executable(const ValidatedAnalysis&, const std::filesystem::path&, bo
 void build_application_package(const ProjectAnalysis&, const std::filesystem::path&, bool optimize,
                                const char* argv0, std::string_view profile, bool replace);
 std::filesystem::path publish_native_application(const ProjectAnalysis&, const publish::PublishPlan&, const char* argv0, const publish::Pack* = nullptr);
-void verify_native_publication(const std::filesystem::path&, std::string_view target);
+void verify_native_publication(const std::filesystem::path&);
+void archive_macos_application(const std::filesystem::path&, const std::filesystem::path&);
 void verify_application_package(const std::filesystem::path&);
 }

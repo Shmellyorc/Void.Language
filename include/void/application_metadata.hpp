@@ -20,6 +20,7 @@ public:
     static Owner decode(std::string_view);
     const std::string& bytes() const { return bytes_; }
     std::string_view application_id() const;
+    Fields fields() const;
     bool operator==(const ApplicationMetadata&) const = default;
 private:
     ApplicationMetadata(std::string bytes, std::uint32_t app_offset, std::uint32_t app_length);

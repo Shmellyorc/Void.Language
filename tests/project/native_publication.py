@@ -3,11 +3,13 @@ from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha256
 import json
 import os
+import plistlib
 import shutil
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import zipfile
 
 compiler, llvm = map(lambda p: Path(p).resolve(), sys.argv[1:])
 windows = sys.platform == "win32"
@@ -126,6 +128,29 @@ async func main() -> i32:
         assert "_main" in report["exports"] and set(report["exports"]) <= {"_main", "__mh_execute_header"}, report
     assert (output / "void-package.txt").read_text().splitlines()[1] == "target " + target
     run(compiler, "publish", "--verify", output)
+    if macos:
+        bundled = root / "app publication"
+        bundle_result = publish(project, "--format", "app", "-o", bundled)
+        app = next(bundled.glob("*.app"))
+        plist = plistlib.loads((app / "Contents/Info.plist").read_bytes())
+        assert plist["CFBundleIdentifier"] + ".app" == app.name
+        assert plist["CFBundlePackageType"] == "APPL"
+        assert plist["LSMinimumSystemVersion"] == "14.0"
+        image = app / "Contents/MacOS" / plist["CFBundleExecutable"]
+        assert archive(bundle_result).name == sha256(image.read_bytes()).hexdigest()
+        run("/usr/bin/codesign", "--verify", "--strict", app)
+        run(compiler, "publish", "--verify", bundled)
+        assert run(image, cwd=outside).stdout.strip() == "21"
+        for publication in (output, bundled):
+            archive_file = root / (publication.name + ".zip")
+            run(compiler, "publish", "--bundle", publication, "-o", archive_file)
+            with zipfile.ZipFile(archive_file) as package:
+                entry = package.getinfo(f"{app.name}/Contents/MacOS/app")
+                assert entry.create_system == 3 and (entry.external_attr >> 16) & 0o111
+                assert package.read(entry) == (publication / "app" if publication == output else image).read_bytes()
+            extracted = root / ("zip " + publication.name)
+            run("/usr/bin/ditto", "-x", "-k", archive_file, extracted)
+            assert run(extracted / app.name / "Contents/MacOS/app", cwd=outside).stdout.strip() == "21"
     if target == "linux-x64":
         second_producer = root / "second producer path"
         second_producer.mkdir()

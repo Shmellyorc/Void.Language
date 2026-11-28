@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           - {runner: ubuntu-24.04, job: runtime}
-          - {runner: macos-15, job: publisher}
+          - {runner: macos-26, job: publisher}
     runs-on: ${{ matrix.runner }}
     env:
       PYTHONUTF8: '1'
@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.14'
+          python-version: ${{ runner.os == 'Linux' && '3.14' || '3.12' }}
       - name: Select isolated build and linker cache locations
         shell: bash
         run: |
@@ -82,8 +82,11 @@ jobs:
           cmake -S . -B "$RUNNER_TEMP/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF \
             "-DLLVM_DIR=$LLVM_DIR" "-DVOID_CLANG=$VOID_CLANG" "-DVOID_LINKER=$VOID_LINKER" "${options[@]}"
           cmake --build "$RUNNER_TEMP/build" --target voidc voidup --parallel 3
-          test -n "$(find "$cache" -type f -size +0c -print -quit)"
+          test -n "$(find "$cache" -type f -size +0c | head -1)"
           find "$cache" -type f | wc -l
+      - name: Verify native macOS publishing and application bundle
+        if: matrix.job == 'publisher'
+        run: python tests/project/native_publication.py "$RUNNER_TEMP/build/voidc" "$(dirname "$VOID_CLANG")"
       - name: Generate Runtime candidate and authenticated Ubuntu input references
         if: matrix.job == 'runtime'
         run: |
@@ -115,7 +118,7 @@ jobs:
           if-no-files-found: ignore
   publish:
     needs: build
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6

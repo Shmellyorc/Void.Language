@@ -72,7 +72,7 @@ struct NativeRequirement {
 };
 // Production settings are separate from development build profiles.
 struct Publishing {
-    std::optional<std::string> target, default_profile, output, optimization, resources, symbols, lto;
+    std::optional<std::string> target, default_profile, output, optimization, resources, symbols, lto, format, icon;
 };
 
 inline constexpr std::size_t native_catalog_byte_limit = 32 * 1024;

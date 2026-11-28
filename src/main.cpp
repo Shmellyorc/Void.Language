@@ -694,8 +694,13 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
                 host.isOSWindows() && host.getArch()==llvm::Triple::x86_64?"windows-x64":
                 host.isMacOSX() && host.getArch()==llvm::Triple::aarch64?"macos-arm64":"unqualified-host";
             if (args.size() == 2 && args[0] == "--verify") {
-                vd::verify_native_publication(vd::utf8_path(args[1]), target);
+                vd::verify_native_publication(vd::utf8_path(args[1]));
                 std::cout << "Native publication verified.\n";
+                return 0;
+            }
+            if (args.size() == 4 && args[0] == "--bundle" && args[2] == "-o") {
+                vd::archive_macos_application(vd::utf8_path(args[1]), vd::utf8_path(args[3]));
+                std::cout << "Published macOS bundle ZIP.\n";
                 return 0;
             }
             auto request=vd::publish::parse_arguments(args);

@@ -7,7 +7,7 @@ namespace vd::publish {
 inline constexpr std::string_view policy_revision = "native-publish-1";
 struct Request {
     std::filesystem::path project = ".";
-    std::optional<std::string> entry, target, profile, optimization, resources, symbols, lto, native_catalog;
+    std::optional<std::string> entry, target, profile, optimization, resources, symbols, lto, native_catalog, format, icon;
     std::optional<std::filesystem::path> output;
 };
 // Pure CLI parsing. No source operands, subprocesses or writes.
@@ -20,7 +20,8 @@ class PublishPlan final {
     std::string target_, profile_, manifest_sha256_, optimization_, resources_, symbols_, lto_;
     std::filesystem::path output_;
     std::string project_id_;
-    std::optional<std::string> entry_;
+    std::optional<std::string> entry_, icon_;
+    bool app_bundle_ = false;
     std::vector<std::string> required_capabilities_;
     PublishPlan(const Request&, const project::Manifest&, std::string_view host);
     friend PublishPlan plan_contract(const Request&, const project::Manifest&, std::string_view);
@@ -29,6 +30,8 @@ public:
     PublishPlan(PublishPlan&&) = default;
     PublishPlan& operator=(const PublishPlan&) = delete;
     PublishPlan& operator=(PublishPlan&&) = delete;
+    bool app_bundle() const { return app_bundle_; }
+    const auto& icon() const { return icon_; }
     bool thin_lto() const { return lto_ == "thin"; }
     const auto& optimization() const { return optimization_; }
     const auto& resources() const { return resources_; }

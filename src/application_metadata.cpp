@@ -35,9 +35,9 @@ ApplicationMetadata::Owner ApplicationMetadata::make(const Fields& fields) {
     }
     return Owner(new ApplicationMetadata(std::move(bytes), offset, static_cast<std::uint32_t>(fields[3].size())));
 }
-ApplicationMetadata::Owner ApplicationMetadata::decode(std::string_view bytes) {
-    if (bytes.size() > byte_limit || take_word(bytes) != revision) invalid();
-    Fields fields;
+static ApplicationMetadata::Fields metadata_fields(std::string_view bytes) {
+    if (bytes.size() > ApplicationMetadata::byte_limit || take_word(bytes) != ApplicationMetadata::revision) invalid();
+    ApplicationMetadata::Fields fields;
     for (auto& field : fields) {
         const auto size = take_word(bytes);
         if (size > bytes.size()) invalid();
@@ -45,8 +45,12 @@ ApplicationMetadata::Owner ApplicationMetadata::decode(std::string_view bytes) {
         bytes.remove_prefix(size);
     }
     if (!bytes.empty()) invalid();
-    return make(fields);
+    return fields;
 }
+ApplicationMetadata::Owner ApplicationMetadata::decode(std::string_view bytes) {
+    return make(metadata_fields(bytes));
+}
+ApplicationMetadata::Fields ApplicationMetadata::fields() const { return metadata_fields(bytes_); }
 std::string_view ApplicationMetadata::application_id() const {
     return std::string_view(bytes_).substr(app_offset_, app_length_);
 }

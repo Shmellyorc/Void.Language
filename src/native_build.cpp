@@ -1,8 +1,10 @@
 #include "void/crash_diagnostics.hpp"
 #include "void/compiler_observation.hpp"
 #include "void/native_build.hpp"
+#include "void/distribution_archive.hpp"
 #include "void/publish.hpp"
 #include "target_pack.hpp"
+#include "macos_bundle.hpp"
 #include "void/binary_audit.hpp"
 #include "frontend/project_digest.hpp"
 #include "void/native_import.hpp"
@@ -776,7 +778,8 @@ void check_package_image(std::string_view bytes) {
 #endif
 }
 
-std::string package_inventory(const fs::path& root, bool prepare, const project::ProjectDirectoryReader& reader, std::string_view production_target = {}) {
+std::string package_inventory(const fs::path& root, bool prepare, const project::ProjectDirectoryReader& reader, std::string_view production_target = {},
+                              const std::string& bundle = {}) {
     const bool production = !production_target.empty();
     const auto executable = production_target.starts_with("windows-") ? "app.exe" : production ? "app" : executable_name;
     std::map<std::string, std::string> rows;
@@ -793,12 +796,64 @@ std::string package_inventory(const fs::path& root, bool prepare, const project:
         if (name == executable && !production) check_package_image(bytes);
         rows.emplace(name, package_digest(bytes) + '\t' + std::to_string(bytes.size()) + '\t' + name + '\n');
     };
+    auto directory = [&](const fs::path& path) {
+        if (!fs::is_directory(fs::symlink_status(path)))
+            throw std::runtime_error("Invalid macOS bundle directory: " + path_utf8(path));
+        reader.inspect(path);
+    };
+    auto exact_contents = [&](const fs::path& path, std::set<std::string> allowed) {
+        directory(path);
+        for (const auto& entry : fs::directory_iterator(path))
+            if (!allowed.erase(path_utf8(entry.path().filename())))
+                throw std::runtime_error("Unexpected macOS bundle entry: " + path_utf8(entry.path()));
+        if (!allowed.empty()) throw std::runtime_error("Incomplete macOS application bundle.");
+    };
+    auto flat_files = [&](const fs::path& path, const std::string& name) {
+        directory(path);
+        std::set<std::string> names;
+        for (const auto& child : fs::directory_iterator(path)) {
+            const auto leaf = path_utf8(child.path().filename());
+            if (!package_leaf(leaf) || !names.insert(project::fold_project_name(leaf)).second)
+                throw std::runtime_error("Invalid or duplicate bundle resource path: " + name + '/' + leaf);
+            file(child, name + '/' + leaf);
+        }
+        if (names.empty()) throw std::runtime_error("Unexpected empty bundle asset directory.");
+    };
+    const auto executable_path = bundle.empty() ? std::string(executable) : bundle + "/Contents/MacOS/app";
+    if (!bundle.empty()) {
+        const auto contents = root / utf8_path(bundle) / "Contents";
+        exact_contents(contents.parent_path(), {"Contents"});
+        std::set<std::string> contents_names{"Info.plist", "MacOS", "Resources"};
+        const auto signature = contents / "_CodeSignature";
+        if (fs::exists(fs::symlink_status(signature))) {
+            contents_names.insert("_CodeSignature");
+            exact_contents(signature, {"CodeResources"});
+            file(fs::directory_entry(signature / "CodeResources"), bundle + "/Contents/_CodeSignature/CodeResources");
+        }
+        exact_contents(contents, std::move(contents_names));
+        exact_contents(contents / "MacOS", {"app"});
+        const auto resources = contents / "Resources";
+        directory(resources);
+        file(fs::directory_entry(contents / "Info.plist"), bundle + "/Contents/Info.plist");
+        file(fs::directory_entry(contents / "MacOS/app"), executable_path);
+        for (const auto& entry : fs::directory_iterator(resources)) {
+            const auto name = path_utf8(entry.path().filename());
+            if (name == "AppIcon.icns") file(entry, bundle + "/Contents/Resources/" + name);
+            else if (name == "assets") flat_files(entry.path(), bundle + "/Contents/Resources/assets");
+            else throw std::runtime_error("Unexpected macOS bundle resource: " + name);
+        }
+#ifndef _WIN32
+        if (!llvm::sys::fs::can_execute(path_utf8(contents / "MacOS/app")))
+            throw std::runtime_error("macOS bundle executable is missing execute permissions.");
+#endif
+    }
     bool has_inventory = false;
     for (const auto& entry : fs::directory_iterator(root)) {
         const auto name = path_utf8(entry.path().filename());
         if (name == inventory_name && !prepare) { has_inventory = true; continue; }
-        if (name == executable || name == metadata_name || (production && name == "binary-audit.json")) file(entry, name);
-        else if ((name == "assets" || name == "native" || name == "licenses") && fs::is_directory(entry.symlink_status())) {
+        if (!bundle.empty() && name == bundle) continue;
+        if ((bundle.empty() && name == executable) || name == metadata_name || (production && name == "binary-audit.json")) file(entry, name);
+        else if (((bundle.empty() && name == "assets") || name == "native" || name == "licenses") && fs::is_directory(entry.symlink_status())) {
 #ifdef _WIN32
             reader.inspect(entry.path());
             const auto pins=native_windows::pin_directories(entry.path(),reader.reservation);
@@ -823,7 +878,7 @@ std::string package_inventory(const fs::path& root, bool prepare, const project:
         } else throw std::runtime_error("Unexpected application package entry: " + name);
     }
     if (!prepare && !has_inventory) throw std::runtime_error("Missing exact application package inventory filename.");
-    if (!rows.contains(executable) || !rows.contains(metadata_name) || !rows.contains("licenses/VOID-MIT-LICENSE.txt"))
+    if (!rows.contains(executable_path) || !rows.contains(metadata_name) || !rows.contains("licenses/VOID-MIT-LICENSE.txt"))
         throw std::runtime_error("Application package is missing its executable, metadata or license.");
     std::string result;
     for (const auto& [name, row] : rows) result += row;
@@ -927,9 +982,19 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
 #ifdef VOID_NATIVE_PUBLISHING
     const auto target = pack ? pack->target->id : std::string_view(plan.target());
     const auto executable = target.starts_with("windows-") ? "app.exe" : "app";
+    const auto& application = *project_analysis.manifest()->application();
+    const auto bundle = plan.app_bundle() ? application.id + ".app" : std::string{};
+    if (!bundle.empty() && !package_leaf(bundle))
+        throw std::runtime_error("macOS bundle requires a portable application identifier.");
+    std::optional<std::string> icon;
     const auto& analysis = *project_analysis.program();
     const auto& root = project_analysis.root();
     const auto& requested = plan.output();
+    if (plan.icon()) {
+        icon = project::read_project_input(root / utf8_path(*plan.icon()), 8 * 1024 * 1024);
+        if (icon->size() < 8 || !icon->starts_with("icns"))
+            throw std::runtime_error("Expected a macOS ICNS application icon.");
+    }
     project::require_outside_user_package_store(requested);
     project::require_outside_native_approval_store(requested, true);
 #ifdef _WIN32
@@ -965,6 +1030,17 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
     fs::path archive;
     project::publish_application_directory(parent, leaf, [&](const fs::path& stage, const project::ProjectDirectoryReader& reader) {
         ProductionLink production{plan, assets, {}, {}};
+        auto image_path = stage / executable;
+        auto asset_root = stage;
+        if (!bundle.empty()) {
+            const auto contents = stage / utf8_path(bundle) / "Contents";
+            fs::create_directories(contents / "MacOS");
+            asset_root = contents / "Resources";
+            fs::create_directory(asset_root);
+            image_path = contents / "MacOS/app";
+            write_package_file(contents / "Info.plist", publish::bundle_plist(application, icon.has_value()), reader);
+            if (icon) write_package_file(asset_root / "AppIcon.icns", *icon, reader);
+        }
         if (pack) {
             for (const auto& [name, bytes] : pack->files)
                 if (name.starts_with("licenses/")) write_package_file(stage / utf8_path(name), bytes, reader);
@@ -974,12 +1050,17 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
             write_package_file(stage / "licenses/APPLICATION-LICENSE.txt", project::read_project_input(license, 1024 * 1024), reader);
         if (plan.resources() == "files")
             for (const auto& [name, bytes] : assets)
-                write_package_file(stage / utf8_path(name), bytes, reader);
+                write_package_file(asset_root / utf8_path(name), bytes, reader);
 
         const auto debug = plan.symbols() == "private" ? project::DebugInfo::full : project::DebugInfo::none;
-        if (pack) link_target_pack(analysis, stage / executable, argv0, reader, production, *pack);
-        else link_executable(analysis, stage / executable, plan.optimization() != "none", argv0, plan.profile(), true, reader, debug, &production);
-        const auto image = reader.read(stage / executable, audit::byte_limit);
+        if (pack) link_target_pack(analysis, image_path, argv0, reader, production, *pack);
+        else link_executable(analysis, image_path, plan.optimization() != "none", argv0, plan.profile(), true, reader, debug, &production);
+#ifdef __APPLE__
+        if (!bundle.empty() && (execute({"/usr/bin/codesign", "--force", "--sign", "-", path_utf8(stage / utf8_path(bundle))}) ||
+            execute({"/usr/bin/codesign", "--verify", "--strict", path_utf8(stage / utf8_path(bundle))})))
+            throw std::runtime_error("Cannot ad hoc sign and verify the macOS application bundle.");
+#endif
+        const auto image = reader.read(image_path, audit::byte_limit);
         audit::Policy policy{2, std::string(target), true, true, true, {}};
         auto forbid = [&](const fs::path& path) {
             auto text = path_utf8(path);
@@ -1008,11 +1089,12 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
             throw std::runtime_error("Binary audit report exceeds the publication size limit.");
         write_package_file(stage / "binary-audit.json", report_text, reader);
         write_package_file(stage / metadata_name, analysis.application_metadata()->bytes(), reader);
-        const auto files = package_inventory(stage, true, reader, target);
-        const auto inventory = std::string("VOID native publication 1\ntarget ") + std::string(target) +
-            "\nprofile " + plan.profile() + "\nbuild " + production.map->build_id() + "\n" + files;
+        const auto files = package_inventory(stage, true, reader, target, bundle);
+        const auto inventory = std::string(bundle.empty() ? "VOID native publication 1\ntarget " : "VOID native publication 2\ntarget ") + std::string(target) +
+            "\nprofile " + plan.profile() + "\nbuild " + production.map->build_id() + "\n" +
+            (bundle.empty() ? std::string{} : "bundle " + bundle + "\n") + files;
         write_package_file(stage / inventory_name, inventory, reader);
-        if (files != package_inventory(stage, false, reader, target))
+        if (files != package_inventory(stage, false, reader, target, bundle))
             throw std::runtime_error("Publication file inventory changed before delivery.");
 
         const auto private_root = root / ".void" / "publish-diagnostics";
@@ -1040,8 +1122,14 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
 #endif
 }
 
-void verify_native_publication(const fs::path& directory, std::string_view) {
 #ifdef VOID_NATIVE_PUBLISHING
+namespace {
+struct VerifiedPublication {
+    fs::path root;
+    std::string platform, bundle, files;
+    ApplicationMetadata::Owner metadata;
+};
+VerifiedPublication verify_publication(const fs::path& directory) {
 #ifdef _WIN32
     require_package_path_spelling(directory);
 #endif
@@ -1050,27 +1138,89 @@ void verify_native_publication(const fs::path& directory, std::string_view) {
     std::istringstream rows(receipt);
     std::string magic, target, profile, build;
     if (!std::getline(rows, magic) || !std::getline(rows, target) || !std::getline(rows, profile) ||
-        !std::getline(rows, build) || magic != "VOID native publication 1" ||
+        !std::getline(rows, build) || (magic != "VOID native publication 1" && magic != "VOID native publication 2") ||
         !target.starts_with("target ") || !publish::find_target(std::string_view(target).substr(7)) ||
         (profile != "profile release" && profile != "profile performance") ||
         !build.starts_with("build ") || !hex_digest(std::string_view(build).substr(6)))
         throw std::runtime_error("Invalid native publication inventory.");
-    const std::string recorded{std::istreambuf_iterator<char>(rows), {}};
     const auto platform = std::string_view(target).substr(7);
-    if (recorded != package_inventory(root, false, {}, platform))
+    const auto metadata = ApplicationMetadata::decode(project::read_project_input(root / metadata_name, ApplicationMetadata::byte_limit));
+    std::string bundle;
+    if (magic == "VOID native publication 2") {
+        bundle = std::string(metadata->application_id()) + ".app";
+        std::string claim;
+        if (!platform.starts_with("macos-") || !package_leaf(bundle) || !std::getline(rows, claim) || claim != "bundle " + bundle)
+            throw std::runtime_error("Invalid macOS bundle identity in publication inventory.");
+    }
+    const std::string recorded{std::istreambuf_iterator<char>(rows), {}};
+    if (recorded != package_inventory(root, false, {}, platform, bundle))
         throw std::runtime_error("Native publication inventory mismatch. A file is missing, changed or unexpected.");
-    const auto image = project::read_project_input(root / (platform.starts_with("windows-") ? "app.exe" : "app"), audit::byte_limit);
+    const auto executable = bundle.empty() ? (platform.starts_with("windows-") ? "app.exe" : "app") : bundle + "/Contents/MacOS/app";
+    const auto image = project::read_project_input(root / utf8_path(executable), audit::byte_limit);
     const auto report = audit::inspect(image, {2, std::string(platform), true, true, true, {}});
     if (!production_image(report) || !report.findings.empty() ||
         project::read_project_input(root / "binary-audit.json", audit_report_byte_limit) != audit::json(report) + '\n')
         throw std::runtime_error("Native publication binary audit mismatch.");
-    (void)ApplicationMetadata::decode(project::read_project_input(root / metadata_name, ApplicationMetadata::byte_limit));
+    return {root, std::string(platform), std::move(bundle), recorded, metadata};
+}
+}
+#endif
+
+void verify_native_publication(const fs::path& directory) {
+#ifdef VOID_NATIVE_PUBLISHING
+    (void)verify_publication(directory);
 #else
     (void)directory;
     throw std::runtime_error("Native publication verification is unavailable on this host.");
 #endif
 }
 
+void archive_macos_application(const fs::path& directory, const fs::path& output) {
+#ifdef VOID_NATIVE_PUBLISHING
+    const auto publication = verify_publication(directory);
+    if (!publication.platform.starts_with("macos-") || output.extension() != ".zip")
+        throw std::invalid_argument("Bundle ZIP requires an existing macOS publication and a new .zip output.");
+    const auto fields = publication.metadata->fields();
+    const project::Identity application{std::string(fields[3]), std::string(fields[4]), *project::parse_version(fields[5])};
+    const auto bundle = application.id + ".app";
+    if (!package_leaf(bundle)) throw std::invalid_argument("Bundle ZIP needs a portable application identifier.");
+    const auto contents = bundle + "/Contents/";
+    const auto executable = contents + "MacOS/app";
+    std::vector<host::DistributionFile> members{
+        {bundle + "/", {}}, {contents, {}}, {contents + "MacOS/", {}}, {contents + "Resources/", {}}
+    };
+    if (publication.bundle.empty())
+        members.push_back({contents + "Info.plist", publish::bundle_plist(application, false)});
+    std::istringstream rows(publication.files);
+    std::string row;
+    std::size_t remaining = package_byte_limit;
+    while (std::getline(rows, row)) {
+        const auto name = row.substr(row.rfind('\t') + 1);
+        auto archive_path = name;
+        if (publication.bundle.empty()) {
+            if (name == "app") archive_path = executable;
+            else if (name.starts_with("assets/")) archive_path = contents + "Resources/" + name;
+        }
+        if (!archive_path.starts_with(contents) && !archive_path.starts_with("licenses/")) continue;
+        auto bytes = project::read_project_input(publication.root / utf8_path(name), remaining);
+        remaining -= bytes.size();
+        if (!row.starts_with(package_digest(bytes) + '\t'))
+            throw std::runtime_error("Publication changed during macOS ZIP assembly: " + name);
+        const auto slash = archive_path.rfind('/');
+        auto parent = archive_path.substr(0, slash + 1);
+        if (std::none_of(members.begin(), members.end(), [&](const auto& member) { return member.name == parent; }))
+            members.push_back({std::move(parent), {}});
+        members.push_back({archive_path, std::move(bytes), archive_path == executable});
+    }
+    project::require_outside_user_package_store(output);
+    project::require_outside_native_approval_store(output, true);
+    project::FreshProjectFile destination(output);
+    destination.publish(host::distribution_zip(std::move(members)));
+#else
+    (void)directory; (void)output;
+    throw std::runtime_error("macOS publication archive assembly is unavailable on this host.");
+#endif
+}
 void verify_application_package(const fs::path& directory) {
 #ifdef VOID_APPLICATION_PACKAGING
     (void)verify_package(directory);

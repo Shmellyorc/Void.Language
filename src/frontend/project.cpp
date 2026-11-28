@@ -676,7 +676,7 @@ public:
         else {
             fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements", "publish"});
             if (auto* publishing = table(root, "publish")) {
-                fields(*publishing, "publish", {"target", "default_profile", "output", "optimization", "resources", "symbols", "lto"});
+                fields(*publishing, "publish", {"target", "default_profile", "output", "optimization", "resources", "symbols", "lto", "format", "icon"});
                 if (auto target = text(*publishing, "target", false)) {
                     if (!publish::target_name(*target))
                         fail(Code::project_reserved, span(publishing->get("target")->source()), "Unsupported publishing target.", "Use an OS/architecture target or a registered custom-* pack.");
@@ -704,6 +704,12 @@ public:
                 setting("resources", {"embed", "files"}, manifest_->publishing_.resources);
                 setting("symbols", {"private", "none"}, manifest_->publishing_.symbols);
                 setting("lto", {"none", "thin"}, manifest_->publishing_.lto);
+                setting("format", {"directory", "app"}, manifest_->publishing_.format);
+                if (auto icon = text(*publishing, "icon", false)) {
+                    if (!relative_path(*icon, false) || !icon->ends_with(".icns"))
+                        fail(Code::project_path, span(publishing->get("icon")->source()), "Invalid macOS application icon.", "Use a normalized project-relative .icns file.");
+                    else manifest_->publishing_.icon = *icon;
+                }
             }
         }
         auto* project = table(root, "project", true);

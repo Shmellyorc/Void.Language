@@ -1,5 +1,6 @@
 #include "host_internal.hpp"
 #include "zip_geometry.hpp"
+#include "void/distribution_archive.hpp"
 #include "void/utf8.hpp"
 #ifndef VOID_HOST_PROVIDERS_UNAVAILABLE
 #include <archive.h>
@@ -59,14 +60,14 @@ struct Zip final : Object {
         z.offset=offset<0?base-(static_cast<std::uint64_t>(-(offset+1))+1):base+offset;return z.offset;
     }
 };
-bool name(const std::string& value,bool directory) {
+bool name(const std::string& value,bool directory,bool unicode=false) {
     if(value.empty() || value.size()>4096 || value[0]=='/' || value.find_first_of("\\:\0",0,3)!=std::string::npos || !valid_utf8(value))return false;
-    // Portable curated ZIP profile: ASCII components, without platform aliases.
+    // The curated archive reader uses ASCII. Distribution archives allow UTF-8.
     std::size_t start=0;
     while(start<value.size()) {
         auto end=value.find('/',start);auto part=value.substr(start,end==std::string::npos?end:end-start);
         if(part.empty() || part=="." || part==".." || part.back()=='.' || part.back()==' ' || part.size()>255)return false;
-        for(unsigned char c:part)if(c<32 || c>=127)return false;
+        for(unsigned char c:part)if(c<32 || c==127 || (!unicode && c>=128))return false;
         auto stem=part.substr(0,part.find('.'));std::transform(stem.begin(),stem.end(),stem.begin(),[](unsigned char c){return c>='a' && c<='z'?c-32:c;});
         if(stem=="CON" || stem=="PRN" || stem=="AUX" || stem=="NUL" ||
           (stem.size()==4 && (stem.substr(0,3)=="COM" || stem.substr(0,3)=="LPT") && stem[3]>='1' && stem[3]<='9'))return false;
@@ -90,6 +91,7 @@ bool export_name(const std::string& value) {
 struct ExportMember {
     std::string name,bytes;
     std::uint32_t offset=0,crc=0;
+    std::uint16_t mode=0;
 };
 
 void put16(std::string& image,std::uint16_t value) {
@@ -104,7 +106,7 @@ void put32(std::string& image,std::uint32_t value) {
 
 void file_fields(std::string& image,const ExportMember& member) {
     put16(image,10); // ZIP 1.0 needed, no flags, stored, 1980-01-01 00:00:00.
-    put16(image,0);
+    put16(image,member.mode ? 0x800 : 0);
     put16(image,0);
     put16(image,0);
     put16(image,33);
@@ -132,12 +134,12 @@ std::string zip_image(std::vector<ExportMember>& members,const ZipGeometry& geom
     const auto central=static_cast<std::uint32_t>(image.size());
     for(const auto& member:members) {
         put32(image,0x02014b50);
-        put16(image,20); // Made by DOS, ZIP 2.0.
+        put16(image,member.mode ? 0x314 : 20); // UNIX permissions for distribution entries.
         file_fields(image,member);
         put16(image,0); // Comment length.
         put16(image,0); // Disk number.
         put16(image,0); // Internal attributes.
-        put32(image,0); // External attributes.
+        put32(image,(std::uint32_t(member.mode) << 16) | (member.name.ends_with('/') ? 0x10 : 0));
         put32(image,member.offset);
         image+=member.name;
     }
@@ -253,6 +255,29 @@ Result preflight(Zip& z,std::uint64_t count_limit) {
 }
 }
 #endif
+std::string distribution_zip(std::vector<DistributionFile> files) {
+#ifdef VOID_HOST_PROVIDERS_UNAVAILABLE
+    (void)files;
+    throw std::runtime_error("Distribution archive provider unavailable.");
+#else
+    ZipGeometry geometry(256 * 1024 * 1024);
+    if (files.empty() || files.size() > 256) throw std::runtime_error("Distribution ZIP entry limit exceeded.");
+    std::vector<ExportMember> members;
+    members.reserve(files.size());
+    std::set<std::string> seen;
+    for (auto& file : files) {
+        const auto directory = file.name.ends_with('/');
+        if (!name(file.name, directory, true) || !seen.insert(file.name).second ||
+            (directory && (!file.bytes.empty() || file.executable)))
+            throw std::runtime_error("Invalid distribution ZIP entry.");
+        if (!geometry.add(file.name.size(), file.bytes.size()))
+            throw std::runtime_error("Distribution ZIP byte limit exceeded.");
+        const auto mode = static_cast<std::uint16_t>(directory ? 0040755 : file.executable ? 0100755 : 0100644);
+        members.push_back({std::move(file.name), std::move(file.bytes), 0, 0, mode});
+    }
+    return zip_image(members, geometry);
+#endif
+}
 Result encode_zip(Runtime& runtime,void* input,const NativeArrayElement* element,
                   std::span<const std::int64_t,4> limits) {
 #ifdef VOID_HOST_PROVIDERS_UNAVAILABLE

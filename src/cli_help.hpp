@@ -43,8 +43,9 @@ inline void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
     if(command.empty() || command=="publish")out<<"Usage: voidc publish [--project DIR] [--entry RELATIVE.void] [--target TARGET] [--profile release|performance|protected] [-o NEW-DIRECTORY]\n"
-      "       [--optimization none|size|speed] [--resources embed|files] [--symbols private|none] [--native-catalog SHA256] [--lto none|thin] [--portable]\n"
+      "       [--optimization none|size|speed] [--resources embed|files] [--symbols private|none] [--native-catalog SHA256] [--lto none|thin] [--format directory|app] [--icon RELATIVE.icns] [--portable]\n"
       "       voidc publish --verify DIR\n"
+      "       voidc publish --bundle DIR -o NEW.zip\n"
       "       voidc publish --resolve-diagnostic MAP IMAGE TOKEN\n";
     if(command.empty() || command=="target")out<<"Usage: voidc target list [--available] | add DIRECTORY | inspect ID | verify ID | remove ID\n";
     if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
@@ -229,6 +230,7 @@ Foreign targets require a compatible installed target pack.
 Managed native code needs the exact catalog SHA-256 and redistribution rights.
 Example: voidc publish --project . --resources embed -o dist/my-app
 )help";
+        if (command=="target") std::cout << "Example: voidc target add ./custom-target\n";
         if (command=="native-bind") {
             options_title();
             help_rows(std::cout, std::array<HelpRow,1>{{{"-o NEW-OUTPUT", "Required fresh .c adapter or .void declarations."}}});
