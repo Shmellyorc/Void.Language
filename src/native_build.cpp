@@ -455,7 +455,10 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
             run({tool("dsymutil"), path_utf8(executable), "-o", path_utf8(bundle)});
             production->symbols = project::read_project_input(bundle / "Contents/Resources/DWARF/program", audit::byte_limit);
         }
-        run({"/usr/bin/strip", "-S", "-x", path_utf8(executable)});
+        // Apple's -x can retain a synthetic local nlist entry for the
+        // indirect symbol table. -N removes nlists from dyld executables
+        // while preserving dyld exports and fixups.
+        run({"/usr/bin/strip", "-S", "-x", "-N", path_utf8(executable)});
         // Apple Silicon enforces a local code signature after image mutation.
         run({"/usr/bin/codesign", "--force", "--sign", "-", path_utf8(executable)});
 #elif defined(_WIN32)

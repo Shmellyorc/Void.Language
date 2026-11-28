@@ -351,13 +351,14 @@ Report inspect(std::string_view bytes, const Policy& policy) {
             check(std::move(error));
         }
         else {finding("unsupported-format","Object is outside supported image encodings.");return report;}
+        report.dynamic_symbols = report.dynamic_symbols || !report.exports.empty();
         std::size_t sections=0;
         for(const auto& section:object->sections()) {
             count(sections);auto name=checked(section.getName());
             if(section.isDebugSection() || name.starts_with(".debug") || name.starts_with(".zdebug") || name.starts_with("__debug") || name==".gnu_debuglink" || name==".gnu_debugdata") report.debug=true;
             if(name==".symtab") report.static_symbols=true;
             if(name==".dynsym" || name=="__export" || name==".edata") report.dynamic_symbols=true;
-            if(name==".eh_frame" || name=="__eh_frame" || name==".pdata") report.unwind=true;
+            if(name==".eh_frame" || name=="__eh_frame" || name=="__unwind_info" || name==".pdata") report.unwind=true;
             if(name==".symtab" || name==".dynsym") report.symbols=true;
             if(policy.revision==2 && llvm::isa<llvm::object::ELFObjectFileBase>(object.get()) &&
                (llvm::object::ELFSectionRef(section).getFlags() & llvm::ELF::SHF_COMPRESSED))

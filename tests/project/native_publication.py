@@ -121,6 +121,9 @@ async func main() -> i32:
     assert not report["findings"] and not report["loader_paths"] and report["unwind"], report
     assert report["sha256"] == files[exe]
     assert "exports" in report
+    if macos:
+        assert not report["symbols"] and report["dynamic_symbols"], report
+        assert "_main" in report["exports"] and set(report["exports"]) <= {"_main", "__mh_execute_header"}, report
     assert (output / "void-package.txt").read_text().splitlines()[1] == "target " + target
     run(compiler, "publish", "--verify", output)
     if target == "linux-x64":
