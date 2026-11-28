@@ -93,7 +93,8 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
         member_name = std::string(llvm::sys::path::filename(buffer->getBufferIdentifier()));
         if (++count > 100000) reject("member count exceeds limit");
         const auto kind = llvm::identify_magic(buffer->getBuffer());
-        if (msvc_sdk && (kind == llvm::file_magic::windows_resource || kind == llvm::file_magic::unknown)) {
+        if ((windows && kind == llvm::file_magic::windows_resource) ||
+            (msvc_sdk && kind == llvm::file_magic::unknown)) {
             // These vendor records carry no readable machine identity. Keep
             // checking all native members and let LLD reject any unsupported
             // record that the application actually selects from the archive.
