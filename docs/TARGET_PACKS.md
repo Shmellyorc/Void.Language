@@ -91,10 +91,13 @@ Runtime candidates from the same revision with the pinned SDK and provider
 recipes. Linux keeps distro library bytes in their original Ubuntu packages.
 The candidate carries immutable APT package hashes and exact member hashes.
 GitHub build attestations bind candidate bytes to the workflow and source SHA.
-The cross-publisher verifies the attestation, then provisions the Ubuntu
-link inputs independently. Destination jobs run relocated distributions from
-the foreign producer. Windows pack checks use only the local developer SDK
-on their destination runners. [GitHub artifact attestations](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)
+The workflow exercises Linux x64 to Linux ARM64, and Windows x64 and macOS
+ARM64 to both Linux architectures. Publishers verify the attestation before
+provisioning the Ubuntu link inputs independently. Native destination jobs
+execute relocated copies. When transferring a Linux distribution from
+Windows, use an archive with Unix execute bits on `app` or set those bits after
+extraction. Windows pack checks use only the local developer SDK on their
+destination runners. [GitHub artifact attestations](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations)
 
 Treat a candidate as an engineering artifact. VOIDUP uses its own established
 release trust policy for active production channels. Attestation establishes

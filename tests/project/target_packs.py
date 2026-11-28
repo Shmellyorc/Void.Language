@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import tarfile
 import tempfile
 import time
 
@@ -132,6 +133,18 @@ def consume(output, compiler):
         assert "zero" not in result.stderr, result
 
 
+def archive_linux_distributions(distributions, output):
+    def metadata(member):
+        # A Windows publishing filesystem cannot carry the Unix execute bits.
+        if member.isfile() and member.name.endswith(("/async/app", "/sync/app", "/failure/app")):
+            member.mode |= 0o111
+        return member
+
+    with tarfile.open(output, "x:gz") as archive:
+        for target in sorted(distributions.iterdir()):
+            archive.add(target, arcname=target.name, filter=metadata)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     modes = parser.add_subparsers(dest="mode", required=True)
@@ -142,11 +155,16 @@ def main():
     execute = modes.add_parser("consume")
     execute.add_argument("output", type=Path)
     execute.add_argument("--compiler", type=Path)
+    archive = modes.add_parser("archive")
+    archive.add_argument("distributions", type=Path)
+    archive.add_argument("output", type=Path)
     args = parser.parse_args()
     if args.mode == "produce":
         produce(args.compiler.resolve(), args.pack.resolve(), args.output.resolve())
-    else:
+    elif args.mode == "consume":
         consume(args.output.resolve(), args.compiler.resolve() if args.compiler else None)
+    else:
+        archive_linux_distributions(args.distributions, args.output)
 
 
 if __name__ == "__main__":

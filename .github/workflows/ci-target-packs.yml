@@ -9,7 +9,7 @@ concurrency:
 permissions:
   contents: read
 jobs:
-  build:
+  build-linux:
     permissions:
       contents: read
       id-token: write
@@ -19,16 +19,13 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {runner: ubuntu-24.04, job: runtime, target: linux-x64}
-          - {runner: ubuntu-24.04-arm, job: runtime, target: linux-arm64}
-          - {runner: macos-26, job: publisher}
-          - {runner: windows-2022, job: local-msvc, target: windows-x64, arch: x64}
-          - {runner: windows-11-arm, job: local-msvc, target: windows-arm64, arch: arm64}
+          - {runner: ubuntu-24.04, job: runtime, target: linux-x64, arch: x64}
+          - {runner: ubuntu-24.04-arm, job: runtime, target: linux-arm64, arch: arm64}
     runs-on: ${{ matrix.runner }}
-    env:
+    env: &build-env
       PYTHONUTF8: '1'
       EXPERIMENT_CONFIGURATION: Release
-    steps:
+    steps: &build-steps
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
@@ -107,6 +104,23 @@ jobs:
             "-DLLVM_DIR=$env:LLVM_DIR" "-DVOID_CLANG=$env:VOID_CLANG"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           cmake --build "$env:RUNNER_TEMP/build" --target voidc voidup --parallel 3
+      - name: Preserve the built compiler for cross-host publishing
+        if: matrix.job == 'publisher' || matrix.target == 'linux-x64' || matrix.target == 'windows-x64'
+        shell: bash
+        run: |
+          executable=voidc
+          work="$RUNNER_TEMP"
+          if [ "$RUNNER_OS" = Windows ]; then
+            executable=voidc.exe
+            work="$(cygpath -u "$work")"
+          fi
+          tar -C "$work/build" -czf "$work/compiler.tar.gz" "$executable"
+      - uses: actions/upload-artifact@v6
+        if: matrix.job == 'publisher' || matrix.target == 'linux-x64' || matrix.target == 'windows-x64'
+        with:
+          name: compiler-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
+          path: ${{ runner.temp }}/compiler.tar.gz
+          if-no-files-found: error
       - name: Qualify the local MSVC pack on the destination runner
         if: matrix.job == 'local-msvc'
         env:
@@ -138,33 +152,36 @@ jobs:
           name: ${{ matrix.target }}-runtime-${{ github.sha }}
           path: ${{ runner.temp }}/runtime-${{ matrix.target }}.tar.gz
           if-no-files-found: error
-      - name: Preserve qualified compiler inputs for the cross-host job
-        if: matrix.job == 'publisher'
-        run: |
-          mkdir "$RUNNER_TEMP/compiler"
-          cp "$RUNNER_TEMP/build/voidc" "$RUNNER_TEMP/compiler/"
-          tar -C "$RUNNER_TEMP/compiler" -czf "$RUNNER_TEMP/compiler.tar.gz" .
-      - uses: actions/upload-artifact@v6
-        if: matrix.job == 'publisher'
-        with:
-          name: macos-arm64-publisher-${{ github.sha }}
-          path: ${{ runner.temp }}/compiler.tar.gz
-          if-no-files-found: error
       - uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: target-pack-build-evidence-${{ runner.os }}-${{ runner.arch }}
           path: ${{ runner.temp }}/evidence/
           if-no-files-found: ignore
-  publish:
-    needs: build
-    if: ${{ !cancelled() }}
+  build-macos:
+    strategy:
+      matrix:
+        include:
+          - {runner: macos-26, job: publisher, target: macos-arm64, arch: arm64}
+    runs-on: ${{ matrix.runner }}
+    env: *build-env
+    steps: *build-steps
+  build-windows:
     strategy:
       fail-fast: false
       matrix:
-        target: [linux-x64, linux-arm64]
-    runs-on: macos-26
-    steps:
+        include:
+          - {runner: windows-2022, job: local-msvc, target: windows-x64, arch: x64}
+          - {runner: windows-11-arm, job: local-msvc, target: windows-arm64, arch: arm64}
+    runs-on: ${{ matrix.runner }}
+    env: *build-env
+    steps: *build-steps
+  publish-from-linux:
+    needs: build-linux
+    runs-on: ubuntu-24.04
+    env:
+      TARGETS: linux-arm64
+    steps: &publish-steps
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
@@ -176,51 +193,97 @@ jobs:
       - run: python tools/ci/llvm_sdk.py
       - uses: actions/download-artifact@v7
         with:
-          name: ${{ matrix.target }}-runtime-${{ github.sha }}
+          pattern: linux-*-runtime-${{ github.sha }}
           path: ${{ runner.temp }}
+          merge-multiple: true
       - uses: actions/download-artifact@v7
         with:
-          name: macos-arm64-publisher-${{ github.sha }}
+          name: compiler-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
           path: ${{ runner.temp }}
-      - name: Verify Runtime provenance and publish on macOS ARM64
+      - name: Verify Runtime provenance and publish for Linux
+        shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
-          VOID_TARGET: ${{ matrix.target }}
         run: |
-          mkdir "$RUNNER_TEMP/candidate" "$RUNNER_TEMP/compiler"
-          gh attestation verify "$RUNNER_TEMP/runtime-$VOID_TARGET.tar.gz" --repo "$GITHUB_REPOSITORY" \
-            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci-target-packs.yml" --source-digest "$GITHUB_SHA"
-          tar -C "$RUNNER_TEMP/candidate" -xzf "$RUNNER_TEMP/runtime-$VOID_TARGET.tar.gz"
-          tar -C "$RUNNER_TEMP/compiler" -xzf "$RUNNER_TEMP/compiler.tar.gz"
-          grep -Fx "source $GITHUB_SHA" "$RUNNER_TEMP/candidate/runtime/target-pack.txt"
-          python tools/target_pack.py compose "$RUNNER_TEMP/candidate" "$RUNNER_TEMP/pack"
-          printf 'VOID native 23.1.4 v2\n%s\n' "$VOID_CLANG" > "$RUNNER_TEMP/compiler/void-native.txt"
+          work="$RUNNER_TEMP"
+          executable=voidc
           export VOID_STDLIB_ROOT="$GITHUB_WORKSPACE/stdlib"
-          python tests/project/target_packs.py produce "$RUNNER_TEMP/compiler/voidc" "$RUNNER_TEMP/pack" "$RUNNER_TEMP/distributions"
-          tar -C "$RUNNER_TEMP/distributions" -czf "$RUNNER_TEMP/distributions.tar.gz" .
+          if [ "$RUNNER_OS" = Windows ]; then
+            work="$(cygpath -u "$work")"
+            executable=voidc.exe
+            VOID_STDLIB_ROOT="$(cygpath -m "$VOID_STDLIB_ROOT")"
+          fi
+          mkdir "$work/compiler" "$work/distributions"
+          tar -C "$work/compiler" -xzf "$work/compiler.tar.gz"
+          printf 'VOID native 23.1.4 v2\n%s\n' "$VOID_CLANG" > "$work/compiler/void-native.txt"
+          for target in $TARGETS; do
+            candidate="$work/candidate-$target"
+            mkdir "$candidate"
+            archive="$work/runtime-$target.tar.gz"
+            gh attestation verify "$archive" --repo "$GITHUB_REPOSITORY" \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci-target-packs.yml" --source-digest "$GITHUB_SHA"
+            tar -C "$candidate" -xzf "$archive"
+            grep -Fx "source $GITHUB_SHA" "$candidate/runtime/target-pack.txt"
+            python tools/target_pack.py compose "$candidate" "$work/pack-$target"
+            python tests/project/target_packs.py produce "$work/compiler/$executable" \
+              "$work/pack-$target" "$work/distributions/$target"
+          done
+          python tests/project/target_packs.py archive "$work/distributions" "$work/distributions.tar.gz"
       - uses: actions/upload-artifact@v6
         with:
-          name: ${{ matrix.target }}-from-macos-arm64-${{ github.sha }}
+          name: distributions-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}
           path: ${{ runner.temp }}/distributions.tar.gz
           if-no-files-found: error
-  run:
-    needs: publish
-    if: ${{ !cancelled() }}
+  publish-from-macos:
+    needs: [build-linux, build-macos]
+    runs-on: macos-26
+    env:
+      TARGETS: linux-x64 linux-arm64
+    steps: *publish-steps
+  publish-from-windows:
+    needs: [build-linux, build-windows]
+    if: ${{ !cancelled() && needs.build-linux.result == 'success' }}
+    runs-on: windows-2022
+    env:
+      TARGETS: linux-x64 linux-arm64
+    steps: *publish-steps
+  run-from-linux:
+    needs: publish-from-linux
     strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: ubuntu-24.04-arm, target: linux-arm64}
+    runs-on: ${{ matrix.runner }}
+    env:
+      PRODUCER: Linux-X64
+    steps: &run-steps
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v7
+        with:
+          name: distributions-${{ env.PRODUCER }}-${{ github.sha }}
+          path: ${{ runner.temp }}
+      - name: Execute relocated distributions on the destination architecture
+        run: |
+          mkdir "$RUNNER_TEMP/distributions"
+          tar -C "$RUNNER_TEMP/distributions" -xzf "$RUNNER_TEMP/distributions.tar.gz"
+          python3 tests/project/target_packs.py consume "$RUNNER_TEMP/distributions/${{ matrix.target }}"
+  run-from-macos:
+    needs: publish-from-macos
+    strategy: &linux-destinations
       fail-fast: false
       matrix:
         include:
           - {runner: ubuntu-24.04, target: linux-x64}
           - {runner: ubuntu-24.04-arm, target: linux-arm64}
     runs-on: ${{ matrix.runner }}
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/download-artifact@v7
-        with:
-          name: ${{ matrix.target }}-from-macos-arm64-${{ github.sha }}
-          path: ${{ runner.temp }}
-      - name: Execute relocated distributions on the destination architecture
-        run: |
-          mkdir "$RUNNER_TEMP/distributions"
-          tar -C "$RUNNER_TEMP/distributions" -xzf "$RUNNER_TEMP/distributions.tar.gz"
-          python3 tests/project/target_packs.py consume "$RUNNER_TEMP/distributions"
+    env:
+      PRODUCER: macOS-ARM64
+    steps: *run-steps
+  run-from-windows:
+    needs: publish-from-windows
+    strategy: *linux-destinations
+    runs-on: ${{ matrix.runner }}
+    env:
+      PRODUCER: Windows-X64
+    steps: *run-steps
