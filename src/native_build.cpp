@@ -824,7 +824,14 @@ std::string package_inventory(const fs::path& root, bool prepare, const project:
         if (name == executable && !llvm::sys::fs::can_execute(path_utf8(entry.path())))
             throw std::runtime_error("Application package executable is not executable: " + path_utf8(entry.path()));
 #endif
+#ifdef _WIN32
+        // Preserve the native AMD64 PE entry-point and section checks. The
+        // portable audit below separately applies the receipt's destination.
+        if (name == executable && (!production || production_target == "windows-x64"))
+            check_package_image(bytes);
+#else
         if (name == executable && !production) check_package_image(bytes);
+#endif
         rows.emplace(name, package_digest(bytes) + '\t' + std::to_string(bytes.size()) + '\t' + name + '\n');
     };
     auto directory = [&](const fs::path& path) {
