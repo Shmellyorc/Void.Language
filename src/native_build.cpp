@@ -986,6 +986,32 @@ std::string package_inventory(const fs::path& root, bool prepare, const project:
             throw std::runtime_error("macOS bundle executable is missing execute permissions.");
 #endif
     }
+    auto visit_files = [&](const auto& scan, const fs::path& folder, const std::string& prefix, unsigned notice_depth) -> void {
+#ifdef _WIN32
+        reader.inspect(folder);
+        const auto pins=native_windows::pin_directories(folder,reader.reservation);
+        std::vector<fs::path> physical_names;
+#endif
+        std::set<std::string> names;
+        for (const auto& child : fs::directory_iterator(folder)) {
+            const auto leaf = path_utf8(child.path().filename());
+            if (!package_leaf(leaf) || !names.insert(project::fold_project_name(leaf)).second)
+                throw std::runtime_error("Invalid or duplicate application package path: " + prefix + '/' + leaf);
+#ifdef _WIN32
+            auto physical=child.path().filename();
+            if (std::any_of(physical_names.begin(),physical_names.end(),[&](const auto& prior) {
+                    return native_windows::same_filename(prior,physical);
+                }))
+                throw std::runtime_error("Duplicate Windows application package path: " + prefix + '/' + leaf);
+            physical_names.push_back(std::move(physical));
+#endif
+            const auto relative = prefix + '/' + leaf;
+            if (notice_depth && fs::is_directory(child.symlink_status()))
+                scan(scan, child.path(), relative, notice_depth - 1);
+            else file(child, relative);
+        }
+        if (names.empty()) throw std::runtime_error("Unexpected empty application package directory: " + prefix);
+    };
     bool has_inventory = false;
     for (const auto& entry : fs::directory_iterator(root)) {
         const auto name = path_utf8(entry.path().filename());
@@ -993,27 +1019,7 @@ std::string package_inventory(const fs::path& root, bool prepare, const project:
         if (!bundle.empty() && name == bundle) continue;
         if ((bundle.empty() && name == executable) || name == metadata_name || (production && name == "binary-audit.json")) file(entry, name);
         else if (((bundle.empty() && name == "assets") || name == "native" || name == "licenses") && fs::is_directory(entry.symlink_status())) {
-#ifdef _WIN32
-            reader.inspect(entry.path());
-            const auto pins=native_windows::pin_directories(entry.path(),reader.reservation);
-            std::vector<fs::path> physical_names;
-#endif
-            std::set<std::string> names;
-            for (const auto& child : fs::directory_iterator(entry)) {
-                const auto leaf = path_utf8(child.path().filename());
-                if (!package_leaf(leaf) || !names.insert(project::fold_project_name(leaf)).second)
-                    throw std::runtime_error("Invalid or duplicate application package path: " + name + '/' + leaf);
-#ifdef _WIN32
-                auto physical=child.path().filename();
-                if (std::any_of(physical_names.begin(),physical_names.end(),[&](const auto& prior) {
-                        return native_windows::same_filename(prior,physical);
-                    }))
-                    throw std::runtime_error("Duplicate Windows application package path: " + name + '/' + leaf);
-                physical_names.push_back(std::move(physical));
-#endif
-                file(child, name + '/' + leaf);
-            }
-            if (names.empty()) throw std::runtime_error("Unexpected empty application package directory: " + name);
+            visit_files(visit_files, entry.path(), name, production && name == "licenses" ? 2 : 0);
         } else throw std::runtime_error("Unexpected application package entry: " + name);
     }
     if (!prepare && !has_inventory) throw std::runtime_error("Missing exact application package inventory filename.");
@@ -1181,8 +1187,12 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
             if (icon) write_package_file(asset_root / "AppIcon.icns", *icon, reader);
         }
         if (pack) {
-            for (const auto& [name, bytes] : pack->files)
-                if (name.starts_with("licenses/")) write_package_file(stage / utf8_path(name), bytes, reader);
+            for (const auto& [name, bytes] : pack->files) {
+                if (!name.starts_with("licenses/")) continue;
+                const auto notice = stage / utf8_path(name);
+                fs::create_directories(notice.parent_path());
+                write_package_file(notice, bytes, reader);
+            }
         } else copy_notices(stage, argv0, reader);
         const auto license = root / "LICENSE";
         if (fs::exists(fs::symlink_status(license)))
@@ -1378,10 +1388,11 @@ void archive_macos_application(const fs::path& directory, const fs::path& output
         remaining -= bytes.size();
         if (!row.starts_with(package_digest(bytes) + '\t'))
             throw std::runtime_error("Publication changed during macOS ZIP assembly: " + name);
-        const auto slash = archive_path.rfind('/');
-        auto parent = archive_path.substr(0, slash + 1);
-        if (std::none_of(members.begin(), members.end(), [&](const auto& member) { return member.name == parent; }))
-            members.push_back({std::move(parent), {}});
+        for (auto slash = archive_path.find('/'); slash != archive_path.npos; slash = archive_path.find('/', slash + 1)) {
+            auto parent = archive_path.substr(0, slash + 1);
+            if (std::none_of(members.begin(), members.end(), [&](const auto& member) { return member.name == parent; }))
+                members.push_back({std::move(parent), {}});
+        }
         members.push_back({archive_path, std::move(bytes), archive_path == executable});
     }
     project::require_outside_user_package_store(output);

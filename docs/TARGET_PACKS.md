@@ -30,9 +30,45 @@ access once the pack and project dependencies are present.
 Install a new custom version under a new `custom-*` ID to retain both versions.
 Remove a custom registration with `voidup target remove ID`. Re-adding the same
 content is idempotent. An occupied ID with different content is refused.
-`list --available` reports the official channel status. Official install and
-update paths are disabled until a trusted production catalog and corresponding
-release artifacts are approved.
+
+## Acquire an official pack with VOIDUP
+
+An enrolled engineering channel can supply official GNU target IDs. Install and
+select its signed compiler release before acquiring a pack.
+
+```sh
+voidup --catalog "$TEST_CATALOG" --ca-file "$TEST_CA" target list --available
+voidup --catalog "$TEST_CATALOG" --ca-file "$TEST_CA" target install linux-arm64
+voidup --catalog "$TEST_CATALOG" --ca-file "$TEST_CA" target update linux-arm64
+voidup target verify linux-arm64
+voidup run default voidc -- publish --target linux-arm64 -o dist/orbit
+```
+
+The usual `voidc` proxy can also publish with the installed pack. The manager
+selects the highest compatible signed version for its selected compiler, LLVM
+and Runtime ABI. Updates refuse downgrades and conflicting bytes for an
+existing release ID or version. The same two-of-three release keys,
+freshness checks, HTTPS origin policy and retained revocations apply to pack
+catalogs. An archive is bound by its length, SHA-256 and exact member inventory.
+The selected verified compiler validates link files and manifest compatibility
+before activation. The proxy passes only authenticated selections to the
+compiler, which binds its link input snapshot to the signed manifest hash.
+
+A new payload is published to a content-addressed directory before the active
+selection changes. An interrupted transfer leaves the previous selection in
+place. If the payload was published and activation was interrupted, retry the
+same command to verify and reuse the payload. `voidup target remove ID`
+unregisters the selection and retains the immutable bytes. After provisioning,
+listing installed packs, verification and publishing use local files and
+cached signed metadata. The next successful catalog refresh applies newly
+learned revocations. The current host's native publish path remains available.
+
+The producer can use `tools/target_pack.py --official-candidate`, then
+`tools/voidup_release.py package-target` and the existing engineering catalog
+command with `--target-pack`. The catalog carries target packs in an optional
+`target_packs.releases` section with minimum manager version 3. Engineering
+qualification uses ephemeral signing roots and an isolated HTTPS server.
+Public production preparation and promotion still require Boss approval.
 
 ## Format 1
 
@@ -59,9 +95,11 @@ minimum glibc-2.39
 
 The compiler checks the compiler version, LLVM version, Runtime ABI, platform,
 member names, geometry and checksums before preparing output. The platform fixes
-the LLVM triple, generic CPU and 64-bit little-endian ABI. Flat inventories
-admit a fixed set of link inputs, regular license files and the two named source
-archives. Version 1 has a
+the LLVM triple, generic CPU and 64-bit little-endian ABI. The inventory admits a fixed set of link inputs, regular notices and the two
+named source archives. Put related notices under up to two directory levels
+inside `licenses/`. The publisher copies those notices with the same relative
+names and includes their hashes in the publication receipt. Link and source
+inputs have exact flat names. Version 1 has a
 256 MiB input budget, 96-member maximum and a 32 KiB manifest bound. It uses no
 pack-provided commands, linker scripts, thin archives or executable hooks.
 Custom IDs describe a supported ABI closure. A different ABI requires its own
@@ -85,13 +123,24 @@ with `--local-msvc-inputs`. Use it only where your Microsoft terms permit use of
 those local developer inputs. It links PE32+ with `lld-link`, the existing
 static MSVC CRT, the selected Windows SDK's architecture-specific import
 libraries and the native Runtime archives. Keep those developer inputs out of
-distribution artifacts. Community MinGW libraries use a distinct C++ ABI and
-cannot substitute for these archives. [Microsoft redistribution terms](https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files)
+distribution artifacts. Community MinGW libraries use a distinct C++ ABI. The hosted LLVM-MinGW UCRT
+probe links both architectures offline on Linux and executes them on native
+Windows. The probe uses a separate C++ closure. A Windows GNU pack will need
+the complete VOID Runtime and native providers rebuilt for that closure, plus
+a distinct target ABI and destination binary audits. The Microsoft list covers
+specific redistributables. Keep the private MSVC link inputs local.
+[Microsoft redistribution terms](https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files) ·
+[Microsoft Visual Studio REDIST list](https://learn.microsoft.com/visualstudio/releases/2022/redistribution) ·
+[LLVM-MinGW](https://github.com/mstorsjo/llvm-mingw)
 
 A pack publish currently requires an ordinary VOID application without a
 managed-native provider. Existing native publishing retains exact catalog
-authorization and the verified same-platform provider closure. Source package
-dependencies continue through the ordinary dependency lock.
+authorization and the verified same-platform provider closure. A cross-publish
+variant requires a destination-specific catalog and descriptor, exact digest
+authorization for that variant, architecture and ABI verification of every
+link and runtime input, and a way to admit declarations without loading the
+destination provider on the publishing host. The established dependency lock
+still applies to source packages.
 
 ## Hosted artifacts and provenance
 
@@ -131,15 +180,18 @@ from a flat Mach-O publication. An assembled ZIP preserves the input binary's
 signature and can be signed as a bundle on macOS. CLI applications can keep
 the default flat distribution.
 
-Apple's SDK agreement governs the SDK. The native Runtime archives still need
-link-time interfaces for libSystem, libc++ and system frameworks. A prelinked
-VOID Runtime and independently authored minimal link definitions are an option
-to investigate, with destination symbol, dyld and signature verification.
-Godot's already-linked export templates demonstrate portable assembly but do
-not supply these interfaces for newly generated native code. No Apple SDK
-payload is included in a pack. Universal output requires both independently
-qualified slices and their dependency closure. [Apple SDK agreement](https://www.apple.com/legal/sla/docs/xcode.pdf) ·
-[Godot macOS exports](https://docs.godotengine.org/en/stable/tutorials/export/exporting_for_macos.html)
+The hosted macOS probe links an executable for each architecture offline on
+Linux using repository-authored definitions for a small adapter interface and
+the dyld binder. It builds each adapter natively, checks the Mach-O slices and
+ad hoc signatures, and runs on macOS ARM64 and Intel. Apple SDK assets stay
+on the native runners. Full VOID support still requires a complete prelinked
+Runtime, a stable exported C ABI, its signed dylib closure and an audited
+packaging layout. LLVM 23.1.4 publishes a macOS ARM64 SDK. The Intel VOID
+compiler needs a reproducible Intel SDK build from the pinned LLVM sources.
+Universal application qualification depends on both full native VOID slices.
+[Apple SDK agreement](https://www.apple.com/legal/sla/docs/xcode.pdf) ·
+[LLVM 23.1.4 release assets](https://github.com/llvm/llvm-project/releases/tag/llvmorg-23.1.4) ·
+[GitHub hosted runner images](https://github.com/actions/runner-images)
 
 For direct public distribution on macOS, use a Developer ID Application
 certificate, sign the complete app with hardened runtime and a secure

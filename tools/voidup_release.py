@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
 import time
 import tarfile
@@ -17,7 +18,7 @@ import tempfile
 import zipfile
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat, PrivateFormat, NoEncryption, load_pem_private_key
-from package_voidup_fixtures import ROOT, DOMAIN, encoded, produce, sha
+from package_voidup_fixtures import ROOT, DOMAIN, encoded, produce, sha, write_member
 
 OFFICIAL_CATALOG = 'https://github.com/Shmellyorc/Void.Language/releases/download/voidup-stable/catalog.json'
 OFFICIAL_ASSETS = 'https://github.com/Shmellyorc/Void.Language/releases/download/'
@@ -101,8 +102,71 @@ def package(args):
     exclusive(args.output/(args.release_id+'.release.json'),encoded(record))
     print('Complete payload, exact inventory and unsigned release descriptor prepared.')
 
+def package_target(args):
+    pack = args.pack.resolve(strict=True)
+    manifest = pack / 'target-pack.txt'
+    rows = manifest.read_text(encoding='ascii').splitlines()
+    keys = ('id', 'version', 'target', 'compiler', 'llvm', 'runtime', 'source', 'minimum')
+    identity = dict(row.split(' ', 1) for row in rows[1:9])
+    if rows[0] != 'VOID target pack 1' or tuple(identity) != keys:
+        raise ValueError('Unsupported target-pack manifest')
+    target = identity['target']
+    version = identity['version']
+    compiler = identity['compiler']
+    runtime = identity['runtime']
+    revision = identity['source']
+    if (target not in ('linux-x64', 'linux-arm64') or identity['id'] != target or
+            not VERSION.fullmatch(version) or not VERSION.fullmatch(compiler) or
+            identity['llvm'] != '23.1.4' or runtime != 'void-aot-64-v1' or
+            not re.fullmatch('[0-9a-f]{40}', revision)):
+        raise ValueError('Invalid official GNU target-pack identity')
+    manifest_digest = sha(manifest)
+    subprocess.run([str(args.compiler.resolve(strict=True)), 'target', 'check-payload', str(pack),
+                    target, version, revision, manifest_digest], check=True)
+    release_id = f'pack-{target}-{compiler}-{version}'
+    www = args.output / 'www'
+    artifact = www / 'packages' / f'{release_id}.zip'
+    inventory = www / 'inventories' / f'{release_id}.json'
+    artifact.parent.mkdir(parents=True, exist_ok=True)
+    inventory.parent.mkdir(parents=True, exist_ok=True)
+    members = []
+    expanded = 0
+    paths = sorted(pack.rglob('*'), key=lambda path: (not path.is_dir(), path.as_posix()))
+    epoch = int(os.environ.get('SOURCE_DATE_EPOCH', '315532800'))
+    if not 315532800 <= epoch <= 4354819199:
+        raise ValueError('SOURCE_DATE_EPOCH must fit the ZIP timestamp range')
+    with zipfile.ZipFile(artifact, 'x', allowZip64=False) as archive:
+        for path in paths:
+            directory = path.is_dir()
+            if path.is_symlink() or (not directory and not path.is_file()):
+                raise ValueError(f'Unexpected pack object: {path}')
+            name = path.relative_to(pack).as_posix() + ('/' if directory else '')
+            name.encode('ascii')
+            size = 0 if directory else path.stat().st_size
+            expanded += size
+            members.append(dict(name=name, size=size, sha256='' if directory else sha(path),
+                                directory=directory, executable=False))
+            write_member(archive, path, name, epoch, directory=directory)
+    if expanded > 268468224 or len(members) > 100 or artifact.stat().st_size > 285212672:
+        raise ValueError('Target pack exceeds manager bounds')
+    raw = encoded(dict(schema=1, release_id=release_id, host=target,
+                       build_identity=manifest_digest, expanded_bytes=expanded, members=members))
+    if len(raw) > 65536:
+        raise ValueError('Target-pack inventory exceeds manager bound')
+    exclusive(inventory, raw)
+    payload = dict(id=release_id, host=target, build_identity=manifest_digest,
+                   artifact_url='packages/' + artifact.name, artifact_bytes=artifact.stat().st_size,
+                   artifact_sha256=sha(artifact), inventory_url='inventories/' + inventory.name,
+                   inventory_bytes=len(raw), inventory_sha256=sha(inventory))
+    descriptor = dict(target=target, version=version, compiler=compiler,
+                      runtime=runtime, revision=revision, payload=payload)
+    exclusive(args.output / f'{release_id}.target-pack.json', encoded(descriptor))
+
+
 def catalog(args):
     config=read_public_config(args.public_config)
+    if args.target_pack and config['trust'] != 'engineering':
+        raise ValueError('Target-pack catalogs are enabled only for the controlled engineering channel')
     revoked=[]
     if args.previous:
         old=authenticate(args.previous.read_bytes(),Path(str(args.previous)+'.sig').read_bytes(),config)
@@ -122,7 +186,15 @@ def catalog(args):
                 if r[role+'_url']!=expected:raise ValueError('Production assets must use their exact immutable version and release ID')
     if not 0<args.serial or not 0<args.valid_days<=30 or not 1<=len(records)<=64 or len(revoked)>1024:raise ValueError('Invalid catalog bounds, serial or validity interval')
     issued=int(time.time())-60
-    raw=encoded(dict(schema=1,domain='voidup-catalog-v1',serial=args.serial,issued=issued,expires=issued+args.valid_days*86400,min_manager=2,llvm_version='23.1.4',revoked=revoked,releases=records))
+    document=dict(schema=1,domain='voidup-catalog-v1',serial=args.serial,issued=issued,expires=issued+args.valid_days*86400,min_manager=2,llvm_version='23.1.4',revoked=revoked,releases=records)
+    if args.target_pack:
+        packs = [json.loads(path.read_text()) for path in args.target_pack]
+        pack_ids = {item['payload']['id'] for item in packs}
+        selections = {(item['target'], item['compiler'], item['runtime'], item['version']) for item in packs}
+        if len(packs) > 64 or len(pack_ids) != len(packs) or len(selections) != len(packs) or pack_ids & {record['id'] for record in records}:
+            raise ValueError('Ambiguous or oversized target-pack catalog')
+        document.update(min_manager=3, target_packs={'releases': packs})
+    raw = encoded(document)
     exclusive(args.output,raw);print('Exact unsigned catalog prepared. Two custodians must endorse these bytes offline.')
 
 def sign_catalog(args):
@@ -166,7 +238,7 @@ def verify(args):
     if config['trust']!='production':raise ValueError('Public release requires approved production roots')
     raw=args.catalog.read_bytes();document=authenticate(raw,Path(str(args.catalog)+'.sig').read_bytes(),config)
     now=int(time.time())
-    if document['domain']!='voidup-catalog-v1' or document['schema']!=1 or document['llvm_version']!='23.1.4' or document['min_manager']!=2 or not 0<document['serial']<=9223372036854775807 or not document['issued']<=now<document['expires'] or not 0<document['expires']-document['issued']<=2592000:
+    if 'target_packs' in document or document['domain']!='voidup-catalog-v1' or document['schema']!=1 or document['llvm_version']!='23.1.4' or document['min_manager']!=2 or not 0<document['serial']<=9223372036854775807 or not document['issued']<=now<document['expires'] or not 0<document['expires']-document['issued']<=2592000:
         raise ValueError('Catalog identity or freshness rejected')
     if not 1<=len(document['releases'])<=64 or len(document['revoked'])>1024:raise ValueError('Publication catalog exceeds native bounds')
     if len(set(document['revoked']))!=len(document['revoked']) or any(not IDENTIFIER.fullmatch(r) for r in document['revoked']):raise ValueError('Invalid publication revocations')
@@ -297,7 +369,8 @@ def main():
     k=s.add_parser('keygen');k.add_argument('--key-id',required=True);k.add_argument('--directory',type=Path,required=True);k.set_defaults(action=keygen)
     e=s.add_parser('enroll');e.add_argument('--public',type=Path,action='append',required=True);e.add_argument('--approval',required=True);e.add_argument('--output',type=Path,required=True);e.set_defaults(action=enroll)
     b=s.add_parser('package');b.add_argument('--build',type=Path,required=True);b.add_argument('--sdk',type=Path,required=True);b.add_argument('--release-id',required=True);b.add_argument('--version',required=True);b.add_argument('--configuration',choices=['Release','Debug']);b.add_argument('--output',type=Path,required=True);b.set_defaults(action=package)
-    c=s.add_parser('catalog');c.add_argument('--public-config',type=Path,required=True);c.add_argument('--serial',type=int,required=True);c.add_argument('--valid-days',type=int,default=7);c.add_argument('--release',type=Path,action='append',required=True);c.add_argument('--previous',type=Path);c.add_argument('--revoke',action='append',default=[]);c.add_argument('--output',type=Path,required=True);c.set_defaults(action=catalog)
+    t=s.add_parser('package-target');t.add_argument('--pack',type=Path,required=True);t.add_argument('--compiler',type=Path,required=True);t.add_argument('--output',type=Path,required=True);t.set_defaults(action=package_target)
+    c=s.add_parser('catalog');c.add_argument('--public-config',type=Path,required=True);c.add_argument('--serial',type=int,required=True);c.add_argument('--valid-days',type=int,default=7);c.add_argument('--release',type=Path,action='append',required=True);c.add_argument('--target-pack',type=Path,action='append',default=[]);c.add_argument('--previous',type=Path);c.add_argument('--revoke',action='append',default=[]);c.add_argument('--output',type=Path,required=True);c.set_defaults(action=catalog)
     g=s.add_parser('sign');g.add_argument('--public-config',type=Path,required=True);g.add_argument('--catalog',type=Path,required=True);g.add_argument('--key',action='append',required=True,help='Enrolled ID=private PEM path; offline use only');g.add_argument('--output',type=Path,required=True);g.set_defaults(action=sign_catalog)
     m=s.add_parser('combine');m.add_argument('--public-config',type=Path,required=True);m.add_argument('--catalog',type=Path,required=True);m.add_argument('--endorsement',type=Path,action='append',required=True);m.add_argument('--output',type=Path,required=True);m.set_defaults(action=combine)
     v=s.add_parser('verify');v.add_argument('--public-config',type=Path,required=True);v.add_argument('--catalog',type=Path,required=True);v.add_argument('--assets',type=Path,required=True);v.add_argument('--version');v.add_argument('--previous',type=Path);v.set_defaults(action=verify)

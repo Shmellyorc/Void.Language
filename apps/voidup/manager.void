@@ -53,10 +53,12 @@ func up_check_retained(context: up_context) -> result<bool, support.up_error>:
             return Err(support.up_fail("control lost an authenticated revocation", "control"))
     return Ok(true)
 
-func up_stage(context: up_context) -> result<io.directory_handle, support.up_error>:
+func up_stage(context: up_context, requested: string = "") -> result<io.directory_handle, support.up_error>:
     var transaction_entries = support.up_io(io.entries(context.options.root_path + "/transactions", max_entries = 1024))?
     if transaction_entries.count >= 256:
         return Err(support.up_fail("retained transaction limit reached; no automatic deletion is performed", "transaction"))
+    if requested != "":
+        return support.up_io(context.transactions_cap.create_directory(requested))
     for attempt in 0..<16:
         var name = storage.up_nonce()?
         var created = context.transactions_cap.create_directory(name)
@@ -247,6 +249,161 @@ func up_environment(context: up_context, release_id: string) -> [string]:
         environment.push("PATH=" + context.options.root_path + "/toolchains/" + release_id + "/sdk/bin:/usr/bin:/bin")
     return environment
 
+func up_compiler_path(context: up_context, release_id: string) -> string:
+    var suffix = ""
+    if os.platform() == "windows":
+        suffix = ".exe"
+    return context.options.root_path + "/toolchains/" + release_id + "/bin/voidc" + suffix
+
+func up_pack_compiler(context: up_context, const arguments: [string]) -> result<string, support.up_error>:
+    var selected = context.control_state.current
+    var limits = process.capture_options(stdout_limit = 4096, stderr_limit = 4096, total_limit = 8192, timeout_ms = 120000)
+    var captured = support.up_sys(process.capture(up_compiler_path(context, selected), arguments, up_environment(context, selected), context.options.working_directory, limits))?
+    if captured.outcome != process.capture_end.complete or not captured.exited or captured.status.signaled or captured.status.code != 0:
+        return Err(support.up_fail("selected compiler could not validate target packs: " + support.up_text(captured.stderr)?, "target-pack"))
+    return Ok(text.trim(support.up_text(captured.stdout)?))
+
+func up_same_pack(first: model.up_target_release, second: model.up_target_release) -> bool:
+    return first.target == second.target and first.version == second.version and first.compiler == second.compiler and first.runtime == second.runtime and first.revision == second.revision and up_equivalent(first.payload, second.payload)
+
+func up_pack_proof(context: up_context, record: model.up_installed_pack) -> result<bool, support.up_error>:
+    var proof = up_cached_catalog(context, record.catalog_digest)?
+    if proof.serial == record.catalog_serial and not model.up_is_revoked(proof.revoked, record.pack.payload.id):
+        for pack in model.up_catalog_packs(proof):
+            if up_same_pack(pack, record.pack):
+                return Ok(true)
+    return Err(support.up_fail("installed target-pack identity differs from its signed catalog", "target-pack"))
+
+func up_pack_environment(context: up_context) -> result<string, support.up_error>:
+    var selectors: [string] = []
+    var installed = storage.up_read_packs(context.root_cap, context.control_state.serial)?
+    for record in installed:
+        var release = record.pack.payload
+        if model.up_is_revoked(context.control_state.revoked, release.id):
+            continue
+        var proof = up_pack_proof(context, record)?
+        selectors.push(record.pack.target + ":" + release.inventory_sha256 + ":" + release.build_identity)
+    return support.up_txt(text.join(selectors, ","))
+
+func up_pack_compatible(pack: model.up_target_release, compatibility: string) -> bool:
+    return compatibility == "VOID target pack 1|" + pack.compiler + "|23.1.4|" + pack.runtime
+
+func up_pack_select(document: model.up_catalog, target: string, compatibility: string) -> result<model.up_target_release, support.up_error>:
+    var best = model.up_target_release(payload = model.up_release())
+    for candidate in model.up_catalog_packs(document):
+        if candidate.target != target or not up_pack_compatible(candidate, compatibility) or model.up_is_revoked(document.revoked, candidate.payload.id):
+            continue
+        if best.target == "" or model.up_version_compare(candidate.version, best.version)? > 0:
+            best = candidate
+    if best.target == "":
+        return Err(support.up_fail("no compatible authenticated target pack for " + target, "target-pack"))
+    return Ok(best)
+
+func up_pack_directory(context: up_context) -> result<io.directory_handle, support.up_error>:
+    var opened = context.root_cap.open_directory("official-target-packs")
+    if opened is Ok(var existing):
+        return Ok(existing)
+    if opened is Err(var cause):
+        if cause.kind is io.error_kind.not_found:
+            var created = support.up_io(context.root_cap.create_directory("official-target-packs"))?
+            var synced = context.root_cap.sync()
+            if synced is Err(var failure):
+                created.deinit()
+                return Err(support.up_error(message = failure.message, operation = failure.operation, kind = failure.kind.name, native_domain = "filesystem", native_code = failure.os_code))
+            return Ok(created)
+    return support.up_io(opened)
+
+func up_pack_validate(context: up_context, pack: model.up_target_release, absolute: string) -> result<bool, support.up_error>:
+    var verified = up_pack_compiler(context, ["target", "check-payload", absolute, pack.target, pack.version, pack.revision, pack.payload.build_identity])?
+    return Ok(true)
+
+func up_pack_publish(context: up_context, pack: model.up_target_release, packs_cap: io.directory_handle) -> result<bool, support.up_error>:
+    var release = pack.payload
+    var slot = "p-" + release.inventory_sha256
+    var raw_inventory: [u8] = []
+    with transport.up_client(context.options.ca_file)? as client:
+        var target = transport.up_remote(context.options.catalog_url, release.inventory_url)?
+        raw_inventory = transport.up_fetch(client, context.options.catalog_url, target, release.inventory_bytes, context.options.timeout_ms)?
+    var manifest = model.up_inventory_parse(raw_inventory, release, true)?
+    var existing = packs_cap.open_directory(slot)
+    if existing is Ok(var prefix):
+        with prefix as retained:
+            var absolute = context.options.root_path + "/official-target-packs/" + slot
+            var verified = inventory.up_verify_prefix(retained, absolute, release, manifest, true)?
+            return up_pack_validate(context, pack, absolute)
+    if existing is Err(var cause):
+        if not (cause.kind is io.error_kind.not_found):
+            return Err(support.up_error(message = cause.message, operation = cause.operation, kind = cause.kind.name, native_domain = "filesystem", native_code = cause.os_code))
+    # The content slot is immutable. A later retry verifies a slot left behind
+    # between this publication and the separate control-state commit.
+    var transaction_name = storage.up_nonce()?
+    with up_stage(context, transaction_name)? as transaction:
+        with support.up_io(transaction.create_directory("payload"))? as payload:
+            with support.up_io(transaction.create_file("package.zip"))? as package:
+                with transport.up_client(context.options.ca_file)? as client:
+                    var target = transport.up_remote(context.options.catalog_url, release.artifact_url)?
+                    presentation.up_status(context.presentation, "Downloading", "target-pack artifact")
+                    var downloaded = transport.up_download(client, context.options.catalog_url, target, package, release.artifact_bytes, context.options.timeout_ms, context.options.package_timeout_ms)?
+                var extracted = inventory.up_extract(package, payload, release, manifest, true)?
+            var checked = up_pack_validate(context, pack, context.options.root_path + "/transactions/" + transaction_name + "/payload")?
+            return support.up_publication(payload.publish(packs_cap, slot), "target-pack-publication")
+
+func up_target_online(context: up_context) -> result<bool, support.up_error>:
+    if context.options.target_action == "available" and context.options.catalog_url == distribution.up_official_catalog and not distribution.up_source_enabled:
+        return up_say("No signed official target packs are enabled on this release channel.")
+    if context.options.target_id != "" and not model.up_official_target(context.options.target_id):
+        return Err(support.up_fail("this channel supports official GNU Linux target packs", "target-pack"))
+    if context.control_state.current == "":
+        return Err(support.up_fail("a default toolchain must be installed before acquiring target packs", "target-pack"))
+    var document = up_fetch_catalog(context)?
+    var checked = up_verify_version(context, context.control_state.current)?
+    var compatibility = up_pack_compiler(context, ["target", "compatibility"])?
+    if context.options.target_action == "available":
+        for pack in model.up_catalog_packs(document):
+            if up_pack_compatible(pack, compatibility) and not model.up_is_revoked(document.revoked, pack.payload.id):
+                var printed = up_say("{pack.target} {pack.version} source={pack.revision}")?
+        return Ok(true)
+    var target = context.options.target_id
+    var selected = up_pack_select(document, target, compatibility)?
+    var records: [model.up_installed_pack] = []
+    var was_installed = false
+    var installed = storage.up_read_packs(context.root_cap, context.control_state.serial)?
+    for record in installed:
+        if record.pack.target != target:
+            records.push(record)
+            continue
+        was_installed = true
+        var proof = up_pack_proof(context, record)?
+        if record.pack.payload.id == selected.payload.id and not up_same_pack(record.pack, selected):
+            return Err(support.up_fail("target-pack release ID has conflicting authenticated content", "target-pack"))
+        if up_pack_compatible(record.pack, compatibility):
+            var order = model.up_version_compare(selected.version, record.pack.version)?
+            if order < 0:
+                return Err(support.up_fail("target-pack update would downgrade the installed version", "target-pack"))
+            if order == 0 and not up_same_pack(record.pack, selected):
+                return Err(support.up_fail("same target-pack version has conflicting authenticated content", "target-pack"))
+    if context.options.target_action == "update" and not was_installed:
+        return Err(support.up_fail("target pack is not installed; use target install", "target-pack"))
+    with up_pack_directory(context)? as packs_cap:
+        var published = up_pack_publish(context, selected, packs_cap)?
+    records.push(model.up_installed_pack(pack = selected, catalog_digest = context.control_state.catalog_digest, catalog_serial = document.serial))
+    var saved = storage.up_write_packs(context.root_cap, records)?
+    return up_say("installed {target} {selected.version}")
+
+func up_target_remove(context: up_context) -> result<bool, support.up_error>:
+    var retained: [model.up_installed_pack] = []
+    var removed = false
+    var installed = storage.up_read_packs(context.root_cap, context.control_state.serial)?
+    for record in installed:
+        if record.pack.target == context.options.target_id:
+            removed = true
+        else:
+            retained.push(record)
+    if not removed:
+        return Err(support.up_fail("target pack is not installed", "target-pack"))
+    var saved = storage.up_write_packs(context.root_cap, retained)?
+    return up_say("removed " + context.options.target_id)
+
 func up_run(context: up_context, writer: io.directory_lock) -> result<i32, support.up_error>:
     var selected_id = context.options.release_id
     if selected_id == "default":
@@ -254,6 +411,11 @@ func up_run(context: up_context, writer: io.directory_lock) -> result<i32, suppo
     if selected_id == "":
         return Err(support.up_fail("no default toolchain is selected", "run"))
     var manifest = up_verify_version(context, selected_id)?
+    var environment = up_environment(context, selected_id)
+    if context.options.tool == "voidc" and context.options.forwarded.count > 0:
+        var first = context.options.forwarded[0]
+        if first == "target" or first == "publish":
+            environment.push("VOIDUP_TARGET_PACKS=" + up_pack_environment(context)?)
     var tool_name = context.options.tool
     if os.platform() == "windows":
         tool_name += ".exe"
@@ -272,7 +434,7 @@ func up_run(context: up_context, writer: io.directory_lock) -> result<i32, suppo
                 return Err(support.up_fail("tool changed after prefix verification", "run"))
             var released = support.up_io(writer.close())?
             var absolute_executable = context.options.root_path + "/toolchains/" + selected_id + "/" + relative_executable
-            with support.up_sys(process.start(absolute_executable, context.options.forwarded, up_environment(context, selected_id), context.options.working_directory))? as running:
+            with support.up_sys(process.start(absolute_executable, context.options.forwarded, environment, context.options.working_directory))? as running:
                 var status = support.up_sys(running.wait())?
                 if status.signaled:
                     return Ok((128 + status.signal) as i32)
@@ -280,6 +442,12 @@ func up_run(context: up_context, writer: io.directory_lock) -> result<i32, suppo
 
 func up_dispatch(context: up_context, writer: io.directory_lock) -> result<i32, support.up_error>:
     var command_name = context.options.command
+    if command_name == "target" and context.options.target_action != "":
+        if context.options.target_action == "remove":
+            var removed = up_target_remove(context)?
+        else:
+            var acquired = up_target_online(context)?
+        return Ok(0)
     if command_name == "run" or command_name == "target":
         return up_run(context, writer)
     if command_name == "setup" or command_name == "update":

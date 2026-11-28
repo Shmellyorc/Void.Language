@@ -206,7 +206,7 @@ def assemble(args):
     if system_name == "Linux":
         files.update(linux_provider_notices(build))
     output = fresh_output(args.output)
-    header = ["VOID target pack 1", f"id {args.id}", f"version {args.version}", f"target {target}",
+    header = ["VOID target pack 1", f"id {args.id or target}", f"version {args.version}", f"target {target}",
               f"compiler {compiler}", "llvm 23.1.4", "runtime void-aot-64-v1", f"source {revision}",
               f"minimum {minimum}"]
     with tempfile.TemporaryDirectory(dir=output.parent, prefix=".pack-") as work:
@@ -323,13 +323,18 @@ def main():
         return
     parser.add_argument("build", type=Path, help="Native Release CMake build directory")
     parser.add_argument("output", type=Path)
-    parser.add_argument("--id", required=True)
+    identity = parser.add_mutually_exclusive_group(required=True)
+    identity.add_argument("--id")
+    identity.add_argument("--official-candidate", action="store_true",
+                          help="Use the canonical GNU target ID for a controlled signed release candidate")
     parser.add_argument("--version", default="1.0.0")
     parser.add_argument("--cc", default="gcc", help="Destination GCC installation for GNU startup/library files")
     parser.add_argument("--local-msvc-inputs", action="store_true", help="Use local MSVC and Windows SDK libraries for a private pack")
     parser.add_argument("--ubuntu-inputs", action="store_true", help="Export Runtime plus data for provisioning exact Ubuntu system packages")
     args = parser.parse_args()
-    if not re.fullmatch(r"custom-[a-z0-9](?:[a-z0-9-]{0,39}[a-z0-9])?", args.id):
+    if args.official_candidate and platform.system() != "Linux":
+        parser.error("Official candidates currently require the GNU Runtime closure")
+    if args.id is not None and not re.fullmatch(r"custom-[a-z0-9](?:[a-z0-9-]{0,39}[a-z0-9])?", args.id):
         parser.error("Choose a custom-* pack ID")
     if not re.fullmatch(r"[0-9]+(?:\.[0-9]+)*", args.version) or len(args.version) > 24:
         parser.error("Expected a dotted numeric pack version")

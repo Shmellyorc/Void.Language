@@ -16,7 +16,7 @@ func up_identity(prefix_cap: io.directory_handle, release: model.up_release) -> 
         return Err(support.up_fail("payload build identity differs from authenticated release", "verify"))
     return Ok(true)
 
-func up_verify_prefix(prefix_cap: io.directory_handle, absolute_prefix: string, release: model.up_release, manifest: model.up_inventory) -> result<bool, support.up_error>:
+func up_verify_prefix(prefix_cap: io.directory_handle, absolute_prefix: string, release: model.up_release, manifest: model.up_inventory, target_pack: bool = false) -> result<bool, support.up_error>:
     var expected: {string: model.up_member}
     for member in manifest.members:
         expected[member.name] = member
@@ -48,9 +48,11 @@ func up_verify_prefix(prefix_cap: io.directory_handle, absolute_prefix: string, 
         var expected_member = expected[relative_name]
         if expected_member.directory != (item.kind is io.entry_kind.directory):
             return Err(support.up_fail("installed object kind changed", "verify"))
+    if target_pack:
+        return Ok(true)
     return up_identity(prefix_cap, release)
 
-func up_extract(package: io.file, prefix_cap: io.directory_handle, release: model.up_release, manifest: model.up_inventory) -> result<bool, support.up_error>:
+func up_extract(package: io.file, prefix_cap: io.directory_handle, release: model.up_release, manifest: model.up_inventory, target_pack: bool = false) -> result<bool, support.up_error>:
     if support.up_hash_file(package, release.artifact_bytes)? != release.artifact_sha256:
         return Err(support.up_fail("package SHA-256 mismatch", "package"))
     var expected: {string: model.up_member}
@@ -103,4 +105,6 @@ func up_extract(package: io.file, prefix_cap: io.directory_handle, release: mode
             var parts = support.up_path_parts(model.up_member_path(member)?)?
             with storage.up_walk(prefix_cap, parts, parts.count)? as directories:
                 var synced = support.up_io(directories.current.sync())?
+    if target_pack:
+        return Ok(true)
     return up_identity(prefix_cap, release)

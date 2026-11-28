@@ -8,7 +8,7 @@ on:
         description: Target-pack qualification scope
         type: choice
         default: foundation
-        options: [foundation, platform-probes, all]
+        options: [foundation, acquisition, platform-probes, all]
 concurrency:
   group: target-packs-${{ github.ref }}
   cancel-in-progress: false
@@ -25,9 +25,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - {runner: ubuntu-24.04, job: runtime, target: linux-x64, arch: x64}
-          - {runner: ubuntu-24.04-arm, job: runtime, target: linux-arm64, arch: arm64}
+        include: ${{ fromJSON(inputs.scope == 'acquisition'
+          && '[{"runner":"ubuntu-24.04-arm","job":"runtime","target":"linux-arm64","arch":"arm64"}]'
+          || '[{"runner":"ubuntu-24.04","job":"runtime","target":"linux-x64","arch":"x64"},{"runner":"ubuntu-24.04-arm","job":"runtime","target":"linux-arm64","arch":"arm64"}]') }}
     runs-on: ${{ matrix.runner }}
     env: &build-env
       PYTHONUTF8: '1'
@@ -111,6 +111,35 @@ jobs:
             "-DLLVM_DIR=$env:LLVM_DIR" "-DVOID_CLANG=$env:VOID_CLANG"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           cmake --build "$env:RUNNER_TEMP/build" --target voidc voidup --parallel 3
+      - uses: actions/download-artifact@v7
+        if: matrix.job == 'acquisition'
+        with:
+          name: linux-arm64-runtime-${{ github.sha }}
+          path: ${{ runner.temp }}
+      - name: Qualify controlled signed target-pack release
+        if: matrix.job == 'acquisition'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP"
+          cmake --build "$work/build" --target voidls --parallel 3
+          python -m pip install cryptography==49.0.0
+          mkdir "$work/candidate"
+          gh attestation verify "$work/runtime-linux-arm64.tar.gz" --repo "$GITHUB_REPOSITORY" \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/ci-target-packs.yml" --source-digest "$GITHUB_SHA"
+          tar -C "$work/candidate" -xzf "$work/runtime-linux-arm64.tar.gz"
+          grep -Fx "source $GITHUB_SHA" "$work/candidate/runtime/target-pack.txt"
+          python tools/target_pack.py compose "$work/candidate" "$work/pack"
+          python tests/voidup/target_packs.py "$work/build" "$(dirname "$VOID_CLANG")/.." "$work/pack" "$work/acquired" --scratch "$work"
+          tar -C "$work/acquired" -czf "$work/acquired.tar.gz" .
+      - uses: actions/upload-artifact@v6
+        if: matrix.job == 'acquisition'
+        with:
+          name: signed-acquisition-distribution-${{ github.sha }}
+          path: ${{ runner.temp }}/acquired.tar.gz
+          if-no-files-found: error
       - name: Preserve the built compiler for cross-host publishing
         if: matrix.job == 'publisher' || matrix.target == 'linux-x64' || matrix.target == 'windows-x64'
         shell: bash
@@ -166,7 +195,7 @@ jobs:
           path: ${{ runner.temp }}/evidence/
           if-no-files-found: ignore
   build-macos:
-    if: inputs.scope != 'platform-probes'
+    if: inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
     strategy:
       matrix:
         include:
@@ -175,7 +204,7 @@ jobs:
     env: *build-env
     steps: *build-steps
   build-windows:
-    if: inputs.scope != 'platform-probes'
+    if: inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
     strategy:
       fail-fast: false
       matrix:
@@ -187,6 +216,7 @@ jobs:
     steps: *build-steps
   publish-from-linux:
     needs: build-linux
+    if: inputs.scope != 'acquisition'
     runs-on: ubuntu-24.04
     env:
       TARGETS: linux-arm64
@@ -251,7 +281,7 @@ jobs:
     steps: *publish-steps
   publish-from-windows:
     needs: [build-linux, build-windows]
-    if: ${{ !cancelled() && needs.build-linux.result == 'success' }}
+    if: ${{ !cancelled() && inputs.scope != 'acquisition' && needs.build-linux.result == 'success' }}
     runs-on: windows-2022
     env:
       TARGETS: linux-x64 linux-arm64
@@ -297,6 +327,32 @@ jobs:
     env:
       PRODUCER: Windows-X64
     steps: *run-steps
+  acquire-official:
+    if: inputs.scope == 'acquisition' || inputs.scope == 'all'
+    needs: build-linux
+    strategy:
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, job: acquisition, target: linux-arm64, arch: x64}
+    runs-on: ${{ matrix.runner }}
+    env: *build-env
+    steps: *build-steps
+  run-acquired:
+    needs: acquire-official
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: signed-acquisition-distribution-${{ github.sha }}
+          path: ${{ runner.temp }}
+      - name: Run the official-pack publication on native Linux ARM64
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = aarch64
+          mkdir "$RUNNER_TEMP/relocated"
+          tar -C "$RUNNER_TEMP/relocated" -xzf "$RUNNER_TEMP/acquired.tar.gz"
+          test "$(cd / && "$RUNNER_TEMP/relocated/app")" = 37
   probe-windows-link:
     if: inputs.scope == 'platform-probes' || inputs.scope == 'all'
     runs-on: ubuntu-24.04
@@ -316,7 +372,7 @@ jobs:
           for arch in x86_64 aarch64; do
             image="$RUNNER_TEMP/windows-probes/$arch.exe"
             sudo unshare --net -- runuser -u "$USER" -- "$sdk/bin/$arch-w64-mingw32-clang++" \
-              -std=c++20 -O2 -static tools/ci/probe_windows_ucrt.cpp -o "$image"
+              -std=c++20 -O2 -static -Iinclude tools/ci/probe_windows_ucrt.cpp src/runtime/application.cpp -o "$image"
             "$sdk/bin/llvm-readobj" --file-headers --coff-imports "$image" | tee "$RUNNER_TEMP/windows-probes/$arch.txt"
             if [ "$arch" = x86_64 ]; then machine=AMD64; else machine=ARM64; fi
             grep -q "Machine: IMAGE_FILE_MACHINE_$machine " "$RUNNER_TEMP/windows-probes/$arch.txt"
@@ -408,7 +464,8 @@ jobs:
           tar -C "$RUNNER_TEMP/macos-probes" -xzf "$RUNNER_TEMP/macos-probes.tar.gz"
           slice="$RUNNER_TEMP/macos-probes/$arch"
           xcrun clang++ -std=c++20 -arch "$arch" -mmacosx-version-min=14.0 -fvisibility=hidden \
-            -dynamiclib -Wl,-install_name,@rpath/libVoidProbe.dylib tools/ci/probe_macos_adapter.cpp -o "$slice/libVoidProbe.dylib"
+            -dynamiclib -Wl,-install_name,@rpath/libVoidProbe.dylib -Iinclude \
+            tools/ci/probe_macos_adapter.cpp src/runtime/application.cpp -o "$slice/libVoidProbe.dylib"
           codesign --force --sign - "$slice/libVoidProbe.dylib"
           codesign --verify --strict "$slice/app"
           codesign --verify --strict "$slice/libVoidProbe.dylib"

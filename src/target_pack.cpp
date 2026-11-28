@@ -188,6 +188,19 @@ void check_link_file(std::string_view name, std::string_view bytes, const Target
     if (!llvm::isa<llvm::object::ELF64LEObjectFile>(file->get()) || (*file)->getArch() != llvm_architecture(target))
         throw std::runtime_error("Target pack link input has the wrong architecture: " + std::string(name));
 }
+bool notice_path(std::string_view path) {
+    unsigned depth = 0;
+    while (!path.empty()) {
+        const auto slash = path.find('/');
+        const auto component = path.substr(0, slash);
+        if (++depth > 3 || component.size() > 128 || !portable_path_component(component))
+            return false;
+        if (slash == path.npos) return true;
+        path.remove_prefix(slash + 1);
+    }
+    return false;
+}
+
 void print_pack(const Pack& pack) {
     std::size_t bytes = 0;
     for (const auto& [name, data] : pack.files) bytes += data.size();
@@ -208,9 +221,13 @@ fs::path pack_store() {
     return data / "target-packs";
 }
 
-static Pack read_pack(const fs::path& requested, const project::ProjectDirectoryReader& reader) {
+static Pack read_pack(const fs::path& requested, const project::ProjectDirectoryReader& reader,
+                      std::string_view expected_manifest = {}) {
     const auto root = reader.inspect(requested).path;
     const auto manifest = reader.read(root / pack_manifest, manifest_limit);
+    const auto manifest_digest = digest(manifest);
+    if (!expected_manifest.empty() && expected_manifest != manifest_digest)
+        throw std::runtime_error("Target pack manifest differs from the authenticated digest.");
     if (!manifest.ends_with('\n') || manifest.find_first_of("\r\0", 0, 2) != manifest.npos)
         throw std::runtime_error("Target pack manifest requires LF-terminated text.");
     std::istringstream rows(manifest);
@@ -241,8 +258,9 @@ static Pack read_pack(const fs::path& requested, const project::ProjectDirectory
     if (target->system == System::windows_msvc &&
         minimum != (target->architecture == Architecture::arm64 ? "windows-11" : "windows-10"))
         throw std::runtime_error("Windows target pack requires a Windows 10 x64 or Windows 11 ARM64 deployment floor.");
-    Pack pack{target, std::move(id), std::move(revision), std::move(version), std::move(minimum), digest(manifest), {}};
+    Pack pack{target, std::move(id), std::move(revision), std::move(version), std::move(minimum), manifest_digest, {}};
     std::set<std::string> names;
+    std::map<std::string, std::string> directories{{"licenses", "licenses"}, {"link", "link"}};
     std::size_t budget = pack_limit;
     std::size_t sources = 0;
     while (std::getline(rows, line)) {
@@ -256,9 +274,24 @@ static Pack read_pack(const fs::path& requested, const project::ProjectDirectory
         const auto leaf = name.substr(slash + 1);
         const bool source = role == "source" && target->system == System::linux_gnu &&
             std::ranges::find(linux_http_sources, leaf) != linux_http_sources.end();
-        if (!portable_path_component(leaf) || leaf.size() > 128 || leaf.find('/') != leaf.npos ||
-            (role != "link" && role != "licenses" && !source) || !names.insert(project::fold_project_name(name)).second)
+        const auto folded = project::fold_project_name(name);
+        const bool reserved_notice = folded == "licenses/application-license.txt" ||
+            folded == "licenses/gnu-http-libraries.txt" ||
+            std::ranges::any_of(linux_http_sources, [&](std::string_view source_name) {
+                return folded == "licenses/" + std::string(source_name);
+            });
+        const bool valid_name = role == "licenses" ? notice_path(leaf) && !reserved_notice :
+            leaf.size() <= 128 && leaf.find('/') == leaf.npos && portable_path_component(leaf);
+        if (!valid_name || (role != "link" && role != "licenses" && !source) ||
+            directories.contains(folded) || !names.insert(folded).second)
             throw std::runtime_error("Invalid or duplicate target pack member: " + name);
+        for (auto parent = name.find('/'); parent != name.npos; parent = name.find('/', parent + 1)) {
+            const auto directory = name.substr(0, parent);
+            const auto key = project::fold_project_name(directory);
+            const auto& [item, inserted] = directories.emplace(key, directory);
+            if ((!inserted && item->second != directory) || names.contains(key))
+                throw std::runtime_error("Conflicting target pack directory: " + directory);
+        }
         if (role == "link" && !expected.erase(leaf)) throw std::runtime_error("Unexpected target pack link input: " + name);
         const std::size_t member_limit = role == "link" ? budget : (source ? 8 : 1) * 1024 * 1024;
         auto bytes = reader.read(root / utf8_path(name), std::min(budget, member_limit));
@@ -274,15 +307,15 @@ static Pack read_pack(const fs::path& requested, const project::ProjectDirectory
         throw std::runtime_error("Target pack requires both GNU HTTP provider source archives.");
     if (!pack.files.contains("licenses/VOID-MIT-LICENSE.txt"))
         throw std::runtime_error("Target pack is missing its VOID license.");
-    for (const auto& entry : fs::directory_iterator(root)) {
-        const auto name = path_utf8(entry.path().filename());
+    for (const auto& entry : fs::recursive_directory_iterator(root)) {
+        const auto name = path_utf8(entry.path().lexically_relative(root));
         if (name == pack_manifest) continue;
-        if ((name != "link" && name != "licenses" && !(sources && name == "source")) ||
-            !fs::is_directory(entry.symlink_status()))
-            throw std::runtime_error("Unexpected target pack entry: " + name);
-        for (const auto& member : fs::directory_iterator(entry))
-            if (!pack.files.contains(name + "/" + path_utf8(member.path().filename())))
-                throw std::runtime_error("Uninventoried target pack member: " + path_utf8(member.path()));
+        const auto kind = entry.symlink_status();
+        if (fs::is_directory(kind)) {
+            const auto directory = directories.find(project::fold_project_name(name));
+            if (directory != directories.end() && directory->second == name) continue;
+        } else if (fs::is_regular_file(kind) && pack.files.contains(name)) continue;
+        throw std::runtime_error("Uninventoried target pack member: " + name);
     }
     pack.files.emplace(pack_manifest, manifest);
     return pack;
@@ -290,37 +323,88 @@ static Pack read_pack(const fs::path& requested, const project::ProjectDirectory
 
 Pack read_pack(const fs::path& requested) { return read_pack(requested, {}); }
 
+namespace {
+struct ManagedPack {
+    std::string inventory;
+    std::string manifest;
+};
+
+// The managed launcher supplies only selections it authenticated with the retained
+// release keys. The compiler binds its independent input snapshot to that selection.
+std::map<std::string, ManagedPack> managed_packs() {
+    const auto selected = llvm::sys::Process::GetEnv("VOIDUP_TARGET_PACKS");
+    std::map<std::string, ManagedPack> packs;
+    if (!selected || selected->empty()) return packs;
+    if (selected->size() > 320)
+        throw std::runtime_error("Invalid managed target-pack selection.");
+    std::istringstream rows(*selected);
+    std::string row;
+    while (std::getline(rows, row, ',')) {
+        const auto id_end = row.find(':');
+        const auto inventory_end = row.find(':', id_end == row.npos ? id_end : id_end + 1);
+        const auto id = std::string_view(row).substr(0, id_end);
+        const auto* target = find_target(id);
+        if (!target || target->system != System::linux_gnu || inventory_end == row.npos ||
+            !hex(std::string_view(row).substr(id_end + 1, inventory_end - id_end - 1), 64) ||
+            !hex(std::string_view(row).substr(inventory_end + 1), 64) ||
+            !packs.emplace(id, ManagedPack{row.substr(id_end + 1, 64), row.substr(inventory_end + 1)}).second)
+            throw std::runtime_error("Invalid managed target-pack selection.");
+    }
+    return packs;
+}
+}
+
 Pack load_pack(std::string_view id) {
     if (!target_name(id)) throw std::invalid_argument("Invalid target pack ID.");
+    auto path = pack_store() / utf8_path(id);
+    std::string expected_manifest;
     if (!custom_target(id)) {
-        if (find_target(id)->system == System::macos)
-            throw std::runtime_error("Offline macOS cross-linking requires independently redistributable libSystem and framework inputs. Use the matching native macOS toolchain.");
-        throw std::runtime_error("No signed official pack is enabled for " + std::string(id) +
-            ". Select an explicitly registered custom pack or publish on the matching native host.");
+        const auto selections = managed_packs();
+        const auto found = selections.find(std::string(id));
+        if (found == selections.end()) {
+            if (find_target(id)->system == System::macos)
+                throw std::runtime_error("Offline macOS cross-linking requires independently redistributable libSystem and framework inputs. Use the matching native macOS toolchain.");
+            throw std::runtime_error("No signed official pack is enabled for " + std::string(id) +
+                ". Use voidup target list --available to check for an official pack or select a registered custom pack.");
+        }
+        path = pack_store().parent_path() / "official-target-packs" / ("p-" + found->second.inventory);
+        expected_manifest = found->second.manifest;
     }
-    const auto path = pack_store() / utf8_path(id);
     if (!fs::exists(fs::symlink_status(path)))
         throw std::runtime_error("Target pack " + std::string(id) +
-            " is not installed. Use voidup target list or voidup target add DIRECTORY. Publishing without a pack requires its matching native host.");
-    auto pack = read_pack(path);
+            " is not installed. Use voidup target install ID or voidup target add DIRECTORY.");
+    auto pack = read_pack(path, {}, expected_manifest);
     if (pack.id != id) throw std::runtime_error("Installed target pack identity differs from its registration.");
     return pack;
 }
 
 int pack_command(std::span<const std::string_view> args) {
-    if (args.empty()) throw std::invalid_argument("Use target list [--available], add DIRECTORY, inspect ID, verify ID or remove ID.");
+    if (args.empty()) throw std::invalid_argument("Use target list, add DIRECTORY, inspect ID, verify ID or remove ID. Use VOIDUP to acquire official packs.");
     const auto verb = args.front();
+    if (verb == "compatibility" && args.size() == 1) {
+        std::cout << "VOID target pack 1|" VOID_COMPILER_VERSION "|" LLVM_VERSION_STRING "|void-aot-64-v1\n";
+        return 0;
+    }
+    if (verb == "check-payload" && args.size() == 6) {
+        if (!hex(args[5], 64)) throw std::invalid_argument("Expected the signed pack manifest digest.");
+        const auto pack = read_pack(utf8_path(args[1]), {}, args[5]);
+        if (pack.id != args[2] || pack.version != args[3] || pack.revision != args[4])
+            throw std::runtime_error("Target pack identity differs from the signed catalog.");
+        return 0;
+    }
     if (verb == "list" && args.size() == 2 && args[1] == "--available") {
-        std::cout << "No signed official target packs are enabled on this release channel.\n";
+        std::cout << "No signed official target packs are enabled in standalone voidc. Use voidup target list --available.\n";
         return 0;
     }
     if (verb == "list" && args.size() == 1) {
         const auto root = pack_store();
-        if (!fs::exists(fs::symlink_status(root))) return 0;
         std::set<std::string> ids;
-        for (const auto& entry : fs::directory_iterator(project::inspect_creation_root(root).path)) {
-            const auto id = path_utf8(entry.path().filename());
-            if (target_name(id)) ids.insert(id);
+        for (const auto& [id, selection] : managed_packs()) ids.insert(id);
+        if (fs::exists(fs::symlink_status(root))) {
+            for (const auto& entry : fs::directory_iterator(project::inspect_creation_root(root).path)) {
+                const auto id = path_utf8(entry.path().filename());
+                if (custom_target(id)) ids.insert(id);
+            }
         }
         for (const auto& id : ids) std::cout << id << '\n';
         return 0;
@@ -340,7 +424,11 @@ int pack_command(std::span<const std::string_view> args) {
             std::map<std::string, std::string_view> files{{"licenses/", ""}, {"link/", ""}};
             if (pack.files.contains(std::string("source/") + linux_http_sources.front()))
                 files.emplace("source/", "");
-            for (const auto& [name, bytes] : pack.files) files.emplace(name, bytes);
+            for (const auto& [name, bytes] : pack.files) {
+                for (auto slash = name.find('/'); slash != name.npos; slash = name.find('/', slash + 1))
+                    files.emplace(name.substr(0, slash + 1), "");
+                files.emplace(name, bytes);
+            }
             project::publish_project_directory(store, pack.id, files, [&](const auto& candidate, const auto& reader) {
                 if (read_pack(candidate, reader).digest != pack.digest) throw std::runtime_error("Target pack changed during registration.");
             });
@@ -350,6 +438,7 @@ int pack_command(std::span<const std::string_view> args) {
         print_pack(load_pack(args[1]));
     } else if (verb == "remove") {
         if (!target_name(args[1])) throw std::invalid_argument("Invalid target pack ID.");
+        if (!custom_target(args[1])) throw std::invalid_argument("Use VOIDUP to remove official target packs.");
         bool removed = false;
         project::with_user_package_store(pack_store(), false, [&](const project::CreationRoot& store) {
             const auto id = std::string(args[1]);

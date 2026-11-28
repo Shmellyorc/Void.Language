@@ -103,13 +103,22 @@ def produce(compiler, pack, output):
         (altered / manifest.name).write_bytes(
             manifest.read_bytes().replace(b"runtime void-aot-64-v1", b"runtime future"))
         run(compiler, "target", "add", altered, env=env, failure="Incompatible target pack")
-        result = run(compiler, "target", "add", pack, env=env)
-        assert pack_id in result.stdout and f"sha256={hashlib.sha256(manifest.read_bytes()).hexdigest()}" in result.stdout
+        staged = workspace / "pack-with-notices"
+        shutil.copytree(pack, staged)
+        notice_path = "licenses/providers/test/NOTICE.txt"
+        notice = b"Target pack notice fixture\n"
+        (staged / notice_path).parent.mkdir(parents=True)
+        (staged / notice_path).write_bytes(notice)
+        extended = manifest.read_bytes() + f"{hashlib.sha256(notice).hexdigest()}\t{notice_path}\n".encode()
+        (staged / manifest.name).write_bytes(extended)
+        result = run(compiler, "target", "add", staged, env=env)
+        assert pack_id in result.stdout and f"sha256={hashlib.sha256(extended).hexdigest()}" in result.stdout
         assert run(compiler, "target", "list", env=env).stdout.splitlines() == [pack_id]
         run(compiler, "target", "verify", pack_id, env=env)
         publish(output / "async", "--resources", "embed", "--profile", "performance")
         publish(output / "async", failure="fresh directory")
         run(compiler, "publish", "--verify", output / "async")
+        assert (output / "async" / notice_path).read_bytes() == notice
         report = json.loads((output / "async/binary-audit.json").read_text())
         assert report["inspected"] and report["architecture"] == expected_arch and not report["findings"], report
 

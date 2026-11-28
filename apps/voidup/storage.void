@@ -74,14 +74,17 @@ func up_write_control(root_cap: io.directory_handle, state: model.up_control) ->
         return Err(support.up_fail("control generation exhausted", "control"))
     state.generation += 1
     var bytes = support.up_json(codec.stringify(state, support.up_json_budget()))?.to_utf8()
+    return up_publish_state(root_cap, "control.json", "control", bytes)
+
+func up_publish_state(root_cap: io.directory_handle, state_name: string, operation: string, const bytes: [u8]) -> result<bool, support.up_error>:
     var name = up_nonce()?
     with support.up_io(root_cap.create_file(name))? as output_file:
         var written = support.up_io(output_file.write_bytes(bytes))?
         if written != bytes.count:
-            return Err(support.up_fail("incomplete control write", "control"))
+            return Err(support.up_fail("incomplete state write", operation))
         var flushed = support.up_io(output_file.flush())?
-        # Never delete or try to roll back after a published uncertain outcome.
-        return support.up_publication(root_cap.publish_file(output_file, name, root_cap, "control.json", true), "control")
+        # A failed post-rename sync requires rereading the visible state.
+        return support.up_publication(root_cap.publish_file(output_file, name, root_cap, state_name, true), operation)
 
 func up_root(root_path: string) -> result<io.directory_handle, support.up_error>:
     if not support.up_io(path.is_absolute(root_path))? or text.contains(root_path, "\n") or text.contains(root_path, "\r"):
@@ -130,3 +133,29 @@ func up_read_control(root_cap: io.directory_handle) -> result<model.up_control, 
     if now < state.last_time:
         return Err(support.up_fail("clock moved behind retained trusted time", "control"))
     return Ok(state)
+
+
+func up_read_packs(root_cap: io.directory_handle, serial: i64) -> result<[model.up_installed_pack], support.up_error>:
+    var opened = root_cap.open_file("target-packs.json")
+    if opened is Err(var cause):
+        if cause.kind is io.error_kind.not_found:
+            return Ok([])
+        var failed = support.up_io(opened)?
+    if opened is Ok(var input):
+        with input as retained:
+            var raw = support.up_read_metadata(retained, "target-packs.json", 32768)?
+            var state = support.up_json(codec.parse_as<model.up_pack_state>(support.up_text(raw)?, support.up_json_budget()))?
+            if state.schema != 1 or state.installed.count > 2:
+                return Err(support.up_fail("invalid target-pack state", "target-pack"))
+            var pack_targets: {string: bool}
+            for item in state.installed:
+                var checked_pack = model.up_pack_shape(item.pack)?
+                if pack_targets.contains(item.pack.target) or not support.up_sha_text(item.catalog_digest) or item.catalog_serial < 1 or item.catalog_serial > serial:
+                    return Err(support.up_fail("invalid installed target-pack record", "target-pack"))
+                pack_targets[item.pack.target] = true
+            return Ok(state.installed)
+    return Err(support.up_fail("invalid target-pack state read", "target-pack"))
+
+func up_write_packs(root_cap: io.directory_handle, records: [model.up_installed_pack]) -> result<bool, support.up_error>:
+    var bytes = support.up_json(codec.stringify(model.up_pack_state(installed = records), support.up_json_budget()))?.to_utf8()
+    return up_publish_state(root_cap, "target-packs.json", "target-pack", bytes)

@@ -28,6 +28,22 @@ struct up_release:
     inventory_bytes: i64
     inventory_sha256: string
 
+struct up_target_release:
+    target: string
+    version: string
+    compiler: string
+    runtime: string
+    revision: string
+    payload: up_release
+
+struct up_installed_pack:
+    pack: up_target_release
+    catalog_digest: string
+    catalog_serial: i64
+
+struct up_pack_catalog:
+    releases: [up_target_release]
+
 struct up_catalog:
     schema: i64
     domain: string
@@ -38,6 +54,7 @@ struct up_catalog:
     llvm_version: string
     revoked: [string]
     releases: [up_release]
+    target_packs: up_pack_catalog?
 
 struct up_member:
     name: string
@@ -77,6 +94,10 @@ struct up_control:
     revoked: [string]
     installed: [up_installed]
 
+struct up_pack_state:
+    schema: i64 = 1
+    installed: [up_installed_pack]
+
 struct up_marker:
     schema: i64
     application: string
@@ -109,22 +130,66 @@ func up_catalog_shape(document: up_catalog) -> result<bool, support.up_error>:
         return Err(support.up_fail("catalog cardinality exceeds local limit", "catalog"))
     var identities: {string: bool}
     for item in document.releases:
-        if not support.up_identifier(item.id) or not support.up_sha_text(item.build_identity) or not support.up_identifier(item.host):
-            return Err(support.up_fail("invalid release identity", "catalog"))
+        var checked_release = up_release_shape(item)?
         var combined = item.host + "/" + item.id
         if identities.contains(combined):
             return Err(support.up_fail("duplicate release identity", "catalog"))
         identities[combined] = true
-        if item.artifact_bytes < 22 or item.artifact_bytes > support.up_package_limit or item.inventory_bytes < 1 or item.inventory_bytes > support.up_metadata_limit:
-            return Err(support.up_fail("signed length exceeds local limit", "catalog"))
-        if not support.up_sha_text(item.artifact_sha256) or not support.up_sha_text(item.inventory_sha256):
-            return Err(support.up_fail("invalid signed digest", "catalog"))
+        identities[item.id] = true
+    var versions: {string: bool}
+    var packs = up_catalog_packs(document)
+    if document.target_packs != null and document.min_manager < 3:
+        return Err(support.up_fail("target-pack catalogs require manager version 3", "catalog"))
+    if packs.count > 64:
+        return Err(support.up_fail("target-pack catalog exceeds local limit", "catalog"))
+    for pack in packs:
+        var checked_pack = up_pack_shape(pack)?
+        var selection = pack.target + "/" + pack.compiler + "/" + pack.runtime + "/" + pack.version
+        if identities.contains(pack.payload.id) or versions.contains(selection):
+            return Err(support.up_fail("duplicate target-pack identity or version", "catalog"))
+        identities[pack.payload.id] = true
+        versions[selection] = true
     var revoked_seen: {string: bool}
     for item in document.revoked:
         if not support.up_identifier(item) or revoked_seen.contains(item):
             return Err(support.up_fail("invalid or duplicate revocation", "catalog"))
         revoked_seen[item] = true
     return Ok(true)
+
+func up_release_shape(item: up_release) -> result<bool, support.up_error>:
+    if not support.up_identifier(item.id) or not support.up_sha_text(item.build_identity) or not support.up_identifier(item.host):
+        return Err(support.up_fail("invalid release identity", "catalog"))
+    if item.artifact_bytes < 22 or item.artifact_bytes > support.up_package_limit or item.inventory_bytes < 1 or item.inventory_bytes > support.up_metadata_limit:
+        return Err(support.up_fail("signed length exceeds local limit", "catalog"))
+    if not support.up_sha_text(item.artifact_sha256) or not support.up_sha_text(item.inventory_sha256):
+        return Err(support.up_fail("invalid signed digest", "catalog"))
+    return Ok(true)
+
+func up_official_target(target: string) -> bool:
+    # This catalog format currently carries the redistributable GNU closure.
+    # Private MSVC registrations remain custom packs.
+    return target == "linux-x64" or target == "linux-arm64"
+
+func up_pack_shape(pack: up_target_release) -> result<bool, support.up_error>:
+    var checked_release = up_release_shape(pack.payload)?
+    if not up_official_target(pack.target) or pack.payload.host != pack.target or pack.payload.selection != null:
+        return Err(support.up_fail("invalid official target-pack identity", "catalog"))
+    var checked_version = up_stable_version(pack.version)?
+    var checked_compiler = up_stable_version(pack.compiler)?
+    var revision = pack.revision.to_utf8()
+    if revision.count != 40:
+        return Err(support.up_fail("invalid target-pack source revision", "catalog"))
+    for byte in revision:
+        if not ((byte >= 48 and byte <= 57) or (byte >= 97 and byte <= 102)):
+            return Err(support.up_fail("invalid target-pack source revision", "catalog"))
+    if pack.runtime != "void-aot-64-v1" or pack.payload.artifact_bytes > 285212672 or pack.payload.inventory_bytes > 65536:
+        return Err(support.up_fail("unsupported target-pack ABI or archive bounds", "catalog"))
+    return Ok(true)
+
+func up_catalog_packs(document: up_catalog) -> [up_target_release]:
+    if document.target_packs is Ok(var packs):
+        return packs.releases
+    return []
 
 func up_find_release(document: up_catalog, release_id: string) -> result<up_release, support.up_error>:
     for item in document.releases:
@@ -203,7 +268,7 @@ func up_member_path(member: up_member) -> result<string, support.up_error>:
         return support.up_txt(text.substring(member.name, 0, member.name.to_utf8().count - 1))
     return Ok(member.name)
 
-func up_inventory_parse(const raw_inventory: [u8], release: up_release) -> result<up_inventory, support.up_error>:
+func up_inventory_parse(const raw_inventory: [u8], release: up_release, target_pack: bool = false) -> result<up_inventory, support.up_error>:
     if raw_inventory.count != release.inventory_bytes or support.up_digest(raw_inventory)? != release.inventory_sha256:
         return Err(support.up_fail("inventory digest or length mismatch", "inventory"))
     var document = support.up_json(codec.parse_as<up_inventory>(support.up_text(raw_inventory)?, support.up_json_budget()))?
@@ -211,6 +276,8 @@ func up_inventory_parse(const raw_inventory: [u8], release: up_release) -> resul
         return Err(support.up_fail("inventory identity differs from catalog", "inventory"))
     if document.expanded_bytes < 0 or document.expanded_bytes > support.up_expanded_limit or document.members.count < 4 or document.members.count > support.up_count_limit:
         return Err(support.up_fail("inventory exceeds local limits", "inventory"))
+    if target_pack and (document.expanded_bytes > 268468224 or document.members.count > 100):
+        return Err(support.up_fail("target-pack inventory exceeds local limits", "inventory"))
     var names: {string: bool}
     var directories: {string: bool}
     var file_names: {string: bool}
@@ -218,6 +285,8 @@ func up_inventory_parse(const raw_inventory: [u8], release: up_release) -> resul
     for member in document.members:
         var relative_name = up_member_path(member)?
         var parts = support.up_path_parts(relative_name)?
+        if target_pack and member.executable:
+            return Err(support.up_fail("target-pack inventory declares an executable", "inventory"))
         var canonical = text.to_lower(relative_name)
         if names.contains(canonical):
             return Err(support.up_fail("duplicate or case-colliding inventory path", "inventory"))
@@ -244,6 +313,13 @@ func up_inventory_parse(const raw_inventory: [u8], release: up_release) -> resul
                 return Err(support.up_fail("inventory ancestor is not a declared directory", "inventory"))
     if total != document.expanded_bytes:
         return Err(support.up_fail("expanded size does not match inventory", "inventory"))
+    if target_pack:
+        if not directories.contains("link") or not directories.contains("licenses"):
+            return Err(support.up_fail("target-pack inventory lacks link or license directory", "inventory"))
+        for member in document.members:
+            if member.name == "target-pack.txt" and not member.directory and member.size > 0 and member.size <= 32768 and member.sha256 == release.build_identity:
+                return Ok(document)
+        return Err(support.up_fail("target-pack manifest differs from authenticated identity", "inventory"))
     var required_executables = ["bin/voidc", "bin/voidls", "sdk/bin/clang", "sdk/bin/ld.lld"]
     if os.platform() == "windows":
         required_executables = ["bin/voidc.exe", "bin/voidls.exe", "sdk/bin/clang.exe", "sdk/bin/lld-link.exe"]

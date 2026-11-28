@@ -23,7 +23,7 @@ struct up_error:
     published: bool
     durable: bool
 
-const up_manager_version: i64 = 2
+const up_manager_version: i64 = 3
 const up_metadata_limit: i64 = 8388608
 const up_file_limit: i64 = 1073741824
 const up_package_limit: i64 = 2147483648
@@ -70,13 +70,16 @@ func up_hash_file(input_file: io.file, expected_size: i64) -> result<string, up_
 
 func up_read_owned(directory: io.directory_handle, name: string, maximum: i64 = up_metadata_limit) -> result<[u8], up_error>:
     with up_io(directory.open_file(name))? as input_file:
-        var extent = up_io(input_file.length())?
-        if extent < 0 or extent > maximum:
-            return Err(up_fail("owned metadata exceeds local limit", name))
-        var output = up_io(input_file.read_exact(extent))?
-        if up_io(input_file.read_bytes(1))?.count != 0:
-            return Err(up_fail("owned metadata grew beyond its declared extent", name))
-        return Ok(output)
+        return up_read_metadata(input_file, name, maximum)
+
+func up_read_metadata(input_file: io.file, name: string, maximum: i64) -> result<[u8], up_error>:
+    var extent = up_io(input_file.length())?
+    if extent < 0 or extent > maximum:
+        return Err(up_fail("owned metadata exceeds local limit", name))
+    var output = up_io(input_file.read_exact(extent))?
+    if up_io(input_file.read_bytes(1))?.count != 0:
+        return Err(up_fail("owned metadata grew beyond its declared extent", name))
+    return Ok(output)
 
 func up_write_new(directory: io.directory_handle, name: string, const data: [u8]) -> result<bool, up_error>:
     with up_io(directory.create_file(name))? as output_file:
