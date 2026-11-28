@@ -4,6 +4,9 @@
 #include "void/path.hpp"
 #include "void/project_creation.hpp"
 #include <llvm/BinaryFormat/Magic.h>
+#include <llvm/Bitcode/BitcodeReader.h>
+#include <llvm/Object/Archive.h>
+#include <llvm/Object/COFFImportFile.h>
 #include <llvm/Config/llvm-config.h>
 #include <llvm/Object/ELFObjectFile.h>
 #include <llvm/Support/Process.h>
@@ -46,20 +49,75 @@ std::set<std::string> link_names(const Target& target) {
     for (auto name : linux_end) result.emplace(name);
     return result;
 }
+llvm::Triple::ArchType llvm_architecture(const Target& target) {
+    return target.architecture == Architecture::arm64 ? llvm::Triple::aarch64 : llvm::Triple::x86_64;
+}
+void check_archive(std::string_view name, std::string_view bytes, const Target& target) {
+    auto archive = llvm::object::Archive::create({bytes, name});
+    const auto reject = [&] {
+        throw std::runtime_error("Target pack contains a malformed or incompatible archive: " + std::string(name));
+    };
+    if (!archive) {
+        llvm::consumeError(archive.takeError());
+        reject();
+    }
+    const bool windows = target.system == System::windows_msvc;
+    const auto expected = llvm_architecture(target);
+    auto iteration_error = llvm::Error::success();
+    std::size_t count = 0;
+    for (const auto& member : (*archive)->children(iteration_error)) {
+        auto buffer = member.getMemoryBufferRef();
+        if (!buffer) {
+            llvm::consumeError(buffer.takeError());
+            reject();
+        }
+        if (++count > 100000) reject();
+        const auto kind = llvm::identify_magic(buffer->getBuffer());
+        if (kind == llvm::file_magic::bitcode) {
+            auto triple = llvm::getBitcodeTargetTriple(*buffer);
+            if (!triple) {
+                llvm::consumeError(triple.takeError());
+                reject();
+            }
+            const llvm::Triple value{llvm::StringRef(*triple)};
+            if (value.getArch() != expected || (windows ? !value.isWindowsMSVCEnvironment() : !value.isOSLinux()))
+                reject();
+        } else if (windows && kind == llvm::file_magic::coff_import_library) {
+            if (buffer->getBufferSize() < sizeof(llvm::object::coff_import_header)) reject();
+            const llvm::object::COFFImportFile object(*buffer);
+            if (object.getMachine() != (expected == llvm::Triple::aarch64 ? llvm::COFF::IMAGE_FILE_MACHINE_ARM64 : llvm::COFF::IMAGE_FILE_MACHINE_AMD64))
+                reject();
+        } else {
+            if (kind != (windows ? llvm::file_magic::coff_object : llvm::file_magic::elf_relocatable))
+                reject();
+            auto object = llvm::object::ObjectFile::createObjectFile(*buffer);
+            if (!object) {
+                llvm::consumeError(object.takeError());
+                reject();
+            }
+            if ((*object)->getArch() != expected || !(*object)->isRelocatableObject()) reject();
+        }
+    }
+    if (iteration_error) {
+        llvm::consumeError(std::move(iteration_error));
+        reject();
+    }
+    if (!count) reject();
+}
 void check_link_file(std::string_view name, std::string_view bytes, const Target& target) {
     const auto kind = llvm::identify_magic(bytes);
     if (name.ends_with(".a") || name.ends_with(".lib")) {
         // A thin archive can reference arbitrary physical files at link time.
         if (kind != llvm::file_magic::archive || !bytes.starts_with("!<arch>\n"))
             throw std::runtime_error("Expected a self-contained archive in target pack: " + std::string(name));
+        check_archive(name, bytes, target);
         return;
     }
     if (kind != (name.ends_with(".o") ? llvm::file_magic::elf_relocatable : llvm::file_magic::elf_shared_object))
         throw std::runtime_error("Expected a target ELF file in target pack: " + std::string(name));
     auto file = llvm::object::ObjectFile::createObjectFile({bytes, name});
     if (!file) throw std::runtime_error("Invalid target ELF file: " + llvm::toString(file.takeError()));
-    const auto expected = target.architecture == Architecture::arm64 ? llvm::Triple::aarch64 : llvm::Triple::x86_64;
-    if (!llvm::isa<llvm::object::ELF64LEObjectFile>(file->get()) || (*file)->getArch() != expected)
+    if (!llvm::isa<llvm::object::ELF64LEObjectFile>(file->get()) || (*file)->getArch() != llvm_architecture(target))
         throw std::runtime_error("Target pack link input has the wrong architecture: " + std::string(name));
 }
 void print_pack(const Pack& pack) {
@@ -158,6 +216,12 @@ Pack read_pack(const fs::path& requested) { return read_pack(requested, {}); }
 
 Pack load_pack(std::string_view id) {
     if (!target_name(id)) throw std::invalid_argument("Invalid target pack ID.");
+    if (!custom_target(id)) {
+        if (find_target(id)->system == System::macos)
+            throw std::runtime_error("Offline macOS cross-linking requires independently redistributable libSystem and framework inputs. Use the matching native macOS toolchain.");
+        throw std::runtime_error("No signed official pack is enabled for " + std::string(id) +
+            ". Select an explicitly registered custom pack or publish on the matching native host.");
+    }
     const auto path = pack_store() / utf8_path(id);
     if (!fs::exists(fs::symlink_status(path)))
         throw std::runtime_error("Target pack " + std::string(id) +

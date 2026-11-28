@@ -101,7 +101,13 @@ def populate(stage, header, files):
 def apt_record(source):
     # Bind to the exact installed Ubuntu package via APT's authenticated index.
     installed = source.resolve()
-    package = command("dpkg-query", "-S", str(installed)).split(": ", 1)[0]
+    entry = str(installed)
+    located = subprocess.run(["dpkg-query", "-S", entry], capture_output=True, text=True)
+    if located.returncode and entry.startswith("/usr/"):
+        entry = entry.removeprefix("/usr")
+        located = subprocess.run(["dpkg-query", "-S", entry], capture_output=True, text=True)
+    located.check_returncode()
+    package = located.stdout.strip().split(": ", 1)[0]
     version = command("dpkg-query", "-W", "-f=${Version}", package)
     selector = f"{package}={version}"
     url, _, size, _ = shlex.split(command("apt-get", "--print-uris", "download", selector))
@@ -114,7 +120,7 @@ def apt_record(source):
     source_identity = command("dpkg-query", "-W", "-f=${source:Package}=${source:Version}", package)
     copyright_file = Path("/usr/share/doc") / package.split(":")[0] / "copyright"
     return {"url": url, "bytes": int(size), "sha256": expected,
-            "path": installed.as_posix().lstrip("/"), "member_sha256": sha(installed),
+            "path": entry.lstrip("/"), "member_sha256": sha(installed),
             "package": package, "source": source_identity}, copyright_file
 
 

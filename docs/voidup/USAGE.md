@@ -112,6 +112,25 @@ for the selected tools. Compiler/loader overrides and the caller's PATH remain
 excluded. On Unix, redirected editor/LSP cancellation reaches the manager and
 its compiler children; interactive terminals keep their foreground job control.
 
+## Publishing target packs
+
+A selected compiler with target-pack support provides the following commands.
+Registration verifies and copies local inputs into the selected VOIDUP root.
+
+```sh
+voidup target list
+voidup target list --available
+voidup target add ./my-linux-pack
+voidup target inspect custom-my-linux
+voidup target verify custom-my-linux
+voidup target remove custom-my-linux
+```
+
+Publish through the normal `voidc` proxy using `--target custom-my-linux`.
+With a standalone CMake compiler, the same commands begin with `voidc target`.
+See [pack creation and distribution](../TARGET_PACKS.md) for ABI and provenance
+requirements and the official channel status.
+
 ## Advanced and private channels
 
 Global options precede the native manager command:

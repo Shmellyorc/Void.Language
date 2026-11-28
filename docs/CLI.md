@@ -504,9 +504,10 @@ authorization commands, see [Bundled raylib](NATIVE_LIBRARIES.md#bundled-raylib)
 
 ### Production publishing
 
-Use `voidc publish` with a manifest-selected application on Linux x64 GNU,
-Windows x64 MSVC or macOS ARM64. The compiler uses its matching native
-toolchain, Runtime and verified dependency lock. The output is a relocatable
+Use `voidc publish` with a manifest-selected application. Native publishing
+uses the matching installed toolchain, Runtime and verified dependency lock.
+For offline publishing with a separately registered target pack, see
+[Target packs](TARGET_PACKS.md). The output is a relocatable
 directory containing `app` or `app.exe`, application metadata, a file inventory,
 a binary audit and redistribution notices. The destination must be fresh.
 `voidc build --portable` directs users to `voidc publish --portable`. The
@@ -523,13 +524,15 @@ voidc publish --verify dist/orbit
 | --- | --- | --- |
 | `--project DIR` | | Current working directory by default. |
 | `--entry RELATIVE.void` | `project.entry` | Exact project-relative entry. The ordinary project selector applies when omitted. |
-| `--target TARGET` | `publish.target` | Current native host. Values are `linux-x64`, `windows-x64` and `macos-arm64`. |
+| `--target TARGET` | `publish.target` | Defaults to the native host. Select a registered `custom-*` pack to use an independent set of destination inputs. |
 | `--profile PROFILE` | `publish.default_profile` | `release` by default, or `performance`. The reserved `protected` profile requires a separately approved protection policy. |
 | `-o DIR` | `publish.output` | `dist/<application-id>/<target>/<profile>`. Manifest paths are project-relative. CLI paths are working-directory-relative or absolute. |
 | `--optimization MODE` | `publish.optimization` | `size` for release and `speed` for performance by default. `none` disables the application LLVM optimization pipeline. |
-| `--lto MODE` | `publish.lto` | `none` by default. `thin` requires Linux x64 and `size` or `speed`. |
+| `--lto MODE` | `publish.lto` | `none` by default. `thin` requires native Linux x64 and `size` or `speed`. |
 | `--resources MODE` | `publish.resources` | `files` by default, or `embed`. Both use the exact `application.resources` list. |
 | `--symbols MODE` | `publish.symbols` | `private` saves matching debug data. `none` saves only the matching diagnostic map. Public executables are stripped in both modes. |
+| `--format directory\|app` | `publish.format` | `directory` by default. `app` assembles a macOS application bundle inside the distribution. |
+| `--icon RELATIVE.icns` | `publish.icon` | Optional project-relative ICNS input for `app`. |
 | `--native-catalog SHA256` | | Explicit authorization of the exact verified managed catalog for this invocation. Review the catalog and redistribution rights before supplying its digest. |
 
 Schema 1 applications can publish with command-line settings. Set `schema = 2`
@@ -555,7 +558,7 @@ Declare up to 32 case-insensitively unique flat `assets/` paths in
 binary data use the same byte-preserving contract. Only the declared files are
 read, using exact physical file admission.
 
-With `files`, resolve the distribution directory through `os.resource_dir()`.
+With `files`, resolve the distribution directory or macOS bundle Resources directory through `os.resource_dir()`.
 With `embed`, call `os.embedded_resource("assets/logo.png")`. It returns an
 independent `[u8]` containing that asset. An empty asset returns an empty list.
 Missing names return `os.error_kind.not_found`, and executions without an

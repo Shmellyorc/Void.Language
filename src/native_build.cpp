@@ -22,6 +22,7 @@
 #include <llvm/Support/Path.h>
 #include <llvm/Support/Program.h>
 #include <llvm/Support/SHA256.h>
+#include <llvm/Support/VersionTuple.h>
 #include <fstream>
 #include <iostream>
 #include <algorithm>
@@ -1112,6 +1113,24 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
                 name.starts_with("/usr/lib/") || name.starts_with("/System/Library/Frameworks/") :
                 !name.empty() && name.find_first_of("/\\:") == name.npos;
             if (!system) throw std::runtime_error("Non-relocatable executable dependency: " + name);
+        }
+        if (pack && pack->target->system == publish::System::linux_gnu) {
+            const auto interpreter = std::string(pack->target->architecture == publish::Architecture::arm64 ? "/lib/" : "/lib64/") +
+                publish::linux_loader(*pack->target);
+            if (report.interpreter != interpreter)
+                throw std::runtime_error("Final ELF interpreter differs from the declared target ABI.");
+            llvm::VersionTuple floor;
+            if (floor.tryParse(llvm::StringRef(pack->minimum).drop_front(6)))
+                throw std::runtime_error("Invalid Linux pack deployment floor.");
+            for (const auto& requirement : report.versions) {
+                const auto marker = requirement.find(":GLIBC_");
+                if (marker == requirement.npos) continue;
+                const auto version = llvm::StringRef(requirement).drop_front(marker + 7);
+                llvm::VersionTuple required;
+                const auto numeric = version == "ABI_DT_RELR" ? llvm::StringRef("2.36") : version;
+                if (required.tryParse(numeric) || required > floor)
+                    throw std::runtime_error("Target pack output exceeds " + pack->minimum + ": " + requirement);
+            }
         }
         production.map->bind_image(image);
         const auto report_text = audit::json(report) + '\n';

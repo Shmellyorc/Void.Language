@@ -36,7 +36,7 @@ macro(void_import_http_dependencies)
   elseif(_http_linux_arch STREQUAL "amd64")
     set(_http_linux_arch x86_64)
   endif()
-  execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../tools/verify_http_dependencies.py" "${VOID_HTTP_DEPS_ROOT}" "${_http_profile}" "${_http_linux_arch}"
+  execute_process(COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../tools/verify_http_dependencies.py" "${VOID_HTTP_DEPS_ROOT}" "${_http_profile}" Linux "${_http_linux_arch}"
     RESULT_VARIABLE _http_verified OUTPUT_VARIABLE _http_verification ERROR_VARIABLE _http_error)
   if(NOT _http_verified EQUAL 0)
     message(FATAL_ERROR "${_http_verification}${_http_error}")

@@ -8,8 +8,6 @@ import sys
 root = Path(__file__).resolve().parents[1]
 prefix = Path(sys.argv[1]).resolve()
 report = json.loads((prefix / "VOID-HTTP-DEPENDENCIES.json").read_text())
-if len(sys.argv) == 4 and report.get("architecture", "x86_64") != sys.argv[3]:
-    raise SystemExit("Pinned Linux HTTP dependency architecture mismatch")
 pins = root / "third_party/http-versions.json"
 if len(sys.argv) > 2 and report["profile"] != sys.argv[2]:
     raise SystemExit("HTTP dependency instrumentation/build profile mismatch")
@@ -17,7 +15,7 @@ if report["pins_sha256"] != hashlib.sha256(pins.read_bytes()).hexdigest():
     raise SystemExit("HTTP dependency pin set changed; rebuild the disposable prefix")
 if len(sys.argv) > 3 and report.get("platform", "Linux") != sys.argv[3]:
     raise SystemExit("HTTP dependency native platform mismatch")
-if len(sys.argv) > 4 and report.get("architecture") != sys.argv[4]:
+if len(sys.argv) > 4 and report.get("architecture", "x86_64" if sys.argv[3] == "Linux" else None) != sys.argv[4]:
     raise SystemExit("HTTP dependency architecture mismatch")
 for name, digest in report.get("recipe_sha256", {}).items():
     if hashlib.sha256((root / name).read_bytes()).hexdigest() != digest:
