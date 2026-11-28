@@ -445,7 +445,7 @@ jobs:
       matrix:
         include:
           - {runner: macos-26, cpu: arm64}
-          - {runner: macos-15-intel, cpu: x86_64}
+          - {runner: macos-26-intel, cpu: x86_64}
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v5
