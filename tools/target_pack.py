@@ -98,7 +98,21 @@ def populate(stage, header, files):
     (stage / "target-pack.txt").write_text("\n".join(header + records) + "\n", encoding="ascii", newline="\n")
 
 
-def apt_record(source):
+def ubuntu_input_url(url, target):
+    # GitHub-hosted images can ask APT to resolve a local mirror list. Transfer
+    # only the package path, digest and size to the foreign publishing host.
+    if url.startswith("mirror+"):
+        _, separator, leaf = url.partition("/pool/")
+        if not separator or not leaf or ".." in leaf.split("/"):
+            raise ValueError("Ubuntu package mirror entry has no package pool path")
+        archive = "https://ports.ubuntu.com/ubuntu-ports/" if target == "linux-arm64" else "https://archive.ubuntu.com/ubuntu/"
+        return archive + "pool/" + leaf
+    if url.startswith("http://"):
+        return "https://" + url.removeprefix("http://")
+    return url
+
+
+def apt_record(source, target):
     # Bind to the exact installed Ubuntu package via APT's authenticated index.
     installed = source.resolve()
     entry = str(installed)
@@ -115,8 +129,7 @@ def apt_record(source):
     if len(values) != 1:
         raise ValueError(f"Expected one authenticated SHA-256 for {selector}")
     expected = values.pop()
-    if url.startswith("http://"):
-        url = "https://" + url.removeprefix("http://")
+    url = ubuntu_input_url(url, target)
     source_identity = command("dpkg-query", "-W", "-f=${source:Package}=${source:Version}", package)
     copyright_file = Path("/usr/share/doc") / package.split(":")[0] / "copyright"
     return {"url": url, "bytes": int(size), "sha256": expected,
@@ -177,7 +190,7 @@ def assemble(args):
             stage.mkdir()
             records = {}
             for name, source in system.items():
-                record, copyright_file = apt_record(source)
+                record, copyright_file = apt_record(source, target)
                 records[name] = record
                 license_name = record["package"].split(":")[0] + "-copyright.txt"
                 files[f"licenses/{license_name}"] = copyright_file
@@ -205,10 +218,13 @@ def compose(candidate, output, ar):
     if len(manifest) < 9 or manifest[0] != "VOID target pack 1" or not manifest[3].startswith("target "):
         raise ValueError("Expected a Linux Runtime candidate manifest")
     loaders = dict(TARGETS.values())
-    loader = loaders[manifest[3].split()[1]]
+    target = manifest[3].split()[1]
+    loader = loaders[target]
     records = json.loads((candidate / "ubuntu-inputs.json").read_text())
     if set(records) != set((*LINUX_SYSTEM, loader)):
         raise ValueError("Incomplete Ubuntu developer input recipe")
+    for record in records.values():
+        record["url"] = ubuntu_input_url(record["url"], target)
     files = {}
     for line in manifest[9:]:
         expected, relative = line.split("\t")
