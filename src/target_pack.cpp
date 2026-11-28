@@ -76,7 +76,9 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
     const auto matches_machine = [&](std::uint16_t actual) {
         // Match the pinned LLD driver's native ARM64/ARM64X compatibility.
         // Machine-neutral SDK records do not prove archive architecture.
-        if (msvc_sdk && actual == llvm::COFF::IMAGE_FILE_MACHINE_UNKNOWN) return false;
+        if (msvc_sdk && (actual == llvm::COFF::IMAGE_FILE_MACHINE_UNKNOWN ||
+            (machine == llvm::COFF::IMAGE_FILE_MACHINE_ARM64 && actual == llvm::COFF::IMAGE_FILE_MACHINE_ARM64EC)))
+            return false;
         if (actual != machine && !(msvc_sdk && machine == llvm::COFF::IMAGE_FILE_MACHINE_ARM64 &&
             actual == llvm::COFF::IMAGE_FILE_MACHINE_ARM64X))
             reject("COFF machine differs from the target (" + std::to_string(actual) + ")");
@@ -222,33 +224,41 @@ static Pack read_pack(const fs::path& requested, const project::ProjectDirectory
     Pack pack{target, std::move(id), std::move(revision), std::move(version), std::move(minimum), digest(manifest), {}};
     std::set<std::string> names;
     std::size_t budget = pack_limit;
+    std::size_t sources = 0;
     while (std::getline(rows, line)) {
         const auto tab = line.find('\t');
         if (tab != 64 || !hex(std::string_view(line).substr(0, tab), 64) || names.size() == 96)
             throw std::runtime_error("Invalid target pack inventory record.");
         const auto name = line.substr(tab + 1);
         const auto slash = name.find('/');
-        if (slash == name.npos) throw std::runtime_error("Target pack requires a link/ or licenses/ member.");
+        if (slash == name.npos) throw std::runtime_error("Target pack requires a link/, licenses/ or source/ member.");
         const auto role = name.substr(0, slash);
         const auto leaf = name.substr(slash + 1);
+        const bool source = role == "source" && target->system == System::linux_gnu &&
+            std::ranges::find(linux_http_sources, leaf) != linux_http_sources.end();
         if (!portable_path_component(leaf) || leaf.size() > 128 || leaf.find('/') != leaf.npos ||
-            (role != "link" && role != "licenses") || !names.insert(project::fold_project_name(name)).second)
+            (role != "link" && role != "licenses" && !source) || !names.insert(project::fold_project_name(name)).second)
             throw std::runtime_error("Invalid or duplicate target pack member: " + name);
         if (role == "link" && !expected.erase(leaf)) throw std::runtime_error("Unexpected target pack link input: " + name);
-        auto bytes = reader.read(root / utf8_path(name), role == "link" ? budget : std::min(budget, std::size_t{1024 * 1024}));
+        const std::size_t member_limit = role == "link" ? budget : (source ? 8 : 1) * 1024 * 1024;
+        auto bytes = reader.read(root / utf8_path(name), std::min(budget, member_limit));
         if (bytes.empty() || digest(bytes) != line.substr(0, tab))
             throw std::runtime_error("Target pack checksum mismatch: " + name);
         budget -= bytes.size();
         if (role == "link") check_link_file(leaf, bytes, *target);
+        if (source) ++sources;
         pack.files.emplace(name, std::move(bytes));
     }
     if (!expected.empty()) throw std::runtime_error("Incomplete target pack. Missing link/" + *expected.begin());
+    if (sources && sources != linux_http_sources.size())
+        throw std::runtime_error("Target pack requires both GNU HTTP provider source archives.");
     if (!pack.files.contains("licenses/VOID-MIT-LICENSE.txt"))
         throw std::runtime_error("Target pack is missing its VOID license.");
     for (const auto& entry : fs::directory_iterator(root)) {
         const auto name = path_utf8(entry.path().filename());
         if (name == pack_manifest) continue;
-        if ((name != "link" && name != "licenses") || !fs::is_directory(entry.symlink_status()))
+        if ((name != "link" && name != "licenses" && !(sources && name == "source")) ||
+            !fs::is_directory(entry.symlink_status()))
             throw std::runtime_error("Unexpected target pack entry: " + name);
         for (const auto& member : fs::directory_iterator(entry))
             if (!pack.files.contains(name + "/" + path_utf8(member.path().filename())))
@@ -307,8 +317,9 @@ int pack_command(std::span<const std::string_view> args) {
                     throw std::runtime_error("A different pack already uses this ID. Register under a new custom ID.");
                 return;
             }
-            const std::map<std::string, std::string_view> directories{{"licenses/", ""}, {"link/", ""}};
-            std::map<std::string, std::string_view> files = directories;
+            std::map<std::string, std::string_view> files{{"licenses/", ""}, {"link/", ""}};
+            if (pack.files.contains(std::string("source/") + linux_http_sources.front()))
+                files.emplace("source/", "");
             for (const auto& [name, bytes] : pack.files) files.emplace(name, bytes);
             project::publish_project_directory(store, pack.id, files, [&](const auto& candidate, const auto& reader) {
                 if (read_pack(candidate, reader).digest != pack.digest) throw std::runtime_error("Target pack changed during registration.");

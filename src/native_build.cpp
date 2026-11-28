@@ -303,7 +303,31 @@ struct ProductionLink {
     const PublicationResources& assets;
     std::optional<diagnostics::PrivateMap> map;
     std::string symbols;
+    std::map<std::string, std::string> linux_http_libraries;
 };
+constexpr auto linux_http_runpath = "$ORIGIN/native";
+bool uses_linux_http_library(const audit::Report& report) {
+    return std::ranges::any_of(publish::linux_http_libraries, [&](auto name) {
+        return std::ranges::find(report.dependencies, name) != report.dependencies.end();
+    });
+}
+bool linux_http_image(const audit::Report& report) {
+    return uses_linux_http_library(report) && report.loader_paths == std::vector<std::string>{linux_http_runpath};
+}
+void require_glibc_floor(const audit::Report& report, std::string_view minimum) {
+    llvm::VersionTuple floor;
+    if (floor.tryParse(llvm::StringRef(minimum).drop_front(6)))
+        throw std::runtime_error("Invalid Linux pack deployment floor.");
+    for (const auto& requirement : report.versions) {
+        const auto marker = requirement.find(":GLIBC_");
+        if (marker == requirement.npos) continue;
+        const auto version = llvm::StringRef(requirement).drop_front(marker + 7);
+        llvm::VersionTuple required;
+        const auto numeric = version == "ABI_DT_RELR" ? llvm::StringRef("2.36") : version;
+        if (required.tryParse(numeric) || required > floor)
+            throw std::runtime_error("Target pack output exceeds " + std::string(minimum) + ": " + requirement);
+    }
+}
 std::string publishing_inputs(const ProductionLink& production, const ValidatedAnalysis& analysis,
                               std::string_view link_digest, const std::map<std::string, std::string>& payload) {
     project::Digest inputs;
@@ -343,12 +367,18 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
         throw std::runtime_error("Target pack publishing requires a destination-compatible native provider.");
     const auto output = output_path(analysis, requested);
 #ifdef _WIN32
-    native_windows::Directory stage(native_windows::temporary_root(), true);
+    const auto temporary_root = native_windows::temporary_root();
+    exact_path(temporary_root);
+    native_windows::Directory stage(temporary_root, true);
 #else
     (void)reader;
     Staging stage(output);
 #endif
     const auto& work = stage.directory;
+    const auto physical_work = project::inspect_creation_root(work).path;
+    const auto read_link_output = [&](const fs::path& path) {
+        return project::read_project_input(physical_work / path.filename(), audit::byte_limit);
+    };
     const auto object = work / "program.o";
     const bool windows = pack.target->system == publish::System::windows_msvc;
     const auto executable = work / (windows ? "program.exe" : "program");
@@ -412,19 +442,20 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
     production.map = emit_publication_object(analysis.lower(ir::Emission::entry), object, plan.optimization() != "none",
         publishing_inputs(production, analysis, pack.digest, {}), plan.optimization() == "size", keep_symbols,
         plan.resources() == "embed" ? &production.assets : nullptr, false, pack.target->triple);
-    {
+    const auto link = [&] {
         observation::Scope timing(observation::Phase::native_link_driver);
         if (execute(arguments) != 0) {
             timing.fail();
             throw std::runtime_error("Target pack link failed for " + pack.id + ". Review the linker diagnostics above.");
         }
-    }
+    };
+    link();
     if (windows) {
-        auto image = project::read_project_input(executable, audit::byte_limit);
+        auto image = read_link_output(executable);
         if (keep_symbols) production.symbols = image;
         if (execute({path_utf8(tool("llvm-objcopy")), "--strip-all", path_utf8(executable)}))
             throw std::runtime_error("Cannot strip target-pack PE image.");
-        image = project::read_project_input(executable, audit::byte_limit);
+        image = read_link_output(executable);
         audit::remove_pe_debug_records(image);
         std::ofstream public_image(executable, std::ios::binary | std::ios::trunc);
         public_image.write(image.data(), static_cast<std::streamsize>(image.size()));
@@ -432,11 +463,25 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
         if (!public_image) throw std::runtime_error("Cannot finish the target-pack PE image.");
     } else {
         const auto objcopy = path_utf8(tool("llvm-objcopy"));
+        const auto linked = read_link_output(executable);
+        const auto imports = audit::inspect(linked, {2, std::string(pack.target->id), false, false, true, {}});
+        if (uses_linux_http_library(imports)) {
+            if (!pack.files.contains(std::string("source/") + publish::linux_http_sources.front()))
+                throw std::runtime_error("This Linux pack lacks the pinned GNU HTTP libraries and their corresponding source. Rebuild the pack with the current generator.");
+            arguments.insert(arguments.end(), {"--enable-new-dtags", "-rpath", linux_http_runpath});
+            link();
+            for (const auto name : publish::linux_http_libraries) {
+                const auto library = work / name;
+                if (execute({objcopy, "--strip-all", "--remove-section=.comment", path_utf8(library)}))
+                    throw std::runtime_error("Cannot prepare the pinned GNU HTTP library for distribution.");
+                production.linux_http_libraries.emplace(name, read_link_output(library));
+            }
+        }
         if (keep_symbols) {
             const auto debug = work / "program.debug";
             if (execute({objcopy, "--only-keep-debug", path_utf8(executable), path_utf8(debug)}))
                 throw std::runtime_error("Cannot extract target-pack private debug symbols.");
-            production.symbols = project::read_project_input(debug, audit::byte_limit);
+            production.symbols = read_link_output(debug);
         }
         if (execute({objcopy, "--strip-all", "--remove-section=.comment", path_utf8(executable)}))
             throw std::runtime_error("Cannot strip target-pack executable.");
@@ -795,6 +840,36 @@ bool production_image(const audit::Report& report) {
         (report.format == "ELF" && report.image_kind == "shared-or-pie" && !report.interpreter.empty()));
 }
 
+void verify_linux_http_payload(const fs::path& root, const publish::Target& target,
+                               const project::ProjectDirectoryReader& reader, std::string_view minimum = {}) {
+    const auto directory = reader.inspect(root / "native").path;
+    std::set<std::string> expected(publish::linux_http_libraries.begin(), publish::linux_http_libraries.end());
+    for (const auto& entry : fs::directory_iterator(directory)) {
+        const auto name = path_utf8(entry.path().filename());
+        if (!expected.erase(name)) throw std::runtime_error("Unexpected Linux HTTP library: " + name);
+        const auto bytes = reader.read(entry.path(), audit::byte_limit);
+        const auto report = audit::inspect(bytes, {2, std::string(target.id), true, true, false, {}});
+        const bool idn = name == publish::linux_http_libraries.front();
+        const bool valid_paths = idn ? report.loader_paths == std::vector<std::string>{"$ORIGIN"} : report.loader_paths.empty();
+        if (!report.inspected || report.image_kind != "shared-or-pie" || !report.interpreter.empty() ||
+            !report.findings.empty() || !valid_paths)
+            throw std::runtime_error("Invalid relocatable Linux HTTP library: " + name);
+        if (!minimum.empty()) require_glibc_floor(report, minimum);
+        for (const auto& required : report.dependencies)
+            if (required != "libc.so.6" && required != "libm.so.6" && required != "libgcc_s.so.1" &&
+                required != publish::linux_loader(target) && !(idn && required == publish::linux_http_libraries.back()))
+                throw std::runtime_error("Unexpected transitive Linux HTTP library: " + required);
+    }
+    if (!expected.empty()) throw std::runtime_error("Incomplete Linux HTTP library closure.");
+    for (const auto name : publish::linux_http_sources)
+        if (reader.read(root / "licenses" / name, 8 * 1024 * 1024).empty())
+            throw std::runtime_error("Missing corresponding source for a Linux HTTP library.");
+    for (const auto name : {"GNU-HTTP-LIBRARIES.txt", "libidn2-2.3.8-COPYING", "libidn2-2.3.8-COPYING.LESSERv3",
+                           "libunistring-1.5-COPYING", "libunistring-1.5-COPYING.LIB"})
+        if (reader.read(root / "licenses" / name, 1024 * 1024).empty())
+            throw std::runtime_error("Missing Linux HTTP library notice.");
+}
+
 void check_package_image(std::string_view bytes) {
 #ifdef _WIN32
     native_windows::check_executable({llvm::StringRef(bytes),executable_name},true);
@@ -1075,7 +1150,7 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
     const auto actual_output = parent.path / output.filename();
     fs::path archive;
     project::publish_application_directory(parent, leaf, [&](const fs::path& stage, const project::ProjectDirectoryReader& reader) {
-        ProductionLink production{plan, assets, {}, {}};
+        ProductionLink production{plan, assets, {}, {}, {}};
         auto image_path = stage / executable;
         auto asset_root = stage;
         if (!bundle.empty()) {
@@ -1106,8 +1181,25 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
             execute({"/usr/bin/codesign", "--verify", "--strict", path_utf8(stage / utf8_path(bundle))})))
             throw std::runtime_error("Cannot ad hoc sign and verify the macOS application bundle.");
 #endif
+        const bool linux_http = !production.linux_http_libraries.empty();
+        if (linux_http) {
+            for (const auto& [name, bytes] : production.linux_http_libraries)
+                write_package_file(stage / "native" / utf8_path(name), bytes, reader);
+            for (const auto name : publish::linux_http_sources)
+                write_package_file(stage / "licenses" / name, pack->files.at(std::string("source/") + name), reader);
+            write_package_file(stage / "licenses/GNU-HTTP-LIBRARIES.txt",
+                "This application uses the GNU libidn2 and libunistring shared libraries.\n"
+                "The libraries are distributed under the included GNU license texts.\n"
+                "This directory includes their corresponding source archives.\n"
+                "Build the shared libunistring first with --enable-shared --disable-static.\n"
+                "Build libidn2 with the same flags, --disable-nls --disable-doc --disable-rpath\n"
+                "and --with-libunistring-prefix pointing to the installed libunistring.\n"
+                "The VOID build uses Clang 23.1.4, -O2 -fPIC and a sibling $ORIGIN RUNPATH for libidn2.\n"
+                "Replace the libraries in native/ with compatible builds under the same names.\n", reader);
+            verify_linux_http_payload(stage, *pack->target, reader, pack->minimum);
+        }
         const auto image = reader.read(image_path, audit::byte_limit);
-        audit::Policy policy{2, std::string(target), true, true, true, {}};
+        audit::Policy policy{2, std::string(target), true, true, !linux_http, {}};
         auto forbid = [&](const fs::path& path) {
             auto text = path_utf8(path);
             if (text.size() > 3 && text.size() <= 256 &&
@@ -1118,7 +1210,9 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
         forbid(parent.path);
         forbid(standard_library_root());
         const auto report = audit::inspect(image, policy);
-        if (!production_image(report) || !report.findings.empty()) {
+        if (pack && pack->target->system == publish::System::linux_gnu && uses_linux_http_library(report) && !linux_http)
+            throw std::runtime_error("Target pack output is missing its required GNU HTTP libraries.");
+        if (!production_image(report) || !report.findings.empty() || (linux_http && !linux_http_image(report))) {
             std::string details;
             for (const auto& finding : report.findings) details += "\n" + finding.code + ": " + finding.detail;
             throw std::runtime_error("Final executable failed binary auditing." + details);
@@ -1134,18 +1228,7 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
                 publish::linux_loader(*pack->target);
             if (report.interpreter != interpreter)
                 throw std::runtime_error("Final ELF interpreter differs from the declared target ABI.");
-            llvm::VersionTuple floor;
-            if (floor.tryParse(llvm::StringRef(pack->minimum).drop_front(6)))
-                throw std::runtime_error("Invalid Linux pack deployment floor.");
-            for (const auto& requirement : report.versions) {
-                const auto marker = requirement.find(":GLIBC_");
-                if (marker == requirement.npos) continue;
-                const auto version = llvm::StringRef(requirement).drop_front(marker + 7);
-                llvm::VersionTuple required;
-                const auto numeric = version == "ABI_DT_RELR" ? llvm::StringRef("2.36") : version;
-                if (required.tryParse(numeric) || required > floor)
-                    throw std::runtime_error("Target pack output exceeds " + pack->minimum + ": " + requirement);
-            }
+            require_glibc_floor(report, pack->minimum);
         }
         production.map->bind_image(image);
         const auto report_text = audit::json(report) + '\n';
@@ -1154,7 +1237,9 @@ fs::path publish_native_application(const ProjectAnalysis& project_analysis, con
         write_package_file(stage / "binary-audit.json", report_text, reader);
         write_package_file(stage / metadata_name, analysis.application_metadata()->bytes(), reader);
         const auto files = package_inventory(stage, true, reader, target, bundle);
-        const auto inventory = std::string(bundle.empty() ? "VOID native publication 1\ntarget " : "VOID native publication 2\ntarget ") + std::string(target) +
+        const auto magic = linux_http ? "VOID native publication 3" :
+            bundle.empty() ? "VOID native publication 1" : "VOID native publication 2";
+        const auto inventory = std::string(magic) + "\ntarget " + std::string(target) +
             "\nprofile " + plan.profile() + "\nbuild " + production.map->build_id() + "\n" +
             (bundle.empty() ? std::string{} : "bundle " + bundle + "\n") + files;
         write_package_file(stage / inventory_name, inventory, reader);
@@ -1202,12 +1287,16 @@ VerifiedPublication verify_publication(const fs::path& directory) {
     std::istringstream rows(receipt);
     std::string magic, target, profile, build;
     if (!std::getline(rows, magic) || !std::getline(rows, target) || !std::getline(rows, profile) ||
-        !std::getline(rows, build) || (magic != "VOID native publication 1" && magic != "VOID native publication 2") ||
+        !std::getline(rows, build) || (magic != "VOID native publication 1" && magic != "VOID native publication 2" &&
+        magic != "VOID native publication 3") ||
         !target.starts_with("target ") || !publish::find_target(std::string_view(target).substr(7)) ||
         (profile != "profile release" && profile != "profile performance") ||
         !build.starts_with("build ") || !hex_digest(std::string_view(build).substr(6)))
         throw std::runtime_error("Invalid native publication inventory.");
     const auto platform = std::string_view(target).substr(7);
+    const bool linux_http = magic == "VOID native publication 3";
+    if (linux_http && !platform.starts_with("linux-"))
+        throw std::runtime_error("GNU HTTP library closure requires a Linux publication.");
     const auto metadata = ApplicationMetadata::decode(project::read_project_input(root / metadata_name, ApplicationMetadata::byte_limit));
     std::string bundle;
     if (magic == "VOID native publication 2") {
@@ -1219,10 +1308,11 @@ VerifiedPublication verify_publication(const fs::path& directory) {
     const std::string recorded{std::istreambuf_iterator<char>(rows), {}};
     if (recorded != package_inventory(root, false, {}, platform, bundle))
         throw std::runtime_error("Native publication inventory mismatch. A file is missing, changed or unexpected.");
+    if (linux_http) verify_linux_http_payload(root, *publish::find_target(platform), {});
     const auto executable = bundle.empty() ? (platform.starts_with("windows-") ? "app.exe" : "app") : bundle + "/Contents/MacOS/app";
     const auto image = project::read_project_input(root / utf8_path(executable), audit::byte_limit);
-    const auto report = audit::inspect(image, {2, std::string(platform), true, true, true, {}});
-    if (!production_image(report) || !report.findings.empty() ||
+    const auto report = audit::inspect(image, {2, std::string(platform), true, true, !linux_http, {}});
+    if (!production_image(report) || !report.findings.empty() || (linux_http && !linux_http_image(report)) ||
         project::read_project_input(root / "binary-audit.json", audit_report_byte_limit) != audit::json(report) + '\n')
         throw std::runtime_error("Native publication binary audit mismatch.");
     return {root, std::string(platform), std::move(bundle), recorded, metadata};

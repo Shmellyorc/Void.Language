@@ -37,6 +37,8 @@ release artifacts are approved.
 ## Format 1
 
 A pack is a directory containing `target-pack.txt`, `link/` and `licenses/`.
+Linux packs that support HTTP also carry the two pinned GNU library archives
+under `source/`.
 The manifest begins with the following ordered fields and ends with one
 tab-delimited line per member. Text uses LF and each SHA-256 is lowercase hex.
 
@@ -52,12 +54,14 @@ source <40 lowercase hex characters>
 minimum glibc-2.39
 <sha256><TAB>link/<file>
 <sha256><TAB>licenses/<file>
+<sha256><TAB>source/<GNU provider archive>
 ```
 
 The compiler checks the compiler version, LLVM version, Runtime ABI, platform,
 member names, geometry and checksums before preparing output. The platform fixes
 the LLVM triple, generic CPU and 64-bit little-endian ABI. Flat inventories
-admit a fixed set of link inputs and regular license files. Version 1 has a
+admit a fixed set of link inputs, regular license files and the two named source
+archives. Version 1 has a
 256 MiB input budget, 96-member maximum and a 32 KiB manifest bound. It uses no
 pack-provided commands, linker scripts, thin archives or executable hooks.
 Custom IDs describe a supported ABI closure. A different ABI requires its own
@@ -65,11 +69,16 @@ Runtime and linking rules.
 
 Linux uses GNU startup objects, the target dynamic loader, glibc, libstdc++,
 GCC support libraries, the existing prebuilt VOID Runtime and the pinned
-provider archives. The application uses the destination's installed system
-libraries. Check its auditor's SONAMEs and symbol versions for the deployed
-distribution. The Ubuntu 24.04 candidate uses glibc 2.39 and the Ubuntu
-24.04 system closure. Musl needs its own Runtime build, startup objects, loader
-policy and destination qualification.
+provider libraries. The Ubuntu 24.04 candidate uses the installed Ubuntu
+system closure and a glibc 2.39 floor. The publisher includes the pinned,
+replaceable libidn2 and libunistring pair only if the executable imports it.
+That publication carries the corresponding source and notices alongside its
+verified relative library directory. Its auditor accepts only the fixed
+`$ORIGIN/native` application search path and the exact two-library payload.
+Other dependencies use the destination's installed system libraries. Check
+the audit's SONAMEs and symbol versions for the deployed distribution.
+Musl needs its own Runtime build, startup objects, loader policy and
+destination qualification.
 
 A private Windows pack is built in the native Visual Studio developer environment
 with `--local-msvc-inputs`. Use it only where your Microsoft terms permit use of
@@ -88,8 +97,9 @@ dependencies continue through the ordinary dependency lock.
 
 The [target pack workflow](../.github/workflows/ci-target-packs.yml) builds
 Runtime candidates from the same revision with the pinned SDK and provider
-recipes. Linux keeps distro library bytes in their original Ubuntu packages.
-The candidate carries immutable APT package hashes and exact member hashes.
+recipes. Linux keeps its system linking inputs in their original Ubuntu
+packages. The candidate carries immutable APT package hashes and exact member
+hashes, along with the GNU HTTP libraries and their corresponding source.
 GitHub build attestations bind candidate bytes to the workflow and source SHA.
 The workflow exercises Linux x64 to Linux ARM64, and Windows x64 and macOS
 ARM64 to both Linux architectures. Publishers verify the attestation before

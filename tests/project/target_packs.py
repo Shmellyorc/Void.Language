@@ -40,6 +40,23 @@ async func main() -> i32:
     return 31
 """
 
+HTTP_PROGRAM = """use archive
+use convert
+use io
+use net/http
+use os
+
+func main() -> i32:
+    with convert.unwrap(http.open_client()) as active_http_session:
+        var directory = convert.unwrap(os.resource_dir())
+        var contents = convert.unwrap(io.read_bytes(directory + "/assets/input.bin"))
+        if contents.count != 4 or contents[3] != 255:
+            return 31
+        var zipped = convert.unwrap(archive.encode_zip([archive.zip_input(name = "a", bytes = contents)]))
+        print(zipped.count)
+        return 0
+"""
+
 
 def run(*args, env=None, cwd=None, failure=None):
     start = time.perf_counter()
@@ -98,6 +115,13 @@ def produce(compiler, pack, output):
 
         source.write_text('func main() -> i32:\n    print(18)\n    return 0\n')
         publish(output / "sync", "--optimization", "none")
+        if not windows:
+            source.write_text(HTTP_PROGRAM)
+            publish(output / "http", "--resources", "files")
+            run(compiler, "publish", "--verify", output / "http")
+            assert {path.name for path in (output / "http/native").iterdir()} == {"libidn2.so.0", "libunistring.so.5"}
+            assert (output / "http/licenses/libidn2-2.3.8.tar.gz").is_file()
+            assert (output / "http/licenses/libunistring-1.5.tar.xz").is_file()
         source.write_text('func main() -> i32:\n    var zero: i32 = 0\n    return 5 / zero\n')
         result = publish(output / "failure")
         private = Path(next(row.split(": ", 1)[1] for row in result.stdout.splitlines()
@@ -123,6 +147,8 @@ def consume(output, compiler):
         for application, expected in [("async", "21"), ("sync", "18")]:
             image = relocated / application / exe
             assert run(image, cwd=root).stdout.strip() == expected
+        if os.name != "nt":
+            assert run(relocated / "http/app", cwd=root).stdout.strip() == "104"
         image = relocated / "failure" / exe
         result = subprocess.run([image], cwd=root, capture_output=True, text=True, timeout=90)
         assert result.returncode == 1 and "VOID-" in result.stderr, result
@@ -136,7 +162,7 @@ def consume(output, compiler):
 def archive_linux_distributions(distributions, output):
     def metadata(member):
         # A Windows publishing filesystem cannot carry the Unix execute bits.
-        if member.isfile() and member.name.endswith(("/async/app", "/sync/app", "/failure/app")):
+        if member.isfile() and member.name.endswith(("/async/app", "/sync/app", "/http/app", "/failure/app")):
             member.mode |= 0o111
         return member
 

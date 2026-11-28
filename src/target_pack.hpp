@@ -12,6 +12,8 @@ inline constexpr std::array linux_archives{"libvoid_runtime.a", "libvoid_native_
     "libsodium.a", "libcurl.a", "libpsl.a", "libnghttp2.a", "libssl.a", "libcrypto.a", "libcares.a", "libz.a"};
 inline constexpr std::array linux_libraries{"libidn2.so.0", "libunistring.so.5", "libstdc++.so.6", "libm.so.6",
     "libgcc.a", "libgcc_s.so.1", "libc.so.6"};
+inline constexpr std::array linux_http_libraries{"libidn2.so.0", "libunistring.so.5"};
+inline constexpr std::array linux_http_sources{"libidn2-2.3.8.tar.gz", "libunistring-1.5.tar.xz"};
 inline constexpr std::array linux_end{"crtendS.o", "crtn.o"};
 
 inline constexpr std::array windows_archives{"void_runtime.lib", "void_native_fixture.lib", "archive.lib",

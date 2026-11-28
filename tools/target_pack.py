@@ -24,8 +24,9 @@ TARGETS = {"x86_64": ("linux-x64", "ld-linux-x86-64.so.2"),
            "aarch64": ("linux-arm64", "ld-linux-aarch64.so.1")}
 LINUX_ARCHIVES = ("libvoid_runtime.a", "libvoid_native_fixture.a", "libarchive.a", "libsodium.a",
             "libcurl.a", "libpsl.a", "libnghttp2.a", "libssl.a", "libcrypto.a", "libcares.a", "libz.a")
-LINUX_SYSTEM = ("Scrt1.o", "crti.o", "crtbeginS.o", "libidn2.so.0", "libunistring.so.5", "libstdc++.so.6",
-          "libm.so.6", "libgcc.a", "libgcc_s.so.1", "libc.so.6", "crtendS.o", "crtn.o")
+LINUX_SHARED = {"libidn2.so": "libidn2.so.0", "libunistring.so": "libunistring.so.5"}
+LINUX_SYSTEM = ("Scrt1.o", "crti.o", "crtbeginS.o", "libstdc++.so.6", "libm.so.6", "libgcc.a",
+                "libgcc_s.so.1", "libc.so.6", "crtendS.o", "crtn.o")
 
 WINDOWS_ARCHIVES = ("void_runtime.lib", "void_native_fixture.lib", "archive.lib", "libsodium.lib",
                     "curl.lib", "psl.lib", "nghttp2.lib", "cares.lib", "zs.lib")
@@ -45,7 +46,7 @@ def command(*args):
     return subprocess.check_output(args, text=True).strip()
 
 
-def runtime_files(build, archives):
+def runtime_files(build, inputs):
     header, *rows = (build / "void-native-resources.txt").read_text().splitlines()
     if header != "VOID native resources 1":
         raise ValueError("Expected the native build resource inventory")
@@ -54,15 +55,15 @@ def runtime_files(build, archives):
         expected, raw_path = record.split("\t")
         path = Path(raw_path)
         name = path.name.lower()
-        # Normalize only the static libcurl archive's producer basename.
         if name.startswith("libcurl") and name.endswith(".lib"):
             name = "curl.lib"
-        if name in archives:
+        name = LINUX_SHARED.get(name, name)
+        if name in inputs:
             if name in files or not path.is_absolute() or sha(path) != expected:
                 raise ValueError(f"Invalid native build input {path}")
             files[name] = path
-    if set(files) != set(archives):
-        raise ValueError(f"Missing runtime archives: {sorted(set(archives) - files.keys())}")
+    if set(files) != set(inputs):
+        raise ValueError(f"Missing Runtime link inputs: {sorted(set(inputs) - files.keys())}")
     return files
 
 
@@ -80,6 +81,26 @@ def license_files(build):
     return files
 
 
+def linux_provider_notices(build):
+    pins = json.loads((ROOT / "third_party/http-versions.json").read_text(encoding="utf-8"))
+    cache = (build / "CMakeCache.txt").read_text()
+    prefix = Path(re.search(r"^VOID_HTTP_DEPS_ROOT:PATH=(.+)$", cache, re.M)[1])
+    downloads = prefix.parents[2] / "downloads"
+    files = {}
+    for entry in pins["dependencies"]:
+        if entry["name"] not in {"libidn2", "libunistring"}:
+            continue
+        archive = downloads / entry["archive"]
+        if sha(archive) != entry["sha256"]:
+            raise ValueError(f"Pinned GNU provider source checksum mismatch: {archive}")
+        files[f"source/{archive.name}"] = archive
+        label = entry["name"] + "-" + entry["version"]
+        for notice in (ROOT / "third_party/http-licenses" / label).iterdir():
+            if notice.is_file():
+                files[f"licenses/{label}-{notice.name}"] = notice
+    return files
+
+
 def system_file(cc, name):
     path = Path(command(cc, f"-print-file-name={name}"))
     if not path.is_absolute() or not path.is_file():
@@ -93,6 +114,7 @@ def populate(stage, header, files):
     records = []
     for relative, source in sorted(files.items()):
         destination = stage / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, destination)
         records.append(f"{sha(destination)}\t{relative}")
     (stage / "target-pack.txt").write_text("\n".join(header + records) + "\n", encoding="ascii", newline="\n")
@@ -169,7 +191,7 @@ def assemble(args):
             raise ValueError("The GCC system input architecture must match the runtime build")
         minimum = command("getconf", "GNU_LIBC_VERSION").replace(" ", "-")
         system = {name: system_file(args.cc, name) for name in (*LINUX_SYSTEM, loader)}
-        archives = LINUX_ARCHIVES
+        archives = (*LINUX_ARCHIVES, *LINUX_SHARED.values())
     else:
         raise ValueError("Assemble from a native Linux GNU or Windows MSVC Release build")
     build = args.build.resolve()
@@ -180,6 +202,8 @@ def assemble(args):
         raise ValueError("Use a Release build without Runtime instrumentation")
     files = {f"link/{name}": source for name, source in runtime_files(build, archives).items()}
     files.update({f"licenses/{name}": source for name, source in license_files(build).items()})
+    if system_name == "Linux":
+        files.update(linux_provider_notices(build))
     output = fresh_output(args.output)
     header = ["VOID target pack 1", f"id {args.id}", f"version {args.version}", f"target {target}",
               f"compiler {compiler}", "llvm 23.1.4", "runtime void-aot-64-v1", f"source {revision}",
@@ -232,7 +256,7 @@ def compose(candidate, output, ar):
         if not path.resolve().is_relative_to(runtime.resolve()) or sha(path) != expected:
             raise ValueError(f"Runtime candidate checksum mismatch: {path}")
         role, leaf = relative.split("/")
-        if role not in ("link", "licenses") or not re.fullmatch(r"[A-Za-z0-9_.+-]+", leaf) or leaf in (".", ".."):
+        if role not in ("link", "licenses", "source") or not re.fullmatch(r"[A-Za-z0-9_.+-]+", leaf) or leaf in (".", ".."):
             raise ValueError(f"Invalid Runtime candidate path: {relative}")
         files[relative] = path
     with tempfile.TemporaryDirectory(dir=output.parent, prefix=".pack-") as work:
