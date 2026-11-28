@@ -8,7 +8,11 @@ on:
         description: Target-pack qualification scope
         type: choice
         default: foundation
-        options: [foundation, acquisition, platform-probes, all]
+        options: [foundation, acquisition, platform-probes, windows-runtime, all]
+      reviewed_sha:
+        description: Exact source revision for the full GNU Windows Runtime probe
+        type: string
+        default: 8da376501a5a5ee3be7bf606b44e41088e429511
 concurrency:
   group: target-packs-${{ github.ref }}-${{ inputs.scope || 'foundation' }}
   cancel-in-progress: false
@@ -16,7 +20,7 @@ permissions:
   contents: read
 jobs:
   build-linux:
-    if: inputs.scope != 'platform-probes'
+    if: inputs.scope != 'windows-runtime' && inputs.scope != 'platform-probes'
     permissions:
       contents: read
       id-token: write
@@ -34,6 +38,18 @@ jobs:
       EXPERIMENT_CONFIGURATION: Release
     steps: &build-steps
       - uses: actions/checkout@v5
+      - name: Use the exact reviewed Runtime sources
+        if: matrix.job == 'gnu-windows-runtime'
+        shell: bash
+        env:
+          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$REVIEWED_SHA" =~ ^[0-9a-f]{40}$ ]]
+          cp tools/ci/probe_windows_gnu_runtime.py "$RUNNER_TEMP"
+          git fetch --no-tags --depth 1 origin "$REVIEWED_SHA"
+          git checkout --detach "$REVIEWED_SHA"
+          test "$(git rev-parse HEAD)" = "$REVIEWED_SHA"
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ (runner.os == 'Linux' || (runner.os == 'Windows' && runner.arch == 'ARM64')) && '3.14' || '3.12' }}
@@ -140,6 +156,26 @@ jobs:
           name: signed-acquisition-distribution-${{ github.sha }}
           path: ${{ runner.temp }}/acquired.tar.gz
           if-no-files-found: error
+      - name: Build and inspect genuine VOID publications using LLVM-MinGW
+        if: matrix.job == 'gnu-windows-runtime'
+        shell: bash
+        env:
+          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+        run: |
+          python "$RUNNER_TEMP/probe_windows_gnu_runtime.py" "$GITHUB_WORKSPACE" "$RUNNER_TEMP/build" \
+            "$RUNNER_TEMP/gnu-windows" "$RUNNER_TEMP/windows-gnu-runtime-output" "$REVIEWED_SHA"
+      - uses: actions/upload-artifact@v6
+        if: matrix.job == 'gnu-windows-runtime'
+        with:
+          name: windows-gnu-runtime-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/windows-gnu-runtime-output/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v6
+        if: failure() && matrix.job == 'gnu-windows-runtime'
+        with:
+          name: windows-gnu-runtime-logs-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/gnu-windows/**/*.log
+          if-no-files-found: ignore
       - name: Preserve the built compiler for cross-host publishing
         if: matrix.job == 'publisher' || matrix.target == 'linux-x64' || matrix.target == 'windows-x64'
         shell: bash
@@ -195,7 +231,7 @@ jobs:
           path: ${{ runner.temp }}/evidence/
           if-no-files-found: ignore
   build-macos:
-    if: inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
+    if: inputs.scope != 'windows-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
     strategy:
       matrix:
         include:
@@ -204,7 +240,7 @@ jobs:
     env: *build-env
     steps: *build-steps
   build-windows:
-    if: inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
+    if: inputs.scope != 'windows-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
     strategy:
       fail-fast: false
       matrix:
@@ -473,3 +509,39 @@ jobs:
           test "$(lipo -archs "$slice/libVoidProbe.dylib")" = "$arch"
           "$slice/app"
           echo "$arch executed the Linux-linked adapter probe"
+  probe-full-windows-runtime:
+    if: inputs.scope == 'windows-runtime'
+    strategy:
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, job: gnu-windows-runtime, target: windows-gnu, arch: x64}
+    runs-on: ${{ matrix.runner }}
+    env: *build-env
+    steps: *build-steps
+  run-full-windows-runtime:
+    needs: probe-full-windows-runtime
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: windows-2022, cpu: x86_64, identity: X64}
+          - {runner: windows-11-arm, cpu: aarch64, identity: Arm64}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: windows-gnu-runtime-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/windows-gnu-runtime
+      - name: Execute the Linux-linked VOID application on native Windows
+        shell: pwsh
+        env:
+          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+        run: |
+          $root = "$env:RUNNER_TEMP/windows-gnu-runtime"
+          $source = (Get-Content -Raw "$root/source-sha.txt").Trim()
+          if ($source -ne $env:REVIEWED_SHA) { throw "Unexpected source SHA: $source" }
+          $native = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+          if ($native -ne '${{ matrix.identity }}') { throw "Unexpected architecture: $native" }
+          $output = & "$root/${{ matrix.cpu }}.exe"
+          if ($LASTEXITCODE -ne 0 -or $output -ne '37') { throw "VOID Windows ABI probe failed: $output" }
+          Write-Output "$native executed VOID publication at $source"
