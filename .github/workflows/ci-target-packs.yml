@@ -10,7 +10,7 @@ on:
         default: foundation
         options: [foundation, acquisition, platform-probes, all]
 concurrency:
-  group: target-packs-${{ github.ref }}
+  group: target-packs-${{ github.ref }}-${{ inputs.scope || 'foundation' }}
   cancel-in-progress: false
 permissions:
   contents: read

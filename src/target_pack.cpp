@@ -275,10 +275,11 @@ static Pack read_pack(const fs::path& requested, const project::ProjectDirectory
         const bool source = role == "source" && target->system == System::linux_gnu &&
             std::ranges::find(linux_http_sources, leaf) != linux_http_sources.end();
         const auto folded = project::fold_project_name(name);
-        const bool reserved_notice = folded == "licenses/application-license.txt" ||
-            folded == "licenses/gnu-http-libraries.txt" ||
+        const auto first_level = folded.substr(0, folded.find('/', slash + 1));
+        const bool reserved_notice = first_level == "licenses/application-license.txt" ||
+            first_level == "licenses/gnu-http-libraries.txt" ||
             std::ranges::any_of(linux_http_sources, [&](std::string_view source_name) {
-                return folded == "licenses/" + std::string(source_name);
+                return first_level == "licenses/" + std::string(source_name);
             });
         const bool valid_name = role == "licenses" ? notice_path(leaf) && !reserved_notice :
             leaf.size() <= 128 && leaf.find('/') == leaf.npos && portable_path_component(leaf);
