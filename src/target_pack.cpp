@@ -6,6 +6,7 @@
 #include <llvm/BinaryFormat/Magic.h>
 #include <llvm/Bitcode/BitcodeReader.h>
 #include <llvm/Object/Archive.h>
+#include <llvm/Object/COFF.h>
 #include <llvm/Object/COFFImportFile.h>
 #include <llvm/Config/llvm-config.h>
 #include <llvm/Object/ELFObjectFile.h>
@@ -72,6 +73,15 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
     const auto expected = llvm_architecture(target);
     const auto machine = expected == llvm::Triple::aarch64 ? llvm::COFF::IMAGE_FILE_MACHINE_ARM64 :
         llvm::COFF::IMAGE_FILE_MACHINE_AMD64;
+    const auto matches_machine = [&](std::uint16_t actual) {
+        // Match the pinned LLD driver's native ARM64/ARM64X compatibility.
+        // Machine-neutral SDK records do not prove archive architecture.
+        if (msvc_sdk && actual == llvm::COFF::IMAGE_FILE_MACHINE_UNKNOWN) return false;
+        if (actual != machine && !(msvc_sdk && machine == llvm::COFF::IMAGE_FILE_MACHINE_ARM64 &&
+            actual == llvm::COFF::IMAGE_FILE_MACHINE_ARM64X))
+            reject("COFF machine differs from the target (" + std::to_string(actual) + ")");
+        return true;
+    };
     auto iteration_error = llvm::Error::success();
     std::size_t count = 0, compatible = 0;
     for (const auto& member : (*archive)->children(iteration_error)) {
@@ -94,8 +104,8 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
             // COFF. Validate the anonymous header's machine. LLD decides
             // whether the application actually requires such a member.
             const auto contents = buffer->getBuffer();
-            if (contents.size() < 8 || llvm::support::endian::read16le(contents.data() + 6) != machine)
-                reject("MSVC LTCG member has the wrong machine");
+            if (contents.size() < 8) reject("truncated MSVC LTCG member");
+            matches_machine(llvm::support::endian::read16le(contents.data() + 6));
             continue;
         }
         if (kind == llvm::file_magic::bitcode) {
@@ -111,16 +121,24 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
             if (buffer->getBufferSize() < sizeof(llvm::object::coff_import_header))
                 reject("truncated import header");
             const llvm::object::COFFImportFile object(*buffer);
-            if (object.getMachine() != machine) reject("import header has the wrong machine");
+            if (!matches_machine(object.getMachine())) continue;
+        } else if (windows && kind == llvm::file_magic::coff_object) {
+            auto object = llvm::object::COFFObjectFile::create(*buffer);
+            if (!object) {
+                llvm::consumeError(object.takeError());
+                reject("invalid COFF object");
+            }
+            if (!(*object)->isRelocatableObject()) reject("COFF member is not a relocatable object");
+            if (!matches_machine((*object)->getMachine())) continue;
         } else {
-            if (kind != (windows ? llvm::file_magic::coff_object : llvm::file_magic::elf_relocatable))
+            if (windows || kind != llvm::file_magic::elf_relocatable)
                 reject("unexpected member format " + std::to_string(static_cast<int>(kind)));
             auto object = llvm::object::ObjectFile::createObjectFile(*buffer);
             if (!object) {
                 llvm::consumeError(object.takeError());
                 reject("invalid relocatable object");
             }
-            if ((*object)->getArch() != expected || !(*object)->isRelocatableObject())
+            if (!llvm::isa<llvm::object::ELF64LEObjectFile>(object->get()) || (*object)->getArch() != expected)
                 reject("relocatable object has the wrong architecture");
         }
         ++compatible;
@@ -130,7 +148,6 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
         reject("invalid member table");
     }
     if (!compatible) reject("no compatible linkable object");
-
 }
 void check_link_file(std::string_view name, std::string_view bytes, const Target& target) {
     const auto kind = llvm::identify_magic(bytes);
