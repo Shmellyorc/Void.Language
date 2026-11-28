@@ -73,19 +73,23 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
     const auto expected = llvm_architecture(target);
     const auto machine = expected == llvm::Triple::aarch64 ? llvm::COFF::IMAGE_FILE_MACHINE_ARM64 :
         llvm::COFF::IMAGE_FILE_MACHINE_AMD64;
+    const bool arm_sdk = msvc_sdk && machine == llvm::COFF::IMAGE_FILE_MACHINE_ARM64;
+    bool alternate_abi = false;
     const auto matches_machine = [&](std::uint16_t actual) {
-        // Match the pinned LLD driver's native ARM64/ARM64X compatibility.
-        // Machine-neutral SDK records do not prove archive architecture.
-        if (msvc_sdk && (actual == llvm::COFF::IMAGE_FILE_MACHINE_UNKNOWN ||
-            (machine == llvm::COFF::IMAGE_FILE_MACHINE_ARM64 && actual == llvm::COFF::IMAGE_FILE_MACHINE_ARM64EC)))
+        // Native ARM64 SDK archives can also hold ARM64EC and x64 code. The
+        // explicitly targeted LLD driver checks every member used by the link.
+        if (arm_sdk && (actual == llvm::COFF::IMAGE_FILE_MACHINE_ARM64EC || actual == llvm::COFF::IMAGE_FILE_MACHINE_AMD64)) {
+            alternate_abi = true;
             return false;
-        if (actual != machine && !(msvc_sdk && machine == llvm::COFF::IMAGE_FILE_MACHINE_ARM64 &&
-            actual == llvm::COFF::IMAGE_FILE_MACHINE_ARM64X))
+        }
+        if (msvc_sdk && actual == llvm::COFF::IMAGE_FILE_MACHINE_UNKNOWN) return false;
+        if (actual != machine && !(arm_sdk && actual == llvm::COFF::IMAGE_FILE_MACHINE_ARM64X))
             reject("COFF machine differs from the target (" + std::to_string(actual) + ")");
         return true;
     };
     auto iteration_error = llvm::Error::success();
     std::size_t count = 0, compatible = 0;
+    bool neutral_sdk_symbols = false;
     for (const auto& member : (*archive)->children(iteration_error)) {
         auto buffer = member.getMemoryBufferRef();
         if (!buffer) {
@@ -132,7 +136,21 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
                 reject("invalid COFF object");
             }
             if (!(*object)->isRelocatableObject()) reject("COFF member is not a relocatable object");
-            if (!matches_machine((*object)->getMachine())) continue;
+            if (!matches_machine((*object)->getMachine())) {
+                // Import and alias archives such as oldnames.lib can have
+                // only machine-neutral weak symbol records.
+                if ((*object)->getMachine() == llvm::COFF::IMAGE_FILE_MACHINE_UNKNOWN &&
+                    !(*object)->symbols().empty()) {
+                    bool neutral = true;
+                    for (const auto& section : (*object)->sections())
+                        if ((section.isText() && section.getSize()) || !section.relocations().empty()) {
+                            neutral = false;
+                            break;
+                        }
+                    neutral_sdk_symbols |= neutral;
+                }
+                continue;
+            }
         } else {
             if (windows || kind != llvm::file_magic::elf_relocatable)
                 reject("unexpected member format " + std::to_string(static_cast<int>(kind)));
@@ -150,7 +168,7 @@ void check_archive(std::string_view name, std::string_view bytes, const Target& 
         llvm::consumeError(std::move(iteration_error));
         reject("invalid member table");
     }
-    if (!compatible) reject("no compatible linkable object");
+    if (!compatible && (!neutral_sdk_symbols || alternate_abi)) reject("no compatible linkable object");
 }
 void check_link_file(std::string_view name, std::string_view bytes, const Target& target) {
     const auto kind = llvm::identify_magic(bytes);
