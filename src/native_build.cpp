@@ -375,9 +375,26 @@ void link_target_pack(const ValidatedAnalysis& analysis, const fs::path& request
     Staging stage(output);
 #endif
     const auto& work = stage.directory;
-    const auto physical_work = project::inspect_creation_root(work).path;
-    const auto read_link_output = [&](const fs::path& path) {
-        return project::read_project_input(physical_work / path.filename(), audit::byte_limit);
+    const auto read_link_output = [](const fs::path& path) {
+#ifdef _WIN32
+        // The native linker workspace may sit below a verified DOS short
+        // name. Read the private artifact by handle, with writers excluded.
+        const auto file = native_windows::read_file(path);
+        const auto size = native_windows::size(file.value);
+        if (!size || size > audit::byte_limit)
+            throw std::runtime_error("Invalid target-pack linker output size.");
+        std::string bytes(static_cast<std::size_t>(size), '\0');
+        std::size_t offset = 0;
+        while (offset != bytes.size()) {
+            const auto got = native_windows::read(file.value, bytes.data() + offset,
+                static_cast<DWORD>(bytes.size() - offset));
+            if (!got) throw std::runtime_error("Short read from private target-pack linker output.");
+            offset += got;
+        }
+        return bytes;
+#else
+        return project::read_project_input(path, audit::byte_limit);
+#endif
     };
     const auto object = work / "program.o";
     const bool windows = pack.target->system == publish::System::windows_msvc;
