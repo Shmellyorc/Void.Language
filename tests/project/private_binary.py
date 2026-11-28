@@ -110,7 +110,11 @@ with tempfile.TemporaryDirectory(prefix='void-private-b-') as temp:
             symbolicated = run([llvm / 'llvm-symbolizer', '--obj=' + str(symbols), '0x' + selected[2]]).stdout
             assert str(source) in symbolicated, symbolicated
             compressed = root / 'compressed-debug'
-            run([llvm / 'llvm-objcopy', '--compress-debug-sections=zlib', linked, compressed])
+            # Keep one real DWARF section while removing the C++ Runtime's
+            # static symbol table, which can exceed the auditor's record budget
+            # in a Debug or Sanitizers build.
+            run([llvm / 'llvm-objcopy', '--strip-all', '--keep-section=.debug_info',
+                 '--compress-debug-sections=zlib', linked, compressed])
             assert any(f['code'] == 'compressed-content' for f in audit(compressed)['findings'])
             error = run([final, '7'], expected=1)
             assert error.stdout == ('retained cleanup\n' if kind == 'retained' else '') + 'cleanup executed\n' and 'VOID-D1 ' in error.stderr
