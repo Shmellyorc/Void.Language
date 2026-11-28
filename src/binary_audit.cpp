@@ -75,7 +75,7 @@ void pe_bounds(std::string_view bytes, Report& report) {
             bounded(directory, 0, size);
             const auto base = number(directory, 16, 4), functions = number(directory, 20, 4), names = number(directory, 24, 4);
             if (functions > record_limit || names > record_limit) throw Limited("PE export table budget exceeded.");
-            if (names > functions) throw Invalid("Invalid PE export counts.");
+            if (names && !functions) throw Invalid("Invalid PE export counts.");
             if (functions) {
                 const auto addresses = mapped(number(directory, 28, 4));
                 bounded(addresses, 0, functions * 4);

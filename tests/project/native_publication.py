@@ -3,6 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from hashlib import sha256
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -122,6 +123,15 @@ async func main() -> i32:
     assert "exports" in report
     assert (output / "void-package.txt").read_text().splitlines()[1] == "target " + target
     run(compiler, "publish", "--verify", output)
+    if target == "linux-x64":
+        second_producer = root / "second producer path"
+        second_producer.mkdir()
+        shutil.copytree(project / "src", second_producer / "src")
+        shutil.copytree(assets, second_producer / "assets")
+        shutil.copyfile(manifest_path, second_producer / manifest_path.name)
+        rebuilt = root / "reproducible"
+        publish(second_producer, "-o", rebuilt)
+        assert snapshot(rebuilt) == files
     rejected = invoke([compiler, "publish", "--project", project])
     assert rejected.returncode and "fresh directory" in rejected.stderr
     assert snapshot(output) == files

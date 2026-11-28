@@ -68,7 +68,8 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     if (input.application_metadata) {
         llvm::IRBuilder<> constants(context);
         application_record = constants.CreateGlobalString(input.application_metadata->bytes(),"vd.application.metadata.v1",0,module.get(),false);
-        auto provenance = application_build_provenance(input.analysis.get(),*input.application_metadata,triple,optimize,build_inputs);
+        const auto provenance = private_map ? private_map->build_id() :
+            application_build_provenance(input.analysis.get(), *input.application_metadata, triple, optimize, build_inputs);
         auto* identity = constants.CreateGlobalString(provenance,"vd.application.provenance.v1",0,module.get());
         llvm::appendToUsed(*module,{application_record,identity});
     }
