@@ -200,14 +200,23 @@ def emit_driver(root, build, work):
     return binary
 
 
-def runtime_objects(root, build, work, prefix, mingw, arch):
+def runtime_rows(build):
     rows = json.loads((build / 'compile_commands.json').read_text())
-    targets = set(RUNTIME_TARGETS)
-    selected = [row for row in rows if row['file'].endswith(('.cpp', '.c'))
-                and Path(row.get('output', '')).parts[:1] == ('CMakeFiles',)
-                and Path(row['output']).parts[1].removesuffix('.dir') in targets]
+    selected = []
+    for row in rows:
+        target = Path(row.get('output', ''))
+        if target.is_absolute():
+            target = target.relative_to(Path(row['directory']))
+        if (row['file'].endswith(('.cpp', '.c')) and target.parts[:1] == ('CMakeFiles',) and
+                target.parts[1].removesuffix('.dir') in RUNTIME_TARGETS):
+            selected.append(row)
     if len(selected) < 55:
         raise RuntimeError('Runtime compile inventory is incomplete')
+    return selected
+
+
+def runtime_objects(root, build, work, prefix, mingw, arch):
+    selected = runtime_rows(build)
     headers = work / 'network-prefix.hpp'
     headers.write_text(NETWORK_HEADERS)
     objdir = work / 'objects'

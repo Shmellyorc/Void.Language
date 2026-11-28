@@ -8,9 +8,9 @@ on:
         description: Target-pack qualification scope
         type: choice
         default: foundation
-        options: [foundation, acquisition, platform-probes, windows-runtime, all]
+        options: [foundation, acquisition, platform-probes, windows-runtime, macos-runtime, all]
       reviewed_sha:
-        description: Exact source revision for the full GNU Windows Runtime probe
+        description: Exact source revision for full platform Runtime probes
         type: string
         default: 8da376501a5a5ee3be7bf606b44e41088e429511
 concurrency:
@@ -20,7 +20,7 @@ permissions:
   contents: read
 jobs:
   build-linux:
-    if: inputs.scope != 'windows-runtime' && inputs.scope != 'platform-probes'
+    if: inputs.scope != 'windows-runtime' && inputs.scope != 'macos-runtime' && inputs.scope != 'platform-probes'
     permissions:
       contents: read
       id-token: write
@@ -39,14 +39,14 @@ jobs:
     steps: &build-steps
       - uses: actions/checkout@v5
       - name: Use the exact reviewed Runtime sources
-        if: matrix.job == 'gnu-windows-runtime'
+        if: matrix.job == 'gnu-windows-runtime' || matrix.job == 'full-macos-link'
         shell: bash
         env:
           REVIEWED_SHA: ${{ inputs.reviewed_sha }}
         run: |
           set -euo pipefail
           [[ "$REVIEWED_SHA" =~ ^[0-9a-f]{40}$ ]]
-          cp tools/ci/probe_windows_gnu_runtime.py "$RUNNER_TEMP"
+          cp tools/ci/probe_windows_gnu_runtime.py tools/ci/probe_macos_full_runtime.py "$RUNNER_TEMP"
           git fetch --no-tags --depth 1 origin "$REVIEWED_SHA"
           git checkout --detach "$REVIEWED_SHA"
           test "$(git rev-parse HEAD)" = "$REVIEWED_SHA"
@@ -176,6 +176,21 @@ jobs:
           name: windows-gnu-runtime-logs-${{ inputs.reviewed_sha }}
           path: ${{ runner.temp }}/gnu-windows/**/*.log
           if-no-files-found: ignore
+      - name: Offline-link real VOID executables with independent macOS definitions
+        if: matrix.job == 'full-macos-link'
+        shell: bash
+        env:
+          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+        run: |
+          python "$RUNNER_TEMP/probe_macos_full_runtime.py" emit "$GITHUB_WORKSPACE" "$RUNNER_TEMP/build" \
+            "$RUNNER_TEMP/macos-full-link" "$RUNNER_TEMP/macos-full-output" "$REVIEWED_SHA"
+          tar -C "$RUNNER_TEMP/macos-full-output" -czf "$RUNNER_TEMP/macos-full-runtime.tar.gz" .
+      - uses: actions/upload-artifact@v6
+        if: matrix.job == 'full-macos-link'
+        with:
+          name: macos-full-runtime-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/macos-full-runtime.tar.gz
+          if-no-files-found: error
       - name: Preserve the built compiler for cross-host publishing
         if: matrix.job == 'publisher' || matrix.target == 'linux-x64' || matrix.target == 'windows-x64'
         shell: bash
@@ -231,7 +246,7 @@ jobs:
           path: ${{ runner.temp }}/evidence/
           if-no-files-found: ignore
   build-macos:
-    if: inputs.scope != 'windows-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
+    if: inputs.scope != 'windows-runtime' && inputs.scope != 'macos-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
     strategy:
       matrix:
         include:
@@ -240,7 +255,7 @@ jobs:
     env: *build-env
     steps: *build-steps
   build-windows:
-    if: inputs.scope != 'windows-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
+    if: inputs.scope != 'windows-runtime' && inputs.scope != 'macos-runtime' && inputs.scope != 'platform-probes' && inputs.scope != 'acquisition'
     strategy:
       fail-fast: false
       matrix:
@@ -545,3 +560,60 @@ jobs:
           $output = & "$root/${{ matrix.cpu }}.exe"
           if ($LASTEXITCODE -ne 0 -or $output -ne '37') { throw "VOID Windows ABI probe failed: $output" }
           Write-Output "$native executed VOID publication at $source"
+  probe-full-macos-link:
+    if: inputs.scope == 'macos-runtime'
+    strategy:
+      matrix:
+        include:
+          - {runner: ubuntu-24.04, job: full-macos-link, target: macos-runtime, arch: x64}
+    runs-on: ${{ matrix.runner }}
+    env: *build-env
+    steps: *build-steps
+  run-full-macos-runtime:
+    needs: probe-full-macos-link
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {runner: macos-26, cpu: arm64, setup_arch: arm64}
+          - {runner: macos-26-intel, cpu: x86_64, setup_arch: x64}
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          architecture: ${{ matrix.setup_arch }}
+      - uses: actions/download-artifact@v7
+        with:
+          name: macos-full-runtime-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}
+      - name: Prelink the full native VOID Runtime, verify signatures and execute
+        shell: bash
+        env:
+          REVIEWED_SHA: ${{ inputs.reviewed_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$REVIEWED_SHA" =~ ^[0-9a-f]{40}$ ]]
+          cp tools/ci/probe_macos_full_runtime.py tools/ci/probe_windows_gnu_runtime.py "$RUNNER_TEMP"
+          git fetch --no-tags --depth 1 origin "$REVIEWED_SHA"
+          git checkout --detach "$REVIEWED_SHA"
+          test "$(git rev-parse HEAD)" = "$REVIEWED_SHA"
+          xcrun clang++ --version
+          command -v ninja >/dev/null || brew install ninja
+          mkdir "$RUNNER_TEMP/macos-full-artifact"
+          tar -C "$RUNNER_TEMP/macos-full-artifact" -xzf "$RUNNER_TEMP/macos-full-runtime.tar.gz"
+          python "$RUNNER_TEMP/probe_macos_full_runtime.py" native "$GITHUB_WORKSPACE" "$RUNNER_TEMP/macos-full-artifact" \
+            "$RUNNER_TEMP/macos-full-native" "${{ matrix.cpu }}" "$REVIEWED_SHA"
+      - uses: actions/upload-artifact@v6
+        if: success()
+        with:
+          name: macos-full-native-${{ matrix.cpu }}-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/macos-full-artifact/${{ matrix.cpu }}/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: macos-full-native-logs-${{ matrix.cpu }}-${{ inputs.reviewed_sha }}
+          path: ${{ runner.temp }}/macos-full-native/**/*.log
+          if-no-files-found: ignore
