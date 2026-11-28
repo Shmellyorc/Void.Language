@@ -875,6 +875,19 @@ void publish_application_directory(const CreationRoot& directory, const std::str
             throw std::runtime_error("Package replacement displaced an unexpected directory. Retained " + path_utf8(stage));
         }
     });
+#elif defined(__APPLE__)
+    if (verify_replacement)
+        throw std::runtime_error("macOS application publishing requires a fresh destination.");
+    if (named(directory.path, leaf))
+        throw CreationCollision("Application destination already exists: " + path_utf8(directory.path / utf8_path(leaf)));
+    with_project_stage(directory, {}, [&](const Parent& destination, Node& staged, const fs::path& stage, bool& keep) {
+        prepare(stage,{});
+        if (inspect_creation_root(directory.path).identity != directory.identity || !owns(staged))
+            throw std::runtime_error("Application staging or destination parent changed.");
+        rename_exclusive(staged, destination.handle.fd, leaf);
+        keep = true;
+    });
+
 #else
     (void)directory; (void)leaf; (void)prepare; (void)verify_replacement;
     throw std::runtime_error("Application packaging requires Linux x86-64 GNU.");

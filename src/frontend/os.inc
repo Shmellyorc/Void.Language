@@ -8,7 +8,8 @@
         target.token = expression.token;
         target.symbol = "$os." + std::to_string(operation);
         target.result = operation == static_cast<unsigned>(os::Operation::process_id) ?
-            Type(Type::i64) : Type(unit.structure_names.at("_reply")->definition);
+            Type(Type::i64) : Type(unit.structure_names.at(operation == static_cast<unsigned>(os::Operation::embedded_resource) ?
+                "_embedded_reply" : "_reply")->definition);
         if (contract.text_argument) target.parameters.push_back({Token{TokenKind::name, "name", expression.token.offset}, Type::string});
         builtin_record(target, "Private checked owner-side OS query.");
         expression.target = expression.source_target = target.symbol;

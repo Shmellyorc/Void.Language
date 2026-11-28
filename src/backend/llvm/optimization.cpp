@@ -59,7 +59,7 @@ void remove_dominated_scalar_defaults(llvm::Function& function, llvm::FunctionAn
 }
 
 void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_machine,
-            bool version_loops) {
+            bool version_loops, bool size, bool thin_lto) {
     std::string message;
     llvm::raw_string_ostream stream(message);
     { observation::Scope timing(observation::Phase::llvm_verification);
@@ -74,6 +74,13 @@ void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_m
         llvm::ModuleAnalysisManager modules;
         llvm::PipelineTuningOptions tuning;
         tuning.SLPVectorization = false;
+        if (size) {
+            tuning.LoopUnrolling = false;
+            for (auto& function : module) if (!function.isDeclaration()) {
+                function.addFnAttr(llvm::Attribute::OptimizeForSize);
+                function.addFnAttr(llvm::Attribute::MinSize);
+            }
+        }
         llvm::PassBuilder builder(analysis_machine, tuning);
         if (analysis_machine && version_loops) {
             // Runtime-free AOT: expose invariant control before vectorization.
@@ -93,7 +100,8 @@ void finish(llvm::Module& module, bool optimize, llvm::TargetMachine* analysis_m
         // The proof requests only the dominator tree. Removing stores leaves
         // it valid for the existing pipeline.
         for (auto& function : module) remove_dominated_scalar_defaults(function, functions);
-        auto pipeline = builder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O2);
+        auto pipeline = thin_lto ? builder.buildThinLTOPreLinkDefaultPipeline(llvm::OptimizationLevel::O2) :
+            builder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O2);
         pipeline.run(module, modules);
         optimization_timing.finish();
         { observation::Scope timing(observation::Phase::llvm_verification);

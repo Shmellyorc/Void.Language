@@ -1,6 +1,9 @@
 #include "void/crash_diagnostics.hpp"
 #include "void/compiler_observation.hpp"
 #include "void/native_build.hpp"
+#include "void/publish.hpp"
+#include "void/binary_audit.hpp"
+#include "frontend/project_digest.hpp"
 #include "void/native_import.hpp"
 #include "void/backend.hpp"
 #include "void/cache.hpp"
@@ -16,6 +19,7 @@
 #include <llvm/Support/Program.h>
 #include <llvm/Support/SHA256.h>
 #include <fstream>
+#include <iostream>
 #include <algorithm>
 #include <cctype>
 #include <stdexcept>
@@ -32,6 +36,9 @@
 #if (defined(__linux__) && defined(__GLIBC__) && defined(__x86_64__)) || \
     (defined(_WIN32) && defined(_MSC_VER) && defined(_M_X64))
 #define VOID_APPLICATION_PACKAGING
+#endif
+#if defined(VOID_APPLICATION_PACKAGING) || (defined(__APPLE__) && defined(__aarch64__))
+#define VOID_NATIVE_PUBLISHING
 #endif
 namespace vd {
 namespace {
@@ -135,7 +142,7 @@ struct Staging {
     ~Staging(){std::error_code ignored;fs::remove_all(directory,ignored);}
 };
 #endif
-void publish(const fs::path& staged,const fs::path& output) {
+void publish_link_output(const fs::path& staged,const fs::path& output) {
     observation::Scope timing(observation::Phase::publication);
     // POSIX rename and Windows MoveFileEx replace in one operation. Never remove
     // a good executable first; an executing/locked Windows file leaves it intact.
@@ -261,12 +268,20 @@ void publish_object(const ValidatedAnalysis& analysis,const fs::path& requested,
     auto output=output_path(analysis,requested);Staging stage(output);
     auto object=stage.directory/"program.o";
     emit_object(analysis.lower(),object,optimize,true,std::string(compiler_build_identity())+":"+std::string(profile),source_debug);
-    output_path(analysis,output);publish(object,output);
+    output_path(analysis,output);publish_link_output(object,output);
+}
+namespace {
+struct ProductionLink {
+    const publish::PublishPlan& plan;
+    const PublicationResources& assets;
+    std::optional<diagnostics::PrivateMap> map;
+    std::string symbols;
+};
 }
 static std::string link_executable(const ValidatedAnalysis& analysis, const fs::path& requested, bool optimize,
                                    const char* argv0, std::string_view profile, bool package,
                                    const project::ProjectDirectoryReader& reader={},
-                                   std::optional<project::DebugInfo> source_debug={}) {
+                                   std::optional<project::DebugInfo> source_debug={}, ProductionLink* production=nullptr) {
     if (analysis.c_primitive_admission() && !analysis.c_primitive_admission()->dynamic())
         throw std::invalid_argument("Host-admitted C primitives require an explicitly linked AOT fixture");
     auto config=[&] {
@@ -326,6 +341,9 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
     std::string provenance=std::string(compiler_build_identity())+":"+std::to_string(profile.size())+":"+std::string(profile)+":"+config.verified_digests;
     for(const auto& flag:config.flags)provenance+=std::to_string(flag.size())+":"+flag;
     std::vector<std::string> args{path_utf8(config.driver),"--driver-mode=g++"};
+#if defined(__linux__)
+    if (production) args.insert(args.end(), {"-Xlinker", "--as-needed"});
+#endif
 #ifdef _WIN32
     if (package || embedded_dwarf) {
         args.push_back("-B"+path_utf8(config.linker.parent_path()));
@@ -364,7 +382,51 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
 #if defined(__linux__)
     args.push_back("-ldl"); // Optional system terminfo binding in the Runtime archive.
 #endif
-    emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance,source_debug);
+    if (production) {
+        project::Digest inputs;
+        inputs.field(publish::policy_revision);
+        inputs.field(compiler_build_identity());
+        inputs.field(production->plan.target());
+        inputs.field(production->plan.profile());
+        inputs.field(production->plan.optimization());
+        inputs.field(production->plan.resources());
+        inputs.field(production->plan.symbols());
+        inputs.field(production->plan.thin_lto() ? "thin" : "none");
+        inputs.field(config.verified_digests);
+        inputs.field(locked ? locked->identity() : "");
+        inputs.field(analysis.entry_identity());
+        inputs.field(analysis.application_metadata()->bytes());
+        for (const auto& module : analysis.modules()) {
+            inputs.field(module.identity);
+            inputs.field(module.source.text());
+        }
+        for (const auto& [name, bytes] : production->assets) {
+            inputs.field(name);
+            inputs.field(bytes);
+        }
+        for (const auto& [name, bytes] : payload) {
+            inputs.field(name);
+            inputs.field(bytes);
+        }
+#if defined(_WIN32)
+        args.insert(args.end(), {"-Xlinker", "/opt:ref", "-Xlinker", "/opt:noicf",
+            "-Xlinker", "/incremental:no", "-Xlinker", "/brepro"});
+#elif defined(__APPLE__)
+        args.insert(args.end(), {"-Xlinker", "-dead_strip", "-Xlinker", "-exported_symbol", "-Xlinker", "_main"});
+#else
+        args.insert(args.end(), {"-Xlinker", "--gc-sections"});
+        if (production->plan.thin_lto()) {
+            if (config.linker.empty())
+                throw std::runtime_error("Publishing ThinLTO requires the configured LLVM 23.1.4 LLD linker.");
+            args.insert(args.end(), {"-flto=thin", "-Xlinker", "--lto-O2", "-Xlinker", "--thinlto-jobs=1"});
+        }
+#endif
+        production->map = emit_publication_object(analysis.lower(ir::Emission::entry), object, optimize,
+            inputs.finish(), production->plan.optimization() == "size", production->plan.symbols() == "private",
+            production->plan.resources() == "embed" ? &production->assets : nullptr, production->plan.thin_lto());
+    } else {
+        emit_object(analysis.lower(ir::Emission::entry),object,optimize,true,provenance,source_debug);
+    }
     observation::Scope link_timing(observation::Phase::native_link_driver);
     auto status=execute(args);
     if(status!=0)link_timing.fail();
@@ -373,6 +435,48 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
       "). Driver: "+path_utf8(config.driver)+"\nCheck the linker diagnostics above and host C/C++ development libraries. See docs/install/README.md.");
     if(!fs::is_regular_file(executable) || fs::file_size(executable)==0 || !llvm::sys::fs::can_execute(path_utf8(executable)))
         throw std::runtime_error("Native linker did not produce a usable executable.");
+    if (production) {
+        const bool keep_symbols = production->plan.symbols() == "private";
+        const auto tool = [&](std::string_view leaf) {
+            const auto path = config.driver.parent_path() / utf8_path(leaf);
+            exact_path(path);
+            if (!llvm::sys::fs::can_execute(path_utf8(path)))
+                throw std::runtime_error("Missing LLVM publishing tool: " + path_utf8(path));
+            return path_utf8(path);
+        };
+        const auto run = [&](const std::vector<std::string>& command) {
+            if (execute(command) != 0)
+                throw std::runtime_error("Publishing tool failed: " + command.front());
+        };
+#if defined(__APPLE__)
+        if (keep_symbols) {
+            const auto bundle = work / "program.dSYM";
+            run({tool("dsymutil"), path_utf8(executable), "-o", path_utf8(bundle)});
+            production->symbols = project::read_project_input(bundle / "Contents/Resources/DWARF/program", audit::byte_limit);
+        }
+        run({"/usr/bin/strip", "-S", "-x", path_utf8(executable)});
+        // Apple Silicon enforces a local code signature after image mutation.
+        run({"/usr/bin/codesign", "--force", "--sign", "-", path_utf8(executable)});
+#elif defined(_WIN32)
+        // LLVM supports stripping embedded DWARF from PE. Retain the complete
+        // linked image privately so a debugger can use its original RVAs.
+        if (keep_symbols) production->symbols = project::read_project_input(executable, audit::byte_limit);
+        run({tool("llvm-strip.exe"), "--strip-all", path_utf8(executable)});
+        auto public_image = project::read_project_input(executable, audit::byte_limit);
+        audit::remove_pe_debug_records(public_image);
+        std::ofstream stripped(executable, std::ios::binary | std::ios::trunc);
+        stripped.write(public_image.data(), static_cast<std::streamsize>(public_image.size()));
+        stripped.close();
+        if (!stripped) throw std::runtime_error("Cannot finish the stripped PE executable.");
+#else
+        if (keep_symbols) {
+            const auto debug = work / "program.debug";
+            run({tool("llvm-objcopy"), "--only-keep-debug", path_utf8(executable), path_utf8(debug)});
+            production->symbols = project::read_project_input(debug, audit::byte_limit);
+        }
+        run({tool("llvm-objcopy"), "--strip-all", "--remove-section=.comment", path_utf8(executable)});
+#endif
+    }
     if (managed) {
         std::map<std::string, std::string_view> files(payload.begin(), payload.end());
         project::publish_project_directory(*destination, managed_payload_directory, files,
@@ -402,10 +506,10 @@ static std::string link_executable(const ValidatedAnalysis& analysis, const fs::
     } else {
         const auto staged=stage->directory/"program.exe";
         native_windows::copy_checked(executable,staged,true);
-        output_path(analysis,output);publish(staged,output);
+        output_path(analysis,output);publish_link_output(staged,output);
     }
 #else
-    output_path(analysis,output);publish(executable,output);
+    output_path(analysis,output);publish_link_output(executable,output);
 #endif
     return std::move(config.verified_digests);
 }
@@ -415,11 +519,14 @@ void build_executable(const ValidatedAnalysis& analysis, const fs::path& request
     link_executable(analysis, requested, optimize, argv0, profile, false,{},source_debug);
 }
 
-#ifdef VOID_APPLICATION_PACKAGING
+#ifdef VOID_NATIVE_PUBLISHING
 namespace {
 #ifdef _WIN32
 constexpr std::string_view package_header = "VOID application package 1\ntarget x86_64-pc-windows-msvc\n";
 constexpr auto executable_name = "app.exe";
+#elif defined(__APPLE__)
+constexpr std::string_view package_header = "VOID application package 1\ntarget arm64-apple-macos\n";
+constexpr auto executable_name = "app";
 #else
 constexpr std::string_view package_header = "VOID application package 1\ntarget x86_64-unknown-linux-gnu\n";
 constexpr auto executable_name = "app";
@@ -428,6 +535,7 @@ constexpr auto inventory_name = "void-package.txt";
 constexpr auto metadata_name = "application.meta";
 constexpr std::size_t package_byte_limit = 256 * 1024 * 1024;
 constexpr std::size_t inventory_byte_limit = 64 * 1024;
+constexpr std::size_t audit_report_byte_limit = 16 * 1024 * 1024;
 
 bool hex_digest(std::string_view hash) {
     return hash.size() == 64 && hash.find_first_not_of("0123456789abcdef") == hash.npos;
@@ -530,6 +638,11 @@ void copy_notices(const fs::path& stage, const char* argv0, const project::Proje
 void check_package_image(std::string_view bytes) {
 #ifdef _WIN32
     native_windows::check_executable({llvm::StringRef(bytes),executable_name},true);
+#elif defined(__APPLE__)
+    const auto report = audit::inspect(bytes, {2, "macos-arm64", false, false, true, {}});
+    if (!report.inspected || report.image_kind != "executable" || !report.findings.empty())
+        throw std::runtime_error("Application distribution requires a native Mach-O ARM64 executable.");
+
 #else
     auto image = llvm::object::ObjectFile::createObjectFile({llvm::StringRef(bytes), executable_name});
     if (!image) throw std::runtime_error("Invalid application package executable: " + llvm::toString(image.takeError()));
@@ -544,7 +657,7 @@ void check_package_image(std::string_view bytes) {
 #endif
 }
 
-std::string package_inventory(const fs::path& root, bool prepare, const project::ProjectDirectoryReader& reader) {
+std::string package_inventory(const fs::path& root, bool prepare, const project::ProjectDirectoryReader& reader, bool production = false) {
     std::map<std::string, std::string> rows;
     std::size_t remaining = package_byte_limit;
     auto file = [&](const fs::directory_entry& entry, const std::string& name) {
@@ -563,7 +676,7 @@ std::string package_inventory(const fs::path& root, bool prepare, const project:
     for (const auto& entry : fs::directory_iterator(root)) {
         const auto name = path_utf8(entry.path().filename());
         if (name == inventory_name && !prepare) { has_inventory = true; continue; }
-        if (name == executable_name || name == metadata_name) file(entry, name);
+        if (name == executable_name || name == metadata_name || (production && name == "binary-audit.json")) file(entry, name);
         else if ((name == "assets" || name == "native" || name == "licenses") && fs::is_directory(entry.symlink_status())) {
 #ifdef _WIN32
             reader.inspect(entry.path());
@@ -686,6 +799,154 @@ void build_application_package(const ProjectAnalysis& project_analysis, const fs
 #else
     (void)project_analysis; (void)requested; (void)optimize; (void)argv0; (void)profile; (void)replace;
     throw std::runtime_error("Application packaging requires Linux x86-64 GNU or Windows x64 MSVC.");
+#endif
+}
+
+fs::path publish_native_application(const ProjectAnalysis& project_analysis, const publish::PublishPlan& plan, const char* argv0) {
+#ifdef VOID_NATIVE_PUBLISHING
+    const auto& analysis = *project_analysis.program();
+    const auto& root = project_analysis.root();
+    const auto& requested = plan.output();
+    project::require_outside_user_package_store(requested);
+    project::require_outside_native_approval_store(requested, true);
+#ifdef _WIN32
+    require_package_path_spelling(requested);
+#endif
+    const auto output = fs::absolute(requested).lexically_normal();
+    const auto leaf = path_utf8(output.filename());
+    if (!package_leaf(leaf) || leaf.starts_with('.') || project::fold_project_name(leaf).ends_with(".void"))
+        throw std::runtime_error("Publishing requires a portable output directory name.");
+    const auto relative = output.lexically_relative(root);
+    if (!relative.empty()) {
+        const auto first = project::fold_project_name(path_utf8(*relative.begin()));
+        if (first == ".void" || first == ".git" || first == "libs" || first == "native" || first == "assets")
+            throw std::runtime_error("Publish output conflicts with project storage: " + path_utf8(output));
+    }
+    if (fs::exists(fs::symlink_status(output)))
+        throw std::runtime_error("Publish output must be a fresh directory: " + path_utf8(output));
+
+    PublicationResources assets;
+    std::size_t remaining = project::application_resource_byte_limit;
+    for (const auto& name : project_analysis.manifest()->resources()) {
+        auto bytes = project::read_project_input(root / utf8_path(name), remaining);
+        remaining -= bytes.size();
+        assets.emplace(name, std::move(bytes));
+    }
+    auto existing = output.parent_path();
+    while (!fs::exists(fs::symlink_status(existing))) existing = existing.parent_path();
+    const auto admitted = project::inspect_creation_root(existing);
+    const auto physical_parent = admitted.path / output.parent_path().lexically_relative(existing);
+    fs::create_directories(physical_parent);
+    const auto parent = project::inspect_creation_root(physical_parent);
+    const auto actual_output = parent.path / output.filename();
+    fs::path archive;
+    project::publish_application_directory(parent, leaf, [&](const fs::path& stage, const project::ProjectDirectoryReader& reader) {
+        ProductionLink production{plan, assets, {}, {}};
+        copy_notices(stage, argv0, reader);
+        const auto license = root / "LICENSE";
+        if (fs::exists(fs::symlink_status(license)))
+            write_package_file(stage / "licenses/APPLICATION-LICENSE.txt", project::read_project_input(license, 1024 * 1024), reader);
+        if (plan.resources() == "files")
+            for (const auto& [name, bytes] : assets)
+                write_package_file(stage / utf8_path(name), bytes, reader);
+
+        const auto debug = plan.symbols() == "private" ? project::DebugInfo::full : project::DebugInfo::none;
+        link_executable(analysis, stage / executable_name, plan.optimization() != "none", argv0, plan.profile(), true, reader, debug, &production);
+        const auto image = reader.read(stage / executable_name, audit::byte_limit);
+        audit::Policy policy{2, plan.target(), true, true, true, {}};
+        auto forbid = [&](const fs::path& path) {
+            auto text = path_utf8(path);
+            if (text.size() > 3 && text.size() <= 256 &&
+                std::find(policy.forbidden_strings.begin(), policy.forbidden_strings.end(), text) == policy.forbidden_strings.end())
+                policy.forbidden_strings.push_back(std::move(text));
+        };
+        forbid(root);
+        forbid(parent.path);
+        forbid(standard_library_root());
+        const auto report = audit::inspect(image, policy);
+        if (!report.inspected || !report.findings.empty()) {
+            std::string details;
+            for (const auto& finding : report.findings) details += "\n" + finding.code + ": " + finding.detail;
+            throw std::runtime_error("Final executable failed binary auditing." + details);
+        }
+        for (const auto& name : report.dependencies) {
+#if defined(__APPLE__)
+            const bool system = name.starts_with("/usr/lib/") || name.starts_with("/System/Library/Frameworks/");
+#else
+            const bool system = !name.empty() && name.find_first_of("/\\:") == name.npos;
+#endif
+            if (!system) throw std::runtime_error("Non-relocatable executable dependency: " + name);
+        }
+        production.map->bind_image(image);
+        const auto report_text = audit::json(report) + '\n';
+        if (report_text.size() > audit_report_byte_limit)
+            throw std::runtime_error("Binary audit report exceeds the publication size limit.");
+        write_package_file(stage / "binary-audit.json", report_text, reader);
+        write_package_file(stage / metadata_name, analysis.application_metadata()->bytes(), reader);
+        const auto files = package_inventory(stage, true, reader, true);
+        const auto inventory = std::string("VOID native publication 1\ntarget ") + plan.target() +
+            "\nprofile " + plan.profile() + "\nbuild " + production.map->build_id() + "\n" + files;
+        write_package_file(stage / inventory_name, inventory, reader);
+        if (files != package_inventory(stage, false, reader, true))
+            throw std::runtime_error("Publication file inventory changed before delivery.");
+
+        const auto private_root = root / ".void" / "publish-diagnostics";
+        const auto archive_name = production.map->image_sha256();
+        const auto map = production.map->encode();
+#if defined(__APPLE__)
+        constexpr auto symbol_file = "app.dwarf";
+#elif defined(_WIN32)
+        constexpr auto symbol_file = "app.unstripped.exe";
+#else
+        constexpr auto symbol_file = "app.debug";
+#endif
+        std::map<std::string, std::string_view> private_files{{"diagnostics.vdiag", map}};
+        if (!production.symbols.empty()) private_files.emplace(symbol_file, production.symbols);
+        project::with_user_package_store(private_root, true, [&](const project::CreationRoot& destination) {
+            project::publish_project_directory(destination, archive_name, private_files,
+                [&](const fs::path& candidate, const project::ProjectDirectoryReader& private_reader) {
+                    for (const auto& [name, bytes] : private_files)
+                        if (private_reader.read(candidate / utf8_path(name), bytes.size()) != bytes)
+                            throw std::runtime_error("Private diagnostic archive differs for the same image.");
+                }, {}, {}, true);
+            archive = destination.path / utf8_path(archive_name);
+        }, true);
+    }, {});
+    std::cout << "Published application: " << path_utf8(actual_output) << '\n';
+    return archive;
+#else
+    (void)project_analysis; (void)plan; (void)argv0;
+    throw std::runtime_error("Publishing requires Linux x64 GNU, Windows x64 MSVC or macOS ARM64.");
+#endif
+}
+
+void verify_native_publication(const fs::path& directory, std::string_view host) {
+#ifdef VOID_NATIVE_PUBLISHING
+#ifdef _WIN32
+    require_package_path_spelling(directory);
+#endif
+    const auto root = project::inspect_creation_root(directory).path;
+    const auto receipt = project::read_project_input(root / inventory_name, inventory_byte_limit);
+    std::istringstream rows(receipt);
+    std::string magic, target, profile, build;
+    if (!std::getline(rows, magic) || !std::getline(rows, target) || !std::getline(rows, profile) ||
+        !std::getline(rows, build) || magic != "VOID native publication 1" ||
+        target != "target " + std::string(host) ||
+        (profile != "profile release" && profile != "profile performance") ||
+        !build.starts_with("build ") || !hex_digest(std::string_view(build).substr(6)))
+        throw std::runtime_error("Invalid native publication inventory for the current host.");
+    const std::string recorded{std::istreambuf_iterator<char>(rows), {}};
+    if (recorded != package_inventory(root, false, {}, true))
+        throw std::runtime_error("Native publication inventory mismatch. A file is missing, changed or unexpected.");
+    const auto image = project::read_project_input(root / executable_name, audit::byte_limit);
+    const auto report = audit::inspect(image, {2, std::string(host), true, true, true, {}});
+    if (!report.inspected || !report.findings.empty() ||
+        project::read_project_input(root / "binary-audit.json", audit_report_byte_limit) != audit::json(report) + '\n')
+        throw std::runtime_error("Native publication binary audit mismatch.");
+    (void)ApplicationMetadata::decode(project::read_project_input(root / metadata_name, ApplicationMetadata::byte_limit));
+#else
+    (void)directory; (void)host;
+    throw std::runtime_error("Native publication verification is unavailable on this host.");
 #endif
 }
 

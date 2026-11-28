@@ -245,32 +245,26 @@ try:
         p = command([compiler, 'publish', '--project', project, '--entry', '/main.void'])
         check(p.returncode != 0 and b'exact project-relative' in p.stderr,
               'drive-rooted Windows entry must reject during argument parsing')
-        for args in [[], ['--project', project], ['--project', project, '--target', 'linux-x64'],
-                     ['--project', project, '--profile', 'performance'], ['--target', 'linux-arm64'],
-                     ['--profile', 'debug'], ['--project', project, '--project', project],
+        for args in [['--target', 'linux-arm64'], ['--profile', 'debug'], ['--project', project, '--project', project],
                      ['--entry', '../main.void'], ['--allow-native'], ['main.void']]:
             before = sorted(p.relative_to(project).as_posix() for p in project.rglob('*'))
             out = root/'fresh output'
             p = command([compiler, 'publish', *args, '-o', out], cwd=project)
             check(p.returncode != 0 and not out.exists(), rows[-1])
-            if not args or args[:2] == ['--project', project] and len(args) in (2, 4) and '--project' not in args[2:]:
-                check(b'Publish capability unavailable' in p.stderr, rows[-1])
             check(before == sorted(p.relative_to(project).as_posix() for p in project.rglob('*')), 'rejection changed project')
-        p = command([compiler, 'publish', '--project', project], cwd=project)
-        check(p.returncode != 0 and not (project/'dist').exists(), rows[-1])
         existing = root/'existing'
         existing.mkdir()
         p = command([compiler, 'publish', '--project', project, '-o', existing])
         check(p.returncode != 0 and b'fresh directory' in p.stderr and not list(existing.iterdir()), rows[-1])
         toml.write_text(manifest.replace('schema=1', 'schema=2') + "[publish]\ntarget='windows-x64'\ndefault_profile='protected'\n")
         p = command([compiler, 'publish', '--project', project, '-o', root/'schema2'])
-        check(p.returncode != 0 and b'windows-x64/protected' in p.stderr and not (root/'schema2').exists(), rows[-1])
+        check(p.returncode != 0 and b'protected' in p.stderr and not (root/'schema2').exists(), rows[-1])
         library = manifest.replace("kind='application'", "kind='library'").replace("[application]\nid='org.test.app'", "[package]\nid='org.test.lib'\nname='fixture'")
         toml.write_text(library)
         p = command([compiler, 'publish', '--project', project, '-o', root/'library'])
         check(p.returncode != 0 and b'libraries are ineligible' in p.stderr.lower() and not (root/'library').exists(), rows[-1])
         for content in [None, 'schema=2\n[invalid', manifest.replace('schema=1', 'schema=3'),
-                        manifest.replace('schema=1', 'schema=2')+'[publish]\nlto="thin"\n']:
+                        manifest.replace('schema=1', 'schema=2')+'[publish]\nlto="full"\n']:
             if content is None:
                 toml.unlink()
             else:

@@ -9,7 +9,7 @@ namespace llvm { class Module; class TargetMachine; }
 
 namespace vd::detail {
 void initialize_native_target();
-std::unique_ptr<llvm::TargetMachine> native_aot_machine();
+std::unique_ptr<llvm::TargetMachine> native_aot_machine(bool split_sections = false);
 void write_object(llvm::Module&, llvm::TargetMachine&, const std::filesystem::path&);
 
 // LLVM's SDK/host triple describes the machine that built LLVM. Generated

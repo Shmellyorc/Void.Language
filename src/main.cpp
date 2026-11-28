@@ -5,6 +5,8 @@
 #include "void/path.hpp"
 #include "void/native_build.hpp"
 #include "void/publish.hpp"
+#include "void/binary_audit.hpp"
+#include "frontend/project_digest.hpp"
 #include <llvm/TargetParser/Triple.h>
 #include "void/native_import.hpp"
 #include "void/project_creation.hpp"
@@ -637,7 +639,7 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
             return 0;
         }
         if(argc==2 && std::string_view(argv[1])=="--capabilities") {
-            std::cout << "{\"schema\":1,\"cliPresentation\":1,\"statusPlain\":true,\"nativeApprovalStdio\":1,\"debugInfoOverride\":1,\"timingsSchema\":1,\"publishContract\":1,\"publishEmission\":false}\n";
+            std::cout << "{\"schema\":1,\"cliPresentation\":1,\"statusPlain\":true,\"nativeApprovalStdio\":1,\"debugInfoOverride\":1,\"timingsSchema\":1,\"publishContract\":1,\"publishEmission\":true}\n";
             return 0;
         }
         if(argc>=2 && std::string(argv[1])=="help") {
@@ -670,13 +672,48 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
         if(command=="publish") {
             std::vector<std::string_view> args;
             for(int i=2;i<argc;++i)args.emplace_back(argv[i]);
-            auto request=vd::publish::parse_arguments(args);
+            if (args.size() == 4 && args[0] == "--resolve-diagnostic") {
+                const auto map = vd::project::read_project_input(vd::utf8_path(args[1]), vd::diagnostics::map_byte_limit);
+                const auto image = vd::project::read_project_input(vd::utf8_path(args[2]), vd::audit::byte_limit);
+                std::string token(args[3]);
+                if (!token.ends_with('\n')) token += '\n';
+                const auto site = vd::diagnostics::PrivateMap::resolve(map, image, token);
+                std::cout << site.path << ':' << site.line << ':' << site.column << ": " << site.description
+                          << '\n' << site.function << '\n' << site.excerpt << '\n';
+                return 0;
+            }
             const llvm::Triple host(LLVM_DEFAULT_TARGET_TRIPLE);
             const auto target=host.isOSLinux() && host.getArch()==llvm::Triple::x86_64?"linux-x64":
                 host.isOSWindows() && host.getArch()==llvm::Triple::x86_64?"windows-x64":
                 host.isMacOSX() && host.getArch()==llvm::Triple::aarch64?"macos-arm64":"unqualified-host";
-            vd::publish::preflight(request,target);
-            return 1; // Stage A preflight always fails closed.
+            if (args.size() == 2 && args[0] == "--verify") {
+                vd::verify_native_publication(vd::utf8_path(args[1]), target);
+                std::cout << "Native publication verified.\n";
+                return 0;
+            }
+            auto request=vd::publish::parse_arguments(args);
+            vd::project::require_outside_user_package_store(request.project);
+            const auto plan = vd::publish::preflight(request,target);
+            auto result = vd::analyze_manifest_project_with_native_approval(request.project, plan.entry(),
+                [&](const vd::ManagedNativeApprovalSubject& subject) -> std::filesystem::path {
+                    const auto& identity = subject.dependencies.native_catalog_identity();
+                    if (request.native_catalog != identity)
+                        throw vd::NativeApprovalRequired("Review redistribution rights and native catalog contents. "
+                            "Publish requires --native-catalog " + identity + " for this exact catalog.");
+                    return {};
+                });
+            if (!result.succeeded()) throw vd::CompilationError(std::move(result.diagnostics));
+            vd::project::Digest manifest;
+            manifest.bytes(result.manifest->source().text());
+            if (manifest.finish() != plan.manifest_sha256())
+                throw std::runtime_error("Project manifest changed after publishing preflight. Retry.");
+            const auto& program = *result.project->program();
+            vd::require_source_entry(program);
+            for (const auto& warning : program.warnings()) std::cerr << vd::render_diagnostic(warning) << '\n';
+            vd::crash::context(vd::crash::Operation::aot_build);
+            const auto archive = vd::publish_native_application(*result.project, plan, argv[0]);
+            std::cout << "Private diagnostics: " << vd::path_utf8(archive) << '\n';
+            return 0;
         }
         if(command=="add" || command=="remove" || command=="tidy")return maintain_project(command,argc,argv,executable);
         if(command=="resolve")return resolve_project(argc,argv);
@@ -770,6 +807,8 @@ static int execute_cli(int argc, char** argv, vd::cli::Presentation& presentatio
                     presentation_options.output=vd::utf8_path(argv[i]);
                 }
             }
+            else if(arg=="--portable" && command=="build")
+                throw UsageError("Use voidc publish --portable --project DIR to produce a portable distribution.");
             else if(arg=="--no-opt") {if(no_opt)throw UsageError("Duplicate --no-opt.");no_opt=true;optimize=false;}
             else if(arg=="--cache") {if(cache)throw UsageError("Duplicate --cache.");cache=true;optimize=false;}
             else if(arg=="--no-cache") {if(no_cache)throw UsageError("Duplicate --no-cache.");no_cache=true;}

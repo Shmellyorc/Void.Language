@@ -52,6 +52,11 @@ private value struct _reply:
     native_domain: string
 
 
+private value struct _embedded_reply:
+    kind: i64
+    bytes: [u8]
+
+
 private func _kind(code: i64) -> error_kind:
     if code as? error_kind is Some(var decoded):
         return decoded
@@ -280,6 +285,19 @@ func resource_dir() -> result<string, error>:
         return Ok(reply.text)
     var image = _text("os.resource_dir", _os_executable())?
     return _adapt("os.resource_dir", path.parent(image))
+
+## Copy a named embedded publication asset into an independent byte list.
+## Names are exact manifest paths such as assets/logo.png. This API does no filesystem I/O.
+## Returns unavailable when the executable has no embedded resource table.
+func embedded_resource(name: string) -> result<[u8], error>:
+    var reply = _os_embedded_resource(name)
+    if reply.kind == 1:
+        return Err(error(message = "os.embedded_resource: asset is absent", operation = "os.embedded_resource",
+            code = 1, kind = error_kind.not_found))
+    if reply.kind != 0:
+        return Err(_error("os.embedded_resource", _reply(kind = reply.kind)))
+    return Ok(reply.bytes)
+
 
 
 ## Read one environment value at execution time; native environment mutation must be quiescent.

@@ -70,10 +70,9 @@ struct NativeRequirement {
     SemanticVersion version;
     unsigned abi = 0;
 };
-// Schema 2 contract only. No optimization, protection or packaging capability
-// is enabled by these defaults; unknown publish fields are rejected.
+// Production settings are separate from development build profiles.
 struct Publishing {
-    std::optional<std::string> target, default_profile;
+    std::optional<std::string> target, default_profile, output, optimization, resources, symbols, lto;
 };
 
 inline constexpr std::size_t native_catalog_byte_limit = 32 * 1024;

@@ -238,7 +238,7 @@ if(VOID_SANITIZERS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT MSVC)
       "VOID_${entry_kind}_SANITIZER_MAGIC=${CMAKE_MATCH_1}" "VOID_${entry_kind}_SANITIZER_HASH=${CMAKE_MATCH_2}")
   endforeach()
 endif()
-set(VOID_LLVM_COMPONENTS Core Support native OrcJIT Passes Target MC Object CodeGen)
+set(VOID_LLVM_COMPONENTS Core Support native OrcJIT Passes Target MC Object CodeGen BitWriter)
 if(VOID_LLVM_RESEARCH)
   list(APPEND VOID_LLVM_COMPONENTS MCDisassembler)
 endif()
@@ -494,6 +494,14 @@ if(BUILD_TESTING)
     "${PROJECT_SOURCE_DIR}/tests/project/publish_fixtures.py" "$<TARGET_FILE:void_publish_foundation>"
     "$<TARGET_FILE:voidc>" "${LLVM_TOOLS_BINARY_DIR}/llvm-readobj${CMAKE_EXECUTABLE_SUFFIX}")
   set_tests_properties(publish_binary_fixtures PROPERTIES TIMEOUT 60)
+  if((CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64)$") OR
+     (WIN32 AND MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64)$") OR
+     (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$"))
+    add_test(NAME publish_native_application COMMAND "${Python3_EXECUTABLE}"
+      "${PROJECT_SOURCE_DIR}/tests/project/native_publication.py" "$<TARGET_FILE:voidc>" "${LLVM_TOOLS_BINARY_DIR}")
+    set_tests_properties(publish_native_application PROPERTIES TIMEOUT 180)
+  endif()
+
   add_test(NAME project_dependencies COMMAND "${Python3_EXECUTABLE}"
     "${PROJECT_SOURCE_DIR}/tests/project/dependencies.py" "$<TARGET_FILE:voidc>" "${CMAKE_C_COMPILER}")
   set_tests_properties(project_dependencies PROPERTIES TIMEOUT 300)

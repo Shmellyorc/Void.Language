@@ -1,4 +1,18 @@
                 case Op::os_query: {
+                    if (instruction.immediate == static_cast<unsigned>(os::Operation::embedded_resource)) {
+                        auto* reply = llvm::cast<llvm::StructType>(type(instruction.type));
+                        auto* output = value_roots[n].at(values.size());
+                        b.CreateStore(llvm::Constant::getNullValue(reply), output);
+                        auto copy = module->getOrInsertFunction("vd_os_embedded_resource", b.getInt64Ty(),
+                            b.getPtrTy(), b.getPtrTy(), b.getPtrTy(), size_type, b.getPtrTy());
+                        auto* status = b.CreateCall(copy,
+                            {b.CreateStructGEP(reply, output, 1), values[instruction.arguments[0]],
+                             resource_table, llvm::ConstantInt::get(size_type, resource_count), failure});
+                        b.CreateStore(status, b.CreateStructGEP(reply, output, 0));
+                        selected_failure();
+                        v = b.CreateLoad(reply, output);
+                        break;
+                    }
                     auto scalar = instruction.immediate == static_cast<unsigned>(os::Operation::process_id);
                     llvm::Constant* record = llvm::ConstantPointerNull::get(b.getPtrTy());
                     if (!scalar) {

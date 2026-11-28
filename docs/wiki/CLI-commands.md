@@ -21,6 +21,7 @@ voidc --help
 voidc check --help
 voidc run --help
 voidc build --help
+voidc publish --help
 voidc new --help
 voidc add --help
 ```
@@ -51,6 +52,18 @@ cache persistence, not optimization. `run --cache` selects compatible Debug code
 and conflicts with `--no-cache`; do not combine it with an explicit incompatible
 profile. Quote paths containing spaces. Use `--` before dash-leading source paths,
 and before application arguments to `run`.
+
+## Publish a production distribution
+
+```sh
+voidc publish --project MyGame --resources embed -o dist/game
+voidc publish --verify dist/game
+```
+
+Publish uses the current native host and creates a fresh directory. Keep the
+matching private diagnostics and optional debug data with the original shipped
+image. See the [production publishing reference](https://github.com/Shmellyorc/Void.Language/blob/main/docs/CLI.md#production-publishing)
+for settings, asset lookup, native library support and offline diagnosis.
 
 ## Maintain dependencies
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "void/ir.hpp"
+#include "void/backend.hpp"
 
 namespace llvm { class DataLayout; class LLVMContext; class Module; class TargetMachine; }
 
@@ -19,9 +19,9 @@ std::unique_ptr<llvm::Module> lower(const ir::Module&, llvm::LLVMContext&, const
     std::vector<NominalDescriptor>* host_catalog = nullptr,
     std::vector<InterfaceWitness>* host_witnesses = nullptr,
     LoweringInventory* = nullptr, bool fixed_call_research = false,
-    std::optional<project::DebugInfo> = {}, bool optimized = false, diagnostics::PrivateMap* = nullptr);
+    std::optional<project::DebugInfo> = {}, bool optimized = false, diagnostics::PrivateMap* = nullptr, const PublicationResources* = nullptr);
 
 void finish(llvm::Module&, bool optimize, llvm::TargetMachine* analysis_machine = nullptr,
-            bool version_loops = false);
+            bool version_loops = false, bool size = false, bool thin_lto = false);
 }
 }

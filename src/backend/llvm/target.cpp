@@ -19,13 +19,16 @@ void initialize_native_target() {
     });
 }
 
-std::unique_ptr<llvm::TargetMachine> native_aot_machine() {
+std::unique_ptr<llvm::TargetMachine> native_aot_machine(bool split_sections) {
     const auto triple = detail::native_deployment_triple(llvm::Triple(llvm::sys::getDefaultTargetTriple()));
     std::string error;
     auto* target = llvm::TargetRegistry::lookupTarget(triple, error);
     if (!target) throw std::runtime_error(error);
+    llvm::TargetOptions options;
+    options.FunctionSections = split_sections;
+    options.DataSections = split_sections;
     std::unique_ptr<llvm::TargetMachine> machine(target->createTargetMachine(triple, "generic", "",
-        llvm::TargetOptions(), llvm::Reloc::PIC_));
+        options, llvm::Reloc::PIC_));
     if (!machine) throw std::runtime_error("cannot create native target machine");
     return machine;
 }

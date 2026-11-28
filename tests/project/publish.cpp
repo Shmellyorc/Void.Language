@@ -33,7 +33,7 @@ int main(int argc,char** argv) {
         auto v2text=app;v2text.replace(7,1,"2");
         auto v2=parse(v2text+"[publish]\ntarget='windows-x64'\ndefault_profile='protected'\n");
         check(v2.succeeded() && v2.manifest->schema()==2,"schema 2");
-        for(const auto& suffix: {"[publish]\nlto='thin'\n","[publish.profiles.release]\noptimization='O2'\n","[publish]\ntarget='linux-arm64'\n","[publish]\ndefault_profile='debug'\n","[publish]\ncrypto='secret'\n","[publish]\ntarget=4\n","[publish]\ntarget='linux-x64'\ntarget='windows-x64'\n","[publish.unknown]\n"})
+        for(const auto& suffix: {"[publish]\nlto='full'\n","[publish.profiles.release]\noptimization='O2'\n","[publish]\ntarget='linux-arm64'\n","[publish]\ndefault_profile='debug'\n","[publish]\ncrypto='secret'\n","[publish]\ntarget=4\n","[publish]\ntarget='linux-x64'\ntarget='windows-x64'\n","[publish.unknown]\n"})
             check(!parse(v2text+suffix).succeeded(),"unknown schema 2 capability rejected");
         check(!parse(app+"[publish]\ntarget='linux-x64'\n").succeeded(),"schema 1 rejects publish");
         for(const auto& args:std::vector<std::vector<std::string_view>>{{"main.void"},{"."},{"--"},{"--target","linux-arm64"},{"--target","linux-x64","--target","linux-x64"},{"--profile","debug"},{"--profile","release","--profile","protected"},{"--allow-native"},{"--reuse-native-approval"},{"--project"},{"--entry","../main.void"},{"--entry","/main.void"},{"--entry","C:/main.void"},{"-o","x","-o","y"},{"--project","x","main.void"},{"--entry","a//b.void"}})
@@ -48,10 +48,13 @@ int main(int argc,char** argv) {
         auto request=parse_arguments(std::vector<std::string_view>{"--target","macos-arm64","--profile","performance","--entry","src/main.void","-o","new output"});
         auto overridden=plan_contract(request,*v2.manifest,"linux-x64");
         check(overridden.target()=="macos-arm64" && overridden.profile()=="performance" && overridden.entry()=="src/main.void","CLI overrides");
-        for(auto target:{"linux-x64","windows-x64","macos-arm64"})for(auto profile:{"release","performance","protected"}) {
-            Request r;r.target=target;r.profile=profile;auto p=plan_contract(r,*v1.manifest,"linux-x64");
-            rejected([&]{require_capabilities(p);},"all target/profile capabilities unavailable");
-        }
+        auto configured_settings = parse(v2text + "[publish]\noutput='dist/custom'\noptimization='none'\nresources='embed'\nsymbols='none'\n");
+        check(configured_settings.succeeded(), "schema 2 production settings");
+        auto settings = plan_contract(parse_arguments(std::vector<std::string_view>{"--portable", "--optimization", "size"}),
+                                      *configured_settings.manifest, "linux-x64");
+        check(settings.output() == "./dist/custom" && settings.optimization() == "size" &&
+              settings.resources() == "embed" && settings.symbols() == "none", "CLI settings override manifest defaults");
+        check(overridden.optimization() == "speed", "performance profile defaults to speed");
         const auto lib="schema=1\n[project]\nid='org.test.sources'\nname='Fixture'\nversion='1.0.0'\nkind='library'\n[package]\nid='org.test.lib'\nname='fixture'\n";
         auto library=parse(lib);check(library.succeeded(),"valid library");rejected([&]{(void)plan_contract({},*library.manifest,"linux-x64");},"library ineligible");
         auto native=parse(app+"[native-requirements.raylib]\nid='org.void.raylib'\nversion='=1.0.0'\nabi=3\n");

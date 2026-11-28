@@ -112,7 +112,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-install-$<CONFIG>.txt" DESTINA
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/native-resources-install-$<CONFIG>.txt"
   DESTINATION bin RENAME void-native-resources.txt COMPONENT compiler)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (WIN32 AND MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$"))
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR (APPLE AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$") OR (WIN32 AND MSVC AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(AMD64|amd64|x86_64)$"))
   # Use the existing compiler install's notice files, with independent hashes
   # and distinct distribution names for files with the same upstream basename.
   set(package_notices_build "VOID package notices 1\n")

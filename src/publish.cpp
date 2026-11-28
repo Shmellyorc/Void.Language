@@ -2,6 +2,7 @@
 #include "void/path.hpp"
 #include "frontend/project_digest.hpp"
 #include "frontend/project_files.hpp"
+#include <algorithm>
 #include <set>
 #include <stdexcept>
 
@@ -19,7 +20,13 @@ Request parse_arguments(std::span<const std::string_view> args) {
     std::set<std::string_view> seen;
     for (std::size_t i = 0; i < args.size(); ++i) {
         const auto key = args[i];
-        if (key != "--project" && key != "--entry" && key != "--target" && key != "--profile" && key != "-o")
+        if (key == "--portable") {
+            if (!seen.insert(key).second) throw std::invalid_argument("Duplicate publish argument: --portable");
+            continue;
+        }
+        if (key != "--project" && key != "--entry" && key != "--target" && key != "--profile" &&
+            key != "--optimization" && key != "--resources" && key != "--symbols" &&
+            key != "--native-catalog" && key != "--lto" && key != "-o")
             throw std::invalid_argument("Unsupported publish argument: " + std::string(key) + ". Use --project DIR; publish accepts no source operand or native consent flag.");
         if (!seen.insert(key).second) throw std::invalid_argument("Duplicate publish argument: " + std::string(key));
         if (++i == args.size() || args[i].empty() || args[i].starts_with('-') || args[i].find('\0') != args[i].npos)
@@ -40,6 +47,25 @@ Request parse_arguments(std::span<const std::string_view> args) {
         } else if (key == "--profile") {
             if (!profile_name(value)) throw std::invalid_argument("Unsupported publish profile: " + std::string(value));
             request.profile = value;
+        } else if (key == "--optimization") {
+            if (value != "none" && value != "size" && value != "speed")
+                throw std::invalid_argument("Expected --optimization none|size|speed.");
+            request.optimization = value;
+        } else if (key == "--resources") {
+            if (value != "embed" && value != "files")
+                throw std::invalid_argument("Expected --resources embed|files.");
+            request.resources = value;
+        } else if (key == "--symbols") {
+            if (value != "private" && value != "none")
+                throw std::invalid_argument("Expected --symbols private|none.");
+            request.symbols = value;
+        } else if (key == "--lto") {
+            if (value != "none" && value != "thin") throw std::invalid_argument("Expected --lto none|thin.");
+            request.lto = value;
+        } else if (key == "--native-catalog") {
+            if (value.size() != 64 || value.find_first_not_of("0123456789abcdef") != value.npos)
+                throw std::invalid_argument("Expected the exact lowercase SHA-256 native catalog identity.");
+            request.native_catalog = value;
         } else request.output = utf8_path(value);
     }
     return request;
@@ -53,7 +79,12 @@ PublishPlan::PublishPlan(const Request& request, const project::Manifest& manife
     entry_ = request.entry ? request.entry : manifest.entry();
     if (!target_name(target_)) throw std::invalid_argument("Unsupported publish target: " + target_);
     if (!profile_name(profile_)) throw std::invalid_argument("Unsupported publish profile: " + profile_);
-    output_ = request.output.value_or(request.project / "dist" / manifest.application()->id / target_ / profile_);
+    output_ = request.output.value_or(request.project / (config.output ? utf8_path(*config.output) :
+        std::filesystem::path("dist") / manifest.application()->id / target_ / profile_));
+    optimization_ = request.optimization.value_or(config.optimization.value_or(profile_ == "performance" ? "speed" : "size"));
+    resources_ = request.resources.value_or(config.resources.value_or("files"));
+    symbols_ = request.symbols.value_or(config.symbols.value_or("private"));
+    lto_ = request.lto.value_or(config.lto.value_or("none"));
     project::Digest digest; digest.bytes(manifest.source().text()); manifest_sha256_ = digest.finish();
     required_capabilities_ = {"admitted-project-snapshot", "native-target:" + target_, "private-diagnostics", "final-bundle-audit", "fresh-directory-transaction"};
     if (!manifest.dependencies().empty()) required_capabilities_.push_back("verified-dependency-lock");
@@ -65,21 +96,29 @@ PublishPlan::PublishPlan(const Request& request, const project::Manifest& manife
 PublishPlan plan_contract(const Request& request, const project::Manifest& manifest, std::string_view host) {
     return PublishPlan(request, manifest, host);
 }
-void require_capabilities(const PublishPlan& plan) {
-    throw std::runtime_error("Publish capability unavailable in Stage A for " + plan.target() + "/" + plan.profile() +
-        "; no target is qualified and no output was created. Native approvals, dependency admission and final-binary gates require separate review.");
-}
-void preflight(const Request& request, std::string_view host) {
-    // Reuse the compiler's bounded manifest reader and root alias admission.
+PublishPlan preflight(const Request& request, std::string_view host) {
     const auto root = project::inspect_creation_root(request.project);
     const auto path = root.path / "void.project.toml";
     auto parsed = project::parse_manifest(SourceFile(path_utf8(path), project::read_project_input(path, project::manifest_byte_limit)));
     if (!parsed.succeeded()) throw CompilationError(std::move(parsed.diagnostics));
-    auto plan = plan_contract(request, *parsed.manifest, host);
+    Request physical = request;
+    physical.project = root.path;
+    auto plan = plan_contract(physical, *parsed.manifest, host);
+    if (plan.target() != host)
+        throw std::invalid_argument("Publishing target " + plan.target() + "/" + plan.profile() +
+            " requires its matching native host. Current host: " + std::string(host) + ".");
+    if (plan.profile() == "protected")
+        throw std::invalid_argument("The protected publishing profile has no approved obfuscation policy. Use release or performance.");
+    if (plan.thin_lto() && (plan.target() != "linux-x64" || plan.optimization() == "none"))
+        throw std::invalid_argument("Publishing ThinLTO requires Linux x64 and optimization size or speed.");
+    if (!parsed.manifest->native().empty())
+        throw std::invalid_argument("Publish requires verified managed native catalogs with redistribution notices.");
+    if (request.native_catalog && !parsed.manifest->native_requirement())
+        throw std::invalid_argument("--native-catalog requires a managed native provider.");
     std::error_code ec;
     auto status = std::filesystem::symlink_status(plan.output(), ec);
     if (ec && ec != std::errc::no_such_file_or_directory) throw std::runtime_error("Cannot inspect publish output destination.");
     if (std::filesystem::exists(status)) throw std::invalid_argument("Publish output must be a fresh directory; replacement is unavailable.");
-    require_capabilities(plan);
+    return plan;
 }
 }

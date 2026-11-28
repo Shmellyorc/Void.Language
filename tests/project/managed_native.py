@@ -339,6 +339,27 @@ with tempfile.TemporaryDirectory(prefix="VOID D4 雪 ") as temporary:
         assert (working / marker.name).read_text().splitlines() == ["dependency initialized"]
         assert (working / released.name).read_text().splitlines() == ["-2", "23"]
 
+    if packaging:
+        distribution = base / "native publication"
+        catalog_id = digest(config)
+        cli("publish", "-o", distribution, status=2, message="--native-catalog " + catalog_id)
+        assert not distribution.exists()
+        cli("publish", "--native-catalog", catalog_id, "--symbols", "none", "-o", distribution)
+        run(compiler, "publish", "--verify", distribution)
+        no_initializers()
+        assert {p.name: digest(p) for p in (distribution / "native").iterdir()} == {
+            p.name: digest(p) for p in [*images, notice]
+        }
+        moved = base / "relocated native publication"
+        relocate(distribution, moved)
+        parked = base / "unavailable native catalog"
+        relocate(catalog, parked)
+        try:
+            executed(moved / ("app.exe" if windows else "app"), "payload")
+        finally:
+            relocate(parked, catalog)
+        reset_markers()
+
     for profile in ("debug", "release"):
         executed(compiler, "run", "--project", project, "--allow-native", "--no-cache", "--profile", profile,
                  "--", "payload")

@@ -6,6 +6,7 @@
 #include <llvm/Object/MachO.h>
 #include <llvm/Support/JSON.h>
 #include <llvm/Support/raw_ostream.h>
+#include <algorithm>
 #include <map>
 #include <stdexcept>
 
@@ -36,7 +37,7 @@ std::string cstring(std::string_view s, std::uint64_t offset) {
 // COFF dependency-name accessors use C strings. Validate their terminators in
 // file-backed RVA ranges before LLVM can inspect them; caller bytes need not
 // carry an accessible sentinel beyond the supplied string_view.
-void pe_bounds(std::string_view bytes) {
+void pe_bounds(std::string_view bytes, Report& report) {
     bounded(bytes,0,64);
     const auto pe=number(bytes,60,4);bounded(bytes,pe,24);
     if(bytes.substr(pe,4)!=std::string_view("PE\0\0",4)) throw Invalid("Invalid PE signature.");
@@ -66,6 +67,40 @@ void pe_bounds(std::string_view bytes) {
         if(!result) throw Invalid("Unmapped PE dependency RVA.");
         return *result;
     };
+    if (directories) {
+        const auto rva = number(bytes, optional + 112, 4), size = number(bytes, optional + 116, 4);
+        if (rva || size) {
+            if (!rva || size < 40) throw Invalid("Incomplete PE export directory.");
+            const auto directory = mapped(rva);
+            bounded(directory, 0, size);
+            const auto base = number(directory, 16, 4), functions = number(directory, 20, 4), names = number(directory, 24, 4);
+            if (functions > record_limit || names > record_limit) throw Limited("PE export table budget exceeded.");
+            if (names > functions) throw Invalid("Invalid PE export counts.");
+            if (functions) {
+                const auto addresses = mapped(number(directory, 28, 4));
+                bounded(addresses, 0, functions * 4);
+                std::vector<bool> named(functions);
+                if (names) {
+                    const auto name_table = mapped(number(directory, 32, 4));
+                    const auto ordinal_table = mapped(number(directory, 36, 4));
+                    bounded(name_table, 0, names * 4);
+                    bounded(ordinal_table, 0, names * 2);
+                    for (std::size_t i = 0; i < names; ++i) {
+                        const auto ordinal = number(ordinal_table, i * 2, 2);
+                        if (ordinal >= functions || !number(addresses, ordinal * 4, 4))
+                            throw Invalid("Invalid PE named export ordinal.");
+                        auto name = cstring(mapped(number(name_table, i * 4, 4)), 0);
+                        if (name.empty()) throw Invalid("Empty PE export name.");
+                        report.exports.push_back(std::move(name));
+                        named[ordinal] = true;
+                    }
+                }
+                for (std::size_t i = 0; i < functions; ++i)
+                    if (number(addresses, i * 4, 4) && !named[i])
+                        report.exports.push_back("#" + std::to_string(base + i));
+            }
+        }
+    }
     std::size_t budget=0;
     for(const auto index:{1u,13u}) {
         if(index>=directories) continue;
@@ -271,7 +306,7 @@ Report inspect(std::string_view bytes, const Policy& policy) {
             if(number(bytes,pe+6,2)>record_limit) throw Limited("PE section budget exceeded.");
             const auto optional=pe+24;bounded(bytes,optional,2);
             if(number(bytes,optional,2)!=0x20b) {finding("unsupported-format","Require a PE32+ image.");return report;}
-            pe_bounds(bytes);
+            pe_bounds(bytes, report);
         }
         if(is_macho) {
             bounded(bytes,0,32);if(number(bytes,16,4)>record_limit) throw Limited("Mach-O command budget exceeded.");
@@ -281,7 +316,18 @@ Report inspect(std::string_view bytes, const Policy& policy) {
         auto object=checked(llvm::object::ObjectFile::createObjectFile(buffer));
         report.architecture=llvm::Triple::getArchTypeName(object->getArch()).str();
         if (auto* e=llvm::dyn_cast<llvm::object::ELFObjectFileBase>(object.get())) {
-            (void)e;report.format="ELF";elf(bytes,report);
+            report.format="ELF";elf(bytes,report);
+            std::size_t dynamic_budget = 0;
+            for (const auto& symbol : e->getDynamicSymbolIterators()) {
+                count(dynamic_budget);
+                const auto flags = checked(symbol.getFlags());
+                if (!(flags & (llvm::object::SymbolRef::SF_Undefined | llvm::object::SymbolRef::SF_Hidden)) &&
+                    (flags & llvm::object::SymbolRef::SF_Global)) {
+                    auto name = checked(symbol.getName());
+                    if (name.size() > 4096) throw Limited("ELF export name budget exceeded.");
+                    if (!name.empty()) report.exports.push_back(name.str());
+                }
+            }
         } else if(auto* pe=llvm::dyn_cast<llvm::object::COFFObjectFile>(object.get())) {
             report.format="PE";
             if(!pe->getPE32PlusHeader()) {finding("unsupported-format","Require a PE32+ image.");return report;}
@@ -292,7 +338,18 @@ Report inspect(std::string_view bytes, const Policy& policy) {
             for(const auto& dependency:pe->delay_import_directories()) {count(budget);llvm::StringRef name;check(dependency.getName(name));if(name.size()>4096)throw Limited("PE delay import name budget exceeded.");report.dependencies.push_back(name.str());}
             report.debug=!pe->debug_directories().empty();
             report.dynamic_symbols=!pe->import_directories().empty() || !pe->export_directories().empty();
-        } else if(auto* m=llvm::dyn_cast<llvm::object::MachOObjectFile>(object.get())) {report.format="Mach-O";macho(*m,bytes,report);}
+        } else if(auto* m=llvm::dyn_cast<llvm::object::MachOObjectFile>(object.get())) {
+            report.format="Mach-O";macho(*m,bytes,report);
+            auto error = llvm::Error::success();
+            for (const auto& entry : m->exports(error)) {
+                if (report.exports.size() >= record_limit || entry.name().size() > 4096) {
+                    llvm::consumeError(std::move(error));
+                    throw Limited("Mach-O export budget exceeded.");
+                }
+                report.exports.push_back(entry.name().str());
+            }
+            check(std::move(error));
+        }
         else {finding("unsupported-format","Object is outside supported image encodings.");return report;}
         std::size_t sections=0;
         for(const auto& section:object->sections()) {
@@ -339,6 +396,7 @@ Report inspect(std::string_view bytes, const Policy& policy) {
             if(retained) report.dynamic_symbols=true;
             else report.static_symbols=true;
         }
+        std::sort(report.exports.begin(), report.exports.end());
         report.inspected=true;
         const auto expected=policy.target=="macos-arm64"?"aarch64":"x86_64";
         const auto expected_format=policy.target=="linux-x64"?"ELF":policy.target=="windows-x64"?"PE":"Mach-O";
@@ -361,6 +419,45 @@ Report inspect(std::string_view bytes, const Policy& policy) {
       catch(const Invalid& error) {report.inspected=false;finding("malformed-image",error.what());}
     return report;
 }
+void remove_pe_debug_records(std::string& bytes) {
+    if (bytes.size() > byte_limit)
+        throw Limited("PE image exceeds the publishing byte budget.");
+    const auto parsed = checked(llvm::object::ObjectFile::createObjectFile({bytes, "<linked PE>"}));
+    const auto* pe = llvm::dyn_cast<llvm::object::COFFObjectFile>(parsed.get());
+    if (!pe || !pe->getPE32PlusHeader())
+        throw Invalid("Expected a linked PE32+ executable for debug record removal.");
+    const auto* directory = pe->getDataDirectory(llvm::COFF::DEBUG_DIRECTORY);
+    if (!directory || (!directory->RelativeVirtualAddress && !directory->Size)) return;
+    llvm::ArrayRef<std::uint8_t> table;
+    check(pe->getRvaAndSizeAsBytes(directory->RelativeVirtualAddress, directory->Size, table));
+    const auto count = table.size() / sizeof(llvm::object::debug_directory);
+    if (!count || count > record_limit || table.size() % sizeof(llvm::object::debug_directory))
+        throw Invalid("Invalid PE debug directory geometry.");
+    const auto table_offset = static_cast<std::size_t>(reinterpret_cast<const char*>(table.data()) - bytes.data());
+    std::vector<std::pair<std::size_t, std::size_t>> records;
+    for (const auto& record : pe->debug_directories()) {
+        const auto type = record.Type;
+        if (type != llvm::COFF::IMAGE_DEBUG_TYPE_CODEVIEW && type != llvm::COFF::IMAGE_DEBUG_TYPE_REPRO)
+            throw Invalid("Unexpected PE debug record type in a published application.");
+        if (!record.SizeOfData) continue;
+        if (!record.AddressOfRawData || !record.PointerToRawData)
+            throw Invalid("PE debug record has no file-backed payload.");
+        const auto offset = static_cast<std::size_t>(record.PointerToRawData);
+        const auto size = static_cast<std::size_t>(record.SizeOfData);
+        bounded(bytes, offset, size);
+        llvm::ArrayRef<std::uint8_t> data;
+        check(pe->getRvaAndSizeAsBytes(record.AddressOfRawData, record.SizeOfData, data));
+        if (data.data() != reinterpret_cast<const std::uint8_t*>(bytes.data() + offset))
+            throw Invalid("PE debug record RVA does not match its file offset.");
+        records.emplace_back(offset, size);
+    }
+    const auto directory_offset = static_cast<std::size_t>(reinterpret_cast<const char*>(directory) - bytes.data());
+    bounded(bytes, directory_offset, sizeof(*directory));
+    bounded(bytes, table_offset, table.size());
+    for (const auto& [offset, size] : records) std::fill_n(bytes.data() + offset, size, '\0');
+    std::fill_n(bytes.data() + table_offset, table.size(), '\0');
+    std::fill_n(bytes.data() + directory_offset, sizeof(*directory), '\0');
+}
 std::string json(const Report& r) {
     std::string result;llvm::raw_string_ostream stream(result);
     llvm::json::OStream out(stream);
@@ -370,7 +467,7 @@ std::string json(const Report& r) {
         out.attribute("symbols",r.symbols);out.attribute("debug",r.debug);
         out.attribute("static_symbols",r.static_symbols);out.attribute("dynamic_symbols",r.dynamic_symbols);out.attribute("unwind",r.unwind);
         auto strings=[&](const char* key,const auto& values){out.attributeArray(key,[&]{for(const auto& v:values)out.value(v);});};
-        strings("dependencies",r.dependencies);strings("versions",r.versions);strings("loader_paths",r.loader_paths);
+        strings("dependencies",r.dependencies);strings("versions",r.versions);strings("loader_paths",r.loader_paths);strings("exports",r.exports);
         out.attributeArray("findings",[&]{for(const auto& f:r.findings)out.object([&]{out.attribute("code",f.code);out.attribute("detail",f.detail);out.attribute("offset",f.offset);});});
     });
     return result;

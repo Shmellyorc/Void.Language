@@ -41,6 +41,7 @@
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Intrinsics.h>
 #include <llvm/IR/Module.h>
+#include <llvm/Transforms/Utils/ModuleUtils.h>
 #include <map>
 #include <stdexcept>
 
@@ -76,7 +77,8 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
                                   const std::string& suffix, const llvm::DataLayout& target_layout, const std::string& exported_entry,
                                   std::vector<NominalDescriptor>* host_catalog,std::vector<InterfaceWitness>* host_witnesses,
                                   llvm_backend::LoweringInventory* inventory,
-                                  bool fixed_call_research,std::optional<project::DebugInfo> source_debug,bool optimized,diagnostics::PrivateMap* private_map) {
+                                  bool fixed_call_research,std::optional<project::DebugInfo> source_debug,bool optimized,diagnostics::PrivateMap* private_map,
+                                  const PublicationResources* resources) {
     // Pure default DAGs are outlined into ordinary private typed-IR functions.
     // The normal shared lowerer supplies roots, failure cleanup and native ABI;
     // defaults execute once per element without expanding IR by array extent.
@@ -114,6 +116,31 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
     }
     auto module = std::make_unique<llvm::Module>(input.identity, context);
     module->setDataLayout(target_layout);
+    const auto resource_count = resources ? resources->size() : 0;
+    llvm::IRBuilder<> constants(context);
+    llvm::Constant* resource_table = llvm::ConstantPointerNull::get(constants.getPtrTy());
+    if (resource_count) {
+        auto* word = constants.getIntNTy(target_layout.getPointerSizeInBits());
+        auto* row = llvm::StructType::get(constants.getPtrTy(), word, constants.getPtrTy(), word);
+        const auto* geometry = target_layout.getStructLayout(row);
+        if (geometry->getSizeInBytes() != sizeof(os::EmbeddedResource) ||
+            geometry->getElementOffset(1) != offsetof(os::EmbeddedResource, name_size) ||
+            geometry->getElementOffset(2) != offsetof(os::EmbeddedResource, bytes) ||
+            geometry->getElementOffset(3) != offsetof(os::EmbeddedResource, size))
+            throw std::logic_error("Embedded resource table ABI mismatch.");
+        std::vector<llvm::Constant*> entries;
+        entries.reserve(resource_count);
+        for (const auto& [name, bytes] : *resources)
+            entries.push_back(llvm::ConstantStruct::get(row, {
+                constants.CreateGlobalString(name, "", 0, module.get()), llvm::ConstantInt::get(word, name.size()),
+                constants.CreateGlobalString(bytes, "", 0, module.get()), llvm::ConstantInt::get(word, bytes.size())}));
+        auto* rows = llvm::ArrayType::get(row, entries.size());
+        auto* table = new llvm::GlobalVariable(*module, rows, true, llvm::GlobalValue::PrivateLinkage,
+            llvm::ConstantArray::get(rows, entries), "vd.application.resources.v1");
+        resource_table = table;
+        llvm::appendToUsed(*module, {table});
+    }
+
 #ifdef VOID_LLVM_RESEARCH
     std::uint64_t home_serial=0;
 #else
@@ -2541,7 +2568,10 @@ std::unique_ptr<llvm::Module> lower(const ir::Module& source, llvm::LLVMContext&
         auto* failed = llvm::BasicBlock::Create(context, "globals.failed", wrapper);
         b.SetInsertPoint(start);
         auto* failure = wrapper->getArg(wrapper->arg_size() - 1);
-        auto contract = global_contract(input);
+        // A published image owns a single closed application. Bind its global
+        // state to the normalized build identity without serializing the JIT
+        // compatibility contract, which includes the physical project root.
+        auto contract = private_map ? "void.publish.globals.v1:" + private_map->build_id() : global_contract(input);
         auto* state = b.CreateCall(module->getOrInsertFunction("vd_globals_begin", b.getInt32Ty(), b.getPtrTy(), size_type, size_type, b.getPtrTy()),
             {b.CreateGlobalString(contract), llvm::ConstantInt::get(size_type, contract.size()), llvm::ConstantInt::get(size_type, input.globals.size()), failure});
         auto* dispatch = llvm::BasicBlock::Create(context, "globals.dispatch", wrapper);

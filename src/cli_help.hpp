@@ -13,7 +13,7 @@ inline constexpr std::array<HelpRow, 16> commands{{
     {"check", "Check source and imports."},
     {"run", "Compile and run through the JIT."},
     {"build", "Build a native executable."},
-    {"publish", "Validate publication contracts (emission unavailable)."},
+    {"publish", "Publish a native application distribution."},
     {"emit", "Write a native object."},
     {"init", "Add a project manifest."},
     {"new", "Create a project or manage templates."},
@@ -42,7 +42,9 @@ inline void usage(std::ostream& out, const std::string& command={}) {
     if(command.empty() || command=="run")out<<"Usage: voidc run [file-or-directory] [legacy-i32-input] [--no-opt] [--no-cache | --cache] [-- application-arguments...]\n";
     if(command.empty() || command=="build")out<<"Usage: voidc build [file-or-directory] [-o executable] [--no-opt]\n";
     if(command.empty() || command=="publish")out<<"Usage: voidc publish [--project DIR] [--entry RELATIVE.void] [--target linux-x64|windows-x64|macos-arm64] [--profile release|performance|protected] [-o NEW-DIRECTORY]\n"
-      "Stage A: all publishing capabilities are unavailable; no output is created. No native consent, uploads or signing.\n";
+      "       [--optimization none|size|speed] [--resources embed|files] [--symbols private|none] [--native-catalog SHA256] [--lto none|thin] [--portable]\n"
+      "       voidc publish --verify DIR\n"
+      "       voidc publish --resolve-diagnostic MAP IMAGE TOKEN\n";
     if(command.empty() || command=="package")out<<"Usage: voidc package [--project DIR] [--profile debug|release] [-o directory] [--allow-native] [--replace]\n"
       "       voidc package --verify DIR\n"
       "       voidc package list | voidc package search NAME\n"
@@ -219,6 +221,11 @@ Example: voidc check --project .
                 {"--", "Begin the bounded -I/-D/-U preprocessing argument vector."}
             }});
         }
+        if (command=="publish") std::cout << R"help(
+Publish to a fresh native-host distribution. The default profile is release.
+Managed native code needs the exact catalog SHA-256 and redistribution rights.
+Example: voidc publish --project . --resources embed -o dist/my-app
+)help";
         if (command=="native-bind") {
             options_title();
             help_rows(std::cout, std::array<HelpRow,1>{{{"-o NEW-OUTPUT", "Required fresh .c adapter or .void declarations."}}});

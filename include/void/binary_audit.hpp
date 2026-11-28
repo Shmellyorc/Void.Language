@@ -16,7 +16,7 @@ struct Report {
     unsigned schema = 1;
     bool inspected = false; // structural inspection, never closure/protection approval
     std::string format, architecture, image_kind, sha256, interpreter;
-    std::vector<std::string> dependencies, versions, loader_paths;
+    std::vector<std::string> dependencies, versions, loader_paths, exports;
     bool symbols = false, debug = false;
     bool static_symbols = false, dynamic_symbols = false, unwind = false;
     std::vector<Finding> findings;
@@ -28,4 +28,7 @@ inline constexpr std::size_t record_limit = 4096;
 // declarations only. Archives/universal images and other variants fail closed.
 Report inspect(std::string_view bytes, const Policy&);
 std::string json(const Report&);
+// Remove LLD's CodeView and reproducibility records after LLVM strips DWARF.
+// Changes only those data records and their PE directory declaration.
+void remove_pe_debug_records(std::string&);
 }

@@ -46,7 +46,7 @@ for args in ([], ['--help'], ['-h'], ['help']):
         assert command in result.stdout.decode()
 version = run(['--version'], out='LLVM 23.1.4')
 assert b'VOID Language Compiler v0.1.0 (development)' in version.stdout and b'Target:' in version.stdout
-for command in ('crashes', 'check', 'run', 'build', 'emit', 'init', 'new', 'add', 'remove', 'tidy', 'resolve', 'deps', 'package', 'native', 'native-bind'):
+for command in ('crashes', 'check', 'run', 'build', 'publish', 'emit', 'init', 'new', 'add', 'remove', 'tidy', 'resolve', 'deps', 'package', 'native', 'native-bind'):
     for args in ([command, '--help'], [command, '-h'], ['help', command]):
         result = run(args, out='Usage: voidc ' + command)
         assert b'Example' in result.stdout and not result.stderr
@@ -55,10 +55,10 @@ for command in ('crashes', 'check', 'run', 'build', 'emit', 'init', 'new', 'add'
 # Top-level columns come from the command inventory, not literal padding.
 help_lines = full_help.decode().splitlines()
 rows = [line for line in help_lines[help_lines.index('Commands:')+1:help_lines.index('Options:')] if line]
-assert len(rows) == 17  # Includes the fail-closed Stage A publish contract.
+assert len(rows) == 17
 assert {re.match(r'  (\S+)( +)(.+)', line).start(3) for line in rows} == {15}
 assert all('\t' not in line for line in rows)
-for command, flags in {'run': ['--cache', '--no-cache'], 'build': ['-o PATH', '--no-opt'],
+for command, flags in {'run': ['--cache', '--no-cache'], 'build': ['-o PATH', '--no-opt'], 'publish': ['--portable', '--resources', '--verify'],
                        'add': ['--path', '--registered', '--edit-token'], 'deps': ['--for-edit'],
                        'native-bind': ['.void']}.items():
     output = run([command, '--help']).stdout.decode()

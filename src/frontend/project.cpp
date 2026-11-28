@@ -675,17 +675,34 @@ public:
         else {
             fields(root, "", {"schema", "project", "application", "package", "sources", "build", "dependencies", "native", "native-requirements", "publish"});
             if (auto* publishing = table(root, "publish")) {
-                fields(*publishing, "publish", {"target", "default_profile"});
+                fields(*publishing, "publish", {"target", "default_profile", "output", "optimization", "resources", "symbols", "lto"});
                 if (auto target = text(*publishing, "target", false)) {
                     if (*target != "linux-x64" && *target != "windows-x64" && *target != "macos-arm64")
-                        fail(Code::project_reserved, span(publishing->get("target")->source()), "Unsupported publishing target.", "Stage A recognizes linux-x64, windows-x64 and macos-arm64 contracts; emission remains unavailable.");
+                        fail(Code::project_reserved, span(publishing->get("target")->source()), "Unsupported publishing target.", "Use linux-x64, windows-x64 or macos-arm64.");
                     else manifest_->publishing_.target = *target;
                 }
                 if (auto profile = text(*publishing, "default_profile", false)) {
                     if (*profile != "release" && *profile != "performance" && *profile != "protected")
-                        fail(Code::project_reserved, span(publishing->get("default_profile")->source()), "Unsupported publishing profile.", "Use release, performance or protected; Stage A enables no profile capability.");
+                        fail(Code::project_reserved, span(publishing->get("default_profile")->source()), "Unsupported publishing profile.", "Use release, performance or protected.");
                     else manifest_->publishing_.default_profile = *profile;
                 }
+                if (auto output = text(*publishing, "output", false)) {
+                    if (!relative_path(*output, false))
+                        fail(Code::project_path, span(publishing->get("output")->source()), "Invalid publishing output.", "Use a normalized project-relative directory.");
+                    else manifest_->publishing_.output = *output;
+                }
+                auto setting = [&](std::string_view key, std::initializer_list<std::string_view> allowed,
+                                   std::optional<std::string>& destination) {
+                    if (auto value = text(*publishing, key, false)) {
+                        if (std::find(allowed.begin(), allowed.end(), *value) == allowed.end())
+                            fail(Code::project_reserved, span(publishing->get(key)->source()), "Unsupported publishing " + std::string(key) + ".", "Choose a supported publishing setting.");
+                        else destination = std::move(value);
+                    }
+                };
+                setting("optimization", {"none", "size", "speed"}, manifest_->publishing_.optimization);
+                setting("resources", {"embed", "files"}, manifest_->publishing_.resources);
+                setting("symbols", {"private", "none"}, manifest_->publishing_.symbols);
+                setting("lto", {"none", "thin"}, manifest_->publishing_.lto);
             }
         }
         auto* project = table(root, "project", true);

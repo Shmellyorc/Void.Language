@@ -502,6 +502,111 @@ authorization commands, see [Bundled raylib](NATIVE_LIBRARIES.md#bundled-raylib)
 
 ## Native output and installation
 
+### Production publishing
+
+Use `voidc publish` with a manifest-selected application on Linux x64 GNU,
+Windows x64 MSVC or macOS ARM64. The compiler uses its matching native
+toolchain, Runtime and verified dependency lock. The output is a relocatable
+directory containing `app` or `app.exe`, application metadata, a file inventory,
+a binary audit and redistribution notices. The destination must be fresh.
+`voidc build --portable` directs users to `voidc publish --portable`. The
+`--portable` spelling is accepted because every publication is portable.
+
+```sh
+voidc publish --project . --portable
+voidc publish --project . --resources embed -o dist/orbit
+voidc publish --project . --profile performance --optimization speed -o dist/fast
+voidc publish --verify dist/orbit
+```
+
+| Setting | Manifest key | Values and defaults |
+| --- | --- | --- |
+| `--project DIR` | | Current working directory by default. |
+| `--entry RELATIVE.void` | `project.entry` | Exact project-relative entry. The ordinary project selector applies when omitted. |
+| `--target TARGET` | `publish.target` | Current native host. Values are `linux-x64`, `windows-x64` and `macos-arm64`. |
+| `--profile PROFILE` | `publish.default_profile` | `release` by default, or `performance`. The reserved `protected` profile requires a separately approved protection policy. |
+| `-o DIR` | `publish.output` | `dist/<application-id>/<target>/<profile>`. Manifest paths are project-relative. CLI paths are working-directory-relative or absolute. |
+| `--optimization MODE` | `publish.optimization` | `size` for release and `speed` for performance by default. `none` disables the application LLVM optimization pipeline. |
+| `--lto MODE` | `publish.lto` | `none` by default. `thin` requires Linux x64 and `size` or `speed`. |
+| `--resources MODE` | `publish.resources` | `files` by default, or `embed`. Both use the exact `application.resources` list. |
+| `--symbols MODE` | `publish.symbols` | `private` saves matching debug data. `none` saves only the matching diagnostic map. Public executables are stripped in both modes. |
+| `--native-catalog SHA256` | | Explicit authorization of the exact verified managed catalog for this invocation. Review the catalog and redistribution rights before supplying its digest. |
+
+Schema 1 applications can publish with command-line settings. Set `schema = 2`
+to configure a `[publish]` table. Command-line values take precedence over
+manifest values and profile defaults. The existing `[build.debug]` and
+`[build.release]` tables govern development operations.
+
+```toml
+schema = 2
+# Existing [project] and [application] declarations go here.
+[publish]
+default_profile = "release"
+output = "dist/orbit"
+optimization = "size"
+resources = "embed"
+symbols = "private"
+```
+
+### Production content and diagnostics
+
+Declare up to 32 case-insensitively unique flat `assets/` paths in
+`[application]`. The combined input limit is 16 MiB. Text, images, audio and
+binary data use the same byte-preserving contract. Only the declared files are
+read, using exact physical file admission.
+
+With `files`, resolve the distribution directory through `os.resource_dir()`.
+With `embed`, call `os.embedded_resource("assets/logo.png")`. It returns an
+independent `[u8]` containing that asset. An empty asset returns an empty list.
+Missing names return `os.error_kind.not_found`, and executions without an
+embedded table return `os.error_kind.unavailable`. The read-only image supplies
+the bytes on demand and the Runtime allocates for the requested asset.
+
+The retained compiler pipeline runs O2 in speed mode. Size mode adds LLVM
+`optsize` and `minsize` attributes and disables loop unrolling in the
+application pass pipeline. Linker dead-code elimination applies to the
+published executable. Linux uses section GC and as-needed dynamic linkage.
+Windows uses reference elimination with distinct function identities.
+macOS limits executable exports and applies dead stripping. Linux application
+ThinLTO optimizes its LLVM module at link time against already compiled Runtime
+and native inputs. Compiler C++ ThinLTO settings and its CI cache are independent.
+All these modes use the generic deployment CPU and retain checked failures.
+
+The public `binary-audit.json` records imports, exports, loader paths, unwind
+section presence, platform ABI declarations and the executable SHA-256.
+Linux requires the reported OS-provided SONAMEs and ABI versions. Windows
+uses the existing static MSVC Runtime linkage and system DLLs. macOS uses
+system libraries and frameworks, with a local ad hoc signature applied after
+stripping. Application signing and distribution identity are separate steps.
+A managed native provider ships its verified runtime files and notices under
+`native/` on Linux and Windows. macOS managed provider execution remains
+outside the current native provider contract. The application author is
+responsible for redistribution rights for assets and dependencies.
+
+The compiler prints the private archive location under
+`.void/publish-diagnostics/<image-sha256>`. Preserve that directory with the
+matching final image. Checked failures emit `VOID-D1` tokens. Resolve one token
+against the exact shipped bytes, including its build identity:
+
+```sh
+voidc publish --resolve-diagnostic /private/diagnostics.vdiag dist/orbit/app "VOID-D1 <build-id> <site> <category>"
+```
+
+Linux archives an `app.debug` companion. Windows archives the matching
+unstripped executable with DWARF. macOS archives the DWARF image extracted from
+the dSYM, with the executable's matching UUID. Use the matching artifact and
+the image-relative address for offline crash symbolication. Symbols and private
+maps are plaintext and access-controlled. Public failure tokens and stripping
+reduce incidental disclosure. Required Runtime identities, application literals
+and native interface definitions can remain visible.
+
+The distribution directory becomes visible after assembly and audit succeed.
+The shared publication transaction protects an existing destination during
+failure and competing publish attempts. Interrupted work can leave a staging
+directory or an already completed diagnostic archive. The public inventory and
+digest check cover exact bytes and membership. Authenticity requires a
+separate trust or signing mechanism.
+
 ### Application distributions
 
 `voidc package --project . --profile release` assembles a Linux x64 GNU or

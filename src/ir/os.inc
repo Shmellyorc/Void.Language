@@ -9,6 +9,16 @@
                     if (contract.text_argument && operand(i.arguments[0]) != Type::string) fail("invalid OS input type");
                     if (i.immediate == static_cast<unsigned>(os::Operation::process_id)) {
                         if (i.type != Type::i64) fail("invalid OS scalar reply");
+                    } else if (i.immediate == static_cast<unsigned>(os::Operation::embedded_resource)) {
+                        valid_type(i.type);
+                        if (i.type.kind != Type::aggregate || !i.type.definition ||
+                            i.type.definition->identity != "/@stdlib/os.void::_embedded_reply" ||
+                            i.type.definition->module_identity != os::source_module ||
+                            i.type.definition->fields.size() != 2 || i.type.readonly || !readonly_paths(i.type).empty() ||
+                            field_type(i.type, 0) != Type::i64) fail("invalid embedded resource reply");
+                        const auto bytes = field_type(i.type, 1);
+                        if (bytes.kind != Type::growable_array || array_element(bytes) != Type::u8)
+                            fail("invalid embedded resource bytes");
                     } else {
                         valid_type(i.type);
                         auto reply = i.type;

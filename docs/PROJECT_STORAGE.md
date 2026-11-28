@@ -19,6 +19,8 @@ Compiler-owned project storage is:
 | `.void/cache/v1/` | Validated and authenticated JIT cache; optional, reusable. |
 | `.void/run/native-<random>/` | One native invocation; private payload and `.owner` lease. |
 | `.void/build/<entry>` | Default manifest application executable and its managed native payload. Explicit `-o` remains relative to the caller. |
+| `dist/<application-id>/<target>/<profile>` | Default `voidc publish` directory. CLI `-o` or schema 2 `publish.output` selects a fresh destination. |
+| `.void/publish-diagnostics/<image-sha256>` | Private matching diagnostic map and optional symbols. Preserve it with the exact shipped image. |
 
 Ordinary project, `.void`, cache, run-parent and build directories follow actual
 OS access permissions, including accessible shared workspaces. New ordinary
@@ -127,3 +129,5 @@ Migration records preserve historical bytes and hashes. Current handoffs must
 link to verified retained destinations or the relocation index and explicitly
 identify discarded generated artifacts; historical commands are not proof that
 their former `/tmp` files still exist.
+
+See [production publishing](CLI.md#production-publishing) for the manifest settings and native host requirements.

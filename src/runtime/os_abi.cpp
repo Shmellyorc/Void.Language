@@ -65,3 +65,24 @@ extern "C" void vd_os_call(void* output, const vd::os::ReplyLayout* layout,
         if (failure) failure->message = "OS boundary invariant failed";
     }
 }
+
+extern "C" std::int64_t vd_os_embedded_resource(void** output, void* input, const vd::os::EmbeddedResource* table,
+                                                std::size_t count, vd::RuntimeFailure* failure) noexcept {
+    using vd::os::ErrorKind;
+    if (!table || !count) return static_cast<std::int64_t>(ErrorKind::unavailable);
+    try {
+        auto& runtime = vd::Runtime::current();
+        const auto name = runtime.string_bytes(input);
+        for (std::size_t index = 0; index < count; ++index) {
+            const auto& asset = table[index];
+            if (name == std::string_view(asset.name, asset.name_size)) {
+                runtime.bytes_into(output, {asset.bytes, asset.size});
+                return static_cast<std::int64_t>(ErrorKind::success);
+            }
+        }
+        return static_cast<std::int64_t>(ErrorKind::not_found);
+    } catch (...) {
+        if (failure) failure->message = "Embedded resource allocation failed";
+        return static_cast<std::int64_t>(ErrorKind::system_failure);
+    }
+}

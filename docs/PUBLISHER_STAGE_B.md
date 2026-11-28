@@ -1,9 +1,13 @@
 # Publisher Stage B private diagnostics
 
-Stage B provides an internal publication object emitter, a private diagnostic map
-and final-image metadata qualification. `voidc publish` still rejects every
-target/profile before creating output. The development CLI and F5 do not call
-the publication emitter.
+Stage B introduced the publication object emitter, private diagnostic map and
+final-image metadata auditor. Milestone 3 uses these components in the
+native-host publishing command and stores private artifacts separately from
+the public distribution. See [production publishing](CLI.md#production-publishing)
+for the current CLI and storage contract.
+
+The record below describes the Stage B foundation and its original qualification
+boundary.
 
 ## Diagnostic contract
 

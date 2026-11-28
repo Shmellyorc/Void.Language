@@ -7,7 +7,13 @@
 #include "void/frontend.hpp"
 #include "void/llvm_storage_audit.hpp"
 #include "void/runtime_abi.hpp"
+#include <llvm/Analysis/ModuleSummaryAnalysis.h>
+#include <llvm/Analysis/ProfileSummaryInfo.h>
+#include <llvm/IR/ModuleSummaryIndex.h>
+#include <llvm/Bitcode/BitcodeWriter.h>
 #include <llvm/IR/IRBuilder.h>
+#include <llvm/Support/FileSystem.h>
+#include "void/path.hpp"
 #include <llvm/IR/Module.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Transforms/Utils/ModuleUtils.h>
@@ -22,7 +28,7 @@ using llvm_backend::native_symbol;
 
 static void emit_impl(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, bool runtime_object, const std::string& generation_suffix = {},
                       bool storage_proof = false, const std::filesystem::path& proof_report = {}, std::string_view build_inputs = {},
-                      std::optional<project::DebugInfo> source_debug = {}, diagnostics::PrivateMap* private_map = nullptr) {
+                      std::optional<project::DebugInfo> source_debug = {}, diagnostics::PrivateMap* private_map = nullptr, bool size = false, const PublicationResources* resources = nullptr, bool thin_lto = false) {
     if ((runtime_object && !input.coordinated) || (input.coordinated && !runtime_object && !source_program)) throw std::invalid_argument("coordinated AOT requires the runtime proof bootstrap");
     detail::initialize_native_target();
     llvm::LLVMContext context;
@@ -31,11 +37,12 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
         entry_valid = f.parameters == std::vector<ir::Type>{ir::Type::i32} && f.result == ir::Type::i32;
     for(const auto& f:input.functions)if(f.name==input.entry_symbol && f.asynchronous!=input.async_root)throw std::invalid_argument("Async AOT entry requires the explicit scheduler root adapter");
     if (!entry_valid) throw std::invalid_argument("AOT CLI adapter requires entry: i32(i32)");
-    auto machine = detail::native_aot_machine();
+    auto machine = detail::native_aot_machine(private_map != nullptr);
     // No-opt AOT must also disable machine scheduling/optimization. Otherwise
     // a later source line can execute before an earlier local's store, even
     // when IR optimization is off and the emitted debug locations are exact.
     if(!optimize)machine->setOptLevel(llvm::CodeGenOptLevel::None);
+    if(size)machine->setOptLevel(llvm::CodeGenOptLevel::Default);
     llvm_backend::check_c_primitive_target(input.c_primitives, machine->getTargetTriple());
     const auto triple = machine->getTargetTriple().str();
 #ifdef VOID_LLVM_RESEARCH
@@ -54,7 +61,7 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
 #else
                         ,nullptr
 #endif
-                        ,false,source_debug,optimize,private_map);
+                        ,false,source_debug,optimize,private_map,resources);
     module->setTargetTriple(machine->getTargetTriple());
     module->setDataLayout(machine->createDataLayout());
     llvm::GlobalVariable* application_record = nullptr;
@@ -246,8 +253,20 @@ static void emit_impl(const ir::Module& input, const std::filesystem::path& outp
     // Analyze against the same generic deployment machine that emits the object.
     // JIT callers retain target-independent O2 and their existing ORC policy.
     ir_timing.finish();
-    finish(*module, optimize, machine.get(), !input.coordinated);
-    detail::write_object(*module,*machine,output);
+    finish(*module, optimize, machine.get(), !input.coordinated && !size && !thin_lto, size, thin_lto);
+    if (thin_lto) {
+        observation::Scope timing(observation::Phase::native_object_emission);
+        std::error_code error;
+        llvm::raw_fd_ostream file(path_utf8(output), error, llvm::sys::fs::OF_None);
+        if (error) throw std::runtime_error("Cannot write ThinLTO bitcode: " + error.message());
+        llvm::ProfileSummaryInfo profile(*module);
+        auto index = llvm::buildModuleSummaryIndex(*module, nullptr, &profile);
+        llvm::WriteBitcodeToFile(*module, file, false, &index, true);
+        file.close();
+        if (file.has_error()) throw std::runtime_error("Cannot finish ThinLTO bitcode.");
+    } else {
+        detail::write_object(*module,*machine,output);
+    }
 }
 void emit_async_object(const ir::Module& source,const std::filesystem::path& output,bool optimize){auto module=source;module.async_root=true;emit_object(module,output,optimize,true);}
 void emit_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, bool source_program, std::string_view build_inputs,
@@ -255,9 +274,10 @@ void emit_object(const ir::Module& input, const std::filesystem::path& output, b
     emit_impl(input,output,optimize,source_program,false,{},false,{},build_inputs,source_debug);
 }
 diagnostics::PrivateMap emit_publication_object(const ir::Module& input, const std::filesystem::path& output,
-                                                bool optimize, std::string_view semantic_inputs_sha256) {
+                                                bool optimize, std::string_view semantic_inputs_sha256, bool size, bool debug,
+                                                const PublicationResources* resources, bool thin_lto) {
     diagnostics::PrivateMap map(semantic_inputs_sha256);
-    emit_impl(input,output,optimize,true,false,{},false,{}, {},project::DebugInfo::full,&map);
+    emit_impl(input,output,optimize,true,false,{},false,{}, {},debug ? project::DebugInfo::full : project::DebugInfo::none,&map,size,resources,thin_lto);
     return map;
 }
 void emit_runtime_object(const ir::Module& input, const std::filesystem::path& output, bool optimize, const std::string& generation_suffix) {
